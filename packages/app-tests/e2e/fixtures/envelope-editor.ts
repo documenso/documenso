@@ -6,7 +6,7 @@ import { DEFAULT_EMBEDDED_EDITOR_CONFIG } from '@documenso/lib/types/envelope-ed
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 import { apiSignin } from './authentication';
@@ -264,8 +264,6 @@ export const getRecipientRows = (root: Page) =>
 
 export const getRecipientRemoveButtons = (root: Page) => root.locator('[data-testid="remove-signer-button"]');
 
-export const getSigningOrderInputs = (root: Page) => root.locator('[data-testid="signing-order-input"]');
-
 export const clickEnvelopeEditorStep = async (root: Page, stepId: 'upload' | 'addFields' | 'preview') => {
   await root.waitForTimeout(200);
   await root.locator(`[data-testid="envelope-editor-step-${stepId}"]`).first().click();
@@ -335,10 +333,143 @@ export const toggleAllowDictateSigners = async (root: Page, enabled: boolean) =>
   }
 };
 
-export const setSigningOrderValue = async (root: Page, index: number, value: number) => {
-  const input = getSigningOrderInputs(root).nth(index);
-  await input.fill(value.toString());
-  await input.blur();
+/**
+ * Performs a mouse-based drag from a drag handle onto a target element.
+ *
+ * `@hello-pangea/dnd` only starts a drag once the pointer travels a small
+ * distance while pressed, and it hit-tests drop targets using the CENTRE of
+ * the dragged element — not the cursor. Since drag handles sit at the edge of
+ * wide rows/cards, the cursor destination is compensated so the dragged
+ * element's centre lands on the target's centre.
+ */
+export const dragHandleToTarget = async (
+  root: Page,
+  handle: Locator,
+  target: Locator,
+  options: { activeClass: string },
+) => {
+  const { activeClass } = options;
+
+  await handle.scrollIntoViewIfNeeded();
+
+  const handleBox = await handle.boundingBox();
+
+  if (!handleBox) {
+    throw new Error('Unable to resolve drag handle position');
+  }
+
+  const startX = handleBox.x + handleBox.width / 2;
+  const startY = handleBox.y + handleBox.height / 2;
+
+  await root.mouse.move(startX, startY);
+  await root.mouse.down();
+
+  // Exceed the drag activation threshold, then wait for drag-dependent layout
+  // (e.g. expanding gap drop-zones) to settle before resolving positions.
+  const cursorX = startX + 8;
+  const cursorY = startY;
+
+  await root.mouse.move(cursorX, cursorY, { steps: 2 });
+  await root.waitForTimeout(300);
+
+  // The dragged element is the handle's draggable ancestor; while dragging it
+  // is fixed-positioned and follows the cursor at a constant offset. Drop
+  // targeting uses the dragged element's CENTRE, not the cursor, so the
+  // cursor destination is compensated by that offset.
+  const draggedElement = handle.locator('xpath=ancestor-or-self::*[@data-rfd-draggable-id][1]');
+  const draggedBox = await draggedElement.boundingBox();
+  const targetBox = await target.boundingBox();
+
+  if (!draggedBox || !targetBox) {
+    await root.mouse.up();
+
+    throw new Error('Unable to resolve drag positions');
+  }
+
+  const itemOffsetX = draggedBox.x + draggedBox.width / 2 - cursorX;
+  const itemOffsetY = draggedBox.y + draggedBox.height / 2 - cursorY;
+
+  const hasBecomeActive = async () => {
+    const className = await target.getAttribute('class');
+
+    return Boolean(className?.includes(activeClass));
+  };
+
+  // Crawl-and-drop: drop-target geometry is captured at drag start and can
+  // drift from the live layout (and auto-scrolling invalidates any cached
+  // coordinates), so precise aiming is unreliable. Instead, approach from
+  // well above the target and crawl downward in small increments, dropping
+  // the moment the target reports the drag as over it — the highlight class
+  // is rendered from the library's own drag state, so it cannot disagree
+  // with where the drop will land.
+  //
+  // The cursor is clamped inside the viewport: moving outside the window
+  // cancels the drag (pointercancel), and holding near the bottom edge lets
+  // the library auto-scroll the target up to the cursor instead.
+  const viewportHeight = root.viewportSize()?.height ?? 720;
+  const maxCursorY = viewportHeight - 40;
+
+  const crawlX = targetBox.x + targetBox.width / 2 - itemOffsetX;
+  const crawlStartY = Math.min(targetBox.y + targetBox.height / 2 - itemOffsetY - 140, maxCursorY);
+
+  await root.mouse.move(crawlX, crawlStartY, { steps: 15 });
+  await root.waitForTimeout(150);
+
+  let hasDropped = false;
+
+  for (let step = 1; step <= 80; step += 1) {
+    if (await hasBecomeActive()) {
+      await root.mouse.up();
+
+      hasDropped = true;
+
+      break;
+    }
+
+    await root.mouse.move(crawlX, Math.min(crawlStartY + step * 6, maxCursorY), { steps: 2 });
+    await root.waitForTimeout(70);
+  }
+
+  if (!hasDropped) {
+    await root.mouse.up();
+  }
+
+  await root.waitForTimeout(400);
+};
+
+export const getRecipientStepCards = (root: Page) => root.locator('[data-testid="recipient-step-card"]');
+
+export const getRecipientStepGaps = (root: Page) => root.locator('[data-testid="recipient-step-gap"]');
+
+export const getStepDragHandles = (root: Page) => root.locator('[data-testid="step-drag-handle"]');
+
+export const getRecipientRowDragHandles = (root: Page) => root.locator('[data-testid="recipient-row-drag-handle"]');
+
+/**
+ * Drags a whole group card onto another card's centre, merging the two groups.
+ */
+export const dragGroupCardOntoCard = async (root: Page, sourceCardIndex: number, targetCardIndex: number) => {
+  await dragHandleToTarget(
+    root,
+    getStepDragHandles(root).nth(sourceCardIndex),
+    getRecipientStepCards(root).nth(targetCardIndex),
+    // The combine/join highlight on the target card.
+    { activeClass: 'ring-primary' },
+  );
+};
+
+/**
+ * Drags a recipient row into a gap between group cards, extracting it into
+ * its own standalone group at that position.
+ */
+export const dragRecipientRowToGap = async (root: Page, rowIndex: number, gapIndex: number) => {
+  await dragHandleToTarget(
+    root,
+    getRecipientRowDragHandles(root).nth(rowIndex),
+    getRecipientStepGaps(root).nth(gapIndex),
+    // The drag-over highlight on the gap drop-zone.
+    { activeClass: 'border-primary' },
+  );
 };
 
 export const persistEmbeddedEnvelope = async (surface: TEnvelopeEditorSurface) => {

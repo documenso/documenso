@@ -3,12 +3,12 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickAddSignerButton,
-  getSigningOrderInputs,
+  dragGroupCardOntoCard,
+  dragRecipientRowToGap,
   openDocumentEnvelopeEditor,
   openTemplateEnvelopeEditor,
   setRecipientEmail,
   setRecipientName,
-  setSigningOrderValue,
   type TEnvelopeEditorSurface,
   toggleSigningOrder,
 } from '../fixtures/envelope-editor';
@@ -48,20 +48,16 @@ const runGroupingFlow = async (surface: TEnvelopeEditorSurface) => {
 
   await toggleSigningOrder(root, true);
 
-  // Three standalone steps.
-  await expect(root.getByText('Step 1', { exact: true })).toBeVisible();
-  await expect(root.getByText('Step 3', { exact: true })).toBeVisible();
+  // Three standalone groups.
+  await expect(root.getByText('Group 1', { exact: true })).toBeVisible();
+  await expect(root.getByText('Group 3', { exact: true })).toBeVisible();
 
-  // Type-to-join: carol (step 3) joins bob (step 2).
-  await setSigningOrderValue(root, 2, 2);
+  // Drag carol's card onto bob's card to merge them into one group.
+  await dragGroupCardOntoCard(root, 2, 1);
 
   await expect(root.getByText('2 signers · any order')).toBeVisible();
   await expect(root.getByTestId('ungroup-step-button')).toBeVisible();
-  await expect(root.getByText('Step 3', { exact: true })).not.toBeVisible();
-
-  const orderInputs = getSigningOrderInputs(root);
-  await expect(orderInputs.nth(1)).toHaveValue('2');
-  await expect(orderInputs.nth(2)).toHaveValue('2');
+  await expect(root.getByText('Group 3', { exact: true })).not.toBeVisible();
 
   await expectRecipientOrders(surface, [
     ['alice@example.com', 1],
@@ -73,11 +69,11 @@ const runGroupingFlow = async (surface: TEnvelopeEditorSurface) => {
   await root.reload();
   await expect(root.getByText('2 signers · any order')).toBeVisible();
 
-  // Ungroup dissolves back into sequential steps.
+  // Ungroup dissolves back into sequential groups.
   await root.getByTestId('ungroup-step-button').click();
 
   await expect(root.getByText('2 signers · any order')).not.toBeVisible();
-  await expect(root.getByText('Step 3', { exact: true })).toBeVisible();
+  await expect(root.getByText('Group 3', { exact: true })).toBeVisible();
 
   await expectRecipientOrders(surface, [
     ['alice@example.com', 1],
@@ -85,9 +81,8 @@ const runGroupingFlow = async (surface: TEnvelopeEditorSurface) => {
     ['carol@example.com', 3],
   ]);
 
-  // Out-of-bounds extraction: bob (step 2) types 4 (> 3 steps) and becomes the
-  // last standalone step.
-  await setSigningOrderValue(root, 1, 4);
+  // Drag bob's row into the gap after the last group, moving him to the end.
+  await dragRecipientRowToGap(root, 1, 3);
 
   await expectRecipientOrders(surface, [
     ['alice@example.com', 1],
@@ -97,7 +92,7 @@ const runGroupingFlow = async (surface: TEnvelopeEditorSurface) => {
 };
 
 test.describe('document editor', () => {
-  test('documents: group recipients via signing order input and ungroup', async ({ page }) => {
+  test('documents: group recipients via drag and drop and ungroup', async ({ page }) => {
     const surface = await openDocumentEnvelopeEditor(page);
 
     await runGroupingFlow(surface);
@@ -105,7 +100,7 @@ test.describe('document editor', () => {
 });
 
 test.describe('template editor', () => {
-  test('templates: group recipients via signing order input and ungroup', async ({ page }) => {
+  test('templates: group recipients via drag and drop and ungroup', async ({ page }) => {
     const surface = await openTemplateEnvelopeEditor(page);
 
     await runGroupingFlow(surface);
