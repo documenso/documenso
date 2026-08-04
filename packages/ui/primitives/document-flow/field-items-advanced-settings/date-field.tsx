@@ -5,6 +5,8 @@ import { Label } from '@documenso/ui/primitives/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Trans, useLingui } from '@lingui/react/macro';
 
+import { TextStyleControls } from './text-style-controls';
+
 type DateFieldAdvancedSettingsProps = {
   fieldState: DateFieldMeta;
   handleFieldChange: (key: keyof DateFieldMeta, value: string | boolean) => void;
@@ -66,6 +68,8 @@ export const DateFieldAdvancedSettings = ({
           max={96}
         />
       </div>
+
+      <TextStyleControls fieldState={fieldState} onChange={handleInput} />
 
       <div>
         <Label>

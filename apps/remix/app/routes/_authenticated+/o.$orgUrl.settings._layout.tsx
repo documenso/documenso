@@ -53,6 +53,11 @@ export default function SettingsLayout() {
       isSubNav: true,
     },
     {
+      path: `/o/${organisation.url}/settings/fonts`,
+      label: t`Fonts`,
+      isSubNav: true,
+    },
+    {
       path: `/o/${organisation.url}/settings/email`,
       label: t`Email`,
       isSubNav: true,

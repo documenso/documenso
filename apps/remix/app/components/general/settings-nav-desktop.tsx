@@ -60,6 +60,15 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
             </Button>
           </Link>
 
+          <Link className="w-full pl-8" to="/settings/fonts">
+            <Button
+              variant="ghost"
+              className={cn('w-full justify-start', pathname?.startsWith('/settings/fonts') && 'bg-secondary')}
+            >
+              <Trans>Fonts</Trans>
+            </Button>
+          </Link>
+
           <Link className="w-full pl-8" to="/settings/email">
             <Button
               variant="ghost"

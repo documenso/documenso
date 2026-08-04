@@ -7,6 +7,8 @@ import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { Trans, useLingui } from '@lingui/react/macro';
 
+import { TextStyleControls } from './text-style-controls';
+
 type TextFieldAdvancedSettingsProps = {
   fieldState: TextFieldMeta;
   handleFieldChange: (key: keyof TextFieldMeta, value: string | boolean) => void;
@@ -65,6 +67,8 @@ export const TextFieldAdvancedSettings = ({
           onChange={(e) => handleFieldChange('placeholder', e.target.value)}
         />
       </div>
+
+      <TextStyleControls fieldState={fieldState} onChange={handleInput} />
 
       <div>
         <Label className="mt-4">

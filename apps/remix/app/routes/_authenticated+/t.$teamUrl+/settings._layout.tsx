@@ -63,6 +63,11 @@ export default function TeamsSettingsLayout() {
       isSubNav: true,
     },
     {
+      path: `/t/${team.url}/settings/fonts`,
+      label: t`Fonts`,
+      isSubNav: true,
+    },
+    {
       path: `/t/${team.url}/settings/email`,
       label: t`Email`,
       isSubNav: true,

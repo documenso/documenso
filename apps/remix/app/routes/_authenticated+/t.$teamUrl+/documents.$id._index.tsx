@@ -34,6 +34,7 @@ import {
 } from '~/components/general/document/document-status';
 import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
 import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
+import { FontFaceStyles } from '~/components/general/font-face-styles';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
@@ -108,6 +109,8 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
+      <FontFaceStyles fields={envelope.fields} />
+
       {envelope.status === DocumentStatus.PENDING && (
         <DocumentRecipientLinkCopyDialog recipients={envelope.recipients} />
       )}

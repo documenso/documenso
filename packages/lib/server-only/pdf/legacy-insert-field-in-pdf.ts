@@ -25,7 +25,10 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
+import { getFontAssetBytesForField } from '../fonts/font-assets';
+import { drawStyledFieldText } from './field-text-style';
 import { getPageSize } from './get-page-size';
+import { getFieldFontLibraryContext } from './helpers';
 
 export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const [fontCaveat, fontNoto] = await Promise.all([
@@ -34,9 +37,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
   ]);
 
   const isSignatureField = isSignatureFieldType(field.type);
-  const isDebugMode =
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
-    process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
+  const isDebugMode = process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
 
   pdf.registerFontkit(fontkit);
 
@@ -111,6 +112,12 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
     isSignatureField ? fontCaveat : fontNoto,
     isSignatureField ? { features: { calt: false } } : undefined,
   );
+  const fontLibraryContext = await getFieldFontLibraryContext(field);
+  const getFieldFont = async (fontFamily: string | undefined | null) => {
+    const uploadedFont = fontLibraryContext ? await getFontAssetBytesForField(fontFamily, fontLibraryContext) : null;
+
+    return uploadedFont ? await pdf.embedFont(uploadedFont.bytes) : font;
+  };
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
     await pdf.embedFont(fontCaveat);
@@ -285,7 +292,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
         }
       }
     })
-    .otherwise((field) => {
+    .otherwise(async (field) => {
       const fieldMetaParsers = {
         [FieldType.TEXT]: ZTextFieldMeta,
         [FieldType.NUMBER]: ZNumberFieldMeta,
@@ -302,17 +309,18 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
       const customFontSize = meta?.success && meta.data.fontSize ? meta.data.fontSize : null;
       const textAlign = meta?.success && meta.data.textAlign ? meta.data.textAlign : 'center';
       const longestLineInTextForWidth = field.customText.split('\n').sort((a, b) => b.length - a.length)[0];
+      const fieldFont = meta?.success ? await getFieldFont(meta.data.fontFamily) : font;
 
       let fontSize = customFontSize || maxFontSize;
-      let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
-      const textHeight = font.heightAtSize(fontSize);
+      let textWidth = fieldFont.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
+      const textHeight = fieldFont.heightAtSize(fontSize);
 
       if (!customFontSize) {
         const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
         fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
       }
 
-      textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
+      textWidth = fieldFont.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
 
       // Add padding similar to web display (roughly 0.5rem equivalent in PDF units)
       const padding = 8; // PDF points, roughly equivalent to 0.5rem
@@ -337,12 +345,15 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
         textY = adjustedPosition.yPos;
       }
 
-      page.drawText(field.customText, {
+      drawStyledFieldText({
+        page,
+        text: field.customText,
         x: textX,
         y: textY,
         size: fontSize,
-        font,
+        font: fieldFont,
         rotate: degrees(pageRotationInDegrees),
+        fieldMeta: meta?.success ? meta.data : null,
       });
     });
 

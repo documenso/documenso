@@ -15,6 +15,9 @@ export const FIELD_MIN_LETTER_SPACING = 0;
 export const FIELD_MAX_LETTER_SPACING = 100;
 
 export const DEFAULT_FIELD_FONT_SIZE = 12;
+export const DEFAULT_FIELD_FONT_FAMILY = '';
+export const DEFAULT_FIELD_FONT_WEIGHT = 'normal';
+export const DEFAULT_FIELD_FONT_STYLE = 'normal';
 
 export const DEFAULT_SIGNATURE_OVERFLOW_MODE = 'auto';
 export const DEFAULT_DATE_OVERFLOW_MODE = 'auto';
@@ -71,6 +74,9 @@ export const ZBaseFieldMeta = z.object({
   required: z.boolean().optional(),
   readOnly: z.boolean().optional(),
   fontSize: z.number().min(8).max(96).default(DEFAULT_FIELD_FONT_SIZE).optional(),
+  fontFamily: z.string().trim().optional(),
+  fontWeight: z.enum(['normal', 'bold']).optional(),
+  fontStyle: z.enum(['normal', 'italic']).optional(),
   overflow: ZFieldOverflowMode.optional(),
 });
 
@@ -307,6 +313,9 @@ export type TFieldAndMeta = z.infer<typeof ZFieldAndMetaSchema>;
 export const FIELD_DATE_META_DEFAULT_VALUES: TDateFieldMeta = {
   type: 'date',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
+  fontFamily: DEFAULT_FIELD_FONT_FAMILY,
+  fontWeight: DEFAULT_FIELD_FONT_WEIGHT,
+  fontStyle: DEFAULT_FIELD_FONT_STYLE,
   textAlign: 'left',
   overflow: DEFAULT_DATE_OVERFLOW_MODE,
 };
@@ -314,6 +323,9 @@ export const FIELD_DATE_META_DEFAULT_VALUES: TDateFieldMeta = {
 export const FIELD_TEXT_META_DEFAULT_VALUES: TTextFieldMeta = {
   type: 'text',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
+  fontFamily: DEFAULT_FIELD_FONT_FAMILY,
+  fontWeight: DEFAULT_FIELD_FONT_WEIGHT,
+  fontStyle: DEFAULT_FIELD_FONT_STYLE,
   textAlign: 'left',
   label: '',
   placeholder: '',
@@ -325,6 +337,9 @@ export const FIELD_TEXT_META_DEFAULT_VALUES: TTextFieldMeta = {
 export const FIELD_NUMBER_META_DEFAULT_VALUES: TNumberFieldMeta = {
   type: 'number',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
+  fontFamily: DEFAULT_FIELD_FONT_FAMILY,
+  fontWeight: DEFAULT_FIELD_FONT_WEIGHT,
+  fontStyle: DEFAULT_FIELD_FONT_STYLE,
   textAlign: 'left',
   label: '',
   placeholder: '',
@@ -335,18 +350,27 @@ export const FIELD_NUMBER_META_DEFAULT_VALUES: TNumberFieldMeta = {
 export const FIELD_INITIALS_META_DEFAULT_VALUES: TInitialsFieldMeta = {
   type: 'initials',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
+  fontFamily: DEFAULT_FIELD_FONT_FAMILY,
+  fontWeight: DEFAULT_FIELD_FONT_WEIGHT,
+  fontStyle: DEFAULT_FIELD_FONT_STYLE,
   textAlign: 'left',
 };
 
 export const FIELD_NAME_META_DEFAULT_VALUES: TNameFieldMeta = {
   type: 'name',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
+  fontFamily: DEFAULT_FIELD_FONT_FAMILY,
+  fontWeight: DEFAULT_FIELD_FONT_WEIGHT,
+  fontStyle: DEFAULT_FIELD_FONT_STYLE,
   textAlign: 'left',
 };
 
 export const FIELD_EMAIL_META_DEFAULT_VALUES: TEmailFieldMeta = {
   type: 'email',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
+  fontFamily: DEFAULT_FIELD_FONT_FAMILY,
+  fontWeight: DEFAULT_FIELD_FONT_WEIGHT,
+  fontStyle: DEFAULT_FIELD_FONT_STYLE,
   textAlign: 'left',
   overflow: DEFAULT_EMAIL_OVERFLOW_MODE,
 };

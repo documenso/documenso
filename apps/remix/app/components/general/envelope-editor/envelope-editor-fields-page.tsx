@@ -20,6 +20,7 @@ import {
 import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { getOverlappingFieldPairs } from '@documenso/lib/utils/fields-overlap';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
+import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -49,6 +50,7 @@ import { EditorFieldNumberForm } from '~/components/forms/editor/editor-field-nu
 import { EditorFieldRadioForm } from '~/components/forms/editor/editor-field-radio-form';
 import { EditorFieldSignatureForm } from '~/components/forms/editor/editor-field-signature-form';
 import { EditorFieldTextForm } from '~/components/forms/editor/editor-field-text-form';
+import { FontFaceStyles } from '~/components/general/font-face-styles';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 import { useCurrentTeam } from '~/providers/team';
 
@@ -76,6 +78,8 @@ export const EnvelopeEditorFieldsPage = () => {
   const [searchParams] = useSearchParams();
 
   const team = useCurrentTeam();
+  const fontTarget = useMemo(() => ({ target: { type: 'team' as const, teamId: team.id } }), [team.id]);
+  const { data: fontOptions = [] } = trpc.font.list.useQuery(fontTarget);
 
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -204,6 +208,8 @@ export const EnvelopeEditorFieldsPage = () => {
 
   return (
     <div className="relative flex h-full">
+      <FontFaceStyles fonts={fontOptions} />
+
       <div className="flex h-full w-full flex-col overflow-y-auto px-2" ref={scrollableContainerRef}>
         {/* Horizontal envelope item selector */}
         <EnvelopeRendererFileSelector
@@ -463,6 +469,7 @@ export const EnvelopeEditorFieldsPage = () => {
                     .with(FieldType.DATE, () => (
                       <EditorFieldDateForm
                         value={selectedField?.fieldMeta as TDateFieldMeta | undefined}
+                        fontOptions={fontOptions}
                         onValueChange={(value) => updateSelectedFieldMeta(value)}
                       />
                     ))
@@ -475,24 +482,28 @@ export const EnvelopeEditorFieldsPage = () => {
                     .with(FieldType.EMAIL, () => (
                       <EditorFieldEmailForm
                         value={selectedField?.fieldMeta as TEmailFieldMeta | undefined}
+                        fontOptions={fontOptions}
                         onValueChange={(value) => updateSelectedFieldMeta(value)}
                       />
                     ))
                     .with(FieldType.INITIALS, () => (
                       <EditorFieldInitialsForm
                         value={selectedField?.fieldMeta as TInitialsFieldMeta | undefined}
+                        fontOptions={fontOptions}
                         onValueChange={(value) => updateSelectedFieldMeta(value)}
                       />
                     ))
                     .with(FieldType.NAME, () => (
                       <EditorFieldNameForm
                         value={selectedField?.fieldMeta as TNameFieldMeta | undefined}
+                        fontOptions={fontOptions}
                         onValueChange={(value) => updateSelectedFieldMeta(value)}
                       />
                     ))
                     .with(FieldType.NUMBER, () => (
                       <EditorFieldNumberForm
                         value={selectedField?.fieldMeta as TNumberFieldMeta | undefined}
+                        fontOptions={fontOptions}
                         onValueChange={(value) => updateSelectedFieldMeta(value)}
                       />
                     ))
@@ -505,6 +516,7 @@ export const EnvelopeEditorFieldsPage = () => {
                     .with(FieldType.TEXT, () => (
                       <EditorFieldTextForm
                         value={selectedField?.fieldMeta as TTextFieldMeta | undefined}
+                        fontOptions={fontOptions}
                         onValueChange={(value) => updateSelectedFieldMeta(value)}
                       />
                     ))

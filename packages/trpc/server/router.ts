@@ -7,6 +7,7 @@ import { enterpriseRouter } from './enterprise-router/router';
 import { envelopeRouter } from './envelope-router/router';
 import { fieldRouter } from './field-router/router';
 import { folderRouter } from './folder-router/router';
+import { fontRouter } from './font-router/router';
 import { organisationRouter } from './organisation-router/router';
 import { profileRouter } from './profile-router/router';
 import { recipientRouter } from './recipient-router/router';
@@ -22,6 +23,7 @@ export const appRouter = router({
   profile: profileRouter,
   document: documentRouter,
   field: fieldRouter,
+  font: fontRouter,
   folder: folderRouter,
   recipient: recipientRouter,
   admin: adminRouter,

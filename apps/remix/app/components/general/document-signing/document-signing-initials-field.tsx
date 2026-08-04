@@ -131,7 +131,12 @@ export const DocumentSigningInitialsField = ({
       )}
 
       {field.inserted && (
-        <DocumentSigningFieldsInserted textAlign={parsedFieldMeta?.textAlign}>
+        <DocumentSigningFieldsInserted
+          textAlign={parsedFieldMeta?.textAlign}
+          fontFamily={parsedFieldMeta?.fontFamily}
+          fontWeight={parsedFieldMeta?.fontWeight}
+          fontStyle={parsedFieldMeta?.fontStyle}
+        >
           {field.customText}
         </DocumentSigningFieldsInserted>
       )}

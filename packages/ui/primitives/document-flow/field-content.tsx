@@ -1,6 +1,8 @@
 import { convertToLocalSystemFormat, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
+import { getFieldRenderFontFamily } from '@documenso/lib/universal/field-fonts';
+import { getFieldTextStyle } from '@documenso/lib/universal/field-text-style';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { DocumentMeta, Signature } from '@prisma/client';
@@ -168,10 +170,17 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
   }
 
   const textAlign = fieldMeta && 'textAlign' in fieldMeta ? fieldMeta.textAlign : 'left';
+  const shouldApplyGenericTextStyle = !isSignatureField;
+  const fontFamily =
+    shouldApplyGenericTextStyle && fieldMeta && 'fontFamily' in fieldMeta ? fieldMeta.fontFamily : null;
+  const textStyle = shouldApplyGenericTextStyle ? getFieldTextStyle(fieldMeta) : undefined;
 
   return (
     <div className="flex h-full w-full items-center overflow-hidden">
       <p
+        style={
+          shouldApplyGenericTextStyle ? { fontFamily: getFieldRenderFontFamily(fontFamily), ...textStyle } : undefined
+        }
         className={cn(
           'w-full whitespace-pre-wrap text-left text-[clamp(0.07rem,25cqw,0.825rem)] text-foreground duration-200',
           {

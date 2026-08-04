@@ -7,6 +7,7 @@ import {
   type TTextFieldMeta as TextFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
+import type { FieldFontOption } from '@documenso/lib/universal/field-fonts';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Textarea } from '@documenso/ui/primitives/textarea';
@@ -17,7 +18,9 @@ import { useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 
 import {
+  EditorGenericFontFamilyField,
   EditorGenericFontSizeField,
+  EditorGenericFontStyleFields,
   EditorGenericLetterSpacingField,
   EditorGenericLineHeightField,
   EditorGenericReadOnlyField,
@@ -32,6 +35,9 @@ const ZTextFieldFormSchema = ZTextFieldMeta.pick({
   text: true,
   characterLimit: true,
   fontSize: true,
+  fontFamily: true,
+  fontWeight: true,
+  fontStyle: true,
   textAlign: true,
   lineHeight: true,
   letterSpacing: true,
@@ -54,6 +60,7 @@ type TTextFieldFormSchema = z.infer<typeof ZTextFieldFormSchema>;
 type EditorFieldTextFormProps = {
   value: TextFieldMeta | undefined;
   onValueChange: (value: TextFieldMeta) => void;
+  fontOptions?: FieldFontOption[];
 };
 
 export const EditorFieldTextForm = ({
@@ -61,6 +68,7 @@ export const EditorFieldTextForm = ({
     type: 'text',
   },
   onValueChange,
+  fontOptions,
 }: EditorFieldTextFormProps) => {
   const { t } = useLingui();
 
@@ -73,6 +81,9 @@ export const EditorFieldTextForm = ({
       text: value.text || '',
       characterLimit: value.characterLimit || 0,
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+      fontFamily: value.fontFamily || '',
+      fontWeight: value.fontWeight || 'normal',
+      fontStyle: value.fontStyle || 'normal',
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
       lineHeight: value.lineHeight ?? FIELD_DEFAULT_LINE_HEIGHT,
       letterSpacing: value.letterSpacing ?? FIELD_DEFAULT_LETTER_SPACING,
@@ -109,6 +120,10 @@ export const EditorFieldTextForm = ({
       <form>
         <fieldset className="flex flex-col gap-2">
           <EditorGenericFontSizeField className="w-full" formControl={form.control} />
+
+          <EditorGenericFontFamilyField className="w-full" formControl={form.control} fontOptions={fontOptions} />
+
+          <EditorGenericFontStyleFields formControl={form.control} />
 
           <div className="flex w-full flex-row gap-x-4">
             <EditorGenericTextAlignField className="w-full" formControl={form.control} />

@@ -9,18 +9,38 @@ import {
   FIELD_DEFAULT_LINE_HEIGHT,
   resolveFieldOverflowMode,
 } from '../../types/field-meta';
+import { getFieldRenderFontFamily } from '../field-fonts';
+import { getKonvaFieldTextStyle } from '../field-text-style';
 import { calculateOverflowLayout } from './calculate-overflow-layout';
-import {
-  createFieldHoverInteraction,
-  konvaTextFill,
-  konvaTextFontFamily,
-  upsertFieldGroup,
-  upsertFieldRect,
-} from './field-generic-items';
+import { createFieldHoverInteraction, konvaTextFill, upsertFieldGroup, upsertFieldRect } from './field-generic-items';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 import { calculateFieldPosition } from './field-renderer';
 
 const DEFAULT_TEXT_X_PADDING = 6;
+const EXPORT_SYNTHETIC_ITALIC_SKEW_X = 0.212;
+const EXPORT_SYNTHETIC_BOLD_OFFSETS = [
+  { x: 0.35, y: 0 },
+  { x: 0, y: 0.35 },
+];
+
+export const getGenericTextFieldRenderStyle = (
+  fieldMeta: GenericTextFieldTypeMetas | undefined,
+  mode: RenderFieldElementOptions['mode'],
+) => {
+  if (mode !== 'export') {
+    return {
+      fontStyle: getKonvaFieldTextStyle(fieldMeta).fontStyle,
+      skewX: 0,
+      syntheticBoldOffsets: [],
+    };
+  }
+
+  return {
+    fontStyle: 'normal',
+    skewX: fieldMeta?.fontStyle === 'italic' ? EXPORT_SYNTHETIC_ITALIC_SKEW_X : 0,
+    syntheticBoldOffsets: fieldMeta?.fontWeight === 'bold' ? EXPORT_SYNTHETIC_BOLD_OFFSETS : [],
+  };
+};
 
 const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOptions) => {
   const { pageWidth, pageHeight, mode = 'edit', pageLayer, translations } = options;
@@ -43,6 +63,8 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   const textX = 0;
   const textY = 0;
   const textFontSize = fieldMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
+  const textFontFamily = getFieldRenderFontFamily(fieldMeta?.fontFamily);
+  const textRenderStyle = getGenericTextFieldRenderStyle(fieldMeta, mode);
 
   // By default, render the field name or label centered.
   // isLabel tracks whether we're rendering the field type name (like "Text", "Date", "Email")
@@ -109,7 +131,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     isLabel,
     textToRender,
     fontSize: textFontSize,
-    fontFamily: konvaTextFontFamily,
+    fontFamily: textFontFamily,
     lineHeight: textLineHeight,
     letterSpacing: textLetterSpacing,
     textAlign,
@@ -136,7 +158,9 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     align: overflowLayout.textAlign,
     lineHeight: textLineHeight,
     letterSpacing: textLetterSpacing,
-    fontFamily: konvaTextFontFamily,
+    fontFamily: textFontFamily,
+    fontStyle: textRenderStyle.fontStyle,
+    skewX: textRenderStyle.skewX,
     fill: konvaTextFill,
     width: overflowLayout.width,
     height: overflowLayout.height,
@@ -151,6 +175,8 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     textVerticalAlign,
     textLineHeight,
     textLetterSpacing,
+    textFontFamily,
+    textRenderStyle,
   };
 };
 
@@ -182,10 +208,22 @@ export const renderGenericTextFieldElement = (field: FieldToRender, options: Ren
     textVerticalAlign,
     textLineHeight,
     textLetterSpacing,
+    textFontFamily,
+    textRenderStyle,
   } = upsertFieldText(field, options);
 
   fieldGroup.add(fieldRect);
   fieldGroup.add(fieldText);
+
+  for (const [index, offset] of textRenderStyle.syntheticBoldOffsets.entries()) {
+    fieldGroup.add(
+      fieldText.clone({
+        id: `${field.renderId}-text-bold-${index}`,
+        x: fieldText.x() + offset.x,
+        y: fieldText.y() + offset.y,
+      }),
+    );
+  }
 
   fieldGroup.on('transform', () => {
     const groupScaleX = fieldGroup.scaleX();
@@ -221,7 +259,7 @@ export const renderGenericTextFieldElement = (field: FieldToRender, options: Ren
       isLabel,
       textToRender,
       fontSize: textFontSize,
-      fontFamily: konvaTextFontFamily,
+      fontFamily: textFontFamily,
       lineHeight: textLineHeight,
       letterSpacing: textLetterSpacing,
       textAlign,

@@ -6,7 +6,7 @@ import Konva from 'konva';
 import type { Canvas } from 'skia-canvas';
 
 import { renderField } from '../../universal/field-renderer/render-field';
-import { ensureFontLibrary } from './helpers';
+import { ensureFontLibrary, ensureUploadedFieldFontLibrary } from './helpers';
 
 type InsertFieldInPDFV2Options = {
   pageWidth: number;
@@ -16,6 +16,7 @@ type InsertFieldInPDFV2Options = {
 
 export const insertFieldInPDFV2 = async ({ pageWidth, pageHeight, fields }: InsertFieldInPDFV2Options) => {
   ensureFontLibrary();
+  await ensureUploadedFieldFontLibrary(fields);
 
   let stage: Konva.Stage | null = new Konva.Stage({ width: pageWidth, height: pageHeight });
   let layer: Konva.Layer | null = new Konva.Layer();

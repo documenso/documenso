@@ -1,9 +1,17 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getUploadedFieldFontIds } from '@documenso/lib/universal/field-fonts';
+import { prisma } from '@documenso/prisma';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import type { Recipient } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { FontLibrary } from 'skia-canvas';
 import { match } from 'ts-pattern';
+
+import type { FontLibraryContext } from '../fonts/font-access';
+import { getFontAssetBytesForField } from '../fonts/font-assets';
 
 /**
  * Ensure all required fonts are registered in the skia-canvas FontLibrary.
@@ -17,24 +25,96 @@ export const ensureFontLibrary = () => {
   if (!FontLibrary.has('Caveat')) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     FontLibrary.use({
-      ['Caveat']: [path.join(fontPath, 'caveat.ttf')],
+      Caveat: [path.join(fontPath, 'caveat.ttf')],
     });
   }
 
   if (!FontLibrary.has('Inter')) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     FontLibrary.use({
-      ['Inter']: [path.join(fontPath, 'inter-variablefont_opsz,wght.ttf')],
+      Inter: [path.join(fontPath, 'inter-variablefont_opsz,wght.ttf')],
     });
   }
 
   if (!FontLibrary.has('Noto Sans')) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     FontLibrary.use({
-      ['Noto Sans']: [path.join(fontPath, 'noto-sans.ttf')],
-      ['Noto Sans Japanese']: [path.join(fontPath, 'noto-sans-japanese.ttf')],
-      ['Noto Sans Chinese']: [path.join(fontPath, 'noto-sans-chinese.ttf')],
-      ['Noto Sans Korean']: [path.join(fontPath, 'noto-sans-korean.ttf')],
+      'Noto Sans': [path.join(fontPath, 'noto-sans.ttf')],
+      'Noto Sans Japanese': [path.join(fontPath, 'noto-sans-japanese.ttf')],
+      'Noto Sans Chinese': [path.join(fontPath, 'noto-sans-chinese.ttf')],
+      'Noto Sans Korean': [path.join(fontPath, 'noto-sans-korean.ttf')],
+    });
+  }
+};
+
+export const getFieldFontLibraryContext = async (
+  field: Pick<FieldWithSignature, 'envelopeId'>,
+): Promise<FontLibraryContext | null> => {
+  if (!field.envelopeId) {
+    return null;
+  }
+
+  const envelope = await prisma.envelope.findUnique({
+    where: {
+      id: field.envelopeId,
+    },
+    select: {
+      userId: true,
+      teamId: true,
+      team: {
+        select: {
+          organisationId: true,
+        },
+      },
+    },
+  });
+
+  if (!envelope) {
+    return null;
+  }
+
+  return {
+    type: 'team',
+    userId: envelope.userId,
+    teamId: envelope.teamId,
+    organisationId: envelope.team.organisationId,
+  };
+};
+
+export const ensureUploadedFieldFontLibrary = async (fields: FieldWithSignature[]) => {
+  const fontIds = getUploadedFieldFontIds(fields);
+
+  if (fontIds.length === 0) {
+    return;
+  }
+
+  const fontLibraryContext = fields[0] ? await getFieldFontLibraryContext(fields[0]) : null;
+
+  if (!fontLibraryContext) {
+    return;
+  }
+
+  const fontDirectory = path.join(os.tmpdir(), 'documenso-fonts');
+  await mkdir(fontDirectory, { recursive: true });
+
+  for (const fontId of fontIds) {
+    if (FontLibrary.has(fontId)) {
+      continue;
+    }
+
+    const fontAsset = await getFontAssetBytesForField(fontId, fontLibraryContext);
+
+    if (!fontAsset) {
+      continue;
+    }
+
+    const extension = fontAsset.fontAsset.fileName.toLowerCase().endsWith('.otf') ? 'otf' : 'ttf';
+    const fontPath = path.join(fontDirectory, `${fontId}.${extension}`);
+
+    await writeFile(fontPath, fontAsset.bytes);
+
+    FontLibrary.use({
+      [fontId]: [fontPath],
     });
   }
 };

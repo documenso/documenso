@@ -488,6 +488,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
             allRecipients={allRecipients}
             includeSenderDetails={includeSenderDetails}
             branding={branding}
+            recipientToken={recipient.token}
           />
         </div>
       </DocumentSigningAuthProvider>
