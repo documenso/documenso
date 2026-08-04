@@ -13,6 +13,17 @@ Allow recipients to be **grouped into a single signing step** when "Enable signi
 
 No database schema changes: `Recipient.signingOrder` is already a nullable, non-unique `Int` (`packages/prisma/schema.prisma:647`), and all tRPC/REST schemas already accept duplicate values (`z.number().optional()` everywhere). Today duplicates are only destroyed by client-side normalization.
 
+## Amendments (2026-08-04, post-implementation)
+
+- The step badge copy is **"Group N"** (not "Step N").
+- The signing-order number input was **removed entirely** — grouping, joining,
+  extraction and reordering are **drag-and-drop only**. The "type-to-join" and
+  "out-of-bounds number extraction" decisions below are superseded; the
+  `Ungroup` link remains as the non-drag affordance for dissolving a group.
+- Known limitation: gap drop-zones keep a constant hit area (drop-target
+  geometry is captured at drag start, so drag-dependent resizing would
+  desynchronise the visible strip from the actual hit area).
+
 ## Product decisions (agreed)
 
 | Topic | Decision |
