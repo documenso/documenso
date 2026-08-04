@@ -117,7 +117,11 @@ const runRecipientFlow = async (surface: TEnvelopeEditorSurface): Promise<Recipi
 
   await toggleSigningOrder(surface.root, true);
   await expect(getSigningOrderInputs(surface.root)).toHaveCount(2);
-  await setSigningOrderValue(surface.root, 0, 2);
+
+  // Typing an existing step number would group the recipients together, so an
+  // out-of-bounds value (> step count) is used to move the first recipient to
+  // the end as their own step, swapping the two.
+  await setSigningOrderValue(surface.root, 0, 3);
 
   await toggleAllowDictateSigners(surface.root, true);
 
