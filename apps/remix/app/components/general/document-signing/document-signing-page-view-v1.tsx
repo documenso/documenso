@@ -15,6 +15,7 @@ import type { CompletedField } from '@documenso/lib/types/fields';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { getDictatableNextRecipient } from '@documenso/lib/utils/recipient-groups';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
@@ -143,31 +144,11 @@ export const DocumentSigningPageViewV1 = ({
   const targetSigner = recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
 
   const nextRecipient = useMemo(() => {
-    if (!documentMeta?.signingOrder || documentMeta.signingOrder !== 'SEQUENTIAL') {
+    if (documentMeta?.signingOrder !== 'SEQUENTIAL') {
       return undefined;
     }
 
-    const sortedRecipients = [...allRecipients].sort((a, b) => {
-      // Sort by signingOrder first (nulls last), then by id
-      if (a.signingOrder === null && b.signingOrder === null) {
-        return a.id - b.id;
-      }
-      if (a.signingOrder === null) {
-        return 1;
-      }
-      if (b.signingOrder === null) {
-        return -1;
-      }
-      if (a.signingOrder === b.signingOrder) {
-        return a.id - b.id;
-      }
-      return a.signingOrder - b.signingOrder;
-    });
-
-    const currentIndex = sortedRecipients.findIndex((r) => r.id === recipient.id);
-    return currentIndex !== -1 && currentIndex < sortedRecipients.length - 1
-      ? sortedRecipients[currentIndex + 1]
-      : undefined;
+    return getDictatableNextRecipient({ recipients: allRecipients, currentRecipientId: recipient.id }) ?? undefined;
   }, [document.documentMeta?.signingOrder, allRecipients, recipient.id]);
 
   const pendingFields = fieldsRequiringValidation.filter((field) => !field.inserted);
