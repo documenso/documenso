@@ -11,7 +11,6 @@ import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipien
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormControl, FormField, FormItem, FormMessage } from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
 import type { DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 import { useLingui } from '@lingui/react/macro';
 import { EnvelopeType, type RecipientRole } from '@prisma/client';
@@ -23,9 +22,7 @@ type TEditorSigner = TEditorRecipientsFormSchema['signers'][number];
 export type RecipientRowProps = {
   signerIndex: number;
   signer: TEditorSigner;
-  stepCount: number;
   isSequential: boolean;
-  isGrouped: boolean;
   isInputDisabled: boolean;
   canBeModified: boolean;
   isRemoveDisabled: boolean;
@@ -33,7 +30,6 @@ export type RecipientRowProps = {
   dragHandleProps?: DraggableProvidedDragHandleProps | null;
   recipientSuggestions: RecipientAutoCompleteOption[];
   isLoadingSuggestions: boolean;
-  onSigningOrderChange: (signerIndex: number, value: string) => void;
   onRoleChange: (signerIndex: number, role: RecipientRole) => void;
   onRemove: (signerIndex: number) => void;
   onAutoCompleteSelect: (signerIndex: number, suggestion: RecipientAutoCompleteOption) => void;
@@ -43,9 +39,7 @@ export type RecipientRowProps = {
 export const RecipientRow = ({
   signerIndex,
   signer,
-  stepCount,
   isSequential,
-  isGrouped,
   isInputDisabled,
   canBeModified,
   isRemoveDisabled,
@@ -53,7 +47,6 @@ export const RecipientRow = ({
   dragHandleProps,
   recipientSuggestions,
   isLoadingSuggestions,
-  onSigningOrderChange,
   onRoleChange,
   onRemove,
   onAutoCompleteSelect,
@@ -81,52 +74,19 @@ export const RecipientRow = ({
     <fieldset data-native-id={signer.id} disabled={isSubmitting || !canBeModified} className="py-1">
       <div className="flex flex-row items-center gap-x-2">
         {isSequential && !isCcRecipient(signer) && (
-          <FormField
-            control={form.control}
-            name={`signers.${signerIndex}.signingOrder`}
-            render={({ field }) => (
-              <FormItem
-                className={cn('mt-auto flex items-center gap-x-1 space-y-0', {
-                  'mb-6': rowErrors && !rowErrors.signingOrder,
-                })}
-              >
-                <span {...(dragHandleProps ?? {})} data-testid="recipient-row-drag-handle">
-                  <GripVerticalIcon
-                    className={cn('h-5 w-5 flex-shrink-0 opacity-40', {
-                      'opacity-10': !dragHandleProps,
-                    })}
-                  />
-                </span>
-
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={stepCount + 1}
-                    data-testid="signing-order-input"
-                    className={cn(
-                      'w-10 text-center',
-                      '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-                      {
-                        'border-primary/50 bg-primary/5': isGrouped,
-                      },
-                    )}
-                    {...field}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      onSigningOrderChange(signerIndex, e.target.value);
-                    }}
-                    onBlur={(e) => {
-                      field.onBlur();
-                      onSigningOrderChange(signerIndex, e.target.value);
-                    }}
-                    disabled={isFieldDisabled}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <span
+            {...(dragHandleProps ?? {})}
+            data-testid="recipient-row-drag-handle"
+            className={cn('mt-auto flex h-10 flex-shrink-0 items-center', {
+              'mb-6': rowErrors,
+            })}
+          >
+            <GripVerticalIcon
+              className={cn('h-5 w-5 flex-shrink-0 opacity-40', {
+                'opacity-10': !dragHandleProps,
+              })}
+            />
+          </span>
         )}
 
         <FormField

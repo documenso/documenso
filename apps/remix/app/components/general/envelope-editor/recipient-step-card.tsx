@@ -16,11 +16,9 @@ export type DraggingType = 'STEP' | 'RECIPIENT' | null;
 
 export type RecipientStepCardSharedRowProps = Pick<
   RecipientRowProps,
-  | 'stepCount'
   | 'showAdvancedSettings'
   | 'recipientSuggestions'
   | 'isLoadingSuggestions'
-  | 'onSigningOrderChange'
   | 'onRoleChange'
   | 'onRemove'
   | 'onAutoCompleteSelect'
@@ -67,11 +65,12 @@ export const RecipientStepCard = ({
         'pointer-events-none': draggableSnapshot.isDragging,
       })}
     >
-      <Droppable
-        droppableId={`step-members-${stepIndex}`}
-        type="RECIPIENT"
-        isDropDisabled={draggingType !== 'RECIPIENT'}
-      >
+      {/*
+        Note: `type="RECIPIENT"` already scopes this droppable to recipient-row
+        drags — `isDropDisabled` must not be toggled based on the active drag,
+        as @hello-pangea/dnd snapshots it at drag start.
+      */}
+      <Droppable droppableId={`step-members-${stepIndex}`} type="RECIPIENT">
         {(droppableProvided, droppableSnapshot) => {
           const isJoinTarget = draggingType === 'RECIPIENT' && droppableSnapshot.isDraggingOver;
           const isHighlighted = isCombineTarget || isJoinTarget;
@@ -108,7 +107,7 @@ export const RecipientStepCard = ({
                 </span>
 
                 <Badge variant="neutral" size="small">
-                  <Trans>Step {step.order}</Trans>
+                  <Trans>Group {step.order}</Trans>
                 </Badge>
 
                 {isGroup && (
@@ -156,7 +155,6 @@ export const RecipientStepCard = ({
                           signerIndex={signerIndex}
                           signer={member}
                           isSequential={true}
-                          isGrouped={isGroup}
                           isInputDisabled={memberSnapshot.isDragging || draggableSnapshot.isDragging}
                           canBeModified={canBeModified}
                           isRemoveDisabled={isRemoveDisabled}

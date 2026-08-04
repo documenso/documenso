@@ -10,7 +10,7 @@ import {
   reorderStep,
   ungroupStep,
 } from '@documenso/lib/utils/recipient-groups';
-import { canEditorRecipientBeModified, isAssistantLastSigner, isCcRecipient } from '@documenso/lib/utils/recipients';
+import { canEditorRecipientBeModified, isAssistantLastSigner } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
 import type { RecipientAutoCompleteOption } from '@documenso/ui/components/recipient/recipient-autocomplete-input';
 import { cn } from '@documenso/ui/lib/utils';
@@ -26,22 +26,26 @@ import { type DraggingType, RecipientStepCard } from './recipient-step-card';
 
 type TEditorSigner = TEditorRecipientsFormSchema['signers'][number];
 
+// Notes:
+// - `type="RECIPIENT"` already scopes these droppables to recipient-row drags,
+//   and `isDropDisabled` must not be toggled based on the active drag, as
+//   @hello-pangea/dnd snapshots it at drag start (before state updates land).
+// - The gap must keep a CONSTANT size: droppable geometry is captured when a
+//   drag starts, so resizing during the drag would leave the visible strip and
+//   the actual hit area in different places. Only colors may change mid-drag.
 const RecipientStepGap = ({ gapIndex, draggingType }: { gapIndex: number; draggingType: DraggingType }) => (
-  <Droppable droppableId={`gap-${gapIndex}`} type="RECIPIENT" isDropDisabled={draggingType !== 'RECIPIENT'}>
+  <Droppable droppableId={`gap-${gapIndex}`} type="RECIPIENT">
     {(provided, snapshot) => (
       <div
         ref={provided.innerRef}
         {...provided.droppableProps}
         data-testid="recipient-step-gap"
-        className={cn(
-          'rounded-md transition-all',
-          draggingType === 'RECIPIENT' ? 'my-1 min-h-10 border border-dashed' : 'h-2',
-          {
-            'border-primary bg-primary/10': snapshot.isDraggingOver,
-          },
-        )}
+        className={cn('h-6 rounded-md transition-colors', {
+          'border border-dashed': draggingType === 'RECIPIENT',
+          'border-primary bg-primary/10': snapshot.isDraggingOver,
+        })}
       >
-        <div className="hidden">{provided.placeholder}</div>
+        {provided.placeholder}
       </div>
     )}
   </Droppable>
@@ -81,7 +85,6 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
 
   const { steps, ccRecipients } = useMemo(() => groupRecipientsBySigningOrder(watchedSigners), [watchedSigners]);
 
-  const stepCount = steps.length;
   const isRemoveDisabled = watchedSigners.length === 1;
 
   const flatIndexByFormId = useMemo(
@@ -113,51 +116,6 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
       void form.trigger('signers');
     },
     [form, t, toast],
-  );
-
-  const handleSigningOrderChange = useCallback(
-    (signerIndex: number, newOrderString: string) => {
-      const trimmedOrderString = newOrderString.trim();
-
-      if (!trimmedOrderString) {
-        return;
-      }
-
-      const newOrder = Number(trimmedOrderString);
-
-      if (!Number.isInteger(newOrder) || newOrder < 1) {
-        return;
-      }
-
-      const currentSigners = form.getValues('signers');
-      const signer = currentSigners[signerIndex];
-
-      if (!signer || isCcRecipient(signer)) {
-        return;
-      }
-
-      const { steps: currentSteps } = groupRecipientsBySigningOrder(currentSigners);
-
-      const currentStepIndex = currentSteps.findIndex((step) =>
-        step.members.some((member) => member.formId === signer.formId),
-      );
-      const targetStepIndex = newOrder - 1;
-
-      if (targetStepIndex === currentStepIndex) {
-        return;
-      }
-
-      // Typing an existing step number joins that step's group; an
-      // out-of-bounds number extracts the recipient to a standalone step at
-      // the end.
-      const updatedSigners =
-        targetStepIndex >= currentSteps.length
-          ? extractRecipientToNewStep(currentSigners, signer.formId, currentSteps.length, canSignerBeModified)
-          : moveRecipientToStep(currentSigners, signer.formId, targetStepIndex, canSignerBeModified);
-
-      applySigners(updatedSigners, { warnWhenAssistantLast: signer.role === RecipientRole.ASSISTANT });
-    },
-    [form, canSignerBeModified, applySigners],
   );
 
   const handleRoleChange = useCallback(
@@ -291,11 +249,9 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
   );
 
   const sharedRowProps = {
-    stepCount,
     showAdvancedSettings,
     recipientSuggestions,
     isLoadingSuggestions: isLoading,
-    onSigningOrderChange: handleSigningOrderChange,
     onRoleChange: handleRoleChange,
     onRemove: handleRemove,
     onAutoCompleteSelect: handleAutoCompleteSelect,
@@ -324,7 +280,6 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
               signerIndex={index}
               signer={signer}
               isSequential={false}
-              isGrouped={false}
               isInputDisabled={false}
               canBeModified={canSignerBeModified(signer)}
               isRemoveDisabled={isRemoveDisabled}
@@ -386,7 +341,6 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
                 signerIndex={flatIndexByFormId.get(signer.formId) ?? -1}
                 signer={signer}
                 isSequential={true}
-                isGrouped={false}
                 isInputDisabled={false}
                 canBeModified={canSignerBeModified(signer)}
                 isRemoveDisabled={isRemoveDisabled}
