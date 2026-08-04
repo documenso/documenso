@@ -94,6 +94,7 @@
     "@prisma/extension-read-replicas": "^0.4.1",
     "ai": "^5.0.104",
     "cron-parser": "^5.5.0",
+    "fflate": "^0.8.3",
     "luxon": "^3.7.2",
     "patch-package": "^8.0.1",
     "posthog-node": "4.18.0",
