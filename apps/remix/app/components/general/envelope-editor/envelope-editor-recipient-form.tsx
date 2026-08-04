@@ -23,7 +23,7 @@ import { Trans } from '@lingui/react/macro';
 import { DocumentSigningOrder, RecipientRole, SendStatus } from '@prisma/client';
 import { HelpCircleIcon, PlusIcon, SparklesIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useWatch } from 'react-hook-form';
+import { useFieldArray, useWatch } from 'react-hook-form';
 import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 
@@ -133,6 +133,15 @@ export const EnvelopeEditorRecipientForm = () => {
   const normalizeSigningOrders = (signers: typeof watchedSigners) => {
     return normalizeGroupedSigningOrders(signers, (signer) => canRecipientBeModified(signer.id));
   };
+
+  // Keep a mounted field array for `signers` so react-hook-form reconciles
+  // whole-array `setValue` calls atomically. Without it, reordering the array
+  // leaves stale partial entries in watched values (missing email/name/role),
+  // which breaks validation and the autosave sync.
+  useFieldArray({
+    control,
+    name: 'signers',
+  });
 
   const stepCount = useMemo(() => groupRecipientsBySigningOrder(watchedSigners).steps.length, [watchedSigners]);
 
