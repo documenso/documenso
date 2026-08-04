@@ -1,4 +1,5 @@
 import type { Recipient } from '@prisma/client';
+import { SigningStatus } from '@prisma/client';
 
 import { isCcRecipient } from './recipients';
 
@@ -259,6 +260,96 @@ export const reorderStep = <T extends EditorRecipient>(
   ];
 
   return normalizeGroupedSigningOrders(updated, canUpdateRecipient);
+};
+
+type SignableRecipient = Pick<Recipient, 'role' | 'signingStatus'> & {
+  signingOrder?: number | null;
+};
+
+/**
+ * Whether it is the recipient's turn to act under SEQUENTIAL signing.
+ *
+ * A recipient may act iff no non-CC recipient with a strictly lower signing
+ * order is still unsigned (rejected counts as unsigned/blocking). Recipients
+ * sharing a signing order never block each other.
+ *
+ * Callers are responsible for checking the document is in SEQUENTIAL mode.
+ */
+export const isRecipientTurnBySigningOrder = <T extends SignableRecipient>(
+  recipients: T[],
+  currentRecipient: { signingOrder?: number | null },
+): boolean => {
+  const currentOrder = effectiveOrder(currentRecipient);
+
+  return !recipients.some(
+    (recipient) =>
+      !isCcRecipient(recipient) &&
+      recipient.signingStatus !== SigningStatus.SIGNED &&
+      effectiveOrder(recipient) < currentOrder,
+  );
+};
+
+/**
+ * Returns every pending recipient sharing the lowest pending signing order —
+ * the "active group". Callers pass an already-filtered pending list.
+ */
+export const filterRecipientsInFirstSigningGroup = <T extends { signingOrder?: number | null }>(
+  pendingRecipients: T[],
+): T[] => {
+  if (pendingRecipients.length === 0) {
+    return [];
+  }
+
+  const minOrder = Math.min(...pendingRecipients.map((recipient) => effectiveOrder(recipient)));
+
+  return pendingRecipients.filter((recipient) => effectiveOrder(recipient) === minOrder);
+};
+
+/**
+ * The single recipient that the current recipient may dictate (rename) on
+ * completion, or null when dictation does not apply:
+ *
+ * - the current recipient must be the last unsigned member of their step, and
+ * - the next step must contain exactly one recipient.
+ */
+export const getDictatableNextRecipient = <T extends SignableRecipient & Pick<Recipient, 'id'>>({
+  recipients,
+  currentRecipientId,
+}: {
+  recipients: T[];
+  currentRecipientId: number;
+}): T | null => {
+  const currentRecipient = recipients.find((recipient) => recipient.id === currentRecipientId);
+
+  if (!currentRecipient || isCcRecipient(currentRecipient)) {
+    return null;
+  }
+
+  const currentOrder = effectiveOrder(currentRecipient);
+
+  const hasUnsignedPeers = recipients.some(
+    (recipient) =>
+      recipient.id !== currentRecipientId &&
+      !isCcRecipient(recipient) &&
+      effectiveOrder(recipient) === currentOrder &&
+      recipient.signingStatus !== SigningStatus.SIGNED,
+  );
+
+  if (hasUnsignedPeers) {
+    return null;
+  }
+
+  const laterRecipients = recipients.filter(
+    (recipient) => !isCcRecipient(recipient) && effectiveOrder(recipient) > currentOrder,
+  );
+
+  const nextStep = filterRecipientsInFirstSigningGroup(laterRecipients);
+
+  if (nextStep.length !== 1) {
+    return null;
+  }
+
+  return nextStep[0];
 };
 
 /**

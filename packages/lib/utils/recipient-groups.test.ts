@@ -1,9 +1,12 @@
-import { RecipientRole } from '@prisma/client';
+import { RecipientRole, SigningStatus } from '@prisma/client';
 import { describe, expect, it } from 'vitest';
 
 import {
   extractRecipientToNewStep,
+  filterRecipientsInFirstSigningGroup,
+  getDictatableNextRecipient,
   groupRecipientsBySigningOrder,
+  isRecipientTurnBySigningOrder,
   mergeSteps,
   moveRecipientToStep,
   normalizeGroupedSigningOrders,
@@ -325,5 +328,139 @@ describe('ungroupStep', () => {
     const signers = makeSigners();
 
     expect(ordersOf(ungroupStep(signers, 0))).toEqual(ordersOf(signers));
+  });
+});
+
+describe('isRecipientTurnBySigningOrder', () => {
+  const recipient = (
+    id: number,
+    signingOrder: number | null,
+    signingStatus: SigningStatus,
+    role: RecipientRole = RecipientRole.SIGNER,
+  ) => ({ id, signingOrder, signingStatus, role });
+
+  it('allows both members of the active group regardless of member order', () => {
+    const recipients = [
+      recipient(1, 1, SigningStatus.SIGNED),
+      recipient(2, 2, SigningStatus.NOT_SIGNED),
+      recipient(3, 2, SigningStatus.NOT_SIGNED),
+      recipient(4, 3, SigningStatus.NOT_SIGNED),
+    ];
+
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[1])).toBe(true);
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[2])).toBe(true);
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[3])).toBe(false);
+  });
+
+  it('blocks later steps until every group member has signed', () => {
+    const recipients = [
+      recipient(1, 1, SigningStatus.SIGNED),
+      recipient(2, 2, SigningStatus.SIGNED),
+      recipient(3, 2, SigningStatus.NOT_SIGNED),
+      recipient(4, 3, SigningStatus.NOT_SIGNED),
+    ];
+
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[3])).toBe(false);
+  });
+
+  it('treats a rejected recipient in an earlier step as blocking', () => {
+    const recipients = [recipient(1, 1, SigningStatus.REJECTED), recipient(2, 2, SigningStatus.NOT_SIGNED)];
+
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[1])).toBe(false);
+  });
+
+  it('ignores CC recipients entirely', () => {
+    const recipients = [
+      recipient(1, 1, SigningStatus.NOT_SIGNED, RecipientRole.CC),
+      recipient(2, 2, SigningStatus.NOT_SIGNED),
+    ];
+
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[1])).toBe(true);
+  });
+
+  it('treats recipients without a signing order as a parallel tail group', () => {
+    const recipients = [
+      recipient(1, 1, SigningStatus.SIGNED),
+      recipient(2, null, SigningStatus.NOT_SIGNED),
+      recipient(3, null, SigningStatus.NOT_SIGNED),
+    ];
+
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[1])).toBe(true);
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[2])).toBe(true);
+  });
+});
+
+describe('filterRecipientsInFirstSigningGroup', () => {
+  it('returns every pending recipient sharing the lowest order', () => {
+    const pending = [
+      { id: 3, signingOrder: 2 },
+      { id: 4, signingOrder: 2 },
+      { id: 5, signingOrder: 3 },
+    ];
+
+    expect(filterRecipientsInFirstSigningGroup(pending).map((r) => r.id)).toEqual([3, 4]);
+  });
+
+  it('returns an empty array for no pending recipients', () => {
+    expect(filterRecipientsInFirstSigningGroup([])).toEqual([]);
+  });
+});
+
+describe('getDictatableNextRecipient', () => {
+  const recipient = (
+    id: number,
+    signingOrder: number | null,
+    signingStatus: SigningStatus,
+    role: RecipientRole = RecipientRole.SIGNER,
+  ) => ({ id, signingOrder, signingStatus, role });
+
+  it('returns the next recipient when current is last of their step and next step is a single recipient', () => {
+    const recipients = [
+      recipient(1, 1, SigningStatus.SIGNED),
+      recipient(2, 2, SigningStatus.NOT_SIGNED),
+      recipient(3, 3, SigningStatus.NOT_SIGNED),
+    ];
+
+    expect(getDictatableNextRecipient({ recipients, currentRecipientId: 2 })?.id).toBe(3);
+  });
+
+  it('returns null while a group peer is still unsigned', () => {
+    const recipients = [
+      recipient(1, 1, SigningStatus.NOT_SIGNED),
+      recipient(2, 1, SigningStatus.NOT_SIGNED),
+      recipient(3, 2, SigningStatus.NOT_SIGNED),
+    ];
+
+    expect(getDictatableNextRecipient({ recipients, currentRecipientId: 1 })).toBeNull();
+  });
+
+  it('returns the next single recipient once all group peers signed', () => {
+    const recipients = [
+      recipient(1, 1, SigningStatus.SIGNED),
+      recipient(2, 1, SigningStatus.NOT_SIGNED),
+      recipient(3, 2, SigningStatus.NOT_SIGNED),
+    ];
+
+    expect(getDictatableNextRecipient({ recipients, currentRecipientId: 2 })?.id).toBe(3);
+  });
+
+  it('returns null when the next step is a group', () => {
+    const recipients = [
+      recipient(1, 1, SigningStatus.NOT_SIGNED),
+      recipient(2, 2, SigningStatus.NOT_SIGNED),
+      recipient(3, 2, SigningStatus.NOT_SIGNED),
+    ];
+
+    expect(getDictatableNextRecipient({ recipients, currentRecipientId: 1 })).toBeNull();
+  });
+
+  it('returns null when there is no later step, for CC targets, or unknown recipients', () => {
+    const recipients = [
+      recipient(1, 1, SigningStatus.NOT_SIGNED),
+      recipient(2, null, SigningStatus.NOT_SIGNED, RecipientRole.CC),
+    ];
+
+    expect(getDictatableNextRecipient({ recipients, currentRecipientId: 1 })).toBeNull();
+    expect(getDictatableNextRecipient({ recipients, currentRecipientId: 999 })).toBeNull();
   });
 });
