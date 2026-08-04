@@ -1,4 +1,5 @@
 import { prepareCscRecipientSigning } from '@documenso/ee/server-only/signing/csc/prepare-recipient-signing';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
@@ -11,7 +12,6 @@ import { isTspEnvelope } from '@documenso/lib/types/signature-level';
 import { unsafeBuildEnvelopeIdQuery } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
-
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import { findRecipientSuggestionsRoute } from './find-recipient-suggestions';
@@ -590,47 +590,58 @@ export const recipientRouter = router({
     .input(ZCompleteDocumentWithTokenMutationSchema)
     .output(ZCompleteDocumentWithTokenResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { token, documentId, accessAuthOptions, nextSigner, recipientOverride } = input;
+      try {
+        const { token, documentId, accessAuthOptions, nextSigner, recipientOverride } = input;
 
-      ctx.logger.info({
-        input: {
-          documentId,
-        },
-      });
+        ctx.logger.info({
+          input: {
+            documentId,
+          },
+        });
 
-      // Branch on TSP envelopes before any SES side effects: TSP recipients
-      // can't complete via this route — they go through the CSC sync sign
-      // flow (`enterprise.csc.signEnvelope`). This route returns the redirect URL
-      // for the credential-scope OAuth round-trip.
-      const envelope = await prisma.envelope.findFirstOrThrow({
-        where: {
-          ...unsafeBuildEnvelopeIdQuery({ type: 'documentId', id: documentId }, EnvelopeType.DOCUMENT),
-          recipients: { some: { token } },
-        },
-        select: { signatureLevel: true, internalVersion: true },
-      });
+        // Branch on TSP envelopes before any SES side effects: TSP recipients
+        // can't complete via this route — they go through the CSC sync sign
+        // flow (`enterprise.csc.signEnvelope`). This route returns the redirect URL
+        // for the credential-scope OAuth round-trip.
+        const envelope = await prisma.envelope.findFirstOrThrow({
+          where: {
+            ...unsafeBuildEnvelopeIdQuery({ type: 'documentId', id: documentId }, EnvelopeType.DOCUMENT),
+            recipients: { some: { token } },
+          },
+          select: { signatureLevel: true, internalVersion: true },
+        });
 
-      if (isTspEnvelope(envelope)) {
-        return await prepareCscRecipientSigning({
-          recipientToken: token,
+        if (isTspEnvelope(envelope)) {
+          return await prepareCscRecipientSigning({
+            recipientToken: token,
+            requestMetadata: ctx.metadata.requestMetadata,
+          });
+        }
+
+        await completeDocumentWithToken({
+          token,
+          id: {
+            type: 'documentId',
+            id: documentId,
+          },
+          accessAuthOptions,
+          nextSigner,
+          recipientOverride,
+          userId: ctx.user?.id,
           requestMetadata: ctx.metadata.requestMetadata,
         });
+
+        return { status: 'SIGNED' as const };
+      } catch (err) {
+        // Log the error for debugging purposes.
+        ctx.logger.error({
+          message: 'Error completing document with token',
+          error: err instanceof AppError ? `[${err.code}]: ${err.message}` : err,
+        });
+
+        // Rethrow the error so that the client receives the appropriate error response.
+        throw err;
       }
-
-      await completeDocumentWithToken({
-        token,
-        id: {
-          type: 'documentId',
-          id: documentId,
-        },
-        accessAuthOptions,
-        nextSigner,
-        recipientOverride,
-        userId: ctx.user?.id,
-        requestMetadata: ctx.metadata.requestMetadata,
-      });
-
-      return { status: 'SIGNED' as const };
     }),
 
   /**
