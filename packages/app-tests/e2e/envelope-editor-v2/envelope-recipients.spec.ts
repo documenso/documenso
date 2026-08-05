@@ -112,6 +112,12 @@ const runRecipientFlow = async (surface: TEnvelopeEditorSurface): Promise<Recipi
   await setRecipientRole(surface.root, 1, 'Needs to approve');
   await setRecipientRole(surface.root, 2, 'Receives copy');
 
+  // The role selects must reflect the change immediately, without requiring a
+  // navigation or reload (regression: leaf controllers going stale after a
+  // root-level signers array update).
+  await assertRecipientRole(surface.root, 1, 'Needs to approve');
+  await assertRecipientRole(surface.root, 2, 'Receives copy');
+
   await getRecipientRemoveButtons(surface.root).nth(2).click();
   await expect(getRecipientEmailInputs(surface.root)).toHaveCount(2);
 

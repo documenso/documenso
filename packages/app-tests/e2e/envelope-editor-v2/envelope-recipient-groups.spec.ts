@@ -5,6 +5,9 @@ import {
   clickAddSignerButton,
   dragGroupCardOntoCard,
   dragRecipientRowToGap,
+  getRecipientEmailInputs,
+  getRecipientStepCards,
+  moveGroupCardUp,
   openDocumentEnvelopeEditor,
   openTemplateEnvelopeEditor,
   setRecipientEmail,
@@ -55,7 +58,7 @@ const runGroupingFlow = async (surface: TEnvelopeEditorSurface) => {
   // Drag carol's card onto bob's card to merge them into one group.
   await dragGroupCardOntoCard(root, 2, 1);
 
-  await expect(root.getByText('2 signers · any order')).toBeVisible();
+  await expect(root.getByText('2 recipients · any order')).toBeVisible();
   await expect(root.getByTestId('ungroup-step-button')).toBeVisible();
   await expect(root.getByText('Group 3', { exact: true })).not.toBeVisible();
 
@@ -67,12 +70,12 @@ const runGroupingFlow = async (surface: TEnvelopeEditorSurface) => {
 
   // Groups survive a reload (grouped normalization on load).
   await root.reload();
-  await expect(root.getByText('2 signers · any order')).toBeVisible();
+  await expect(root.getByText('2 recipients · any order')).toBeVisible();
 
   // Ungroup dissolves back into sequential groups.
   await root.getByTestId('ungroup-step-button').click();
 
-  await expect(root.getByText('2 signers · any order')).not.toBeVisible();
+  await expect(root.getByText('2 recipients · any order')).not.toBeVisible();
   await expect(root.getByText('Group 3', { exact: true })).toBeVisible();
 
   await expectRecipientOrders(surface, [
@@ -96,6 +99,32 @@ test.describe('document editor', () => {
     const surface = await openDocumentEnvelopeEditor(page);
 
     await runGroupingFlow(surface);
+  });
+
+  test('documents: reordered group cards can still be dragged', async ({ page }) => {
+    const surface = await openDocumentEnvelopeEditor(page);
+    const { root } = surface;
+
+    await setRecipientEmail(root, 0, 'alice@example.com');
+    await clickAddSignerButton(root);
+    await setRecipientEmail(root, 1, 'bob@example.com');
+
+    await toggleSigningOrder(root, true);
+    await expect(getRecipientStepCards(root)).toHaveCount(2);
+
+    // Move bob's card into position 1.
+    await moveGroupCardUp(root, 1);
+
+    await expect(getRecipientEmailInputs(root).nth(0)).toHaveValue('bob@example.com');
+    await expect(getRecipientEmailInputs(root).nth(1)).toHaveValue('alice@example.com');
+
+    // Regression: after a reorder, the card moved into position 2 must still
+    // be draggable — positional drag-and-drop ids used to go stale on mounted
+    // cards, silently killing their drag handles. Prove it by completing a
+    // merge with the repositioned card.
+    await dragGroupCardOntoCard(root, 1, 0);
+
+    await expect(root.getByText('2 recipients · any order')).toBeVisible();
   });
 });
 

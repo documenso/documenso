@@ -88,6 +88,49 @@ export const ZEditorRecipientsFormSchema = z
 
 export type TEditorRecipientsFormSchema = z.infer<typeof ZEditorRecipientsFormSchema>;
 
+/**
+ * Replaces the signers array while keeping controlled inputs in sync.
+ *
+ * Rows are rendered with stable `formId` keys (required for drag and drop),
+ * so react-hook-form `Controller`s never remount and their leaf
+ * subscriptions are NOT re-notified by a root-level array `setValue`. Any
+ * value that changes while a signer keeps its index (e.g. a role change)
+ * must be leaf-set first so the controlled input actually re-renders.
+ */
+export const updateEditorSigners = (
+  form: UseFormReturn<TEditorRecipientsFormSchema>,
+  updatedSigners: TEditorRecipientsFormSchema['signers'],
+) => {
+  const previousSigners = form.getValues('signers');
+
+  updatedSigners.forEach((signer, index) => {
+    const previousSigner = previousSigners[index];
+
+    // Only slot-stable signers need leaf notifications — moved signers get a
+    // new field name and re-subscribe with fresh values on their own.
+    if (!previousSigner || previousSigner.formId !== signer.formId) {
+      return;
+    }
+
+    if (previousSigner.role !== signer.role) {
+      form.setValue(`signers.${index}.role`, signer.role, { shouldDirty: true });
+    }
+
+    if (previousSigner.email !== signer.email) {
+      form.setValue(`signers.${index}.email`, signer.email, { shouldDirty: true });
+    }
+
+    if (previousSigner.name !== signer.name) {
+      form.setValue(`signers.${index}.name`, signer.name, { shouldDirty: true });
+    }
+  });
+
+  form.setValue('signers', updatedSigners, {
+    shouldValidate: true,
+    shouldDirty: true,
+  });
+};
+
 type EditorRecipientsProps = {
   envelope: TEditorEnvelope;
 };

@@ -395,32 +395,48 @@ export const dragHandleToTarget = async (
     return Boolean(className?.includes(activeClass));
   };
 
-  // Crawl-and-drop: drop-target geometry is captured at drag start and can
-  // drift from the live layout (and auto-scrolling invalidates any cached
-  // coordinates), so precise aiming is unreliable. Instead, approach from
-  // well above the target and crawl downward in small increments, dropping
-  // the moment the target reports the drag as over it — the highlight class
-  // is rendered from the library's own drag state, so it cannot disagree
-  // with where the drop will land.
+  // The highlight class is rendered from the library's own drag state, so it
+  // cannot disagree with where a drop will land — both phases below only drop
+  // once the target reports the drag as over it AND that state survives a
+  // short confirmation dwell (it can flicker while crossing a card's
+  // reorder/combine boundary).
   //
-  // The cursor is clamped inside the viewport: moving outside the window
-  // cancels the drag (pointercancel), and holding near the bottom edge lets
-  // the library auto-scroll the target up to the cursor instead.
+  // The cursor is always clamped inside the viewport: moving outside the
+  // window cancels the drag (pointercancel), and holding near the bottom edge
+  // lets the library auto-scroll the target up to the cursor instead.
   const viewportHeight = root.viewportSize()?.height ?? 720;
   const maxCursorY = viewportHeight - 40;
 
+  const confirmAndDrop = async () => {
+    if (!(await hasBecomeActive())) {
+      return false;
+    }
+
+    await root.waitForTimeout(150);
+
+    if (!(await hasBecomeActive())) {
+      return false;
+    }
+
+    await root.mouse.up();
+
+    return true;
+  };
+
+  let hasDropped = false;
+
+  // Crawl-and-drop: approach from above and inch downward through the
+  // corridor. Captured drop-target geometry can drift a few pixels from the
+  // live layout for small targets, so a slow traversal is the reliable way to
+  // hit them.
   const crawlX = targetBox.x + targetBox.width / 2 - itemOffsetX;
   const crawlStartY = Math.min(targetBox.y + targetBox.height / 2 - itemOffsetY - 140, maxCursorY);
 
   await root.mouse.move(crawlX, crawlStartY, { steps: 15 });
   await root.waitForTimeout(150);
 
-  let hasDropped = false;
-
   for (let step = 1; step <= 80; step += 1) {
-    if (await hasBecomeActive()) {
-      await root.mouse.up();
-
+    if (await confirmAndDrop()) {
       hasDropped = true;
 
       break;
@@ -446,16 +462,65 @@ export const getStepDragHandles = (root: Page) => root.locator('[data-testid="st
 export const getRecipientRowDragHandles = (root: Page) => root.locator('[data-testid="recipient-row-drag-handle"]');
 
 /**
- * Drags a whole group card onto another card's centre, merging the two groups.
+ * Drags a whole group card onto another card, merging the two groups.
+ *
+ * Uses @hello-pangea/dnd's keyboard drag mode: mouse-emulated combines are
+ * unreliable because approaching a card traverses its reorder edge, which
+ * displaces the target away from the cursor. Keyboard drags step through
+ * positions (including combine states) deterministically.
  */
 export const dragGroupCardOntoCard = async (root: Page, sourceCardIndex: number, targetCardIndex: number) => {
-  await dragHandleToTarget(
-    root,
-    getStepDragHandles(root).nth(sourceCardIndex),
-    getRecipientStepCards(root).nth(targetCardIndex),
-    // The combine/join highlight on the target card.
-    { activeClass: 'ring-primary' },
-  );
+  const handle = getStepDragHandles(root).nth(sourceCardIndex);
+  const target = getRecipientStepCards(root).nth(targetCardIndex);
+
+  await handle.scrollIntoViewIfNeeded();
+  await handle.focus();
+
+  // Lift.
+  await root.keyboard.press('Space');
+  await root.waitForTimeout(250);
+
+  const direction = targetCardIndex < sourceCardIndex ? 'ArrowUp' : 'ArrowDown';
+
+  for (let press = 0; press < 4; press += 1) {
+    await root.keyboard.press(direction);
+    await root.waitForTimeout(250);
+
+    const targetClassName = await target.getAttribute('class');
+
+    if (targetClassName?.includes('ring-primary')) {
+      // Drop while the target reports the combine state.
+      await root.keyboard.press('Space');
+      await root.waitForTimeout(400);
+
+      return;
+    }
+  }
+
+  await root.keyboard.press('Escape');
+
+  throw new Error('Combine drag did not reach the target card');
+};
+
+/**
+ * Moves a group card one position up via keyboard drag. With combining
+ * enabled, the first ArrowUp enters the combine state with the card above and
+ * the second moves above it.
+ */
+export const moveGroupCardUp = async (root: Page, cardIndex: number) => {
+  const handle = getStepDragHandles(root).nth(cardIndex);
+
+  await handle.scrollIntoViewIfNeeded();
+  await handle.focus();
+
+  await root.keyboard.press('Space');
+  await root.waitForTimeout(250);
+  await root.keyboard.press('ArrowUp');
+  await root.waitForTimeout(250);
+  await root.keyboard.press('ArrowUp');
+  await root.waitForTimeout(250);
+  await root.keyboard.press('Space');
+  await root.waitForTimeout(400);
 };
 
 /**
@@ -467,8 +532,8 @@ export const dragRecipientRowToGap = async (root: Page, rowIndex: number, gapInd
     root,
     getRecipientRowDragHandles(root).nth(rowIndex),
     getRecipientStepGaps(root).nth(gapIndex),
-    // The drag-over highlight on the gap drop-zone.
-    { activeClass: 'border-primary' },
+    // The marker class applied to a gap drop-zone while dragged over.
+    { activeClass: 'gap-active' },
   );
 };
 

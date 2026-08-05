@@ -15,6 +15,7 @@ import type { DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 import { useLingui } from '@lingui/react/macro';
 import { EnvelopeType, type RecipientRole } from '@prisma/client';
 import { GripVerticalIcon, TrashIcon } from 'lucide-react';
+import { memo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 type TEditorSigner = TEditorRecipientsFormSchema['signers'][number];
@@ -36,7 +37,7 @@ export type RecipientRowProps = {
   onSearchQueryChange: (query: string) => void;
 };
 
-export const RecipientRow = ({
+const RecipientRowInner = ({
   signerIndex,
   signer,
   isSequential,
@@ -77,9 +78,13 @@ export const RecipientRow = ({
           <span
             {...(dragHandleProps ?? {})}
             data-testid="recipient-row-drag-handle"
-            className={cn('mt-auto flex h-10 flex-shrink-0 items-center', {
-              'mb-6': rowErrors,
-            })}
+            className={cn(
+              'mt-auto -ml-1.5 flex h-10 w-8 flex-shrink-0 cursor-grab items-center justify-center rounded-md hover:bg-foreground/5 active:cursor-grabbing',
+              {
+                'mb-6': rowErrors,
+                'cursor-default hover:bg-transparent': !dragHandleProps,
+              },
+            )}
           >
             <GripVerticalIcon
               className={cn('h-5 w-5 flex-shrink-0 opacity-40', {
@@ -218,3 +223,11 @@ export const RecipientRow = ({
     </fieldset>
   );
 };
+
+/**
+ * Memoized: rows contain heavy inputs (autocomplete, role select) and would
+ * otherwise re-render on every drag state change, making drags feel sluggish.
+ * All callback props are stable (useCallback in the list) and `signer` object
+ * identities only change when form values actually change.
+ */
+export const RecipientRow = memo(RecipientRowInner);

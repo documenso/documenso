@@ -1,5 +1,8 @@
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
-import { ZEditorRecipientsFormSchema } from '@documenso/lib/client-only/hooks/use-editor-recipients';
+import {
+  updateEditorSigners,
+  ZEditorRecipientsFormSchema,
+} from '@documenso/lib/client-only/hooks/use-editor-recipients';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
@@ -171,10 +174,7 @@ export const EnvelopeEditorRecipientForm = () => {
   const appendNormalizedSigner = (signer: (typeof watchedSigners)[number], shouldFocus = false) => {
     const updatedSigners = normalizeSigningOrders([...form.getValues('signers'), signer]);
 
-    form.setValue('signers', updatedSigners, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    updateEditorSigners(form, updatedSigners);
 
     if (shouldFocus) {
       const signerIndex = updatedSigners.findIndex((updatedSigner) => updatedSigner.formId === signer.formId);
@@ -204,8 +204,8 @@ export const EnvelopeEditorRecipientForm = () => {
 
     // If the only signer is the default empty signer lets just replace it with the detected recipients
     if (currentSigners.length === 1 && !currentSigners[0].name && !currentSigners[0].email) {
-      form.setValue(
-        'signers',
+      updateEditorSigners(
+        form,
         detectedRecipients.map((recipient, index) => ({
           formId: nanoid(12),
           name: recipient.name,
@@ -214,10 +214,6 @@ export const EnvelopeEditorRecipientForm = () => {
           actionAuth: [],
           signingOrder: index + 1,
         })),
-        {
-          shouldValidate: true,
-          shouldDirty: true,
-        },
       );
 
       return;
@@ -244,10 +240,7 @@ export const EnvelopeEditorRecipientForm = () => {
       nextSigningOrder += 1;
     }
 
-    form.setValue('signers', normalizeSigningOrders(currentSigners), {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    updateEditorSigners(form, normalizeSigningOrders(currentSigners));
 
     toast({
       title: plural(detectedRecipients.length, {
@@ -301,10 +294,8 @@ export const EnvelopeEditorRecipientForm = () => {
       })),
     );
 
-    form.setValue('signers', updatedSigners, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    updateEditorSigners(form, updatedSigners);
+
     form.setValue('signingOrder', DocumentSigningOrder.PARALLEL, {
       shouldValidate: true,
       shouldDirty: true,

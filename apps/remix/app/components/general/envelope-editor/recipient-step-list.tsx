@@ -1,5 +1,8 @@
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
-import type { TEditorRecipientsFormSchema } from '@documenso/lib/client-only/hooks/use-editor-recipients';
+import {
+  type TEditorRecipientsFormSchema,
+  updateEditorSigners,
+} from '@documenso/lib/client-only/hooks/use-editor-recipients';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import {
   extractRecipientToNewStep,
@@ -13,43 +16,17 @@ import {
 import { canEditorRecipientBeModified, isAssistantLastSigner } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
 import type { RecipientAutoCompleteOption } from '@documenso/ui/components/recipient/recipient-autocomplete-input';
-import { cn } from '@documenso/ui/lib/utils';
+import { Badge } from '@documenso/ui/primitives/badge';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import type { BeforeCapture, DropResult } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { useCallback, useMemo, useState } from 'react';
-
 import { RecipientRow } from './recipient-row';
 import { type DraggingType, RecipientStepCard } from './recipient-step-card';
 
 type TEditorSigner = TEditorRecipientsFormSchema['signers'][number];
-
-// Notes:
-// - `type="RECIPIENT"` already scopes these droppables to recipient-row drags,
-//   and `isDropDisabled` must not be toggled based on the active drag, as
-//   @hello-pangea/dnd snapshots it at drag start (before state updates land).
-// - The gap must keep a CONSTANT size: droppable geometry is captured when a
-//   drag starts, so resizing during the drag would leave the visible strip and
-//   the actual hit area in different places. Only colors may change mid-drag.
-const RecipientStepGap = ({ gapIndex, draggingType }: { gapIndex: number; draggingType: DraggingType }) => (
-  <Droppable droppableId={`gap-${gapIndex}`} type="RECIPIENT">
-    {(provided, snapshot) => (
-      <div
-        ref={provided.innerRef}
-        {...provided.droppableProps}
-        data-testid="recipient-step-gap"
-        className={cn('h-6 rounded-md transition-colors', {
-          'border border-dashed': draggingType === 'RECIPIENT',
-          'border-primary bg-primary/10': snapshot.isDraggingOver,
-        })}
-      >
-        {provided.placeholder}
-      </div>
-    )}
-  </Droppable>
-);
 
 export type RecipientStepListProps = {
   showAdvancedSettings: boolean;
@@ -101,10 +78,7 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
     (updatedSigners: TEditorSigner[], options: { warnWhenAssistantLast?: boolean } = {}) => {
       const { warnWhenAssistantLast = true } = options;
 
-      form.setValue('signers', updatedSigners, {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
+      updateEditorSigners(form, updatedSigners);
 
       if (warnWhenAssistantLast && isAssistantLastSigner(updatedSigners)) {
         toast({
@@ -210,9 +184,20 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
 
       const currentSigners = form.getValues('signers');
 
+      // Drag-and-drop ids are anchored to the first member's formId so they
+      // stay stable across reorders; resolve them back to step indexes here.
+      const { steps: currentSteps } = groupRecipientsBySigningOrder(currentSigners);
+
+      const findStepIndexByAnchor = (anchorFormId: string) =>
+        currentSteps.findIndex((step) => step.members[0]?.formId === anchorFormId);
+
       if (result.type === 'STEP') {
         if (result.combine) {
-          const targetStepIndex = Number(result.combine.draggableId.slice('step-'.length));
+          const targetStepIndex = findStepIndexByAnchor(result.combine.draggableId.slice('step-'.length));
+
+          if (targetStepIndex === -1) {
+            return;
+          }
 
           applySigners(mergeSteps(currentSigners, result.source.index, targetStepIndex, canSignerBeModified));
 
@@ -230,16 +215,30 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
         const formId = result.draggableId.slice('recipient-'.length);
         const { droppableId } = result.destination;
 
-        if (droppableId.startsWith('gap-')) {
-          const gapIndex = Number(droppableId.slice('gap-'.length));
+        if (droppableId === 'gap-end') {
+          applySigners(extractRecipientToNewStep(currentSigners, formId, currentSteps.length, canSignerBeModified));
 
-          applySigners(extractRecipientToNewStep(currentSigners, formId, gapIndex, canSignerBeModified));
+          return;
+        }
+
+        if (droppableId.startsWith('gap-')) {
+          const insertStepIndex = findStepIndexByAnchor(droppableId.slice('gap-'.length));
+
+          if (insertStepIndex === -1) {
+            return;
+          }
+
+          applySigners(extractRecipientToNewStep(currentSigners, formId, insertStepIndex, canSignerBeModified));
 
           return;
         }
 
         if (droppableId.startsWith('step-members-')) {
-          const targetStepIndex = Number(droppableId.slice('step-members-'.length));
+          const targetStepIndex = findStepIndexByAnchor(droppableId.slice('step-members-'.length));
+
+          if (targetStepIndex === -1) {
+            return;
+          }
 
           applySigners(moveRecipientToStep(currentSigners, formId, targetStepIndex, canSignerBeModified));
         }
@@ -260,8 +259,8 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
 
   return (
     <div>
-      {!showAdvancedSettings && (
-        <div className={cn('mb-1 flex flex-row gap-x-2 text-sm', { 'pl-[4.75rem]': isSequential })}>
+      {!showAdvancedSettings && !isSequential && (
+        <div className="mb-1 flex flex-row gap-x-2 text-sm">
           <span className="w-full">
             <Trans>Email</Trans>
           </span>
@@ -298,36 +297,32 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
                     const isStepLocked = step.members.some((member) => !canSignerBeModified(member));
 
                     return (
-                      <div key={`step-fragment-${step.members[0].formId}`}>
-                        <RecipientStepGap gapIndex={stepIndex} draggingType={draggingType} />
-
-                        <Draggable
-                          draggableId={`step-${stepIndex}`}
-                          index={stepIndex}
-                          isDragDisabled={isSubmitting || isStepLocked}
-                        >
-                          {(draggableProvided, draggableSnapshot) => (
-                            <RecipientStepCard
-                              stepIndex={stepIndex}
-                              step={step}
-                              draggableProvided={draggableProvided}
-                              draggableSnapshot={draggableSnapshot}
-                              draggingType={draggingType}
-                              isStepLocked={isStepLocked}
-                              isRemoveDisabled={isRemoveDisabled}
-                              flatIndexByFormId={flatIndexByFormId}
-                              canSignerBeModified={canSignerBeModified}
-                              isSubmitting={isSubmitting}
-                              onUngroup={handleUngroup}
-                              rowProps={sharedRowProps}
-                            />
-                          )}
-                        </Draggable>
-                      </div>
+                      <Draggable
+                        key={`step-${step.members[0].formId}`}
+                        draggableId={`step-${step.members[0].formId}`}
+                        index={stepIndex}
+                        isDragDisabled={isSubmitting || isStepLocked}
+                      >
+                        {(draggableProvided, draggableSnapshot) => (
+                          <RecipientStepCard
+                            stepIndex={stepIndex}
+                            step={step}
+                            isLastStep={stepIndex === steps.length - 1}
+                            draggableProvided={draggableProvided}
+                            draggableSnapshot={draggableSnapshot}
+                            draggingType={draggingType}
+                            isStepLocked={isStepLocked}
+                            isRemoveDisabled={isRemoveDisabled}
+                            flatIndexByFormId={flatIndexByFormId}
+                            canSignerBeModified={canSignerBeModified}
+                            isSubmitting={isSubmitting}
+                            onUngroup={handleUngroup}
+                            rowProps={sharedRowProps}
+                          />
+                        )}
+                      </Draggable>
                     );
                   })}
-
-                  <RecipientStepGap gapIndex={steps.length} draggingType={draggingType} />
 
                   {provided.placeholder}
                 </div>
@@ -335,20 +330,28 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
             </Droppable>
           </DragDropContext>
 
-          {ccRecipients.map((signer) => (
-            <div key={signer.formId} className="my-1 rounded-lg border px-3 py-1">
-              <RecipientRow
-                signerIndex={flatIndexByFormId.get(signer.formId) ?? -1}
-                signer={signer}
-                isSequential={true}
-                isInputDisabled={false}
-                canBeModified={canSignerBeModified(signer)}
-                isRemoveDisabled={isRemoveDisabled}
-                dragHandleProps={null}
-                {...sharedRowProps}
-              />
+          {ccRecipients.length > 0 && (
+            <div className="my-1 rounded-lg border px-3 py-1.5">
+              <Badge variant="neutral" size="small">
+                <Trans>Receives Copy</Trans>
+              </Badge>
+
+              {ccRecipients.map((signer) => (
+                <div key={signer.formId} className="my-1">
+                  <RecipientRow
+                    signerIndex={flatIndexByFormId.get(signer.formId) ?? -1}
+                    signer={signer}
+                    isSequential={true}
+                    isInputDisabled={false}
+                    canBeModified={canSignerBeModified(signer)}
+                    isRemoveDisabled={isRemoveDisabled}
+                    dragHandleProps={null}
+                    {...sharedRowProps}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </>
       )}
     </div>
