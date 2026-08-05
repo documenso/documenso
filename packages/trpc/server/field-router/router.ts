@@ -636,8 +636,11 @@ export const fieldRouter = router({
       // Log the error for debugging purposes.
       ctx.logger.error({
         message: 'Error signing field with token',
-        error: err instanceof AppError ? `[${err.code}]: ${err.message}` : err,
+        error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
       });
+
+      // Raw console.log incase we're somehow deailing with a funky error object that doesn't serialize well.
+      console.log('Error signing field with token', err);
 
       // Rethrow the error so that the client receives the appropriate error response.
       throw err;
@@ -668,8 +671,10 @@ export const fieldRouter = router({
         // Log the error for debugging purposes.
         ctx.logger.error({
           message: 'Error removing signed field with token',
-          error: err instanceof AppError ? `[${err.code}]: ${err.message}` : err,
+          error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
         });
+
+        console.log('Error removing signed field with token', err);
 
         // Rethrow the error so that the client receives the appropriate error response.
         throw err;

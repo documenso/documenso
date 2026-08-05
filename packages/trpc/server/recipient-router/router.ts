@@ -636,8 +636,11 @@ export const recipientRouter = router({
         // Log the error for debugging purposes.
         ctx.logger.error({
           message: 'Error completing document with token',
-          error: err instanceof AppError ? `[${err.code}]: ${err.message}` : err,
+          error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
         });
+
+        // Raw console.log incase we're somehow dealing with a funky error object that doesn't serialize well.
+        console.log('Error completing document with token', err);
 
         // Rethrow the error so that the client receives the appropriate error response.
         throw err;
