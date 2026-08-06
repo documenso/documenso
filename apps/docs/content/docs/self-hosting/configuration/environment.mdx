@@ -10,6 +10,7 @@ These variables must be set for Documenso to function:
 | Variable                                | Description                                                                                |
 | --------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `NEXTAUTH_SECRET`                       | Secret key for NextAuth.js encryption and signing. Generate with `openssl rand -base64 32` |
+| `NEXTAUTH_URL`                          | Public auth URL                                                                            |
 | `NEXT_PRIVATE_ENCRYPTION_KEY`           | Primary encryption key for symmetric encryption (minimum 32 characters)                    |
 | `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Secondary encryption key for symmetric encryption (minimum 32 characters)                  |
 | `NEXT_PUBLIC_WEBAPP_URL`                | Public URL of your Documenso instance (e.g., `https://sign.example.com`)                   |
@@ -54,6 +55,7 @@ For detailed database setup, see [Database Configuration](/docs/self-hosting/con
 | Variable                                | Required | Description                                                               |
 | --------------------------------------- | -------- | ------------------------------------------------------------------------- |
 | `NEXTAUTH_SECRET`                       | Yes      | Secret for NextAuth.js session encryption. Must be at least 32 characters |
+| `NEXTAUTH_URL`                          | Yes      | Public auth URL                                                           |
 | `NEXT_PRIVATE_ENCRYPTION_KEY`           | Yes      | Primary key for encrypting sensitive data. Must be at least 32 characters |
 | `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Yes      | Secondary encryption key for key rotation. Must be at least 32 characters |
 
@@ -88,8 +90,8 @@ Callback URL: `https://<your-domain>/api/auth/callback/microsoft`
 
 ### Webhooks
 
-| Variable                                | Default | Description                                                              |
-| --------------------------------------- | ------- | ------------------------------------------------------------------------ |
+| Variable                                 | Default | Description                                                              |
+| ---------------------------------------- | ------- | ------------------------------------------------------------------------ |
 | `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS` | -       | Comma-separated hostnames or IPs allowed to resolve to private addresses |
 
 Before delivering a webhook, Documenso checks whether the target resolves to a
@@ -201,9 +203,9 @@ Documenso requires a certificate to digitally sign documents.
 
 ### Transport Selection
 
-| Variable                         | Description                                       | Default |
-| -------------------------------- | ------------------------------------------------- | ------- |
-| `NEXT_PRIVATE_SIGNING_TRANSPORT` | Signing backend: `local`, `gcloud-hsm`, or `csc`  | `local` |
+| Variable                         | Description                                      | Default |
+| -------------------------------- | ------------------------------------------------ | ------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT` | Signing backend: `local`, `gcloud-hsm`, or `csc` | `local` |
 
 ### Local Signing
 
@@ -231,12 +233,12 @@ Routes signing through a third-party Trust Service Provider for Advanced and Qua
 
 CSC mode requires an active [Enterprise Edition](/docs/policies/enterprise-edition) license. Without a valid license, the instance will refuse to start in `csc` mode.
 
-| Variable                                       | Description                                                                                                                | Default |
-| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `NEXT_PRIVATE_SIGNING_CSC_PROVIDER_BASE_URL`   | Base URL of the CSC provider's API                                                                                         |         |
-| `NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_ID`     | OAuth client ID registered with the CSC provider                                                                           |         |
-| `NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_SECRET` | OAuth client secret registered with the CSC provider                                                                       |         |
-| `NEXT_PRIVATE_SIGNING_CSC_SIGNATURE_LEVEL`     | Default legal tier for new envelopes when the caller doesn't specify one. `AES` or `QES`. Explicit requests pass through.  | `AES`   |
+| Variable                                       | Description                                                                                                               | Default |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `NEXT_PRIVATE_SIGNING_CSC_PROVIDER_BASE_URL`   | Base URL of the CSC provider's API                                                                                        |         |
+| `NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_ID`     | OAuth client ID registered with the CSC provider                                                                          |         |
+| `NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_SECRET` | OAuth client secret registered with the CSC provider                                                                      |         |
+| `NEXT_PRIVATE_SIGNING_CSC_SIGNATURE_LEVEL`     | Default legal tier for new envelopes when the caller doesn't specify one. `AES` or `QES`. Explicit requests pass through. | `AES`   |
 
 The OAuth callback URL registered with the CSC provider is fixed at `${NEXT_PUBLIC_WEBAPP_URL}/api/csc/oauth/callback` — register this exact URL with the TSP.
 
@@ -244,19 +246,19 @@ The OAuth callback URL registered with the CSC provider is fixed at `${NEXT_PUBL
 
 The following client-visible variable is **derived automatically** from the private transport at server startup. Do not set it manually — any value set in the environment is overwritten on boot.
 
-| Variable                              | Derived from                                       | Value                                             |
-| ------------------------------------- | -------------------------------------------------- | ------------------------------------------------- |
-| `NEXT_PUBLIC_SIGNING_TRANSPORT_IS_CSC` | `NEXT_PRIVATE_SIGNING_TRANSPORT === 'csc'`        | `'true'` when CSC mode is active, else `'false'` |
+| Variable                               | Derived from                               | Value                                            |
+| -------------------------------------- | ------------------------------------------ | ------------------------------------------------ |
+| `NEXT_PUBLIC_SIGNING_TRANSPORT_IS_CSC` | `NEXT_PRIVATE_SIGNING_TRANSPORT === 'csc'` | `'true'` when CSC mode is active, else `'false'` |
 
 The authoring UI uses this flag to gate features that AES/QES envelopes cannot support (parallel signing, assistant role, dictate next signer). Deriving it from the private transport prevents the client-side flag from drifting from the real server-side configuration.
 
 ### Signature Options
 
-| Variable                                    | Description                                                 | Default    |
-| ------------------------------------------- | ----------------------------------------------------------- | ---------- |
+| Variable                                    | Description                                                                                                                                                                                                                                                                                                                                                         | Default    |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
 | `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`  | Comma-separated timestamp authority URLs for LTV signatures. Optional for `local` / `gcloud-hsm` (signatures omit the timestamp when unset). **Required** when `NEXT_PRIVATE_SIGNING_TRANSPORT=csc` — the instance refuses to start without it. See [CSC (AES / QES)](/docs/self-hosting/configuration/signing-certificate/csc-qes#timestamp-authority-resolution). |            |
-| `NEXT_PUBLIC_SIGNING_CONTACT_INFO`          | Contact info embedded in PDF signatures                     | Webapp URL |
-| `NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER` | Use `adbe.pkcs7.detached` instead of `ETSI.CAdES.detached`  | `false`    |
+| `NEXT_PUBLIC_SIGNING_CONTACT_INFO`          | Contact info embedded in PDF signatures                                                                                                                                                                                                                                                                                                                             | Webapp URL |
+| `NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER` | Use `adbe.pkcs7.detached` instead of `ETSI.CAdES.detached`                                                                                                                                                                                                                                                                                                          | `false`    |
 
 For detailed certificate setup, see [Signing Certificate](/docs/self-hosting/configuration/signing-certificate).
 
@@ -264,22 +266,22 @@ For detailed certificate setup, see [Signing Certificate](/docs/self-hosting/con
 
 ## Feature Flags
 
-| Variable                                     | Description                                                                         | Default |
-| -------------------------------------------- | ----------------------------------------------------------------------------------- | ------- |
-| `NEXT_PUBLIC_DISABLE_SIGNUP`                 | Master switch. Disable all signup methods application-wide                          | `false` |
-| `NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP`  | Disable email/password signup only. SSO signup is unaffected                        | `false` |
-| `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP`          | Block new accounts via Google. Existing Google-linked users can still sign in       | `false` |
-| `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP`       | Block new accounts via Microsoft. Existing linked users can still sign in           | `false` |
-| `NEXT_PUBLIC_DISABLE_OIDC_SIGNUP`            | Block new accounts via OIDC, including the organisation portal                      | `false` |
-| `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`        | Comma-separated list of email domains allowed to sign up (e.g., `example.com,acme.org`) |         |
-| `NEXT_PUBLIC_DISABLE_SIGNIN`                 | Master switch. Disable all signin methods application-wide                          | `false` |
-| `NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN`  | Disable email/password signin. Also closes `/forgot-password` and `/reset-password` | `false` |
-| `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN`          | Hide the Google signin button                                                       | `false` |
-| `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN`       | Hide the Microsoft signin button                                                    | `false` |
-| `NEXT_PUBLIC_DISABLE_OIDC_SIGNIN`            | Hide the OIDC signin button                                                         | `false` |
-| `NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT`     | Disable the automatic `/signin` redirect when OIDC is the only enabled transport    | `false` |
-| `NEXT_PUBLIC_POSTHOG_KEY`             | PostHog API key for analytics and feature flags                                     |         |
-| `NEXT_PUBLIC_FEATURE_BILLING_ENABLED` | Enable billing features                                                             | `false` |
+| Variable                                    | Description                                                                             | Default |
+| ------------------------------------------- | --------------------------------------------------------------------------------------- | ------- |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`                | Master switch. Disable all signup methods application-wide                              | `false` |
+| `NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP` | Disable email/password signup only. SSO signup is unaffected                            | `false` |
+| `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP`         | Block new accounts via Google. Existing Google-linked users can still sign in           | `false` |
+| `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP`      | Block new accounts via Microsoft. Existing linked users can still sign in               | `false` |
+| `NEXT_PUBLIC_DISABLE_OIDC_SIGNUP`           | Block new accounts via OIDC, including the organisation portal                          | `false` |
+| `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`       | Comma-separated list of email domains allowed to sign up (e.g., `example.com,acme.org`) |         |
+| `NEXT_PUBLIC_DISABLE_SIGNIN`                | Master switch. Disable all signin methods application-wide                              | `false` |
+| `NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN` | Disable email/password signin. Also closes `/forgot-password` and `/reset-password`     | `false` |
+| `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN`         | Hide the Google signin button                                                           | `false` |
+| `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN`      | Hide the Microsoft signin button                                                        | `false` |
+| `NEXT_PUBLIC_DISABLE_OIDC_SIGNIN`           | Hide the OIDC signin button                                                             | `false` |
+| `NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT`    | Disable the automatic `/signin` redirect when OIDC is the only enabled transport        | `false` |
+| `NEXT_PUBLIC_POSTHOG_KEY`                   | PostHog API key for analytics and feature flags                                         |         |
+| `NEXT_PUBLIC_FEATURE_BILLING_ENABLED`       | Enable billing features                                                                 | `false` |
 
 ### Signup Restrictions
 
@@ -367,12 +369,12 @@ AI features must also be enabled in organisation/team settings after configurati
 
 Documenso can accept `.docx` uploads by sending them to a [Gotenberg](https://gotenberg.dev) service that converts them to PDF. When `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL` is unset, DOCX uploads are rejected and only PDFs are accepted.
 
-| Variable                                      | Description                                                                                       | Default |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------- |
-| `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL`        | Base URL of the Gotenberg service (e.g., `http://gotenberg:3000`). Unset disables the feature.    |         |
-| `NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME`   | HTTP Basic auth username. Required when Gotenberg runs with `--api-enable-basic-auth`.            |         |
-| `NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD`   | HTTP Basic auth password. Set together with the username.                                         |         |
-| `NEXT_PRIVATE_DOCUMENT_CONVERSION_TIMEOUT_MS` | Per-request timeout in milliseconds. Increase for very large documents.                           | `30000` |
+| Variable                                      | Description                                                                                    | Default |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------- |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL`        | Base URL of the Gotenberg service (e.g., `http://gotenberg:3000`). Unset disables the feature. |         |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME`   | HTTP Basic auth username. Required when Gotenberg runs with `--api-enable-basic-auth`.         |         |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD`   | HTTP Basic auth password. Set together with the username.                                      |         |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_TIMEOUT_MS` | Per-request timeout in milliseconds. Increase for very large documents.                        | `30000` |
 
 The public flag `NEXT_PUBLIC_DOCUMENT_CONVERSION_ENABLED` is derived automatically from `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL` on server start. Do not set it manually.
 
@@ -386,24 +388,24 @@ Documenso supports multiple background job providers for processing emails, docu
 
 ### Provider Selection
 
-| Variable                     | Description                                                                            | Default |
-| ---------------------------- | -------------------------------------------------------------------------------------- | ------- |
+| Variable                     | Description                                                                           | Default |
+| ---------------------------- | ------------------------------------------------------------------------------------- | ------- |
 | `NEXT_PRIVATE_JOBS_PROVIDER` | Jobs provider: `local` (PostgreSQL), `bullmq` (Redis), or `inngest` (managed service) | `local` |
 
 ### Local (local)
 
 No additional configuration required. Jobs are stored in PostgreSQL and processed via internal HTTP requests.
 
-| Variable                           | Description                                                  | Default                          |
-| ---------------------------------- | ------------------------------------------------------------ | -------------------------------- |
-| `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` | Internal URL for the app to send job requests to itself      | Same as `NEXT_PUBLIC_WEBAPP_URL` |
+| Variable                           | Description                                             | Default                          |
+| ---------------------------------- | ------------------------------------------------------- | -------------------------------- |
+| `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` | Internal URL for the app to send job requests to itself | Same as `NEXT_PUBLIC_WEBAPP_URL` |
 
 ### BullMQ (bullmq)
 
-| Variable                           | Required | Description                                                   | Default     |
-| ---------------------------------- | -------- | ------------------------------------------------------------- | ----------- |
-| `NEXT_PRIVATE_REDIS_URL`           | Yes      | Redis connection URL (e.g., `redis://localhost:6379`)         |             |
-| `NEXT_PRIVATE_REDIS_PREFIX`        | No       | Key prefix for Redis queues (useful when sharing an instance) | `documenso` |
+| Variable                          | Required | Description                                                   | Default     |
+| --------------------------------- | -------- | ------------------------------------------------------------- | ----------- |
+| `NEXT_PRIVATE_REDIS_URL`          | Yes      | Redis connection URL (e.g., `redis://localhost:6379`)         |             |
+| `NEXT_PRIVATE_REDIS_PREFIX`       | No       | Key prefix for Redis queues (useful when sharing an instance) | `documenso` |
 | `NEXT_PRIVATE_BULLMQ_CONCURRENCY` | No       | Number of concurrent jobs to process                          | `10`        |
 
 ### Inngest (inngest)
@@ -445,14 +447,14 @@ Telemetry collects only: app version, installation ID, and node ID. No personal 
 
 These variables require an active [Enterprise Edition](/docs/policies/enterprise-edition) license. Obtain a license key from [license.documenso.com](https://license.documenso.com) and set it below to unlock enterprise features such as SSO, embed editor, and 21 CFR Part 11 compliance. See [Apply Your License Key](/docs/self-hosting/configuration/license) for step-by-step setup.
 
-| Variable                             | Description                                      |
-| ------------------------------------ | ------------------------------------------------ |
+| Variable                             | Description                                                                                                                      |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
 | `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` | License key for enterprise features — see [Apply Your License Key](/docs/self-hosting/configuration/license) for how to apply it |
-| `NEXT_PRIVATE_STRIPE_API_KEY`        | Stripe API key for billing                       |
-| `NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET` | Stripe webhook secret                            |
-| `NEXT_PRIVATE_SES_ACCESS_KEY_ID`     | AWS SES access key for email domain verification |
-| `NEXT_PRIVATE_SES_SECRET_ACCESS_KEY` | AWS SES secret key                               |
-| `NEXT_PRIVATE_SES_REGION`            | AWS SES region                                   |
+| `NEXT_PRIVATE_STRIPE_API_KEY`        | Stripe API key for billing                                                                                                       |
+| `NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET` | Stripe webhook secret                                                                                                            |
+| `NEXT_PRIVATE_SES_ACCESS_KEY_ID`     | AWS SES access key for email domain verification                                                                                 |
+| `NEXT_PRIVATE_SES_SECRET_ACCESS_KEY` | AWS SES secret key                                                                                                               |
+| `NEXT_PRIVATE_SES_REGION`            | AWS SES region                                                                                                                   |
 
 ---
 
@@ -463,6 +465,7 @@ A minimal production configuration:
 ```bash
 # Required
 NEXTAUTH_SECRET="your-random-secret-at-least-32-chars"
+NEXTAUTH_URL="https://sign.example.com"
 NEXT_PRIVATE_ENCRYPTION_KEY="your-encryption-key-at-least-32-chars"
 NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="your-secondary-key-at-least-32-chars"
 NEXT_PUBLIC_WEBAPP_URL="https://sign.example.com"
