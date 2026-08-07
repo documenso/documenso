@@ -9,6 +9,7 @@ These variables must be set for Documenso to function:
 
 | Variable                                | Description                                                                                |
 | --------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `NEXTAUTH_URL`                          | Public URL used by authentication (e.g., `https://sign.example.com`)                       |
 | `NEXTAUTH_SECRET`                       | Secret key for NextAuth.js encryption and signing. Generate with `openssl rand -base64 32` |
 | `NEXT_PRIVATE_ENCRYPTION_KEY`           | Primary encryption key for symmetric encryption (minimum 32 characters)                    |
 | `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Secondary encryption key for symmetric encryption (minimum 32 characters)                  |
@@ -51,11 +52,12 @@ For detailed database setup, see [Database Configuration](/docs/self-hosting/con
 
 ### Core Authentication
 
-| Variable                                | Required | Description                                                               |
-| --------------------------------------- | -------- | ------------------------------------------------------------------------- |
-| `NEXTAUTH_SECRET`                       | Yes      | Secret for NextAuth.js session encryption. Must be at least 32 characters |
-| `NEXT_PRIVATE_ENCRYPTION_KEY`           | Yes      | Primary key for encrypting sensitive data. Must be at least 32 characters |
-| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Yes      | Secondary encryption key for key rotation. Must be at least 32 characters |
+| Variable                                | Required | Description                                                                      |
+| --------------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| `NEXTAUTH_URL`                          | Yes      | Public authentication URL. Set this to the same origin as `NEXT_PUBLIC_WEBAPP_URL` |
+| `NEXTAUTH_SECRET`                       | Yes      | Secret for NextAuth.js session encryption. Must be at least 32 characters        |
+| `NEXT_PRIVATE_ENCRYPTION_KEY`           | Yes      | Primary key for encrypting sensitive data. Must be at least 32 characters        |
+| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Yes      | Secondary encryption key for key rotation. Must be at least 32 characters        |
 
 ### Google OAuth
 
@@ -462,6 +464,7 @@ A minimal production configuration:
 
 ```bash
 # Required
+NEXTAUTH_URL="https://sign.example.com"
 NEXTAUTH_SECRET="your-random-secret-at-least-32-chars"
 NEXT_PRIVATE_ENCRYPTION_KEY="your-encryption-key-at-least-32-chars"
 NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="your-secondary-key-at-least-32-chars"
