@@ -202,6 +202,10 @@ For full instructions, requirements, and configuration details, see the [Self Ho
 
 [![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/documenso)
 
+#### Miget
+
+[![Deploy to Miget](https://miget.com/deploy-to-miget.svg)](https://miget.com/deploy?repo=https://github.com/deployable-sh/stacks&path=documenso&type=stack)
+
 ## Security
 
 If you believe you have found a security vulnerability in Documenso, please report it through our [Security Policy](https://github.com/documenso/documenso/security/policy). We prioritize private reports via [GitHub Security Advisories](https://github.com/documenso/documenso/security/advisories/new). See [SECURITY.md](./SECURITY.md) for scope and details.
