@@ -66,6 +66,9 @@ test.describe('Unified Settings', () => {
     await expect(sidebar.getByTestId('settings-org-switcher-trigger')).toContainText(organisation.name);
     // Team switcher shows the fallback team (the user's first manageable team in this org).
     await expect(sidebar.getByTestId('settings-team-switcher-trigger')).toContainText(team.name);
+
+    // The empty state is only for users who can't manage the organisation.
+    await expect(sidebar.getByTestId('unified-settings-organisation-empty-state')).toHaveCount(0);
   });
 
   test('sidebar is flush with the left viewport edge', async ({ page }) => {
@@ -341,6 +344,11 @@ test.describe('Unified Settings', () => {
     await expect(sidebar.getByTestId('unified-settings-nav-organisation-members')).toHaveCount(0);
     await expect(sidebar.getByTestId('unified-settings-nav-organisation-billing')).toHaveCount(0);
 
+    // An empty group would just look broken, so it explains itself directly under the switcher.
+    const emptyState = sidebar.getByTestId('unified-settings-organisation-empty-state');
+    await expect(emptyState).toBeVisible();
+    await expect(emptyState).toContainText(/permission to manage this organisation/i);
+
     // Team and account pages remain navigable.
     await expect(sidebar.getByTestId('unified-settings-nav-team-general')).toBeVisible();
     await expect(sidebar.getByTestId('unified-settings-nav-team-members')).toBeVisible();
@@ -358,7 +366,8 @@ test.describe('Unified Settings', () => {
     // Managing a team must not grant access to the organisation scope.
     await page.goto(`/o/${organisation.url}/settings/general`);
 
-    await expect(page.getByText('401 Unauthorized')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Unauthorized' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /go to your settings/i })).toBeVisible();
     await expect(page.getByTestId('unified-settings-sidebar')).toHaveCount(0);
   });
 
@@ -370,6 +379,7 @@ test.describe('Unified Settings', () => {
     await apiSignin({ page, email: member.email });
     await page.goto(`/t/${team.url}/settings/general`);
 
+    // The team settings loader redirects out of the settings tree on a full page load.
     await expect(page).not.toHaveURL(/\/settings\//);
     await expect(page.getByTestId('unified-settings-sidebar')).toHaveCount(0);
   });

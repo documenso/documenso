@@ -29,6 +29,17 @@ export const UnifiedSettingsSidebar = ({ groups, currentOrgUrl, currentTeamUrl }
             switcher={<SettingsOrgSwitcher currentOrgUrl={currentOrgUrl} />}
             items={groups.organisation?.items ?? []}
             scope="organisation"
+            emptyState={
+              <p
+                className="rounded-md border border-dashed px-3 py-2 text-muted-foreground text-xs"
+                data-testid="unified-settings-organisation-empty-state"
+              >
+                <Trans>
+                  You don't have permission to manage this organisation. Switch to another one above, or continue in
+                  your team settings below.
+                </Trans>
+              </p>
+            }
           />
         </div>
       )}
@@ -65,6 +76,7 @@ type SidebarGroupProps = {
   switcher?: ReactNode;
   items: SettingsNavItem[];
   scope: SettingsNavScope;
+  emptyState?: ReactNode;
 };
 
 type GroupedNavEntry =
@@ -106,6 +118,7 @@ const SidebarGroup = ({
   switcher,
   items,
   scope,
+  emptyState,
 }: SidebarGroupProps) => {
   const grouped = groupNavEntries(items);
 
@@ -117,6 +130,8 @@ const SidebarGroup = ({
         {heading}
       </div>
       {switcher && <div className="mb-2">{switcher}</div>}
+
+      {items.length === 0 && emptyState}
 
       <nav className="flex flex-col gap-1">
         {grouped.map((entry) => {

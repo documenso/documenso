@@ -157,7 +157,7 @@ export const SettingsOrgSwitcher = ({ currentOrgUrl }: SettingsOrgSwitcherProps)
           </div>
         )}
 
-        <ul className="max-h-72 overflow-auto py-1">
+        <ul className="max-h-72 space-y-1 overflow-auto p-1">
           {filtered.map((org) => {
             const isCurrent = org.url === currentOrgUrl;
             return (
@@ -165,7 +165,10 @@ export const SettingsOrgSwitcher = ({ currentOrgUrl }: SettingsOrgSwitcherProps)
                 <button
                   type="button"
                   onClick={() => handleSelect(org.url)}
-                  className={cn('flex w-full items-center px-3 py-2 text-left hover:bg-muted', isCurrent && 'bg-muted')}
+                  className={cn(
+                    'flex w-full items-center rounded-md px-2 py-2 text-left hover:bg-muted',
+                    isCurrent && 'bg-muted',
+                  )}
                   data-testid={`settings-org-switcher-item-${org.url}`}
                 >
                   <AvatarWithText

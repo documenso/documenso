@@ -125,7 +125,7 @@ export const SettingsTeamSwitcher = ({ currentOrgUrl, currentTeamUrl }: Settings
           </div>
         )}
 
-        <ul className="max-h-72 overflow-auto py-1">
+        <ul className="max-h-72 space-y-1 overflow-auto p-1">
           {filtered.map((team) => {
             const isCurrent = team.url === currentTeam.url;
             return (
@@ -133,7 +133,10 @@ export const SettingsTeamSwitcher = ({ currentOrgUrl, currentTeamUrl }: Settings
                 <button
                   type="button"
                   onClick={() => handleSelect(team.url)}
-                  className={cn('flex w-full items-center px-3 py-2 text-left hover:bg-muted', isCurrent && 'bg-muted')}
+                  className={cn(
+                    'flex w-full items-center rounded-md px-2 py-2 text-left hover:bg-muted',
+                    isCurrent && 'bg-muted',
+                  )}
                   data-testid={`settings-team-switcher-item-${team.url}`}
                 >
                   <AvatarWithText

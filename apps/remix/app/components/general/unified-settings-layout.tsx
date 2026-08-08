@@ -91,6 +91,21 @@ export const UnifiedSettingsLayout = ({ activeScope }: UnifiedSettingsLayoutProp
   const teamForSidebar =
     team ?? organisation?.teams.find((t) => canExecuteTeamAction('MANAGE_TEAM', t.currentTeamRole)) ?? null;
 
+  const sidebarTeamUrl = teamForSidebar?.url ?? null;
+
+  // Sync the selected team URL in the sidebar into the preferred team URL cookie.
+  useEffect(() => {
+    if (!sidebarTeamUrl) {
+      return;
+    }
+
+    const body = new FormData();
+
+    body.append('teamUrl', sidebarTeamUrl);
+
+    void fetch('/api/preferred-team', { method: 'POST', body });
+  }, [sidebarTeamUrl]);
+
   const groups = getSettingsNavGroups({
     organisation: organisation
       ? {
@@ -108,6 +123,10 @@ export const UnifiedSettingsLayout = ({ activeScope }: UnifiedSettingsLayoutProp
   const canManageOrg =
     organisation !== null && canExecuteOrganisationAction('MANAGE_ORGANISATION', organisation.currentOrganisationRole);
 
+  // Must be derived from the team in the URL context, NOT from `teamForSidebar` — the
+  // latter falls back to any manageable team in the org, which would let a team manager
+  // through the organisation-scope guard (and `useOptionalCurrentTeam()` resolves for any
+  // member regardless of role, which would let a plain member through the team guard).
   const canManageCurrentTeam = team !== null && canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole);
 
   // Account pages are available to every user. The organisation and team scopes each
@@ -131,8 +150,8 @@ export const UnifiedSettingsLayout = ({ activeScope }: UnifiedSettingsLayoutProp
         }}
         primaryButton={
           <Button asChild>
-            <Link to="/settings/profile">
-              <Trans>Go to Account</Trans>
+            <Link to="/settings">
+              <Trans>Go to your settings</Trans>
             </Link>
           </Button>
         }

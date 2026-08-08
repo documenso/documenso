@@ -1,52 +1,124 @@
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getTeamWithEmail } from '@documenso/lib/server-only/team/get-team-email-by-email';
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
+import { buildTeamWhereQuery, canExecuteTeamAction } from '@documenso/lib/utils/teams';
+import { prisma } from '@documenso/prisma';
+import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@documenso/ui/primitives/dropdown-menu';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { CheckCircle2, Clock } from 'lucide-react';
+import { CheckCircle2, Clock, EditIcon, LoaderIcon, MailIcon, MoreHorizontalIcon, XIcon } from 'lucide-react';
+import { redirect } from 'react-router';
 import { match, P } from 'ts-pattern';
 import { TeamDeleteDialog } from '~/components/dialogs/team-delete-dialog';
 import { TeamEmailAddDialog } from '~/components/dialogs/team-email-add-dialog';
+import { TeamEmailDeleteDialog } from '~/components/dialogs/team-email-delete-dialog';
+import { TeamEmailUpdateDialog } from '~/components/dialogs/team-email-update-dialog';
 import { AvatarImageForm } from '~/components/forms/avatar-image';
 import { TeamUpdateForm } from '~/components/forms/team-update-form';
 import { SettingsHeader } from '~/components/general/settings-header';
-import { TeamEmailDropdown } from '~/components/general/teams/team-email-dropdown';
 import { useCurrentTeam } from '~/providers/team';
 import type { Route } from './+types/settings.general';
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const { user } = await getSession(request);
 
-  const team = await getTeamWithEmail({
-    userId: user.id,
-    teamUrl: params.teamUrl,
+  if (!user || !params.teamUrl) {
+    throw redirect('/');
+  }
+
+  const team = await prisma.team.findUnique({
+    where: {
+      ...buildTeamWhereQuery({
+        teamId: undefined,
+        userId: user.id,
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+      }),
+      url: params.teamUrl,
+    },
+    include: {
+      teamEmail: {
+        select: {
+          email: true,
+          name: true,
+        },
+      },
+      emailVerification: {
+        select: {
+          email: true,
+          name: true,
+          expiresAt: true,
+        },
+      },
+    },
   });
 
+  if (!team) {
+    throw redirect('/');
+  }
+
   return {
-    team,
+    teamEmail: team.teamEmail
+      ? {
+          email: team.teamEmail?.email,
+          name: team.teamEmail.name,
+        }
+      : null,
+    emailVerification: team.emailVerification
+      ? {
+          email: team.emailVerification?.email,
+          name: team.emailVerification.name,
+          expiresAt: team.emailVerification.expiresAt,
+        }
+      : null,
   };
 }
 
 export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) {
   const { t } = useLingui();
+  const { toast } = useToast();
 
-  const { team } = loaderData;
+  const { teamEmail, emailVerification } = loaderData;
 
-  const currentTeam = useCurrentTeam();
+  const team = useCurrentTeam();
+
+  const { mutateAsync: resendEmailVerification, isPending: isResendingEmailVerification } =
+    trpc.team.email.verification.resend.useMutation({
+      onSuccess: () => {
+        toast({
+          title: t`Success`,
+          description: t`Email verification has been resent`,
+          duration: 5000,
+        });
+      },
+      onError: () => {
+        toast({
+          title: t`Something went wrong`,
+          description: t`Unable to resend verification at this time. Please try again.`,
+          variant: 'destructive',
+          duration: 10000,
+        });
+      },
+    });
 
   return (
     <div>
       <SettingsHeader title={t`General settings`} subtitle={t`Here you can edit your team's details.`} />
 
-      <AvatarImageForm team={currentTeam} className="mb-8" />
+      <AvatarImageForm team={team} className="mb-8" />
 
       <TeamUpdateForm teamId={team.id} teamName={team.name} teamUrl={team.url} />
 
       <section className="mt-6 space-y-6">
-        {(team.teamEmail || team.emailVerification) && (
+        {(teamEmail || emailVerification) && (
           <Alert className="p-6" variant="neutral">
             <AlertTitle>
               <Trans>Team email</Trans>
@@ -64,22 +136,20 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
               <AvatarWithText
                 avatarClass="h-12 w-12"
                 avatarSrc={formatAvatarUrl(team.avatarImageId)}
-                avatarFallback={extractInitials((team.teamEmail?.name || team.emailVerification?.name) ?? '')}
+                avatarFallback={extractInitials((teamEmail?.name || emailVerification?.name) ?? '')}
                 primaryText={
                   <span className="font-semibold text-foreground/80 text-sm">
-                    {team.teamEmail?.name || team.emailVerification?.name}
+                    {teamEmail?.name || emailVerification?.name}
                   </span>
                 }
-                secondaryText={
-                  <span className="text-sm">{team.teamEmail?.email || team.emailVerification?.email}</span>
-                }
+                secondaryText={<span className="text-sm">{teamEmail?.email || emailVerification?.email}</span>}
               />
 
               <div className="flex flex-row items-center pr-2">
                 <div className="mr-4 flex flex-row items-center text-muted-foreground text-sm xl:mr-8">
                   {match({
-                    teamEmail: team.teamEmail,
-                    emailVerification: team.emailVerification,
+                    teamEmail,
+                    emailVerification: emailVerification,
                   })
                     .with({ teamEmail: P.not(null) }, () => (
                       <>
@@ -109,13 +179,62 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
                     .otherwise(() => null)}
                 </div>
 
-                <TeamEmailDropdown team={team} />
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <MoreHorizontalIcon className="h-5 w-5 text-muted-foreground" />
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent className="w-52" align="start" forceMount>
+                    {!teamEmail && emailVerification && (
+                      <DropdownMenuItem
+                        disabled={isResendingEmailVerification}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          void resendEmailVerification({ teamId: team.id });
+                        }}
+                      >
+                        {isResendingEmailVerification ? (
+                          <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <MailIcon className="mr-2 h-4 w-4" />
+                        )}
+                        <Trans>Resend verification</Trans>
+                      </DropdownMenuItem>
+                    )}
+
+                    {teamEmail && (
+                      <TeamEmailUpdateDialog
+                        teamId={team.id}
+                        teamEmail={teamEmail}
+                        trigger={
+                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            <EditIcon className="mr-2 h-4 w-4" />
+                            <Trans>Edit</Trans>
+                          </DropdownMenuItem>
+                        }
+                      />
+                    )}
+
+                    <TeamEmailDeleteDialog
+                      team={team}
+                      teamEmail={teamEmail}
+                      emailVerification={emailVerification}
+                      teamName={team.name}
+                      trigger={
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                          <XIcon className="mr-2 h-4 w-4" />
+                          <Trans>Remove</Trans>
+                        </DropdownMenuItem>
+                      }
+                    />
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </Alert>
         )}
 
-        {!team.teamEmail && !team.emailVerification && (
+        {!teamEmail && !emailVerification && (
           <Alert className="flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
             <div className="mb-4 sm:mb-0">
               <AlertTitle>
@@ -139,7 +258,7 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
           </Alert>
         )}
 
-        {canExecuteTeamAction('MANAGE_TEAM', currentTeam.currentTeamRole) && (
+        {canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole) && (
           <Alert className="flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
             <div className="mb-4 sm:mb-0">
               <AlertTitle>
