@@ -160,6 +160,109 @@ test.describe('Unified Settings', () => {
     await expect(page).toHaveURL(`/t/${team2Url}/settings/members`);
   });
 
+  test('account settings keep the organisation the user was working in', async ({ page }) => {
+    // The user administers their own organisation, but only manages a team in the seeded
+    // one — so the two differ in whether organisation settings are reachable.
+    const { team: teamInOtherOrg, organisation: otherOrganisation } = await seedTeam();
+
+    const user = await seedTeamMember({ teamId: teamInOtherOrg.id, role: TeamMemberRole.MANAGER });
+
+    const ownedOrganisation = await prisma.organisation.findFirstOrThrow({
+      where: { ownerUserId: user.id },
+      include: { teams: true },
+    });
+
+    // Both are seeded as "Personal Organisation", so rename them to tell the switcher apart.
+    await prisma.organisation.update({ where: { id: ownedOrganisation.id }, data: { name: 'Org I Administer' } });
+    await prisma.organisation.update({
+      where: { id: otherOrganisation.id },
+      data: { name: 'Org I Only Have A Team In' },
+    });
+
+    await apiSignin({ page, email: user.email });
+
+    const sidebar = page.getByTestId('unified-settings-sidebar');
+    const orgTrigger = sidebar.getByTestId('settings-org-switcher-trigger');
+
+    // `organisations` comes back unordered, so which one account scope falls back to isn't
+    // fixed. Read it cold, then work in the *other* one — otherwise the test can pass just
+    // because the fallback already happened to be the right organisation.
+    await page.goto('/settings/profile');
+
+    const fallbackIsOwned = ((await orgTrigger.textContent()) ?? '').includes('Org I Administer');
+
+    const target = fallbackIsOwned
+      ? { name: 'Org I Only Have A Team In', teamUrl: teamInOtherOrg.url }
+      : { name: 'Org I Administer', teamUrl: ownedOrganisation.teams[0].url };
+
+    await page.goto(`/t/${target.teamUrl}/settings/general`);
+    await expect(orgTrigger).toContainText(target.name);
+
+    // Account scope has no organisation in the URL either, so it must not silently jump
+    // back to whichever organisation happens to be first.
+    await sidebar.getByTestId('unified-settings-nav-account-profile').click();
+    await page.waitForURL('/settings/profile');
+    await expect(page.getByTestId('settings-scope-breadcrumb-chip')).toContainText('Account Settings');
+
+    await expect(orgTrigger).toContainText(target.name);
+  });
+
+  test('team switcher keeps the selected team when moving to organisation scope', async ({ page }) => {
+    const { owner, team: team1, organisation } = await seedTeam();
+
+    // Lowercased to match what `ZTeamUrlSchema` stores — `createTeam` is called directly
+    // here, bypassing the tRPC input schema that would normalise it in the real flow.
+    const team2Url = `team-two-${nanoid()}`.toLowerCase();
+
+    await createTeam({
+      userId: owner.id,
+      teamName: 'Team Two',
+      teamUrl: team2Url,
+      organisationId: organisation.id,
+      inheritMembers: true,
+    });
+
+    await apiSignin({ page, email: owner.email });
+
+    const sidebar = page.getByTestId('unified-settings-sidebar');
+    const trigger = sidebar.getByTestId('settings-team-switcher-trigger');
+
+    // `organisation.teams` comes back unordered, so which team the sidebar falls back to
+    // isn't fixed. Read it first, then deliberately select the *other* one — otherwise the
+    // test can pass simply because the fallback already happened to be the right team.
+    await page.goto(`/o/${organisation.url}/settings/general`);
+
+    const fallbackIsTeam2 = ((await trigger.textContent()) ?? '').includes('Team Two');
+    const selected = fallbackIsTeam2 ? { url: team1.url, name: team1.name } : { url: team2Url, name: 'Team Two' };
+
+    await page.goto(`/t/${team2Url}/settings/general`);
+    await trigger.click();
+    await page.getByTestId(`settings-team-switcher-item-${selected.url}`).click();
+    await page.waitForURL(`/t/${selected.url}/settings/general`);
+    await expect(trigger).toContainText(selected.name);
+
+    // Organisation scope has no team in the URL, so the sidebar has to remember which team
+    // the user picked rather than falling back to whichever one happens to be first.
+    await sidebar.getByTestId('unified-settings-nav-organisation-general').click();
+    await page.waitForURL(`/o/${organisation.url}/settings/general`);
+
+    // Wait for the organisation page to actually render — asserting straight after
+    // `waitForURL` can read the previous scope's still-mounted sidebar and pass falsely.
+    await expect(page.getByTestId('settings-scope-breadcrumb-chip')).toContainText('Organisation Settings');
+
+    await expect(trigger).toContainText(selected.name);
+
+    // The selection must also survive in the cookie — otherwise the app root would send the
+    // user back to the wrong team.
+    await expect
+      .poll(async () => {
+        const cookies = await page.context().cookies();
+
+        return cookies.find((cookie) => cookie.name === 'preferred-team-url')?.value ?? null;
+      })
+      .toBe(selected.url);
+  });
+
   test('inheritable field toggles between INHERITED and OVERRIDDEN', async ({ page }) => {
     const { owner, team } = await seedTeam();
 

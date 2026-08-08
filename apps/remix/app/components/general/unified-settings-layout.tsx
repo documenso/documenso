@@ -21,6 +21,13 @@ export type UnifiedSettingsScope = 'organisation' | 'team' | 'account';
 
 export type UnifiedSettingsLayoutProps = {
   activeScope: UnifiedSettingsScope;
+
+  /**
+   * The team the user last worked in, read from the `preferred-team-url` cookie by the
+   * layout's loader. Used to keep the sidebar's team switcher stable at organisation and
+   * account scope, where the URL carries no team.
+   */
+  preferredTeamUrl?: string | null;
 };
 
 /**
@@ -59,7 +66,7 @@ const findActiveCrumbs = (group: SettingsNavGroup | null, pathname: string): Mes
   return [bestMatch.label];
 };
 
-export const UnifiedSettingsLayout = ({ activeScope }: UnifiedSettingsLayoutProps) => {
+export const UnifiedSettingsLayout = ({ activeScope, preferredTeamUrl = null }: UnifiedSettingsLayoutProps) => {
   const { _ } = useLingui();
   const { organisations } = useSession();
   const { pathname } = useLocation();
@@ -74,22 +81,22 @@ export const UnifiedSettingsLayout = ({ activeScope }: UnifiedSettingsLayoutProp
     contentPaneRef.current?.scrollTo(0, 0);
   }, [pathname]);
 
-  // At account scope there is no organisation in the URL context — fall back to
-  // the user's first manageable organisation so the org/team groups still render.
+  // An organisation is worth showing in the sidebar if it has settings the user can reach —
+  // either the organisation's own, or those of a team inside it.
+  const hasReachableSettings = (org: (typeof organisations)[number]) =>
+    canExecuteOrganisationAction('MANAGE_ORGANISATION', org.currentOrganisationRole) ||
+    org.teams.some((t) => canExecuteTeamAction('MANAGE_TEAM', t.currentTeamRole));
+
   const organisation =
     currentOrganisation ??
-    organisations.find(
-      (org) =>
-        canExecuteOrganisationAction('MANAGE_ORGANISATION', org.currentOrganisationRole) ||
-        org.teams.some((t) => canExecuteTeamAction('MANAGE_TEAM', t.currentTeamRole)),
-    ) ??
+    organisations.find((org) => org.teams.some((t) => t.url === preferredTeamUrl) && hasReachableSettings(org)) ??
+    organisations.find(hasReachableSettings) ??
     null;
 
-  // At org scope (no team in context), surface the user's first manageable team
-  // in the current org so the Team group renders alongside the Organisation group.
-  // At team scope, `team` from the context is the source of truth.
+  const manageableTeams = organisation?.teams.filter((t) => canExecuteTeamAction('MANAGE_TEAM', t.currentTeamRole));
+
   const teamForSidebar =
-    team ?? organisation?.teams.find((t) => canExecuteTeamAction('MANAGE_TEAM', t.currentTeamRole)) ?? null;
+    team ?? manageableTeams?.find((t) => t.url === preferredTeamUrl) ?? manageableTeams?.[0] ?? null;
 
   const sidebarTeamUrl = teamForSidebar?.url ?? null;
 
