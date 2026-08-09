@@ -44,31 +44,13 @@ export const UserOrganisationsTable = () => {
         header: _(msg`Organisation`),
         accessorKey: 'name',
         cell: ({ row }) => (
-          <Link
-            to={isPersonalLayoutMode ? `/settings/organisations` : `/o/${row.original.url}`}
-            preventScrollReset={true}
-          >
+          <Link to={`/o/${row.original.url}`} preventScrollReset={true}>
             <AvatarWithText
               avatarSrc={formatAvatarUrl(row.original.avatarImageId)}
               avatarClass="h-12 w-12"
               avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
-              primaryText={
-                <span className="font-semibold text-foreground/80">
-                  {isPersonalLayoutMode
-                    ? _(
-                        msg({
-                          message: `Personal`,
-                          context: `Personal organisation (adjective)`,
-                        }),
-                      )
-                    : row.original.name}
-                </span>
-              }
-              secondaryText={
-                isPersonalLayoutMode
-                  ? _(msg`Your personal organisation`)
-                  : `${NEXT_PUBLIC_WEBAPP_URL()}/o/${row.original.url}`
-              }
+              primaryText={<span className="font-semibold text-foreground/80">{row.original.name}</span>}
+              secondaryText={`${NEXT_PUBLIC_WEBAPP_URL()}/o/${row.original.url}`}
             />
           </Link>
         ),

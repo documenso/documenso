@@ -243,6 +243,38 @@
   display: none;
 }
 
+/*
+ * Scrollbar hidden until the element is hovered, then a thin thumb is revealed.
+ * The track keeps a constant width so revealing the thumb doesn't shift layout;
+ * the thumb colour transitions in on WebKit (Firefox snaps, which is fine).
+ */
+.hover-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.hover-scrollbar:hover {
+  scrollbar-color: hsl(var(--muted-foreground) / 0.4) transparent;
+}
+
+.hover-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+}
+
+.hover-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 9999px;
+  transition: background-color 200ms ease;
+}
+
+.hover-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.4);
+}
+
 /* .custom-scrollbar::-webkit-scrollbar-track {
   border-radius: 10px;
 }
