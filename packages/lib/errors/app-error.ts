@@ -37,6 +37,13 @@ export enum AppErrorCode {
   ENVELOPE_TSP_LOCKED = 'ENVELOPE_TSP_LOCKED',
 
   /**
+   * A completion request was made for a recipient that has already signed.
+   * Thrown for retried, stale or concurrent duplicate submissions so callers
+   * can resolve them idempotently instead of surfacing an error.
+   */
+  RECIPIENT_ALREADY_SIGNED = 'RECIPIENT_ALREADY_SIGNED',
+
+  /**
    * A signer recipient does not have a signature field assigned. Thrown when
    * distributing an envelope or using a direct template where at least one
    * signer has no signature field.
