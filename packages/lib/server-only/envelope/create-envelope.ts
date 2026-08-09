@@ -416,7 +416,12 @@ export const createEnvelope = async ({
 
     const allRecipients = [...(data.recipients || []), ...mappedDefaultRecipients];
 
-    await Promise.all(
+    // Promise.all resolves in input order, so createdRecipientRecords[i] is the
+    // recipient created from allRecipients[i] (and therefore from data.recipients[i]
+    // for the leading entries). Keeping this correspondence lets placeholder tags be
+    // resolved by index below instead of by email, which is what allows two recipients
+    // that share an email to stay distinct (#3115).
+    const createdRecipientRecords = await Promise.all(
       allRecipients.map(async (recipient) => {
         const recipientAuthOptions = createRecipientAuthOptions({
           accessAuth: recipient.accessAuth ?? [],
@@ -455,7 +460,7 @@ export const createEnvelope = async ({
           };
         });
 
-        await tx.recipient.create({
+        return tx.recipient.create({
           data: {
             envelopeId: envelope.id,
             name: recipient.name,
@@ -472,6 +477,7 @@ export const createEnvelope = async ({
               },
             },
           },
+          select: { id: true, email: true },
         });
       }),
     );
@@ -547,16 +553,21 @@ export const createEnvelope = async ({
               recipientPlaceholder,
               placeholder,
               data.recipients && data.recipients.length > 0
-                ? data.recipients.map((r) => {
-                    const found = availableRecipients.find((cr) => cr.email === r.email);
+                ? // Index-based: r1 -> data.recipients[0], r2 -> data.recipients[1], etc.
+                  // Matching each entry back by email collapsed recipients that share an
+                  // email onto whichever row was found first, so every tag bound to one of
+                  // them (#3115). createdRecipientRecords lines up with data.recipients by
+                  // position, so index resolution keeps same-email recipients distinct.
+                  data.recipients.map((_, index) => {
+                    const created = createdRecipientRecords[index];
 
-                    if (!found) {
+                    if (!created) {
                       throw new AppError(AppErrorCode.NOT_FOUND, {
-                        message: `Recipient not found for email: ${r.email}`,
+                        message: `Recipient not found for placeholder index r${index + 1}`,
                       });
                     }
 
-                    return found;
+                    return created;
                   })
                 : undefined,
               availableRecipients,
