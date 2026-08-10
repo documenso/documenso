@@ -26,7 +26,7 @@ export const appMiddleware = async (c: Context, next: Next) => {
   }
 
   // PRE-HANDLER CODE: Place code here to execute BEFORE the route handler runs.
-  const redirectPath = await handleRedirects(c);
+  const redirectPath = handleRedirects(c);
 
   if (redirectPath) {
     debug.log('Redirecting from', path);

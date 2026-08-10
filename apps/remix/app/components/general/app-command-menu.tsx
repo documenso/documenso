@@ -288,7 +288,7 @@ export const AppCommandMenu = ({ open, onOpenChange }: AppCommandMenuProps) => {
       {
         id: 'settings-main',
         label: msg`Settings`,
-        path: '/settings',
+        path: '/settings/profile',
         icon: SettingsIcon,
         shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', ''),
       },
@@ -390,7 +390,7 @@ export const AppCommandMenu = ({ open, onOpenChange }: AppCommandMenuProps) => {
 
   const formatChipCount = (count: number, isCapped: boolean) => (isCapped ? `≥${count}` : `${count}`);
 
-  const goToSettings = useCallback(() => push('/settings'), [push]);
+  const goToSettings = useCallback(() => push('/settings/profile'), [push]);
   const goToDocuments = useCallback(() => {
     if (teamUrl) {
       push(`/t/${teamUrl}/documents?status=ALL`);

@@ -1,10 +1,8 @@
-import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
-import { useLoaderData } from 'react-router';
 
 import {
   DocumentPreferencesForm,
@@ -13,15 +11,7 @@ import {
 import { SettingsHeader } from '~/components/general/settings-header';
 import { useCurrentTeam } from '~/providers/team';
 
-export const loader = () => {
-  return {
-    isAiFeaturesConfigured: IS_AI_FEATURES_CONFIGURED(),
-  };
-};
-
 export default function TeamsSettingsPage() {
-  const { isAiFeaturesConfigured } = useLoaderData<typeof loader>();
-
   const team = useCurrentTeam();
 
   const { t } = useLingui();
@@ -103,7 +93,6 @@ export default function TeamsSettingsPage() {
       <section>
         <DocumentPreferencesForm
           canInherit={true}
-          isAiFeaturesConfigured={isAiFeaturesConfigured}
           settings={teamWithSettings.teamSettings}
           onFormSubmit={onDocumentPreferencesSubmit}
         />
