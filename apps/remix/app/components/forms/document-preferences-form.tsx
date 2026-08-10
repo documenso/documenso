@@ -7,6 +7,7 @@ import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import type { TDefaultRecipients } from '@documenso/lib/types/default-recipients';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { type TDocumentMetaDateFormat, ZDocumentMetaDateFormatSchema } from '@documenso/lib/types/document-meta';
+import { env } from '@documenso/lib/utils/env';
 import { generateDefaultOrganisationSettings, isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { extractTeamSignatureSettings, generateDefaultTeamSettings } from '@documenso/lib/utils/teams';
@@ -24,10 +25,8 @@ import { Trans } from '@lingui/react/macro';
 import { DocumentVisibility, type RecipientRole, type TeamGlobalSettings } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
 import { DocumentPreferencesResetDialog } from '~/components/dialogs/document-preferences-reset-dialog';
 import { useOptionalCurrentTeam } from '~/providers/team';
-
 import { DefaultRecipientsMultiSelectCombobox } from '../general/default-recipients-multiselect-combobox';
 import { FormStickySaveBar } from './form-sticky-save-bar';
 import { InheritableField } from './inheritable-field';
@@ -64,7 +63,6 @@ type SettingsSubset = Pick<
 export type DocumentPreferencesFormProps = {
   settings: SettingsSubset;
   canInherit: boolean;
-  isAiFeaturesConfigured?: boolean;
   onFormSubmit: (data: TDocumentPreferencesFormSchema) => Promise<void>;
 };
 
@@ -83,16 +81,13 @@ const getDocumentPreferencesFormValues = (settings: SettingsSubset): TDocumentPr
   };
 };
 
-export const DocumentPreferencesForm = ({
-  settings,
-  onFormSubmit,
-  canInherit,
-  isAiFeaturesConfigured = false,
-}: DocumentPreferencesFormProps) => {
+export const DocumentPreferencesForm = ({ settings, onFormSubmit, canInherit }: DocumentPreferencesFormProps) => {
   const { _ } = useLingui();
   const { organisations } = useSession();
   const currentOrganisation = useCurrentOrganisation();
   const optionalTeam = useOptionalCurrentTeam();
+
+  const isAiFeaturesConfigured = env('NEXT_PUBLIC_AI_FEATURES_ENABLED') === 'true';
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 

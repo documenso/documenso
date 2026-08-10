@@ -24,6 +24,7 @@ export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'support@docume
 
 export const USE_INTERNAL_URL_BROWSERLESS = () => env('NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS') === 'true';
 
+// Note: This will only work on the server side only. For frontend use env('NEXT_PUBLIC_AI_FEATURES_ENABLED') === 'true';
 export const IS_AI_FEATURES_CONFIGURED = () => !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
 
 /**

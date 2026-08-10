@@ -157,7 +157,7 @@ export const UnifiedSettingsLayout = ({ activeScope, preferredTeamUrl = null }: 
         }}
         primaryButton={
           <Button asChild>
-            <Link to="/settings">
+            <Link to="/settings/profile">
               <Trans>Go to your settings</Trans>
             </Link>
           </Button>

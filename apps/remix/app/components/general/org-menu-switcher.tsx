@@ -168,7 +168,7 @@ export const OrgMenuSwitcher = () => {
                   {canExecuteOrganisationAction('MANAGE_ORGANISATION', org.currentOrganisationRole) && (
                     <div className="absolute top-0 right-0 bottom-0 flex items-center justify-center">
                       <Link
-                        to={`/o/${org.url}/settings`}
+                        to={`/o/${org.url}/settings/general`}
                         className="mr-2 rounded-sm border p-1 text-muted-foreground transition-opacity duration-200 group-hover:opacity-100 md:opacity-0"
                       >
                         <Settings2Icon className="h-3.5 w-3.5" />
@@ -221,7 +221,7 @@ export const OrgMenuSwitcher = () => {
                       {canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole) && (
                         <div className="absolute top-0 right-0 bottom-0 flex items-center justify-center">
                           <Link
-                            to={`/t/${team.url}/settings`}
+                            to={`/t/${team.url}/settings/general`}
                             className="mr-2 rounded-sm border p-1 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100"
                           >
                             <Settings2Icon className="h-3.5 w-3.5" />
@@ -275,10 +275,10 @@ export const OrgMenuSwitcher = () => {
                 <Link
                   to={
                     canAccessOrganisationSettings
-                      ? `/o/${currentOrganisation?.url}/settings`
+                      ? `/o/${currentOrganisation?.url}/settings/general`
                       : canAccessTeamSettings
-                        ? `/t/${currentTeam?.url}/settings`
-                        : '/settings'
+                        ? `/t/${currentTeam?.url}/settings/general`
+                        : '/settings/profile'
                   }
                 >
                   <Trans>Settings</Trans>
