@@ -1,7 +1,6 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import type { SanitizeBrandingCssWarning } from '@documenso/lib/utils/sanitize-branding-css';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -26,15 +25,11 @@ export function meta() {
 }
 
 export default function OrganisationSettingsBrandingPage() {
-  const { organisations } = useSession();
-
   const organisation = useCurrentOrganisation();
   const team = useOptionalCurrentTeam();
 
   const { t } = useLingui();
   const { toast } = useToast();
-
-  const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const [cssWarnings, setCssWarnings] = useState<SanitizeBrandingCssWarning[]>([]);
 
@@ -122,11 +117,9 @@ export default function OrganisationSettingsBrandingPage() {
 
   const settingsHeaderText = t`Branding Preferences`;
 
-  const settingsHeaderSubtitle = isPersonalLayoutMode
-    ? t`Here you can set your general branding preferences.`
-    : team
-      ? t`Here you can set branding preferences for your team.`
-      : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
+  const settingsHeaderSubtitle = team
+    ? t`Here you can set branding preferences for your team.`
+    : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
 
   return (
     <div>
@@ -181,7 +174,7 @@ export default function OrganisationSettingsBrandingPage() {
 
           {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
             <Button asChild variant="outline">
-              <Link to={isPersonalLayoutMode ? '/settings/billing' : `/o/${organisation.url}/settings/billing`}>
+              <Link to={`/o/${organisation.url}/settings/billing`}>
                 <Trans>Update Billing</Trans>
               </Link>
             </Button>

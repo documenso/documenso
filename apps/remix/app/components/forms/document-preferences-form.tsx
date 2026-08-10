@@ -1,5 +1,6 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES, DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode, SUPPORTED_LANGUAGE_CODES, SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
@@ -24,10 +25,8 @@ import { Trans } from '@lingui/react/macro';
 import { DocumentVisibility, type RecipientRole, type TeamGlobalSettings } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
 import { DocumentPreferencesResetDialog } from '~/components/dialogs/document-preferences-reset-dialog';
 import { useOptionalCurrentTeam } from '~/providers/team';
-
 import { DefaultRecipientsMultiSelectCombobox } from '../general/default-recipients-multiselect-combobox';
 import { FormStickySaveBar } from './form-sticky-save-bar';
 import { InheritableField } from './inheritable-field';
@@ -64,7 +63,6 @@ type SettingsSubset = Pick<
 export type DocumentPreferencesFormProps = {
   settings: SettingsSubset;
   canInherit: boolean;
-  isAiFeaturesConfigured?: boolean;
   onFormSubmit: (data: TDocumentPreferencesFormSchema) => Promise<void>;
 };
 
@@ -83,16 +81,13 @@ const getDocumentPreferencesFormValues = (settings: SettingsSubset): TDocumentPr
   };
 };
 
-export const DocumentPreferencesForm = ({
-  settings,
-  onFormSubmit,
-  canInherit,
-  isAiFeaturesConfigured = false,
-}: DocumentPreferencesFormProps) => {
+export const DocumentPreferencesForm = ({ settings, onFormSubmit, canInherit }: DocumentPreferencesFormProps) => {
   const { _ } = useLingui();
   const { organisations } = useSession();
   const currentOrganisation = useCurrentOrganisation();
   const optionalTeam = useOptionalCurrentTeam();
+
+  const isAiFeaturesConfigured = IS_AI_FEATURES_CONFIGURED();
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 

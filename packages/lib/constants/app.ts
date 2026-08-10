@@ -24,7 +24,20 @@ export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'support@docume
 
 export const USE_INTERNAL_URL_BROWSERLESS = () => env('NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS') === 'true';
 
-export const IS_AI_FEATURES_CONFIGURED = () => !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
+/**
+ * Returns whether AI features are configured for this instance.
+ *
+ * Platform-aware:
+ * - On the server, checks the private Vertex credentials are configured.
+ * - On the client, reads the derived public flag injected via `window.__ENV__`.
+ */
+export const IS_AI_FEATURES_CONFIGURED = (): boolean => {
+  if (typeof window === 'undefined') {
+    return !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
+  }
+
+  return env('NEXT_PUBLIC_AI_FEATURES_ENABLED') === 'true';
+};
 
 /**
  * Temporary flag to toggle between Playwright-based and Konva-based PDF generation
