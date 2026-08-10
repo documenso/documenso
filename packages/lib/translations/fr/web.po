@@ -43,7 +43,7 @@ msgstr "« {documentName} » a été signé"
 
 #: packages/email/template-components/template-document-completed.tsx
 msgid "“{documentName}” was signed by all signers"
-msgstr "“{documentName}” a été signé par tous les signataires"
+msgstr "« {documentName} » a été signé par tous les signataires"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
