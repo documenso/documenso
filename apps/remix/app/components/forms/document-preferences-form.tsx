@@ -1,5 +1,6 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES, DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode, SUPPORTED_LANGUAGE_CODES, SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
@@ -7,7 +8,6 @@ import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import type { TDefaultRecipients } from '@documenso/lib/types/default-recipients';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { type TDocumentMetaDateFormat, ZDocumentMetaDateFormatSchema } from '@documenso/lib/types/document-meta';
-import { env } from '@documenso/lib/utils/env';
 import { generateDefaultOrganisationSettings, isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { extractTeamSignatureSettings, generateDefaultTeamSettings } from '@documenso/lib/utils/teams';
@@ -87,7 +87,7 @@ export const DocumentPreferencesForm = ({ settings, onFormSubmit, canInherit }: 
   const currentOrganisation = useCurrentOrganisation();
   const optionalTeam = useOptionalCurrentTeam();
 
-  const isAiFeaturesConfigured = env('NEXT_PUBLIC_AI_FEATURES_ENABLED') === 'true';
+  const isAiFeaturesConfigured = IS_AI_FEATURES_CONFIGURED();
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 
