@@ -5343,12 +5343,12 @@ msgstr "Contagem de Itens do Envelope"
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Envelope item created"
-msgstr ""
+msgstr "Item do envelope criado"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Envelope item deleted"
-msgstr ""
+msgstr "Item do envelope excluído"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
@@ -6792,7 +6792,7 @@ msgstr "O link expira em 30 minutos."
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgctxt "Action button to link template to public profile"
 msgid "Link template"
-msgstr ""
+msgstr "Vincular modelo"
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "Link your Documenso account"
