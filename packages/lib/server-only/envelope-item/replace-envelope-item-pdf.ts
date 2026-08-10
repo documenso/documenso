@@ -6,6 +6,7 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { prisma } from '@documenso/prisma';
 import type { Envelope, Field, Recipient } from '@prisma/client';
 
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { convertPlaceholdersToFieldInputs, extractPdfPlaceholders } from '../pdf/auto-place-fields';
 import { findRecipientByPlaceholder } from '../pdf/helpers';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
@@ -96,6 +97,8 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
   let didFieldsChange = false;
 
   const updatedEnvelopeItem = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     const updatedItem = await tx.envelopeItem.update({
       where: {
         id: envelopeItemId,

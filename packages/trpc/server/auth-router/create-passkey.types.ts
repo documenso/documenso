@@ -1,8 +1,9 @@
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { ZRegistrationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 import { z } from 'zod';
 
 export const ZCreatePasskeyRequestSchema = z.object({
-  passkeyName: z.string().trim().min(1),
+  passkeyName: ZNameSchema,
   verificationResponse: ZRegistrationResponseJSONSchema,
 });
 

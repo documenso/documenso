@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import { BulkSendCompleteEmail } from '@documenso/email/templates/bulk-send-complete';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
@@ -164,7 +163,7 @@ export const run = async ({ payload, io }: { payload: TBulkSendTemplateJobDefini
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });
 
-    const { branding, emailLanguage, senderEmail } = await getEmailContext({
+    const { branding, emailLanguage, senderEmail, emailTransport } = await getEmailContext({
       emailType: 'INTERNAL',
       source: {
         type: 'team',
@@ -186,7 +185,7 @@ export const run = async ({ payload, io }: { payload: TBulkSendTemplateJobDefini
       }),
     ]);
 
-    await mailer.sendMail({
+    await emailTransport.sendMail({
       to: {
         name: user.name || '',
         address: user.email,

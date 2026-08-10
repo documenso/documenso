@@ -6,6 +6,8 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { SubscriptionStatus } from '@prisma/client';
 import { Loader } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router';
 import type Stripe from 'stripe';
 import { match, P } from 'ts-pattern';
 
@@ -23,12 +25,51 @@ export default function TeamsSettingBillingPage() {
 
   const organisation = useCurrentOrganisation();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const utils = trpc.useUtils();
+
   const { data: subscriptionQuery, isLoading: isLoadingSubscription } =
     trpc.enterprise.billing.subscription.get.useQuery({
       organisationId: organisation.id,
     });
 
-  if (isLoadingSubscription || !subscriptionQuery) {
+  const { mutateAsync: syncSubscription, isPending: isSyncingSubscription } =
+    trpc.enterprise.billing.subscription.sync.useMutation();
+
+  const hasTriggeredCheckoutSyncRef = useRef(false);
+
+  const isCheckoutSuccess = searchParams.get('success') === 'true';
+
+  /**
+   * Eagerly sync the subscription from Stripe when returning from a successful
+   * checkout, since the webhook may not have arrived yet.
+   */
+  useEffect(() => {
+    if (!isCheckoutSuccess || hasTriggeredCheckoutSyncRef.current) {
+      return;
+    }
+
+    hasTriggeredCheckoutSyncRef.current = true;
+
+    void syncSubscription({ organisationId: organisation.id })
+      .catch(() => {
+        // Non-fatal, webhooks will converge the subscription state shortly.
+      })
+      .finally(() => {
+        void utils.enterprise.billing.invalidate();
+
+        setSearchParams(
+          (params) => {
+            params.delete('success');
+
+            return params;
+          },
+          { replace: true },
+        );
+      });
+  }, [isCheckoutSuccess, organisation.id]);
+
+  if (isLoadingSubscription || !subscriptionQuery || isSyncingSubscription) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
         <Loader className="h-6 w-6 animate-spin text-muted-foreground" />

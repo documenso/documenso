@@ -32,7 +32,7 @@ type FindOrganisationStatsOptions = {
   claimId?: string;
   page?: number;
   perPage?: number;
-  orderByColumn?: 'documentCount' | 'emailCount' | 'apiCount' | 'totalCount';
+  orderByColumn?: 'documentCount' | 'emailCount' | 'apiCount' | 'emailReports' | 'totalCount';
   orderByDirection?: 'asc' | 'desc';
 };
 
@@ -91,6 +91,10 @@ export const findOrganisationStats = async ({
       'OrganisationMonthlyStat.documentCount as documentCount',
       'OrganisationMonthlyStat.emailCount as emailCount',
       'OrganisationMonthlyStat.apiCount as apiCount',
+      'OrganisationMonthlyStat.emailReports as emailReports',
+      'OrganisationClaim.documentQuota as documentQuota',
+      'OrganisationClaim.emailQuota as emailQuota',
+      'OrganisationClaim.apiQuota as apiQuota',
       totalCountExpression.as('totalCount'),
       eb.fn.countAll().over().as('totalRows'),
     ])
@@ -99,6 +103,7 @@ export const findOrganisationStats = async ({
         .with('documentCount', () => qb.orderBy('OrganisationMonthlyStat.documentCount', orderByDirection))
         .with('emailCount', () => qb.orderBy('OrganisationMonthlyStat.emailCount', orderByDirection))
         .with('apiCount', () => qb.orderBy('OrganisationMonthlyStat.apiCount', orderByDirection))
+        .with('emailReports', () => qb.orderBy('OrganisationMonthlyStat.emailReports', orderByDirection))
         .with('totalCount', () => qb.orderBy(totalCountExpression, orderByDirection))
         .with(undefined, () =>
           // Default ordering mirrors the desired SQL: email, api, document descending.
@@ -126,6 +131,10 @@ export const findOrganisationStats = async ({
     documentCount: Number(row.documentCount),
     emailCount: Number(row.emailCount),
     apiCount: Number(row.apiCount),
+    emailReports: Number(row.emailReports),
+    documentQuota: row.documentQuota === null ? null : Number(row.documentQuota),
+    emailQuota: row.emailQuota === null ? null : Number(row.emailQuota),
+    apiQuota: row.apiQuota === null ? null : Number(row.apiQuota),
     totalCount: Number(row.totalCount),
   }));
 

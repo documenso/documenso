@@ -3,6 +3,8 @@ import { useEffect, useRef } from 'react';
 
 import { cn } from '../../lib/utils';
 
+const SIGNATURE_FONT_FAMILY = 'Caveat';
+
 export type SignatureRenderProps = {
   className?: string;
   value: string;
@@ -30,7 +32,6 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
 
     const canvasWidth = $el.current.width;
     const canvasHeight = $el.current.height;
-    const fontFamily = 'Caveat';
 
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     ctx.textAlign = 'center';
@@ -42,7 +43,7 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
 
     // Start with a base font size
     let fontSize = 18;
-    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.font = `${fontSize}px ${SIGNATURE_FONT_FAMILY}`;
 
     // Measure 10 characters and calculate scale factor
     const characterWidth = ctx.measureText('m'.repeat(10)).width;
@@ -52,7 +53,7 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
     fontSize = fontSize * scaleFactor;
 
     // Adjust font size if it exceeds canvas width
-    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.font = `${fontSize}px ${SIGNATURE_FONT_FAMILY}`;
 
     const textWidth = ctx.measureText(value).width;
 
@@ -61,7 +62,7 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
     }
 
     // Set final font and render text
-    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.font = `${fontSize}px ${SIGNATURE_FONT_FAMILY}`;
     ctx.fillText(value, canvasWidth / 2, canvasHeight / 2);
   };
 
@@ -110,11 +111,28 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
     if (isBase64Image(value)) {
       renderImageSignature();
-    } else {
-      renderTypedSignature();
+      return;
     }
+
+    const renderWhenFontIsReady = async () => {
+      try {
+        await document.fonts?.load(`18px ${SIGNATURE_FONT_FAMILY}`);
+      } finally {
+        if (isMounted) {
+          renderTypedSignature();
+        }
+      }
+    };
+
+    void renderWhenFontIsReady();
+
+    return () => {
+      isMounted = false;
+    };
   }, [value]);
 
   return (

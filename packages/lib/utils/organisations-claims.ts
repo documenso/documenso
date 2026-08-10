@@ -23,5 +23,6 @@ export const generateDefaultSubscriptionClaim = (): Omit<
     emailQuota: null,
     apiRateLimits: [],
     apiQuota: null,
+    emailTransportId: null,
   };
 };

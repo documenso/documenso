@@ -35,12 +35,24 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   await page.getByTestId('signature-types-trigger').click();
   await page.getByRole('option', { name: 'Draw' }).click();
   await page.getByRole('option', { name: 'Upload' }).click();
+  await page.keyboard.press('Escape');
+
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
+  await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
+
+  // Sender details moved to the email preferences page.
+  await page.goto(`/o/${organisation.url}/settings/email`);
   await page.getByTestId('include-sender-details-trigger').click();
   await page.getByRole('option', { name: 'No' }).click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
+  await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
+
+  // The signing certificate toggle moved to the certificates page.
+  await page.goto(`/o/${organisation.url}/settings/certificates`);
   await page.getByTestId('include-signing-certificate-trigger').click();
   await page.getByRole('option', { name: 'No' }).click();
-  await page.getByRole('button', { name: 'Update' }).first().click();
-  await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
+  await expect(page.getByText('Your certificate preferences have been updated').first()).toBeVisible();
 
   const teamSettings = await getTeamSettings({
     teamId: team.id,
@@ -73,7 +85,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   await page.getByTestId('document-date-format-trigger').click();
   await page.getByRole('option', { name: 'MM/DD/YYYY', exact: true }).click();
 
-  await page.getByRole('button', { name: 'Update' }).first().click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
   await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
 
   const updatedTeamSettings = await getTeamSettings({
@@ -128,7 +140,7 @@ test('[ORGANISATIONS]: manage branding preferences', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Brand Website' }).fill('https://documenso.com');
   await page.getByRole('textbox', { name: 'Brand Details' }).click();
   await page.getByRole('textbox', { name: 'Brand Details' }).fill('BrandDetails');
-  await page.getByRole('button', { name: 'Update' }).first().click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
   await expect(page.getByText('Your branding preferences have been updated').first()).toBeVisible();
 
   const teamSettings = await getTeamSettings({
@@ -150,7 +162,7 @@ test('[ORGANISATIONS]: manage branding preferences', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Brand Website' }).fill('https://example.com');
   await page.getByRole('textbox', { name: 'Brand Details' }).click();
   await page.getByRole('textbox', { name: 'Brand Details' }).fill('UpdatedBrandDetails');
-  await page.getByRole('button', { name: 'Update' }).first().click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
   await expect(page.getByText('Your branding preferences have been updated').first()).toBeVisible();
 
   const updatedTeamSettings = await getTeamSettings({
@@ -165,7 +177,7 @@ test('[ORGANISATIONS]: manage branding preferences', async ({ page }) => {
   // Test inheritance by setting team back to inherit from organisation
   await page.getByTestId('enable-branding').click();
   await page.getByRole('option', { name: 'Inherit from organisation' }).click();
-  await page.getByRole('button', { name: 'Update' }).first().click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
   await expect(page.getByText('Your branding preferences have been updated').first()).toBeVisible();
 
   await page.waitForTimeout(2000);
@@ -208,7 +220,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('checkbox', { name: 'Email the signer if the document is still pending' }).uncheck();
   await page.getByRole('checkbox', { name: 'Email recipients when a pending document is deleted' }).uncheck();
 
-  await page.getByRole('button', { name: 'Update' }).first().click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
   await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
 
   const teamSettings = await getTeamSettings({
@@ -236,8 +248,14 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Reply to email' }).click();
   await page.getByRole('textbox', { name: 'Reply to email' }).fill('team@example.com');
 
-  // Change email document settings inheritance to controlled
-  await page.getByRole('combobox').filter({ hasText: 'Inherit from organisation' }).click();
+  // Change email document settings inheritance to controlled. Scope to the
+  // email-document-settings field — the sender-details select on this page also
+  // renders an "Inherit from organisation" value.
+  await page
+    .getByTestId('inheritable-email-document-settings')
+    .getByRole('combobox')
+    .filter({ hasText: 'Inherit from organisation' })
+    .click();
   await page.getByRole('option', { name: 'Override organisation settings' }).click();
 
   // Update some email settings
@@ -245,7 +263,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('checkbox', { name: 'Email recipients when the document is completed', exact: true }).uncheck();
   await page.getByRole('checkbox', { name: 'Email the owner when the document is completed' }).uncheck();
 
-  await page.getByRole('button', { name: 'Update' }).first().click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
   await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
 
   const updatedTeamSettings = await getTeamSettings({
@@ -292,7 +310,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Reply to email' }).fill('');
   await page.getByRole('combobox').filter({ hasText: 'Override organisation settings' }).click();
   await page.getByRole('option', { name: 'Inherit from organisation' }).click();
-  await page.getByRole('button', { name: 'Update' }).first().click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
   await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
 
   await page.waitForTimeout(1000);

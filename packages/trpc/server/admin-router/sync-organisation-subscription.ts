@@ -1,6 +1,5 @@
-import { onSubscriptionUpdated } from '@documenso/ee/server-only/stripe/webhook/on-subscription-updated';
+import { syncStripeCustomerSubscription } from '@documenso/ee/server-only/stripe/sync-stripe-customer-subscription';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
 
 import { adminProcedure } from '../trpc';
@@ -24,9 +23,6 @@ export const syncOrganisationSubscriptionRoute = adminProcedure
 
     const organisation = await prisma.organisation.findUnique({
       where: { id: organisationId },
-      include: {
-        subscription: true,
-      },
     });
 
     if (!organisation) {
@@ -35,47 +31,14 @@ export const syncOrganisationSubscriptionRoute = adminProcedure
       });
     }
 
-    if (!organisation.subscription) {
+    if (!organisation.customerId) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Organisation has no subscription to sync',
+        message: 'Organisation has no Stripe customer to sync from',
       });
     }
 
-    let stripeSubscription: Stripe.Subscription;
-
-    try {
-      stripeSubscription = await stripe.subscriptions.retrieve(organisation.subscription.planId, {
-        expand: ['items.data.price.product'],
-      });
-    } catch (error) {
-      if (error instanceof Stripe.errors.StripeInvalidRequestError && error.code === 'resource_missing') {
-        throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'Subscription not found on Stripe',
-        });
-      }
-
-      throw error;
-    }
-
-    const stripeCustomerId =
-      typeof stripeSubscription.customer === 'string' ? stripeSubscription.customer : stripeSubscription.customer.id;
-
-    if (organisation.customerId !== stripeCustomerId) {
-      ctx.logger.error({
-        message: 'Organisation customerId does not match Stripe subscription customer',
-        organisationId,
-        localCustomerId: organisation.customerId,
-        stripeCustomerId,
-      });
-
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Organisation customerId mismatch: local=${organisation.customerId ?? 'null'}, Stripe=${stripeCustomerId}`,
-      });
-    }
-
-    await onSubscriptionUpdated({
-      subscription: stripeSubscription,
-      previousAttributes: null,
+    await syncStripeCustomerSubscription({
+      customerId: organisation.customerId,
       bypassClaimUpdate: !syncClaims,
     });
   });

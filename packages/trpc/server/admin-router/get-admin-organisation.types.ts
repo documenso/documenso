@@ -53,6 +53,7 @@ export const ZGetAdminOrganisationResponseSchema = ZOrganisationSchema.extend({
       documentCount: true,
       emailCount: true,
       apiCount: true,
+      emailReports: true,
     }),
   ),
 });

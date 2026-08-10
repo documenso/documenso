@@ -233,13 +233,17 @@ export class BullMQJobProvider extends BaseJobProvider {
       backgroundJobId?: string;
     };
 
+    let payload = jobData.payload;
+
     if (definition.trigger.schema) {
-      const result = definition.trigger.schema.safeParse(jobData.payload);
+      const result = definition.trigger.schema.safeParse(payload);
 
       if (!result.success) {
         console.error(`[JOBS]: Payload validation failed for ${definitionId}`, result.error);
         throw new Error(`Payload validation failed for ${definitionId}`);
       }
+
+      payload = result.data;
     }
 
     const backgroundJobId = jobData.backgroundJobId;
@@ -260,11 +264,11 @@ export class BullMQJobProvider extends BaseJobProvider {
         .catch(() => null);
     }
 
-    console.log(`[JOBS]: Processing job ${definitionId} with payload`, jobData.payload);
+    console.log(`[JOBS]: Processing job ${definitionId} with payload`, payload);
 
     try {
       await definition.handler({
-        payload: jobData.payload,
+        payload,
         io: this.createJobRunIO(backgroundJobId ?? job.id ?? definitionId),
       });
 

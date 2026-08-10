@@ -207,7 +207,7 @@ export const OrganisationInsightsTable = ({
           <SummaryCard
             icon={TrendingUp}
             title={_(msg`Documents Completed`)}
-            value={insights.summary.volumeThisPeriod}
+            value={`${insights.summary.volumeThisPeriod}/${insights.summary.documentsThisPeriod}`}
           />
         </div>
       )}
@@ -269,7 +269,7 @@ const SummaryCard = ({
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
-  value: number;
+  value: number | string;
   subtitle?: string;
 }) => (
   <div className="flex items-start gap-x-2 rounded-lg border bg-card px-4 py-3">

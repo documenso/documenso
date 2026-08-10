@@ -15,17 +15,6 @@ body:
       description: 'Are there any additional context or information that might be relevant to the improvement suggestion.'
     validations:
       required: false
-  - type: dropdown
-    id: assignee
-    attributes:
-      label: 'Do you want to work on this improvement?'
-      multiple: false
-      options:
-        - 'No'
-        - 'Yes'
-      default: 0
-    validations:
-      required: true
   - type: checkboxes
     attributes:
       label: 'Please check the boxes that apply to this improvement suggestion.'

@@ -1,9 +1,15 @@
-import { seedDraftDocument } from '@documenso/prisma/seed/documents';
+import fs from 'node:fs';
+import { createTeam } from '@documenso/lib/server-only/team/create-team';
+import { prisma } from '@documenso/prisma';
+import { seedCompletedDocument, seedDraftDocument, seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
+import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
+import { DocumentStatus, TeamMemberRole } from '@prisma/client';
+import { unzipSync } from 'fflate';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
 
 test.describe.configure({ mode: 'parallel' });
@@ -47,10 +53,10 @@ test('[BULK_ACTIONS]: can select multiple documents with checkboxes', async ({ p
   });
 
   await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
-  await expect(page.getByText('1 selected')).toBeVisible();
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
 
   await page.locator('tr', { hasText: 'Bulk Test Doc 2' }).getByRole('checkbox').click();
-  await expect(page.getByText('2 selected')).toBeVisible();
+  await expect(page.getByText(/2\s*selected/)).toBeVisible();
 });
 
 test('[BULK_ACTIONS]: header checkbox selects all documents on page', async ({ page }) => {
@@ -64,7 +70,7 @@ test('[BULK_ACTIONS]: header checkbox selects all documents on page', async ({ p
 
   await page.locator('thead').getByRole('checkbox').click();
 
-  await expect(page.getByText(`${documents.length} selected`)).toBeVisible();
+  await expect(page.getByText(new RegExp(`${documents.length}\\s*selected`))).toBeVisible();
 });
 
 test('[BULK_ACTIONS]: can clear selection with X button', async ({ page }) => {
@@ -77,11 +83,11 @@ test('[BULK_ACTIONS]: can clear selection with X button', async ({ page }) => {
   });
 
   await page.locator('thead').getByRole('checkbox').click();
-  await expect(page.getByText(/\d+ selected/)).toBeVisible();
+  await expect(page.getByText(/\d+\s*selected/)).toBeVisible();
 
   await page.getByLabel('Clear selection').click();
 
-  await expect(page.getByText(/\d+ selected/)).not.toBeVisible();
+  await expect(page.getByText(/\d+\s*selected/)).not.toBeVisible();
 });
 
 test('[BULK_ACTIONS]: can move multiple documents to a folder', async ({ page }) => {
@@ -95,19 +101,135 @@ test('[BULK_ACTIONS]: can move multiple documents to a folder', async ({ page })
 
   await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
   await page.locator('tr', { hasText: 'Bulk Test Doc 2' }).getByRole('checkbox').click();
-  await page.getByRole('button', { name: 'Move to Folder' }).click();
+  await page.getByRole('button', { name: 'Move', exact: true }).click();
 
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.getByText('Move Documents to Folder')).toBeVisible();
 
   await page.getByRole('button', { name: folder.name }).click();
-  await page.getByRole('button', { name: 'Move' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Move' }).click();
 
   await expectToastTextToBeVisible(page, 'Selected items have been moved.');
 
   await page.goto(`/t/${sender.team.url}/documents/f/${folder.id}`);
   await expect(page.getByRole('link', { name: 'Bulk Test Doc 1' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Bulk Test Doc 2' })).toBeVisible();
+});
+
+test('[BULK_ACTIONS]: selection does not leak between teams', async ({ page }) => {
+  const { sender } = await seedBulkActionsTestRequirements();
+
+  const teamBUrl = `team-b-${Date.now()}`;
+
+  await createTeam({
+    userId: sender.user.id,
+    teamName: 'Team B',
+    teamUrl: teamBUrl,
+    organisationId: sender.organisation.id,
+    inheritMembers: true,
+  });
+
+  const teamB = await prisma.team.findFirstOrThrow({
+    where: { url: teamBUrl },
+  });
+
+  await seedDraftDocument(sender.user, teamB.id, [], {
+    createDocumentOptions: { title: 'Team B Doc' },
+  });
+
+  await apiSignin({
+    page,
+    email: sender.user.email,
+    redirectPath: `/t/${sender.team.url}/documents`,
+  });
+
+  await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
+
+  // The selection made in team A must not appear in team B.
+  await page.goto(`/t/${teamBUrl}/documents`);
+  await expect(page.getByRole('link', { name: 'Team B Doc' })).toBeVisible();
+  await expect(page.getByText(/\d+\s*selected/)).not.toBeVisible();
+
+  // Returning to team A restores its selection.
+  await page.goto(`/t/${sender.team.url}/documents`);
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
+});
+
+test('[BULK_ACTIONS]: escape clears selection unless a dialog is open', async ({ page }) => {
+  const { sender } = await seedBulkActionsTestRequirements();
+
+  await apiSignin({
+    page,
+    email: sender.user.email,
+    redirectPath: `/t/${sender.team.url}/documents`,
+  });
+
+  await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
+
+  // Escape while a dialog is open should close the dialog but keep the selection.
+  await page.getByRole('button', { name: 'Move', exact: true }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  await page.keyboard.press('Escape');
+
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
+
+  // Escape with no dialog open should clear the selection.
+  await page.keyboard.press('Escape');
+
+  await expect(page.getByText(/1\s*selected/)).not.toBeVisible();
+});
+
+test('[BULK_ACTIONS]: can bulk download multiple documents as a zip', async ({ page }) => {
+  const { sender, documents } = await seedBulkActionsTestRequirements();
+
+  const [doc1, doc2] = documents;
+
+  await apiSignin({
+    page,
+    email: sender.user.email,
+    redirectPath: `/t/${sender.team.url}/documents`,
+  });
+
+  await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
+  await page.locator('tr', { hasText: 'Bulk Test Doc 2' }).getByRole('checkbox').click();
+
+  await page.getByRole('button', { name: 'Download', exact: true }).click();
+
+  const dialog = page.getByRole('dialog');
+
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByText('Download Documents')).toBeVisible();
+  await expect(dialog.getByText('Bulk Test Doc 1')).toBeVisible();
+  await expect(dialog.getByText('Bulk Test Doc 2')).toBeVisible();
+  await expect(dialog.getByText('Draft').first()).toBeVisible();
+
+  const downloadPromise = page.waitForEvent('download', { timeout: 10_000 });
+
+  await dialog.getByRole('button', { name: 'Download' }).click();
+
+  const download = await downloadPromise;
+
+  expect(download.suggestedFilename()).toMatch(/^documenso-documents-\d{4}-\d{2}-\d{2}\.zip$/);
+
+  const downloadPath = await download.path();
+  const zipContents = unzipSync(new Uint8Array(fs.readFileSync(downloadPath)));
+
+  // Each envelope's files are nested inside an `envelopeId_title` folder.
+  expect(Object.keys(zipContents).sort()).toEqual(
+    [`${doc1.id}_Bulk Test Doc 1/Bulk Test Doc 1.pdf`, `${doc2.id}_Bulk Test Doc 2/Bulk Test Doc 2.pdf`].sort(),
+  );
+
+  // Each entry should be a valid non-empty PDF (%PDF magic bytes).
+  for (const entry of Object.values(zipContents)) {
+    expect(Array.from(entry.slice(0, 4))).toEqual([0x25, 0x50, 0x44, 0x46]);
+  }
+
+  await expectToastTextToBeVisible(page, 'Documents downloaded');
+  await expect(page.getByText(/\d+\s*selected/)).not.toBeVisible();
 });
 
 test('[BULK_ACTIONS]: can delete multiple draft documents', async ({ page }) => {
@@ -149,14 +271,14 @@ test('[BULK_ACTIONS]: selection clears after successful move', async ({ page }) 
   });
 
   await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
-  await expect(page.getByText('1 selected')).toBeVisible();
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
 
-  await page.getByRole('button', { name: 'Move to Folder' }).click();
+  await page.getByRole('button', { name: 'Move', exact: true }).click();
   await page.getByRole('button', { name: folder.name }).click();
-  await page.getByRole('button', { name: 'Move' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Move' }).click();
 
   await expectToastTextToBeVisible(page, 'Selected items have been moved.');
-  await expect(page.getByText(/\d+ selected/)).not.toBeVisible();
+  await expect(page.getByText(/\d+\s*selected/)).not.toBeVisible();
 });
 
 test('[BULK_ACTIONS]: selection clears after successful delete', async ({ page }) => {
@@ -169,13 +291,13 @@ test('[BULK_ACTIONS]: selection clears after successful delete', async ({ page }
   });
 
   await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
-  await expect(page.getByText('1 selected')).toBeVisible();
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
 
   await page.getByRole('button', { name: 'Delete' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Delete' }).click();
 
   await expectToastTextToBeVisible(page, 'Documents deleted');
-  await expect(page.getByText(/\d+ selected/)).not.toBeVisible();
+  await expect(page.getByText(/\d+\s*selected/)).not.toBeVisible();
 });
 
 test('[BULK_ACTIONS]: can search for folders in move dialog', async ({ page }) => {
@@ -196,7 +318,7 @@ test('[BULK_ACTIONS]: can search for folders in move dialog', async ({ page }) =
 
   await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
 
-  await page.getByRole('button', { name: 'Move to Folder' }).click();
+  await page.getByRole('button', { name: 'Move', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
 
   await expect(page.getByRole('button', { name: folder.name })).toBeVisible();
@@ -233,14 +355,14 @@ test('[BULK_ACTIONS]: can move documents from folder to home (root)', async ({ p
   await expect(page.getByRole('link', { name: 'Bulk Test Doc 1' })).toBeVisible();
 
   await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
-  await expect(page.getByText('1 selected')).toBeVisible();
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
 
-  await page.getByRole('button', { name: 'Move to Folder' }).click();
+  await page.getByRole('button', { name: 'Move', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
 
   await page.getByRole('button', { name: 'Home (No Folder)' }).click();
 
-  await page.getByRole('button', { name: 'Move' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Move' }).click();
 
   await expectToastTextToBeVisible(page, 'Selected items have been moved.');
 
@@ -249,4 +371,148 @@ test('[BULK_ACTIONS]: can move documents from folder to home (root)', async ({ p
 
   await page.goto(`/t/${sender.team.url}/documents/f/${folder.id}`);
   await expect(page.getByRole('link', { name: 'Bulk Test Doc 1' })).not.toBeVisible();
+});
+
+// ─── Bulk cancel ─────────────────────────────────────────────────────────────
+
+test('[BULK_ACTIONS]: can cancel multiple pending documents', async ({ page }) => {
+  const sender = await seedUser({ setTeamEmailAsOwner: true });
+  const { user: recipient } = await seedUser();
+
+  const [pending1, pending2] = await Promise.all([
+    seedPendingDocument(sender.user, sender.team.id, [recipient], {
+      createDocumentOptions: { title: 'Bulk Cancel Pending 1' },
+    }),
+    seedPendingDocument(sender.user, sender.team.id, [recipient], {
+      createDocumentOptions: { title: 'Bulk Cancel Pending 2' },
+    }),
+  ]);
+
+  await apiSignin({
+    page,
+    email: sender.user.email,
+    redirectPath: `/t/${sender.team.url}/documents`,
+  });
+
+  await page.locator('tr', { hasText: 'Bulk Cancel Pending 1' }).getByRole('checkbox').click();
+  await page.locator('tr', { hasText: 'Bulk Cancel Pending 2' }).getByRole('checkbox').click();
+  await expect(page.getByText('2 selected')).toBeVisible();
+
+  // The bulk action bar Cancel button (distinct from the dialog's confirm button).
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: 'Cancel Documents' })).toBeVisible();
+  await expect(dialog.getByText('You are about to cancel 2 documents')).toBeVisible();
+
+  await dialog.getByRole('button', { name: 'Cancel documents' }).click();
+
+  await expectToastTextToBeVisible(page, 'Documents cancelled');
+
+  // Selection clears after a successful cancel.
+  await expect(page.getByText(/\d+ selected/)).not.toBeVisible();
+
+  // Both documents are now cancelled in the database.
+  for (const document of [pending1, pending2]) {
+    const envelope = await prisma.envelope.findFirstOrThrow({
+      where: { id: document.id },
+      select: { status: true, deletedAt: true },
+    });
+
+    expect(envelope.status).toBe(DocumentStatus.CANCELLED);
+    expect(envelope.deletedAt).toBeNull();
+  }
+});
+
+test('[BULK_ACTIONS]: bulk cancel only affects pending documents', async ({ page }) => {
+  const sender = await seedUser({ setTeamEmailAsOwner: true });
+  const { user: recipient } = await seedUser();
+
+  const pending = await seedPendingDocument(sender.user, sender.team.id, [recipient], {
+    createDocumentOptions: { title: 'Mixed Cancel Pending' },
+  });
+  const draft = await seedDraftDocument(sender.user, sender.team.id, [], {
+    createDocumentOptions: { title: 'Mixed Cancel Draft' },
+  });
+  const completed = await seedCompletedDocument(sender.user, sender.team.id, [recipient], {
+    createDocumentOptions: { title: 'Mixed Cancel Completed' },
+  });
+
+  await apiSignin({
+    page,
+    email: sender.user.email,
+    redirectPath: `/t/${sender.team.url}/documents`,
+  });
+
+  await page.locator('thead').getByRole('checkbox').click();
+  await expect(page.getByText('3 selected')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button', { name: 'Cancel documents' }).click();
+
+  // Only one of the three was pending, so this is a partial result.
+  await expectToastTextToBeVisible(page, 'Documents partially cancelled');
+
+  const pendingEnvelope = await prisma.envelope.findFirstOrThrow({
+    where: { id: pending.id },
+    select: { status: true },
+  });
+  expect(pendingEnvelope.status).toBe(DocumentStatus.CANCELLED);
+
+  // The draft and completed documents are untouched.
+  const draftEnvelope = await prisma.envelope.findFirstOrThrow({
+    where: { id: draft.id },
+    select: { status: true },
+  });
+  expect(draftEnvelope.status).toBe(DocumentStatus.DRAFT);
+
+  const completedEnvelope = await prisma.envelope.findFirstOrThrow({
+    where: { id: completed.id },
+    select: { status: true },
+  });
+  expect(completedEnvelope.status).toBe(DocumentStatus.COMPLETED);
+});
+
+test('[BULK_ACTIONS]: a MEMBER cannot bulk cancel documents they do not own', async ({ page }) => {
+  const { team, owner } = await seedTeam();
+
+  const memberUser = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.MEMBER });
+
+  const { user: recipient } = await seedUser();
+
+  const ownerDocument = await seedPendingDocument(owner, team.id, [recipient], {
+    createDocumentOptions: { title: 'Member Cannot Cancel This', visibility: 'EVERYONE' },
+  });
+
+  await apiSignin({
+    page,
+    email: memberUser.email,
+    redirectPath: `/t/${team.url}/documents?status=PENDING`,
+  });
+
+  await page.locator('tr', { hasText: 'Member Cannot Cancel This' }).getByRole('checkbox').click();
+  await expect(page.getByText('1 selected')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button', { name: 'Cancel documents' }).click();
+
+  // The server rejects the cancellation for a document the MEMBER does not own,
+  // so it reports zero cancelled (a partial result with the document in failedIds).
+  await expectToastTextToBeVisible(page, 'Documents partially cancelled');
+
+  // The document remains pending.
+  const envelope = await prisma.envelope.findFirstOrThrow({
+    where: { id: ownerDocument.id },
+    select: { status: true },
+  });
+  expect(envelope.status).toBe(DocumentStatus.PENDING);
+
+  await apiSignout({ page });
 });

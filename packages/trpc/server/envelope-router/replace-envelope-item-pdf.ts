@@ -1,4 +1,5 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { assertEnvelopeMutable } from '@documenso/lib/server-only/envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { UNSAFE_replaceEnvelopeItemPdf } from '@documenso/lib/server-only/envelope-item/replace-envelope-item-pdf';
 import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
@@ -58,6 +59,8 @@ export const replaceEnvelopeItemPdfRoute = authenticatedProcedure
         message: 'Envelope not found',
       });
     }
+
+    assertEnvelopeMutable(envelope);
 
     if (envelope.internalVersion !== 2) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {

@@ -25,13 +25,13 @@ export const TemplateRecipientExpired = ({
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
-        <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-lg text-primary">
+        <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-foreground text-lg">
           <Trans>
             Signing window expired for "{displayName}" on "{documentName}"
           </Trans>
         </Text>
 
-        <Text className="my-1 text-center text-base text-slate-400">
+        <Text className="my-1 text-center text-base text-muted-foreground">
           <Trans>
             The signing window for {displayName} on document "{documentName}" has expired. You can resend the document
             to extend their deadline or cancel the document.
@@ -40,7 +40,7 @@ export const TemplateRecipientExpired = ({
 
         <Section className="my-4 text-center">
           <Button
-            className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center font-medium text-sm text-white no-underline"
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-center font-medium text-primary-foreground text-sm no-underline"
             href={documentLink}
           >
             <Trans>View Document</Trans>

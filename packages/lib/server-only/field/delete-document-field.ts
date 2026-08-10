@@ -6,6 +6,7 @@ import { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface DeleteDocumentFieldOptions {
@@ -59,6 +60,8 @@ export const deleteDocumentField = async ({ userId, teamId, fieldId, requestMeta
     });
   }
 
+  assertEnvelopeMutable(envelope);
+
   if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
@@ -81,6 +84,8 @@ export const deleteDocumentField = async ({ userId, teamId, fieldId, requestMeta
   }
 
   return await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     const deletedField = await tx.field.delete({
       where: {
         id: fieldId,

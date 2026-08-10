@@ -51,24 +51,16 @@ export default function OrganisationSettingsDocumentPage() {
         documentLanguage,
         documentTimezone,
         documentDateFormat,
-        includeSenderDetails,
-        includeSigningCertificate,
-        includeAuditLog,
         signatureTypes,
         defaultRecipients,
         delegateDocumentOwnership,
         aiFeaturesEnabled,
-        envelopeExpirationPeriod,
-        reminderSettings,
       } = data;
 
       if (
         documentVisibility === null ||
         documentLanguage === null ||
         documentDateFormat === null ||
-        includeSenderDetails === null ||
-        includeSigningCertificate === null ||
-        includeAuditLog === null ||
         aiFeaturesEnabled === null
       ) {
         throw new Error('Should not be possible.');
@@ -81,17 +73,12 @@ export default function OrganisationSettingsDocumentPage() {
           documentLanguage,
           documentTimezone,
           documentDateFormat,
-          includeSenderDetails,
-          includeSigningCertificate,
-          includeAuditLog,
           defaultRecipients,
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
-          delegateDocumentOwnership: delegateDocumentOwnership,
+          delegateDocumentOwnership,
           aiFeaturesEnabled,
-          envelopeExpirationPeriod: envelopeExpirationPeriod ?? undefined,
-          reminderSettings: reminderSettings ?? undefined,
         },
       });
 
@@ -105,6 +92,8 @@ export default function OrganisationSettingsDocumentPage() {
         description: t`We were unable to update your document preferences at this time, please try again later`,
         variant: 'destructive',
       });
+
+      throw err;
     }
   };
 
@@ -122,7 +111,7 @@ export default function OrganisationSettingsDocumentPage() {
     : t`Here you can set document preferences for your organisation. Teams will inherit these settings by default.`;
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <SettingsHeader title={settingsHeaderText} subtitle={settingsHeaderSubtitle} />
 
       <section>

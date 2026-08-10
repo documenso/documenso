@@ -12,7 +12,7 @@ import { ZManageSubscriptionRequestSchema } from './manage-subscription.types';
 export const manageSubscriptionRoute = authenticatedProcedure
   .input(ZManageSubscriptionRequestSchema)
   .mutation(async ({ ctx, input }) => {
-    const { organisationId, isPersonalLayoutMode } = input;
+    const { organisationId } = input;
 
     ctx.logger.info({
       input: {
@@ -93,9 +93,7 @@ export const manageSubscriptionRoute = authenticatedProcedure
       });
     }
 
-    const returnUrl = isPersonalLayoutMode
-      ? `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing-personal`
-      : `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`;
+    const returnUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`;
 
     const redirectUrl = await getPortalSession({
       customerId,

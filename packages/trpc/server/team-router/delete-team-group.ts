@@ -53,6 +53,15 @@ export const deleteTeamGroupRoute = authenticatedProcedure
       });
     }
 
+    // You cannot delete internal team groups. These are the system-managed
+    // admin/manager/member groups that back the team's role-based access, and
+    // deleting them would silently strip team members of their access.
+    if (group.organisationGroup.type === OrganisationGroupType.INTERNAL_TEAM) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You are not allowed to delete internal team groups',
+      });
+    }
+
     // You cannot delete internal organisation groups.
     // The only exception is deleting the "member" organisation group which is used to allow
     // all organisation members to access a team.

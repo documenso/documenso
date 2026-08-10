@@ -2,6 +2,7 @@ import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { trpc } from '@documenso/trpc/react';
 import type { TFindSubscriptionClaimsResponse } from '@documenso/trpc/server/admin-router/find-subscription-claims.types';
 import { Button } from '@documenso/ui/primitives/button';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +29,7 @@ export const ClaimUpdateDialog = ({ claim, trigger, licenseFlags }: ClaimUpdateD
   const { toast } = useToast();
 
   const [open, setOpen] = useState(false);
+  const [backportEmailTransport, setBackportEmailTransport] = useState(false);
 
   const { mutateAsync: updateClaim, isPending } = trpc.admin.claims.update.useMutation({
     onSuccess: () => {
@@ -67,19 +69,33 @@ export const ClaimUpdateDialog = ({ claim, trigger, licenseFlags }: ClaimUpdateD
             await updateClaim({
               id: claim.id,
               data,
+              backportEmailTransport,
             })
           }
           licenseFlags={licenseFlags}
           formSubmitTrigger={
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
-                <Trans>Cancel</Trans>
-              </Button>
+            <>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="backport-email-transport"
+                  checked={backportEmailTransport}
+                  onCheckedChange={(checked) => setBackportEmailTransport(checked === true)}
+                />
+                <label htmlFor="backport-email-transport" className="text-muted-foreground text-sm">
+                  <Trans>Backport email transport</Trans>
+                </label>
+              </div>
 
-              <Button type="submit" loading={isPending}>
-                <Trans>Update Claim</Trans>
-              </Button>
-            </DialogFooter>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
+                  <Trans>Cancel</Trans>
+                </Button>
+
+                <Button type="submit" loading={isPending}>
+                  <Trans>Update Claim</Trans>
+                </Button>
+              </DialogFooter>
+            </>
           }
         />
       </DialogContent>

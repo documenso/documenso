@@ -1,4 +1,5 @@
 import { router } from '../trpc';
+import { adminSearchRoute } from './admin-search';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
@@ -11,6 +12,11 @@ import { deleteAdminTeamMemberRoute } from './delete-team-member';
 import { deleteUserRoute } from './delete-user';
 import { disableUserRoute } from './disable-user';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
+import { createEmailTransportRoute } from './email-transport/create-email-transport';
+import { deleteEmailTransportRoute } from './email-transport/delete-email-transport';
+import { findEmailTransportsRoute } from './email-transport/find-email-transports';
+import { sendTestEmailTransportRoute } from './email-transport/send-test-email-transport';
+import { updateEmailTransportRoute } from './email-transport/update-email-transport';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
@@ -100,11 +106,19 @@ export const adminRouter = router({
     get: getEmailDomainRoute,
     reregister: reregisterEmailDomainRoute,
   },
+  emailTransport: {
+    find: findEmailTransportsRoute,
+    create: createEmailTransportRoute,
+    update: updateEmailTransportRoute,
+    delete: deleteEmailTransportRoute,
+    sendTest: sendTestEmailTransportRoute,
+  },
   team: {
     get: getAdminTeamRoute,
   },
   teamMember: {
     delete: deleteAdminTeamMemberRoute,
   },
+  search: adminSearchRoute,
   updateSiteSetting: updateSiteSettingRoute,
 });

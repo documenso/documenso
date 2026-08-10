@@ -1,30 +1,27 @@
+import { extractCookieFromHeaders } from '@documenso/auth/server/lib/utils/cookies';
+import type { RouteHandle } from '@documenso/lib/client-only/hooks/use-child-route-flags';
+import { PREFERRED_TEAM_URL_COOKIE } from '@documenso/lib/constants/cookies';
 import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { Outlet } from 'react-router';
 
-import { SettingsDesktopNav } from '~/components/general/settings-nav-desktop';
-import { SettingsMobileNav } from '~/components/general/settings-nav-mobile';
+import { UnifiedSettingsLayout } from '~/components/general/unified-settings-layout';
 import { appMetaTags } from '~/utils/meta';
+
+import type { Route } from './+types/_layout';
 
 export function meta() {
   return appMetaTags(msg`Settings`);
 }
 
-export default function SettingsLayout() {
-  return (
-    <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h1 className="font-semibold text-4xl">
-        <Trans>Settings</Trans>
-      </h1>
+export const handle: RouteHandle = {
+  layoutMode: 'settings',
+};
 
-      <div className="mt-4 grid grid-cols-12 gap-x-8 md:mt-8">
-        <SettingsDesktopNav className="hidden md:col-span-3 md:flex" />
-        <SettingsMobileNav className="col-span-12 mb-8 md:hidden" />
+export function loader({ request }: Route.LoaderArgs) {
+  return {
+    preferredTeamUrl: extractCookieFromHeaders(PREFERRED_TEAM_URL_COOKIE, request.headers),
+  };
+}
 
-        <div className="col-span-12 md:col-span-9">
-          <Outlet />
-        </div>
-      </div>
-    </div>
-  );
+export default function SettingsLayout({ loaderData }: Route.ComponentProps) {
+  return <UnifiedSettingsLayout activeScope="account" preferredTeamUrl={loaderData.preferredTeamUrl} />;
 }
