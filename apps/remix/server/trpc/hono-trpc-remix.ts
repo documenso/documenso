@@ -1,4 +1,4 @@
-import { getBasePath } from '@documenso/lib/constants/app';
+import { formatPath } from '@documenso/lib/constants/app';
 import { createTrpcContext } from '@documenso/trpc/server/context';
 import { appRouter } from '@documenso/trpc/server/router';
 import { handleTrpcRouterError } from '@documenso/trpc/utils/trpc-error-handler';
@@ -13,7 +13,7 @@ import { trpcServer } from '@hono/trpc-server';
  */
 export const reactRouterTrpcServer = trpcServer({
   router: appRouter,
-  endpoint: `${getBasePath()}/api/trpc`,
+  endpoint: formatPath('/api/trpc'),
   createContext: async (_, c) => createTrpcContext({ c, requestSource: 'app' }),
   onError: (opts) => handleTrpcRouterError(opts, 'trpc'),
 });

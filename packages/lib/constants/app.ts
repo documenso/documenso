@@ -14,6 +14,9 @@ export const NEXT_PUBLIC_WEBAPP_URL = () => env('NEXT_PUBLIC_WEBAPP_URL') ?? 'ht
  * into the Vite/React Router build). Falls back to the pathname of
  * NEXT_PUBLIC_WEBAPP_URL so the function still works in dev when the env
  * variable is unset.
+ *
+ * Avoid using this to build URLs, use {@link formatPath} instead. Reserve this
+ * for cases where the raw prefix itself is needed, such as path comparisons.
  */
 export const getBasePath = (): string => {
   const explicit = env('NEXT_PUBLIC_BASE_PATH');
@@ -27,6 +30,16 @@ export const getBasePath = (): string => {
   } catch {
     return '';
   }
+};
+
+/**
+ * Prefix a root-relative path with the app's base path.
+ *
+ * `formatPath('/api/trpc')` -> `/ESign/api/trpc` under sub-path hosting,
+ * `/api/trpc` otherwise.
+ */
+export const formatPath = (path: string): string => {
+  return `${getBasePath()}${path}`;
 };
 
 export const NEXT_PUBLIC_SIGNING_CONTACT_INFO = () =>
