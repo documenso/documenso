@@ -17,6 +17,14 @@ export const NEXT_PRIVATE_INTERNAL_WEBAPP_URL = () =>
 
 export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED') === 'true';
 
+/**
+ * Whether this instance is Documenso Cloud (managed SaaS).
+ *
+ * Used so we can show a different UI for Documenso Cloud and self-hosted instances since
+ * there are things like billing, upsells, documenso links, etc that don't make sense for self-hosted instances.
+ */
+export const IS_DOCUMENSO_CLOUD = () => env('NEXT_PUBLIC_IS_DOCUMENSO_CLOUD') === 'true';
+
 export const API_V2_BETA_URL = '/api/v2-beta';
 export const API_V2_URL = '/api/v2';
 
@@ -99,3 +107,5 @@ export const CSC_INSTANCE_SIGNATURE_LEVEL = (): TSignatureLevel => {
 
   return value;
 };
+
+export const DOCUMENSO_CLOUD_ENTERPRISE_CTA_URL = 'https://documen.so/enterprise-cta';

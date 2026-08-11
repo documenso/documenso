@@ -1,4 +1,5 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { IS_DOCUMENSO_CLOUD } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import {
@@ -28,6 +29,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { SettingsHeader } from '~/components/general/settings-header';
+import { SsoPortalUpsell } from '~/components/general/settings-upsell/sso-portal-upsell';
 import { appMetaTags } from '~/utils/meta';
 
 const ZProviderFormSchema = ZUpdateOrganisationAuthenticationPortalRequestSchema.shape.data
@@ -63,10 +65,33 @@ export default function OrganisationSettingSSOLoginPage() {
   const { t } = useLingui();
   const organisation = useCurrentOrganisation();
 
+  const isAuthenticationPortalEnabled = organisation.organisationClaim.flags.authenticationPortal === true;
+
   const { data: authenticationPortal, isLoading: isLoadingAuthenticationPortal } =
-    trpc.enterprise.organisation.authenticationPortal.get.useQuery({
-      organisationId: organisation.id,
-    });
+    trpc.enterprise.organisation.authenticationPortal.get.useQuery(
+      {
+        organisationId: organisation.id,
+      },
+      {
+        // The endpoint rejects orgs without the claim flag, so don't fire
+        // requests that are guaranteed to error.
+        enabled: isAuthenticationPortalEnabled,
+      },
+    );
+
+  if (!isAuthenticationPortalEnabled && IS_DOCUMENSO_CLOUD()) {
+    return (
+      <div>
+        <SettingsHeader
+          hideDivider
+          title={t`Organisation SSO Portal`}
+          subtitle={t`Manage a custom SSO login portal for your organisation.`}
+        />
+
+        <SsoPortalUpsell />
+      </div>
+    );
+  }
 
   if (isLoadingAuthenticationPortal || !authenticationPortal) {
     return <SpinnerBox className="py-32" />;
