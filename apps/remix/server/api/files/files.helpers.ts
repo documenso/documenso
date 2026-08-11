@@ -11,8 +11,7 @@ import {
   DocumentStatus,
   type EnvelopeType,
   EnvelopeType as EnvelopeTypeEnum,
-  type RecipientRole,
-  type SigningStatus,
+  SigningStatus,
   type TemplateType,
   TemplateType as TemplateTypeEnum,
 } from '@prisma/client';
@@ -55,17 +54,13 @@ type EnvelopeForPendingDownload = {
   id: string;
   status: DocumentStatus;
   internalVersion: number;
-  recipients: Array<{
-    role: RecipientRole;
-    signingStatus: SigningStatus;
-  }>;
 };
 
 /**
  * Options shape varies by `version`:
  * - `signed` / `original`: serves stored bytes; only needs envelope `status` for cache headers.
  * - `pending`: generates a fresh PDF with currently-inserted fields burned in; needs the
- *   full envelope (id, status, internalVersion, recipients) plus envelopeItemId to query fields.
+ *   envelope (id, status, internalVersion) plus envelopeItemId to query fields.
  */
 type HandleEnvelopeItemFileRequestOptions = {
   title: string;
@@ -81,6 +76,13 @@ type HandleEnvelopeItemFileRequestOptions = {
       version: 'pending';
       envelopeItemId: string;
       envelope: EnvelopeForPendingDownload;
+
+      /**
+       * When set, only fields from recipients who have signed, plus the fields of
+       * the recipient owning this token, are burned in. Keeps recipient downloads
+       * in parity with what the signing page shows them.
+       */
+      recipientToken?: string;
     }
 );
 
@@ -165,6 +167,7 @@ const handlePendingFileRequest = async ({
   envelopeItemId,
   envelope,
   documentData,
+  recipientToken,
   context: c,
 }: PendingFileRequestOptions) => {
   if (envelope.status !== DocumentStatus.PENDING) {
@@ -191,6 +194,13 @@ const handlePendingFileRequest = async ({
     where: {
       envelopeItemId,
       inserted: true,
+      ...(recipientToken
+        ? {
+            recipient: {
+              OR: [{ signingStatus: SigningStatus.SIGNED }, { token: recipientToken }],
+            },
+          }
+        : {}),
     },
     include: {
       signature: true,
