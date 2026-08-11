@@ -1,0 +1,79 @@
+name: documenso-base44
+
+services:
+  database:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: documenso
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: documenso
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U documenso -d documenso"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mailserver:
+    image: inbucket/inbucket:stable
+    ports:
+      - "9000:9000"
+
+  setup:
+    image: node:22-bookworm-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment: &app-environment
+      NEXTAUTH_SECRET: base44-local-development-secret
+      NEXT_PRIVATE_ENCRYPTION_KEY: base44-local-primary-encryption-key
+      NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: base44-local-secondary-encryption-key
+      NEXT_PUBLIC_WEBAPP_URL: https://3000-${BASE44_PUBLIC_HOST_SUFFIX}
+      NEXT_PRIVATE_INTERNAL_WEBAPP_URL: http://web:3000
+      PORT: "3000"
+      NEXT_PRIVATE_DATABASE_URL: postgres://documenso:password@database:5432/documenso
+      NEXT_PRIVATE_DIRECT_DATABASE_URL: postgres://documenso:password@database:5432/documenso
+      NEXT_PRIVATE_SIGNING_TRANSPORT: local
+      NEXT_PUBLIC_UPLOAD_TRANSPORT: database
+      NEXT_PRIVATE_SMTP_TRANSPORT: smtp-auth
+      NEXT_PRIVATE_SMTP_HOST: mailserver
+      NEXT_PRIVATE_SMTP_PORT: "2500"
+      NEXT_PRIVATE_SMTP_FROM_NAME: Documenso
+      NEXT_PRIVATE_SMTP_FROM_ADDRESS: noreply@documenso.local
+      NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT: "5"
+      NEXT_PRIVATE_JOBS_PROVIDER: local
+      DOCUMENSO_DISABLE_TELEMETRY: "true"
+    depends_on:
+      database:
+        condition: service_healthy
+    command: >-
+      sh -c "npm install --global npm@11.11.0 &&
+      npm ci &&
+      npm run translate:compile &&
+      npm run prisma:generate &&
+      npm run prisma:migrate-deploy &&
+      npm run prisma:seed"
+
+  web:
+    image: node:22-bookworm-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment:
+      <<: *app-environment
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "3000:3000"
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+      mailserver:
+        condition: service_started
+    command: npm run dev -w @documenso/remix -- --host 0.0.0.0
+
+volumes:
+  database_data:
+  node_modules:

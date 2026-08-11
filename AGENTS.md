@@ -57,3 +57,11 @@
 - Use `(params: Route.Params)` and `(loaderData: Route.LoaderData)` for routes
 - Directly return data from loaders, don't use `json()`
 - Use `superLoaderJson` when sending complex data through loaders such as dates or prisma decimals
+
+## Base44 Development Environment
+
+- Start the complete development stack with `docker compose -f docker-compose.base44.yml up -d`.
+- The `setup` service installs npm 11.11 dependencies, compiles translations, applies Prisma migrations, and seeds PostgreSQL before `web` starts.
+- The app redirects `/` to `/signin`; verify with `curl -fsSL http://localhost:3000/` and expect the title `Sign In - Documenso`.
+- PostgreSQL and Inbucket are local Compose services; the default preview does not require external credentials.
+- The web service runs React Router/Vite from the bind-mounted repository with polling enabled, so source edits hot-reload.

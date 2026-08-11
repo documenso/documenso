@@ -1,0 +1,7 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/signin",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [],
+  "verifiedAtCommit": "962cffc9f546be68860be3489247f67255c83a66"
+}
