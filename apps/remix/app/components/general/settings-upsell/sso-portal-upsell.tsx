@@ -87,7 +87,7 @@ const PortalScene = ({ isStatic }: { isStatic: boolean }) => {
         transition={{ ...POP, delay: 0.04 }}
       >
         <div className="flex h-10 w-10 items-center justify-center rounded-md bg-documenso-200 font-semibold text-documenso-900">
-          {organisation.name[0]?.toUpperCase() || 'D'}
+          {([...organisation.name][0] ?? 'D').toUpperCase()}
         </div>
       </motion.div>
 
