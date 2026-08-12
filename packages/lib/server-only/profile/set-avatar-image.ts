@@ -83,58 +83,64 @@ export const setAvatarImage = async ({ userId, target, bytes, requestMetadata }:
     oldAvatarImageId = user.avatarImageId;
   }
 
-  if (oldAvatarImageId) {
-    await prisma.avatarImage.delete({
-      where: {
-        id: oldAvatarImageId,
-      },
-    });
-  }
-
-  let newAvatarImageId: string | null = null;
+  let optimisedBytes: Buffer | null = null;
 
   if (bytes) {
-    const optimisedBytes = await optimiseAvatar(bytes);
-
-    const avatarImage = await prisma.avatarImage.create({
-      data: {
-        bytes: optimisedBytes.toString('base64'),
-      },
-    });
-
-    newAvatarImageId = avatarImage.id;
+    optimisedBytes = await optimiseAvatar(bytes);
   }
 
-  // TODO: Audit Logs
+  return await prisma.$transaction(async (tx) => {
+    if (oldAvatarImageId) {
+      await tx.avatarImage.delete({
+        where: {
+          id: oldAvatarImageId,
+        },
+      });
+    }
 
-  if (target.type === 'team') {
-    await prisma.team.update({
-      where: {
-        id: target.teamId,
-      },
-      data: {
-        avatarImageId: newAvatarImageId,
-      },
-    });
-  } else if (target.type === 'organisation') {
-    await prisma.organisation.update({
-      where: {
-        id: target.organisationId,
-      },
-      data: {
-        avatarImageId: newAvatarImageId,
-      },
-    });
-  } else {
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        avatarImageId: newAvatarImageId,
-      },
-    });
-  }
+    let newAvatarImageId: string | null = null;
 
-  return newAvatarImageId;
+    if (bytes && optimisedBytes) {
+      const avatarImage = await tx.avatarImage.create({
+        data: {
+          bytes: optimisedBytes.toString('base64'),
+        },
+      });
+
+      newAvatarImageId = avatarImage.id;
+    }
+
+    // TODO: Audit Logs
+
+    if (target.type === 'team') {
+      await tx.team.update({
+        where: {
+          id: target.teamId,
+        },
+        data: {
+          avatarImageId: newAvatarImageId,
+        },
+      });
+    } else if (target.type === 'organisation') {
+      await tx.organisation.update({
+        where: {
+          id: target.organisationId,
+        },
+        data: {
+          avatarImageId: newAvatarImageId,
+        },
+      });
+    } else {
+      await tx.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          avatarImageId: newAvatarImageId,
+        },
+      });
+    }
+
+    return newAvatarImageId;
+  });
 };
