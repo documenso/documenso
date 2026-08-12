@@ -1,8 +1,9 @@
 import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@prisma/client';
 
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/organisations';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
-import { AppError } from '../../errors/app-error';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { optimiseAvatar } from '../../utils/images/avatar';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
@@ -100,7 +101,13 @@ export const setAvatarImage = async ({ userId, target, bytes, requestMetadata }:
 
     let newAvatarImageId: string | null = null;
 
-    if (bytes && optimisedBytes) {
+    if (bytes) {
+      if (!optimisedBytes) {
+        throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+          message: 'Avatar optimisation returned an empty buffer',
+        });
+      }
+
       const avatarImage = await tx.avatarImage.create({
         data: {
           bytes: optimisedBytes.toString('base64'),
@@ -110,7 +117,16 @@ export const setAvatarImage = async ({ userId, target, bytes, requestMetadata }:
       newAvatarImageId = avatarImage.id;
     }
 
-    // TODO: Audit Logs
+    if (bytes || oldAvatarImageId) {
+      await tx.userSecurityAuditLog.create({
+        data: {
+          userId,
+          type: UserSecurityAuditLogType.AVATAR_UPDATED,
+          userAgent: requestMetadata.requestMetadata.userAgent,
+          ipAddress: requestMetadata.requestMetadata.ipAddress,
+        },
+      });
+    }
 
     if (target.type === 'team') {
       await tx.team.update({
