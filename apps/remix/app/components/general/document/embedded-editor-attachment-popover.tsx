@@ -19,6 +19,12 @@ import { z } from 'zod';
 export type EmbeddedEditorAttachmentPopoverProps = {
   buttonClassName?: string;
   buttonSize?: 'sm' | 'default';
+
+  /**
+   * Visually hide the button label below the `sm` breakpoint while keeping it
+   * available to screen readers.
+   */
+  collapseLabelOnMobile?: boolean;
 };
 
 const ZAttachmentFormSchema = z.object({
@@ -32,6 +38,7 @@ type TAttachmentFormSchema = z.infer<typeof ZAttachmentFormSchema>;
 export const EmbeddedEditorAttachmentPopover = ({
   buttonClassName,
   buttonSize,
+  collapseLabelOnMobile = false,
 }: EmbeddedEditorAttachmentPopoverProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -90,7 +97,7 @@ export const EmbeddedEditorAttachmentPopover = ({
         <Button variant="outline" className={cn('gap-2', buttonClassName)} size={buttonSize}>
           <Paperclip className="h-4 w-4" />
 
-          <span>
+          <span className={cn(collapseLabelOnMobile && 'sr-only sm:not-sr-only')}>
             <Trans>Attachments</Trans>
             {attachments.length > 0 && <span className="ml-1">({attachments.length})</span>}
           </span>

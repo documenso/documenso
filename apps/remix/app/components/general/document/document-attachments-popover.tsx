@@ -21,6 +21,12 @@ export type DocumentAttachmentsPopoverProps = {
   envelopeId: string;
   buttonClassName?: string;
   buttonSize?: 'sm' | 'default';
+
+  /**
+   * Visually hide the button label below the `sm` breakpoint while keeping it
+   * available to screen readers.
+   */
+  collapseLabelOnMobile?: boolean;
 };
 
 const ZAttachmentFormSchema = z.object({
@@ -35,6 +41,7 @@ export const DocumentAttachmentsPopover = ({
   envelopeId,
   buttonClassName,
   buttonSize,
+  collapseLabelOnMobile = false,
 }: DocumentAttachmentsPopoverProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -129,7 +136,7 @@ export const DocumentAttachmentsPopover = ({
         <Button variant="outline" className={cn('gap-2', buttonClassName)} size={buttonSize}>
           <Paperclip className="h-4 w-4" />
 
-          <span>
+          <span className={cn(collapseLabelOnMobile && 'sr-only sm:not-sr-only')}>
             <Trans>Attachments</Trans>
             {attachments && attachments.data.length > 0 && <span className="ml-1">({attachments.data.length})</span>}
           </span>
