@@ -6,6 +6,42 @@ export const APP_DOCUMENT_UPLOAD_SIZE_LIMIT = Number(env('NEXT_PUBLIC_DOCUMENT_S
 
 export const NEXT_PUBLIC_WEBAPP_URL = () => env('NEXT_PUBLIC_WEBAPP_URL') ?? 'http://localhost:3000';
 
+/**
+ * The sub-path the app is served under (no trailing slash), e.g. "/ESign".
+ * Returns an empty string when served at root.
+ *
+ * Prefers the explicit NEXT_PUBLIC_BASE_PATH (which is the same value baked
+ * into the Vite/React Router build). Falls back to the pathname of
+ * NEXT_PUBLIC_WEBAPP_URL so the function still works in dev when the env
+ * variable is unset.
+ *
+ * Avoid using this to build URLs, use {@link formatPath} instead. Reserve this
+ * for cases where the raw prefix itself is needed, such as path comparisons.
+ */
+export const getBasePath = (): string => {
+  const explicit = env('NEXT_PUBLIC_BASE_PATH');
+
+  if (explicit) {
+    return explicit.replace(/\/$/, '');
+  }
+
+  try {
+    return new URL(NEXT_PUBLIC_WEBAPP_URL()).pathname.replace(/\/$/, '');
+  } catch {
+    return '';
+  }
+};
+
+/**
+ * Prefix a root-relative path with the app's base path.
+ *
+ * `formatPath('/api/trpc')` -> `/ESign/api/trpc` under sub-path hosting,
+ * `/api/trpc` otherwise.
+ */
+export const formatPath = (path: string): string => {
+  return `${getBasePath()}${path}`;
+};
+
 export const NEXT_PUBLIC_SIGNING_CONTACT_INFO = () =>
   env('NEXT_PUBLIC_SIGNING_CONTACT_INFO') ?? NEXT_PUBLIC_WEBAPP_URL();
 
