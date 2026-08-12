@@ -8,7 +8,9 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
-import { Link, Outlet, redirect } from 'react-router';
+import { Link, Outlet, redirect, useLocation } from 'react-router';
+
+import { useEffect } from 'react';
 
 import { AppBanner } from '~/components/general/app-banner';
 import { Header } from '~/components/general/app-header';
@@ -17,6 +19,7 @@ import { OrganisationBillingBanner } from '~/components/general/organisations/or
 import { OrganisationQuotaBanner } from '~/components/general/organisations/organisation-quota-banner';
 import { VerifyEmailBanner } from '~/components/general/verify-email-banner';
 import { TeamProvider } from '~/providers/team';
+import { holostaffMarkPath } from '~/utils/holostaff';
 
 import type { Route } from './+types/_layout';
 
@@ -46,6 +49,15 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
   const { banner } = loaderData;
 
   const { user, organisations } = useSession();
+
+  const { pathname } = useLocation();
+
+  // Optional Holostaff copilot (off by default, see ~/utils/holostaff).
+  // Init from this layout only, never from root: the public recipient
+  // pages must not load it.
+  useEffect(() => {
+    holostaffMarkPath(pathname);
+  }, [pathname]);
 
   const { layoutMode } = useChildRouteFlags();
 
