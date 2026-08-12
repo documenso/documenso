@@ -11,12 +11,7 @@ export type TriggerTestWebhookOptions = {
   teamId: number;
 };
 
-export const triggerTestWebhook = async ({
-  id,
-  event,
-  userId,
-  teamId,
-}: TriggerTestWebhookOptions) => {
+export const triggerTestWebhook = async ({ id, event, userId, teamId }: TriggerTestWebhookOptions) => {
   const webhook = await getWebhookById({ id, userId, teamId });
 
   if (!webhook.enabled) {
@@ -32,7 +27,7 @@ export const triggerTestWebhook = async ({
   try {
     await triggerWebhook({
       event,
-      data: samplePayload,
+      data: samplePayload.payload,
       userId,
       teamId,
     });

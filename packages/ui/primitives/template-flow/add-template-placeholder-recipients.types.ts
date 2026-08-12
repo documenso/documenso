@@ -1,7 +1,7 @@
+import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
-
-import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 
 export const ZAddTemplatePlacholderRecipientsFormSchema = z
   .object({
@@ -9,7 +9,7 @@ export const ZAddTemplatePlacholderRecipientsFormSchema = z
       z.object({
         formId: z.string().min(1),
         nativeId: z.number().optional(),
-        email: z.string().min(1).email(),
+        email: zEmail().min(1),
         name: z.string().min(1, { message: 'Name is required' }),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),
@@ -32,6 +32,4 @@ export const ZAddTemplatePlacholderRecipientsFormSchema = z
     { message: 'Signers must have unique names', path: ['signers__root'] },
   );
 
-export type TAddTemplatePlacholderRecipientsFormSchema = z.infer<
-  typeof ZAddTemplatePlacholderRecipientsFormSchema
->;
+export type TAddTemplatePlacholderRecipientsFormSchema = z.infer<typeof ZAddTemplatePlacholderRecipientsFormSchema>;

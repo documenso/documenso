@@ -1,0 +1,15 @@
+{
+  "title": "API Reference",
+  "pages": [
+    "documents",
+    "recipients",
+    "fields",
+    "templates",
+    "teams",
+    "rate-limits",
+    "versioning",
+    "migrate-to-envelopes",
+    "developer-mode",
+    "common-errors"
+  ]
+}

@@ -36,16 +36,18 @@ export type JobDefinition<Name extends string = string, Schema = any> = {
   trigger: {
     name: Name;
     schema?: z.ZodType<Schema>;
+    /**
+     * Optional cron expression (e.g., "* * * * *" for every minute).
+     * When set, the job runs on a schedule instead of being event-triggered.
+     */
+    cron?: string;
   };
   handler: (options: { payload: Schema; io: JobRunIO }) => Promise<Json | void>;
 };
 
 export interface JobRunIO {
   // stableRun<T extends Json | void>(cacheKey: string, callback: (io: JobRunIO) => T | Promise<T>): Promise<T>;
-  runTask<T extends Json | void | undefined>(
-    cacheKey: string,
-    callback: () => Promise<T>,
-  ): Promise<T>;
+  runTask<T extends Json | void | undefined>(cacheKey: string, callback: () => Promise<T>): Promise<T>;
   triggerJob(cacheKey: string, options: SimpleTriggerJobOptions): Promise<unknown>;
   wait(cacheKey: string, ms: number): Promise<void>;
   logger: {
@@ -57,6 +59,4 @@ export interface JobRunIO {
   };
 }
 
-export const defineJob = <N extends string, T = unknown>(
-  job: JobDefinition<N, T>,
-): JobDefinition<N, T> => job;
+export const defineJob = <N extends string, T = unknown>(job: JobDefinition<N, T>): JobDefinition<N, T> => job;

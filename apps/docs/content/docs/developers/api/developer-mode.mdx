@@ -1,0 +1,42 @@
+---
+title: Developer Mode
+description: Advanced development tools for debugging field IDs, recipient IDs, coordinates and integrating with the Documenso API.
+---
+
+## Overview
+
+Developer mode provides additional tools and features to help you integrate and debug Documenso.
+
+## Field Information
+
+When enabled, developer mode displays the following information for each field:
+
+- **Field ID** - The unique identifier of the field
+- **Recipient ID** - The ID of the recipient assigned to the field
+- **Pos X / Pos Y** - The position of the field on the page
+- **Width / Height** - The dimensions of the field
+
+To enable developer mode, add the `devmode=true` query parameter to the editor URL.
+
+```bash
+# Legacy editor
+
+https://app.documenso.com/t/<team-url>/documents/<envelope-id>/legacy_editor?devmode=true
+```
+
+![Field Coordinates Legacy Editor](/developer-mode/field-coordinates-legacy-editor.webp)
+
+```bash
+# New editor
+
+https://app.documenso.com/t/<team-url>/documents/<envelope-id>/edit?step=addFields&devmode=true
+```
+
+![Field Coordinates New Editor](/developer-mode/field-coordinates-new-editor.webp)
+
+---
+
+## See Also
+
+- [Fields API](/docs/developers/api/fields) - Create and position fields via API
+- [Field Types](/docs/concepts/field-types) - Detailed field type reference

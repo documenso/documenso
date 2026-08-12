@@ -1,0 +1,131 @@
+---
+title: Organisation Templates
+description: Share templates across all teams in your organisation so any team can create documents from them.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Overview
+
+Organisation templates are templates shared across all teams within the same organisation. Any team in the organisation can browse and use them to create documents, but only the owning team can edit or delete them.
+
+This is useful when you have standardised documents that multiple teams need to use, such as company-wide NDAs, onboarding agreements, or compliance forms.
+
+## Requirements
+
+The Organisation template type is available when your organisation has **two or more teams**. If your organisation has only one team, the option does not appear.
+
+## Template Types
+
+| Type             | Who can see it            | Who can edit it   | Who can use it              |
+| ---------------- | ------------------------- | ----------------- | --------------------------- |
+| **Private**      | Members of the owning team | Owning team       | Owning team                 |
+| **Organisation** | All teams in the org      | Owning team only  | All teams in the org        |
+| **Public**       | Anyone with the link      | Owning team       | Anyone via direct link      |
+
+## Set a Template as Organisation
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open template settings
+
+Navigate to **Templates**, open the template you want to share, and click **Edit Template** to open the editor. Then open the settings dialog.
+
+</Step>
+
+<Step>
+### Change the template type
+
+In the **Template type** dropdown, select **Organisation**. This option only appears if your organisation has at least two teams.
+
+</Step>
+
+<Step>
+### Save
+
+Click **Save** to apply the change. The template is now visible to all teams in your organisation.
+
+</Step>
+</Steps>
+
+You can also set the template type to Organisation when creating a new template. The type dropdown appears in the template settings step.
+
+## Browse Organisation Templates
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open the templates page
+
+Navigate to **Templates** in the sidebar.
+
+</Step>
+
+<Step>
+### Switch to the Organisation tab
+
+Click the **Organisation** tab above the template list. This tab only appears for non-personal organisations.
+
+The Organisation tab shows all organisation templates from every team in your organisation, including your own.
+
+</Step>
+</Steps>
+
+Templates from other teams display the owning team's name next to the template type.
+
+## Use an Organisation Template
+
+Any team member in the organisation can create documents from an organisation template, even if the template belongs to a different team.
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+
+Find the template in the **Organisation** tab or click through from the template detail page.
+
+</Step>
+
+<Step>
+
+Click **Use Template** and fill in the recipient details. The document is created under your team, not the template's owning team.
+
+</Step>
+</Steps>
+
+See [Use Templates](/docs/users/templates/use) for details on creating documents from templates.
+
+## Editing and Permissions
+
+Only members of the team that owns the template can edit or delete it. When viewing an organisation template from another team:
+
+- The **Edit Template**, **Direct Link**, and **Bulk Send** controls are hidden
+- The recipients section is read-only
+- The **Use Template** button is available
+
+To modify a template owned by another team, contact that team's members or ask an organisation admin to make changes.
+
+## Visibility
+
+Organisation templates respect the same visibility settings as other templates. A template's visibility determines which team roles can access it:
+
+| Visibility            | Who can access                          |
+| --------------------- | --------------------------------------- |
+| **Everyone**          | All team members (Admin, Manager, Member) |
+| **Manager and above** | Admins and Managers only                |
+| **Admin**             | Admins only                             |
+
+This applies to both the owning team and other teams in the organisation. A Member-role user on any team cannot see an organisation template set to Admin visibility.
+
+## Reverting to Private
+
+To stop sharing a template across the organisation, change the template type back to **Private** in the template settings. The template will only be visible to the owning team. Documents already created from the template are not affected.
+
+---
+
+## See Also
+
+- [Create Templates](/docs/users/templates/create) - Build reusable templates
+- [Use Templates](/docs/users/templates/use) - Create documents from templates
+- [Organisations](/docs/users/organisations) - Managing organisations and teams

@@ -1,29 +1,45 @@
-import { Trans } from '@lingui/react/macro';
-import { Outlet } from 'react-router';
+import { extractCookieFromHeaders } from '@documenso/auth/server/lib/utils/cookies';
+import { extractCookieFromDocument } from '@documenso/lib/client-only/cookies';
+import type { RouteHandle } from '@documenso/lib/client-only/hooks/use-child-route-flags';
+import { PREFERRED_TEAM_URL_COOKIE } from '@documenso/lib/constants/cookies';
+import { msg } from '@lingui/core/macro';
 
-import { SettingsDesktopNav } from '~/components/general/settings-nav-desktop';
-import { SettingsMobileNav } from '~/components/general/settings-nav-mobile';
+import { UnifiedSettingsLayout } from '~/components/general/unified-settings-layout';
 import { appMetaTags } from '~/utils/meta';
 
+import type { Route } from './+types/_layout';
+
 export function meta() {
-  return appMetaTags('Settings');
+  return appMetaTags(msg`Settings`);
 }
 
-export default function SettingsLayout() {
-  return (
-    <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h1 className="text-4xl font-semibold">
-        <Trans>Settings</Trans>
-      </h1>
+export const handle: RouteHandle = {
+  layoutMode: 'settings',
+};
 
-      <div className="mt-4 grid grid-cols-12 gap-x-8 md:mt-8">
-        <SettingsDesktopNav className="hidden md:col-span-3 md:flex" />
-        <SettingsMobileNav className="col-span-12 mb-8 md:hidden" />
+/**
+ * Only runs on the initial document request (SSR) so the first paint has the
+ * correct preferred team without a hydration mismatch.
+ */
+export function loader({ request }: Route.LoaderArgs) {
+  return {
+    preferredTeamUrl: extractCookieFromHeaders(PREFERRED_TEAM_URL_COOKIE, request.headers),
+  };
+}
 
-        <div className="col-span-12 md:col-span-9">
-          <Outlet />
-        </div>
-      </div>
-    </div>
-  );
+/**
+ * Runs instead of the server loader on client-side navigations, otherwise every
+ * settings page switch would trigger a `.data` round-trip to the server just to
+ * read this cookie.
+ *
+ * The cookie is not `HttpOnly` so it can be read straight from the document.
+ */
+export function clientLoader() {
+  return {
+    preferredTeamUrl: extractCookieFromDocument(PREFERRED_TEAM_URL_COOKIE),
+  };
+}
+
+export default function SettingsLayout({ loaderData }: Route.ComponentProps) {
+  return <UnifiedSettingsLayout activeScope="account" preferredTeamUrl={loaderData.preferredTeamUrl} />;
 }

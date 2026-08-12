@@ -1,16 +1,9 @@
-import { Trans, useLingui } from '@lingui/react/macro';
-
 import { validateFields as validateEmailFields } from '@documenso/lib/advanced-fields-validation/validate-fields';
-import { type TEmailFieldMeta as EmailFieldMeta } from '@documenso/lib/types/field-meta';
+import { DEFAULT_EMAIL_OVERFLOW_MODE, type TEmailFieldMeta as EmailFieldMeta } from '@documenso/lib/types/field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { Trans, useLingui } from '@lingui/react/macro';
 
 type EmailFieldAdvancedSettingsProps = {
   fieldState: EmailFieldMeta;
@@ -30,6 +23,7 @@ export const EmailFieldAdvancedSettings = ({
 
     const errors = validateEmailFields({
       fontSize,
+      overflow: fieldState.overflow ?? DEFAULT_EMAIL_OVERFLOW_MODE,
       type: 'email',
     });
 
@@ -46,7 +40,7 @@ export const EmailFieldAdvancedSettings = ({
         <Input
           id="fontSize"
           type="number"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field font size`}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
@@ -60,11 +54,8 @@ export const EmailFieldAdvancedSettings = ({
           <Trans>Text Align</Trans>
         </Label>
 
-        <Select
-          value={fieldState.textAlign}
-          onValueChange={(value) => handleInput('textAlign', value)}
-        >
-          <SelectTrigger className="bg-background mt-2">
+        <Select value={fieldState.textAlign} onValueChange={(value) => handleInput('textAlign', value)}>
+          <SelectTrigger className="mt-2 bg-background">
             <SelectValue placeholder={t`Select text align`} />
           </SelectTrigger>
 

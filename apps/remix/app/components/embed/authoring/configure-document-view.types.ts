@@ -1,12 +1,9 @@
-import { z } from 'zod';
-
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import {
-  ZDocumentMetaDateFormatSchema,
-  ZDocumentMetaLanguageSchema,
-} from '@documenso/lib/types/document-meta';
+import { ZDocumentMetaDateFormatSchema, ZDocumentMetaLanguageSchema } from '@documenso/lib/types/document-meta';
 import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { DocumentDistributionMethod } from '@documenso/prisma/generated/types';
+import { z } from 'zod';
 
 // Define the schema for configuration
 export type TConfigureEmbedFormSchema = z.infer<typeof ZConfigureEmbedFormSchema>;
@@ -19,7 +16,7 @@ export const ZConfigureEmbedFormSchema = z.object({
         nativeId: z.number().optional(),
         formId: z.string(),
         name: z.string(),
-        email: z.string().email('Invalid email address'),
+        email: zEmail('Invalid email address'),
         role: z.enum(['SIGNER', 'CC', 'APPROVER', 'VIEWER', 'ASSISTANT']),
         signingOrder: z.number().optional(),
         disabled: z.boolean().optional(),

@@ -1,22 +1,18 @@
-import { useState } from 'react';
-
+import { authClient } from '@documenso/auth/client';
+import { formatPath } from '@documenso/lib/constants/app';
+import { Button } from '@documenso/ui/primitives/button';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-
-import { authClient } from '@documenso/auth/client';
-import { Button } from '@documenso/ui/primitives/button';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { useState } from 'react';
 
 export type DocumentSigningAuthPageViewProps = {
   email?: string;
   emailHasAccount?: boolean;
 };
 
-export const DocumentSigningAuthPageView = ({
-  email,
-  emailHasAccount,
-}: DocumentSigningAuthPageViewProps) => {
+export const DocumentSigningAuthPageView = ({ email, emailHasAccount }: DocumentSigningAuthPageViewProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -26,10 +22,10 @@ export const DocumentSigningAuthPageView = ({
     try {
       setIsSigningOut(true);
 
-      let redirectPath = '/signin';
+      let redirectPath = formatPath('/signin');
 
       if (email) {
-        redirectPath = emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`;
+        redirectPath = emailHasAccount ? formatPath(`/signin#email=${email}`) : formatPath(`/signup#email=${email}`);
       }
 
       await authClient.signOut({
@@ -50,11 +46,11 @@ export const DocumentSigningAuthPageView = ({
   return (
     <div className="mx-auto flex h-[70vh] w-full max-w-md flex-col items-center justify-center">
       <div>
-        <h1 className="text-3xl font-semibold">
+        <h1 className="font-semibold text-3xl">
           <Trans>Authentication required</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="mt-2 text-muted-foreground text-sm">
           {email ? (
             <Trans>
               You need to be logged in as <strong>{email}</strong> to view this page.

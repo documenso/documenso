@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { useLocation, useSearchParams } from 'react-router';
-
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { Input } from '@documenso/ui/primitives/input';
+import { useLingui } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router';
 
 import { TeamMemberCreateDialog } from '~/components/dialogs/team-member-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
@@ -42,7 +40,7 @@ export default function TeamsSettingsMembersPage() {
 
   return (
     <div>
-      <SettingsHeader title={t`Team Members`} subtitle={t`Manage the members of your team.`}>
+      <SettingsHeader hideDivider title={t`Team Members`} subtitle={t`Manage the members of your team.`}>
         <TeamMemberCreateDialog />
       </SettingsHeader>
 

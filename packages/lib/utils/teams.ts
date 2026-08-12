@@ -1,12 +1,5 @@
-import type {
-  DocumentVisibility,
-  OrganisationGlobalSettings,
-  Prisma,
-  TeamGlobalSettings,
-} from '@prisma/client';
-
-import type { TeamGroup } from '@documenso/prisma/generated/types';
-import type { TeamMemberRole } from '@documenso/prisma/generated/types';
+import { type TeamGroup, TeamMemberRole } from '@documenso/prisma/generated/types';
+import type { DocumentVisibility, OrganisationGlobalSettings, Prisma, TeamGlobalSettings } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import {
@@ -198,6 +191,8 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
     brandingLogo: null,
     brandingUrl: null,
     brandingCompanyDetails: null,
+    brandingColors: null,
+    brandingCss: null,
 
     emailDocumentSettings: null,
     emailId: null,
@@ -205,6 +200,11 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
     // emailReplyToName: null,
 
     defaultRecipients: null,
+
+    envelopeExpirationPeriod: null,
+
+    reminderSettings: null,
+
     aiFeaturesEnabled: null,
   };
 };
@@ -234,4 +234,12 @@ export const extractDerivedTeamSettings = (
   }
 
   return derivedSettings;
+};
+
+export const isMemberManagerOrAbove = (role: TeamMemberRole) => {
+  return role === TeamMemberRole.ADMIN || role === TeamMemberRole.MANAGER;
+};
+
+export const isMemberAdmin = (role: TeamMemberRole) => {
+  return role === TeamMemberRole.ADMIN;
 };

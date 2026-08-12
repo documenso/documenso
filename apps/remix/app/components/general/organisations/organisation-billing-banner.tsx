@@ -1,15 +1,6 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { SubscriptionStatus } from '@prisma/client';
-import { AlertTriangle } from 'lucide-react';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { SUPPORT_EMAIL } from '@documenso/lib/constants/app';
+import { isOrganisationPendingPayment } from '@documenso/lib/utils/billing';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -25,6 +16,14 @@ import {
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { SubscriptionStatus } from '@prisma/client';
+import { AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router';
+import { match } from 'ts-pattern';
 
 export const OrganisationBillingBanner = () => {
   const { _ } = useLingui();
@@ -34,8 +33,7 @@ export const OrganisationBillingBanner = () => {
 
   const organisation = useOptionalCurrentOrganisation();
 
-  const { mutateAsync: manageSubscription, isPending } =
-    trpc.enterprise.billing.subscription.manage.useMutation();
+  const { mutateAsync: manageSubscription, isPending } = trpc.enterprise.billing.subscription.manage.useMutation();
 
   const handleCreatePortal = async (organisationId: string) => {
     try {
@@ -56,13 +54,9 @@ export const OrganisationBillingBanner = () => {
     }
   };
 
-  const subscriptionStatus = organisation?.subscription?.status;
+  const bannerVariant = getBannerVariant(organisation);
 
-  if (
-    !organisation ||
-    subscriptionStatus === undefined ||
-    subscriptionStatus === SubscriptionStatus.ACTIVE
-  ) {
+  if (!organisation || bannerVariant === null) {
     return null;
   }
 
@@ -70,29 +64,28 @@ export const OrganisationBillingBanner = () => {
     <>
       <div
         className={cn({
-          'bg-yellow-200 text-yellow-900 dark:bg-yellow-400':
-            subscriptionStatus === SubscriptionStatus.PAST_DUE,
+          'bg-yellow-200 text-yellow-900 dark:bg-yellow-400': bannerVariant === 'PAST_DUE',
           'bg-destructive text-destructive-foreground':
-            subscriptionStatus === SubscriptionStatus.INACTIVE,
+            bannerVariant === 'INACTIVE' || bannerVariant === 'PENDING_PAYMENT',
         })}
       >
-        <div className="mx-auto flex max-w-screen-xl items-center justify-center gap-x-4 px-4 py-2 text-sm font-medium">
+        <div className="mx-auto flex max-w-screen-xl items-center justify-center gap-x-4 px-4 py-2 font-medium text-sm">
           <div className="flex items-center">
             <AlertTriangle className="mr-2.5 h-5 w-5" />
 
-            {match(subscriptionStatus)
-              .with(SubscriptionStatus.PAST_DUE, () => <Trans>Payment overdue</Trans>)
-              .with(SubscriptionStatus.INACTIVE, () => <Trans>Restricted Access</Trans>)
+            {match(bannerVariant)
+              .with('PAST_DUE', () => <Trans>Payment overdue</Trans>)
+              .with('INACTIVE', () => <Trans>Restricted Access</Trans>)
+              .with('PENDING_PAYMENT', () => <Trans>Payment required</Trans>)
               .exhaustive()}
           </div>
 
           <Button
             variant="outline"
             className={cn({
-              'text-yellow-900 hover:bg-yellow-100 dark:hover:bg-yellow-500':
-                subscriptionStatus === SubscriptionStatus.PAST_DUE,
+              'text-yellow-900 hover:bg-yellow-100 dark:hover:bg-yellow-500': bannerVariant === 'PAST_DUE',
               'text-destructive-foreground hover:bg-destructive hover:text-white':
-                subscriptionStatus === SubscriptionStatus.INACTIVE,
+                bannerVariant === 'INACTIVE' || bannerVariant === 'PENDING_PAYMENT',
             })}
             disabled={isPending}
             onClick={() => setIsOpen(true)}
@@ -104,8 +97,8 @@ export const OrganisationBillingBanner = () => {
       </div>
 
       <Dialog open={isOpen} onOpenChange={(value) => !isPending && setIsOpen(value)}>
-        {match(subscriptionStatus)
-          .with(SubscriptionStatus.PAST_DUE, () => (
+        {match(bannerVariant)
+          .with('PAST_DUE', () => (
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
@@ -113,29 +106,20 @@ export const OrganisationBillingBanner = () => {
                 </DialogTitle>
 
                 <DialogDescription>
-                  <Trans>
-                    Your payment is overdue. Please settle the payment to avoid any service
-                    disruptions.
-                  </Trans>
+                  <Trans>Your payment is overdue. Please settle the payment to avoid any service disruptions.</Trans>
                 </DialogDescription>
               </DialogHeader>
 
-              {canExecuteOrganisationAction(
-                'MANAGE_BILLING',
-                organisation.currentOrganisationRole,
-              ) && (
+              {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
                 <DialogFooter>
-                  <Button
-                    loading={isPending}
-                    onClick={async () => handleCreatePortal(organisation.id)}
-                  >
+                  <Button loading={isPending} onClick={async () => handleCreatePortal(organisation.id)}>
                     <Trans>Resolve payment</Trans>
                   </Button>
                 </DialogFooter>
               )}
             </DialogContent>
           ))
-          .with(SubscriptionStatus.INACTIVE, () => (
+          .with('INACTIVE', () => (
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
@@ -144,8 +128,7 @@ export const OrganisationBillingBanner = () => {
 
                 <DialogDescription>
                   <Trans>
-                    Your plan is no longer valid. Please subscribe to a new plan to continue using
-                    Documenso.
+                    Your plan is no longer valid. Please subscribe to a new plan to continue using Documenso.
                   </Trans>
                 </DialogDescription>
               </DialogHeader>
@@ -159,10 +142,7 @@ export const OrganisationBillingBanner = () => {
                 </AlertDescription>
               </Alert>
 
-              {canExecuteOrganisationAction(
-                'MANAGE_BILLING',
-                organisation.currentOrganisationRole,
-              ) && (
+              {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
                 <DialogFooter>
                   <DialogClose asChild>
                     <Button asChild>
@@ -175,8 +155,66 @@ export const OrganisationBillingBanner = () => {
               )}
             </DialogContent>
           ))
-          .otherwise(() => null)}
+          .with('PENDING_PAYMENT', () => (
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  <Trans>Payment required</Trans>
+                </DialogTitle>
+
+                <DialogDescription>
+                  <Trans>This organisation is awaiting payment. Complete checkout to unlock it.</Trans>
+                </DialogDescription>
+              </DialogHeader>
+
+              <Alert variant="neutral">
+                <AlertDescription>
+                  <Trans>
+                    If there is any issue with your subscription, please contact us at{' '}
+                    <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
+                  </Trans>
+                </AlertDescription>
+              </Alert>
+
+              {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button asChild>
+                      <Link to={`/o/${organisation.url}/settings/billing`}>
+                        <Trans>Manage Billing</Trans>
+                      </Link>
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              )}
+            </DialogContent>
+          ))
+          .exhaustive()}
       </Dialog>
     </>
   );
+};
+
+type BannerVariant = 'PAST_DUE' | 'INACTIVE' | 'PENDING_PAYMENT';
+
+const getBannerVariant = (organisation: ReturnType<typeof useOptionalCurrentOrganisation>): BannerVariant | null => {
+  if (!organisation) {
+    return null;
+  }
+
+  if (isOrganisationPendingPayment(organisation)) {
+    return 'PENDING_PAYMENT';
+  }
+
+  const subscriptionStatus = organisation.subscription?.status;
+
+  if (subscriptionStatus === SubscriptionStatus.PAST_DUE) {
+    return 'PAST_DUE';
+  }
+
+  if (subscriptionStatus === SubscriptionStatus.INACTIVE) {
+    return 'INACTIVE';
+  }
+
+  return null;
 };

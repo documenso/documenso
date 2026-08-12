@@ -1,6 +1,5 @@
-import { match } from 'ts-pattern';
-
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { match } from 'ts-pattern';
 
 import { ERROR_CODES } from './errors';
 import { getServerLimits } from './server';

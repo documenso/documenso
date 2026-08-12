@@ -1,10 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { createCallable } from 'react-call';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
+import { zEmail } from '@documenso/lib/utils/zod';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -14,20 +8,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
+import { createCallable } from 'react-call';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 const ZSignFieldEmailFormSchema = z.object({
-  email: z
-    .string()
-    .email()
-    .min(1, { message: msg`Email is required`.id }),
+  email: zEmail().min(1, { message: msg`Email is required`.id }),
 });
 
 type TSignFieldEmailFormSchema = z.infer<typeof ZSignFieldEmailFormSchema>;
@@ -60,10 +51,7 @@ export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, st
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit((data) => call.end(data.email))}>
-              <fieldset
-                className="flex h-full flex-col space-y-4"
-                disabled={form.formState.isSubmitting}
-              >
+              <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
                 <FormField
                   control={form.control}
                   name="email"

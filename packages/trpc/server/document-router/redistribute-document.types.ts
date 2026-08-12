@@ -9,17 +9,15 @@ export const redistributeDocumentMeta: TrpcRouteMeta = {
     path: '/document/redistribute',
     summary: 'Redistribute document',
     description:
-      'Redistribute the document to the provided recipients who have not actioned the document. Will use the distribution method set in the document',
+      'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Redistribute the document to the provided recipients who have not actioned the document. Will use the distribution method set in the document. This also refreshes the signing-link expiration for the targeted unsigned recipients, renewing any expired links.',
     tags: ['Document'],
+    deprecated: true,
   },
 };
 
 export const ZRedistributeDocumentRequestSchema = z.object({
   documentId: z.number(),
-  recipients: z
-    .array(z.number())
-    .min(1)
-    .describe('The IDs of the recipients to redistribute the document to.'),
+  recipients: z.array(z.number()).min(1).describe('The IDs of the recipients to redistribute the document to.'),
 });
 
 export const ZRedistributeDocumentResponseSchema = ZSuccessResponseSchema;

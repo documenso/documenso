@@ -1,9 +1,3 @@
-import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentDistributionMethod } from '@prisma/client';
-import { InfoIcon } from 'lucide-react';
-import type { Control } from 'react-hook-form';
-import { useFormContext } from 'react-hook-form';
-
 import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
@@ -21,16 +15,17 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import { t } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { DocumentDistributionMethod } from '@prisma/client';
+import { InfoIcon } from 'lucide-react';
+import type { Control } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 
 import { useConfigureDocument } from './configure-document-context';
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';
@@ -44,7 +39,7 @@ export const ConfigureDocumentAdvancedSettings = ({
   control,
   isSubmitting,
 }: ConfigureDocumentAdvancedSettingsProps) => {
-  const { t } = useLingui();
+  const { _ } = useLingui();
 
   const form = useFormContext<TConfigureEmbedFormSchema>();
   const { features } = useConfigureDocument();
@@ -58,11 +53,11 @@ export const ConfigureDocumentAdvancedSettings = ({
 
   return (
     <div>
-      <h3 className="text-foreground mb-1 text-lg font-medium">
+      <h3 className="mb-1 font-medium text-foreground text-lg">
         <Trans>Advanced Settings</Trans>
       </h3>
 
-      <p className="text-muted-foreground mb-6 text-sm">
+      <p className="mb-6 text-muted-foreground text-sm">
         <Trans>Configure additional options and preferences</Trans>
       </p>
 
@@ -93,12 +88,12 @@ export const ConfigureDocumentAdvancedSettings = ({
                     <FormControl>
                       <MultiSelectCombobox
                         options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
-                          label: t(option.label),
+                          label: _(option.label),
                           value: option.value,
                         }))}
                         selectedValues={field.value}
                         onChange={field.onChange}
-                        className="bg-background w-full"
+                        className="w-full bg-background"
                         emptySelectionPlaceholder={t`Select signature types`}
                       />
                     </FormControl>
@@ -125,7 +120,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                         <SelectContent>
                           {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                             <SelectItem key={code} value={code}>
-                              {language.full}
+                              {_(language.full)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -202,10 +197,8 @@ export const ConfigureDocumentAdvancedSettings = ({
                         <TooltipTrigger>
                           <InfoIcon className="mx-2 h-4 w-4" />
                         </TooltipTrigger>
-                        <TooltipContent className="text-muted-foreground max-w-xs">
-                          <Trans>
-                            Add a URL to redirect the user to once the document is signed
-                          </Trans>
+                        <TooltipContent className="max-w-xs text-muted-foreground">
+                          <Trans>Add a URL to redirect the user to once the document is signed</Trans>
                         </TooltipContent>
                       </Tooltip>
                     </FormLabel>
@@ -250,8 +243,8 @@ export const ConfigureDocumentAdvancedSettings = ({
 
                     <FormDescription>
                       <Trans>
-                        Choose how to distribute your document to recipients. Email will send
-                        notifications, None will generate signing links for manual distribution.
+                        Choose how to distribute your document to recipients. Email will send notifications, None will
+                        generate signing links for manual distribution.
                       </Trans>
                     </FormDescription>
 
@@ -277,7 +270,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                       <FormControl>
                         <Input
                           id="subject"
-                          className="bg-background mt-2"
+                          className="mt-2 bg-background"
                           disabled={isSubmitting || !isEmailDistribution}
                           {...field}
                         />
@@ -300,7 +293,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                       <FormControl>
                         <Textarea
                           id="message"
-                          className="bg-background mt-2 h-32 resize-none"
+                          className="mt-2 h-32 resize-none bg-background"
                           disabled={isSubmitting || !isEmailDistribution}
                           {...field}
                         />

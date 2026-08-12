@@ -1,11 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { type TemplateDirectLink, TemplateType } from '@prisma/client';
-import { EditIcon, FileIcon, LinkIcon, MoreHorizontalIcon, Trash2Icon } from 'lucide-react';
-
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { trpc } from '@documenso/trpc/react';
@@ -19,6 +11,12 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { type TemplateDirectLink, TemplateType } from '@prisma/client';
+import { EditIcon, FileIcon, LinkIcon, MoreHorizontalIcon, Trash2Icon } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import { ManagePublicTemplateDialog } from '~/components/dialogs/public-profile-template-manage-dialog';
 
@@ -74,7 +72,7 @@ export const SettingsPublicProfileTemplatesTable = () => {
 
   return (
     <div>
-      <div className="dark:divide-foreground/30 dark:border-foreground/30 mt-6 divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200">
+      <div className="mt-6 divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 dark:divide-foreground/30 dark:border-foreground/30">
         {/* Loading and error handling states. */}
         {publicDirectTemplates.length === 0 && (
           <>
@@ -82,12 +80,9 @@ export const SettingsPublicProfileTemplatesTable = () => {
               Array(3)
                 .fill(0)
                 .map((_, index) => (
-                  <div
-                    key={index}
-                    className="bg-background flex items-center justify-between gap-x-6 p-4"
-                  >
+                  <div key={index} className="flex items-center justify-between gap-x-6 bg-background p-4">
                     <div className="flex gap-x-2">
-                      <FileIcon className="text-muted-foreground/40 h-8 w-8" strokeWidth={1.5} />
+                      <FileIcon className="h-8 w-8 text-muted-foreground/40" strokeWidth={1.5} />
 
                       <div className="space-y-2">
                         <Skeleton className="h-4 w-24" />
@@ -95,12 +90,12 @@ export const SettingsPublicProfileTemplatesTable = () => {
                       </div>
                     </div>
 
-                    <MoreHorizontalIcon className="text-muted-foreground h-5 w-5" />
+                    <MoreHorizontalIcon className="h-5 w-5 text-muted-foreground" />
                   </div>
                 ))}
 
             {isLoadingError && (
-              <div className="text-muted-foreground flex h-32 flex-col items-center justify-center text-sm">
+              <div className="flex h-32 flex-col items-center justify-center text-muted-foreground text-sm">
                 <Trans>Unable to load your public profile templates at this time</Trans>
                 <button
                   onClick={(e) => {
@@ -114,12 +109,12 @@ export const SettingsPublicProfileTemplatesTable = () => {
             )}
 
             {!isLoading && (
-              <div className="text-muted-foreground flex h-32 flex-col items-center justify-center text-sm">
+              <div className="flex h-32 flex-col items-center justify-center text-muted-foreground text-sm">
                 <Trans>No public profile templates found</Trans>
                 <ManagePublicTemplateDialog
                   directTemplates={privateDirectTemplates}
                   trigger={
-                    <button className="hover:text-muted-foreground/80 mt-1 text-xs">
+                    <button className="mt-1 text-xs hover:text-muted-foreground/80">
                       <Trans>Click here to get started</Trans>
                     </button>
                   }
@@ -131,25 +126,19 @@ export const SettingsPublicProfileTemplatesTable = () => {
 
         {/* Public templates list. */}
         {publicDirectTemplates.map((template) => (
-          <div
-            key={template.id}
-            className="bg-background flex items-center justify-between gap-x-6 p-4"
-          >
+          <div key={template.id} className="flex items-center justify-between gap-x-6 bg-background p-4">
             <div className="flex gap-x-2">
-              <FileIcon
-                className="text-muted-foreground/40 h-8 w-8 flex-shrink-0"
-                strokeWidth={1.5}
-              />
+              <FileIcon className="h-8 w-8 flex-shrink-0 text-muted-foreground/40" strokeWidth={1.5} />
 
               <div>
-                <p className="text-sm">{template.publicTitle}</p>
-                <p className="text-xs text-neutral-400">{template.publicDescription}</p>
+                <p className="break-all text-sm">{template.publicTitle}</p>
+                <p className="break-all text-neutral-400 text-xs">{template.publicDescription}</p>
               </div>
             </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <MoreHorizontalIcon className="text-muted-foreground h-5 w-5" />
+                <MoreHorizontalIcon className="h-5 w-5 text-muted-foreground" />
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="w-52" align="center" side="left">

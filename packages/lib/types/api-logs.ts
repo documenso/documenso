@@ -26,4 +26,9 @@ export type BaseApiLog = Partial<RootApiLog> & {
 export type TrpcApiLog = BaseApiLog & {
   trpcMiddleware: string;
   unverifiedTeamId?: number | null;
+  /**
+   * Used to differentiate between batched TRPC requests sharing the same
+   * underlying HTTP `requestId`.
+   */
+  nonBatchedRequestId?: string;
 };

@@ -1,3 +1,4 @@
+import { zEmail } from '@documenso/lib/utils/zod';
 import { OrganisationMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
@@ -16,7 +17,7 @@ export const ZCreateOrganisationMemberInvitesRequestSchema = z.object({
   invitations: z
     .array(
       z.object({
-        email: z.string().trim().email().toLowerCase(),
+        email: zEmail().trim().toLowerCase(),
         organisationRole: z.nativeEnum(OrganisationMemberRole),
       }),
     )

@@ -1,12 +1,3 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationGroupType } from '@prisma/client';
-import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
-import { useSearchParams } from 'react-router';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
@@ -27,6 +18,13 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { OrganisationGroupType } from '@prisma/client';
+import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { useMemo } from 'react';
+import { useSearchParams } from 'react-router';
 
 import { OrganisationMemberDeleteDialog } from '~/components/dialogs/organisation-member-delete-dialog';
 import { OrganisationMemberUpdateDialog } from '~/components/dialogs/organisation-member-update-dialog';
@@ -79,9 +77,7 @@ export const OrganisationMembersDataTable = () => {
             <AvatarWithText
               avatarClass="h-12 w-12"
               avatarFallback={avatarFallbackText}
-              primaryText={
-                <span className="text-foreground/80 font-semibold">{row.original.name}</span>
-              }
+              primaryText={<span className="font-semibold text-foreground/80">{row.original.name}</span>}
               secondaryText={row.original.email}
             />
           );
@@ -102,15 +98,14 @@ export const OrganisationMembersDataTable = () => {
       },
       {
         header: _(msg`Groups`),
-        cell: ({ row }) =>
-          row.original.groups.filter((group) => group.type === OrganisationGroupType.CUSTOM).length,
+        cell: ({ row }) => row.original.groups.filter((group) => group.type === OrganisationGroupType.CUSTOM).length,
       },
       {
         header: _(msg`Actions`),
         cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+              <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-52" align="start" forceMount>
@@ -209,11 +204,7 @@ export const OrganisationMembersDataTable = () => {
         ),
       }}
     >
-      {(table) =>
-        results.totalPages > 1 && (
-          <DataTablePagination additionalInformation="VisibleCount" table={table} />
-        )
-      }
+      {(table) => results.totalPages > 1 && <DataTablePagination additionalInformation="VisibleCount" table={table} />}
     </DataTable>
   );
 };

@@ -1,10 +1,10 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type GetRecipientByIdOptions = {
   recipientId: number;
@@ -17,12 +17,7 @@ export type GetRecipientByIdOptions = {
  * Get a recipient by ID. This will also return the recipient signing token so
  * be careful when using this.
  */
-export const getRecipientById = async ({
-  recipientId,
-  userId,
-  teamId,
-  type,
-}: GetRecipientByIdOptions) => {
+export const getRecipientById = async ({ recipientId, userId, teamId, type }: GetRecipientByIdOptions) => {
   const recipient = await prisma.recipient.findFirst({
     where: {
       id: recipientId,
@@ -47,15 +42,30 @@ export const getRecipientById = async ({
     });
   }
 
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'envelopeId',
+      id: recipient.envelopeId,
+    },
+    type,
+    userId,
+    teamId,
+  });
+
+  // Additional validation to check visibility.
+  const envelope = await prisma.envelope.findUnique({
+    where: envelopeWhereInput,
+  });
+
+  if (!envelope) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Recipient not found',
+    });
+  }
+
   const legacyId = {
-    documentId:
-      type === EnvelopeType.DOCUMENT
-        ? mapSecondaryIdToDocumentId(recipient.envelope.secondaryId)
-        : null,
-    templateId:
-      type === EnvelopeType.TEMPLATE
-        ? mapSecondaryIdToTemplateId(recipient.envelope.secondaryId)
-        : null,
+    documentId: type === EnvelopeType.DOCUMENT ? mapSecondaryIdToDocumentId(recipient.envelope.secondaryId) : null,
+    templateId: type === EnvelopeType.TEMPLATE ? mapSecondaryIdToTemplateId(recipient.envelope.secondaryId) : null,
   };
 
   // Backwards compatibility mapping.

@@ -1,20 +1,24 @@
-import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@prisma/client';
-import { EnvelopeType, FolderType } from '@prisma/client';
-import { DocumentStatus } from '@prisma/client';
-import { isDeepEqual } from 'remeda';
-
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, FolderType, WebhookTriggerEvents } from '@prisma/client';
+import { isDeepEqual } from 'remeda';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
+import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
+import { recomputeNextReminderForEnvelope } from '../recipient/update-recipient-next-reminder';
+import { assertCompatibleDictateNextSigner } from '../signature-level/assert-compatible-dictate-next-signer';
+import { assertCompatibleSigningOrder } from '../signature-level/assert-compatible-signing-order';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { assertEnvelopeMutable } from './assert-envelope-mutable';
 import { getEnvelopeWhereInput } from './get-envelope-by-id';
 
 export type UpdateEnvelopeOptions = {
@@ -75,10 +79,23 @@ export const updateEnvelope = async ({
     });
   }
 
-  if (
-    envelope.type !== EnvelopeType.TEMPLATE &&
-    (data.publicTitle || data.publicDescription || data.templateType)
-  ) {
+  assertEnvelopeMutable(envelope);
+
+  if (meta.signingOrder !== undefined) {
+    assertCompatibleSigningOrder({
+      signatureLevel: envelope.signatureLevel,
+      signingOrder: meta.signingOrder,
+    });
+  }
+
+  if (meta.allowDictateNextSigner !== undefined) {
+    assertCompatibleDictateNextSigner({
+      signatureLevel: envelope.signatureLevel,
+      allowDictateNextSigner: meta.allowDictateNextSigner,
+    });
+  }
+
+  if (envelope.type !== EnvelopeType.TEMPLATE && (data.publicTitle || data.publicDescription || data.templateType)) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
       message: 'You cannot update the template fields for document type envelopes',
     });
@@ -92,11 +109,7 @@ export const updateEnvelope = async ({
   const isEnvelopeOwner = envelope.userId === userId;
 
   // Validate whether the new visibility setting is allowed for the current user.
-  if (
-    !isEnvelopeOwner &&
-    data?.visibility &&
-    !canAccessTeamDocument(team.currentTeamRole, data.visibility)
-  ) {
+  if (!isEnvelopeOwner && data?.visibility && !canAccessTeamDocument(team.currentTeamRole, data.visibility)) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to update the envelope visibility',
     });
@@ -110,10 +123,8 @@ export const updateEnvelope = async ({
   const documentGlobalActionAuth = documentAuthOption?.globalActionAuth ?? null;
 
   // If the new global auth values aren't passed in, fallback to the current document values.
-  const newGlobalAccessAuth =
-    data?.globalAccessAuth === undefined ? documentGlobalAccessAuth : data.globalAccessAuth;
-  const newGlobalActionAuth =
-    data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
+  const newGlobalAccessAuth = data?.globalAccessAuth === undefined ? documentGlobalAccessAuth : data.globalAccessAuth;
+  const newGlobalActionAuth = data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
 
   // Check if user has permission to set the global action auth.
   if (newGlobalActionAuth.length > 0 && !envelope.team.organisation.organisationClaim.flags.cfr21) {
@@ -145,7 +156,7 @@ export const updateEnvelope = async ({
     }
   }
 
-  let folderUpdateQuery: Prisma.FolderUpdateOneWithoutEnvelopesNestedInput | undefined = undefined;
+  let folderUpdateQuery: Prisma.FolderUpdateOneWithoutEnvelopesNestedInput | undefined;
 
   // Validate folder ID.
   if (data.folderId) {
@@ -186,26 +197,21 @@ export const updateEnvelope = async ({
   const isTitleSame = data.title === undefined || data.title === envelope.title;
   const isExternalIdSame = data.externalId === undefined || data.externalId === envelope.externalId;
   const isGlobalAccessSame =
-    documentGlobalAccessAuth === undefined ||
-    isDeepEqual(documentGlobalAccessAuth, newGlobalAccessAuth);
+    documentGlobalAccessAuth === undefined || isDeepEqual(documentGlobalAccessAuth, newGlobalAccessAuth);
   const isGlobalActionSame =
-    documentGlobalActionAuth === undefined ||
-    isDeepEqual(documentGlobalActionAuth, newGlobalActionAuth);
-  const isDocumentVisibilitySame =
-    data.visibility === undefined || data.visibility === envelope.visibility;
+    documentGlobalActionAuth === undefined || isDeepEqual(documentGlobalActionAuth, newGlobalActionAuth);
+  const isDocumentVisibilitySame = data.visibility === undefined || data.visibility === envelope.visibility;
   const isFolderSame = data.folderId === undefined || data.folderId === envelope.folderId;
-  const isTemplateTypeSame =
-    data.templateType === undefined || data.templateType === envelope.templateType;
+  const isTemplateTypeSame = data.templateType === undefined || data.templateType === envelope.templateType;
   const isPublicDescriptionSame =
     data.publicDescription === undefined || data.publicDescription === envelope.publicDescription;
-  const isPublicTitleSame =
-    data.publicTitle === undefined || data.publicTitle === envelope.publicTitle;
+  const isPublicTitleSame = data.publicTitle === undefined || data.publicTitle === envelope.publicTitle;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
-  if (!isTitleSame && envelope.status !== DocumentStatus.DRAFT) {
+  if (!isTitleSame && envelope.status !== DocumentStatus.DRAFT && envelope.status !== DocumentStatus.PENDING) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'You cannot update the title if the envelope has been sent',
+      message: 'Envelope title can only be updated while in draft or pending status',
     });
   }
 
@@ -309,8 +315,10 @@ export const updateEnvelope = async ({
   //   return envelope;
   // }
 
-  return await prisma.$transaction(async (tx) => {
-    const updatedEnvelope = await tx.envelope.update({
+  const updatedEnvelope = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
+    const result = await tx.envelope.update({
       where: {
         id: envelope.id,
       },
@@ -331,6 +339,10 @@ export const updateEnvelope = async ({
           },
         },
       },
+      include: {
+        documentMeta: true,
+        recipients: true,
+      },
     });
 
     if (envelope.type === EnvelopeType.DOCUMENT) {
@@ -339,6 +351,25 @@ export const updateEnvelope = async ({
       });
     }
 
-    return updatedEnvelope;
+    return result;
   });
+
+  // Recompute reminders for active recipients when reminder settings change.
+  if (meta && 'reminderSettings' in meta) {
+    await recomputeNextReminderForEnvelope(envelope.id);
+  }
+
+  if (envelope.type === EnvelopeType.TEMPLATE) {
+    await triggerWebhook({
+      event: WebhookTriggerEvents.TEMPLATE_UPDATED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedEnvelope)),
+      userId,
+      teamId,
+    });
+  }
+
+  // deconstruct to remove the recipients and documentMeta from the returned object since they aren't needed and can be large.
+  const { recipients: _recipients, documentMeta: _documentMeta, ...finalEnvelope } = updatedEnvelope;
+
+  return finalEnvelope;
 };

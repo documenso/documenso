@@ -1,12 +1,12 @@
-import { expect, test } from '@playwright/test';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 import { seedDirectTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
+import { signSignaturePad } from '../fixtures/signature';
 
 test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
   const { user, team } = await seedUser();
@@ -31,9 +31,7 @@ test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Update' }).click();
 
-  await expect(page.getByRole('status').first()).toContainText(
-    'Your public profile has been updated.',
-  );
+  await expect(page.getByRole('status').first()).toContainText('Your public profile has been updated.');
 
   // Link direct template to public profile.
   await page.getByRole('button', { name: 'Link template' }).click();
@@ -41,9 +39,7 @@ test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
   await page.getByRole('button', { name: 'Continue' }).click();
 
   await page.getByRole('textbox', { name: 'Title *' }).fill('public-direct-template-title');
-  await page
-    .getByRole('textbox', { name: 'Description *' })
-    .fill('public-direct-template-description');
+  await page.getByRole('textbox', { name: 'Description *' }).fill('public-direct-template-description');
   await page.getByRole('button', { name: 'Update' }).click();
 
   // Wait for toast
@@ -78,11 +74,53 @@ test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
   await expect(page.locator('body')).toContainText('public-direct-template-title');
   await expect(page.locator('body')).toContainText('public-direct-template-description');
 
+  const directSignatureField = directTemplate.fields[0];
+
+  if (!directSignatureField) {
+    throw new Error('Expected seeded direct template signature field to exist');
+  }
+
   await page.getByRole('link', { name: 'Sign' }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
+
+  await signSignaturePad(page);
+  await page.locator(`#field-${directSignatureField.id}`).getByRole('button').click();
+  await expect(page.locator(`#field-${directSignatureField.id}`)).toHaveAttribute('data-inserted', 'true');
+
   await page.getByRole('button', { name: 'Complete' }).click();
   await page.getByRole('button', { name: 'Sign' }).click();
 
   await expect(page.getByRole('heading', { name: 'Document Signed' })).toBeVisible();
   await expect(page.getByRole('heading')).toContainText('Document Signed');
+});
+
+test('[PUBLIC_PROFILE]: empty-profile settings hint only shows to team managers', async ({ page }) => {
+  const { user, team } = await seedUser();
+
+  // Enable the team's public profile with no linked templates so the empty
+  // state (and its "manage your profile" hint) renders.
+  await prisma.teamProfile.upsert({
+    where: { teamId: team.id },
+    update: { enabled: true },
+    create: { teamId: team.id, enabled: true },
+  });
+
+  // The team owner manages the team → sees the hint linking straight to the
+  // team's public-profile settings.
+  await apiSignin({ page, email: user.email });
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/p/${team.url}`);
+
+  const settingsLink = page.getByRole('link', { name: 'public profile settings' });
+  await expect(settingsLink).toBeVisible();
+  await expect(settingsLink).toHaveAttribute('href', `/t/${team.url}/settings/public-profile`);
+
+  // A different signed-in user who doesn't manage this team sees the empty state
+  // but no settings hint.
+  const { user: stranger } = await seedUser();
+
+  await apiSignin({ page, email: stranger.email });
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/p/${team.url}`);
+
+  await expect(page.getByText("hasn't added any documents")).toBeVisible();
+  await expect(page.getByRole('link', { name: 'public profile settings' })).toHaveCount(0);
 });

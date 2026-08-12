@@ -1,13 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import type { z } from 'zod';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
 import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
@@ -34,15 +24,20 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationMemberRole } from '@prisma/client';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import type { z } from 'zod';
+
+import {
+  type OrganisationMemberOption,
+  OrganisationMembersMultiSelectCombobox,
+} from '~/components/general/organisation-members-multiselect-combobox';
 
 export type OrganisationGroupCreateDialogProps = {
   trigger?: React.ReactNode;
@@ -56,14 +51,12 @@ const ZCreateOrganisationGroupFormSchema = ZCreateOrganisationGroupRequestSchema
 
 type TCreateOrganisationGroupFormSchema = z.infer<typeof ZCreateOrganisationGroupFormSchema>;
 
-export const OrganisationGroupCreateDialog = ({
-  trigger,
-  ...props
-}: OrganisationGroupCreateDialogProps) => {
+export const OrganisationGroupCreateDialog = ({ trigger, ...props }: OrganisationGroupCreateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
   const [open, setOpen] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<OrganisationMemberOption[]>([]);
   const organisation = useCurrentOrganisation();
 
   const form = useForm({
@@ -77,18 +70,7 @@ export const OrganisationGroupCreateDialog = ({
 
   const { mutateAsync: createOrganisationGroup } = trpc.organisation.group.create.useMutation();
 
-  const { data: membersFindResult, isLoading: isLoadingMembers } =
-    trpc.organisation.member.find.useQuery({
-      organisationId: organisation.id,
-    });
-
-  const members = membersFindResult?.data ?? [];
-
-  const onFormSubmit = async ({
-    name,
-    organisationRole,
-    memberIds,
-  }: TCreateOrganisationGroupFormSchema) => {
+  const onFormSubmit = async ({ name, organisationRole, memberIds }: TCreateOrganisationGroupFormSchema) => {
     try {
       await createOrganisationGroup({
         organisationId: organisation.id,
@@ -119,14 +101,11 @@ export const OrganisationGroupCreateDialog = ({
 
   useEffect(() => {
     form.reset();
+    setSelectedMembers([]);
   }, [open, form]);
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button className="flex-shrink-0" variant="secondary">
@@ -148,10 +127,7 @@ export const OrganisationGroupCreateDialog = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset
-              className="flex h-full flex-col space-y-4"
-              disabled={form.formState.isSubmitting}
-            >
+            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="name"
@@ -178,14 +154,12 @@ export const OrganisationGroupCreateDialog = ({
                     </FormLabel>
                     <FormControl>
                       <Select {...field} onValueChange={field.onChange}>
-                        <SelectTrigger className="text-muted-foreground w-full">
+                        <SelectTrigger className="w-full text-muted-foreground">
                           <SelectValue />
                         </SelectTrigger>
 
                         <SelectContent position="popper">
-                          {ORGANISATION_MEMBER_ROLE_HIERARCHY[
-                            organisation.currentOrganisationRole
-                          ].map((role) => (
+                          {ORGANISATION_MEMBER_ROLE_HIERARCHY[organisation.currentOrganisationRole].map((role) => (
                             <SelectItem key={role} value={role}>
                               {t(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[role]) ?? role}
                             </SelectItem>
@@ -209,16 +183,15 @@ export const OrganisationGroupCreateDialog = ({
                     </FormLabel>
 
                     <FormControl>
-                      <MultiSelectCombobox
-                        options={members.map((member) => ({
-                          label: member.name,
-                          value: member.id,
-                        }))}
-                        loading={isLoadingMembers}
-                        selectedValues={field.value}
-                        onChange={field.onChange}
-                        className="bg-background w-full"
-                        emptySelectionPlaceholder={t`Select members`}
+                      <OrganisationMembersMultiSelectCombobox
+                        organisationId={organisation.id}
+                        selectedMembers={selectedMembers}
+                        onChange={(members) => {
+                          setSelectedMembers(members);
+                          field.onChange(members.map((member) => member.id));
+                        }}
+                        className="w-full bg-background"
+                        dataTestId="group-members-picker"
                       />
                     </FormControl>
 

@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { useSearchParams } from 'react-router';
-import { useLocation } from 'react-router';
-
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { Input } from '@documenso/ui/primitives/input';
+import { useLingui } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router';
 
 import { TeamCreateDialog } from '~/components/dialogs/team-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
@@ -38,7 +35,7 @@ export default function OrganisationSettingsTeamsPage() {
 
   return (
     <div>
-      <SettingsHeader title={t`Teams`} subtitle={t`Manage the teams in this organisation.`}>
+      <SettingsHeader hideDivider title={t`Teams`} subtitle={t`Manage the teams in this organisation.`}>
         <TeamCreateDialog />
       </SettingsHeader>
 

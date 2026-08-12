@@ -1,9 +1,5 @@
+import { DEFAULT_RECT_BACKGROUND, getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
 import Konva from 'konva';
-
-import {
-  DEFAULT_RECT_BACKGROUND,
-  RECIPIENT_COLOR_STYLES,
-} from '@documenso/ui/lib/recipient-colors';
 
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 import { calculateFieldPosition } from './field-renderer';
@@ -12,17 +8,10 @@ export const konvaTextFontFamily =
   '"Noto Sans", "Noto Sans Japanese", "Noto Sans Chinese", "Noto Sans Korean", sans-serif';
 export const konvaTextFill = 'black';
 
-export const upsertFieldGroup = (
-  field: FieldToRender,
-  options: RenderFieldElementOptions,
-): Konva.Group => {
+export const upsertFieldGroup = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Group => {
   const { pageWidth, pageHeight, pageLayer, editable, scale } = options;
 
-  const { fieldX, fieldY, fieldWidth, fieldHeight } = calculateFieldPosition(
-    field,
-    pageWidth,
-    pageHeight,
-  );
+  const { fieldX, fieldY, fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
   const fieldGroup: Konva.Group =
     pageLayer.findOne(`#${field.renderId}`) ||
@@ -40,6 +29,7 @@ export const upsertFieldGroup = (
     x: fieldX,
     y: fieldY,
     draggable: editable,
+    opacity: options.fieldCanvasStyle?.opacity ?? 1,
     dragBoundFunc: (pos) => {
       const newX = Math.max(0, Math.min(maxXPosition, pos.x));
       const newY = Math.max(0, Math.min(maxYPosition, pos.y));
@@ -51,11 +41,9 @@ export const upsertFieldGroup = (
   return fieldGroup;
 };
 
-export const upsertFieldRect = (
-  field: FieldToRender,
-  options: RenderFieldElementOptions,
-): Konva.Rect => {
+export const upsertFieldRect = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Rect => {
   const { pageWidth, pageHeight, mode, pageLayer, color } = options;
+  const { fieldCanvasStyle } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
@@ -69,10 +57,10 @@ export const upsertFieldRect = (
   fieldRect.setAttrs({
     width: fieldWidth,
     height: fieldHeight,
-    fill: DEFAULT_RECT_BACKGROUND,
-    stroke: color ? RECIPIENT_COLOR_STYLES[color].baseRing : '#e5e7eb',
-    strokeWidth: 2,
-    cornerRadius: 2,
+    fill: fieldCanvasStyle?.backgroundColor ?? DEFAULT_RECT_BACKGROUND,
+    stroke: fieldCanvasStyle?.borderColor ?? (color ? getRecipientColorStyles(color).baseRing : '#e5e7eb'),
+    strokeWidth: fieldCanvasStyle?.borderWidth ?? 2,
+    cornerRadius: fieldCanvasStyle?.borderRadius ?? 2,
     strokeScaleEnabled: false,
     visible: mode !== 'export',
   } satisfies Partial<Konva.RectConfig>);
@@ -80,15 +68,10 @@ export const upsertFieldRect = (
   return fieldRect;
 };
 
-export const createSpinner = ({
-  fieldWidth,
-  fieldHeight,
-}: {
-  fieldWidth: number;
-  fieldHeight: number;
-}) => {
+export const createSpinner = ({ fieldWidth, fieldHeight }: { fieldWidth: number; fieldHeight: number }) => {
   const loadingGroup = new Konva.Group({
     name: 'loading-spinner-group',
+    listening: false,
   });
 
   const rect = new Konva.Rect({
@@ -139,18 +122,18 @@ type CreateFieldHoverInteractionOptions = {
 /**
  * Adds smooth transition-like behavior for hover effects to the field group and rectangle.
  */
-export const createFieldHoverInteraction = ({
-  options,
-  fieldGroup,
-  fieldRect,
-}: CreateFieldHoverInteractionOptions) => {
+export const createFieldHoverInteraction = ({ options, fieldGroup, fieldRect }: CreateFieldHoverInteractionOptions) => {
   const { mode } = options;
 
   if (mode === 'export' || !options.color) {
     return;
   }
 
-  const hoverColor = RECIPIENT_COLOR_STYLES[options.color].baseRingHover;
+  if (options.fieldCanvasStyle?.backgroundColor) {
+    return;
+  }
+
+  const hoverColor = getRecipientColorStyles(options.color).baseRingHover;
 
   fieldGroup.on('mouseover', () => {
     const layer = fieldRect.getLayer();

@@ -2,10 +2,7 @@ import { updateAttachment } from '@documenso/lib/server-only/envelope-attachment
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
-import {
-  ZUpdateAttachmentRequestSchema,
-  ZUpdateAttachmentResponseSchema,
-} from './update-attachment.types';
+import { ZUpdateAttachmentRequestSchema, ZUpdateAttachmentResponseSchema } from './update-attachment.types';
 
 export const updateAttachmentRoute = authenticatedProcedure
   .meta({
@@ -13,8 +10,10 @@ export const updateAttachmentRoute = authenticatedProcedure
       method: 'POST',
       path: '/document/attachment/update',
       summary: 'Update attachment',
-      description: 'Update an existing attachment',
+      description:
+        'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update an existing attachment',
       tags: ['Document'],
+      deprecated: true,
     },
   })
   .input(ZUpdateAttachmentRequestSchema)

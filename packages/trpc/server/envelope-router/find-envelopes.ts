@@ -1,11 +1,7 @@
 import { findEnvelopes } from '@documenso/lib/server-only/envelope/find-envelopes';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZFindEnvelopesRequestSchema,
-  ZFindEnvelopesResponseSchema,
-  findEnvelopesMeta,
-} from './find-envelopes.types';
+import { findEnvelopesMeta, ZFindEnvelopesRequestSchema, ZFindEnvelopesResponseSchema } from './find-envelopes.types';
 
 export const findEnvelopesRoute = authenticatedProcedure
   .meta(findEnvelopesMeta)
@@ -24,6 +20,7 @@ export const findEnvelopesRoute = authenticatedProcedure
       orderByColumn,
       source,
       status,
+      hasExpiredRecipients,
       folderId,
     } = input;
 
@@ -34,6 +31,7 @@ export const findEnvelopesRoute = authenticatedProcedure
         templateId,
         source,
         status,
+        hasExpiredRecipients,
         folderId,
         page,
         perPage,
@@ -48,9 +46,11 @@ export const findEnvelopesRoute = authenticatedProcedure
       query,
       source,
       status,
+      hasExpiredRecipients,
       page,
       perPage,
       folderId,
       orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
+      useWindowedCount: false,
     });
   });

@@ -1,7 +1,6 @@
-import { z } from 'zod';
-
 import OrganisationClaimSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationClaimSchema';
 import { OrganisationSchema } from '@documenso/prisma/generated/zod/modelSchema/OrganisationSchema';
+import { z } from 'zod';
 
 export const ZOrganisationSchema = OrganisationSchema.pick({
   id: true,
@@ -21,6 +20,7 @@ export const ZOrganisationSchema = OrganisationSchema.pick({
     originalSubscriptionClaimId: true,
     teamCount: true,
     memberCount: true,
+    recipientCount: true,
     flags: true,
   }),
 });
@@ -56,6 +56,4 @@ export const ZOrganisationAccountLinkMetadataSchema = z.object({
   }),
 });
 
-export type TOrganisationAccountLinkMetadata = z.infer<
-  typeof ZOrganisationAccountLinkMetadataSchema
->;
+export type TOrganisationAccountLinkMetadata = z.infer<typeof ZOrganisationAccountLinkMetadataSchema>;

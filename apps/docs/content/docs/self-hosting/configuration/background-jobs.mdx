@@ -1,0 +1,187 @@
+---
+title: Background Jobs
+description: Configure how Documenso processes background tasks like email delivery, document processing, and webhook dispatch.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
+
+Documenso processes background jobs for email delivery, document sealing, webhook dispatch, and scheduled maintenance tasks. Three providers are available:
+
+| Provider | Backend    | Best For                                        | Infrastructure |
+| -------- | ---------- | ----------------------------------------------- | -------------- |
+| Inngest  | Managed    | Production with zero ops overhead               | None           |
+| BullMQ   | Redis      | Self-hosted production with full control         | Redis          |
+| Local    | PostgreSQL | Development and small self-hosted deployments   | None           |
+
+Select a provider with the `NEXT_PRIVATE_JOBS_PROVIDER` environment variable:
+
+```bash
+NEXT_PRIVATE_JOBS_PROVIDER=inngest  # or bullmq, local
+```
+
+<Callout type="info">
+  The default provider is `local`. It requires no additional infrastructure and works well for development and small deployments, but is not recommended for production workloads.
+</Callout>
+
+---
+
+## Inngest (Recommended)
+
+[Inngest](https://www.inngest.com/) is a managed background job service. It handles scheduling, retries, concurrency, and observability without any infrastructure to manage. This is the recommended provider for production deployments.
+
+### Setup
+
+{/* prettier-ignore */}
+1. Create an account at [inngest.com](https://www.inngest.com/)
+2. Create an app and obtain your event key and signing key
+3. Configure the environment variables:
+
+```bash
+NEXT_PRIVATE_JOBS_PROVIDER=inngest
+NEXT_PRIVATE_INNGEST_EVENT_KEY=your-event-key
+INNGEST_SIGNING_KEY=your-signing-key
+```
+
+### Environment Variables
+
+| Variable                         | Description                                  | Required |
+| -------------------------------- | -------------------------------------------- | -------- |
+| `NEXT_PRIVATE_INNGEST_EVENT_KEY` | Inngest event key                            | Yes      |
+| `INNGEST_EVENT_KEY`              | Alternative Inngest event key                | No       |
+| `INNGEST_SIGNING_KEY`            | Inngest signing key for webhook verification | Yes      |
+| `NEXT_PRIVATE_INNGEST_APP_ID`    | Custom Inngest app ID                        | No       |
+
+### Advantages
+
+- No infrastructure to manage
+- Built-in monitoring dashboard
+- Automatic retries with backoff
+- Cron scheduling handled externally
+- Scales automatically
+
+---
+
+## BullMQ
+
+[BullMQ](https://docs.bullmq.io/) is a Redis-backed job queue that runs inside the Documenso process. It provides higher throughput than the local provider, configurable concurrency, and a built-in dashboard for monitoring jobs.
+
+### Requirements
+
+- **Redis 6.2+** - any Redis-compatible service works (Redis, KeyDB, Dragonfly, AWS ElastiCache, Upstash, etc.)
+
+### Setup
+
+```bash
+NEXT_PRIVATE_JOBS_PROVIDER=bullmq
+NEXT_PRIVATE_REDIS_URL=redis://localhost:6379
+```
+
+### Environment Variables
+
+| Variable                           | Description                                                                | Default     |
+| ---------------------------------- | -------------------------------------------------------------------------- | ----------- |
+| `NEXT_PRIVATE_REDIS_URL`           | Redis connection URL                                                       | _(required)_ |
+| `NEXT_PRIVATE_REDIS_PREFIX`        | Key prefix for Redis queues (useful when sharing an instance)              | `documenso` |
+| `NEXT_PRIVATE_BULLMQ_CONCURRENCY` | Number of concurrent jobs to process                                       | `10`        |
+
+### Dashboard
+
+BullMQ includes a job monitoring dashboard at `/api/jobs/board`. In production, only admin users can access the dashboard. In development, it is open to all users.
+
+The dashboard provides visibility into queued, active, completed, and failed jobs.
+
+### Docker Compose with Redis
+
+If you're using Docker Compose, add a Redis service:
+
+```yaml
+services:
+  redis:
+    image: redis:8-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
+```
+
+Then set `NEXT_PRIVATE_REDIS_URL=redis://redis:6379` in your Documenso environment.
+
+### Advantages
+
+- Self-hosted with no external service dependencies beyond Redis
+- Configurable concurrency
+- Built-in job monitoring dashboard
+- Reliable retries with exponential backoff
+- Queue namespacing for shared Redis instances
+
+---
+
+## Local
+
+The local provider uses your PostgreSQL database as a job queue. Jobs are stored in the `BackgroundJob` table and processed via internal HTTP requests that Documenso sends to itself.
+
+### Setup
+
+No configuration required. The local provider is the default when `NEXT_PRIVATE_JOBS_PROVIDER` is unset or set to `local`.
+
+```bash
+# Optional - this is the default
+NEXT_PRIVATE_JOBS_PROVIDER=local
+```
+
+### Internal URL
+
+Background jobs in the local provider work by Documenso sending HTTP requests to itself. If your reverse proxy or network setup causes issues with the app reaching its own public URL, set the internal URL:
+
+```bash
+NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000
+```
+
+This tells the job system to use the internal address instead of `NEXT_PUBLIC_WEBAPP_URL` for self-requests.
+
+<Callout type="warn">
+  The local provider is suitable for development and small deployments. For production workloads, use Inngest or BullMQ.
+</Callout>
+
+### Limitations
+
+- No concurrency control - jobs are processed one at a time per request cycle
+- No built-in monitoring
+- Depends on the application being able to reach itself over HTTP
+- Not suitable for high-throughput workloads
+
+---
+
+## Choosing a Provider
+
+<Tabs items={['Managed hosting', 'Self-hosted production', 'Development']}>
+<Tab value="Managed hosting">
+
+Use **Inngest**. Zero infrastructure, automatic scaling, and built-in observability. The simplest path to reliable background jobs in production.
+
+</Tab>
+<Tab value="Self-hosted production">
+
+Use **BullMQ**. Add a Redis instance to your infrastructure and get reliable job processing with a monitoring dashboard. Good fit if you already run Redis or want to keep everything self-hosted.
+
+</Tab>
+<Tab value="Development">
+
+Use **Local** (the default). No additional setup required. Works out of the box with just PostgreSQL.
+
+</Tab>
+</Tabs>
+
+---
+
+## See Also
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
+- [Requirements](/docs/self-hosting/getting-started/requirements) - Infrastructure requirements
+- [Docker Compose](/docs/self-hosting/deployment/docker-compose) - Deploy with Docker Compose

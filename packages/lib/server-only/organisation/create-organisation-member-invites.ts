@@ -1,12 +1,3 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import type { Organisation, Prisma } from '@prisma/client';
-import { OrganisationMemberInviteStatus } from '@prisma/client';
-import { nanoid } from 'nanoid';
-
-import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
-import { mailer } from '@documenso/email/mailer';
 import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
@@ -14,10 +5,14 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 import type { TCreateOrganisationMemberInvitesRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation-member-invites.types';
+import { msg } from '@lingui/core/macro';
+import type { Organisation, Prisma } from '@prisma/client';
+import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { nanoid } from 'nanoid';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { generateDatabaseId } from '../../universal/id';
-import { validateIfSubscriptionIsRequired } from '../../utils/billing';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
@@ -62,18 +57,12 @@ export const createOrganisationMemberInvites = async ({
         },
       },
       organisationGlobalSettings: true,
-      organisationClaim: true,
-      subscription: true,
     },
   });
 
   if (!organisation) {
     throw new AppError(AppErrorCode.NOT_FOUND);
   }
-
-  const { organisationClaim } = organisation;
-
-  const subscription = validateIfSubscriptionIsRequired(organisation.subscription);
 
   const currentOrganisationMemberRole = await getMemberOrganisationRole({
     organisationId: organisation.id,
@@ -101,8 +90,7 @@ export const createOrganisationMemberInvites = async ({
   });
 
   const unauthorizedRoleAccess = usersToInvite.some(
-    ({ organisationRole }) =>
-      !isOrganisationRoleWithinUserHierarchy(currentOrganisationMemberRole, organisationRole),
+    ({ organisationRole }) => !isOrganisationRoleWithinUserHierarchy(currentOrganisationMemberRole, organisationRole),
   );
 
   if (unauthorizedRoleAccess) {
@@ -111,30 +99,15 @@ export const createOrganisationMemberInvites = async ({
     });
   }
 
-  const organisationMemberInvites: Prisma.OrganisationMemberInviteCreateManyInput[] =
-    usersToInvite.map(({ email, organisationRole }) => ({
+  const organisationMemberInvites: Prisma.OrganisationMemberInviteCreateManyInput[] = usersToInvite.map(
+    ({ email, organisationRole }) => ({
       id: generateDatabaseId('member_invite'),
       email,
       organisationId,
       organisationRole,
       token: nanoid(32),
-    }));
-
-  const numberOfCurrentMembers = organisation.members.length;
-  const numberOfCurrentInvites = organisation.invites.length;
-  const numberOfNewInvites = organisationMemberInvites.length;
-
-  const totalMemberCountWithInvites =
-    numberOfCurrentMembers + numberOfCurrentInvites + numberOfNewInvites;
-
-  // Handle billing for seat based plans.
-  if (subscription) {
-    await syncMemberCountWithStripeSeatPlan(
-      subscription,
-      organisationClaim,
-      totalMemberCountWithInvites,
-    );
-  }
+    }),
+  );
 
   await prisma.organisationMemberInvite.createMany({
     data: organisationMemberInvites,
@@ -189,13 +162,19 @@ export const sendOrganisationMemberInviteEmail = async ({
     organisationName: organisation.name,
   });
 
-  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, emailsDisabled, emailTransport } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'organisation',
       organisationId: organisation.id,
     },
   });
+
+  // Member invites can be sent to anyone, so block them when the organisation has email
+  // sending disabled.
+  if (emailsDisabled) {
+    return;
+  }
 
   const [html, text] = await Promise.all([
     renderEmailWithI18N(template, {
@@ -211,7 +190,7 @@ export const sendOrganisationMemberInviteEmail = async ({
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  await mailer.sendMail({
+  await emailTransport.sendMail({
     to: email,
     from: senderEmail,
     subject: i18n._(msg`You have been invited to join ${organisation.name} on Documenso`),

@@ -1,10 +1,5 @@
-import { PDF, StandardFonts } from '@libpdf/core';
-import type { APIRequestContext } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-import type { Team, User } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
@@ -16,6 +11,10 @@ import type {
 } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import type { TCreateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
+import { PDF, StandardFonts } from '@libpdf/core';
+import type { APIRequestContext } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import type { Team, User } from '@prisma/client';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const baseUrl = `${WEBAPP_BASE_URL}/api/v2-beta`;
@@ -66,11 +65,7 @@ test.describe('Placeholder-based field creation', () => {
     return res.json();
   };
 
-  const createEnvelopeItemsWithPdf = async (
-    request: APIRequestContext,
-    envelopeId: string,
-    pdfFilename: string,
-  ) => {
+  const createEnvelopeItemsWithPdf = async (request: APIRequestContext, envelopeId: string, pdfFilename: string) => {
     const pdfPath = path.join(FIXTURES_DIR, pdfFilename);
     const pdfData = fs.readFileSync(pdfPath);
 
@@ -129,10 +124,7 @@ test.describe('Placeholder-based field creation', () => {
     expect(res.ok()).toBeTruthy();
   };
 
-  const getEnvelope = async (
-    request: APIRequestContext,
-    envelopeId: string,
-  ): Promise<TGetEnvelopeResponse> => {
+  const getEnvelope = async (request: APIRequestContext, envelopeId: string): Promise<TGetEnvelopeResponse> => {
     const res = await request.get(`${baseUrl}/envelope/${envelopeId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -281,9 +273,7 @@ test.describe('Placeholder-based field creation', () => {
     expect(createFieldsRes.ok()).toBeFalsy();
   });
 
-  test('should create fields using a mix of coordinate and placeholder positioning', async ({
-    request,
-  }) => {
+  test('should create fields using a mix of coordinate and placeholder positioning', async ({ request }) => {
     const envelope = await createEnvelopeWithPdf(request, 'no-recipient-placeholders.pdf');
     await addRecipient(request, envelope.id);
 
@@ -409,9 +399,7 @@ test.describe('Placeholder-based field creation', () => {
     expect(uniqueYPositions.size).toBe(3);
   });
 
-  test('should map placeholder recipients by signing order when adding items', async ({
-    request,
-  }) => {
+  test('should map placeholder recipients by signing order when adding items', async ({ request }) => {
     const envelope = await createEnvelopeWithPdf(request, 'no-recipient-placeholders.pdf');
 
     await addRecipients(request, envelope.id, [

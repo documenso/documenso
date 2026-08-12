@@ -1,13 +1,10 @@
-import { EnvelopeType } from '@prisma/client';
-
-import { findAttachmentsByEnvelopeId } from '@documenso/lib/server-only/envelope-attachment/find-attachments-by-envelope-id';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 
+import { findAttachmentsByEnvelopeId } from '@documenso/lib/server-only/envelope-attachment/find-attachments-by-envelope-id';
+import { EnvelopeType } from '@prisma/client';
+
 import { authenticatedProcedure } from '../../trpc';
-import {
-  ZFindAttachmentsRequestSchema,
-  ZFindAttachmentsResponseSchema,
-} from './find-attachments.types';
+import { ZFindAttachmentsRequestSchema, ZFindAttachmentsResponseSchema } from './find-attachments.types';
 
 export const findAttachmentsRoute = authenticatedProcedure
   .meta({
@@ -15,8 +12,10 @@ export const findAttachmentsRoute = authenticatedProcedure
       method: 'GET',
       path: '/document/attachment',
       summary: 'Find attachments',
-      description: 'Find all attachments for a document',
+      description:
+        'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Find all attachments for a document',
       tags: ['Document'],
+      deprecated: true,
     },
   })
   .input(ZFindAttachmentsRequestSchema)

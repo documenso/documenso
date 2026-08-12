@@ -1,6 +1,5 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 
@@ -13,7 +12,7 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     throw new Error('Missing token');
   }
 
-  const result = await prisma.envelope.findFirstOrThrow({
+  const result = await prisma.envelope.findFirst({
     where: {
       type: EnvelopeType.DOCUMENT,
       status: DocumentStatus.COMPLETED,
@@ -55,6 +54,14 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
       },
     },
   });
+
+  if (!result) {
+    return null;
+  }
+
+  if (result.envelopeItems.length === 0) {
+    throw new Error('Completed envelope has no items');
+  }
 
   const firstDocumentData = result.envelopeItems[0].documentData;
 

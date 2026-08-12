@@ -1,16 +1,10 @@
-import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
-import { validateIfSubscriptionIsRequired } from '@documenso/lib/utils/billing';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
-import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZLeaveOrganisationRequestSchema,
-  ZLeaveOrganisationResponseSchema,
-} from './leave-organisation.types';
+import { ZLeaveOrganisationRequestSchema, ZLeaveOrganisationResponseSchema } from './leave-organisation.types';
 
 export const leaveOrganisationRoute = authenticatedProcedure
   .input(ZLeaveOrganisationRequestSchema)
@@ -28,17 +22,7 @@ export const leaveOrganisationRoute = authenticatedProcedure
     const organisation = await prisma.organisation.findFirst({
       where: buildOrganisationWhereQuery({ organisationId, userId }),
       include: {
-        organisationClaim: true,
-        subscription: true,
-        invites: {
-          where: {
-            status: OrganisationMemberInviteStatus.PENDING,
-          },
-          select: {
-            id: true,
-          },
-        },
-        members: {
+        teams: {
           select: {
             id: true,
           },
@@ -50,24 +34,50 @@ export const leaveOrganisationRoute = authenticatedProcedure
       throw new AppError(AppErrorCode.NOT_FOUND);
     }
 
-    const { organisationClaim } = organisation;
-
-    const subscription = validateIfSubscriptionIsRequired(organisation.subscription);
-
-    const inviteCount = organisation.invites.length;
-    const newMemberCount = organisation.members.length + inviteCount - 1;
-
-    if (subscription) {
-      await syncMemberCountWithStripeSeatPlan(subscription, organisationClaim, newMemberCount);
+    // The organisation owner cannot leave their own organisation. Ownership must
+    // be transferred to another member first.
+    if (organisation.ownerUserId === userId) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You cannot leave an organisation you own. Please transfer ownership first.',
+      });
     }
 
-    await prisma.organisationMember.delete({
-      where: {
-        userId_organisationId: {
-          userId,
-          organisationId,
+    const teamIds = organisation.teams.map((team) => team.id);
+
+    await prisma.$transaction(async (tx) => {
+      // Leaving the org cascades the user out of every team via
+      // OrganisationGroupMember, but their authored Envelope rows still
+      // reference them. Reassign those to the org owner so they remain
+      // reachable after the member loses access (mirrors delete-user.ts).
+      if (teamIds.length > 0) {
+        await tx.envelope.updateMany({
+          where: {
+            userId,
+            teamId: {
+              in: teamIds,
+            },
+          },
+          data: {
+            userId: organisation.ownerUserId,
+          },
+        });
+      }
+
+      await tx.organisationMember.delete({
+        where: {
+          userId_organisationId: {
+            userId,
+            organisationId,
+          },
         },
-      },
+      });
+    });
+
+    // A member was removed — queue a seat sync to true the Stripe quantity down
+    // to the new count (no proration, no credit).
+    await jobs.triggerJob({
+      name: 'internal.sync-organisation-seats',
+      payload: { organisationId },
     });
 
     await jobs.triggerJob({

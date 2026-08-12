@@ -1,17 +1,9 @@
-import { useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import { createCallable } from 'react-call';
-
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@documenso/ui/primitives/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { createCallable } from 'react-call';
 
 import { DocumentSigningDisclosure } from '../general/document-signing/document-signing-disclosure';
 
@@ -23,18 +15,8 @@ export type SignFieldSignatureDialogProps = {
   drawSignatureEnabled?: boolean;
 };
 
-export const SignFieldSignatureDialog = createCallable<
-  SignFieldSignatureDialogProps,
-  string | null
->(
-  ({
-    call,
-    fullName,
-    typedSignatureEnabled,
-    uploadSignatureEnabled,
-    drawSignatureEnabled,
-    initialSignature,
-  }) => {
+export const SignFieldSignatureDialog = createCallable<SignFieldSignatureDialogProps, string | null>(
+  ({ call, fullName, typedSignatureEnabled, uploadSignatureEnabled, drawSignatureEnabled, initialSignature }) => {
     const [localSignature, setLocalSignature] = useState(initialSignature);
 
     return (
@@ -64,11 +46,7 @@ export const SignFieldSignatureDialog = createCallable<
               <Trans>Cancel</Trans>
             </Button>
 
-            <Button
-              type="button"
-              disabled={!localSignature}
-              onClick={() => call.end(localSignature || null)}
-            >
+            <Button type="button" disabled={!localSignature} onClick={() => call.end(localSignature || null)}>
               <Trans>Sign</Trans>
             </Button>
           </DialogFooter>

@@ -6,7 +6,7 @@ import { SettingsSecurityActivityTable } from '~/components/tables/settings-secu
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Security activity');
+  return appMetaTags(msg`Security activity`);
 }
 
 export default function SettingsSecurityActivity() {
@@ -15,9 +15,9 @@ export default function SettingsSecurityActivity() {
   return (
     <div>
       <SettingsHeader
+        hideDivider
         title={_(msg`Security activity`)}
         subtitle={_(msg`View all security activity related to your account.`)}
-        hideDivider={true}
       />
 
       <div className="mt-4">

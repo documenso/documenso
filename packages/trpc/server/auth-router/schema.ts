@@ -1,9 +1,6 @@
 import { z } from 'zod';
 
-export const ZCurrentPasswordSchema = z
-  .string()
-  .min(6, { message: 'Must be at least 6 characters in length' })
-  .max(72);
+export const ZCurrentPasswordSchema = z.string().min(6, { message: 'Must be at least 6 characters in length' }).max(72);
 
 export const ZPasswordSchema = z
   .string()

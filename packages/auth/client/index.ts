@@ -1,9 +1,8 @@
+import { formatPath, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { AppError } from '@documenso/lib/errors/app-error';
 import type { ClientResponse, InferRequestType } from 'hono/client';
 import { hc } from 'hono/client';
 import superjson from 'superjson';
-
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { AppError } from '@documenso/lib/errors/app-error';
 
 import type { AuthAppType } from '../server';
 import type { SessionValidationResult } from '../server/lib/session/session';
@@ -26,9 +25,9 @@ import type {
 
 type AuthClientType = ReturnType<typeof hc<AuthAppType>>;
 
-type TEmailPasswordSignin = InferRequestType<
-  AuthClientType['email-password']['authorize']['$post']
->['json'] & { redirectPath?: string };
+type TEmailPasswordSignin = InferRequestType<AuthClientType['email-password']['authorize']['$post']>['json'] & {
+  redirectPath?: string;
+};
 
 type TPasskeySignin = InferRequestType<AuthClientType['passkey']['authorize']['$post']>['json'] & {
   redirectPath?: string;
@@ -37,8 +36,6 @@ type TPasskeySignin = InferRequestType<AuthClientType['passkey']['authorize']['$
 export class AuthClient {
   public client: AuthClientType;
 
-  private signOutredirectPath: string = '/signin';
-
   constructor(options: { baseUrl: string }) {
     this.client = hc<AuthAppType>(options.baseUrl);
   }
@@ -46,20 +43,14 @@ export class AuthClient {
   public async signOut({ redirectPath }: { redirectPath?: string } = {}) {
     await this.client.signout.$post();
 
-    window.location.href = redirectPath ?? this.signOutredirectPath;
+    window.location.href = redirectPath ?? formatPath('/signin');
   }
 
   public async signOutAllSessions() {
     await this.client['signout-all'].$post();
   }
 
-  public async signOutSession({
-    sessionId,
-    redirectPath,
-  }: {
-    sessionId: string;
-    redirectPath?: string;
-  }) {
+  public async signOutSession({ sessionId, redirectPath }: { sessionId: string; redirectPath?: string }) {
     await this.client['signout-session'].$post({
       json: { sessionId },
     });

@@ -1,11 +1,8 @@
-import { useLingui } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
-import { useLoaderData } from 'react-router';
-
-import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { useLingui } from '@lingui/react/macro';
+import { Loader } from 'lucide-react';
 
 import {
   DocumentPreferencesForm,
@@ -13,21 +10,8 @@ import {
 } from '~/components/forms/document-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { useCurrentTeam } from '~/providers/team';
-import { appMetaTags } from '~/utils/meta';
-
-export function meta() {
-  return appMetaTags('Document Preferences');
-}
-
-export const loader = () => {
-  return {
-    isAiFeaturesConfigured: IS_AI_FEATURES_CONFIGURED(),
-  };
-};
 
 export default function TeamsSettingsPage() {
-  const { isAiFeaturesConfigured } = useLoaderData<typeof loader>();
-
   const team = useCurrentTeam();
 
   const { t } = useLingui();
@@ -46,9 +30,6 @@ export default function TeamsSettingsPage() {
         documentLanguage,
         documentTimezone,
         documentDateFormat,
-        includeSenderDetails,
-        includeSigningCertificate,
-        includeAuditLog,
         signatureTypes,
         defaultRecipients,
         delegateDocumentOwnership,
@@ -62,9 +43,6 @@ export default function TeamsSettingsPage() {
           documentLanguage,
           documentTimezone,
           documentDateFormat,
-          includeSenderDetails,
-          includeSigningCertificate,
-          includeAuditLog,
           defaultRecipients,
           aiFeaturesEnabled,
           ...(signatureTypes.length === 0
@@ -78,7 +56,7 @@ export default function TeamsSettingsPage() {
                 uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
                 drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
               }),
-          delegateDocumentOwnership: delegateDocumentOwnership,
+          delegateDocumentOwnership,
         },
       });
 
@@ -92,6 +70,8 @@ export default function TeamsSettingsPage() {
         description: t`We were unable to update your document preferences at this time, please try again later`,
         variant: 'destructive',
       });
+
+      throw err;
     }
   };
 
@@ -104,7 +84,7 @@ export default function TeamsSettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <SettingsHeader
         title={t`Document Preferences`}
         subtitle={t`Here you can set preferences and defaults for your team.`}
@@ -113,7 +93,6 @@ export default function TeamsSettingsPage() {
       <section>
         <DocumentPreferencesForm
           canInherit={true}
-          isAiFeaturesConfigured={isAiFeaturesConfigured}
           settings={teamWithSettings.teamSettings}
           onFormSubmit={onDocumentPreferencesSubmit}
         />

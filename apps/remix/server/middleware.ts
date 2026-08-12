@@ -1,7 +1,7 @@
+import { PREFERRED_TEAM_URL_COOKIE } from '@documenso/lib/constants/cookies';
+import { AppDebugger } from '@documenso/lib/utils/debugger';
 import type { Context, Next } from 'hono';
 import { setCookie } from 'hono/cookie';
-
-import { AppDebugger } from '@documenso/lib/utils/debugger';
 
 import { handleRedirects } from './redirects';
 
@@ -26,7 +26,7 @@ export const appMiddleware = async (c: Context, next: Next) => {
   }
 
   // PRE-HANDLER CODE: Place code here to execute BEFORE the route handler runs.
-  const redirectPath = await handleRedirects(c);
+  const redirectPath = handleRedirects(c);
 
   if (redirectPath) {
     debug.log('Redirecting from', path);
@@ -50,7 +50,7 @@ export const appMiddleware = async (c: Context, next: Next) => {
   if (pathname.startsWith('/t/')) {
     debug.log('Setting preferred team url cookie');
 
-    setCookie(c, 'preferred-team-url', pathname.split('/')[2], {
+    setCookie(c, PREFERRED_TEAM_URL_COOKIE, pathname.split('/')[2], {
       sameSite: 'lax',
     });
 

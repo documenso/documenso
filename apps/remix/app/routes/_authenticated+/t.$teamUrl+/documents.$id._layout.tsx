@@ -1,18 +1,22 @@
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { ChevronLeftIcon } from 'lucide-react';
-import { Link, Outlet, isRouteErrorResponse, redirect } from 'react-router';
-
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { Button } from '@documenso/ui/primitives/button';
+import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
+import { ChevronLeftIcon } from 'lucide-react';
+import type { ShouldRevalidateFunctionArgs } from 'react-router';
+import { isRouteErrorResponse, Link, Outlet, redirect } from 'react-router';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 
 import type { Route } from './+types/settings._layout';
+
+export const shouldRevalidate = ({ currentParams, nextParams }: ShouldRevalidateFunctionArgs) => {
+  return currentParams.id !== nextParams.id;
+};
 
 /**
  * This file is very similar for templates as well. Any changes here should also be adjusted there as well.

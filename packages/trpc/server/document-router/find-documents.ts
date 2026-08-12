@@ -2,11 +2,7 @@ import { findDocuments } from '@documenso/lib/server-only/document/find-document
 import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZFindDocumentsMeta,
-  ZFindDocumentsRequestSchema,
-  ZFindDocumentsResponseSchema,
-} from './find-documents.types';
+import { ZFindDocumentsMeta, ZFindDocumentsRequestSchema, ZFindDocumentsResponseSchema } from './find-documents.types';
 
 export const findDocumentsRoute = authenticatedProcedure
   .meta(ZFindDocumentsMeta)
@@ -24,6 +20,7 @@ export const findDocumentsRoute = authenticatedProcedure
       orderByColumn,
       source,
       status,
+      hasExpiredRecipients,
       folderId,
     } = input;
 
@@ -34,10 +31,12 @@ export const findDocumentsRoute = authenticatedProcedure
       query,
       source,
       status,
+      hasExpiredRecipients,
       page,
       perPage,
       folderId,
       orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
+      useWindowedCount: false,
     });
 
     return {

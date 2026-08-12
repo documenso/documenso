@@ -1,18 +1,16 @@
-import { useMemo } from 'react';
-
+import { DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT, PAID_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
+import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
+import { useChildRouteFlags } from '@documenso/lib/client-only/hooks/use-child-route-flags';
+import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { isOrganisationPendingPayment } from '@documenso/lib/utils/billing';
+import { TrpcProvider } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { SubscriptionStatus } from '@prisma/client';
+import { useMemo } from 'react';
 import { Link, Outlet } from 'react-router';
-
-import {
-  DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
-  PAID_PLAN_LIMITS,
-} from '@documenso/ee/server-only/limits/constants';
-import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
-import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { TrpcProvider } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { useOptionalCurrentTeam } from '~/providers/team';
@@ -21,15 +19,18 @@ export default function Layout() {
   const team = useOptionalCurrentTeam();
   const organisation = useOptionalCurrentOrganisation();
 
+  const { layoutMode } = useChildRouteFlags();
+
   const limits = useMemo(() => {
     if (!organisation) {
       return undefined;
     }
 
-    if (
-      organisation?.subscription &&
-      organisation.subscription.status === SubscriptionStatus.INACTIVE
-    ) {
+    const isRestricted =
+      (organisation.subscription && organisation.subscription.status === SubscriptionStatus.INACTIVE) ||
+      isOrganisationPendingPayment(organisation);
+
+    if (isRestricted) {
       return {
         quota: {
           documents: 0,
@@ -50,7 +51,7 @@ export default function Layout() {
       remaining: PAID_PLAN_LIMITS,
       maximumEnvelopeItemCount: DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
     };
-  }, [organisation?.subscription]);
+  }, [organisation]);
 
   if (!team) {
     return (
@@ -81,7 +82,7 @@ export default function Layout() {
   // Note: We use a key to force a re-render if the team context changes.
   // This is required otherwise you would see the wrong page content.
   return (
-    <div key={team.url}>
+    <div key={team.url} className={cn({ 'md:flex md:min-h-0 md:flex-1 md:flex-col': layoutMode === 'settings' })}>
       <TrpcProvider headers={trpcHeaders}>
         <LimitsProvider initialValue={limits} teamId={team.id}>
           <Outlet />

@@ -1,10 +1,4 @@
-import { z } from 'zod';
-import { zfd } from 'zod-form-data';
-
-import {
-  ZDocumentAccessAuthTypesSchema,
-  ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
+import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
 import { ZDocumentVisibilitySchema } from '@documenso/lib/types/document-visibility';
@@ -17,8 +11,10 @@ import {
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 
-import { zodFormData } from '../../utils/zod-form-data';
+import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import { ZCreateRecipientSchema } from '../recipient-router/schema';
 import type { TrpcRouteMeta } from '../trpc';
 import { ZDocumentExternalIdSchema, ZDocumentTitleSchema } from './schema';
@@ -29,8 +25,10 @@ export const createDocumentMeta: TrpcRouteMeta = {
     path: '/document/create',
     contentTypes: ['multipart/form-data'],
     summary: 'Create document',
-    description: 'Create a document using form data.',
+    description:
+      'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
     tags: ['Document'],
+    deprecated: true,
   },
 };
 
@@ -79,7 +77,7 @@ export const ZCreateDocumentPayloadSchema = z.object({
 
 export const ZCreateDocumentRequestSchema = zodFormData({
   payload: zfd.json(ZCreateDocumentPayloadSchema),
-  file: zfd.file(),
+  file: zfdFile(),
 });
 
 export const ZCreateDocumentResponseSchema = z.object({

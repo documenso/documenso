@@ -1,6 +1,5 @@
-import { EnvelopeType, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 
 export type GetFieldsForTokenOptions = {
   token: string;
@@ -35,6 +34,7 @@ export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => 
               signingOrder: {
                 gte: recipient.signingOrder ?? 0,
               },
+              envelopeId: recipient.envelopeId,
             },
             envelope: {
               id: recipient.envelopeId,

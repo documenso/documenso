@@ -1,0 +1,155 @@
+---
+title: Setting up OAuth Providers
+description: Learn how to set up OAuth providers for your own instance of Documenso.
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Google OAuth (Gmail)
+
+To use Google OAuth, you will need to create a Google Cloud Platform project and enable the Google Identity and Access Management (IAM) API. You will also need to create a new OAuth client ID and download the client secret.
+
+### Create and configure a new OAuth client ID
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open Google Cloud Console
+
+Go to the [Google Cloud Platform Console](https://console.cloud.google.com/) and select a project or create a new one from the projects list.
+
+</Step>
+<Step>
+### Open APIs & services
+
+From the console's left side menu, select **APIs & services** (if not already open).
+
+</Step>
+<Step>
+### Open Credentials
+
+On the left, click **Credentials**.
+
+</Step>
+<Step>
+### Create OAuth client ID
+
+Click **New Credentials**, then select **OAuth client ID**. When prompted, select **Web application**.
+
+</Step>
+<Step>
+### Name and create the client
+
+Enter a name for your client ID and click **Create**. Click the download button to download the client secret.
+
+</Step>
+<Step>
+### Set authorized origins and redirect URIs
+
+Set:
+
+- **Authorized JavaScript origins**: `https://<documenso-domain>`
+- **Authorized redirect URIs**: `https://<documenso-domain>/api/auth/callback/google`
+
+</Step>
+<Step>
+### Set environment variables
+
+In your Documenso environment, set:
+
+```
+NEXT_PRIVATE_GOOGLE_CLIENT_ID=<your-client-id>
+NEXT_PRIVATE_GOOGLE_CLIENT_SECRET=<your-client-secret>
+```
+
+</Step>
+</Steps>
+
+Finally verify sign-in with Google by signing in with your Google account and checking the email address in your profile.
+
+## Microsoft OAuth (Azure AD)
+
+To use Microsoft OAuth, you will need to create an Azure AD application registration in the Microsoft Azure portal. This will allow users to sign in with their Microsoft accounts.
+
+### Create and configure a new Azure AD application
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open Azure Portal
+
+Go to the [Azure Portal](https://portal.azure.com/) and navigate to **Azure Active Directory** (or **Microsoft Entra ID** in newer portals).
+
+</Step>
+<Step>
+### Start app registration
+
+In the left sidebar, click **App registrations**, then **New registration**.
+
+</Step>
+<Step>
+### Name and choose account types
+
+Enter a name (e.g. "Documenso").
+
+Under **Supported account types**, select both:
+
+- Accounts in any organizational directory (Any Azure AD directory - Multitenant)
+- Personal Microsoft accounts (e.g. Skype, Xbox)
+
+This allows any Microsoft account to sign in.
+
+</Step>
+<Step>
+### Set redirect URI and register
+
+Under **Redirect URI**, select **Web** and enter:
+
+```bash
+https://<documenso-domain>/api/auth/callback/microsoft
+```
+
+Click **Register**.
+
+</Step>
+</Steps>
+
+### Configure the application
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Copy the Application (client) ID
+
+After registration you're on the app overview page. Copy the **Application (client) ID** for `NEXT_PRIVATE_MICROSOFT_CLIENT_ID`.
+
+</Step>
+<Step>
+### Create a client secret
+
+- In the left sidebar, click **Certificates & secrets**
+- Under **Client secrets**, click **New client secret**
+- Add a description and select an expiration period, then click **Add**
+- Copy the **Value** (not the Secret ID): this is your `NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET`
+
+</Step>
+<Step>
+### Set environment variables
+
+In your Documenso environment, set:
+
+```
+NEXT_PRIVATE_MICROSOFT_CLIENT_ID=<your-application-client-id>
+NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET=<your-client-secret-value>
+```
+
+</Step>
+</Steps>
+
+---
+
+## See Also
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) - All configuration options
+- [Single Sign-On](/docs/users/organisations/single-sign-on) - Configure SSO for your organisation
+- [Microsoft Entra ID](/docs/users/organisations/single-sign-on/microsoft-entra-id) - Detailed Entra ID setup guide

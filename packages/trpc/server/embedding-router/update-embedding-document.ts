@@ -24,9 +24,7 @@ export const updateEmbeddingDocumentRoute = procedure
     try {
       const authorizationHeader = ctx.req.headers.get('authorization');
 
-      const [presignToken] = (authorizationHeader || '')
-        .split('Bearer ')
-        .filter((s) => s.length > 0);
+      const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
 
       if (!presignToken) {
         throw new AppError(AppErrorCode.UNAUTHORIZED, {

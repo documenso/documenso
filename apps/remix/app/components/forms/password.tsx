@@ -1,3 +1,12 @@
+import { authClient } from '@documenso/auth/client';
+import type { SessionUser } from '@documenso/auth/server/lib/session/session';
+import { AppError } from '@documenso/lib/errors/app-error';
+import { ZCurrentPasswordSchema, ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -5,23 +14,6 @@ import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
-
-import { authClient } from '@documenso/auth/client';
-import type { SessionUser } from '@documenso/auth/server/lib/session/session';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { ZCurrentPasswordSchema, ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZPasswordFormSchema = z
   .object({
@@ -76,13 +68,9 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       const errorMessage = match(error.code)
         .with('NO_PASSWORD', () => msg`User has no password.`)
         .with('INCORRECT_PASSWORD', () => msg`Current password is incorrect.`)
-        .with(
-          'SAME_PASSWORD',
-          () => msg`Your new password cannot be the same as your old password.`,
-        )
+        .with('SAME_PASSWORD', () => msg`Your new password cannot be the same as your old password.`)
         .otherwise(
-          () =>
-            msg`We encountered an unknown error while attempting to update your password. Please try again later.`,
+          () => msg`We encountered an unknown error while attempting to update your password. Please try again later.`,
         );
 
       toast({
@@ -95,10 +83,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
 
   return (
     <Form {...form}>
-      <form
-        className={cn('flex w-full flex-col gap-y-4', className)}
-        onSubmit={form.handleSubmit(onFormSubmit)}
-      >
+      <form className={cn('flex w-full flex-col gap-y-4', className)} onSubmit={form.handleSubmit(onFormSubmit)}>
         <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
           <FormField
             control={form.control}
@@ -149,7 +134,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           />
         </fieldset>
 
-        <div className="ml-auto mt-4">
+        <div className="mt-4 ml-auto">
           <Button type="submit" loading={isSubmitting}>
             {isSubmitting ? <Trans>Updating password...</Trans> : <Trans>Update password</Trans>}
           </Button>

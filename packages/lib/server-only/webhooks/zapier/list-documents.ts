@@ -1,6 +1,5 @@
-import { EnvelopeType, type Webhook } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType, type Webhook } from '@prisma/client';
 
 import { mapSecondaryIdToDocumentId } from '../../../utils/envelope';
 import { getWebhooksByTeamId } from '../get-webhooks-by-team-id';
@@ -67,7 +66,9 @@ export const listDocumentsHandler = async (req: Request) => {
           name: recipient.name,
           token: recipient.token,
           documentDeletedAt: recipient.documentDeletedAt,
-          expired: recipient.expired,
+          expired: recipient.expired, // !: deprecated Not in use. To be removed in a future migration.
+          expiresAt: recipient.expiresAt,
+          expirationNotifiedAt: recipient.expirationNotifiedAt,
           signedAt: recipient.signedAt,
           authOptions: recipient.authOptions,
           signingOrder: recipient.signingOrder,

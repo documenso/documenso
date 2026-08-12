@@ -13,10 +13,7 @@ export type GetTeamMembersOptions = {
 /**
  * Get all team members for a given team.
  */
-export const getTeamMembers = async ({
-  userId,
-  teamId,
-}: GetTeamMembersOptions): Promise<TGetTeamMembersResponse> => {
+export const getTeamMembers = async ({ userId, teamId }: GetTeamMembersOptions): Promise<TGetTeamMembersResponse> => {
   const teamMembers = await prisma.organisationMember.findMany({
     where: {
       organisationGroupMembers: {

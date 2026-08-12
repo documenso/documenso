@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const baseConfig = require('@documenso/tailwind-config');
+const baseConfig = require('@documenso/ui/tailwind.config.cjs');
 const path = require('path');
 
 module.exports = {
-  ...baseConfig,
+  presets: [baseConfig],
   content: [
-    ...baseConfig.content,
     './app/**/*.{ts,tsx}',
     `${path.join(require.resolve('@documenso/ui'), '..')}/components/**/*.{ts,tsx}`,
     `${path.join(require.resolve('@documenso/ui'), '..')}/icons/**/*.{ts,tsx}`,

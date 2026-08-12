@@ -1,38 +1,40 @@
-import { useCallback, useId, useMemo, useRef, useState } from 'react';
-
-import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { Field, Recipient } from '@prisma/client';
-import { DocumentSigningOrder, RecipientRole, SendStatus } from '@prisma/client';
-import { motion } from 'framer-motion';
-import { GripVerticalIcon, HelpCircle, Plus, Trash } from 'lucide-react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { prop, sortBy } from 'remeda';
-
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { nanoid } from '@documenso/lib/universal/id';
-import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
+import {
+  isAssistantLastSigner,
+  isCcRecipient,
+  normalizeRecipientSigningOrders,
+  sortRecipientsForSigningOrder,
+  canRecipientBeModified as utilCanRecipientBeModified,
+} from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
 import { cn } from '@documenso/ui/lib/utils';
+import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { Field } from '@prisma/client';
+import { DocumentSigningOrder, RecipientRole, SendStatus } from '@prisma/client';
+import { motion } from 'framer-motion';
+import { GripVerticalIcon, HelpCircle, Plus, Trash } from 'lucide-react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 
-import {
-  DocumentReadOnlyFields,
-  mapFieldsWithRecipients,
-} from '../../components/document/document-read-only-fields';
+import { DocumentReadOnlyFields, mapFieldsWithRecipients } from '../../components/document/document-read-only-fields';
 import type { RecipientAutoCompleteOption } from '../../components/recipient/recipient-autocomplete-input';
 import { RecipientAutoCompleteInput } from '../../components/recipient/recipient-autocomplete-input';
+import { Alert, AlertDescription } from '../alert';
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
@@ -54,12 +56,12 @@ import { SigningOrderConfirmation } from './signing-order-confirmation';
 import type { DocumentFlowStep } from './types';
 
 type AutoSaveResponse = {
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
 };
 
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   fields: Field[];
   signingOrder?: DocumentSigningOrder | null;
   allowDictateNextSigner?: boolean;
@@ -121,19 +123,18 @@ export const AddSignersFormPartial = ({
     defaultValues: {
       signers:
         recipients.length > 0
-          ? sortBy(
-              recipients.map((recipient, index) => ({
-                nativeId: recipient.id,
-                formId: String(recipient.id),
-                name: recipient.name,
-                email: recipient.email,
-                role: recipient.role,
-                signingOrder: recipient.signingOrder ?? index + 1,
-                actionAuth:
-                  ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
-              })),
-              [prop('signingOrder'), 'asc'],
-              [prop('nativeId'), 'asc'],
+          ? normalizeRecipientSigningOrders(
+              sortRecipientsForSigningOrder(
+                recipients.map((recipient, index) => ({
+                  nativeId: recipient.id,
+                  formId: String(recipient.id),
+                  name: recipient.name,
+                  email: recipient.email,
+                  role: recipient.role,
+                  signingOrder: isCcRecipient(recipient) ? undefined : (recipient.signingOrder ?? index + 1),
+                  actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
+                })),
+              ),
             )
           : defaultRecipients,
       signingOrder: signingOrder || DocumentSigningOrder.PARALLEL,
@@ -146,14 +147,10 @@ export const AddSignersFormPartial = ({
     const recipientHasAuthOptions = recipients.find((recipient) => {
       const recipientAuthOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
-      return (
-        recipientAuthOptions.accessAuth.length > 0 || recipientAuthOptions.actionAuth.length > 0
-      );
+      return recipientAuthOptions.accessAuth.length > 0 || recipientAuthOptions.actionAuth.length > 0;
     });
 
-    const formHasActionAuth = form
-      .getValues('signers')
-      .find((signer) => signer.actionAuth.length > 0);
+    const formHasActionAuth = form.getValues('signers').find((signer) => signer.actionAuth.length > 0);
 
     return recipientHasAuthOptions !== undefined || formHasActionAuth !== undefined;
   }, [recipients, form]);
@@ -176,26 +173,19 @@ export const AddSignersFormPartial = ({
   }, [watchedSigners]);
 
   const normalizeSigningOrders = (signers: typeof watchedSigners) => {
-    return signers
-      .sort((a, b) => (a.signingOrder ?? 0) - (b.signingOrder ?? 0))
-      .map((signer, index) => ({ ...signer, signingOrder: index + 1 }));
+    return normalizeRecipientSigningOrders(signers, (signer) => canRecipientBeModified(signer.nativeId));
   };
+
+  const activeRecipientCount = watchedSigners.filter((signer) => !isCcRecipient(signer)).length;
 
   const onFormSubmit = form.handleSubmit(onSubmit);
 
-  const {
-    append: appendSigner,
-    fields: signers,
-    remove: removeSigner,
-  } = useFieldArray({
+  const { fields: signers, remove: removeSigner } = useFieldArray({
     control,
     name: 'signers',
   });
 
-  const emptySigners = useCallback(
-    () => form.getValues('signers').filter((signer) => signer.email === ''),
-    [form],
-  );
+  const emptySigners = useCallback(() => form.getValues('signers').filter((signer) => signer.email === ''), [form]);
 
   const { scheduleSave } = useAutoSave(onAutoSave);
 
@@ -219,9 +209,7 @@ export const AddSignersFormPartial = ({
 
         const updatedSigners = currentSigners.map((signer) => {
           // Find the matching recipient from the response using nativeId
-          const matchingRecipient = response.recipients.find(
-            (recipient) => recipient.id === signer.nativeId,
-          );
+          const matchingRecipient = response.recipients.find((recipient) => recipient.id === signer.nativeId);
 
           if (matchingRecipient) {
             // Update the signer with the server-returned data, especially the ID
@@ -232,9 +220,7 @@ export const AddSignersFormPartial = ({
           } else if (!signer.nativeId) {
             // For new signers without nativeId, match by email and update with server ID
             // Bug: Multiple recipients with the same email will be matched incorrectly here.
-            const newRecipient = response.recipients.find(
-              (recipient) => recipient.email === signer.email,
-            );
+            const newRecipient = response.recipients.find((recipient) => recipient.email === signer.email);
             if (newRecipient) {
               return {
                 ...signer,
@@ -257,9 +243,7 @@ export const AddSignersFormPartial = ({
     (signer) => signer.email.toLowerCase() === user?.email?.toLowerCase(),
   );
 
-  const hasDocumentBeenSent = recipients.some(
-    (recipient) => recipient.sendStatus === SendStatus.SENT,
-  );
+  const hasDocumentBeenSent = recipients.some((recipient) => recipient.sendStatus === SendStatus.SENT);
 
   const canRecipientBeModified = (recipientId?: number) => {
     if (recipientId === undefined) {
@@ -275,14 +259,31 @@ export const AddSignersFormPartial = ({
     return utilCanRecipientBeModified(recipient, fields);
   };
 
+  const appendNormalizedSigner = (signer: (typeof watchedSigners)[number], shouldFocus = false) => {
+    const updatedSigners = normalizeSigningOrders([...form.getValues('signers'), signer]);
+
+    form.setValue('signers', updatedSigners, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    if (shouldFocus) {
+      const signerIndex = updatedSigners.findIndex((updatedSigner) => updatedSigner.formId === signer.formId);
+
+      if (signerIndex !== -1) {
+        requestAnimationFrame(() => form.setFocus(`signers.${signerIndex}.email`));
+      }
+    }
+  };
+
   const onAddSigner = () => {
-    appendSigner({
+    appendNormalizedSigner({
       formId: nanoid(12),
       name: '',
       email: '',
       role: RecipientRole.SIGNER,
       actionAuth: [],
-      signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+      signingOrder: activeRecipientCount + 1,
     });
   };
 
@@ -327,29 +328,23 @@ export const AddSignersFormPartial = ({
 
       form.setFocus(`signers.${emptySignerIndex}.email`);
     } else {
-      appendSigner(
+      appendNormalizedSigner(
         {
           formId: nanoid(12),
           name: user?.name ?? '',
           email: user?.email ?? '',
           role: RecipientRole.SIGNER,
           actionAuth: [],
-          signingOrder:
-            signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+          signingOrder: activeRecipientCount + 1,
         },
-        {
-          shouldFocus: true,
-        },
+        true,
       );
 
       void form.trigger('signers');
     }
   };
 
-  const handleRecipientAutoCompleteSelect = (
-    index: number,
-    suggestion: RecipientAutoCompleteOption,
-  ) => {
+  const handleRecipientAutoCompleteSelect = (index: number, suggestion: RecipientAutoCompleteOption) => {
     setValue(`signers.${index}.email`, suggestion.email, {
       shouldValidate: true,
       shouldDirty: true,
@@ -362,7 +357,9 @@ export const AddSignersFormPartial = ({
 
   const onDragEnd = useCallback(
     async (result: DropResult) => {
-      if (!result.destination) return;
+      if (!result.destination) {
+        return;
+      }
 
       const items = Array.from(watchedSigners);
       const [reorderedSigner] = items.splice(result.source.index, 1);
@@ -375,18 +372,14 @@ export const AddSignersFormPartial = ({
 
       items.splice(insertIndex, 0, reorderedSigner);
 
-      const updatedSigners = items.map((signer, index) => ({
-        ...signer,
-        signingOrder: !canRecipientBeModified(signer.nativeId) ? signer.signingOrder : index + 1,
-      }));
+      const updatedSigners = normalizeSigningOrders(items);
 
       form.setValue('signers', updatedSigners, {
         shouldValidate: true,
         shouldDirty: true,
       });
 
-      const lastSigner = updatedSigners[updatedSigners.length - 1];
-      if (lastSigner.role === RecipientRole.ASSISTANT) {
+      if (isAssistantLastSigner(updatedSigners)) {
         toast({
           title: _(msg`Warning: Assistant as last signer`),
           description: _(
@@ -421,18 +414,19 @@ export const AddSignersFormPartial = ({
         return;
       }
 
-      const updatedSigners = currentSigners.map((signer, idx) => ({
-        ...signer,
-        role: idx === index ? role : signer.role,
-        signingOrder: !canRecipientBeModified(signer.nativeId) ? signer.signingOrder : idx + 1,
-      }));
+      const updatedSigners = normalizeSigningOrders(
+        currentSigners.map((signer, idx) => ({
+          ...signer,
+          role: idx === index ? role : signer.role,
+        })),
+      );
 
       form.setValue('signers', updatedSigners, {
         shouldValidate: true,
         shouldDirty: true,
       });
 
-      if (role === RecipientRole.ASSISTANT && index === updatedSigners.length - 1) {
+      if (role === RecipientRole.ASSISTANT && isAssistantLastSigner(updatedSigners)) {
         toast({
           title: _(msg`Warning: Assistant as last signer`),
           description: _(
@@ -459,22 +453,30 @@ export const AddSignersFormPartial = ({
       const currentSigners = form.getValues('signers');
       const signer = currentSigners[index];
 
-      // Remove signer from current position and insert at new position
-      const remainingSigners = currentSigners.filter((_, idx) => idx !== index);
-      const newPosition = Math.min(Math.max(0, newOrder - 1), currentSigners.length - 1);
-      remainingSigners.splice(newPosition, 0, signer);
+      if (isCcRecipient(signer)) {
+        return;
+      }
 
-      const updatedSigners = remainingSigners.map((s, idx) => ({
-        ...s,
-        signingOrder: !canRecipientBeModified(s.nativeId) ? s.signingOrder : idx + 1,
-      }));
+      const nonCcSigners = currentSigners.filter((s) => !isCcRecipient(s));
+      const ccSigners = currentSigners.filter((s) => isCcRecipient(s));
+      const currentSigningOrderIndex = nonCcSigners.findIndex((s) => s.formId === signer.formId);
+
+      if (currentSigningOrderIndex === -1) {
+        return;
+      }
+
+      const [reorderedSigner] = nonCcSigners.splice(currentSigningOrderIndex, 1);
+      const newPosition = Math.min(Math.max(0, newOrder - 1), nonCcSigners.length);
+      nonCcSigners.splice(newPosition, 0, reorderedSigner);
+
+      const updatedSigners = normalizeSigningOrders([...nonCcSigners, ...ccSigners]);
 
       form.setValue('signers', updatedSigners, {
         shouldValidate: true,
         shouldDirty: true,
       });
 
-      if (signer.role === RecipientRole.ASSISTANT && newPosition === remainingSigners.length - 1) {
+      if (signer.role === RecipientRole.ASSISTANT && isAssistantLastSigner(updatedSigners)) {
         toast({
           title: _(msg`Warning: Assistant as last signer`),
           description: _(
@@ -490,10 +492,12 @@ export const AddSignersFormPartial = ({
     setShowSigningOrderConfirmation(false);
 
     const currentSigners = form.getValues('signers');
-    const updatedSigners = currentSigners.map((signer) => ({
-      ...signer,
-      role: signer.role === RecipientRole.ASSISTANT ? RecipientRole.SIGNER : signer.role,
-    }));
+    const updatedSigners = normalizeSigningOrders(
+      currentSigners.map((signer) => ({
+        ...signer,
+        role: signer.role === RecipientRole.ASSISTANT ? RecipientRole.SIGNER : signer.role,
+      })),
+    );
 
     form.setValue('signers', updatedSigners, {
       shouldValidate: true,
@@ -511,13 +515,24 @@ export const AddSignersFormPartial = ({
     void handleAutoSave();
   }, [form]);
 
+  const recipientCountLimit = organisation.organisationClaim.recipientCount;
+  const isOverRecipientLimit = recipientCountLimit > 0 && signers.length > recipientCountLimit;
+
   return (
     <>
-      <DocumentFlowFormContainerHeader
-        title={documentFlow.title}
-        description={documentFlow.description}
-      />
+      <DocumentFlowFormContainerHeader title={documentFlow.title} description={documentFlow.description} />
       <DocumentFlowFormContainerContent>
+        {isOverRecipientLimit && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>
+              <Trans>
+                This envelope cannot have more than {recipientCountLimit} recipients. Please contact support if you need
+                more.
+              </Trans>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {isDocumentPdfLoaded && (
           <DocumentReadOnlyFields
             showRecipientColors={true}
@@ -544,9 +559,7 @@ export const AddSignersFormPartial = ({
                           return;
                         }
 
-                        field.onChange(
-                          checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL,
-                        );
+                        field.onChange(checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL);
 
                         // If sequential signing is turned off, disable dictate next signer
                         if (!checked) {
@@ -622,8 +635,8 @@ export const AddSignersFormPartial = ({
                       <TooltipContent className="max-w-80 p-4">
                         <p>
                           <Trans>
-                            When enabled, signers can choose who should sign next in the sequence
-                            instead of following the predefined order.
+                            When enabled, signers can choose who should sign next in the sequence instead of following
+                            the predefined order.
                           </Trans>
                         </p>
                       </TooltipContent>
@@ -643,11 +656,7 @@ export const AddSignersFormPartial = ({
             >
               <Droppable droppableId="signers">
                 {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="flex w-full flex-col gap-y-2"
-                  >
+                  <div {...provided.droppableProps} ref={provided.innerRef} className="flex w-full flex-col gap-y-2">
                     {signers.map((signer, index) => (
                       <Draggable
                         key={`${signer.id}-${signer.signingOrder}`}
@@ -656,6 +665,7 @@ export const AddSignersFormPartial = ({
                         isDragDisabled={
                           !isSigningOrderSequential ||
                           isSubmitting ||
+                          isCcRecipient(signer) ||
                           !canRecipientBeModified(signer.nativeId) ||
                           !signer.signingOrder
                         }
@@ -666,8 +676,7 @@ export const AddSignersFormPartial = ({
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={cn('py-1', {
-                              'pointer-events-none rounded-md bg-widget-foreground pt-2':
-                                snapshot.isDragging,
+                              'pointer-events-none rounded-md bg-widget-foreground pt-2': snapshot.isDragging,
                             })}
                           >
                             <motion.fieldset
@@ -678,26 +687,25 @@ export const AddSignersFormPartial = ({
                                 'grid-cols-12 pr-3': isSigningOrderSequential,
                               })}
                             >
-                              {isSigningOrderSequential && (
+                              {isSigningOrderSequential && isCcRecipient(signer) && <div className="col-span-2" />}
+
+                              {isSigningOrderSequential && !isCcRecipient(signer) && (
                                 <FormField
                                   control={form.control}
                                   name={`signers.${index}.signingOrder`}
                                   render={({ field }) => (
                                     <FormItem
-                                      className={cn(
-                                        'col-span-2 mt-auto flex items-center gap-x-1 space-y-0',
-                                        {
-                                          'mb-6':
-                                            form.formState.errors.signers?.[index] &&
-                                            !form.formState.errors.signers[index]?.signingOrder,
-                                        },
-                                      )}
+                                      className={cn('col-span-2 mt-auto flex items-center gap-x-1 space-y-0', {
+                                        'mb-6':
+                                          form.formState.errors.signers?.[index] &&
+                                          !form.formState.errors.signers[index]?.signingOrder,
+                                      })}
                                     >
                                       <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
                                       <FormControl>
                                         <Input
                                           type="number"
-                                          max={signers.length}
+                                          max={activeRecipientCount}
                                           data-testid="signing-order-input"
                                           className={cn(
                                             'w-full text-center',
@@ -757,9 +765,7 @@ export const AddSignersFormPartial = ({
                                           !canRecipientBeModified(signer.nativeId)
                                         }
                                         options={recipientSuggestions}
-                                        onSelect={(suggestion) =>
-                                          handleRecipientAutoCompleteSelect(index, suggestion)
-                                        }
+                                        onSelect={(suggestion) => handleRecipientAutoCompleteSelect(index, suggestion)}
                                         onSearchQueryChange={(query) => {
                                           field.onChange(query);
                                           setRecipientSearchQuery(query);
@@ -806,9 +812,7 @@ export const AddSignersFormPartial = ({
                                           !canRecipientBeModified(signer.nativeId)
                                         }
                                         options={recipientSuggestions}
-                                        onSelect={(suggestion) =>
-                                          handleRecipientAutoCompleteSelect(index, suggestion)
-                                        }
+                                        onSelect={(suggestion) => handleRecipientAutoCompleteSelect(index, suggestion)}
                                         onSearchQueryChange={(query) => {
                                           field.onChange(query);
                                           setRecipientSearchQuery(query);
@@ -824,37 +828,36 @@ export const AddSignersFormPartial = ({
                                 )}
                               />
 
-                              {showAdvancedSettings &&
-                                organisation.organisationClaim.flags.cfr21 && (
-                                  <FormField
-                                    control={form.control}
-                                    name={`signers.${index}.actionAuth`}
-                                    render={({ field }) => (
-                                      <FormItem
-                                        className={cn('col-span-8', {
-                                          'mb-6':
-                                            form.formState.errors.signers?.[index] &&
-                                            !form.formState.errors.signers[index]?.actionAuth,
-                                          'col-span-10': isSigningOrderSequential,
-                                        })}
-                                      >
-                                        <FormControl>
-                                          <RecipientActionAuthSelect
-                                            {...field}
-                                            onValueChange={field.onChange}
-                                            disabled={
-                                              snapshot.isDragging ||
-                                              isSubmitting ||
-                                              !canRecipientBeModified(signer.nativeId)
-                                            }
-                                          />
-                                        </FormControl>
+                              {showAdvancedSettings && organisation.organisationClaim.flags.cfr21 && (
+                                <FormField
+                                  control={form.control}
+                                  name={`signers.${index}.actionAuth`}
+                                  render={({ field }) => (
+                                    <FormItem
+                                      className={cn('col-span-8', {
+                                        'mb-6':
+                                          form.formState.errors.signers?.[index] &&
+                                          !form.formState.errors.signers[index]?.actionAuth,
+                                        'col-span-10': isSigningOrderSequential,
+                                      })}
+                                    >
+                                      <FormControl>
+                                        <RecipientActionAuthSelect
+                                          {...field}
+                                          onValueChange={field.onChange}
+                                          disabled={
+                                            snapshot.isDragging ||
+                                            isSubmitting ||
+                                            !canRecipientBeModified(signer.nativeId)
+                                          }
+                                        />
+                                      </FormControl>
 
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                )}
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              )}
 
                               <div className="col-span-2 flex gap-x-2">
                                 <FormField
@@ -939,7 +942,7 @@ export const AddSignersFormPartial = ({
                 disabled={isSubmitting || signers.length >= remaining.recipients}
                 onClick={() => onAddSigner()}
               >
-                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                <Plus className="mr-2 -ml-1 h-5 w-5" />
                 <Trans>Add Signer</Trans>
               </Button>
 
@@ -950,7 +953,7 @@ export const AddSignersFormPartial = ({
                 disabled={isSubmitting || isUserAlreadyARecipient}
                 onClick={() => onAddSelfSigner()}
               >
-                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                <Plus className="mr-2 -ml-1 h-5 w-5" />
                 <Trans>Add myself</Trans>
               </Button>
             </div>
@@ -964,10 +967,7 @@ export const AddSignersFormPartial = ({
                   onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
                 />
 
-                <label
-                  className="ml-2 text-sm text-muted-foreground"
-                  htmlFor="showAdvancedRecipientSettings"
-                >
+                <label className="ml-2 text-muted-foreground text-sm" htmlFor="showAdvancedRecipientSettings">
                   <Trans>Show advanced settings</Trans>
                 </label>
               </div>

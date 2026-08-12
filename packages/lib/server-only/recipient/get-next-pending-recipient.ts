@@ -1,6 +1,5 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { mapDocumentIdToSecondaryId } from '../../utils/envelope';
 
@@ -16,6 +15,11 @@ export const getNextPendingRecipient = async ({
       envelope: {
         type: EnvelopeType.DOCUMENT,
         secondaryId: mapDocumentIdToSecondaryId(documentId),
+      },
+      // CC recipients are informational only and never take part in signing,
+      // so they must never be offered as the next pending recipient.
+      role: {
+        not: RecipientRole.CC,
       },
     },
     orderBy: [

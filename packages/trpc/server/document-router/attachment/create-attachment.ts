@@ -1,13 +1,10 @@
-import { EnvelopeType } from '@prisma/client';
-
-import { createAttachment } from '@documenso/lib/server-only/envelope-attachment/create-attachment';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 
+import { createAttachment } from '@documenso/lib/server-only/envelope-attachment/create-attachment';
+import { EnvelopeType } from '@prisma/client';
+
 import { authenticatedProcedure } from '../../trpc';
-import {
-  ZCreateAttachmentRequestSchema,
-  ZCreateAttachmentResponseSchema,
-} from './create-attachment.types';
+import { ZCreateAttachmentRequestSchema, ZCreateAttachmentResponseSchema } from './create-attachment.types';
 
 export const createAttachmentRoute = authenticatedProcedure
   .meta({
@@ -15,8 +12,10 @@ export const createAttachmentRoute = authenticatedProcedure
       method: 'POST',
       path: '/document/attachment/create',
       summary: 'Create attachment',
-      description: 'Create a new attachment for a document',
+      description:
+        'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create a new attachment for a document',
       tags: ['Document'],
+      deprecated: true,
     },
   })
   .input(ZCreateAttachmentRequestSchema)

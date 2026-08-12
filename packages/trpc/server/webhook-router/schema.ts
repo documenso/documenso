@@ -1,8 +1,24 @@
+import { isPrivateUrl } from '@documenso/lib/server-only/webhooks/is-private-url';
+import { URL_PATTERN } from '@documenso/lib/types/name';
 import { WebhookTriggerEvents } from '@prisma/client';
 import { z } from 'zod';
 
+export const ZWebhookUrlSchema = z
+  .string()
+  .url()
+  .refine((url) => !isPrivateUrl(url), {
+    message: 'Webhook URL cannot point to a private or loopback address',
+  })
+  /*
+   * Without this, values like "foo: bar" would be valid URLs.
+   * Keep the same error message as the zod url() validator.
+   */
+  .refine((value) => URL_PATTERN.test(value), {
+    message: 'Invalid url',
+  });
+
 export const ZCreateWebhookRequestSchema = z.object({
-  webhookUrl: z.string().url(),
+  webhookUrl: ZWebhookUrlSchema,
   eventTriggers: z
     .array(z.nativeEnum(WebhookTriggerEvents))
     .min(1, { message: 'At least one event trigger is required' }),

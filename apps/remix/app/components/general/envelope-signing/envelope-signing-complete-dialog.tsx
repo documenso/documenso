@@ -1,17 +1,16 @@
-import { useMemo } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { FieldType } from '@prisma/client';
-import { useNavigate, useRevalidator, useSearchParams } from 'react-router';
-
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { PDF_VIEWER_CONTENT_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { useLingui } from '@lingui/react/macro';
+import { FieldType } from '@prisma/client';
+import { useMemo } from 'react';
+import { useNavigate, useRevalidator, useSearchParams } from 'react-router';
 
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 
@@ -43,8 +42,11 @@ export const EnvelopeSignerCompleteDialog = () => {
 
   const { onDocumentCompleted, onDocumentError } = useEmbedSigningContext() || {};
 
-  const { mutateAsync: completeDocument, isPending } =
-    trpc.recipient.completeDocumentWithToken.useMutation();
+  const {
+    mutateAsync: completeDocument,
+    isPending,
+    isSuccess,
+  } = trpc.recipient.completeDocumentWithToken.useMutation();
 
   const { mutateAsync: createDocumentFromDirectTemplate } =
     trpc.template.createDocumentFromDirectTemplate.useMutation();
@@ -71,6 +73,14 @@ export const EnvelopeSignerCompleteDialog = () => {
 
         if (fieldTooltip) {
           fieldTooltip.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          // Tooltip not in DOM (page virtualized away) — signal the PDF viewer
+          // to scroll to the correct page via the data attribute.
+          const pdfContent = document.querySelector(PDF_VIEWER_CONTENT_SELECTOR);
+
+          if (pdfContent) {
+            pdfContent.setAttribute('data-scroll-to-page', String(nextField.page));
+          }
         }
       },
       isEnvelopeItemSwitch ? 150 : 50,
@@ -83,7 +93,7 @@ export const EnvelopeSignerCompleteDialog = () => {
     recipientDetails?: { name: string; email: string },
   ) => {
     try {
-      await completeDocument({
+      const result = await completeDocument({
         token: recipient.token,
         documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
         accessAuthOptions,
@@ -91,11 +101,30 @@ export const EnvelopeSignerCompleteDialog = () => {
         ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
       });
 
-      analytics.capture('App: Recipient has completed signing', {
-        signerId: recipient.id,
-        documentId: envelope.id,
-        timestamp: new Date().toISOString(),
-      });
+      // TSP envelopes can't be completed via the SES path; the mutation returns
+      // a credential-scope OAuth URL the recipient must follow to acquire a SAD
+      // before the sync sign mutation can run. Short-circuit here so the
+      // analytics / completion handlers don't run with a still-unsigned doc.
+      if (result.status === 'REDIRECT') {
+        window.location.href = result.redirectUrl;
+        return;
+      }
+
+      // The document was already completed by an earlier request (retry,
+      // stale tab or concurrent submission). Let the user know this click
+      // didn't complete the document, then continue to the completed page.
+      if (result.status === 'ALREADY_SIGNED') {
+        toast({
+          title: t`Document already signed`,
+          description: t`This document was already signed and no further action was taken.`,
+        });
+      } else {
+        analytics.capture('App: Recipient has completed signing', {
+          signerId: recipient.id,
+          documentId: envelope.id,
+          timestamp: new Date().toISOString(),
+        });
+      }
 
       if (onDocumentCompleted) {
         onDocumentCompleted({
@@ -113,7 +142,7 @@ export const EnvelopeSignerCompleteDialog = () => {
       if (envelope.documentMeta.redirectUrl) {
         window.location.href = envelope.documentMeta.redirectUrl;
       } else {
-        await navigate(`/sign/${recipient.token}/complete`);
+        window.location.href = `/sign/${recipient.token}/complete`;
       }
     } catch (err) {
       const error = AppError.parseError(err);
@@ -191,7 +220,7 @@ export const EnvelopeSignerCompleteDialog = () => {
       if (redirectUrl) {
         window.location.href = redirectUrl;
       } else {
-        await navigate(`/sign/${token}/complete`);
+        window.location.href = `/sign/${token}/complete`;
       }
     } catch (err) {
       console.log('err', err);
@@ -212,10 +241,12 @@ export const EnvelopeSignerCompleteDialog = () => {
       return {
         name:
           recipient.name ||
+          fullName ||
           recipient.fields.find((field) => field.type === FieldType.NAME)?.customText ||
           '',
         email:
           recipient.email ||
+          email ||
           recipient.fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
           '',
       };
@@ -229,22 +260,16 @@ export const EnvelopeSignerCompleteDialog = () => {
 
   return (
     <DocumentSigningCompleteDialog
-      isSubmitting={isPending}
+      isSubmitting={isPending || isSuccess}
       recipientPayload={recipientPayload}
-      onSignatureComplete={
-        isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick
-      }
+      onSignatureComplete={isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick}
       documentTitle={envelope.title}
       fields={recipientFieldsRemaining}
       fieldsValidated={handleOnNextFieldClick}
       recipient={recipient}
-      allowDictateNextSigner={Boolean(
-        nextRecipient && envelope.documentMeta.allowDictateNextSigner,
-      )}
+      allowDictateNextSigner={Boolean(nextRecipient && envelope.documentMeta.allowDictateNextSigner)}
       disableNameInput={!isDirectTemplate && recipient.name !== ''}
-      defaultNextSigner={
-        nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined
-      }
+      defaultNextSigner={nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined}
       buttonSize="sm"
       position="center"
     />

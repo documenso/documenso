@@ -1,14 +1,11 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { OrganisationGroupType, type Team } from '@prisma/client';
-import { uniqueBy } from 'remeda';
-
-import { mailer } from '@documenso/email/mailer';
 import { TeamDeleteEmailTemplate } from '@documenso/email/templates/team-delete';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import { OrganisationGroupType, type Team } from '@prisma/client';
+import { createElement } from 'react';
+import { uniqueBy } from 'remeda';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
@@ -78,38 +75,36 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
     (member) => member.id,
   );
 
-  await prisma.$transaction(
-    async (tx) => {
-      await tx.team.delete({
-        where: {
-          id: teamId,
-        },
-      });
+  await prisma.$transaction(async (tx) => {
+    await tx.team.delete({
+      where: {
+        id: teamId,
+      },
+    });
 
-      // Purge all internal organisation groups that have no teams.
-      await tx.organisationGroup.deleteMany({
-        where: {
-          type: OrganisationGroupType.INTERNAL_TEAM,
-          teamGroups: {
-            none: {},
-          },
+    // Purge all internal organisation groups that have no teams.
+    await tx.organisationGroup.deleteMany({
+      where: {
+        organisationId: team.organisationId,
+        type: OrganisationGroupType.INTERNAL_TEAM,
+        teamGroups: {
+          none: {},
         },
-      });
+      },
+    });
+  });
 
-      await jobs.triggerJob({
-        name: 'send.team-deleted.email',
-        payload: {
-          team: {
-            name: team.name,
-            url: team.url,
-          },
-          members: membersToNotify,
-          organisationId: team.organisationId,
-        },
-      });
+  await jobs.triggerJob({
+    name: 'send.team-deleted.email',
+    payload: {
+      team: {
+        name: team.name,
+        url: team.url,
+      },
+      members: membersToNotify,
+      organisationId: team.organisationId,
     },
-    { timeout: 30_000 },
-  );
+  });
 };
 
 type SendTeamDeleteEmailOptions = {
@@ -118,18 +113,14 @@ type SendTeamDeleteEmailOptions = {
   organisationId: string;
 };
 
-export const sendTeamDeleteEmail = async ({
-  email,
-  team,
-  organisationId,
-}: SendTeamDeleteEmailOptions) => {
+export const sendTeamDeleteEmail = async ({ email, team, organisationId }: SendTeamDeleteEmailOptions) => {
   const template = createElement(TeamDeleteEmailTemplate, {
     assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     teamUrl: team.url,
   });
 
-  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, emailTransport } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'organisation',
@@ -144,7 +135,7 @@ export const sendTeamDeleteEmail = async ({
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  await mailer.sendMail({
+  await emailTransport.sendMail({
     to: email,
     from: senderEmail,
     subject: i18n._(msg`Team "${team.name}" has been deleted on Documenso`),

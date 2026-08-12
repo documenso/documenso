@@ -1,9 +1,11 @@
-import { expect, test } from '@playwright/test';
-
 import { seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
+import { openCommandMenu } from '../fixtures/command-menu';
+
+const COMMAND_MENU_PLACEHOLDER = 'Type a command or search...';
 
 test('[COMMAND_MENU]: should see sent documents', async ({ page }) => {
   const { user, team } = await seedUser();
@@ -15,9 +17,9 @@ test('[COMMAND_MENU]: should see sent documents', async ({ page }) => {
     email: user.email,
   });
 
-  await page.keyboard.press('Meta+K');
+  await openCommandMenu(page, COMMAND_MENU_PLACEHOLDER);
 
-  await page.getByPlaceholder('Type a command or search...').first().fill(document.title);
+  await page.getByPlaceholder(COMMAND_MENU_PLACEHOLDER).first().fill(document.title);
   await expect(page.getByRole('option', { name: document.title })).toBeVisible();
 });
 
@@ -31,9 +33,9 @@ test('[COMMAND_MENU]: should see received documents', async ({ page }) => {
     email: recipient.email,
   });
 
-  await page.keyboard.press('Meta+K');
+  await openCommandMenu(page, COMMAND_MENU_PLACEHOLDER);
 
-  await page.getByPlaceholder('Type a command or search...').first().fill(document.title);
+  await page.getByPlaceholder(COMMAND_MENU_PLACEHOLDER).first().fill(document.title);
   await expect(page.getByRole('option', { name: document.title })).toBeVisible();
 });
 
@@ -44,11 +46,11 @@ test('[COMMAND_MENU]: should be able to search by recipient', async ({ page }) =
 
   await apiSignin({
     page,
-    email: recipient.email,
+    email: user.email,
   });
 
-  await page.keyboard.press('Meta+K');
+  await openCommandMenu(page, COMMAND_MENU_PLACEHOLDER);
 
-  await page.getByPlaceholder('Type a command or search...').first().fill(recipient.email);
+  await page.getByPlaceholder(COMMAND_MENU_PLACEHOLDER).first().fill(recipient.email);
   await expect(page.getByRole('option', { name: document.title })).toBeVisible();
 });

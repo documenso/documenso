@@ -1,5 +1,4 @@
-import type { Envelope } from '@prisma/client';
-import { type Recipient } from '@prisma/client';
+import type { Envelope, Recipient } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import type { TTemplateLite } from '../types/template';
@@ -51,7 +50,7 @@ export const mapEnvelopeToTemplateLite = (envelope: Envelope): TTemplateLite => 
 
   return {
     id: legacyTemplateId,
-    envelopeId: envelope.secondaryId,
+    envelopeId: envelope.id,
     type: envelope.templateType,
     visibility: envelope.visibility,
     externalId: envelope.externalId,

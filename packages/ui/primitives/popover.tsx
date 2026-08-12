@@ -1,6 +1,5 @@
-import * as React from 'react';
-
 import * as PopoverPrimitive from '@radix-ui/react-popover';
+import * as React from 'react';
 
 import { cn } from '../lib/utils';
 
@@ -20,7 +19,7 @@ const PopoverContent = React.forwardRef<
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        'bg-popover text-popover-foreground animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 rounded-md border p-4 shadow-md outline-none',
+        'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 animate-in rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none',
         className,
       )}
       {...props}
@@ -81,16 +80,11 @@ const PopoverHover = ({ trigger, children, contentProps, side = 'top' }: Popover
         {trigger}
       </PopoverTrigger>
 
-      <PopoverContent
-        side={side}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        {...contentProps}
-      >
+      <PopoverContent side={side} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...contentProps}>
         {children}
       </PopoverContent>
     </Popover>
   );
 };
 
-export { Popover, PopoverTrigger, PopoverAnchor, PopoverContent, PopoverHover };
+export { Popover, PopoverAnchor, PopoverContent, PopoverHover, PopoverTrigger };

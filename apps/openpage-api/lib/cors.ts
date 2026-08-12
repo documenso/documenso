@@ -60,7 +60,9 @@ async function originHeadersFromReq(req: Request, origin: StaticOrigin | OriginF
   const reqOrigin = req.headers.get('Origin') || undefined;
   const value = typeof origin === 'function' ? await origin(reqOrigin, req) : origin;
 
-  if (!value) return;
+  if (!value) {
+    return;
+  }
   return getOriginHeaders(reqOrigin, value);
 }
 
@@ -85,12 +87,17 @@ export default async function cors(req: Request, res: Response, options?: CorsOp
   const { headers } = res;
   const originHeaders = await originHeadersFromReq(req, opts.origin ?? false);
   const mergeHeaders = (v: string, k: string) => {
-    if (k === 'Vary') headers.append(k, v);
-    else headers.set(k, v);
+    if (k === 'Vary') {
+      headers.append(k, v);
+    } else {
+      headers.set(k, v);
+    }
   };
 
   // If there's no origin we won't touch the response
-  if (!originHeaders) return res;
+  if (!originHeaders) {
+    return res;
+  }
 
   originHeaders.forEach(mergeHeaders);
 
@@ -98,9 +105,7 @@ export default async function cors(req: Request, res: Response, options?: CorsOp
     headers.set('Access-Control-Allow-Credentials', 'true');
   }
 
-  const exposed = Array.isArray(opts.exposedHeaders)
-    ? opts.exposedHeaders.join(',')
-    : opts.exposedHeaders;
+  const exposed = Array.isArray(opts.exposedHeaders) ? opts.exposedHeaders.join(',') : opts.exposedHeaders;
 
   if (exposed) {
     headers.set('Access-Control-Expose-Headers', exposed);
@@ -120,7 +125,9 @@ export default async function cors(req: Request, res: Response, options?: CorsOp
       headers.set('Access-Control-Max-Age', String(opts.maxAge));
     }
 
-    if (opts.preflightContinue) return res;
+    if (opts.preflightContinue) {
+      return res;
+    }
 
     headers.set('Content-Length', '0');
     return new Response(null, { status: opts.optionsSuccessStatus, headers });

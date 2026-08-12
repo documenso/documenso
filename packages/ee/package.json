@@ -13,9 +13,11 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@aws-sdk/client-sesv2": "^3.936.0",
+    "@aws-sdk/client-sesv2": "^3.998.0",
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
+    "arctic": "^3.7.0",
+    "hono": "^4.12.14",
     "luxon": "^3.7.2",
     "react": "^18",
     "ts-pattern": "^5.9.0",

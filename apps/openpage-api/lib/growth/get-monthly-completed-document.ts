@@ -1,7 +1,6 @@
+import { kyselyPrisma, sql } from '@documenso/prisma';
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import { DateTime } from 'luxon';
-
-import { kyselyPrisma, sql } from '@documenso/prisma';
 
 import { addZeroMonth } from '../add-zero-month';
 
@@ -21,8 +20,7 @@ export const getCompletedDocumentsMonthly = async (type: 'count' | 'cumulative' 
     .where(() => sql`"Envelope"."status" = ${DocumentStatus.COMPLETED}::"DocumentStatus"`)
     .where(() => sql`"Envelope"."type" = ${EnvelopeType.DOCUMENT}::"EnvelopeType"`)
     .groupBy('month')
-    .orderBy('month', 'desc')
-    .limit(12);
+    .orderBy('month', 'desc');
 
   const result = await qb.execute();
 
@@ -31,16 +29,12 @@ export const getCompletedDocumentsMonthly = async (type: 'count' | 'cumulative' 
     datasets: [
       {
         label: type === 'count' ? 'Completed Documents per Month' : 'Total Completed Documents',
-        data: result
-          .map((row) => (type === 'count' ? Number(row.count) : Number(row.cume_count)))
-          .reverse(),
+        data: result.map((row) => (type === 'count' ? Number(row.count) : Number(row.cume_count))).reverse(),
       },
     ],
   };
 
-  return addZeroMonth(transformedData);
+  return addZeroMonth(transformedData, type === 'cumulative');
 };
 
-export type GetCompletedDocumentsMonthlyResult = Awaited<
-  ReturnType<typeof getCompletedDocumentsMonthly>
->;
+export type GetCompletedDocumentsMonthlyResult = Awaited<ReturnType<typeof getCompletedDocumentsMonthly>>;

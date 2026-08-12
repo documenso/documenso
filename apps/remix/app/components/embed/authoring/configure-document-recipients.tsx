@@ -1,5 +1,10 @@
-import { useCallback, useRef } from 'react';
-
+import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { msg } from '@lingui/core/macro';
@@ -9,22 +14,9 @@ import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { GripVertical, HelpCircle, Plus, Trash } from 'lucide-react';
 import { nanoid } from 'nanoid';
+import { useCallback, useRef } from 'react';
 import type { Control } from 'react-hook-form';
 import { useFieldArray, useFormContext, useFormState } from 'react-hook-form';
-
-import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 import { useConfigureDocument } from './configure-document-context';
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';
@@ -37,10 +29,7 @@ export interface ConfigureDocumentRecipientsProps {
   isSubmitting: boolean;
 }
 
-export const ConfigureDocumentRecipients = ({
-  control,
-  isSubmitting,
-}: ConfigureDocumentRecipientsProps) => {
+export const ConfigureDocumentRecipients = ({ control, isSubmitting }: ConfigureDocumentRecipientsProps) => {
   const { _ } = useLingui();
   const { isTemplate } = useConfigureDocument();
 
@@ -66,16 +55,14 @@ export const ConfigureDocumentRecipients = ({
   });
 
   const onAddSigner = useCallback(() => {
-    const recipientSigningOrder =
-      signers.length > 0 ? (signers[signers.length - 1]?.signingOrder || 0) + 1 : 1;
+    const recipientSigningOrder = signers.length > 0 ? (signers[signers.length - 1]?.signingOrder || 0) + 1 : 1;
 
     appendSigner({
       formId: nanoid(8),
       name: '',
       email: '',
       role: RecipientRole.SIGNER,
-      signingOrder:
-        signingOrder === DocumentSigningOrder.SEQUENTIAL ? recipientSigningOrder : undefined,
+      signingOrder: signingOrder === DocumentSigningOrder.SEQUENTIAL ? recipientSigningOrder : undefined,
     });
   }, [appendSigner, signers]);
 
@@ -116,7 +103,9 @@ export const ConfigureDocumentRecipients = ({
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
-      if (!result.destination) return;
+      if (!result.destination) {
+        return;
+      }
 
       // Use the move function from useFieldArray which preserves input values
       move(result.source.index, result.destination.index);
@@ -146,11 +135,11 @@ export const ConfigureDocumentRecipients = ({
 
   return (
     <div>
-      <h3 className="text-foreground mb-1 text-lg font-medium">
+      <h3 className="mb-1 font-medium text-foreground text-lg">
         <Trans>Recipients</Trans>
       </h3>
 
-      <p className="text-muted-foreground mb-6 text-sm">
+      <p className="mb-6 text-muted-foreground text-sm">
         <Trans>Add signers and configure signing preferences</Trans>
       </p>
 
@@ -165,9 +154,7 @@ export const ConfigureDocumentRecipients = ({
                 id="signingOrder"
                 checked={field.value === DocumentSigningOrder.SEQUENTIAL}
                 onCheckedChange={(checked) =>
-                  onSigningOrderChange(
-                    checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL,
-                  )
+                  onSigningOrderChange(checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL)
                 }
                 disabled={isSubmitting}
               />
@@ -206,15 +193,15 @@ export const ConfigureDocumentRecipients = ({
               </FormLabel>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="text-muted-foreground ml-1 cursor-help">
+                  <span className="ml-1 cursor-help text-muted-foreground">
                     <HelpCircle className="h-3.5 w-3.5" />
                   </span>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-80 p-4">
                   <p>
                     <Trans>
-                      When enabled, signers can choose who should sign next in the sequence instead
-                      of following the predefined order.
+                      When enabled, signers can choose who should sign next in the sequence instead of following the
+                      predefined order.
                     </Trans>
                   </p>
                 </TooltipContent>
@@ -249,8 +236,7 @@ export const ConfigureDocumentRecipients = ({
                       {...provided.dragHandleProps}
                       disabled={signer.disabled}
                       className={cn('py-1', {
-                        'bg-widget-foreground pointer-events-none rounded-md pt-2':
-                          snapshot.isDragging,
+                        'pointer-events-none rounded-md bg-widget-foreground pt-2': snapshot.isDragging,
                       })}
                     >
                       <motion.div
@@ -265,9 +251,7 @@ export const ConfigureDocumentRecipients = ({
                             render={({ field }) => (
                               <FormItem
                                 className={cn('flex w-16 flex-none items-center gap-x-1', {
-                                  'mb-6':
-                                    errors?.signers?.[index] &&
-                                    !errors?.signers?.[index]?.signingOrder,
+                                  'mb-6': errors?.signers?.[index] && !errors?.signers?.[index]?.signingOrder,
                                 })}
                               >
                                 <GripVertical className="h-5 w-5 flex-shrink-0 opacity-40" />
@@ -325,8 +309,7 @@ export const ConfigureDocumentRecipients = ({
                           render={({ field }) => (
                             <FormItem
                               className={cn('flex-1', {
-                                'mb-6':
-                                  errors?.signers?.[index] && !errors?.signers?.[index]?.email,
+                                'mb-6': errors?.signers?.[index] && !errors?.signers?.[index]?.email,
                               })}
                             >
                               <FormLabel className="sr-only">
@@ -374,12 +357,7 @@ export const ConfigureDocumentRecipients = ({
                         <Button
                           type="button"
                           variant="ghost"
-                          disabled={
-                            isSubmitting ||
-                            signers.length === 1 ||
-                            snapshot.isDragging ||
-                            signer.disabled
-                          }
+                          disabled={isSubmitting || signers.length === 1 || snapshot.isDragging || signer.disabled}
                           onClick={() => removeSigner(index)}
                         >
                           <Trash className="h-4 w-4" />
@@ -396,14 +374,8 @@ export const ConfigureDocumentRecipients = ({
       </DragDropContext>
 
       <div className="mt-4 flex justify-end">
-        <Button
-          type="button"
-          variant="outline"
-          className="w-auto"
-          disabled={isSubmitting}
-          onClick={onAddSigner}
-        >
-          <Plus className="-ml-1 mr-2 h-5 w-5" />
+        <Button type="button" variant="outline" className="w-auto" disabled={isSubmitting} onClick={onAddSigner}>
+          <Plus className="mr-2 -ml-1 h-5 w-5" />
           <Trans>Add Signer</Trans>
         </Button>
       </div>

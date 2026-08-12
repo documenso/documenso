@@ -1,6 +1,5 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { TFolderType } from '../../types/folder-type';
@@ -13,12 +12,7 @@ export interface FindFoldersInternalOptions {
   type?: TFolderType;
 }
 
-export const findFoldersInternal = async ({
-  userId,
-  teamId,
-  parentId,
-  type,
-}: FindFoldersInternalOptions) => {
+export const findFoldersInternal = async ({ userId, teamId, parentId, type }: FindFoldersInternalOptions) => {
   const team = await getTeamById({ userId, teamId });
 
   const visibilityFilters = {

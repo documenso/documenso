@@ -1,6 +1,6 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
+import { nanoid, prefixedId } from '@documenso/lib/universal/id';
+import { prisma } from '@documenso/prisma';
+import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 import type { Field, Signature } from '@prisma/client';
 import {
   DocumentSigningOrder,
@@ -18,23 +18,15 @@ import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { mailer } from '@documenso/email/mailer';
-import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
-import { nanoid, prefixedId } from '@documenso/lib/universal/id';
-import { prisma } from '@documenso/prisma';
-import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
-
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { jobs } from '../../jobs/client';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
-import {
-  ZWebhookDocumentSchema,
-  mapEnvelopeToWebhookDocumentPayload,
-} from '../../types/webhook-payload';
+import { ZSignatureLevelSchema } from '../../types/signature-level';
+import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
@@ -48,12 +40,13 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { formatDocumentsPath } from '../../utils/teams';
+import { getRecipientsWithMissingFields } from '../../utils/recipients';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
-import { getEmailContext } from '../email/get-email-context';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentFromDirectTemplateOptions = {
@@ -87,9 +80,7 @@ export const ZCreateDocumentFromDirectTemplateResponseSchema = z.object({
   recipientId: z.number(),
 });
 
-export type TCreateDocumentFromDirectTemplateResponse = z.infer<
-  typeof ZCreateDocumentFromDirectTemplateResponseSchema
->;
+export type TCreateDocumentFromDirectTemplateResponse = z.infer<typeof ZCreateDocumentFromDirectTemplateResponseSchema>;
 
 export const createDocumentFromDirectTemplate = async ({
   directRecipientName: initialDirectRecipientName,
@@ -128,6 +119,20 @@ export const createDocumentFromDirectTemplate = async ({
           name: true,
         },
       },
+      team: {
+        select: {
+          organisationId: true,
+          organisation: {
+            select: {
+              organisationClaim: {
+                select: {
+                  recipientCount: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 
@@ -141,14 +146,11 @@ export const createDocumentFromDirectTemplate = async ({
       directTemplateEnvelope.documentMeta?.signingOrder !== DocumentSigningOrder.SEQUENTIAL)
   ) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message:
-        'You need to enable allowDictateNextSigner and sequential signing to dictate the next signer',
+      message: 'You need to enable allowDictateNextSigner and sequential signing to dictate the next signer',
     });
   }
 
-  const directTemplateEnvelopeLegacyId = mapSecondaryIdToTemplateId(
-    directTemplateEnvelope.secondaryId,
-  );
+  const directTemplateEnvelopeLegacyId = mapSecondaryIdToTemplateId(directTemplateEnvelope.secondaryId);
 
   if (directTemplateEnvelope.envelopeItems.length < 1) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -156,19 +158,14 @@ export const createDocumentFromDirectTemplate = async ({
     });
   }
 
-  const { branding, settings, senderEmail, emailLanguage } = await getEmailContext({
-    emailType: 'INTERNAL',
-    source: {
-      type: 'team',
-      teamId: directTemplateEnvelope.teamId,
-    },
+  const settings = await getTeamSettings({
+    userId: directTemplateEnvelope.userId,
+    teamId: directTemplateEnvelope.teamId,
   });
 
-  const { recipients, directLink, user: templateOwner } = directTemplateEnvelope;
+  const { recipients, directLink } = directTemplateEnvelope;
 
-  const directTemplateRecipient = recipients.find(
-    (recipient) => recipient.id === directLink.directTemplateRecipientId,
-  );
+  const directTemplateRecipient = recipients.find((recipient) => recipient.id === directLink.directTemplateRecipientId);
 
   if (!directTemplateRecipient || directTemplateRecipient.role === RecipientRole.CC) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -176,14 +173,24 @@ export const createDocumentFromDirectTemplate = async ({
     });
   }
 
+  const recipientsWithMissingFields = getRecipientsWithMissingFields(
+    recipients,
+    recipients.flatMap((recipient) => recipient.fields),
+  );
+
+  if (recipientsWithMissingFields.length > 0) {
+    throw new AppError(AppErrorCode.MISSING_SIGNATURE_FIELD, {
+      message: 'One or more signers on this direct template are missing a signature field',
+    });
+  }
+
   if (directTemplateEnvelope.updatedAt.getTime() !== templateUpdatedAt.getTime()) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Template no longer matches' });
   }
 
-  const { derivedRecipientAccessAuth, documentAuthOption: templateAuthOptions } =
-    extractDocumentAuthMethods({
-      documentAuth: directTemplateEnvelope.authOptions,
-    });
+  const { derivedRecipientAccessAuth, documentAuthOption: templateAuthOptions } = extractDocumentAuthMethods({
+    documentAuth: directTemplateEnvelope.authOptions,
+  });
 
   let directRecipientName = user?.name || initialDirectRecipientName;
 
@@ -198,17 +205,36 @@ export const createDocumentFromDirectTemplate = async ({
     throw new AppError(AppErrorCode.UNAUTHORIZED, { message: 'You must be logged in' });
   }
 
-  const directTemplateRecipientAuthOptions = ZRecipientAuthOptionsSchema.parse(
-    directTemplateRecipient.authOptions,
-  );
+  const directTemplateRecipientAuthOptions = ZRecipientAuthOptionsSchema.parse(directTemplateRecipient.authOptions);
 
   const nonDirectTemplateRecipients = directTemplateEnvelope.recipients.filter(
     (recipient) => recipient.id !== directTemplateRecipient.id,
   );
-  const derivedDocumentMeta = extractDerivedDocumentMeta(
-    settings,
-    directTemplateEnvelope.documentMeta,
-  );
+
+  // Carry the template's level forward, coercing if the instance mode has
+  // changed since the template was created. ZSignatureLevelSchema parses the
+  // free-form TEXT column defensively. Resolved before meta extraction so
+  // signingOrder picks up the TSP-appropriate default + assertion.
+  const signatureLevel = resolveSignatureLevel({
+    requested: ZSignatureLevelSchema.parse(directTemplateEnvelope.signatureLevel),
+    strict: false,
+  });
+
+  const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta, signatureLevel);
+
+  // The resulting document contains every non-direct template recipient plus the
+  // direct recipient that is signing now. A recipientCount of 0 means unlimited.
+  // This mirrors the check in `sendDocument`, but must be done here because this
+  // flow creates the document directly in PENDING and swallows `sendDocument` errors.
+  const maximumRecipientCount = directTemplateEnvelope.team.organisation.organisationClaim.recipientCount;
+  const resultingRecipientCount = nonDirectTemplateRecipients.length + 1;
+
+  if (maximumRecipientCount > 0 && resultingRecipientCount > maximumRecipientCount) {
+    throw new AppError('RECIPIENT_LIMIT_EXCEEDED', {
+      message: `You cannot send a document with more than ${maximumRecipientCount} recipients`,
+      statusCode: 400,
+    });
+  }
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   // Only process fields that are either required or have been signed by the user
@@ -227,9 +253,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   const createDirectRecipientFieldArgs = await Promise.all(
     fieldsToProcess.map(async (templateField) => {
-      const signedFieldValue = signedFieldValues.find(
-        (value) => value.fieldId === templateField.id,
-      );
+      const signedFieldValue = signedFieldValues.find((value) => value.fieldId === templateField.id);
 
       if (isRequiredField(templateField) && !signedFieldValue) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
@@ -265,8 +289,7 @@ export const createDocumentFromDirectTemplate = async ({
       const { value, isBase64 } = signedFieldValue;
 
       const isSignatureField =
-        templateField.type === FieldType.SIGNATURE ||
-        templateField.type === FieldType.FREE_SIGNATURE;
+        templateField.type === FieldType.SIGNATURE || templateField.type === FieldType.FREE_SIGNATURE;
 
       let customText = !isSignatureField ? value : '';
 
@@ -274,9 +297,7 @@ export const createDocumentFromDirectTemplate = async ({
       const typedSignature = isSignatureField && !isBase64 ? value : undefined;
 
       if (templateField.type === FieldType.DATE) {
-        customText = DateTime.now()
-          .setZone(derivedDocumentMeta.timezone)
-          .toFormat(derivedDocumentMeta.dateFormat);
+        customText = DateTime.now().setZone(derivedDocumentMeta.timezone).toFormat(derivedDocumentMeta.dateFormat);
       }
 
       if (isSignatureField && !signatureImageAsBase64 && !typedSignature) {
@@ -297,13 +318,16 @@ export const createDocumentFromDirectTemplate = async ({
     }),
   );
 
-  const directTemplateNonSignatureFields = createDirectRecipientFieldArgs.filter(
-    ({ signature }) => signature === null,
-  );
+  const directTemplateNonSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature === null);
 
-  const directTemplateSignatureFields = createDirectRecipientFieldArgs.filter(
-    ({ signature }) => signature !== null,
-  );
+  const directTemplateSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature !== null);
+
+  // Enforce the organisation document-creation limit before creating the document.
+  await assertOrganisationRatesAndLimits({
+    organisationId: directTemplateEnvelope.team.organisationId,
+    type: 'document',
+    count: 1,
+  });
 
   const initialRequestTime = new Date();
 
@@ -318,18 +342,10 @@ export const createDocumentFromDirectTemplate = async ({
 
       const titleToUse = item.title || directTemplateEnvelope.title;
 
-      const duplicatedFile = await putPdfFileServerSide({
+      const { documentData: newDocumentData } = await putPdfFileServerSide({
         name: titleToUse,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(buffer),
-      });
-
-      const newDocumentData = await prisma.documentData.create({
-        data: {
-          type: duplicatedFile.type,
-          data: duplicatedFile.data,
-          initialData: duplicatedFile.initialData,
-        },
       });
 
       const newEnvelopeItemId = prefixedId('envelope_item');
@@ -359,6 +375,7 @@ export const createDocumentFromDirectTemplate = async ({
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
         internalVersion: directTemplateEnvelope.internalVersion,
+        signatureLevel,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE_DIRECT_LINK,
         templateId: directTemplateEnvelopeLegacyId,
@@ -391,12 +408,8 @@ export const createDocumentFromDirectTemplate = async ({
                   accessAuth: authOptions.accessAuth,
                   actionAuth: authOptions.actionAuth,
                 }),
-                sendStatus:
-                  recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
-                signingStatus:
-                  recipient.role === RecipientRole.CC
-                    ? SigningStatus.SIGNED
-                    : SigningStatus.NOT_SIGNED,
+                sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
+                signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
                 signingOrder: recipient.signingOrder,
                 token: nanoid(),
               };
@@ -423,9 +436,7 @@ export const createDocumentFromDirectTemplate = async ({
     let nonDirectRecipientFieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
     Object.values(nonDirectTemplateRecipients).forEach((templateRecipient) => {
-      const recipient = createdEnvelope.recipients.find(
-        (recipient) => recipient.email === templateRecipient.email,
-      );
+      const recipient = createdEnvelope.recipients.find((recipient) => recipient.email === templateRecipient.email);
 
       if (!recipient) {
         throw new Error('Recipient not found.');
@@ -507,45 +518,43 @@ export const createDocumentFromDirectTemplate = async ({
     // Create any direct recipient signature fields.
     // Note: It's done like this because we can't nest things in createMany.
     const createdDirectRecipientSignatureFields: CreatedDirectRecipientField[] = await Promise.all(
-      directTemplateSignatureFields.map(
-        async ({ templateField, signature, derivedRecipientActionAuth }) => {
-          if (!signature) {
-            throw new Error('Not possible.');
-          }
+      directTemplateSignatureFields.map(async ({ templateField, signature, derivedRecipientActionAuth }) => {
+        if (!signature) {
+          throw new Error('Not possible.');
+        }
 
-          const field = await tx.field.create({
-            data: {
-              envelopeId: createdEnvelope.id,
-              envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[templateField.envelopeItemId],
-              recipientId: createdDirectRecipient.id,
-              type: templateField.type,
-              page: templateField.page,
-              positionX: templateField.positionX,
-              positionY: templateField.positionY,
-              width: templateField.width,
-              height: templateField.height,
-              customText: '',
-              inserted: true,
-              fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
-              signature: {
-                create: {
-                  recipientId: createdDirectRecipient.id,
-                  signatureImageAsBase64: signature.signatureImageAsBase64,
-                  typedSignature: signature.typedSignature,
-                },
+        const field = await tx.field.create({
+          data: {
+            envelopeId: createdEnvelope.id,
+            envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[templateField.envelopeItemId],
+            recipientId: createdDirectRecipient.id,
+            type: templateField.type,
+            page: templateField.page,
+            positionX: templateField.positionX,
+            positionY: templateField.positionY,
+            width: templateField.width,
+            height: templateField.height,
+            customText: '',
+            inserted: true,
+            fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
+            signature: {
+              create: {
+                recipientId: createdDirectRecipient.id,
+                signatureImageAsBase64: signature.signatureImageAsBase64,
+                typedSignature: signature.typedSignature,
               },
             },
-            include: {
-              signature: true,
-            },
-          });
+          },
+          include: {
+            signature: true,
+          },
+        });
 
-          return {
-            field,
-            derivedRecipientActionAuth,
-          };
-        },
-      ),
+        return {
+          field,
+          derivedRecipientActionAuth,
+        };
+      }),
     );
 
     const createdDirectRecipientFields: CreatedDirectRecipientField[] = [
@@ -617,8 +626,7 @@ export const createDocumentFromDirectTemplate = async ({
             field: match(field.type)
               .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
                 type,
-                data:
-                  field.signature?.signatureImageAsBase64 || field.signature?.typedSignature || '',
+                data: field.signature?.signatureImageAsBase64 || field.signature?.typedSignature || '',
               }))
               .with(
                 FieldType.DATE,
@@ -722,7 +730,6 @@ export const createDocumentFromDirectTemplate = async ({
         await tx.recipient.update({
           where: { id: nextRecipient.id },
           data: {
-            sendStatus: SendStatus.SENT,
             ...(nextSigner && documentMeta?.allowDictateNextSigner
               ? {
                   name: nextSigner.name,
@@ -755,43 +762,24 @@ export const createDocumentFromDirectTemplate = async ({
       });
     }
 
-    // Send email to template owner.
-    const emailTemplate = createElement(DocumentCreatedFromDirectTemplateEmailTemplate, {
-      recipientName: directRecipientEmail,
-      recipientRole: directTemplateRecipient.role,
-      documentLink: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(createdEnvelope.team?.url)}/${
-        createdEnvelope.id
-      }`,
-      documentName: createdEnvelope.title,
-      assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
-    });
-
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding, plainText: true }),
-    ]);
-
-    const i18n = await getI18nInstance(emailLanguage);
-
-    await mailer.sendMail({
-      to: [
-        {
-          name: templateOwner.name || '',
-          address: templateOwner.email,
-        },
-      ],
-      from: senderEmail,
-      subject: i18n._(msg`Document created from direct template`),
-      html,
-      text,
-    });
-
     return {
       createdEnvelope,
       token: createdDirectRecipient.token,
       recipientId: createdDirectRecipient.id,
     };
   });
+
+  const emailSettings = extractDerivedDocumentEmailSettings(documentMeta);
+
+  if (emailSettings.ownerDocumentCreated) {
+    await jobs.triggerJob({
+      name: 'send.document.created.from.direct.template.email',
+      payload: {
+        envelopeId: createdEnvelope.id,
+        recipientId,
+      },
+    });
+  }
 
   try {
     // This handles sending emails and sealing the document if required.

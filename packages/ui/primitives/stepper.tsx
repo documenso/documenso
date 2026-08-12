@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
 import type { FC } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 type StepContextValue = {
   isCompleting: boolean;

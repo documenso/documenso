@@ -2,6 +2,7 @@ import { router } from '../trpc';
 import { createOrganisationEmailRoute } from './create-organisation-email';
 import { createOrganisationEmailDomainRoute } from './create-organisation-email-domain';
 import { createSubscriptionRoute } from './create-subscription';
+import { cscSignEnvelopeRoute } from './csc-sign-envelope';
 import { declineLinkOrganisationAccountRoute } from './decline-link-organisation-account';
 import { deleteOrganisationEmailRoute } from './delete-organisation-email';
 import { deleteOrganisationEmailDomainRoute } from './delete-organisation-email-domain';
@@ -14,6 +15,7 @@ import { getPlansRoute } from './get-plans';
 import { getSubscriptionRoute } from './get-subscription';
 import { linkOrganisationAccountRoute } from './link-organisation-account';
 import { manageSubscriptionRoute } from './manage-subscription';
+import { syncSubscriptionRoute } from './sync-subscription';
 import { updateOrganisationAuthenticationPortalRoute } from './update-organisation-authentication-portal';
 import { updateOrganisationEmailRoute } from './update-organisation-email';
 import { verifyOrganisationEmailDomainRoute } from './verify-organisation-email-domain';
@@ -48,9 +50,13 @@ export const enterpriseRouter = router({
       get: getSubscriptionRoute,
       create: createSubscriptionRoute,
       manage: manageSubscriptionRoute,
+      sync: syncSubscriptionRoute,
     },
     invoices: {
       get: getInvoicesRoute,
     },
+  },
+  csc: {
+    signEnvelope: cscSignEnvelopeRoute,
   },
 });

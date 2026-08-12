@@ -1,0 +1,195 @@
+---
+title: Signing Reminders
+description: Automatically email recipients who have not yet signed on a configurable schedule.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
+
+Signing reminders automatically email recipients who have not completed their signing. You configure when the first reminder goes out and how often it repeats — Documenso handles the rest until the recipient signs or the document leaves a pending state.
+
+This is useful when:
+
+- You want recipients nudged without having to track them down manually
+- A deadline is approaching and you want to escalate gradually
+- You send a high volume of documents and cannot chase each one
+
+Reminders are tracked **per recipient**, not per document. Each unsigned recipient is on their own schedule based on when they were emailed.
+
+This is different from the **Resend** action covered in [Send Documents](/docs/users/documents/send), which is a one-off manual nudge. Reminders are scheduled and recurring.
+
+## Default Behaviour
+
+Every **newly created** organisation starts with reminders **enabled**:
+
+- First reminder sent **5 days** after the recipient is emailed
+- Repeats **every 2 days** until the recipient signs
+
+You can change this default at the organisation or team level, or override it per document.
+
+<Callout type="info">
+  Organisations created **before this feature shipped** have reminders left blank (no default) so
+  recipients of in-flight or future documents are not unexpectedly sent reminders. To enable
+  reminders for an existing organisation, configure **Default Signing Reminders** under
+  **Organisation Settings > Preferences > Document**.
+</Callout>
+
+## Settings Cascade
+
+Reminder settings follow a three-level cascade: **Organisation → Team → Document**. Each level can override the one above it, or inherit from it.
+
+<Tabs items={['Organisation', 'Team', 'Document']}>
+<Tab value="Organisation">
+
+Sets the default for all teams in the organisation. Options are **Enabled** (set when the first reminder fires and how often it repeats) or **No reminders**.
+
+To configure, navigate to **Organisation Settings > Preferences > Document** and find **Default Signing Reminders**.
+
+</Tab>
+<Tab value="Team">
+
+Overrides the organisation default for documents created within this team. Options are **Enabled**, **No reminders**, or **Inherit from organisation**.
+
+New teams default to **Inherit from organisation**.
+
+To configure, navigate to **Team Settings > Preferences > Document** and find **Default Signing Reminders**.
+
+</Tab>
+<Tab value="Document">
+
+Overrides the team or organisation default for a single document. Options are **Enabled**, **No reminders**, or **Inherit from organisation**.
+
+If you do not change reminders when editing a document, the team or organisation default applies.
+
+</Tab>
+</Tabs>
+
+## Set Reminders for a Document
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+
+### Open the document settings
+
+In the document editor, open the **Settings** dialog and go to the **Reminders** tab.
+
+</Step>
+<Step>
+
+### Choose a mode
+
+- **Enabled** — Documenso sends reminders on the schedule you configure below
+- **No reminders** — no automatic reminders for this document
+- **Inherit from organisation** — use the team or organisation default
+
+</Step>
+<Step>
+
+### Configure the schedule
+
+When **Enabled**, set:
+
+- **Send first reminder after** — a number and unit (days, weeks, or months) measured from when the recipient is first emailed
+- **Then repeat every** — either **Custom interval** (a number and unit) or **Don't repeat** (only one reminder is ever sent)
+
+</Step>
+<Step>
+
+### Send the document
+
+The first reminder is scheduled when the recipient receives the initial signing email. Subsequent reminders are scheduled from the time the previous reminder was sent.
+
+</Step>
+</Steps>
+
+<Callout type="info">
+  Editing reminder settings on a document that is already pending recalculates the next reminder for
+  every unsigned recipient immediately.
+</Callout>
+
+## Set a Default Reminder Schedule
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+
+### Navigate to document preferences
+
+Go to **Organisation Settings > Preferences > Document** (or **Team Settings > Preferences > Document** for team-level overrides).
+
+</Step>
+<Step>
+
+### Configure the default
+
+Find **Default Signing Reminders** and choose:
+
+- **Enabled** — set the first-reminder delay and repeat interval
+- **No reminders** — disable reminders by default
+- **Inherit from organisation** (team level only) — use whatever the organisation has configured
+
+</Step>
+<Step>
+
+### Save
+
+Click **Save** to apply. New documents created after this change use the updated default. Documents already in flight are unaffected unless you edit their reminder settings directly.
+
+</Step>
+</Steps>
+
+## What Happens When a Reminder Fires
+
+When a recipient's next reminder time arrives:
+
+1. Documenso sends the reminder email — same template as the original signing request, but the subject and preview are prefixed with **"Reminder:"**.
+2. An audit log entry is created for the recipient (an `EMAIL_SENT` entry of type `REMINDER`).
+3. The `document.reminder.sent` webhook fires. See [webhook events](/docs/developers/webhooks/events).
+4. The next reminder is scheduled based on **Then repeat every**, or no further reminder is scheduled if you chose **Don't repeat**.
+
+Reminders stop automatically when the recipient signs, declines, the recipient's signing deadline passes, or the document leaves the pending state (completed, rejected, or deleted).
+
+## When Reminders Are Skipped
+
+A configured reminder will not be sent in the following cases:
+
+- The recipient is a **CC** — CCs are notified once and never reminded
+- The recipient's **signing deadline has passed** — see [Recipient Expiration](/docs/users/documents/advanced/recipient-expiration). Resending the document refreshes the deadline and resumes reminders.
+- The document uses **manual link distribution** — Documenso never emails recipients for these documents
+- The envelope's email settings have **signing request emails disabled**
+- The recipient has not yet been emailed (for example, an unreached step in a sequential workflow)
+
+<Callout type="info">
+  Reminders stop automatically **30 days after the recipient was first emailed**, regardless of the
+  repeat interval. This hard cap prevents runaway reminder chains for recipients who never sign and
+  have no expiration set. If you need a different stop condition, set a shorter repeat interval,
+  use **Don't repeat**, or configure [recipient expiration](/docs/users/documents/advanced/recipient-expiration).
+</Callout>
+
+<Callout type="info">
+  Reminders are dispatched by a background sweep that runs every 15 minutes, so the actual send time
+  may be up to ~15 minutes after the scheduled time.
+</Callout>
+
+## Reminder Options Reference
+
+| Setting                     | Options                                  | Notes                                                                |
+| --------------------------- | ---------------------------------------- | -------------------------------------------------------------------- |
+| **Mode**                    | Enabled / No reminders / Inherit         | Inherit is only available at the team and document levels            |
+| **Send first reminder after** | 1+ days, weeks, or months              | Measured from when the recipient receives the initial signing email. Reminders past 30 days from that moment are skipped. |
+| **Then repeat every**       | Custom interval (1+ days/weeks/months) or Don't repeat | Custom interval keeps reminding until the recipient signs or the 30-day cap is reached |
+
+The organisation default out of the box is **first reminder after 5 days, repeating every 2 days**, which falls well inside the 30-day cap.
+
+---
+
+## See Also
+
+- [Send Documents](/docs/users/documents/send) - Send documents and trigger a one-off resend
+- [Recipient Expiration](/docs/users/documents/advanced/recipient-expiration) - Set a hard signing deadline
+- [Document Preferences](/docs/users/organisations/preferences/document) - Configure default document settings
+- [Webhook Events](/docs/developers/webhooks/events) - Subscribe to `document.reminder.sent`

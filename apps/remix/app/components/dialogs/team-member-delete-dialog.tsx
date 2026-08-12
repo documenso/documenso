@@ -1,9 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -18,6 +12,21 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { match } from 'ts-pattern';
+
+/**
+ * The reason a team member cannot be removed from the team. When set, the delete
+ * dialog explains the reason instead of offering a confirm button.
+ */
+export type TeamMemberDeleteDisableReason =
+  | 'TEAM_OWNER'
+  | 'HIGHER_ROLE'
+  | 'INHERIT_MEMBER_ENABLED'
+  | 'INHERITED_MEMBER';
 
 export type TeamMemberDeleteDialogProps = {
   teamId: number;
@@ -25,7 +34,7 @@ export type TeamMemberDeleteDialogProps = {
   memberId: string;
   memberName: string;
   memberEmail: string;
-  isInheritMemberEnabled: boolean | null;
+  disableReason?: TeamMemberDeleteDisableReason | null;
   trigger?: React.ReactNode;
 };
 
@@ -36,35 +45,34 @@ export const TeamMemberDeleteDialog = ({
   memberId,
   memberName,
   memberEmail,
-  isInheritMemberEnabled,
+  disableReason,
 }: TeamMemberDeleteDialogProps) => {
   const [open, setOpen] = useState(false);
 
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: deleteTeamMember, isPending: isDeletingTeamMember } =
-    trpc.team.member.delete.useMutation({
-      onSuccess: () => {
-        toast({
-          title: _(msg`Success`),
-          description: _(msg`You have successfully removed this user from the team.`),
-          duration: 5000,
-        });
+  const { mutateAsync: deleteTeamMember, isPending: isDeletingTeamMember } = trpc.team.member.delete.useMutation({
+    onSuccess: () => {
+      toast({
+        title: _(msg`Success`),
+        description: _(msg`You have successfully removed this user from the team.`),
+        duration: 5000,
+      });
 
-        setOpen(false);
-      },
-      onError: () => {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          description: _(
-            msg`We encountered an unknown error while attempting to remove this user. Please try again later.`,
-          ),
-          variant: 'destructive',
-          duration: 10000,
-        });
-      },
-    });
+      setOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to remove this user. Please try again later.`,
+        ),
+        variant: 'destructive',
+        duration: 10000,
+      });
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isDeletingTeamMember && setOpen(value)}>
@@ -84,18 +92,24 @@ export const TeamMemberDeleteDialog = ({
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are about to remove the following user from{' '}
-              <span className="font-semibold">{teamName}</span>.
+              You are about to remove the following user from <span className="font-semibold">{teamName}</span>.
             </Trans>
           </DialogDescription>
         </DialogHeader>
 
-        {isInheritMemberEnabled ? (
+        {disableReason ? (
           <Alert variant="neutral">
             <AlertDescription>
-              <Trans>
-                You cannot remove members from this team if the inherit member feature is enabled.
-              </Trans>
+              {match(disableReason)
+                .with('TEAM_OWNER', () => <Trans>You cannot remove the organisation owner from the team.</Trans>)
+                .with('HIGHER_ROLE', () => <Trans>You cannot remove a member with a role higher than your own.</Trans>)
+                .with('INHERIT_MEMBER_ENABLED', () => (
+                  <Trans>You cannot remove members from this team while the inherit member feature is enabled.</Trans>
+                ))
+                .with('INHERITED_MEMBER', () => (
+                  <Trans>This member is inherited from a group and cannot be removed from the team directly.</Trans>
+                ))
+                .exhaustive()}
             </AlertDescription>
           </Alert>
         ) : (
@@ -115,11 +129,10 @@ export const TeamMemberDeleteDialog = ({
               <Trans>Close</Trans>
             </Button>
 
-            {!isInheritMemberEnabled && (
+            {!disableReason && (
               <Button
                 type="submit"
                 variant="destructive"
-                disabled={Boolean(isInheritMemberEnabled)}
                 loading={isDeletingTeamMember}
                 onClick={async () => deleteTeamMember({ teamId, memberId })}
               >

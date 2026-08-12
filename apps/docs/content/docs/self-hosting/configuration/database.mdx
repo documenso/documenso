@@ -1,0 +1,490 @@
+---
+title: Database Configuration
+description: Configure PostgreSQL connection strings, pooling, SSL, migrations, and performance tuning for your Documenso deployment.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Supported Databases
+
+Documenso requires **PostgreSQL 14 or later**. No other databases are supported.
+
+PostgreSQL provides the reliability, performance, and feature set required for document signing workflows, including:
+
+- ACID compliance for transaction integrity
+- JSON support for flexible metadata storage
+- Full-text search capabilities
+- Robust backup and replication options
+
+## Connection String Format
+
+PostgreSQL connection strings follow this format:
+
+```
+postgresql://[user]:[password]@[host]:[port]/[database]?[parameters]
+```
+
+### Components
+
+| Component    | Description                     | Example           |
+| ------------ | ------------------------------- | ----------------- |
+| `user`       | Database username               | `documenso`       |
+| `password`   | Database password (URL-encoded) | `secretpass`      |
+| `host`       | Database server hostname or IP  | `localhost`       |
+| `port`       | Database port                   | `5432`            |
+| `database`   | Database name                   | `documenso`       |
+| `parameters` | Additional connection options   | `sslmode=require` |
+
+### Examples
+
+**Local development:**
+
+```
+postgresql://documenso:password@localhost:5432/documenso
+```
+
+**Remote server with SSL:**
+
+```
+postgresql://documenso:password@db.example.com:5432/documenso?sslmode=require
+```
+
+**With special characters in password:**
+
+URL-encode special characters in passwords. For example, `p@ss#word` becomes `p%40ss%23word`:
+
+```
+postgresql://documenso:p%40ss%23word@localhost:5432/documenso
+```
+
+## Environment Variables
+
+Documenso uses two database connection variables:
+
+| Variable                           | Purpose                                             |
+| ---------------------------------- | --------------------------------------------------- |
+| `NEXT_PRIVATE_DATABASE_URL`        | Primary connection for application queries          |
+| `NEXT_PRIVATE_DIRECT_DATABASE_URL` | Direct connection for migrations and schema changes |
+
+### Basic Configuration
+
+When not using a connection pooler, set both variables to the same value:
+
+```bash
+NEXT_PRIVATE_DATABASE_URL=postgresql://user:password@host:5432/documenso
+NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://user:password@host:5432/documenso
+```
+
+### Automatic Detection
+
+Documenso automatically detects common database environment variable formats used by hosting providers:
+
+| Provider Variable          | Maps To                            |
+| -------------------------- | ---------------------------------- |
+| `DATABASE_URL`             | `NEXT_PRIVATE_DATABASE_URL`        |
+| `POSTGRES_URL`             | `NEXT_PRIVATE_DATABASE_URL`        |
+| `POSTGRES_PRISMA_URL`      | `NEXT_PRIVATE_DATABASE_URL`        |
+| `DATABASE_URL_UNPOOLED`    | `NEXT_PRIVATE_DIRECT_DATABASE_URL` |
+| `POSTGRES_URL_NON_POOLING` | `NEXT_PRIVATE_DIRECT_DATABASE_URL` |
+
+If your hosting provider sets these variables, Documenso will use them automatically.
+
+## Connection Pooling
+
+Connection pooling improves performance by reusing database connections instead of creating new ones for each request.
+
+### When to Use Pooling
+
+Use connection pooling when:
+
+- Running multiple application instances
+- Deploying to serverless environments
+- Handling high concurrent request volumes
+- Your database has connection limits
+
+### PgBouncer Configuration
+
+When using PgBouncer or similar poolers, configure two connection strings:
+
+1. **Pooled connection** for application queries
+2. **Direct connection** for migrations (bypasses the pooler)
+
+```bash
+# Pooled connection (through PgBouncer)
+NEXT_PRIVATE_DATABASE_URL=postgresql://user:password@pooler-host:6432/documenso?pgbouncer=true
+
+# Direct connection (bypasses PgBouncer)
+NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://user:password@db-host:5432/documenso
+```
+
+<Callout type="warn">
+  Migrations must use a direct connection. Running migrations through a connection pooler will fail.
+</Callout>
+
+### Prisma Connection Pool
+
+Documenso uses Prisma, which maintains its own connection pool. Configure pool size with connection string parameters:
+
+```
+postgresql://user:password@host:5432/documenso?connection_limit=10&pool_timeout=30
+```
+
+| Parameter          | Description                              | Default |
+| ------------------ | ---------------------------------------- | ------- |
+| `connection_limit` | Maximum connections in the pool          | 10      |
+| `pool_timeout`     | Seconds to wait for available connection | 10      |
+
+## SSL/TLS Connections
+
+### Enabling SSL
+
+Add SSL parameters to your connection string:
+
+```
+postgresql://user:password@host:5432/documenso?sslmode=require
+```
+
+### SSL Modes
+
+| Mode          | Description                                         |
+| ------------- | --------------------------------------------------- |
+| `disable`     | No SSL (not recommended for production)             |
+| `allow`       | Try non-SSL first, fall back to SSL                 |
+| `prefer`      | Try SSL first, fall back to non-SSL                 |
+| `require`     | Require SSL, but don't verify certificate           |
+| `verify-ca`   | Require SSL and verify server certificate           |
+| `verify-full` | Require SSL, verify certificate, and check hostname |
+
+For production, use `require` at minimum. Use `verify-full` when your CA certificate is available.
+
+### Custom Certificates
+
+When connecting to databases with self-signed or private CA certificates:
+
+```
+postgresql://user:password@host:5432/documenso?sslmode=verify-full&sslrootcert=/path/to/ca.crt
+```
+
+For Docker deployments, mount the certificate file:
+
+```bash
+docker run -d \
+  -v /path/to/ca.crt:/etc/ssl/certs/db-ca.crt:ro \
+  -e NEXT_PRIVATE_DATABASE_URL="postgresql://user:password@host:5432/documenso?sslmode=verify-full&sslrootcert=/etc/ssl/certs/db-ca.crt" \
+  documenso/documenso:latest
+```
+
+## Running Migrations
+
+Database migrations update your schema when upgrading Documenso.
+
+### Automatic Migrations
+
+When running Documenso via Docker, migrations run automatically on container startup. No manual intervention is required.
+
+### Manual Migrations
+
+For manual deployments or troubleshooting:
+
+```bash
+# Apply pending migrations
+npm run prisma:migrate-deploy
+
+# Or using npx directly
+npx prisma migrate deploy
+```
+
+<Callout type="info">
+  Always back up your database before running migrations, especially for major version upgrades.
+</Callout>
+
+### Migration Commands
+
+| Command                 | Purpose                                   |
+| ----------------------- | ----------------------------------------- |
+| `prisma:migrate-deploy` | Apply pending migrations (production)     |
+| `prisma:migrate-dev`    | Create and apply migrations (development) |
+| `prisma:migrate-reset`  | Reset database and apply all migrations   |
+
+### Troubleshooting Migrations
+
+<Accordions type="multiple">
+  <Accordion title="Migration failed midway">
+    Check the `_prisma_migrations` table:
+    
+    ```sql
+    SELECT * FROM _prisma_migrations WHERE finished_at IS NULL;
+    ```
+
+    To retry, fix the underlying issue (disk space, permissions, etc.), mark as rolled back:
+
+    ```sql
+    UPDATE _prisma_migrations SET rolled_back_at = NOW() WHERE migration_name = 'failed_migration_name';
+    ```
+
+    Run migrations again.
+
+  </Accordion>
+  <Accordion title="Connection timeout during migration">
+    Use the direct database URL and increase timeout:
+    
+    ```bash
+    NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://user:password@host:5432/documenso?connect_timeout=60"
+    ```
+  </Accordion>
+</Accordions>
+
+## Managed Database Services
+
+<Accordions type="multiple">
+  <Accordion title="Supabase">
+    Supabase provides PostgreSQL with built-in connection pooling via Supavisor.
+
+    **Configuration:**
+
+    ```bash
+    # Pooled connection (Session mode - port 5432)
+    NEXT_PRIVATE_DATABASE_URL=postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
+
+    # Direct connection for migrations (port 5432, direct host)
+    NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
+    ```
+
+    Find your connection strings in the Supabase dashboard under **Settings > Database > Connection string**.
+
+  </Accordion>
+  <Accordion title="Neon">
+    Neon provides serverless PostgreSQL with automatic scaling.
+
+    **Configuration:**
+
+    ```bash
+    # Pooled connection
+    NEXT_PRIVATE_DATABASE_URL=postgresql://[user]:[password]@[endpoint]-pooler.region.aws.neon.tech/documenso?sslmode=require
+
+    # Direct connection for migrations
+    NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://[user]:[password]@[endpoint].region.aws.neon.tech/documenso?sslmode=require
+    ```
+
+    The pooler endpoint includes `-pooler` in the hostname.
+
+  </Accordion>
+  <Accordion title="AWS RDS">
+    **Configuration:**
+
+    ```bash
+    NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:[password]@your-instance.region.rds.amazonaws.com:5432/documenso?sslmode=require
+    NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://documenso:[password]@your-instance.region.rds.amazonaws.com:5432/documenso?sslmode=require
+    ```
+
+    **Recommended settings:**
+
+    - Instance class: `db.t3.medium` or larger for production
+    - Storage: General Purpose SSD (gp3), minimum 20GB
+    - Enable automated backups with 7+ day retention
+    - Enable Multi-AZ for high availability
+
+  </Accordion>
+  <Accordion title="Google Cloud SQL">
+    **Configuration:**
+
+    ```bash
+    NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:[password]@/documenso?host=/cloudsql/[project]:[region]:[instance]
+    ```
+
+    When connecting via Cloud SQL Proxy, use Unix socket connections.
+
+    For public IP connections:
+
+    ```bash
+    NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:[password]@[public-ip]:5432/documenso?sslmode=require
+    ```
+
+  </Accordion>
+  <Accordion title="Azure Database for PostgreSQL">
+    **Configuration:**
+
+    ```bash
+    NEXT_PRIVATE_DATABASE_URL=postgresql://documenso@[server-name]:[password]@[server-name].postgres.database.azure.com:5432/documenso?sslmode=require
+    ```
+
+    Note: Azure requires the username format `user@servername`.
+
+  </Accordion>
+  <Accordion title="DigitalOcean Managed Databases">
+    **Configuration:**
+
+    ```bash
+    NEXT_PRIVATE_DATABASE_URL=postgresql://doadmin:[password]@[cluster-host]:25060/documenso?sslmode=require
+    ```
+
+    DigitalOcean uses port 25060 by default and requires SSL.
+
+  </Accordion>
+</Accordions>
+
+## Backup Recommendations
+
+### Backup Strategies
+
+| Strategy               | Frequency    | Retention   | Use Case               |
+| ---------------------- | ------------ | ----------- | ---------------------- |
+| Automated snapshots    | Daily        | 7-30 days   | Point-in-time recovery |
+| Logical backups        | Daily/Weekly | 30-90 days  | Long-term retention    |
+| Continuous replication | Real-time    | 24-72 hours | Disaster recovery      |
+
+### PostgreSQL Backup Commands
+
+**Create a logical backup:**
+
+```bash
+pg_dump -h host -U user -d documenso -F c -f documenso_backup.dump
+```
+
+**Restore from backup:**
+
+```bash
+pg_restore -h host -U user -d documenso -c documenso_backup.dump
+```
+
+### Managed Service Backups
+
+Most managed database services provide automated backups:
+
+<Tabs items={['Supabase', 'Neon', 'AWS RDS', 'Google Cloud SQL', 'Azure']}>
+  <Tab value="Supabase">Daily backups with point-in-time recovery (Pro plan)</Tab>
+  <Tab value="Neon">Automatic branching for instant recovery</Tab>
+  <Tab value="AWS RDS">Automated backups with configurable retention</Tab>
+  <Tab value="Google Cloud SQL">Automated and on-demand backups</Tab>
+  <Tab value="Azure">Automatic backups with geo-redundancy options</Tab>
+</Tabs>
+
+<Callout type="warn">
+  Always test your backup restoration process. Untested backups may not work when needed.
+</Callout>
+
+## Performance Tuning
+
+### PostgreSQL Configuration
+
+Key parameters for Documenso workloads:
+
+| Parameter              | Recommended Value | Description                           |
+| ---------------------- | ----------------- | ------------------------------------- |
+| `shared_buffers`       | 25% of RAM        | Memory for caching data               |
+| `effective_cache_size` | 75% of RAM        | Planner's estimate of available cache |
+| `work_mem`             | 64MB-256MB        | Memory per sort/hash operation        |
+| `maintenance_work_mem` | 512MB-1GB         | Memory for maintenance operations     |
+| `max_connections`      | 100-200           | Maximum concurrent connections        |
+
+### Connection Limits
+
+Calculate your connection limit:
+
+```
+max_connections = (application_instances × connection_pool_size) + admin_overhead
+```
+
+Example: 3 app instances with pool size 10 = `(3 × 10) + 10 = 40` connections minimum.
+
+### Indexing
+
+Documenso includes necessary indexes by default. Additional indexes may help for:
+
+- Custom reporting queries
+- High-volume document searches
+- Audit log analysis
+
+Check for slow queries:
+
+```sql
+SELECT query, calls, mean_time, total_time
+FROM pg_stat_statements
+ORDER BY total_time DESC
+LIMIT 10;
+```
+
+### Monitoring
+
+Monitor these metrics:
+
+| Metric               | Warning Threshold | Action                          |
+| -------------------- | ----------------- | ------------------------------- |
+| Connection usage     | > 80%             | Increase limits or add pooling  |
+| Disk usage           | > 80%             | Add storage or archive old data |
+| Cache hit ratio      | < 95%             | Increase `shared_buffers`       |
+| Long-running queries | > 30 seconds      | Optimize query or add indexes   |
+
+## Troubleshooting
+
+<Accordions type="multiple">
+  <Accordion title="Connection refused">
+    Causes:
+    - PostgreSQL not running
+    - Incorrect host or port
+    - Firewall blocking
+    
+    Solutions:
+    - Verify PostgreSQL is running with `pg_isready -h host -p 5432`
+    - Check the connection string
+    - Verify firewall rules
+    with `pg_isready -h host -p 5432`, check the connection string, verify firewall rules.
+  </Accordion>
+  <Accordion title="Authentication failed">
+    Causes: 
+    - Incorrect password
+    - User doesn't exist
+    - Password contains special characters
+    
+    Solutions:
+    - Reset password with `ALTER USER documenso WITH PASSWORD 'newpassword';`
+    - Verify credentials in `pg_hba.conf`
+    - Verify URL-encoded special characters
+  </Accordion>
+  <Accordion title="SSL connection required">
+    Add SSL mode to your connection string:
+
+    ```bash
+    postgresql://user:password@host:5432/documenso?sslmode=require
+    ```
+
+  </Accordion>
+  <Accordion title="Too many connections">
+    Causes: 
+    - Connection pool exhausted
+    - Connections not released
+    - Multiple instances exceeding limits
+    
+    Solutions:
+    - Reduce `connection_limit`
+    - Increase `max_connections`
+    - Implement PgBouncer
+  </Accordion>
+  <Accordion title="Database does not exist">
+    Create the database:
+    
+    ```sql
+    CREATE DATABASE documenso;
+    GRANT ALL PRIVILEGES ON DATABASE documenso TO documenso;
+    ```
+  </Accordion>
+  <Accordion title="Permission denied">
+    Grant permissions:
+    
+    ```sql
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO documenso;
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO documenso;
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## See Also
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
+- [Storage Configuration](/docs/self-hosting/configuration/storage) - Set up document storage
+- [Backups](/docs/self-hosting/maintenance/backups) - Backup strategies and procedures
+- [Upgrades](/docs/self-hosting/maintenance/upgrades) - Upgrade procedures and migration handling

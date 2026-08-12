@@ -11,8 +11,7 @@ export const getCertificateStatus = () => {
     return { isAvailable: true };
   }
 
-  const defaultPath =
-    env('NODE_ENV') === 'production' ? '/opt/documenso/cert.p12' : './example/cert.p12';
+  const defaultPath = env('NODE_ENV') === 'production' ? '/opt/documenso/cert.p12' : './example/cert.p12';
 
   const filePath = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH') || defaultPath;
 

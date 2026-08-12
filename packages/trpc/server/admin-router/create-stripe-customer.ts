@@ -38,19 +38,19 @@ export const createStripeCustomerRoute = adminProcedure
       throw new AppError(AppErrorCode.NOT_FOUND);
     }
 
-    await prisma.$transaction(async (tx) => {
-      const stripeCustomer = await createCustomer({
-        name: organisation.name,
-        email: organisation.owner.email,
-      });
+    // Create Stripe customer outside a transaction to avoid holding a
+    // connection open during the external API call.
+    const stripeCustomer = await createCustomer({
+      name: organisation.name,
+      email: organisation.owner.email,
+    });
 
-      await tx.organisation.update({
-        where: {
-          id: organisationId,
-        },
-        data: {
-          customerId: stripeCustomer.id,
-        },
-      });
+    await prisma.organisation.update({
+      where: {
+        id: organisationId,
+      },
+      data: {
+        customerId: stripeCustomer.id,
+      },
     });
   });

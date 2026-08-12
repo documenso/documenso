@@ -2,10 +2,10 @@
  * Legacy Template schema to confirm backwards API compatibility since
  * we removed the "Template" prisma schema model.
  */
-import { TemplateType } from '@prisma/client';
-import { z } from 'zod';
 
 import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';
+import { TemplateType } from '@prisma/client';
+import { z } from 'zod';
 
 import { DocumentVisibilitySchema } from '../generated/zod/inputTypeSchemas/DocumentVisibilitySchema';
 import TemplateDirectLinkSchema from '../generated/zod/modelSchema/TemplateDirectLinkSchema';

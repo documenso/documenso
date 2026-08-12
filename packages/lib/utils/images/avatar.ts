@@ -1,10 +1,7 @@
 import sharp from 'sharp';
 
 export const optimiseAvatar = async (bytes: string) => {
-  return await sharp(Buffer.from(bytes, 'base64'))
-    .resize(512, 512)
-    .toFormat('jpeg', { quality: 75 })
-    .toBuffer();
+  return await sharp(Buffer.from(bytes, 'base64')).resize(512, 512).toFormat('jpeg', { quality: 75 }).toBuffer();
 };
 
 export const loadAvatar = async (bytes: string) => {

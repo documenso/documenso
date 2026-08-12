@@ -1,5 +1,11 @@
-import { useEffect, useState } from 'react';
-
+import { AppError } from '@documenso/lib/errors/app-error';
+import { DocumentAuth, type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { trpc } from '@documenso/trpc/react';
+import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
+import { Button } from '@documenso/ui/primitives/button';
+import { DialogFooter } from '@documenso/ui/primitives/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -7,30 +13,10 @@ import { Trans } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import { Loader } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
-
-import { AppError } from '@documenso/lib/errors/app-error';
-import { DocumentAuth, type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import { trpc } from '@documenso/trpc/react';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
-import { DialogFooter } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
 
 import { PasskeyCreateDialog } from '~/components/dialogs/passkey-create-dialog';
 
@@ -38,7 +24,6 @@ import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-p
 
 export type DocumentSigningAuthPasskeyProps = {
   actionTarget?: 'FIELD' | 'DOCUMENT';
-  actionVerb?: string;
   open: boolean;
   onOpenChange: (value: boolean) => void;
   onReauthFormSubmit: (values?: TRecipientActionAuth) => Promise<void> | void;
@@ -52,7 +37,6 @@ type TPasskeyAuthFormSchema = z.infer<typeof ZPasskeyAuthFormSchema>;
 
 export const DocumentSigningAuthPasskey = ({
   actionTarget = 'FIELD',
-  actionVerb = 'sign',
   onReauthFormSubmit,
   open,
   onOpenChange,
@@ -128,9 +112,40 @@ export const DocumentSigningAuthPasskey = ({
       <div className="space-y-4">
         <Alert variant="warning">
           <AlertDescription>
-            {/* Todo: Translate */}
-            Your browser does not support passkeys, which is required to {actionVerb.toLowerCase()}{' '}
-            this {actionTarget.toLowerCase()}.
+            {match({ role: recipient.role, actionTarget })
+              .with({ role: RecipientRole.SIGNER, actionTarget: 'FIELD' }, () => (
+                <Trans>Your browser does not support passkeys, which is required to sign this field.</Trans>
+              ))
+              .with({ role: RecipientRole.SIGNER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>Your browser does not support passkeys, which is required to sign this document.</Trans>
+              ))
+              .with({ role: RecipientRole.APPROVER, actionTarget: 'FIELD' }, () => (
+                <Trans>Your browser does not support passkeys, which is required to approve this field.</Trans>
+              ))
+              .with({ role: RecipientRole.APPROVER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>Your browser does not support passkeys, which is required to approve this document.</Trans>
+              ))
+              .with({ role: RecipientRole.VIEWER, actionTarget: 'FIELD' }, () => (
+                <Trans>Your browser does not support passkeys, which is required to view this field.</Trans>
+              ))
+              .with({ role: RecipientRole.VIEWER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to mark this document as viewed.
+                </Trans>
+              ))
+              .with({ role: RecipientRole.CC, actionTarget: 'FIELD' }, () => (
+                <Trans>Your browser does not support passkeys, which is required to view this field.</Trans>
+              ))
+              .with({ role: RecipientRole.CC, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>Your browser does not support passkeys, which is required to view this document.</Trans>
+              ))
+              .with({ role: RecipientRole.ASSISTANT, actionTarget: 'FIELD' }, () => (
+                <Trans>Your browser does not support passkeys, which is required to assist with this field.</Trans>
+              ))
+              .with({ role: RecipientRole.ASSISTANT, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>Your browser does not support passkeys, which is required to assist with this document.</Trans>
+              ))
+              .exhaustive()}
           </AlertDescription>
         </Alert>
 
@@ -178,10 +193,38 @@ export const DocumentSigningAuthPasskey = ({
       <div className="space-y-4">
         <Alert variant="warning">
           <AlertDescription>
-            {/* Todo: Translate */}
-            {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
-              ? 'You need to setup a passkey to mark this document as viewed.'
-              : `You need to setup a passkey to ${actionVerb.toLowerCase()} this ${actionTarget.toLowerCase()}.`}
+            {match({ role: recipient.role, actionTarget })
+              .with({ role: RecipientRole.SIGNER, actionTarget: 'FIELD' }, () => (
+                <Trans>You need to setup a passkey to sign this field.</Trans>
+              ))
+              .with({ role: RecipientRole.SIGNER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>You need to setup a passkey to sign this document.</Trans>
+              ))
+              .with({ role: RecipientRole.APPROVER, actionTarget: 'FIELD' }, () => (
+                <Trans>You need to setup a passkey to approve this field.</Trans>
+              ))
+              .with({ role: RecipientRole.APPROVER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>You need to setup a passkey to approve this document.</Trans>
+              ))
+              .with({ role: RecipientRole.VIEWER, actionTarget: 'FIELD' }, () => (
+                <Trans>You need to setup a passkey to view this field.</Trans>
+              ))
+              .with({ role: RecipientRole.VIEWER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>You need to setup a passkey to mark this document as viewed.</Trans>
+              ))
+              .with({ role: RecipientRole.CC, actionTarget: 'FIELD' }, () => (
+                <Trans>You need to setup a passkey to view this field.</Trans>
+              ))
+              .with({ role: RecipientRole.CC, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>You need to setup a passkey to view this document.</Trans>
+              ))
+              .with({ role: RecipientRole.ASSISTANT, actionTarget: 'FIELD' }, () => (
+                <Trans>You need to setup a passkey to assist with this field.</Trans>
+              ))
+              .with({ role: RecipientRole.ASSISTANT, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>You need to setup a passkey to assist with this document.</Trans>
+              ))
+              .exhaustive()}
           </AlertDescription>
         </Alert>
 
@@ -213,15 +256,14 @@ export const DocumentSigningAuthPasskey = ({
               name="passkeyId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel required>Passkey</FormLabel>
+                  <FormLabel required>
+                    <Trans>Passkey</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <Select {...field} onValueChange={field.onChange}>
                       <SelectTrigger className="bg-background text-muted-foreground">
-                        <SelectValue
-                          data-testid="documentAccessSelectValue"
-                          placeholder={_(msg`Select passkey`)}
-                        />
+                        <SelectValue data-testid="documentAccessSelectValue" placeholder={_(msg`Select passkey`)} />
                       </SelectTrigger>
 
                       <SelectContent position="popper">
@@ -241,20 +283,22 @@ export const DocumentSigningAuthPasskey = ({
 
             {formErrorCode && (
               <Alert variant="destructive">
-                <AlertTitle>Unauthorized</AlertTitle>
+                <AlertTitle>
+                  <Trans>Unauthorized</Trans>
+                </AlertTitle>
                 <AlertDescription>
-                  We were unable to verify your details. Please try again or contact support
+                  <Trans>We were unable to verify your details. Please try again or contact support</Trans>
                 </AlertDescription>
               </Alert>
             )}
 
             <DialogFooter>
               <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-                Cancel
+                <Trans>Cancel</Trans>
               </Button>
 
               <Button type="submit" loading={isCurrentlyAuthenticating}>
-                Sign
+                <Trans>Sign</Trans>
               </Button>
             </DialogFooter>
           </div>

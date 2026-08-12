@@ -10,17 +10,14 @@ export const redistributeEnvelopeMeta: TrpcRouteMeta = {
     path: '/envelope/redistribute',
     summary: 'Redistribute envelope',
     description:
-      'Redistribute the envelope to the provided recipients who have not actioned the envelope. Will use the distribution method set in the envelope',
+      'Redistribute the envelope to the provided recipients who have not actioned the envelope. Will use the distribution method set in the envelope. This also refreshes the signing-link expiration for the targeted unsigned recipients, renewing any expired links.',
     tags: ['Envelope'],
   },
 };
 
 export const ZRedistributeEnvelopeRequestSchema = z.object({
   envelopeId: z.string(),
-  recipients: z
-    .array(z.number())
-    .min(1)
-    .describe('The IDs of the recipients to redistribute the envelope to.'),
+  recipients: z.array(z.number()).min(1).describe('The IDs of the recipients to redistribute the envelope to.'),
 });
 
 export const ZRedistributeEnvelopeResponseSchema = ZSuccessResponseSchema.extend({

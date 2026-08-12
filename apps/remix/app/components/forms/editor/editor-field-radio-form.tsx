@@ -1,34 +1,19 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { PlusIcon, Trash } from 'lucide-react';
-import { useForm, useWatch } from 'react-hook-form';
-import type { z } from 'zod';
-
 import {
   DEFAULT_FIELD_FONT_SIZE,
   type TRadioFieldMeta as RadioFieldMeta,
   ZRadioFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Separator } from '@documenso/ui/primitives/separator';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { PlusIcon, Trash } from 'lucide-react';
+import { useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import type { z } from 'zod';
 
 import {
   EditorGenericFontSizeField,
@@ -79,7 +64,7 @@ export const EditorFieldRadioForm = ({
     mode: 'onChange',
     defaultValues: {
       label: value.label || '',
-      values: value.values || [{ id: 1, checked: false, value: 'Default value' }],
+      values: value.values || [{ id: 1, checked: false, value: t`Default value` }],
       required: value.required || false,
       readOnly: value.readOnly || false,
       direction: value.direction || 'vertical',
@@ -93,8 +78,7 @@ export const EditorFieldRadioForm = ({
 
   const addValue = () => {
     const currentValues = form.getValues('values') || [];
-    const newId =
-      currentValues.length > 0 ? Math.max(...currentValues.map((val) => val.id)) + 1 : 1;
+    const newId = currentValues.length > 0 ? Math.max(...currentValues.map((val) => val.id)) + 1 : 1;
 
     const newValues = [...currentValues, { id: newId, checked: false, value: '' }];
     form.setValue('values', newValues);
@@ -140,7 +124,10 @@ export const EditorFieldRadioForm = ({
                 </FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="text-muted-foreground bg-background w-full">
+                    <SelectTrigger
+                      data-testid="field-form-direction"
+                      className="w-full bg-background text-muted-foreground"
+                    >
                       <SelectValue placeholder={t`Select direction`} />
                     </SelectTrigger>
                     <SelectContent position="popper">
@@ -163,16 +150,16 @@ export const EditorFieldRadioForm = ({
           <EditorGenericReadOnlyField formControl={form.control} />
 
           <section className="space-y-2">
-            <div className="-mx-4 mb-4 mt-2">
+            <div className="-mx-4 mt-2 mb-4">
               <Separator />
             </div>
 
             <div className="flex flex-row items-center justify-between gap-2">
-              <p className="text-sm font-medium">
+              <p className="font-medium text-sm">
                 <Trans>Radio values</Trans>
               </p>
 
-              <button type="button" onClick={addValue}>
+              <button type="button" data-testid="field-form-values-add" onClick={addValue}>
                 <PlusIcon className="h-4 w-4" />
               </button>
             </div>
@@ -187,7 +174,8 @@ export const EditorFieldRadioForm = ({
                       <FormItem>
                         <FormControl>
                           <Checkbox
-                            className="data-[state=checked]:bg-primary border-foreground/30 h-5 w-5"
+                            data-testid={`field-form-values-${index}-checked`}
+                            className="h-5 w-5 border-foreground/30 data-[state=checked]:bg-primary"
                             checked={field.value}
                             onCheckedChange={(value) => {
                               // Uncheck all other values.
@@ -216,7 +204,7 @@ export const EditorFieldRadioForm = ({
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input className="w-full" {...field} />
+                          <Input data-testid={`field-form-values-${index}-value`} className="w-full" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -224,6 +212,7 @@ export const EditorFieldRadioForm = ({
 
                   <button
                     type="button"
+                    data-testid={`field-form-values-${index}-remove`}
                     className="flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={() => removeValue(index)}
                   >

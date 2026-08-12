@@ -1,12 +1,20 @@
-import { UserSecurityAuditLogType } from '@prisma/client';
-import { OAuth2Client, decodeIdToken } from 'arctic';
-import type { Context } from 'hono';
-import { deleteCookie } from 'hono/cookie';
-
+import { formatPath, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import {
+  isDisposableEmail,
+  isEmailDomainAllowedForSignup,
+  isSignupEnabledForProvider,
+} from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
+import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
+import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@prisma/client';
+import { decodeIdToken, OAuth2Client } from 'arctic';
+import type { Context } from 'hono';
+import { deleteCookie } from 'hono/cookie';
 
 import type { OAuthClientOptions } from '../../config';
 import { AuthenticationErrorCode } from '../errors/error-codes';
@@ -23,8 +31,14 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   const requestMeta = c.get('requestMetadata');
 
-  const { email, name, sub, accessToken, accessTokenExpiresAt, idToken, redirectPath } =
-    await validateOauth({ c, clientOptions });
+  const { email, name, sub, accessToken, accessTokenExpiresAt, idToken, redirectPath } = await validateOauth({
+    c,
+    clientOptions,
+  });
+
+  if (email.toLowerCase() === legacyServiceAccountEmail() || email.toLowerCase() === deletedServiceAccountEmail()) {
+    return c.text('FORBIDDEN', 403);
+  }
 
   // Find the account if possible.
   const existingAccount = await prisma.account.findFirst({
@@ -105,6 +119,35 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     return c.redirect(redirectPath, 302);
   }
 
+  // Check if signups are disabled for this provider.
+  if (!isSignupEnabledForProvider(clientOptions.id as 'google' | 'microsoft' | 'oidc')) {
+    const errorUrl = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
+
+    errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
+
+    return c.redirect(errorUrl.toString(), 302);
+  }
+
+  // Check domain restriction for new SSO users.
+  if (!isEmailDomainAllowedForSignup(email)) {
+    const errorUrl = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
+
+    errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
+
+    return c.redirect(errorUrl.toString(), 302);
+  }
+
+  // Reject disposable / throwaway email providers for new SSO users.
+  const additionalBlockedDomains = await getEmailBlocklistDomains();
+
+  if (isDisposableEmail(email, additionalBlockedDomains)) {
+    const errorUrl = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
+
+    errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisposableEmail);
+
+    return c.redirect(errorUrl.toString(), 302);
+  }
+
   // Handle new user.
   const createdUser = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
@@ -152,11 +195,7 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
     requiredScopes: clientOptions.scope,
   });
 
-  const oAuthClient = new OAuth2Client(
-    clientOptions.clientId,
-    clientOptions.clientSecret,
-    clientOptions.redirectUrl,
-  );
+  const oAuthClient = new OAuth2Client(clientOptions.clientId, clientOptions.clientSecret, clientOptions.redirectUrl);
 
   const code = c.req.query('code');
   const state = c.req.query('state');
@@ -174,21 +213,20 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
   // eslint-disable-next-line prefer-const
   let [redirectState, redirectPath] = storedRedirectPath.split(' ');
 
+  // The sub-path aware root, e.g. "/" or "/ESign/".
+  const defaultRedirectPath = formatPath('/');
+
   if (redirectState !== storedState || !redirectPath) {
-    redirectPath = '/';
+    redirectPath = defaultRedirectPath;
   }
 
   if (!isValidReturnTo(redirectPath)) {
-    redirectPath = '/';
+    redirectPath = defaultRedirectPath;
   }
 
-  redirectPath = normalizeReturnTo(redirectPath) || '/';
+  redirectPath = normalizeReturnTo(redirectPath) || defaultRedirectPath;
 
-  const tokens = await oAuthClient.validateAuthorizationCode(
-    token_endpoint,
-    code,
-    storedCodeVerifier,
-  );
+  const tokens = await oAuthClient.validateAuthorizationCode(token_endpoint, code, storedCodeVerifier);
 
   const accessToken = tokens.accessToken();
   const accessTokenExpiresAt = tokens.accessTokenExpiresAt();

@@ -1,9 +1,8 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { PDF_SIZE_A4_72PPI } from '@documenso/lib/constants/pdf';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-audit-log-pdf';
+import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -16,18 +15,18 @@ export const downloadDocumentAuditLogsRoute = authenticatedProcedure
   .output(ZDownloadDocumentAuditLogsResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
-    const { documentId } = input;
+    const { envelopeId } = input;
 
     ctx.logger.info({
       input: {
-        documentId,
+        envelopeId,
       },
     });
 
     const envelope = await getEnvelopeById({
       id: {
-        type: 'documentId',
-        id: documentId,
+        type: 'envelopeId',
+        id: envelopeId,
       },
       type: EnvelopeType.DOCUMENT,
       userId: ctx.user.id,
@@ -56,10 +55,8 @@ export const downloadDocumentAuditLogsRoute = authenticatedProcedure
 
     const result = await certificatePdf.save();
 
-    const base64 = Buffer.from(result).toString('base64');
-
     return {
-      data: base64,
+      data: Buffer.from(result).toString('base64'),
       envelopeTitle: envelope.title,
     };
   });

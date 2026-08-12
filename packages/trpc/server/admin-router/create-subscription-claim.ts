@@ -10,7 +10,21 @@ export const createSubscriptionClaimRoute = adminProcedure
   .input(ZCreateSubscriptionClaimRequestSchema)
   .output(ZCreateSubscriptionClaimResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { name, teamCount, memberCount, envelopeItemCount, flags } = input;
+    const {
+      name,
+      teamCount,
+      memberCount,
+      envelopeItemCount,
+      recipientCount,
+      flags,
+      documentRateLimits,
+      documentQuota,
+      emailRateLimits,
+      emailQuota,
+      apiRateLimits,
+      apiQuota,
+      emailTransportId,
+    } = input;
 
     ctx.logger.info({
       input,
@@ -21,8 +35,16 @@ export const createSubscriptionClaimRoute = adminProcedure
         name,
         teamCount,
         envelopeItemCount,
+        recipientCount,
         memberCount,
         flags,
+        documentRateLimits,
+        documentQuota,
+        emailRateLimits,
+        emailQuota,
+        apiRateLimits,
+        apiQuota,
+        emailTransportId,
       },
     });
   });

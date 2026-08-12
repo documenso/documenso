@@ -10,9 +10,5 @@ export const ZApplyMultiSignSignatureResponseSchema = z.object({
   success: z.boolean(),
 });
 
-export type TApplyMultiSignSignatureRequestSchema = z.infer<
-  typeof ZApplyMultiSignSignatureRequestSchema
->;
-export type TApplyMultiSignSignatureResponseSchema = z.infer<
-  typeof ZApplyMultiSignSignatureResponseSchema
->;
+export type TApplyMultiSignSignatureRequestSchema = z.infer<typeof ZApplyMultiSignSignatureRequestSchema>;
+export type TApplyMultiSignSignatureResponseSchema = z.infer<typeof ZApplyMultiSignSignatureResponseSchema>;

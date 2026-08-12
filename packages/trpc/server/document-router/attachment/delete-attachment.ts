@@ -2,10 +2,7 @@ import { deleteAttachment } from '@documenso/lib/server-only/envelope-attachment
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
-import {
-  ZDeleteAttachmentRequestSchema,
-  ZDeleteAttachmentResponseSchema,
-} from './delete-attachment.types';
+import { ZDeleteAttachmentRequestSchema, ZDeleteAttachmentResponseSchema } from './delete-attachment.types';
 
 export const deleteAttachmentRoute = authenticatedProcedure
   .meta({
@@ -13,8 +10,10 @@ export const deleteAttachmentRoute = authenticatedProcedure
       method: 'POST',
       path: '/document/attachment/delete',
       summary: 'Delete attachment',
-      description: 'Delete an attachment from a document',
+      description:
+        'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Delete an attachment from a document',
       tags: ['Document'],
+      deprecated: true,
     },
   })
   .input(ZDeleteAttachmentRequestSchema)

@@ -1,12 +1,5 @@
-import {
-  createTRPCClient,
-  httpBatchLink,
-  httpLink,
-  isNonJsonSerializable,
-  splitLink,
-} from '@trpc/client';
-
 import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
+import { createTRPCClient, httpBatchLink, httpLink, isNonJsonSerializable, splitLink } from '@trpc/client';
 
 import type { AppRouter } from '../server/router';
 import { dataTransformer } from '../utils/data-transformer';

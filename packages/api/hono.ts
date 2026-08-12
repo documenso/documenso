@@ -1,6 +1,3 @@
-import { TsRestHttpError, fetchRequestHandler } from '@ts-rest/serverless/fetch';
-import { Hono } from 'hono';
-
 import { ApiContractV1 } from '@documenso/api/v1/contract';
 import { ApiContractV1Implementation } from '@documenso/api/v1/implementation';
 import { OpenAPIV1 } from '@documenso/api/v1/openapi';
@@ -10,6 +7,8 @@ import { subscribeHandler } from '@documenso/lib/server-only/webhooks/zapier/sub
 import { unsubscribeHandler } from '@documenso/lib/server-only/webhooks/zapier/unsubscribe';
 // This is a bit nasty. Todo: Extract
 import type { HonoEnv } from '@documenso/remix/server/router';
+import { fetchRequestHandler, TsRestHttpError } from '@ts-rest/serverless/fetch';
+import { Hono } from 'hono';
 
 // This is bad, ts-router will be created on each request.
 // But don't really have a choice here.

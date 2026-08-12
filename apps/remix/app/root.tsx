@@ -1,17 +1,6 @@
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  data,
-  isRouteErrorResponse,
-  useLoaderData,
-} from 'react-router';
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
+import { getBasePath } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
 import { createPublicEnv } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
@@ -19,13 +8,26 @@ import { TrpcProvider } from '@documenso/trpc/react';
 import { getOrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
-
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
+import {
+  data,
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData,
+  useMatches,
+} from 'react-router';
+import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
 import { GenericErrorLayout } from './components/general/generic-error-layout';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
+import { nonce } from './utils/nonce';
 
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
@@ -40,7 +42,7 @@ export function meta() {
  */
 export const shouldRevalidate = () => false;
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader({ context, request }: Route.LoaderArgs) {
   const session = await getOptionalSession(request);
 
   const { getTheme } = await themeSessionResolver(request);
@@ -66,6 +68,11 @@ export async function loader({ request }: Route.LoaderArgs) {
       lang,
       theme: getTheme(),
       disableAnimations,
+      basePath: getBasePath(),
+      // Surface the per-request CSP nonce produced by `securityHeadersMiddleware` so all
+      // SSR-rendered <script>/<style> elements in this layout (and child
+      // routes that need it) can carry the matching nonce attribute.
+      nonce: context.nonce,
       session: session.isAuthenticated
         ? {
             user: session.user,
@@ -84,38 +91,58 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { theme } = useLoaderData<typeof loader>() || {};
+  const { theme, basePath } = useLoaderData<typeof loader>() || {};
 
   return (
-    <ThemeProvider specifiedTheme={theme} themeAction="/api/theme">
+    <ThemeProvider specifiedTheme={theme} themeAction={`${basePath ?? ''}/api/theme`}>
       <LayoutContent>{children}</LayoutContent>
     </ThemeProvider>
   );
 }
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { publicEnv, session, lang, disableAnimations, ...data } =
-    useLoaderData<typeof loader>() || {};
+  const {
+    publicEnv,
+    session,
+    lang,
+    disableAnimations,
+    nonce: cspNonce,
+    ...data
+  } = useLoaderData<typeof loader>() || {};
 
   const [theme] = useTheme();
 
+  const basePath = data.basePath ?? '';
+
+  // Recipient routes (signing pages) put `documenso-branded` on <body> so the
+  // <style> block from `RecipientBranding` applies to BOTH the main tree and
+  // any portaled content (Radix dialogs/popovers/dropdowns mount outside the
+  // route tree, attached directly to document.body).
+  const matches = useMatches();
+  const isRecipientRoute = matches.some((m) => m.id?.startsWith('routes/_recipient+'));
+
   return (
-    <html translate="no" lang={lang} data-theme={theme} className={theme ?? ''}>
+    // `suppressHydrationWarning` because `remix-themes` intentionally mutates
+    // `data-theme`/`class` on <html> before hydration (PreventFlashOnWrongTheme),
+    // so the server-rendered attributes never match the client render when the
+    // theme is resolved from the system preference. Attribute-only, one level deep.
+    <html translate="no" lang={lang} data-theme={theme} className={theme ?? ''} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href={`${basePath}/apple-touch-icon.png`} />
+        <link rel="icon" type="image/png" sizes="32x32" href={`${basePath}/favicon-32x32.png`} />
+        <link rel="icon" type="image/png" sizes="16x16" href={`${basePath}/favicon-16x16.png`} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="manifest" href={`${basePath}/site.webmanifest`} />
         <meta name="google" content="notranslate" />
         <Meta />
-        <Links />
+        <Links nonce={nonce(cspNonce)} />
         <meta name="google" content="notranslate" />
-        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
+        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} nonce={nonce(cspNonce)} />
 
         {disableAnimations && (
           <style
+            nonce={nonce(cspNonce)}
             dangerouslySetInnerHTML={{
               __html: `*, *::before, *::after { animation: none !important; transition: none !important; }`,
             }}
@@ -123,9 +150,9 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         )}
 
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
-        <script>0</script>
+        <script nonce={nonce(cspNonce)}>0</script>
       </head>
-      <body>
+      <body className={isRecipientRoute ? 'documenso-branded' : undefined}>
         {/* Global license banner currently disabled. Need to wait until after a few releases. */}
         {/* {licenseStatus === '?' && (
           <div className="bg-destructive text-destructive-foreground">
@@ -138,24 +165,31 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
           </div>
         )} */}
 
-        <SessionProvider initialSession={session}>
-          <TooltipProvider>
-            <TrpcProvider>
-              {children}
+        <NuqsAdapter>
+          <SessionProvider initialSession={session}>
+            <TooltipProvider>
+              <TrpcProvider>
+                {children}
 
-              <Toaster />
-            </TrpcProvider>
-          </TooltipProvider>
-        </SessionProvider>
-
-        <ScrollRestoration />
-        <Scripts />
+                <Toaster />
+              </TrpcProvider>
+            </TooltipProvider>
+          </SessionProvider>
+        </NuqsAdapter>
 
         <script
+          nonce={nonce(cspNonce)}
           dangerouslySetInnerHTML={{
-            __html: `window.__ENV__ = ${JSON.stringify(publicEnv)}`,
+            // `__webpack_nonce__` is read by `get-nonce` (used by
+            // react-remove-scroll / react-style-singleton inside Radix menus and
+            // dialogs) to stamp runtime-injected <style> elements. Without it the
+            // strict `style-src-elem` CSP blocks the scroll-lock styles.
+            __html: `window.__ENV__ = ${JSON.stringify(publicEnv)}; window.__webpack_nonce__ = ${JSON.stringify(cspNonce ?? '')}`,
           }}
         />
+
+        <ScrollRestoration nonce={nonce(cspNonce)} />
+        <Scripts nonce={nonce(cspNonce)} />
       </body>
     </html>
   );

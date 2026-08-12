@@ -1,8 +1,8 @@
+import { formatPath } from '@documenso/lib/constants/app';
+import { ZDetectedRecipientSchema } from '@documenso/lib/server-only/ai/envelope/detect-recipients/schema';
 import { z } from 'zod';
 
-import { ZDetectedRecipientSchema } from '@documenso/lib/server-only/ai/envelope/detect-recipients/schema';
-
-import { type TDetectRecipientsRequest } from './detect-recipients.types';
+import type { TDetectRecipientsRequest } from './detect-recipients.types';
 
 export type { TDetectRecipientsRequest };
 
@@ -71,7 +71,7 @@ export const detectRecipients = async ({
   onError,
   signal,
 }: DetectRecipientsOptions): Promise<void> => {
-  const response = await fetch('/api/ai/detect-recipients', {
+  const response = await fetch(formatPath('/api/ai/detect-recipients'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

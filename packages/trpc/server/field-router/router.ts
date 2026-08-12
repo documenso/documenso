@@ -1,5 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
-
+import { AppError } from '@documenso/lib/errors/app-error';
 import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
 import { deleteTemplateField } from '@documenso/lib/server-only/field/delete-template-field';
@@ -9,6 +8,7 @@ import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-field
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { updateEnvelopeFields } from '@documenso/lib/server-only/field/update-envelope-fields';
+import { EnvelopeType } from '@prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
@@ -52,8 +52,9 @@ export const fieldRouter = router({
         path: '/document/field/{fieldId}',
         summary: 'Get document field',
         description:
-          'Returns a single field. If you want to retrieve all the fields for a document, use the "Get Document" endpoint.',
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Returns a single field. If you want to retrieve all the fields for a document, use the "Get Document" endpoint.',
         tags: ['Document Fields'],
+        deprecated: true,
       },
     })
     .input(ZGetFieldRequestSchema)
@@ -85,8 +86,10 @@ export const fieldRouter = router({
         method: 'POST',
         path: '/document/field/create',
         summary: 'Create document field',
-        description: 'Create a single field for a document.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create a single field for a document.',
         tags: ['Document Fields'],
+        deprecated: true,
       },
     })
     .input(ZCreateDocumentFieldRequestSchema)
@@ -131,8 +134,10 @@ export const fieldRouter = router({
         method: 'POST',
         path: '/document/field/create-many',
         summary: 'Create document fields',
-        description: 'Create multiple fields for a document.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create multiple fields for a document.',
         tags: ['Document Fields'],
+        deprecated: true,
       },
     })
     .input(ZCreateDocumentFieldsRequestSchema)
@@ -173,8 +178,10 @@ export const fieldRouter = router({
         method: 'POST',
         path: '/document/field/update',
         summary: 'Update document field',
-        description: 'Update a single field for a document.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update a single field for a document.',
         tags: ['Document Fields'],
+        deprecated: true,
       },
     })
     .input(ZUpdateDocumentFieldRequestSchema)
@@ -213,8 +220,10 @@ export const fieldRouter = router({
         method: 'POST',
         path: '/document/field/update-many',
         summary: 'Update document fields',
-        description: 'Update multiple fields for a document.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update multiple fields for a document.',
         tags: ['Document Fields'],
+        deprecated: true,
       },
     })
     .input(ZUpdateDocumentFieldsRequestSchema)
@@ -251,7 +260,10 @@ export const fieldRouter = router({
         method: 'POST',
         path: '/document/field/delete',
         summary: 'Delete document field',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Document Fields'],
+        deprecated: true,
       },
     })
     .input(ZDeleteDocumentFieldRequestSchema)
@@ -324,8 +336,10 @@ export const fieldRouter = router({
         method: 'POST',
         path: '/template/field/create',
         summary: 'Create template field',
-        description: 'Create a single field for a template.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create a single field for a template.',
         tags: ['Template Fields'],
+        deprecated: true,
       },
     })
     .input(ZCreateTemplateFieldRequestSchema)
@@ -371,8 +385,9 @@ export const fieldRouter = router({
         path: '/template/field/{fieldId}',
         summary: 'Get template field',
         description:
-          'Returns a single field. If you want to retrieve all the fields for a template, use the "Get Template" endpoint.',
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Returns a single field. If you want to retrieve all the fields for a template, use the "Get Template" endpoint.',
         tags: ['Template Fields'],
+        deprecated: true,
       },
     })
     .input(ZGetFieldRequestSchema)
@@ -404,8 +419,10 @@ export const fieldRouter = router({
         method: 'POST',
         path: '/template/field/create-many',
         summary: 'Create template fields',
-        description: 'Create multiple fields for a template.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create multiple fields for a template.',
         tags: ['Template Fields'],
+        deprecated: true,
       },
     })
     .input(ZCreateTemplateFieldsRequestSchema)
@@ -446,8 +463,10 @@ export const fieldRouter = router({
         method: 'POST',
         path: '/template/field/update',
         summary: 'Update template field',
-        description: 'Update a single field for a template.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update a single field for a template.',
         tags: ['Template Fields'],
+        deprecated: true,
       },
     })
     .input(ZUpdateTemplateFieldRequestSchema)
@@ -486,8 +505,10 @@ export const fieldRouter = router({
         method: 'POST',
         path: '/template/field/update-many',
         summary: 'Update template fields',
-        description: 'Update multiple fields for a template.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update multiple fields for a template.',
         tags: ['Template Fields'],
+        deprecated: true,
       },
     })
     .input(ZUpdateTemplateFieldsRequestSchema)
@@ -524,7 +545,10 @@ export const fieldRouter = router({
         method: 'POST',
         path: '/template/field/delete',
         summary: 'Delete template field',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Template Fields'],
+        deprecated: true,
       },
     })
     .input(ZDeleteTemplateFieldRequestSchema)
@@ -589,9 +613,8 @@ export const fieldRouter = router({
   /**
    * @private
    */
-  signFieldWithToken: procedure
-    .input(ZSignFieldWithTokenMutationSchema)
-    .mutation(async ({ input, ctx }) => {
+  signFieldWithToken: procedure.input(ZSignFieldWithTokenMutationSchema).mutation(async ({ input, ctx }) => {
+    try {
       const { token, fieldId, value, isBase64, authOptions } = input;
 
       ctx.logger.info({
@@ -609,7 +632,20 @@ export const fieldRouter = router({
         authOptions,
         requestMetadata: ctx.metadata.requestMetadata,
       });
-    }),
+    } catch (err) {
+      // Log the error for debugging purposes.
+      ctx.logger.error({
+        message: 'Error signing field with token',
+        error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
+      });
+
+      // Raw console.log incase we're somehow deailing with a funky error object that doesn't serialize well.
+      console.log('Error signing field with token', err);
+
+      // Rethrow the error so that the client receives the appropriate error response.
+      throw err;
+    }
+  }),
 
   /**
    * @private
@@ -617,18 +653,31 @@ export const fieldRouter = router({
   removeSignedFieldWithToken: procedure
     .input(ZRemovedSignedFieldWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { token, fieldId } = input;
+      try {
+        const { token, fieldId } = input;
 
-      ctx.logger.info({
-        input: {
+        ctx.logger.info({
+          input: {
+            fieldId,
+          },
+        });
+
+        return await removeSignedFieldWithToken({
+          token,
           fieldId,
-        },
-      });
+          requestMetadata: ctx.metadata.requestMetadata,
+        });
+      } catch (err) {
+        // Log the error for debugging purposes.
+        ctx.logger.error({
+          message: 'Error removing signed field with token',
+          error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
+        });
 
-      return await removeSignedFieldWithToken({
-        token,
-        fieldId,
-        requestMetadata: ctx.metadata.requestMetadata,
-      });
+        console.log('Error removing signed field with token', err);
+
+        // Rethrow the error so that the client receives the appropriate error response.
+        throw err;
+      }
     }),
 });

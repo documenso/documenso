@@ -1,0 +1,174 @@
+---
+title: GDPR
+description: Understand how Documenso handles GDPR compliance for data processing and storage.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Documenso's Role
+
+When using Documenso for document signing, two distinct data processing roles apply:
+
+| Role                | Description                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| **Data Controller** | You (the organisation using Documenso) determine the purposes and means of processing |
+| **Data Processor**  | Documenso processes personal data on your behalf according to your instructions       |
+
+As the data controller, you are responsible for:
+
+- Obtaining appropriate consent or legal basis for processing
+- Informing data subjects about how their data is used
+- Responding to data subject access requests
+- Ensuring compliance with GDPR requirements
+
+As the data processor, Documenso:
+
+- Processes data only according to your instructions
+- Implements appropriate security measures
+- Assists with data subject requests when needed
+- Maintains records of processing activities
+
+## Data Processing
+
+Documenso processes personal data necessary to provide document signing services:
+
+| Data Category      | Examples                                       | Purpose                                 |
+| ------------------ | ---------------------------------------------- | --------------------------------------- |
+| **Identity Data**  | Name, email address                            | User accounts, recipient identification |
+| **Document Data**  | Uploaded PDFs, field values                    | Document storage and signing            |
+| **Signature Data** | Signature images, signing timestamps           | Recording signing actions               |
+| **Audit Data**     | IP addresses, browser information, action logs | Audit trail and verification            |
+
+Data is processed for the following purposes:
+
+- Delivering documents to recipients
+- Recording signatures and other recipient actions
+- Generating signed documents with audit trails
+- Sending email notifications
+
+## Data Storage Locations
+
+Where your data is stored depends on how you use Documenso:
+
+<Tabs items={['Documenso Cloud', 'Self-Hosted']}>
+<Tab value="Documenso Cloud">
+
+For the hosted cloud service:
+
+- Application data is stored in data centres within the European Union
+- Document storage uses EU-based infrastructure
+- Backups are maintained in geographically separate EU locations
+
+Contact Documenso for specific information about sub-processors and data centre locations.
+
+</Tab>
+<Tab value="Self-Hosted">
+
+When you self-host Documenso:
+
+- You control all data storage locations
+- No data is transmitted to Documenso's infrastructure
+- You choose your own database, file storage, and backup locations
+
+Self-hosting provides complete control over data residency, which may be required for certain compliance scenarios.
+
+</Tab>
+</Tabs>
+
+## Data Subject Rights
+
+GDPR grants individuals specific rights regarding their personal data. As the data controller, you are responsible for fulfilling these requests:
+
+| Right             | Description                                                                |
+| ----------------- | -------------------------------------------------------------------------- |
+| **Access**        | Data subjects can request a copy of their personal data                    |
+| **Rectification** | Data subjects can request correction of inaccurate data                    |
+| **Erasure**       | Data subjects can request deletion of their data ("right to be forgotten") |
+| **Portability**   | Data subjects can request their data in a machine-readable format          |
+| **Restriction**   | Data subjects can request limited processing of their data                 |
+| **Objection**     | Data subjects can object to certain types of processing                    |
+
+When you receive a data subject request, you can:
+
+- Export user and document data from your Documenso account
+- Delete user accounts and associated documents
+- Contact Documenso support for assistance with cloud-hosted data
+
+## Data Deletion
+
+Documenso supports data deletion to help fulfill erasure requests:
+
+<Accordions type="multiple">
+  <Accordion title="User Account Deletion">
+    - Users can delete their own accounts
+    - Account deletion removes profile data and authentication credentials
+    - Team owners can remove members from teams
+  </Accordion>
+  <Accordion title="Document Deletion">
+    - Document owners can delete documents in draft state
+    - Completed documents can be deleted by the owner
+    - Deletion removes the document, recipient data, and associated audit logs
+  </Accordion>
+  <Accordion title="Retention Considerations">
+    For signed documents, you may need to balance deletion requests against:
+
+    - Legal requirements to retain signed contracts
+    - Your organisation's record-keeping policies
+    - The rights of other parties to the signed document
+
+    Consult with legal counsel to establish appropriate retention policies.
+
+  </Accordion>
+</Accordions>
+
+## Self-Hosting for GDPR Compliance
+
+Self-hosting Documenso can simplify GDPR compliance:
+
+- **Data residency** - Store all data in your chosen jurisdiction
+- **Sub-processor control** - No third-party data processors beyond your own infrastructure
+- **Direct access** - Full database access for data subject requests
+- **Retention control** - Implement custom data retention and deletion policies
+
+See the [Self-Hosting Guide](/docs/self-hosting) for deployment options.
+
+## Data Processing Agreement
+
+A Data Processing Agreement (DPA) is a contract required by GDPR when a data controller engages a data processor.
+
+<Tabs items={['Documenso Cloud', 'Self-Hosted']}>
+<Tab value="Documenso Cloud">
+
+- A DPA is available upon request
+- Contact [support@documenso.com](mailto:support@documenso.com) to request a DPA
+- The DPA covers Documenso's obligations as a data processor
+
+</Tab>
+<Tab value="Self-Hosted">
+
+No DPA with Documenso is required since no personal data is processed by Documenso.
+
+</Tab>
+</Tabs>
+
+---
+
+## Disclaimer
+
+This documentation is provided for informational purposes only and does not constitute legal advice. GDPR compliance depends on your specific circumstances, including how you use Documenso, what data you process, and your organisation's obligations.
+
+Consult with qualified legal counsel to:
+
+- Determine your GDPR obligations
+- Draft appropriate privacy notices
+- Establish lawful bases for processing
+- Implement compliant data handling procedures
+
+---
+
+## Related
+
+- [Standards & Regulations](/docs/compliance/standards) - eIDAS, ESIGN Act, and other compliance frameworks
+- [Self-Hosting Guide](/docs/self-hosting) - Deploy Documenso on your own infrastructure
+- [Security Settings](/docs/users/settings/security) - Configure authentication and security options

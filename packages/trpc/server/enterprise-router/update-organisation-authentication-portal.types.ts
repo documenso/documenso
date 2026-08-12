@@ -1,6 +1,5 @@
-import { z } from 'zod';
-
 import OrganisationMemberRoleSchema from '@documenso/prisma/generated/zod/inputTypeSchemas/OrganisationMemberRoleSchema';
+import { z } from 'zod';
 
 import { domainRegex } from './create-organisation-email-domain.types';
 
@@ -14,6 +13,7 @@ export const ZUpdateOrganisationAuthenticationPortalRequestSchema = z.object({
     wellKnownUrl: z.union([z.string().url(), z.literal('')]),
     autoProvisionUsers: z.boolean(),
     allowedDomains: z.array(z.string().regex(domainRegex)),
+    allowPersonalOrganisations: z.boolean(),
   }),
 });
 

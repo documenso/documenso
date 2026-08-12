@@ -1,13 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { ApiToken } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -19,16 +9,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { ApiToken } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -102,10 +93,7 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
   }, [isOpen, form]);
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(value) => !form.formState.isSubmitting && setIsOpen(value)}
-    >
+    <Dialog open={isOpen} onOpenChange={(value) => !form.formState.isSubmitting && setIsOpen(value)}>
       <DialogTrigger asChild={true}>
         {children ?? (
           <Button className="mr-4" variant="destructive">
@@ -117,23 +105,19 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            <Trans>Are you sure you want to delete this token?</Trans>
+            <Trans>Delete token</Trans>
           </DialogTitle>
 
           <DialogDescription>
             <Trans>
-              Please note that this action is irreversible. Once confirmed, your token will be
-              permanently deleted.
+              Please note that this action is irreversible. Once confirmed, your token will be permanently deleted.
             </Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <fieldset
-              className="flex h-full flex-col space-y-4"
-              disabled={form.formState.isSubmitting}
-            >
+            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="tokenName"
@@ -142,9 +126,7 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
                     <FormLabel>
                       <Trans>
                         Confirm by typing:{' '}
-                        <span className="font-sm text-destructive font-semibold">
-                          {deleteMessage}
-                        </span>
+                        <span className="font-semibold text-destructive text-sm">{deleteMessage}</span>
                       </Trans>
                     </FormLabel>
 
@@ -157,26 +139,18 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
               />
 
               <DialogFooter>
-                <div className="flex w-full flex-nowrap gap-4">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="flex-1"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Trans>Cancel</Trans>
-                  </Button>
+                <Button type="button" variant="secondary" onClick={() => setIsOpen(false)}>
+                  <Trans>Cancel</Trans>
+                </Button>
 
-                  <Button
-                    type="submit"
-                    variant="destructive"
-                    className="flex-1"
-                    disabled={!form.formState.isValid}
-                    loading={form.formState.isSubmitting}
-                  >
-                    <Trans>I'm sure! Delete it</Trans>
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={!form.formState.isValid}
+                  loading={form.formState.isSubmitting}
+                >
+                  <Trans>Delete</Trans>
+                </Button>
               </DialogFooter>
             </fieldset>
           </form>
