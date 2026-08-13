@@ -9116,6 +9116,7 @@ msgstr "Odbiorcy"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-invalid-direct-template-alert.tsx
 msgid "Recipients cannot use this direct link template because the following signers are missing a signature field"
+msgstr "Odbiorcy nie mogą używać tego szablonu bezpośredniego linku, ponieważ brakuje w nim pola podpisu dla następujących podpisujących"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Recipients metrics"
