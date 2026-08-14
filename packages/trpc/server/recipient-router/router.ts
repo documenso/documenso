@@ -1,5 +1,5 @@
 import { prepareCscRecipientSigning } from '@documenso/ee/server-only/signing/csc/prepare-recipient-signing';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
@@ -633,6 +633,17 @@ export const recipientRouter = router({
 
         return { status: 'SIGNED' as const };
       } catch (err) {
+        // Resolve retried, stale or concurrent duplicate completion requests
+        // idempotently so the client routes the user to the completed page
+        // instead of surfacing an error for a document that is signed.
+        if (err instanceof AppError && err.code === AppErrorCode.RECIPIENT_ALREADY_SIGNED) {
+          ctx.logger.info({
+            message: 'Recipient attempted to complete a document they have already signed',
+          });
+
+          return { status: 'ALREADY_SIGNED' as const };
+        }
+
         // Log the error for debugging purposes.
         ctx.logger.error({
           message: 'Error completing document with token',

@@ -35,12 +35,24 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   await page.getByTestId('signature-types-trigger').click();
   await page.getByRole('option', { name: 'Draw' }).click();
   await page.getByRole('option', { name: 'Upload' }).click();
+  await page.keyboard.press('Escape');
+
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
+  await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
+
+  // Sender details moved to the email preferences page.
+  await page.goto(`/o/${organisation.url}/settings/email`);
   await page.getByTestId('include-sender-details-trigger').click();
   await page.getByRole('option', { name: 'No' }).click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
+  await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
+
+  // The signing certificate toggle moved to the certificates page.
+  await page.goto(`/o/${organisation.url}/settings/certificates`);
   await page.getByTestId('include-signing-certificate-trigger').click();
   await page.getByRole('option', { name: 'No' }).click();
   await page.getByRole('button', { name: 'Save changes' }).first().click();
-  await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
+  await expect(page.getByText('Your certificate preferences have been updated').first()).toBeVisible();
 
   const teamSettings = await getTeamSettings({
     teamId: team.id,
@@ -236,8 +248,14 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Reply to email' }).click();
   await page.getByRole('textbox', { name: 'Reply to email' }).fill('team@example.com');
 
-  // Change email document settings inheritance to controlled
-  await page.getByRole('combobox').filter({ hasText: 'Inherit from organisation' }).click();
+  // Change email document settings inheritance to controlled. Scope to the
+  // email-document-settings field — the sender-details select on this page also
+  // renders an "Inherit from organisation" value.
+  await page
+    .getByTestId('inheritable-email-document-settings')
+    .getByRole('combobox')
+    .filter({ hasText: 'Inherit from organisation' })
+    .click();
   await page.getByRole('option', { name: 'Override organisation settings' }).click();
 
   // Update some email settings

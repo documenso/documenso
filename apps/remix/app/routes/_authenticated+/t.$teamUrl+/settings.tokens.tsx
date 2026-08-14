@@ -84,6 +84,7 @@ export default function ApiTokensPage() {
   return (
     <div>
       <SettingsHeader
+        hideDivider
         title={<Trans>API Tokens</Trans>}
         subtitle={
           <Trans>
