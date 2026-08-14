@@ -44,7 +44,7 @@
     "autoprefixer": "^10.4.22",
     "colord": "^2.9.3",
     "content-disposition": "^1.0.1",
-    "framer-motion": "^12.23.24",
+    "framer-motion": "^12.43.0",
     "hono": "^4.12.14",
     "hono-react-router-adapter": "^0.6.5",
     "input-otp": "^1.4.2",

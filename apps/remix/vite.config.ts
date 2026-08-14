@@ -23,6 +23,10 @@ const cMapsDir = normalizePath(path.join(pdfjsDistPath, 'cmaps'));
  * Do not configure any envs here.
  */
 export default defineConfig({
+  // No trailing slash: the React Router dev server requires its `basename` to
+  // start with this raw value (see react-router.config.ts). Vite normalizes
+  // and joins asset URLs correctly either way.
+  base: process.env.NEXT_PUBLIC_BASE_PATH ? process.env.NEXT_PUBLIC_BASE_PATH.replace(/\/$/, '') : '/',
   css: {
     postcss: {
       plugins: [tailwindcss, autoprefixer],

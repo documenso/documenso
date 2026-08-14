@@ -1,5 +1,6 @@
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { formatPath } from '@documenso/lib/constants/app';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import {
   DOCUMENTS_PAGE_SHORTCUT,
@@ -862,7 +863,7 @@ const PromptLanguageCommands = ({
 
       formData.append('lang', lang);
 
-      const response = await fetch('/api/locale', {
+      const response = await fetch(formatPath('/api/locale'), {
         method: 'post',
         body: formData,
       });

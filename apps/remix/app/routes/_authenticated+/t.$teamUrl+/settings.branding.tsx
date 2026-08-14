@@ -1,5 +1,5 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { IS_BILLING_ENABLED, IS_DOCUMENSO_CLOUD } from '@documenso/lib/constants/app';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import type { SanitizeBrandingCssWarning } from '@documenso/lib/utils/sanitize-branding-css';
 import { trpc } from '@documenso/trpc/react';
@@ -17,6 +17,7 @@ import {
   type TBrandingPreferencesFormSchema,
 } from '~/components/forms/branding-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
+import { BrandingUpsell } from '~/components/general/settings-upsell/branding-upsell';
 import { useCurrentTeam } from '~/providers/team';
 
 export default function TeamsSettingsPage() {
@@ -155,6 +156,8 @@ export default function TeamsSettingsPage() {
             </Alert>
           )}
         </section>
+      ) : IS_DOCUMENSO_CLOUD() ? (
+        <BrandingUpsell />
       ) : (
         <Alert className="mt-8 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
           <div className="mb-4 sm:mb-0">

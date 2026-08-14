@@ -6,6 +6,42 @@ export const APP_DOCUMENT_UPLOAD_SIZE_LIMIT = Number(env('NEXT_PUBLIC_DOCUMENT_S
 
 export const NEXT_PUBLIC_WEBAPP_URL = () => env('NEXT_PUBLIC_WEBAPP_URL') ?? 'http://localhost:3000';
 
+/**
+ * The sub-path the app is served under (no trailing slash), e.g. "/ESign".
+ * Returns an empty string when served at root.
+ *
+ * Prefers the explicit NEXT_PUBLIC_BASE_PATH (which is the same value baked
+ * into the Vite/React Router build). Falls back to the pathname of
+ * NEXT_PUBLIC_WEBAPP_URL so the function still works in dev when the env
+ * variable is unset.
+ *
+ * Avoid using this to build URLs, use {@link formatPath} instead. Reserve this
+ * for cases where the raw prefix itself is needed, such as path comparisons.
+ */
+export const getBasePath = (): string => {
+  const explicit = env('NEXT_PUBLIC_BASE_PATH');
+
+  if (explicit) {
+    return explicit.replace(/\/$/, '');
+  }
+
+  try {
+    return new URL(NEXT_PUBLIC_WEBAPP_URL()).pathname.replace(/\/$/, '');
+  } catch {
+    return '';
+  }
+};
+
+/**
+ * Prefix a root-relative path with the app's base path.
+ *
+ * `formatPath('/api/trpc')` -> `/ESign/api/trpc` under sub-path hosting,
+ * `/api/trpc` otherwise.
+ */
+export const formatPath = (path: string): string => {
+  return `${getBasePath()}${path}`;
+};
+
 export const NEXT_PUBLIC_SIGNING_CONTACT_INFO = () =>
   env('NEXT_PUBLIC_SIGNING_CONTACT_INFO') ?? NEXT_PUBLIC_WEBAPP_URL();
 
@@ -16,6 +52,14 @@ export const NEXT_PRIVATE_INTERNAL_WEBAPP_URL = () =>
   env('NEXT_PRIVATE_INTERNAL_WEBAPP_URL') ?? NEXT_PUBLIC_WEBAPP_URL();
 
 export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED') === 'true';
+
+/**
+ * Whether this instance is Documenso Cloud (managed SaaS).
+ *
+ * Used so we can show a different UI for Documenso Cloud and self-hosted instances since
+ * there are things like billing, upsells, documenso links, etc that don't make sense for self-hosted instances.
+ */
+export const IS_DOCUMENSO_CLOUD = () => env('NEXT_PUBLIC_IS_DOCUMENSO_CLOUD') === 'true';
 
 export const API_V2_BETA_URL = '/api/v2-beta';
 export const API_V2_URL = '/api/v2';
@@ -99,3 +143,5 @@ export const CSC_INSTANCE_SIGNATURE_LEVEL = (): TSignatureLevel => {
 
   return value;
 };
+
+export const DOCUMENSO_CLOUD_ENTERPRISE_CTA_URL = 'https://documen.so/enterprise-cta';
