@@ -1,8 +1,11 @@
 import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 import { createTRPCClient, httpBatchLink, httpLink, isNonJsonSerializable, splitLink } from '@trpc/client';
+import { z } from 'zod';
 
 import type { AppRouter } from '../server/router';
 import { dataTransformer } from '../utils/data-transformer';
+
+const ZTeamIdHeaderSchema = z.string().min(1);
 
 export const trpc = createTRPCClient<AppRouter>({
   links: [
@@ -12,9 +15,11 @@ export const trpc = createTRPCClient<AppRouter>({
         url: `${getBaseUrl()}/api/trpc`,
         transformer: dataTransformer,
         headers: (opts) => {
-          if (typeof opts.op.context.teamId === 'string') {
+          const teamId = ZTeamIdHeaderSchema.safeParse(opts.op.context.teamId);
+
+          if (teamId.success) {
             return {
-              'x-team-id': opts.op.context.teamId,
+              'x-team-id': teamId.data,
             };
           }
 
@@ -25,14 +30,14 @@ export const trpc = createTRPCClient<AppRouter>({
         url: `${getBaseUrl()}/api/trpc`,
         transformer: dataTransformer,
         headers: (opts) => {
-          const operationWithTeamId = opts.opList.find(
-            (op) => op.context.teamId && typeof op.context.teamId === 'string',
-          );
+          for (const op of opts.opList) {
+            const teamId = ZTeamIdHeaderSchema.safeParse(op.context.teamId);
 
-          if (operationWithTeamId && typeof operationWithTeamId.context.teamId === 'string') {
-            return {
-              'x-team-id': operationWithTeamId.context.teamId,
-            };
+            if (teamId.success) {
+              return {
+                'x-team-id': teamId.data,
+              };
+            }
           }
 
           return {};
