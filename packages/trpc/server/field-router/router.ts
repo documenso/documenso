@@ -1,3 +1,4 @@
+import { AppError } from '@documenso/lib/errors/app-error';
 import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
 import { deleteTemplateField } from '@documenso/lib/server-only/field/delete-template-field';
@@ -613,23 +614,37 @@ export const fieldRouter = router({
    * @private
    */
   signFieldWithToken: procedure.input(ZSignFieldWithTokenMutationSchema).mutation(async ({ input, ctx }) => {
-    const { token, fieldId, value, isBase64, authOptions } = input;
+    try {
+      const { token, fieldId, value, isBase64, authOptions } = input;
 
-    ctx.logger.info({
-      input: {
+      ctx.logger.info({
+        input: {
+          fieldId,
+        },
+      });
+
+      return await signFieldWithToken({
+        token,
         fieldId,
-      },
-    });
+        value: value ?? '',
+        isBase64,
+        userId: ctx.user?.id,
+        authOptions,
+        requestMetadata: ctx.metadata.requestMetadata,
+      });
+    } catch (err) {
+      // Log the error for debugging purposes.
+      ctx.logger.error({
+        message: 'Error signing field with token',
+        error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
+      });
 
-    return await signFieldWithToken({
-      token,
-      fieldId,
-      value: value ?? '',
-      isBase64,
-      userId: ctx.user?.id,
-      authOptions,
-      requestMetadata: ctx.metadata.requestMetadata,
-    });
+      // Raw console.log incase we're somehow deailing with a funky error object that doesn't serialize well.
+      console.log('Error signing field with token', err);
+
+      // Rethrow the error so that the client receives the appropriate error response.
+      throw err;
+    }
   }),
 
   /**
@@ -638,18 +653,31 @@ export const fieldRouter = router({
   removeSignedFieldWithToken: procedure
     .input(ZRemovedSignedFieldWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { token, fieldId } = input;
+      try {
+        const { token, fieldId } = input;
 
-      ctx.logger.info({
-        input: {
+        ctx.logger.info({
+          input: {
+            fieldId,
+          },
+        });
+
+        return await removeSignedFieldWithToken({
+          token,
           fieldId,
-        },
-      });
+          requestMetadata: ctx.metadata.requestMetadata,
+        });
+      } catch (err) {
+        // Log the error for debugging purposes.
+        ctx.logger.error({
+          message: 'Error removing signed field with token',
+          error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
+        });
 
-      return await removeSignedFieldWithToken({
-        token,
-        fieldId,
-        requestMetadata: ctx.metadata.requestMetadata,
-      });
+        console.log('Error removing signed field with token', err);
+
+        // Rethrow the error so that the client receives the appropriate error response.
+        throw err;
+      }
     }),
 });

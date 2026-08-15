@@ -50,6 +50,12 @@ ENV NEXT_PRIVATE_ENCRYPTION_KEY="$NEXT_PRIVATE_ENCRYPTION_KEY"
 ARG NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="DEADBEEF"
 ENV NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="$NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY"
 
+# Sub-path the app is served under (e.g. "/ESign"). Empty = root.
+# Baked into the client bundle by Vite/React Router at build time; also
+# required at runtime for SSR so window.__ENV__ exposes it to the client.
+ARG NEXT_PUBLIC_BASE_PATH=""
+ENV NEXT_PUBLIC_BASE_PATH="$NEXT_PUBLIC_BASE_PATH"
+
 # Telemetry credentials (optional, baked into image at build time)
 ARG NEXT_PRIVATE_TELEMETRY_KEY=""
 ENV NEXT_PRIVATE_TELEMETRY_KEY="$NEXT_PRIVATE_TELEMETRY_KEY"
