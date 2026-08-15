@@ -7,6 +7,8 @@ on:
 jobs:
   label-when-assigned:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Label issue
         uses: actions/github-script@v6
@@ -15,7 +17,7 @@ jobs:
           script: |
             const issue = context.issue;
             // To run only on issues and not on PR
-            if (github.context.payload.issue.pull_request === undefined) {
+            if (context.payload.issue.pull_request === undefined) {
               const labelResponse = await github.rest.issues.addLabels({
                 owner: issue.owner,
                 repo: issue.repo,
