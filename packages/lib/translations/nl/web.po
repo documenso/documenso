@@ -312,6 +312,12 @@ msgstr "{0}-veld"
 msgid "{0} has invited you to {recipientActionVerb} the document \"{1}\"."
 msgstr "{0} heeft je uitgenodigd om het document \"{1}\" te {recipientActionVerb}."
 
+#. placeholder {0}: organisation.name
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "{0} has invited you to sign this document."
+msgstr ""
+
 #. placeholder {0}: team.name
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 msgid "{0} invited you to {recipientActionVerb} a document"
@@ -1220,6 +1226,10 @@ msgstr ""
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Account unlinked"
 msgstr "Account ontkoppeld"
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Accounts are automatically added to your organisation on sign-in"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Acknowledgment"
@@ -2455,6 +2465,10 @@ msgstr "Grootte van afgeronde hoeken in REM-eenheden (bijv. 0.5rem)."
 msgid "Bottom"
 msgstr "Onder"
 
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Brand accent"
+msgstr ""
+
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Colours"
 msgstr "Merkkleuren"
@@ -2988,6 +3002,14 @@ msgstr "Komma-gescheiden lijst met e‑maildomeinen die voor registratie moeten 
 msgid "Communication"
 msgstr "Communicatie"
 
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Company details"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Company details and website in email footers"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Compare all plans and features in detail"
 msgstr "Vergelijk alle abonnementen en functies in detail"
@@ -3174,6 +3196,11 @@ msgstr "Toestemming voor elektronische transacties"
 msgid "Contact Information"
 msgstr "Contactgegevens"
 
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Contact Sales"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Contact sales here"
 msgstr "Neem hier contact op met sales"
@@ -3181,6 +3208,10 @@ msgstr "Neem hier contact op met sales"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Contact us"
 msgstr "Neem contact met ons op"
+
+#: apps/remix/app/components/general/settings-upsell/settings-upsell-card.tsx
+msgid "Contact your organisation owner to upgrade plans."
+msgstr ""
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Content"
@@ -3233,6 +3264,10 @@ msgstr "Ga verder door het document te bekijken."
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "Continue to login"
 msgstr "Doorgaan naar inloggen"
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Continue with SSO"
+msgstr ""
 
 #: apps/remix/app/components/forms/reminder-preferences-form.tsx
 msgid "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
@@ -4978,6 +5013,10 @@ msgstr "Bijv. 100"
 msgid "e.g. Resend (free plans)"
 msgstr "bijv. Resend (gratis abonnementen)"
 
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Easy DNS setup with auto-generated DKIM and SPF records"
+msgstr ""
+
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
@@ -5496,6 +5535,8 @@ msgid "Enter your text here"
 msgstr "Voer hier je tekst in"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
 msgid "Enterprise"
 msgstr "Enterprise"
 
@@ -6146,6 +6187,10 @@ msgstr "Links genereren"
 #: packages/lib/constants/i18n.ts
 msgid "German"
 msgstr "Duits"
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Give your members a dedicated single sign-on portal. The SSO portal is available on the Enterprise plan."
+msgstr ""
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
@@ -7106,6 +7151,7 @@ msgid "Manage {0}'s profile"
 msgstr "Profiel van {0} beheren"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Manage a custom SSO login portal for your organisation."
 msgstr "Beheer een aangepast SSO-inlogportaal voor uw organisatie."
 
@@ -7530,6 +7576,10 @@ msgstr "Naam is verplicht"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Name Settings"
 msgstr "Naam-instellingen"
+
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Named senders with defaults per team, template or document"
+msgstr ""
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Navigate"
@@ -8129,6 +8179,7 @@ msgstr "Organisatie-instellingen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Organisation SSO Portal"
 msgstr "SSO-portaal van organisatie"
 
@@ -8673,6 +8724,11 @@ msgstr "Selecteer minstens één lid om aan het team toe te voegen."
 msgid "Please select how you'd like to receive your verification code."
 msgstr "Selecteer hoe u uw verificatiecode wilt ontvangen."
 
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Please sign: Example.pdf"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Please try a different domain."
 msgstr "Probeer een ander domein."
@@ -8858,6 +8914,10 @@ msgstr "Publieke sjabloon"
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
 msgstr "Openbare sjablonen zijn gekoppeld aan je openbare profiel. Alle wijzigingen aan openbare sjablonen worden ook zichtbaar in je openbare profiel."
+
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Put your own brand on every document you send. Branding is available on the Teams plan and above."
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Quick Actions"
@@ -9185,6 +9245,10 @@ msgstr "Doorsturen"
 #. placeholder {0}: oidcProviderLabel || 'OIDC'
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
 msgid "Redirecting to {0}..."
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Redirecting to your identity provider"
 msgstr ""
 
 #: apps/remix/app/components/forms/signup.tsx
@@ -9554,6 +9618,10 @@ msgstr "Responsheaders"
 #: packages/ui/components/document/document-share-button.tsx
 msgid "Rest assured, your document is strictly confidential and will never be shared. Only your signing experience will be highlighted. Share your personalized signing card to showcase your signature!"
 msgstr "Wees gerust, je document is strikt vertrouwelijk en wordt nooit gedeeld. Alleen je ondertekeningservaring wordt uitgelicht. Deel je gepersonaliseerde ondertekeningskaart om je handtekening te laten zien!"
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Restrict sign-ins by email domain and choose the default role"
+msgstr ""
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Restricted Access"
@@ -10071,6 +10139,10 @@ msgstr "Document verzenden"
 msgid "Send Document"
 msgstr "Document verzenden"
 
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Send documents from your own domain. Email domains are available on the Enterprise plan."
+msgstr ""
+
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Send documents on behalf of the team using the email address"
 msgstr "Documenten versturen namens het team met dit e-mailadres"
@@ -10078,6 +10150,10 @@ msgstr "Documenten versturen namens het team met dit e-mailadres"
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Send documents to recipients immediately"
 msgstr "Documenten direct naar ontvangers verzenden"
+
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Send emails to recipients from your domain"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Send Envelope"
@@ -10125,6 +10201,14 @@ msgstr "Afzender"
 msgid "Sender reported"
 msgstr "Afzender gerapporteerd"
 
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Sending from app.documenso.com"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Sending from your domain"
+msgstr ""
+
 #: apps/remix/app/components/forms/forgot-password.tsx
 msgid "Sending Reset Email..."
 msgstr "Resetmail wordt verzonden..."
@@ -10143,6 +10227,10 @@ msgstr "Verzonden"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "Sent this period"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Separate branding per team"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
@@ -10250,6 +10338,7 @@ msgstr "Gebruik met quota weergeven"
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
 #: apps/remix/app/components/general/user-profile-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
@@ -10421,6 +10510,10 @@ msgctxt "Signed document (adjective)"
 msgid "Signed"
 msgstr "Ondertekend"
 
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Signed in"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-header.tsx
 msgid "Signer"
 msgstr "Ondertekenaar"
@@ -10536,6 +10629,10 @@ msgstr "Registratie is momenteel uitgeschakeld of niet beschikbaar voor jouw e�
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "Since {0}"
 msgstr "Sinds {0}"
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Single sign-on"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Site Banner"
@@ -11137,6 +11234,7 @@ msgstr "Team‑URL"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
 #: apps/remix/app/components/general/use-admin-search-categories.ts
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -12673,6 +12771,18 @@ msgstr "Onbeperkte documenten, API en meer"
 msgid "Unlink"
 msgstr "Ontkoppelen"
 
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Unlock Branding Preferences"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Unlock Email Domains"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Unlock the Organisation SSO Portal"
+msgstr ""
+
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Unpin"
 msgstr "Losmaken"
@@ -12845,6 +12955,10 @@ msgstr "Upgraden"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Upgrade <0>{0}</0> to {planName}"
 msgstr "Upgrade <0>{0}</0> naar {planName}"
+
+#: apps/remix/app/components/general/settings-upsell/settings-upsell-card.tsx
+msgid "Upgrade Plan"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "Upgrade your plan to upload more documents"
@@ -13830,6 +13944,11 @@ msgstr "Welkom terug, we boffen met je."
 msgid "Welcome back! Here's an overview of your account."
 msgstr "Welkom terug! Hier is een overzicht van je account."
 
+#. placeholder {0}: organisation.name
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Welcome to {0}"
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Welcome to {organisationName}"
 msgstr "Welkom bij {organisationName}"
@@ -13905,6 +14024,10 @@ msgstr "Toestemming intrekken"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "Within limit"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Works with any OIDC provider — Okta, Entra ID, Google and more"
 msgstr ""
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
@@ -14923,6 +15046,10 @@ msgstr "Uw envelop is succesvol verzonden."
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "Your envelope has been resent successfully."
 msgstr "Uw envelop is succesvol opnieuw verzonden."
+
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Your logo on signing pages and emails"
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Your Name"
