@@ -3,6 +3,8 @@ title: Getting Started
 description: Requirements and quick start guide for self-hosting Documenso.
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
+
 <Cards>
   <Card
     title="Requirements"
@@ -15,3 +17,11 @@ description: Requirements and quick start guide for self-hosting Documenso.
     href="/docs/self-hosting/getting-started/quick-start"
   />
 </Cards>
+
+<Callout type="error">
+  **You must generate a signing certificate.** Documenso does not ship with one. Without a
+  certificate, the application starts normally but document signing will fail on completion with
+  errors.
+
+  Please see all the [requirements](/docs/self-hosting/getting-started/requirements) before proceeding.
+</Callout>

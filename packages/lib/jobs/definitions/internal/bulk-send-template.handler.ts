@@ -1,16 +1,13 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/macro';
-import { parse } from 'csv-parse/sync';
-import { z } from 'zod';
-
-import { mailer } from '@documenso/email/mailer';
 import { BulkSendCompleteEmail } from '@documenso/email/templates/bulk-send-complete';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/macro';
+import { parse } from 'csv-parse/sync';
+import { createElement } from 'react';
+import { z } from 'zod';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
@@ -28,13 +25,7 @@ const ZRecipientRowSchema = z.object({
   ]),
 });
 
-export const run = async ({
-  payload,
-  io,
-}: {
-  payload: TBulkSendTemplateJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ payload, io }: { payload: TBulkSendTemplateJobDefinition; io: JobRunIO }) => {
   const { userId, teamId, templateId, csvContent, sendImmediately, requestMetadata } = payload;
 
   const template = await getTemplateById({
@@ -82,7 +73,7 @@ export const run = async ({
   const results = {
     success: 0,
     failed: 0,
-    errors: Array<string>(),
+    errors: [] as string[],
   };
 
   // Process each row
@@ -172,7 +163,7 @@ export const run = async ({
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });
 
-    const { branding, emailLanguage, senderEmail } = await getEmailContext({
+    const { branding, emailLanguage, senderEmail, emailTransport } = await getEmailContext({
       emailType: 'INTERNAL',
       source: {
         type: 'team',
@@ -194,7 +185,7 @@ export const run = async ({
       }),
     ]);
 
-    await mailer.sendMail({
+    await emailTransport.sendMail({
       to: {
         name: user.name || '',
         address: user.email,

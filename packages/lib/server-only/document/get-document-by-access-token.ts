@@ -1,6 +1,5 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 

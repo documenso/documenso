@@ -1,20 +1,11 @@
-import { useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@documenso/ui/primitives/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
+import { useState } from 'react';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -24,11 +15,7 @@ type AiFeaturesEnableDialogProps = {
   onEnabled: () => void;
 };
 
-export const AiFeaturesEnableDialog = ({
-  open,
-  onOpenChange,
-  onEnabled,
-}: AiFeaturesEnableDialogProps) => {
+export const AiFeaturesEnableDialog = ({ open, onOpenChange, onEnabled }: AiFeaturesEnableDialogProps) => {
   const { t } = useLingui();
 
   const team = useCurrentTeam();
@@ -71,11 +58,7 @@ export const AiFeaturesEnableDialog = ({
       onOpenChange(false);
     } catch (err) {
       console.error('Failed to enable AI features', err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : t`We couldn't enable AI features right now. Please try again.`,
-      );
+      setError(err instanceof Error ? err.message : t`We couldn't enable AI features right now. Please try again.`);
     }
   };
 
@@ -89,39 +72,38 @@ export const AiFeaturesEnableDialog = ({
         </DialogHeader>
 
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             <Trans>
-              Turn on AI detection to automatically find recipients and fields in your documents. AI
-              providers do not retain your data for training.
+              Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not
+              retain your data for training.
             </Trans>
           </p>
 
           <Alert variant="neutral">
             <AlertDescription>
               <Trans>
-                Your document content will be sent securely to our AI provider solely for detection
-                and will not be stored or used for training.
+                Your document content will be sent securely to our AI provider solely for detection and will not be
+                stored or used for training.
               </Trans>
             </AlertDescription>
           </Alert>
 
           {canEnableAiFeatures ? (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               <Trans>
-                You're an admin. You can enable AI features for this team right away. Everyone on
-                the team will see AI detection once enabled.
+                You're an admin. You can enable AI features for this team right away. Everyone on the team will see AI
+                detection once enabled.
               </Trans>
             </p>
           ) : (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               <Trans>
-                AI features are disabled for your team. Please ask your team owner or organisation
-                owner to enable them.
+                AI features are disabled for your team. Please ask your team owner or organisation owner to enable them.
               </Trans>
             </p>
           )}
 
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          {error ? <p className="text-destructive text-sm">{error}</p> : null}
         </div>
 
         <DialogFooter>

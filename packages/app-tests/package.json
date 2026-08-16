@@ -18,7 +18,7 @@
     "@playwright/test": "1.56.1",
     "@types/node": "^20",
     "@types/pngjs": "^6.0.5",
-    "tsx": "^4.20.6",
+    "tsx": "^4.23.1",
     "pixelmatch": "^7.1.0",
     "pngjs": "^7.0.0"
   },

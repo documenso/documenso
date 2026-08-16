@@ -1,12 +1,3 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { EditIcon, MoreHorizontal, Trash2Icon } from 'lucide-react';
-import { useSearchParams } from 'react-router';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
@@ -28,10 +19,17 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+import { EditIcon, MoreHorizontal, Trash2Icon } from 'lucide-react';
+import { useMemo } from 'react';
+import { useSearchParams } from 'react-router';
 
 import { useCurrentTeam } from '~/providers/team';
 
-import { TeamMemberDeleteDialog } from '../dialogs/team-member-delete-dialog';
+import { TeamMemberDeleteDialog, type TeamMemberDeleteDisableReason } from '../dialogs/team-member-delete-dialog';
 import { TeamMemberUpdateDialog } from '../dialogs/team-member-update-dialog';
 import { TeamInheritMemberAlert } from '../general/teams/team-inherit-member-alert';
 
@@ -88,6 +86,39 @@ export const TeamMembersTable = () => {
   );
 
   const columns = useMemo(() => {
+    // A member is a direct team member when they belong to one of the team's
+    // INTERNAL_TEAM groups. Otherwise they are inherited from an organisation or
+    // custom group and cannot be managed directly from this team.
+    const isMemberPartOfInternalTeamGroup = (memberId: string) =>
+      groups.some(
+        (group) =>
+          group.organisationGroupType === OrganisationGroupType.INTERNAL_TEAM &&
+          group.members.some((member) => member.id === memberId),
+      );
+
+    // Determine why a member can't be removed from the team (if at all). The delete
+    // dialog uses this to explain the reason instead of attempting a removal that
+    // would fail.
+    const getDeleteDisableReason = (member: (typeof results)['data'][number]): TeamMemberDeleteDisableReason | null => {
+      if (organisation.ownerUserId === member.userId) {
+        return 'TEAM_OWNER';
+      }
+
+      if (!isTeamRoleWithinUserHierarchy(team.currentTeamRole, member.teamRole)) {
+        return 'HIGHER_ROLE';
+      }
+
+      if (memberAccessTeamGroup !== undefined) {
+        return 'INHERIT_MEMBER_ENABLED';
+      }
+
+      if (!isMemberPartOfInternalTeamGroup(member.id)) {
+        return 'INHERITED_MEMBER';
+      }
+
+      return null;
+    };
+
     return [
       {
         header: _(msg`Team Member`),
@@ -100,9 +131,7 @@ export const TeamMembersTable = () => {
             <AvatarWithText
               avatarClass="h-12 w-12"
               avatarFallback={avatarFallbackText}
-              primaryText={
-                <span className="text-foreground/80 font-semibold">{row.original.name}</span>
-              }
+              primaryText={<span className="font-semibold text-foreground/80">{row.original.name}</span>}
               secondaryText={row.original.email}
             />
           );
@@ -115,22 +144,14 @@ export const TeamMembersTable = () => {
       },
       {
         header: _(msg`Source`),
-        cell: ({ row }) => {
-          const internalTeamGroupFound = groups.find(
-            (group) =>
-              group.organisationGroupType === OrganisationGroupType.INTERNAL_TEAM &&
-              group.members.some((member) => member.id === row.original.id),
-          );
-
-          return internalTeamGroupFound ? _(msg`Member`) : _(msg`Group`);
-        },
+        cell: ({ row }) => (isMemberPartOfInternalTeamGroup(row.original.id) ? _(msg`Member`) : _(msg`Group`)),
       },
       {
         header: _(msg`Actions`),
         cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+              <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-52" align="start" forceMount>
@@ -165,16 +186,9 @@ export const TeamMembersTable = () => {
                 memberId={row.original.id}
                 memberName={row.original.name ?? ''}
                 memberEmail={row.original.email}
-                isInheritMemberEnabled={memberAccessTeamGroup !== undefined}
+                disableReason={getDeleteDisableReason(row.original)}
                 trigger={
-                  <DropdownMenuItem
-                    onSelect={(e) => e.preventDefault()}
-                    disabled={
-                      organisation.ownerUserId === row.original.userId ||
-                      !isTeamRoleWithinUserHierarchy(team.currentTeamRole, row.original.teamRole)
-                    }
-                    title={_(msg`Remove team member`)}
-                  >
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} title={_(msg`Remove team member`)}>
                     <Trash2Icon className="mr-2 h-4 w-4" />
                     <Trans>Remove</Trans>
                   </DropdownMenuItem>
@@ -231,9 +245,7 @@ export const TeamMembersTable = () => {
       </DataTable>
 
       <AnimateGenericFadeInOut key={groupQuery.isPending ? 'pending' : 'fetched'}>
-        {!groupQuery.isPending && (
-          <TeamInheritMemberAlert memberAccessTeamGroup={memberAccessTeamGroup || null} />
-        )}
+        {!groupQuery.isPending && <TeamInheritMemberAlert memberAccessTeamGroup={memberAccessTeamGroup || null} />}
       </AnimateGenericFadeInOut>
     </div>
   );

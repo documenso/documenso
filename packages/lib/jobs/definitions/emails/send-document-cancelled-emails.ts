@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION_ID = 'send.document.cancelled.emails';
 

@@ -1,15 +1,11 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-import pMap from 'p-map';
-import { match } from 'ts-pattern';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import { UNSAFE_createEnvelopeItems } from '@documenso/lib/server-only/envelope-item/create-envelope-items';
 import { UNSAFE_deleteEnvelopeItem } from '@documenso/lib/server-only/envelope-item/delete-envelope-item';
 import { UNSAFE_replaceEnvelopeItemPdf } from '@documenso/lib/server-only/envelope-item/replace-envelope-item-pdf';
 import { UNSAFE_updateEnvelopeItems } from '@documenso/lib/server-only/envelope-item/update-envelope-items';
-import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
@@ -18,6 +14,9 @@ import { nanoid } from '@documenso/lib/universal/id';
 import { PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
 import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import pMap from 'p-map';
+import { match } from 'ts-pattern';
 
 import { procedure } from '../trpc';
 import {
@@ -104,9 +103,7 @@ export const updateEmbeddingEnvelopeRoute = procedure
 
       // Handle existing envelope items.
       if (!isNewEnvelopeItem) {
-        const envelopeItem = envelope.envelopeItems.find(
-          (envelopeItem) => envelopeItem.id === item.id,
-        );
+        const envelopeItem = envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === item.id);
 
         if (!envelopeItem) {
           throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -135,8 +132,7 @@ export const updateEmbeddingEnvelopeRoute = procedure
           return;
         }
 
-        const hasEnvelopeItemChanged =
-          envelopeItem.title !== item.title || envelopeItem.order !== item.order;
+        const hasEnvelopeItemChanged = envelopeItem.title !== item.title || envelopeItem.order !== item.order;
 
         if (hasEnvelopeItemChanged) {
           envelopeItemsToUpdate.push({
@@ -453,8 +449,7 @@ export const updateEmbeddingEnvelopeRoute = procedure
       .exhaustive();
 
     // Step 5: Handle attachments (set semantics: delete all existing, create new).
-    let hasEnvelopeAttachmentsChanged =
-      envelope.envelopeAttachments.length !== data.attachments.length;
+    let hasEnvelopeAttachmentsChanged = envelope.envelopeAttachments.length !== data.attachments.length;
 
     data.attachments.forEach((attachment) => {
       const foundAttachment = envelope.envelopeAttachments.find((a) => a.id === attachment.id);

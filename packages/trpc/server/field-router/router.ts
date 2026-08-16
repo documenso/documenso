@@ -1,5 +1,3 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
 import { deleteTemplateField } from '@documenso/lib/server-only/field/delete-template-field';
@@ -9,6 +7,7 @@ import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-field
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { updateEnvelopeFields } from '@documenso/lib/server-only/field/update-envelope-fields';
+import { EnvelopeType } from '@prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
@@ -589,27 +588,25 @@ export const fieldRouter = router({
   /**
    * @private
    */
-  signFieldWithToken: procedure
-    .input(ZSignFieldWithTokenMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { token, fieldId, value, isBase64, authOptions } = input;
+  signFieldWithToken: procedure.input(ZSignFieldWithTokenMutationSchema).mutation(async ({ input, ctx }) => {
+    const { token, fieldId, value, isBase64, authOptions } = input;
 
-      ctx.logger.info({
-        input: {
-          fieldId,
-        },
-      });
-
-      return await signFieldWithToken({
-        token,
+    ctx.logger.info({
+      input: {
         fieldId,
-        value: value ?? '',
-        isBase64,
-        userId: ctx.user?.id,
-        authOptions,
-        requestMetadata: ctx.metadata.requestMetadata,
-      });
-    }),
+      },
+    });
+
+    return await signFieldWithToken({
+      token,
+      fieldId,
+      value: value ?? '',
+      isBase64,
+      userId: ctx.user?.id,
+      authOptions,
+      requestMetadata: ctx.metadata.requestMetadata,
+    });
+  }),
 
   /**
    * @private

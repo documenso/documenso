@@ -1,10 +1,5 @@
-import { z } from 'zod';
-
 import { ZDocumentSchema } from '@documenso/lib/types/document';
-import {
-  ZDocumentAccessAuthTypesSchema,
-  ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
+import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
@@ -16,14 +11,11 @@ import {
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { z } from 'zod';
 
 import { ZCreateRecipientSchema } from '../recipient-router/schema';
 import type { TrpcRouteMeta } from '../trpc';
-import {
-  ZDocumentExternalIdSchema,
-  ZDocumentTitleSchema,
-  ZDocumentVisibilitySchema,
-} from './schema';
+import { ZDocumentExternalIdSchema, ZDocumentTitleSchema, ZDocumentVisibilitySchema } from './schema';
 
 /**
  * Temporariy endpoint for V2 Beta until we allow passthrough documents on create.
@@ -88,12 +80,8 @@ export const ZCreateDocumentTemporaryResponseSchema = z.object({
   document: ZDocumentSchema,
   uploadUrl: z
     .string()
-    .describe(
-      'The URL to upload the document PDF to. Use a PUT request with the file via form-data',
-    ),
+    .describe('The URL to upload the document PDF to. Use a PUT request with the file via form-data'),
 });
 
 export type TCreateDocumentTemporaryRequest = z.infer<typeof ZCreateDocumentTemporaryRequestSchema>;
-export type TCreateDocumentTemporaryResponse = z.infer<
-  typeof ZCreateDocumentTemporaryResponseSchema
->;
+export type TCreateDocumentTemporaryResponse = z.infer<typeof ZCreateDocumentTemporaryResponseSchema>;

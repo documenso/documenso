@@ -17,9 +17,7 @@ export const ZBulkDeleteEnvelopesRequestSchema = z.object({
     .array(z.string())
     .min(1)
     .max(100)
-    .describe(
-      'The IDs of the envelopes to delete. The maximum number of envelopes you can delete at once is 100.',
-    ),
+    .describe('The IDs of the envelopes to delete. The maximum number of envelopes you can delete at once is 100.'),
 });
 
 export const ZBulkDeleteEnvelopesResponseSchema = z.object({

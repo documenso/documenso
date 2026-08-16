@@ -296,12 +296,27 @@ const config = {
       },
       {
         source: '/developers/embedding/authoring',
-        destination: '/docs/developers/embedding/authoring',
+        destination: '/docs/developers/embedding/editor',
+        permanent: true,
+      },
+      {
+        source: '/developers/embedding/authoring/:path*',
+        destination: '/docs/developers/embedding/editor/:path*',
         permanent: true,
       },
       {
         source: '/developers/embedded-authoring',
-        destination: '/docs/developers/embedding/authoring',
+        destination: '/docs/developers/embedding/editor',
+        permanent: true,
+      },
+      {
+        source: '/docs/developers/embedding/authoring',
+        destination: '/docs/developers/embedding/editor',
+        permanent: true,
+      },
+      {
+        source: '/docs/developers/embedding/authoring/:path*',
+        destination: '/docs/developers/embedding/editor/:path*',
         permanent: true,
       },
 

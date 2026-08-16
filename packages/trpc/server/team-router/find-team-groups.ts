@@ -1,16 +1,12 @@
+import type { FindResultResponse } from '@documenso/lib/types/search-params';
+import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
+import { prisma } from '@documenso/prisma';
 import type { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { unique } from 'remeda';
 
-import type { FindResultResponse } from '@documenso/lib/types/search-params';
-import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
-import { prisma } from '@documenso/prisma';
-
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZFindTeamGroupsRequestSchema,
-  ZFindTeamGroupsResponseSchema,
-} from './find-team-groups.types';
+import { ZFindTeamGroupsRequestSchema, ZFindTeamGroupsResponseSchema } from './find-team-groups.types';
 
 export const findTeamGroupsRoute = authenticatedProcedure
   // .meta(getTeamGroupsMeta)

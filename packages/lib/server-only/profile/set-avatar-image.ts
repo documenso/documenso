@@ -29,12 +29,7 @@ export type SetAvatarImageOptions = {
 /**
  * Pretty nasty but will do for now.
  */
-export const setAvatarImage = async ({
-  userId,
-  target,
-  bytes,
-  requestMetadata,
-}: SetAvatarImageOptions) => {
+export const setAvatarImage = async ({ userId, target, bytes, requestMetadata }: SetAvatarImageOptions) => {
   let oldAvatarImageId: string | null = null;
 
   if (target.type === 'team') {

@@ -1,12 +1,3 @@
-import { useMemo, useTransition } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Loader } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
@@ -19,6 +10,13 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Loader } from 'lucide-react';
+import { DateTime } from 'luxon';
+import { useMemo, useTransition } from 'react';
+import { Link } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { useCurrentTeam } from '~/providers/team';
@@ -31,7 +29,7 @@ export type DocumentsTableProps = {
   data?: TFindDocumentsResponse;
   isLoading?: boolean;
   isLoadingError?: boolean;
-  onMoveDocument?: (documentId: number) => void;
+  onMoveDocument?: (envelopeId: string) => void;
   enableSelection?: boolean;
   rowSelection?: RowSelectionState;
   onRowSelectionChange?: (selection: RowSelectionState) => void;
@@ -87,18 +85,11 @@ export const DocumentsTable = ({
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) =>
-          i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+        cell: ({ row }) => i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
       },
       {
         header: _(msg`Title`),
-        cell: ({ row }) => (
-          <DataTableTitle
-            row={row.original}
-            teamUrl={team?.url}
-            teamEmail={team?.teamEmail?.email}
-          />
-        ),
+        cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} teamEmail={team?.teamEmail?.email} />,
       },
       {
         id: 'sender',
@@ -109,10 +100,7 @@ export const DocumentsTable = ({
         header: _(msg`Recipient`),
         accessorKey: 'recipient',
         cell: ({ row }) => (
-          <StackAvatarsWithTooltip
-            recipients={row.original.recipients}
-            documentStatus={row.original.status}
-          />
+          <StackAvatarsWithTooltip recipients={row.original.recipients} documentStatus={row.original.status} />
         ),
       },
       {
@@ -129,7 +117,7 @@ export const DocumentsTable = ({
               <DocumentsTableActionButton row={row.original} />
               <DocumentsTableActionDropdown
                 row={row.original}
-                onMoveDocument={onMoveDocument ? () => onMoveDocument(row.original.id) : undefined}
+                onMoveDocument={onMoveDocument ? () => onMoveDocument(row.original.envelopeId) : undefined}
               />
             </div>
           ),
@@ -263,8 +251,6 @@ const DataTableTitle = ({ row, teamUrl, teamEmail }: DataTableTitleProps) => {
       </Link>
     ))
     .otherwise(() => (
-      <span className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]">
-        {row.title}
-      </span>
+      <span className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]">{row.title}</span>
     ));
 };

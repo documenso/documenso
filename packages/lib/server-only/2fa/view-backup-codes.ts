@@ -5,10 +5,7 @@ import { getBackupCodes } from './get-backup-code';
 import { validateTwoFactorAuthentication } from './validate-2fa';
 
 type ViewBackupCodesOptions = {
-  user: Pick<
-    User,
-    'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret' | 'twoFactorBackupCodes'
-  >;
+  user: Pick<User, 'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret' | 'twoFactorBackupCodes'>;
   token: string;
 };
 

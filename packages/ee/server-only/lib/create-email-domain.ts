@@ -1,8 +1,4 @@
 import { CreateEmailIdentityCommand, SESv2Client } from '@aws-sdk/client-sesv2';
-import { EmailDomainStatus } from '@prisma/client';
-import { generateKeyPair } from 'crypto';
-import { promisify } from 'util';
-
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
@@ -10,6 +6,9 @@ import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { generateEmailDomainRecords } from '@documenso/lib/utils/email-domains';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
+import { EmailDomainStatus } from '@prisma/client';
+import { generateKeyPair } from 'crypto';
+import { promisify } from 'util';
 
 export const getSesClient = () => {
   const accessKeyId = env('NEXT_PRIVATE_SES_ACCESS_KEY_ID');

@@ -1,6 +1,5 @@
-import { type RecipientRole, SigningStatus } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { type RecipientRole, SigningStatus } from '@prisma/client';
 
 export type UpdateRecipientOptions = {
   id: number;

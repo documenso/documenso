@@ -1,16 +1,15 @@
-import type { DocumentData } from '@prisma/client';
-import { DocumentDataType, EnvelopeType } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import type { DocumentData } from '@prisma/client';
+import { DocumentDataType, DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
+  downloadDocumentMeta,
   ZDownloadDocumentRequestSchema,
   ZDownloadDocumentResponseSchema,
-  downloadDocumentMeta,
 } from './download-document-beta.types';
 
 export const downloadDocumentBetaRoute = authenticatedProcedure
@@ -49,8 +48,7 @@ export const downloadDocumentBetaRoute = authenticatedProcedure
 
     if (envelope.envelopeItems.length !== 1 || !documentData) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message:
-          'This endpoint only supports documents with a single item. Use envelopes API instead.',
+        message: 'This endpoint only supports documents with a single item. Use envelopes API instead.',
       });
     }
 
@@ -60,15 +58,19 @@ export const downloadDocumentBetaRoute = authenticatedProcedure
       });
     }
 
-    if (version === 'signed' && !isDocumentCompleted(envelope.status)) {
+    // A cancelled document was never sealed, so its data is the unsigned original.
+    // Treat it as not-completed here so a "signed" version is never served for it.
+    // REJECTED and COMPLETED keep their prior behavior.
+    const hasSignedArtifact = isDocumentCompleted(envelope.status) && envelope.status !== DocumentStatus.CANCELLED;
+
+    if (version === 'signed' && !hasSignedArtifact) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Document is not completed yet.',
       });
     }
 
     try {
-      const data =
-        version === 'original' ? documentData.initialData || documentData.data : documentData.data;
+      const data = version === 'original' ? documentData.initialData || documentData.data : documentData.data;
 
       const { url } = await getPresignGetUrl(data);
 

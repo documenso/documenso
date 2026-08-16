@@ -1,11 +1,10 @@
-import { Trans } from '@lingui/react/macro';
-import { ChevronLeft } from 'lucide-react';
-import { Link, redirect } from 'react-router';
-
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
+import { Trans } from '@lingui/react/macro';
+import { ChevronLeft } from 'lucide-react';
+import { Link, redirect } from 'react-router';
 
 import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
 import { DocumentAttachmentsPopover } from '~/components/general/document/document-attachments-popover';
@@ -68,7 +67,7 @@ export default function TemplateEditPage() {
           </Link>
 
           <h1
-            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+            className="mt-4 block max-w-[20rem] truncate font-semibold text-2xl md:max-w-[30rem] md:text-3xl"
             title={template.title}
           >
             {template.title}
@@ -104,11 +103,7 @@ export default function TemplateEditPage() {
         </div>
       </div>
 
-      <TemplateEditForm
-        className="mt-6"
-        initialTemplate={template}
-        templateRootPath={templateRootPath}
-      />
+      <TemplateEditForm className="mt-6" initialTemplate={template} templateRootPath={templateRootPath} />
     </div>
   );
 }

@@ -42,7 +42,7 @@ export type ApiRequestMetadata = {
 };
 
 export const extractRequestMetadata = (req: Request): RequestMetadata => {
-  let ip: string | undefined = undefined;
+  let ip: string | undefined;
 
   try {
     ip = getIpAddress(req);

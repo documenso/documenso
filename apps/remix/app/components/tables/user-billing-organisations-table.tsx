@@ -1,32 +1,29 @@
-import { useMemo } from 'react';
-
-import { Trans, useLingui } from '@lingui/react/macro';
-import { SubscriptionStatus } from '@prisma/client';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
+import { isOrganisationPendingPayment } from '@documenso/lib/utils/billing';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { SubscriptionStatus } from '@prisma/client';
+import { useMemo } from 'react';
+import { Link } from 'react-router';
+import { match } from 'ts-pattern';
 
 export const UserBillingOrganisationsTable = () => {
   const { t } = useLingui();
   const { organisations } = useSession();
 
   const billingOrganisations = useMemo(() => {
-    return organisations.filter((org) =>
-      canExecuteOrganisationAction('MANAGE_BILLING', org.currentOrganisationRole),
-    );
+    return organisations.filter((org) => canExecuteOrganisationAction('MANAGE_BILLING', org.currentOrganisationRole));
   }, [organisations]);
 
-  const getSubscriptionStatusDisplay = (status: SubscriptionStatus | undefined) => {
-    return match(status)
+  const getSubscriptionStatusDisplay = (organisation: (typeof billingOrganisations)[number]) => {
+    return match(organisation.subscription?.status)
       .with(SubscriptionStatus.ACTIVE, () => ({
         label: t({ message: `Active`, context: `Subscription status` }),
         variant: 'default' as const,
@@ -39,10 +36,19 @@ export const UserBillingOrganisationsTable = () => {
         label: t({ message: `Inactive`, context: `Subscription status` }),
         variant: 'neutral' as const,
       }))
-      .otherwise(() => ({
-        label: t({ message: `Free`, context: `Subscription status` }),
-        variant: 'neutral' as const,
-      }));
+      .otherwise(() => {
+        if (isOrganisationPendingPayment(organisation)) {
+          return {
+            label: t({ message: `Free (Pending)`, context: `Subscription status` }),
+            variant: 'warning' as const,
+          };
+        }
+
+        return {
+          label: t({ message: `Free`, context: `Subscription status` }),
+          variant: 'neutral' as const,
+        };
+      });
   };
 
   const columns = useMemo(() => {
@@ -56,9 +62,7 @@ export const UserBillingOrganisationsTable = () => {
               avatarSrc={formatAvatarUrl(row.original.avatarImageId)}
               avatarClass="h-12 w-12"
               avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
-              primaryText={
-                <span className="text-foreground/80 font-semibold">{row.original.name}</span>
-              }
+              primaryText={<span className="font-semibold text-foreground/80">{row.original.name}</span>}
               secondaryText={`${NEXT_PUBLIC_WEBAPP_URL()}/o/${row.original.url}`}
             />
           </Link>
@@ -68,9 +72,7 @@ export const UserBillingOrganisationsTable = () => {
         header: t`Subscription Status`,
         accessorKey: 'subscription',
         cell: ({ row }) => {
-          const subscription = row.original.subscription;
-          const status = subscription?.status;
-          const { label, variant } = getSubscriptionStatusDisplay(status);
+          const { label, variant } = getSubscriptionStatusDisplay(row.original);
 
           return <Badge variant={variant}>{label}</Badge>;
         },
@@ -91,7 +93,7 @@ export const UserBillingOrganisationsTable = () => {
 
   if (billingOrganisations.length === 0) {
     return (
-      <div className="text-muted-foreground flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center text-muted-foreground">
         <p className="text-sm">
           <Trans>You don't manage billing for any organisations.</Trans>
         </p>

@@ -1,8 +1,7 @@
-import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
-import { z } from 'zod';
-
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { OrganisationGroupSchema } from '@documenso/prisma/generated/zod/modelSchema/OrganisationGroupSchema';
+import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
+import { z } from 'zod';
 
 // export const getOrganisationGroupsMeta: TrpcOpenApiMeta = {
 //   openapi: {
@@ -19,6 +18,12 @@ export const ZFindOrganisationGroupsRequestSchema = ZFindSearchParamsSchema.exte
   organisationGroupId: z.string().optional(),
   organisationRoles: z.nativeEnum(OrganisationMemberRole).array().optional(),
   types: z.nativeEnum(OrganisationGroupType).array().optional(),
+  /**
+   * Exclude organisation groups that are already attached to the given team.
+   * Useful for "add groups to team" pickers so that groups already on the
+   * team don't appear in the dropdown.
+   */
+  excludeTeamId: z.number().optional(),
 });
 
 export const ZFindOrganisationGroupsResponseSchema = ZFindResultResponse.extend({

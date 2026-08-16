@@ -1,15 +1,7 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType, type Recipient, SigningStatus } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
+import { AppError } from '@documenso/lib/errors/app-error';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
+import type { TEnvelopeRecipientLite } from '@documenso/lib/types/recipient';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -25,21 +17,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import * as z from 'zod';
+import { getDistributeErrorMessage } from '~/utils/toast-error-messages';
 import { StackAvatar } from '../general/stack-avatar';
 
 export type EnvelopeRedistributeDialogProps = {
-  envelope: Pick<TEnvelope, 'id' | 'userId' | 'teamId' | 'status' | 'type' | 'documentMeta'> & {
-    recipients: Recipient[];
+  envelope: Pick<TEnvelope, 'id' | 'status' | 'type'> & {
+    recipients: TEnvelopeRecipientLite[];
   };
+  envelopeType?: EnvelopeType;
   trigger?: React.ReactNode;
 };
 
@@ -51,14 +46,11 @@ export const ZEnvelopeRedistributeFormSchema = z.object({
 
 export type TEnvelopeRedistributeFormSchema = z.infer<typeof ZEnvelopeRedistributeFormSchema>;
 
-export const EnvelopeRedistributeDialog = ({
-  envelope,
-  trigger,
-}: EnvelopeRedistributeDialogProps) => {
+export const EnvelopeRedistributeDialog = ({ envelope, envelopeType, trigger }: EnvelopeRedistributeDialogProps) => {
   const recipients = envelope.recipients;
 
   const { toast } = useToast();
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -80,17 +72,34 @@ export const EnvelopeRedistributeDialog = ({
     try {
       await redistributeEnvelope({ envelopeId: envelope.id, recipients });
 
+      const successMessage = match(envelopeType)
+        .with(EnvelopeType.DOCUMENT, () => ({
+          title: t`Document resent`,
+          description: t`Your document has been resent successfully.`,
+        }))
+        .with(EnvelopeType.TEMPLATE, () => ({
+          title: t`Template resent`,
+          description: t`Your template has been resent successfully.`,
+        }))
+        .otherwise(() => ({
+          title: t`Envelope resent`,
+          description: t`Your envelope has been resent successfully.`,
+        }));
+
       toast({
-        title: t`Envelope resent`,
-        description: t`Your envelope has been resent successfully.`,
+        title: successMessage.title,
+        description: successMessage.description,
         duration: 5000,
       });
 
       setIsOpen(false);
     } catch (err) {
+      const error = AppError.parseError(err);
+      const errorMessage = getDistributeErrorMessage(error.code);
+
       toast({
-        title: t`Something went wrong`,
-        description: t`This envelope could not be resent at this time. Please try again.`,
+        title: i18n._(errorMessage.title),
+        description: i18n._(errorMessage.description),
         variant: 'destructive',
         duration: 7500,
       });

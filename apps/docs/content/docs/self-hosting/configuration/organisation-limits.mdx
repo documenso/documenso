@@ -1,0 +1,111 @@
+---
+title: Organisation Limits
+description: View and set per-organisation document, email, and API limits on a self-hosted Documenso instance using the admin panel's subscription claims.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Per-organisation limits — document, email, and API usage, plus feature toggles and team/member caps — are controlled by **subscription claims**. You configure them in the admin panel, not through environment variables.
+
+There are three distinct kinds of limit:
+
+| Limit                  | Caps                                              | Admin-settable          |
+| ---------------------- | ------------------------------------------------- | ----------------------- |
+| Resource quota         | Documents, emails, and API requests **per month** | Yes — per claim and org |
+| Resource rate limit    | The same resources over a short window (e.g. `1h`) | Yes — per claim and org |
+| Global HTTP rate limit | API requests per IP (100/min, hardcoded)          | No — see [Limitations](#limitations) |
+
+## Prerequisites
+
+- A running self-hosted Documenso instance.
+- An account with the **`ADMIN`** role — an account-level role, separate from organisation and team roles. New accounts are created with the `USER` role only. Grant the first admin by adding `ADMIN` to that user's `roles` directly in the database; after that, an existing admin can grant the role to others under **Admin Panel > Users > _(user)_ > Roles > Update user**.
+
+Open the admin panel at `/admin`. The sidebar sections used below are **Claims**, **Organisations**, and **Organisation Stats**.
+
+## Viewing usage
+
+**One organisation:** open **Admin Panel > Organisations** and select it. The **Organisation usage** section shows the current period's document, email, and API usage against its quotas.
+
+**All organisations:** open **Admin Panel > Organisation Stats** to sort and filter monthly usage. Filter by **claim** and by **period** (a UTC calendar month, shown as `YYYY-MM`), and switch between **Show usage**, **Show usage with quotas**, and **Show daily averages**.
+
+<Callout type="warn">
+  Usage counts **attempts**, not only successful actions. A request that exceeds a quota is still counted before it is rejected, so displayed usage can read higher than the number of actions that succeeded.
+</Callout>
+
+## Subscription claims
+
+A subscription claim is a named bundle of limits and feature flags (for example `Free`, `Individual`, `Teams`, `Platform`, or `Enterprise`). Claims are **templates**: when an organisation is created it receives a private copy of its claim and reads from that copy afterwards. Editing a claim template therefore affects organisations created later, not existing ones — to change an existing organisation, [edit it directly](#change-limits-for-one-organisation).
+
+### Claim fields
+
+Under **Admin Panel > Claims** (`/admin/claims`), each claim has:
+
+| Field                   | Controls                                                                          |
+| ----------------------- | --------------------------------------------------------------------------------- |
+| **Name**                | The claim's display name.                                                         |
+| **Team Count**          | Teams allowed. `0` = unlimited.                                                   |
+| **Member Count**        | Members allowed. `0` = unlimited.                                                 |
+| **Envelope Item Count** | Uploaded files allowed per envelope. Minimum `1`.                                |
+| **Recipient Count**     | Recipients allowed per document. `0` = unlimited.                                |
+| **Feature Flags**       | Feature toggles (see [Feature flags](#feature-flags)).                            |
+| **Limits**              | Monthly quota and rate-limit windows for Documents, Emails, and API.              |
+| **Email transport**     | Transport the claim uses. *Default (system mailer)* uses the instance default.    |
+
+### Quotas and rate limits
+
+The **Limits** section has a column for **Documents**, **Emails**, and **API**, each with two controls:
+
+- **Monthly quota** — how many of that resource are allowed per calendar month. An **empty** field is unlimited; **`0`** blocks the resource entirely.
+- **Rate limit windows** — optional short-window caps, each a duration and a maximum. A window is a number and a unit (`s`, `m`, `h`, `d`), such as `5m`, `1h`, or `24h`, and must be unique within the resource.
+
+<Callout type="warn">
+  Quotas and counts use opposite conventions for "unlimited": an **empty** quota is unlimited (and `0` blocks the resource), whereas `0` in the **Team**, **Member**, and **Recipient Count** fields means unlimited.
+</Callout>
+
+### Feature flags
+
+The **Feature Flags** section toggles capabilities such as Unlimited documents, Branding, Hide Documenso branding, Email domains, Embed authoring, Embed signing, White label for embed authoring/signing, 21 CFR, HIPAA, Authentication portal, Allow Legacy Envelopes, Signing reminders, QES signing, and Disable emails.
+
+Some flags are Enterprise features. If your license does not include one, it is marked and cannot be enabled (you can still turn it off). See [Enterprise Edition](/docs/policies/enterprise-edition).
+
+### Create or edit a claim template
+
+1. Go to **Admin Panel > Claims**.
+2. Select **New claim**, or select an existing claim to edit it.
+3. Set the counts, feature flags, and the **Limits** section.
+4. Save. Changes apply to organisations created afterwards, not existing ones.
+
+### Change limits for one organisation
+
+To change limits for an existing organisation, edit it directly rather than its claim template.
+
+1. Go to **Admin Panel > Organisations** and open the organisation.
+2. Adjust its quota, rate-limit, feature-flag, or email-transport fields.
+3. Save. Changes take effect immediately.
+
+The organisation also shows the **Inherited subscription claim** it was created from.
+
+## Usage reset
+
+Monthly quota usage is keyed to the **UTC calendar month**. There is no scheduled reset job — when the month rolls over, the new period's counter starts at `0`.
+
+## Limitations
+
+The **global HTTP rate limit is not configurable.** Documenso enforces a hardcoded **100 requests per minute per IP address** on its API endpoint groups (`/api/v1`, `/api/v2`, and the tRPC API are limited separately), returning `429 Too Many Requests`. It is a per-IP safeguard applied at the HTTP layer — not per-organisation, not stored on any claim, and not adjustable from the admin panel. See [Rate Limits](/docs/developers/api/rate-limits).
+
+## Troubleshooting
+
+| Symptom                                          | Cause and fix                                                                                                                    |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| An organisation hit its limit unexpectedly       | Usage counts rejected over-quota attempts. Compare usage against the quota under **Organisation Stats > Show usage with quotas**. |
+| A resource is blocked entirely, not just capped  | The **Monthly quota** is `0`, which blocks the resource. Leave it empty for unlimited.                                           |
+| Emails are not sending for an organisation        | Check whether the **Disable emails** flag is enabled on the organisation's claim — it blocks all emails regardless of quota.     |
+| A claim template edit had no effect              | Template edits are not retroactive. Edit the organisation directly under **Admin Panel > Organisations**.                        |
+
+---
+
+## See Also
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) - All configuration options
+- [Rate Limits](/docs/developers/api/rate-limits) - The global HTTP API rate limit (separate from claims)
+- [Enterprise Edition](/docs/policies/enterprise-edition) - Features unlocked by license flags

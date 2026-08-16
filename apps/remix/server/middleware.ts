@@ -1,7 +1,6 @@
+import { AppDebugger } from '@documenso/lib/utils/debugger';
 import type { Context, Next } from 'hono';
 import { setCookie } from 'hono/cookie';
-
-import { AppDebugger } from '@documenso/lib/utils/debugger';
 
 import { handleRedirects } from './redirects';
 

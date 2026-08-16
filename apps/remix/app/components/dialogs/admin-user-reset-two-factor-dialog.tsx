@@ -1,11 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { useRevalidator } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
@@ -22,24 +14,26 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { useRevalidator } from 'react-router';
+import { match } from 'ts-pattern';
 
 export type AdminUserResetTwoFactorDialogProps = {
   className?: string;
   user: TGetUserResponse;
 };
 
-export const AdminUserResetTwoFactorDialog = ({
-  className,
-  user,
-}: AdminUserResetTwoFactorDialogProps) => {
+export const AdminUserResetTwoFactorDialog = ({ className, user }: AdminUserResetTwoFactorDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
   const [email, setEmail] = useState('');
   const [open, setOpen] = useState(false);
 
-  const { mutateAsync: resetTwoFactor, isPending: isResettingTwoFactor } =
-    trpc.admin.user.resetTwoFactor.useMutation();
+  const { mutateAsync: resetTwoFactor, isPending: isResettingTwoFactor } = trpc.admin.user.resetTwoFactor.useMutation();
 
   const onResetTwoFactor = async () => {
     try {
@@ -64,9 +58,7 @@ export const AdminUserResetTwoFactorDialog = ({
           AppErrorCode.UNAUTHORIZED,
           () => msg`You are not authorized to reset two factor authentcation for this user.`,
         )
-        .otherwise(
-          () => msg`An error occurred while resetting two factor authentication for the user.`,
-        );
+        .otherwise(() => msg`An error occurred while resetting two factor authentication for the user.`);
 
       toast({
         title: _(msg`Error`),
@@ -87,16 +79,13 @@ export const AdminUserResetTwoFactorDialog = ({
 
   return (
     <div className={className}>
-      <Alert
-        className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row"
-        variant="neutral"
-      >
+      <Alert className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row" variant="neutral">
         <div>
           <AlertTitle>Reset Two Factor Authentication</AlertTitle>
           <AlertDescription className="mr-2">
             <Trans>
-              Reset the users two factor authentication. This action is irreversible and will
-              disable two factor authentication for the user.
+              Reset the users two factor authentication. This action is irreversible and will disable two factor
+              authentication for the user.
             </Trans>
           </AlertDescription>
         </div>
@@ -119,8 +108,7 @@ export const AdminUserResetTwoFactorDialog = ({
               <Alert variant="destructive">
                 <AlertDescription className="selection:bg-red-100">
                   <Trans>
-                    This action is irreversible. Please ensure you have informed the user before
-                    proceeding.
+                    This action is irreversible. Please ensure you have informed the user before proceeding.
                   </Trans>
                 </AlertDescription>
               </Alert>
@@ -132,12 +120,7 @@ export const AdminUserResetTwoFactorDialog = ({
                   </Trans>
                 </DialogDescription>
 
-                <Input
-                  className="mt-2"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                <Input className="mt-2" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
 
               <DialogFooter>

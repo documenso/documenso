@@ -1,6 +1,5 @@
-import { type DocumentAuditLog, EnvelopeType, type Prisma } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { type DocumentAuditLog, EnvelopeType, type Prisma } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -99,7 +98,7 @@ export const findDocumentAuditLogs = async ({
     }),
   ]);
 
-  let nextCursor: string | undefined = undefined;
+  let nextCursor: string | undefined;
 
   const parsedData = data.map((auditLog) => parseDocumentAuditLogData(auditLog));
 

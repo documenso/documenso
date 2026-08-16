@@ -1,7 +1,6 @@
-import { test } from '@playwright/test';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { expectTextToBeVisible } from '../fixtures/generic';
@@ -9,10 +8,7 @@ import { expectTextToBeVisible } from '../fixtures/generic';
 test('[TEAMS]: create team', async ({ page }) => {
   const { user, organisation } = await seedUser();
 
-  test.skip(
-    process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true',
-    'Test skipped because billing is enabled.',
-  );
+  test.skip(process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true', 'Test skipped because billing is enabled.');
 
   await apiSignin({
     page,
@@ -70,7 +66,7 @@ test('[TEAMS]: update team', async ({ page }) => {
   await page.getByLabel('Team URL*').clear();
   await page.getByLabel('Team URL*').fill(updatedTeamId);
 
-  await page.getByRole('button', { name: 'Update team' }).click();
+  await page.getByRole('button', { name: 'Save changes' }).click();
 
   // Check we have been redirected to the new team URL and the name is updated.
   await page.waitForURL(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${updatedTeamId}/settings`);

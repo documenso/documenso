@@ -1,6 +1,5 @@
-import { z } from 'zod';
-
 import { ZDetectedRecipientSchema } from '@documenso/lib/server-only/ai/envelope/detect-recipients/schema';
+import { z } from 'zod';
 
 export const ZDetectRecipientsRequestSchema = z.object({
   envelopeId: z.string().min(1).describe('The ID of the envelope to detect recipients from.'),

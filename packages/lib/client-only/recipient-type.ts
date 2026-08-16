@@ -1,11 +1,7 @@
 import type { Recipient } from '@prisma/client';
-import {
-  DocumentDistributionMethod,
-  ReadStatus,
-  RecipientRole,
-  SendStatus,
-  SigningStatus,
-} from '@prisma/client';
+import { DocumentDistributionMethod, ReadStatus, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+
+type RecipientForType = Pick<Recipient, 'role' | 'signingStatus' | 'readStatus' | 'sendStatus'>;
 
 export enum RecipientStatusType {
   COMPLETED = 'completed',
@@ -16,7 +12,7 @@ export enum RecipientStatusType {
 }
 
 export const getRecipientType = (
-  recipient: Recipient,
+  recipient: RecipientForType,
   distributionMethod: DocumentDistributionMethod = DocumentDistributionMethod.EMAIL,
 ) => {
   if (recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED) {
@@ -27,10 +23,7 @@ export const getRecipientType = (
     return RecipientStatusType.REJECTED;
   }
 
-  if (
-    recipient.readStatus === ReadStatus.OPENED &&
-    recipient.signingStatus === SigningStatus.NOT_SIGNED
-  ) {
+  if (recipient.readStatus === ReadStatus.OPENED && recipient.signingStatus === SigningStatus.NOT_SIGNED) {
     return RecipientStatusType.OPENED;
   }
 
@@ -45,7 +38,7 @@ export const getRecipientType = (
   return RecipientStatusType.UNSIGNED;
 };
 
-export const getExtraRecipientsType = (extraRecipients: Recipient[]) => {
+export const getExtraRecipientsType = (extraRecipients: RecipientForType[]) => {
   const types = extraRecipients.map((r) => getRecipientType(r));
 
   if (types.includes(RecipientStatusType.UNSIGNED)) {

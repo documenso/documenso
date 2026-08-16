@@ -1,13 +1,4 @@
 {
   "title": "Organisations",
-  "pages": [
-    "overview",
-    "create-team",
-    "members",
-    "groups",
-    "email-domains",
-    "preferences",
-    "single-sign-on",
-    "billing"
-  ]
+  "pages": ["overview", "create-team", "members", "groups", "email-domains", "preferences", "single-sign-on", "billing"]
 }

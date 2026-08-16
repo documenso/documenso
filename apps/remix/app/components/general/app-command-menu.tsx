@@ -1,15 +1,3 @@
-import { useCallback, useMemo, useState } from 'react';
-
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { keepPreviousData } from '@tanstack/react-query';
-import { CheckIcon, Loader, Monitor, Moon, Sun } from 'lucide-react';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { useNavigate } from 'react-router';
-import { Theme, useTheme } from 'remix-themes';
-
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
@@ -18,10 +6,7 @@ import {
   SETTINGS_PAGE_SHORTCUT,
   TEMPLATES_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
-import {
-  DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-  SKIP_QUERY_BATCH_META,
-} from '@documenso/lib/constants/trpc';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION, SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc as trpcReact } from '@documenso/trpc/react';
@@ -36,6 +21,16 @@ import {
   CommandShortcut,
 } from '@documenso/ui/primitives/command';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { keepPreviousData } from '@tanstack/react-query';
+import { CheckIcon, Loader, Monitor, Moon, Sun } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { useNavigate } from 'react-router';
+import { Theme, useTheme } from 'remix-themes';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
@@ -68,33 +63,31 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   const debouncedSearch = useDebouncedValue(search, 200);
   const hasValidSearch = debouncedSearch.trim().length > 0;
 
-  const { data: searchDocumentsData, isFetching: isFetchingDocuments } =
-    trpcReact.document.search.useQuery(
-      {
-        query: debouncedSearch,
-      },
-      {
-        enabled: open === true && hasValidSearch,
-        placeholderData: keepPreviousData,
-        // Do not batch this due to relatively long request time compared to
-        // other queries which are generally batched with this.
-        ...SKIP_QUERY_BATCH_META,
-        ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      },
-    );
+  const { data: searchDocumentsData, isFetching: isFetchingDocuments } = trpcReact.document.search.useQuery(
+    {
+      query: debouncedSearch,
+    },
+    {
+      enabled: open === true && hasValidSearch,
+      placeholderData: keepPreviousData,
+      // Do not batch this due to relatively long request time compared to
+      // other queries which are generally batched with this.
+      ...SKIP_QUERY_BATCH_META,
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    },
+  );
 
-  const { data: searchTemplatesData, isFetching: isFetchingTemplates } =
-    trpcReact.template.search.useQuery(
-      {
-        query: debouncedSearch,
-      },
-      {
-        enabled: open === true && hasValidSearch,
-        placeholderData: keepPreviousData,
-        ...SKIP_QUERY_BATCH_META,
-        ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      },
-    );
+  const { data: searchTemplatesData, isFetching: isFetchingTemplates } = trpcReact.template.search.useQuery(
+    {
+      query: debouncedSearch,
+    },
+    {
+      enabled: open === true && hasValidSearch,
+      placeholderData: keepPreviousData,
+      ...SKIP_QUERY_BATCH_META,
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    },
+  );
 
   const teamUrl = useMemo(() => {
     let teamUrl = currentTeam?.url || null;
@@ -237,11 +230,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
       open={open}
       onOpenChange={setOpen}
     >
-      <CommandInput
-        value={search}
-        onValueChange={setSearch}
-        placeholder={_(msg`Type a command or search...`)}
-      />
+      <CommandInput value={search} onValueChange={setSearch} placeholder={_(msg`Type a command or search...`)} />
 
       <CommandList>
         <CommandEmpty>
@@ -345,7 +334,7 @@ const ThemeCommands = () => {
     <CommandItem
       key={theme.theme}
       onSelect={() => setTheme(theme.theme)}
-      className="-my-1 mx-2 rounded-lg first:mt-2 last:mb-2"
+      className="mx-2 -my-1 rounded-lg first:mt-2 last:mb-2"
     >
       <theme.icon className="mr-2" />
       {_(theme.label)}
@@ -399,11 +388,9 @@ const LanguageCommands = () => {
       disabled={isLoading}
       key={language.short}
       onSelect={async () => setLanguage(language.short)}
-      className="-my-1 mx-2 rounded-lg first:mt-2 last:mb-2"
+      className="mx-2 -my-1 rounded-lg first:mt-2 last:mb-2"
     >
-      <CheckIcon
-        className={cn('mr-2 h-4 w-4', i18n.locale === language.short ? 'opacity-100' : 'opacity-0')}
-      />
+      <CheckIcon className={cn('mr-2 h-4 w-4', i18n.locale === language.short ? 'opacity-100' : 'opacity-0')} />
       {_(language.full)}
     </CommandItem>
   ));

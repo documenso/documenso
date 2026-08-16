@@ -1,6 +1,5 @@
-import { EnvelopeType, type Webhook } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType, type Webhook } from '@prisma/client';
 
 import { mapSecondaryIdToDocumentId } from '../../../utils/envelope';
 import { getWebhooksByTeamId } from '../get-webhooks-by-team-id';

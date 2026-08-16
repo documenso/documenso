@@ -13,7 +13,7 @@ export const updateSubscriptionClaimRoute = adminProcedure
   .input(ZUpdateSubscriptionClaimRequestSchema)
   .output(ZUpdateSubscriptionClaimResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { id, data } = input;
+    const { id, data, backportEmailTransport } = input;
 
     ctx.logger.info({
       input,
@@ -36,6 +36,13 @@ export const updateSubscriptionClaimRoute = adminProcedure
       data,
     });
 
+    if (backportEmailTransport) {
+      await prisma.organisationClaim.updateMany({
+        where: { originalSubscriptionClaimId: id },
+        data: { emailTransportId: data.emailTransportId ?? null },
+      });
+    }
+
     if (Object.keys(newlyEnabledFlags).length > 0) {
       await jobsClient.triggerJob({
         name: 'internal.backport-subscription-claims',
@@ -47,10 +54,7 @@ export const updateSubscriptionClaimRoute = adminProcedure
     }
   });
 
-function getNewTruthyFlags(
-  a: Partial<TClaimFlags>,
-  b: Partial<TClaimFlags>,
-): Record<keyof TClaimFlags, true> {
+function getNewTruthyFlags(a: Partial<TClaimFlags>, b: Partial<TClaimFlags>): Record<keyof TClaimFlags, true> {
   const flags: { [key in keyof TClaimFlags]?: true } = {};
 
   for (const key in b) {

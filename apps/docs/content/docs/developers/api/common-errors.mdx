@@ -1,0 +1,45 @@
+---
+title: Common Errors
+description: A comprehensive troubleshooting matrix for Documenso API and Webhook integration errors.
+---
+
+This guide provides a comprehensive troubleshooting matrix for the standard error codes returned by the Documenso API. Use this reference to diagnose and resolve integration issues related to envelopes, recipients, and webhooks.
+
+## Application Error Codes
+
+| Error Code | Description | Recommended Action |
+| :--- | :--- | :--- |
+| `ALREADY_EXISTS` | The resource you are attempting to create already exists. | Verify if the entity (e.g., user, envelope, webhook) has already been instantiated. Use a `PUT` or `PATCH` request to update the existing resource instead of `POST`. |
+| `EXPIRED_CODE` | The provided access code or token has expired. | Generate a new access code or request a new invitation link before retrying the request. |
+| `INVALID_BODY` | The request payload is malformed. | Inspect your JSON payload structure. Ensure it strictly adheres to the expected schema and that no required fields are missing. |
+| `INVALID_REQUEST` | The overall request is malformed or invalid. | Review your API call parameters, including the URL, query parameters, and headers. Correct the request syntax. |
+| `RECIPIENT_EXPIRED` | The signing link or recipient access has expired. | Generate and resend a new invitation to the affected recipient. |
+| `LIMIT_EXCEEDED` | Your account usage quota has been exceeded. | Check your current plan limits. Upgrade your subscription or wait until your billing cycle renews. |
+| `NOT_FOUND` | The requested resource could not be found (404). | Verify the resource ID (envelope, document, webhook) passed in the URL. Ensure the resource has not been deleted. |
+| `NOT_IMPLEMENTED` | The requested feature is not currently supported by the server. | Consult the API documentation to verify available methods. Do not use this endpoint at this time. |
+| `NOT_SETUP` | The required configuration for this action is incomplete. | Access your account or integration settings and complete the necessary configuration before retrying. |
+| `INVALID_CAPTCHA` | Security token (Captcha) validation failed. | Ensure the Captcha token is correctly generated on the client side and transmitted without alteration in your request. |
+| `UNAUTHORIZED` | Missing or invalid authentication (401). | Verify that your API key is correct, active, and properly formatted in the `Authorization` header (e.g., `Bearer <YOUR_API_KEY>`). |
+| `FORBIDDEN` | Access to the resource is denied (403). | Ensure your API key or user account has the necessary permissions and roles to execute this specific action. |
+| `UNKNOWN_ERROR` | An unexpected internal server error occurred (500). | Retry the request later. If the issue persists, contact technical support with your request payload and the timestamp of the incident. |
+| `RETRY_EXCEPTION` | The operation failed temporarily but can be retried. | Implement an automatic retry logic in your integration, ideally using an exponential backoff strategy. |
+| `SCHEMA_FAILED` | Strict data schema validation failed. | Verify that the data types sent (string, number, boolean) exactly match the OpenAPI specification. |
+| `TOO_MANY_REQUESTS` | Rate limit exceeded (429). | Reduce the frequency of your API calls. Implement rate-limiting handling based on the response headers. |
+| `TWO_FACTOR_AUTH_FAILED` | Two-factor authentication (2FA) failed. | Verify the provided 2FA code. Ensure it was entered correctly and has not expired. |
+| `WEBHOOK_INVALID_REQUEST` | The webhook-related request is invalid. | Check your receiving endpoint configuration. Ensure the URL is correct and that your server accepts `POST` requests from Documenso. |
+
+## Envelope State Errors
+
+The following errors occur when attempting to perform actions on an envelope that are incompatible with its current state.
+
+| Error Code | Description | Recommended Action |
+| :--- | :--- | :--- |
+| `ENVELOPE_DRAFT` | The action cannot be performed because the envelope is still in a draft state. | Finalize the envelope configuration and transition it to the `PENDING` (sent) state before attempting this operation. |
+| `ENVELOPE_COMPLETED` | The action cannot be performed because the envelope is already completed. | No further modifications (e.g., adding signers, modifying documents) can be made to an envelope once the signing process is finished. |
+| `ENVELOPE_REJECTED` | The action cannot be performed because the envelope was rejected by a recipient. | The signing flow is permanently halted. Create a new envelope if you wish to resubmit the document. |
+| `ENVELOPE_LEGACY` | The action cannot be performed because the envelope uses an obsolete format. | This envelope was created with a legacy version of the system. Recreate the envelope using the current API version to interact with it. |
+
+## See Also
+
+- [Documents API](/docs/developers/api/documents)
+- [Webhooks](/docs/developers/webhooks)

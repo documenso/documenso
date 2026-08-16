@@ -1,9 +1,8 @@
+import { prisma } from '@documenso/prisma';
+import { Button } from '@documenso/ui/primitives/button';
 import { Trans } from '@lingui/react/macro';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { Link } from 'react-router';
-
-import { prisma } from '@documenso/prisma';
-import { Button } from '@documenso/ui/primitives/button';
 
 import type { Route } from './+types/organisation.decline.$token';
 
@@ -59,11 +58,11 @@ export default function DeclineInvitationPage({ loaderData }: Route.ComponentPro
     return (
       <div className="w-screen max-w-lg px-4">
         <div className="w-full">
-          <h1 className="text-4xl font-semibold">
+          <h1 className="font-semibold text-4xl">
             <Trans>Invalid token</Trans>
           </h1>
 
-          <p className="text-muted-foreground mb-4 mt-2 text-sm">
+          <p className="mt-2 mb-4 text-muted-foreground text-sm">
             <Trans>This token is invalid or has expired. No action is needed.</Trans>
           </p>
 
@@ -79,14 +78,13 @@ export default function DeclineInvitationPage({ loaderData }: Route.ComponentPro
 
   return (
     <div className="w-screen max-w-lg px-4">
-      <h1 className="text-4xl font-semibold">
+      <h1 className="font-semibold text-4xl">
         <Trans>Invitation declined</Trans>
       </h1>
 
-      <p className="text-muted-foreground mb-4 mt-2 text-sm">
+      <p className="mt-2 mb-4 text-muted-foreground text-sm">
         <Trans>
-          You have declined the invitation from <strong>{data.organisationName}</strong> to join
-          their organisation.
+          You have declined the invitation from <strong>{data.organisationName}</strong> to join their organisation.
         </Trans>
       </p>
 

@@ -1,9 +1,7 @@
-import React, { useMemo } from 'react';
-
-import { useLocation, useNavigate } from 'react-router';
-import { useSearchParams } from 'react-router';
-
 import { Select, SelectContent, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import type React from 'react';
+import { useMemo } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
 export type SearchParamSelector = {
   paramKey: string;
@@ -41,7 +39,7 @@ export const SearchParamSelector = ({ children, paramKey, isValueValid }: Search
 
   return (
     <Select defaultValue={value} onValueChange={onValueChange}>
-      <SelectTrigger className="text-muted-foreground max-w-[200px]">
+      <SelectTrigger className="max-w-[200px] text-muted-foreground">
         <SelectValue />
       </SelectTrigger>
 

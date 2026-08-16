@@ -1,6 +1,5 @@
-import { z } from 'zod';
-
 import { ZDocumentMetaUpdateSchema } from '@documenso/lib/types/document-meta';
+import { z } from 'zod';
 
 import { ZSuccessResponseSchema } from '../schema';
 import type { TrpcRouteMeta } from '../trpc';

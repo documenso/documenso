@@ -1,9 +1,5 @@
+import { PDF_VIEWER_CONTENT_SELECTOR, PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { useEffect, useState } from 'react';
-
-import {
-  PDF_VIEWER_CONTENT_SELECTOR,
-  PDF_VIEWER_PAGE_SELECTOR,
-} from '@documenso/lib/constants/pdf-viewer';
 
 /**
  * Returns whether the PDF page element for the given page number is currently

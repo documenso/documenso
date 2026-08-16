@@ -1,10 +1,9 @@
-import type { Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-import { EnvelopeType } from '@prisma/client';
-
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import type { Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { EnvelopeType } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 

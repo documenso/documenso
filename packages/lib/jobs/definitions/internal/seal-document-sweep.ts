@@ -1,14 +1,12 @@
 import { z } from 'zod';
 
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_ID = 'internal.seal-document-sweep';
 
 const SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_SCHEMA = z.object({});
 
-export type TSealDocumentSweepJobDefinition = z.infer<
-  typeof SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_SCHEMA
->;
+export type TSealDocumentSweepJobDefinition = z.infer<typeof SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_SCHEMA>;
 
 export const SEAL_DOCUMENT_SWEEP_JOB_DEFINITION = {
   id: SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_ID,
@@ -24,7 +22,4 @@ export const SEAL_DOCUMENT_SWEEP_JOB_DEFINITION = {
 
     await handler.run({ payload, io });
   },
-} as const satisfies JobDefinition<
-  typeof SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_ID,
-  TSealDocumentSweepJobDefinition
->;
+} as const satisfies JobDefinition<typeof SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_ID, TSealDocumentSweepJobDefinition>;

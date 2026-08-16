@@ -5,8 +5,6 @@
   "types": "./index.ts",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "clean": "rimraf node_modules"
   },
   "dependencies": {

@@ -1,12 +1,11 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { Link2Icon } from 'lucide-react';
-
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { Link2Icon } from 'lucide-react';
 
 type TemplateDirectLinkBadgeProps = {
   token: string;
@@ -14,11 +13,7 @@ type TemplateDirectLinkBadgeProps = {
   className?: string;
 };
 
-export const TemplateDirectLinkBadge = ({
-  token,
-  enabled,
-  className,
-}: TemplateDirectLinkBadgeProps) => {
+export const TemplateDirectLinkBadge = ({ token, enabled, className }: TemplateDirectLinkBadgeProps) => {
   const [, copy] = useCopyToClipboard();
 
   const { _ } = useLingui();

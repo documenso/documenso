@@ -2,7 +2,7 @@
   "extends": "@documenso/tsconfig/base.json",
   "compilerOptions": {
     "allowJs": true,
-    "noEmit": true,
+    "noEmit": true
   },
   "include": ["**/*.cjs", "**/*.js"],
   "exclude": ["dist", "build", "node_modules"]

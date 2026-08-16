@@ -1,10 +1,9 @@
-import { useMemo, useState } from 'react';
+import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink, httpLink, isNonJsonSerializable, splitLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
-
-import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
+import { useMemo, useState } from 'react';
 
 import type { AppRouter } from '../server/router';
 import { dataTransformer } from '../utils/data-transformer';

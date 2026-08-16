@@ -1,3 +1,9 @@
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { getAllowedUploadMimeTypes } from '@documenso/lib/constants/document-conversion';
+import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -7,12 +13,6 @@ import { Upload } from 'lucide-react';
 import type { DropEvent, FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router';
-
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
-import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 
 import { Button } from './button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
@@ -52,9 +52,7 @@ export const DocumentUploadButton = ({
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      'application/pdf': ['.pdf'],
-    },
+    accept: getAllowedUploadMimeTypes(),
     multiple: internalVersion === '2',
     disabled,
     maxFiles,
@@ -68,10 +66,8 @@ export const DocumentUploadButton = ({
   });
 
   const heading = {
-    [EnvelopeType.DOCUMENT]:
-      internalVersion === '1' ? msg`Document (Legacy)` : msg`Upload Document`,
-    [EnvelopeType.TEMPLATE]:
-      internalVersion === '1' ? msg`Template (Legacy)` : msg`Upload Template`,
+    [EnvelopeType.DOCUMENT]: internalVersion === '1' ? msg`Document (Legacy)` : msg`Upload Document`,
+    [EnvelopeType.TEMPLATE]: internalVersion === '1' ? msg`Template (Legacy)` : msg`Upload Template`,
   };
 
   if (disabled && IS_BILLING_ENABLED()) {
@@ -79,14 +75,8 @@ export const DocumentUploadButton = ({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className="hover:bg-warning/80 bg-warning" asChild>
-              <Link
-                to={
-                  isPersonalLayoutMode
-                    ? `/settings/billing`
-                    : `/o/${organisation.url}/settings/billing`
-                }
-              >
+            <Button className="bg-warning hover:bg-warning/80" asChild>
+              <Link to={isPersonalLayoutMode ? `/settings/billing` : `/o/${organisation.url}/settings/billing`}>
                 <Trans>Upgrade</Trans>
               </Link>
             </Button>

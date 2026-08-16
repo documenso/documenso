@@ -22,9 +22,5 @@ export const ZUpdateOrganisationMemberRoleRequestSchema = z.object({
 
 export const ZUpdateOrganisationMemberRoleResponseSchema = z.void();
 
-export type TUpdateOrganisationMemberRoleRequest = z.infer<
-  typeof ZUpdateOrganisationMemberRoleRequestSchema
->;
-export type TUpdateOrganisationMemberRoleResponse = z.infer<
-  typeof ZUpdateOrganisationMemberRoleResponseSchema
->;
+export type TUpdateOrganisationMemberRoleRequest = z.infer<typeof ZUpdateOrganisationMemberRoleRequestSchema>;
+export type TUpdateOrganisationMemberRoleResponse = z.infer<typeof ZUpdateOrganisationMemberRoleResponseSchema>;

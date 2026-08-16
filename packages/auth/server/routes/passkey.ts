@@ -1,10 +1,3 @@
-import { sValidator } from '@hono/standard-validator';
-import { UserSecurityAuditLogType } from '@prisma/client';
-import { verifyAuthenticationResponse } from '@simplewebauthn/server';
-import { isoBase64URL } from '@simplewebauthn/server/helpers';
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { rateLimitResponse } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
 import { passkeyRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limits';
@@ -14,6 +7,12 @@ import type { TAuthenticationResponseJSONSchema } from '@documenso/lib/types/web
 import { ZAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 import { getAuthenticatorOptions } from '@documenso/lib/utils/authenticator';
 import { prisma } from '@documenso/prisma';
+import { sValidator } from '@hono/standard-validator';
+import { UserSecurityAuditLogType } from '@prisma/client';
+import { verifyAuthenticationResponse } from '@simplewebauthn/server';
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
+import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 
 import { onAuthorize } from '../lib/utils/authorizer';
 import type { HonoAuthContext } from '../types/context';

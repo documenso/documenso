@@ -1,12 +1,12 @@
-import type { Envelope, Field, Recipient } from '@prisma/client';
-
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { Envelope, Field, Recipient } from '@prisma/client';
 
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { convertPlaceholdersToFieldInputs, extractPdfPlaceholders } from '../pdf/auto-place-fields';
 import { findRecipientByPlaceholder } from '../pdf/helpers';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
@@ -97,6 +97,8 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
   let didFieldsChange = false;
 
   const updatedEnvelopeItem = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     const updatedItem = await tx.envelopeItem.update({
       where: {
         id: envelopeItemId,
@@ -154,12 +156,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
       const fieldsToCreate = convertPlaceholdersToFieldInputs(
         placeholders,
         (recipientPlaceholder, placeholder) =>
-          findRecipientByPlaceholder(
-            recipientPlaceholder,
-            placeholder,
-            orderedRecipients,
-            orderedRecipients,
-          ),
+          findRecipientByPlaceholder(recipientPlaceholder, placeholder, orderedRecipients, orderedRecipients),
         updatedItem.id,
       );
 
@@ -211,7 +208,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
     },
   });
 
-  let fields: Field[] | undefined = undefined;
+  let fields: Field[] | undefined;
 
   if (didFieldsChange) {
     try {

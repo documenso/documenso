@@ -1,11 +1,3 @@
-import { useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
 import { authClient } from '@documenso/auth/client';
 import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { AppError } from '@documenso/lib/errors/app-error';
@@ -21,14 +13,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@documenso/ui/primitives/form/form';
 import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/pin-input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 import { RecoveryCodeList } from './recovery-code-list';
 
@@ -97,9 +89,7 @@ export const ViewRecoveryCodesDialog = () => {
               </DialogTitle>
 
               <DialogDescription>
-                <Trans>
-                  Your recovery codes are listed below. Please store them in a safe place.
-                </Trans>
+                <Trans>Your recovery codes are listed below. Please store them in a safe place.</Trans>
               </DialogDescription>
             </DialogHeader>
 
@@ -156,9 +146,7 @@ export const ViewRecoveryCodesDialog = () => {
                   <Alert variant="destructive">
                     <AlertDescription>
                       {match(AppError.parseError(error).message)
-                        .with('INCORRECT_TWO_FACTOR_CODE', () => (
-                          <Trans>Invalid code. Please try again.</Trans>
-                        ))
+                        .with('INCORRECT_TWO_FACTOR_CODE', () => <Trans>Invalid code. Please try again.</Trans>)
                         .otherwise(() => (
                           <Trans>Something went wrong. Please try again or contact support.</Trans>
                         ))}

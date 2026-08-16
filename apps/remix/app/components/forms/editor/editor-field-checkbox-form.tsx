@@ -1,12 +1,3 @@
-import { useEffect, useMemo } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { t } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { PlusIcon, Trash } from 'lucide-react';
-import { useForm, useWatch } from 'react-hook-form';
-import { z } from 'zod';
-
 import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import {
   type TCheckboxFieldMeta as CheckboxFieldMeta,
@@ -20,23 +11,17 @@ import {
   checkboxValidationRules,
   checkboxValidationSigns,
 } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Separator } from '@documenso/ui/primitives/separator';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { t } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
+import { PlusIcon, Trash } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
 
 import {
   EditorGenericFontSizeField,
@@ -150,19 +135,13 @@ export const EditorFieldCheckboxForm = ({
     const preselectedValues = (formValues.values || [])?.filter((value) => value.checked);
 
     if (formValues.validationLength && formValues.validationRule && preselectedValues.length > 0) {
-      const validationRule = checkboxValidationSigns.find(
-        (sign) => sign.label === formValues.validationRule,
-      );
+      const validationRule = checkboxValidationSigns.find((sign) => sign.label === formValues.validationRule);
 
       if (!validationRule) {
         return false;
       }
 
-      return validateCheckboxLength(
-        preselectedValues.length,
-        validationRule.value,
-        formValues.validationLength,
-      );
+      return validateCheckboxLength(preselectedValues.length, validationRule.value, formValues.validationLength);
     }
 
     return true;
@@ -251,8 +230,7 @@ export const EditorFieldCheckboxForm = ({
 
                           const currentValues = formValues.values || [];
 
-                          const minimumNumberOfValuesRequired =
-                            validationNumber - currentValues.length;
+                          const minimumNumberOfValuesRequired = validationNumber - currentValues.length;
 
                           if (!formValues.validationRule) {
                             form.setValue('validationRule', checkboxValidationRules[0]);
@@ -295,12 +273,12 @@ export const EditorFieldCheckboxForm = ({
           <EditorGenericReadOnlyField formControl={form.control} />
 
           <section className="space-y-2">
-            <div className="-mx-4 mb-4 mt-2">
+            <div className="-mx-4 mt-2 mb-4">
               <Separator />
             </div>
 
             <div className="flex flex-row items-center justify-between gap-2">
-              <p className="text-sm font-medium">
+              <p className="font-medium text-sm">
                 <Trans>Checkbox values</Trans>
               </p>
 
@@ -335,11 +313,7 @@ export const EditorFieldCheckboxForm = ({
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input
-                            data-testid={`field-form-values-${index}-value`}
-                            className="w-full"
-                            {...field}
-                          />
+                          <Input data-testid={`field-form-values-${index}-value`} className="w-full" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -360,9 +334,7 @@ export const EditorFieldCheckboxForm = ({
             {!isValidationRuleMetForPreselectedValues && (
               <Alert variant="warning">
                 <AlertDescription>
-                  <Trans>
-                    The preselected values will be ignored unless they meet the validation criteria.
-                  </Trans>
+                  <Trans>The preselected values will be ignored unless they meet the validation criteria.</Trans>
                 </AlertDescription>
               </Alert>
             )}

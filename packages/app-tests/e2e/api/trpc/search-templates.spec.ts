@@ -1,7 +1,3 @@
-import type { Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-import { OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
@@ -9,6 +5,9 @@ import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import type { Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
 
 import { apiSignin, apiSignout } from '../../fixtures/authentication';
 
@@ -171,9 +170,7 @@ test.describe('Template Search - Cross-Team Isolation', () => {
 // ─── Recipient Email Search ──────────────────────────────────────────────────
 
 test.describe('Template Search - Recipient Email', () => {
-  test('should find templates by recipient email within team but not cross-team', async ({
-    page,
-  }) => {
+  test('should find templates by recipient email within team but not cross-team', async ({ page }) => {
     const { team: teamA, owner: ownerA } = await seedTeam();
     const adminUserA = await seedTeamMember({ teamId: teamA.id, role: TeamMemberRole.ADMIN });
     const { team: teamB, owner: ownerB } = await seedTeam();

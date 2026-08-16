@@ -11,14 +11,39 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 | Limitation              | Value                               |
 | ----------------------- | ----------------------------------- |
-| Supported format        | PDF only                            |
+| Supported formats       | PDF, DOCX                           |
 | Maximum file size       | 50MB (configurable for self-hosted) |
 | Encrypted PDFs          | Not supported                       |
 | Password-protected PDFs | Not supported                       |
+| Legacy `.doc` files     | Not supported (convert to DOCX)     |
 
 <Callout type="warn">
   Documenso does not support password-protected or encrypted PDF files. Remove encryption before
   uploading.
+</Callout>
+
+## Supported Formats
+
+Documenso accepts two file formats:
+
+- **PDF** (`.pdf`): used as-is. **Recommended.**
+- **Word** (`.docx`): converted to PDF on the server during upload. The converted PDF is what recipients sign.
+
+Other formats (`.doc`, `.odt`, `.rtf`, images) are not supported. Convert them to PDF or DOCX before uploading.
+
+<Callout type="warn">
+  **Upload a PDF whenever you can.** DOCX files are converted to PDF using LibreOffice, which is not
+  byte-identical to Microsoft Word. Spacing, line breaks, fonts, and complex elements (tables,
+  charts, headers, footers) can shift in the converted PDF. For the final document to look exactly
+  the way you designed it, export to PDF from Word, Google Docs, or Pages and upload the PDF
+  directly.
+</Callout>
+
+<Callout type="info">
+  DOCX support requires the document conversion service. It is enabled on
+  [documenso.com](https://app.documenso.com). Self-hosted instances must
+  [configure it](/docs/self-hosting/configuration/advanced/document-conversion) before DOCX uploads
+  are accepted.
 </Callout>
 
 ## Upload Methods
@@ -38,15 +63,15 @@ You can upload documents in two ways:
 
   </Step>
   <Step>
-    ### Drag and drop your PDF
+    ### Drag and drop your file
 
-    Drag a PDF file from your computer and drop it anywhere on the page.
+    Drag a PDF or DOCX file from your computer and drop it anywhere on the page.
 
   </Step>
   <Step>
     ### Wait for the upload to complete
 
-    The document will process and the editor will open when ready.
+    The document will process and the editor will open when ready. DOCX files take a few extra seconds while they are converted to PDF.
 
   </Step>
 </Steps>
@@ -70,7 +95,7 @@ You can upload documents in two ways:
   <Step>
     ### Select your file
 
-    Choose a PDF file from your computer.
+    Choose a PDF or DOCX file from your computer.
 
   </Step>
   <Step>
@@ -81,16 +106,32 @@ You can upload documents in two ways:
   </Step>
 </Steps>
 
+## DOCX Conversion
+
+We always recommend uploading a PDF rather than a DOCX. If you have the original document open in Word, Google Docs, or Pages, export to PDF from there and upload the PDF. The result is guaranteed to match what you see on screen.
+
+If you do upload a `.docx` file, Documenso converts it to PDF before adding it to the envelope. The original `.docx` is discarded. Only the converted PDF is stored, signed, and downloaded.
+
+Things to keep in mind when uploading DOCX:
+
+- **The converted PDF will not be pixel-identical to your Word document.** Conversion uses LibreOffice, which renders most documents faithfully but differs from Microsoft Word in subtle ways. Spacing, font metrics, line breaks, and complex layout features can shift.
+- **Always review the converted PDF before adding fields or sending.** Open the document in the editor and scroll through every page to confirm it looks the way you expect.
+- **Form controls are flattened.** Word content controls (drop-downs, date pickers, checkboxes) become static text or graphics. Use Documenso fields for anything that needs to be filled in.
+- **Fonts not installed on the server fall back to substitutes.** On documenso.com, common fonts (Calibri, Arial, Times New Roman, etc.) are installed. On self-hosted instances, font fidelity depends on the operator's setup.
+- **Tracked changes and comments are preserved as they appear in Word.** Accept or reject changes and remove comments before uploading if you do not want them in the final document.
+
+If the converted PDF does not match what you expect, export the document to PDF from Word, Google Docs, or another tool and upload the PDF directly.
+
 ## Uploading Multiple Documents
 
-You can upload multiple PDF files at once to create a single envelope containing multiple documents. The number of files you can upload per envelope depends on your plan.
+You can upload multiple files at once to create a single envelope containing multiple documents. The number of files you can upload per envelope depends on your plan.
 
 To upload multiple files:
 
-- Select multiple PDF files when using the file picker, or
-- Drag and drop multiple PDF files at once
+- Select multiple PDF or DOCX files when using the file picker, or
+- Drag and drop multiple files at once
 
-All files in the same upload become part of the same envelope and share the same recipients and signing workflow.
+You can mix PDF and DOCX files in the same upload. All files become part of the same envelope and share the same recipients and signing workflow.
 
 <Callout type="info">
   If you need separate signing workflows for each document, upload them individually.
@@ -114,15 +155,37 @@ The document remains in `Draft` status until you send it. You can close the edit
   <Accordion title="File is larger than 50MB">
     Reduce the file size before uploading:
 
-    - Compress images within the PDF
+    - Compress images within the document
     - Remove unnecessary pages
-    - Use a PDF compression tool
+    - Use a PDF compression tool (for PDFs) or save with images downsampled (for DOCX)
 
   </Accordion>
 
-<Accordion title="Only PDF files are allowed">
-  Convert your document to PDF before uploading. Most applications (Word, Google Docs, etc.) can
-  export to PDF format.
+<Accordion title="Only PDF and DOCX files are allowed">
+  Documenso accepts PDF and DOCX. For other formats (`.doc`, `.odt`, `.rtf`, etc.), export to PDF
+  from your editor (Word, Google Docs, Pages) and upload the PDF.
+
+If you are self-hosted and DOCX is rejected, the [document conversion
+service](/docs/self-hosting/configuration/advanced/document-conversion) is not configured on your
+instance.
+
+</Accordion>
+
+<Accordion title="DOCX upload fails with a conversion error">
+  The document conversion service was reachable but could not convert the file. Common causes:
+
+- The `.docx` file is corrupted. Open it in Word, save a new copy, and try again.
+- The file uses very unusual fonts or embedded objects that LibreOffice cannot render.
+- The file is unusually large or complex and exceeded the conversion timeout.
+
+If the problem persists, export the document to PDF from Word and upload the PDF directly.
+
+</Accordion>
+
+<Accordion title="DOCX upload fails with 'conversion service unavailable'">
+  The document conversion service is down or temporarily unreachable. Try again in a minute. If you
+  self-host, check the [document conversion
+  service](/docs/self-hosting/configuration/advanced/document-conversion) logs.
 </Accordion>
 
 <Accordion title="You cannot upload encrypted PDFs">

@@ -1,33 +1,19 @@
+import { trpc } from '@documenso/trpc/react';
+import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
+import { ZUpdateUserRequestSchema } from '@documenso/trpc/server/admin-router/update-user.types';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
+import { Button } from '@documenso/ui/primitives/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
+import { SpinnerBox } from '@documenso/ui/primitives/spinner';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
-import { useRevalidator } from 'react-router';
-import { Link } from 'react-router';
+import { Link, useRevalidator } from 'react-router';
 import type { z } from 'zod';
-
-import { trpc } from '@documenso/trpc/react';
-import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
-import { ZUpdateUserRequestSchema } from '@documenso/trpc/server/admin-router/update-user.types';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@documenso/ui/primitives/accordion';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { SpinnerBox } from '@documenso/ui/primitives/spinner';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { AdminOrganisationCreateDialog } from '~/components/dialogs/admin-organisation-create-dialog';
 import { AdminUserDeleteDialog } from '~/components/dialogs/admin-user-delete-dialog';
@@ -129,7 +115,7 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">
+      <h2 className="font-semibold text-4xl">
         <Trans>Manage {user?.name}'s profile</Trans>
       </h2>
       <Form {...form}>
@@ -176,10 +162,7 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
                       <Trans>Roles</Trans>
                     </FormLabel>
                     <FormControl>
-                      <MultiSelectRoleCombobox
-                        listValues={roles}
-                        onChange={(values: string[]) => onChange(values)}
-                      />
+                      <MultiSelectRoleCombobox listValues={roles} onChange={(values: string[]) => onChange(values)} />
                     </FormControl>
                     <FormMessage />
                   </fieldset>
@@ -201,10 +184,10 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
       <div>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold leading-none tracking-tight">
+            <h3 className="font-semibold text-lg leading-none tracking-tight">
               <Trans>User Organisations</Trans>
             </h3>
-            <p className="mt-1.5 text-sm text-muted-foreground">
+            <p className="mt-1.5 text-muted-foreground text-sm">
               <Trans>Organisations that the user is a member of.</Trans>
             </p>
           </div>
@@ -219,11 +202,7 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
           />
         </div>
 
-        <AdminOrganisationsTable
-          memberUserId={user.id}
-          showOwnerColumn={false}
-          hidePaginationUntilOverflow
-        />
+        <AdminOrganisationsTable memberUserId={user.id} showOwnerColumn={false} hidePaginationUntilOverflow />
       </div>
 
       <hr className="my-8" />
@@ -232,10 +211,10 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
         <AccordionItem value="team-memberships" className="border-b-0">
           <AccordionTrigger className="py-0">
             <div className="text-left">
-              <h3 className="text-lg font-semibold leading-none tracking-tight">
+              <h3 className="font-semibold text-lg leading-none tracking-tight">
                 <Trans>Team Memberships</Trans>
               </h3>
-              <p className="mt-1.5 text-sm font-normal text-muted-foreground">
+              <p className="mt-1.5 font-normal text-muted-foreground text-sm">
                 <Trans>Teams that this user is a member of and their roles.</Trans>
               </p>
             </div>

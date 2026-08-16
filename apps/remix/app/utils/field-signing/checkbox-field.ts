@@ -1,11 +1,10 @@
-import { FieldType } from '@prisma/client';
-
 import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TFieldCheckbox } from '@documenso/lib/types/field';
 import { parseCheckboxCustomText } from '@documenso/lib/utils/fields';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
+import { FieldType } from '@prisma/client';
 
 import { SignFieldCheckboxDialog } from '~/components/dialogs/sign-field-checkbox-dialog';
 
@@ -53,9 +52,7 @@ export const handleCheckboxFieldClick = async (
   }
 
   if (validationRule && validationLength) {
-    const checkboxValidationRule = checkboxValidationSigns.find(
-      (sign) => sign.label === validationRule,
-    );
+    const checkboxValidationRule = checkboxValidationSigns.find((sign) => sign.label === validationRule);
 
     if (!checkboxValidationRule) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -65,21 +62,14 @@ export const handleCheckboxFieldClick = async (
 
     // Custom logic to make it flow better.
     // If "at most" OR "exactly" 1 value then just return the new selected value if exists.
-    if (
-      (checkboxValidationRule.value === '=' || checkboxValidationRule.value === '<=') &&
-      validationLength === 1
-    ) {
+    if ((checkboxValidationRule.value === '=' || checkboxValidationRule.value === '<=') && validationLength === 1) {
       return {
         type: FieldType.CHECKBOX,
         value: [clickedCheckboxIndex],
       };
     }
 
-    const isValid = validateCheckboxLength(
-      checkedValues.length,
-      checkboxValidationRule.value,
-      validationLength,
-    );
+    const isValid = validateCheckboxLength(checkedValues.length, checkboxValidationRule.value, validationLength);
 
     // Only render validation dialog if validation is invalid.
     if (!isValid) {

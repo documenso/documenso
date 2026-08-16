@@ -14,10 +14,7 @@ export const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number) =>
  * Wrapper around `fetch` that aborts the request after `timeoutMs`.
  * Throws with a descriptive message on timeout.
  */
-export const fetchWithTimeout = async (
-  input: string | URL | Request,
-  init: RequestInit & { timeoutMs: number },
-) => {
+export const fetchWithTimeout = async (input: string | URL | Request, init: RequestInit & { timeoutMs: number }) => {
   const { timeoutMs, ...fetchInit } = init;
 
   const controller = new AbortController();

@@ -1,11 +1,9 @@
-import { type Page, expect, test } from '@playwright/test';
-import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
-
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import { expect, type Page, test } from '@playwright/test';
+import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 
 import {
-  type TEnvelopeEditorSurface,
   addEnvelopeItemPdf,
   assertRecipientRole,
   clickAddMyselfButton,
@@ -24,6 +22,7 @@ import {
   setRecipientName,
   setRecipientRole,
   setSigningOrderValue,
+  type TEnvelopeEditorSurface,
   toggleAllowDictateSigners,
   toggleSigningOrder,
 } from '../fixtures/envelope-editor';
@@ -125,24 +124,17 @@ const runRecipientFlow = async (surface: TEnvelopeEditorSurface): Promise<Recipi
   await navigateToAddFieldsAndBack(surface.root);
 
   await expect(getRecipientEmailInputs(surface.root)).toHaveCount(2);
-  await expect(getRecipientEmailInputs(surface.root).nth(0)).toHaveValue(
-    TEST_RECIPIENT_VALUES.secondRecipient.email,
-  );
+  await expect(getRecipientEmailInputs(surface.root).nth(0)).toHaveValue(TEST_RECIPIENT_VALUES.secondRecipient.email);
   await expect(getRecipientEmailInputs(surface.root).nth(1)).toHaveValue(primaryRecipient.email);
 
-  await expect(getRecipientNameInputs(surface.root).nth(0)).toHaveValue(
-    TEST_RECIPIENT_VALUES.secondRecipient.name,
-  );
+  await expect(getRecipientNameInputs(surface.root).nth(0)).toHaveValue(TEST_RECIPIENT_VALUES.secondRecipient.name);
   await expect(getRecipientNameInputs(surface.root).nth(1)).toHaveValue(primaryRecipient.name);
 
   await assertRecipientRole(surface.root, 0, 'Needs to approve');
   await assertRecipientRole(surface.root, 1, 'Needs to sign');
 
   await expect(surface.root.locator('#signingOrder')).toHaveAttribute('aria-checked', 'true');
-  await expect(surface.root.locator('#allowDictateNextSigner')).toHaveAttribute(
-    'aria-checked',
-    'true',
-  );
+  await expect(surface.root.locator('#allowDictateNextSigner')).toHaveAttribute('aria-checked', 'true');
   await expect(getSigningOrderInputs(surface.root).nth(0)).toHaveValue('1');
   await expect(getSigningOrderInputs(surface.root).nth(1)).toHaveValue('2');
 
@@ -210,9 +202,7 @@ const assertRecipientsPersistedInDatabase = async ({
     expect(recipient.signingOrder).toBe(expectedRecipient.signingOrder);
   });
 
-  expect(envelope.recipients.some((recipient) => recipient.email === removedRecipientEmail)).toBe(
-    false,
-  );
+  expect(envelope.recipients.some((recipient) => recipient.email === removedRecipientEmail)).toBe(false);
 };
 
 test.describe('document editor', () => {

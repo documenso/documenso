@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const SEND_OWNER_RECIPIENT_EXPIRED_EMAIL_JOB_DEFINITION_ID = 'send.owner.recipient.expired.email';
 

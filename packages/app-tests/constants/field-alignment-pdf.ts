@@ -1,9 +1,8 @@
-import { FieldType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import type { TFieldAndMeta } from '@documenso/lib/types/field-meta';
 import { toCheckboxCustomText } from '@documenso/lib/utils/fields';
+import { FieldType } from '@prisma/client';
 
 export type FieldTestData = TFieldAndMeta & {
   page: number;
@@ -25,11 +24,7 @@ const fullColumnWidth = 57.37499999999998;
 const rowHeight = 6.7;
 const rowPadding = 0;
 
-const calculatePositionPageOne = (
-  row: number,
-  column: number,
-  width: 'full' | 'column' = 'column',
-) => {
+const calculatePositionPageOne = (row: number, column: number, width: 'full' | 'column' = 'column') => {
   const alignmentGridStartX = 31;
   const alignmentGridStartY = 19;
 
@@ -41,11 +36,7 @@ const calculatePositionPageOne = (
   };
 };
 
-const calculatePositionPageTwo = (
-  row: number,
-  column: number,
-  width: 'full' | 'column' = 'column',
-) => {
+const calculatePositionPageTwo = (row: number, column: number, width: 'full' | 'column' = 'column') => {
   const alignmentGridStartX = 31;
   const alignmentGridStartY = 16.35;
 
@@ -86,6 +77,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
       fontSize: 10,
       textAlign: 'left',
       type: 'email',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(0, 0),
@@ -96,6 +88,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       textAlign: 'center',
       type: 'email',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(0, 1),
@@ -107,6 +100,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
       fontSize: 20,
       textAlign: 'right',
       type: 'email',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(0, 2),
@@ -156,6 +150,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
       fontSize: 10,
       textAlign: 'left',
       type: 'date',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(2, 0),
@@ -166,6 +161,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       textAlign: 'center',
       type: 'date',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(2, 1),
@@ -177,6 +173,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
       fontSize: 20,
       textAlign: 'right',
       type: 'date',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(2, 2),
@@ -424,6 +421,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       fontSize: 10,
       type: 'signature',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(9, 0),
@@ -434,6 +432,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
     type: FieldType.SIGNATURE,
     fieldMeta: {
       type: 'signature',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(9, 1),
@@ -445,6 +444,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       fontSize: 20,
       type: 'signature',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(9, 2),

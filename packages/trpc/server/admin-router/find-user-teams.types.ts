@@ -1,9 +1,8 @@
-import { z } from 'zod';
-
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { TeamMemberRoleSchema } from '@documenso/prisma/generated/zod/inputTypeSchemas/TeamMemberRoleSchema';
 import OrganisationSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
+import { z } from 'zod';
 
 export const ZFindUserTeamsRequestSchema = ZFindSearchParamsSchema.extend({
   userId: z.number(),

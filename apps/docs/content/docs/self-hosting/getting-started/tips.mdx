@@ -92,7 +92,7 @@ Use a specific version tag in production:
 
 ```bash
 # Good — predictable, reproducible
-docker pull documenso/documenso:1.8.0
+docker pull documenso/documenso:<version>
 
 # Risky — may pull breaking changes
 docker pull documenso/documenso:latest
@@ -151,6 +151,34 @@ Documenso uses a PostgreSQL-based job queue by default (`local` provider). No Re
 For production workloads, consider switching to **Inngest** (managed) or **BullMQ** (self-hosted with Redis) for better reliability and throughput.
 
 See [Background Jobs Configuration](/docs/self-hosting/configuration/background-jobs) for setup instructions and provider comparison.
+
+---
+
+## IPv6-Only Deployments
+
+If you are deploying to an environment that uses only IPv6, set the `HOST` environment variable to `::` so the application binds to all IPv6 addresses:
+
+**Docker:**
+
+```bash
+docker run -it -e HOST=:: documenso/documenso:latest npm run start
+```
+
+**Kubernetes or Docker Compose:**
+
+```yaml
+containers:
+  - name: documenso
+    image: documenso/documenso:latest
+    command:
+      - npm
+    args:
+      - run
+      - start
+    env:
+      - name: HOST
+        value: '::'
+```
 
 ---
 

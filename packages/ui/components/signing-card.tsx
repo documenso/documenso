@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-
 import type { Signature } from '@prisma/client';
 import { animate, motion, useMotionTemplate, useMotionValue, useTransform } from 'framer-motion';
-import { P, match } from 'ts-pattern';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { match, P } from 'ts-pattern';
 
 import { cn } from '../lib/utils';
 import { Card, CardContent } from '../primitives/card';
@@ -17,19 +16,12 @@ export type SigningCardProps = {
 /**
  * 2D signing card.
  */
-export const SigningCard = ({
-  className,
-  name,
-  signature,
-  signingCelebrationImage,
-}: SigningCardProps) => {
+export const SigningCard = ({ className, name, signature, signingCelebrationImage }: SigningCardProps) => {
   return (
     <div className={cn('relative w-full max-w-sm md:max-w-md', className)}>
       <SigningCardContent name={name} signature={signature} />
 
-      {signingCelebrationImage && (
-        <SigningCardImage signingCelebrationImage={signingCelebrationImage} />
-      )}
+      {signingCelebrationImage && <SigningCardImage signingCelebrationImage={signingCelebrationImage} />}
     </div>
   );
 };
@@ -37,12 +29,7 @@ export const SigningCard = ({
 /**
  * 3D signing card that follows the mouse movement within a certain range.
  */
-export const SigningCard3D = ({
-  className,
-  name,
-  signature,
-  signingCelebrationImage,
-}: SigningCardProps) => {
+export const SigningCard3D = ({ className, name, signature, signingCelebrationImage }: SigningCardProps) => {
   // Should use % based dimensions by calculating the window height/width.
   const boundary = 400;
 
@@ -127,12 +114,9 @@ export const SigningCard3D = ({
   }, [onMouseMove]);
 
   return (
-    <div
-      className={cn('relative w-full max-w-sm md:max-w-md', className)}
-      style={{ perspective: 800 }}
-    >
+    <div className={cn('relative w-full max-w-sm md:max-w-md', className)} style={{ perspective: 800 }}>
       <motion.div
-        className="bg-background w-full rounded-lg [--sheen-color:180_180_180] dark:[--sheen-color:200_200_200]"
+        className="w-full rounded-lg bg-background [--sheen-color:180_180_180] dark:[--sheen-color:200_200_200]"
         ref={cardRef}
         style={{
           perspective: '800',
@@ -145,9 +129,7 @@ export const SigningCard3D = ({
         <SigningCardContent className="bg-transparent" name={name} signature={signature} />
       </motion.div>
 
-      {signingCelebrationImage && (
-        <SigningCardImage signingCelebrationImage={signingCelebrationImage} />
-      )}
+      {signingCelebrationImage && <SigningCardImage signingCelebrationImage={signingCelebrationImage} />}
     </div>
   );
 };
@@ -161,34 +143,25 @@ type SigningCardContentProps = {
 const SigningCardContent = ({ className, name, signature }: SigningCardContentProps) => {
   return (
     <Card
-      className={cn(
-        'group z-10 mx-auto flex aspect-[21/9] w-full items-center justify-center',
-        className,
-      )}
+      className={cn('group z-10 mx-auto flex aspect-[21/9] w-full items-center justify-center', className)}
       degrees={-145}
       gradient
     >
       <CardContent
-        className="font-signature p-6 text-center"
+        className="p-6 text-center font-signature"
         style={{
           container: 'main',
         }}
       >
         {match(signature)
           .with({ signatureImageAsBase64: P.string }, (signature) => (
-            <img
-              src={signature.signatureImageAsBase64}
-              alt="signature"
-              className="h-full max-w-[100%] dark:invert"
-            />
+            <img src={signature.signatureImageAsBase64} alt="signature" className="h-full max-w-[100%] dark:invert" />
           ))
           .with({ typedSignature: P.string }, (signature) => (
             <span
-              className="text-muted-foreground/60 group-hover:text-primary/80 break-all font-semibold duration-300"
+              className="break-all font-semibold text-muted-foreground/60 duration-300 group-hover:text-primary/80"
               style={{
-                fontSize: `max(min(4rem, ${(100 / signature.typedSignature.length / 2).toFixed(
-                  4,
-                )}cqw), 1.875rem)`,
+                fontSize: `max(min(4rem, ${(100 / signature.typedSignature.length / 2).toFixed(4)}cqw), 1.875rem)`,
               }}
             >
               {signature.typedSignature}
@@ -196,7 +169,7 @@ const SigningCardContent = ({ className, name, signature }: SigningCardContentPr
           ))
           .otherwise(() => (
             <span
-              className="text-muted-foreground/60 group-hover:text-primary/80 break-all font-semibold duration-300"
+              className="break-all font-semibold text-muted-foreground/60 duration-300 group-hover:text-primary/80"
               style={{
                 fontSize: `max(min(4rem, ${(100 / name.length / 2).toFixed(4)}cqw), 1.875rem)`,
               }}

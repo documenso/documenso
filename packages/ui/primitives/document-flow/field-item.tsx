@@ -1,19 +1,17 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { FieldType } from '@prisma/client';
-import { CopyPlus, Settings2, SquareStack, Trash } from 'lucide-react';
-import { createPortal } from 'react-dom';
-import { Rnd } from 'react-rnd';
-import { useSearchParams } from 'react-router';
-
 import { useElementBounds } from '@documenso/lib/client-only/hooks/use-element-bounds';
 import { useIsPageInDom } from '@documenso/lib/client-only/hooks/use-is-page-in-dom';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { FieldType } from '@prisma/client';
+import { CopyPlus, Settings2, SquareStack, Trash } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Rnd } from 'react-rnd';
+import { useSearchParams } from 'react-router';
 
 import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
@@ -96,9 +94,7 @@ const FieldItemInner = ({
   const [settingsActive, setSettingsActive] = useState(false);
   const $el = useRef<HTMLDivElement>(null);
 
-  const $pageBounds = useElementBounds(
-    `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`,
-  );
+  const $pageBounds = useElementBounds(`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`);
 
   const signerStyles = getRecipientColorStyles(recipientIndex);
 
@@ -275,20 +271,16 @@ const FieldItemInner = ({
         onMove?.(d.node);
       }}
     >
-      {(field.type === FieldType.RADIO || field.type === FieldType.CHECKBOX) &&
-        field.fieldMeta?.label && (
-          <div
-            className={cn(
-              'absolute -top-16 left-0 right-0 rounded-md p-2 text-center text-xs text-gray-700',
-              {
-                'border border-primary bg-foreground/5': !fieldHasCheckedValues,
-                'border border-primary bg-documenso-200': fieldHasCheckedValues,
-              },
-            )}
-          >
-            {field.fieldMeta.label}
-          </div>
-        )}
+      {(field.type === FieldType.RADIO || field.type === FieldType.CHECKBOX) && field.fieldMeta?.label && (
+        <div
+          className={cn('absolute -top-16 right-0 left-0 rounded-md p-2 text-center text-gray-700 text-xs', {
+            'border border-primary bg-foreground/5': !fieldHasCheckedValues,
+            'border border-primary bg-documenso-200': fieldHasCheckedValues,
+          })}
+        >
+          {field.fieldMeta.label}
+        </div>
+      )}
 
       <div
         className={cn(
@@ -317,18 +309,17 @@ const FieldItemInner = ({
         <FieldContent field={field} />
 
         {/* On hover, display recipient initials on side of field.  */}
-        <div className="absolute -right-5 top-0 z-20 hidden h-full w-5 items-center justify-center group-hover:flex">
+        <div className="absolute top-0 -right-5 z-20 hidden h-full w-5 items-center justify-center group-hover:flex">
           <div
             className={cn(
-              'flex h-5 w-5 flex-col items-center justify-center rounded-r-md text-[0.5rem] font-bold text-white opacity-0 transition duration-200 group-hover/field-item:opacity-100',
+              'flex h-5 w-5 flex-col items-center justify-center rounded-r-md font-bold text-[0.5rem] text-white opacity-0 transition duration-200 group-hover/field-item:opacity-100',
               signerStyles.fieldItemInitials,
               {
                 '!opacity-50': disabled || passive,
               },
             )}
           >
-            {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') +
-              (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
+            {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') + (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
           </div>
         </div>
 

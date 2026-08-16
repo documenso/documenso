@@ -1,7 +1,5 @@
-import { expect, test } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
@@ -12,6 +10,7 @@ import type {
   TCreateEnvelopePayload,
   TCreateEnvelopeResponse,
 } from '@documenso/trpc/server/envelope-router/create-envelope.types';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -46,9 +45,7 @@ const setTeamDefaultRecipients = async (
 };
 
 test.describe('Default Recipients', () => {
-  test('[DEFAULT_RECIPIENTS]: default recipients are added to documents created via UI', async ({
-    page,
-  }) => {
+  test('[DEFAULT_RECIPIENTS]: default recipients are added to documents created via UI', async ({ page }) => {
     const { team, owner } = await seedTeam({
       createTeamMembers: 2,
     });
@@ -142,17 +139,13 @@ test.describe('Default Recipients', () => {
       expect(defaultRecipient).toBeDefined();
       expect(defaultRecipient?.role).toBe(RecipientRole.CC);
 
-      const regularSigner = envelope.recipients.find(
-        (r) => r.email === 'regular-signer@documenso.com',
-      );
+      const regularSigner = envelope.recipients.find((r) => r.email === 'regular-signer@documenso.com');
       expect(regularSigner).toBeDefined();
     }).toPass();
   });
 
   // TODO: Are we intending to allow default recipients to be removed from a document?
-  test.skip('[DEFAULT_RECIPIENTS]: default recipients cannot be removed from a document', async ({
-    page,
-  }) => {
+  test.skip('[DEFAULT_RECIPIENTS]: default recipients cannot be removed from a document', async ({ page }) => {
     const { team, owner } = await seedTeam({
       createTeamMembers: 2,
     });
@@ -245,9 +238,7 @@ test.describe('Default Recipients', () => {
     await expect(removeButton).toBeDisabled();
   });
 
-  test('[DEFAULT_RECIPIENTS]: documents created via API have default recipients', async ({
-    request,
-  }) => {
+  test('[DEFAULT_RECIPIENTS]: documents created via API have default recipients', async ({ request }) => {
     const { team, owner } = await seedTeam({
       createTeamMembers: 2,
     });
@@ -336,9 +327,7 @@ test.describe('Default Recipients', () => {
     expect(defaultRecipient?.role).toBe(RecipientRole.CC);
   });
 
-  test('[DEFAULT_RECIPIENTS]: documents created from template have default recipients', async ({
-    page,
-  }) => {
+  test('[DEFAULT_RECIPIENTS]: documents created from template have default recipients', async ({ page }) => {
     const { team, owner } = await seedTeam({
       createTeamMembers: 2,
     });
@@ -413,9 +402,7 @@ test.describe('Default Recipients', () => {
 
     expect(document.recipients.length).toBe(2);
 
-    const templateRecipient = document.recipients.find(
-      (r) => r.email === 'template-recipient@documenso.com',
-    );
+    const templateRecipient = document.recipients.find((r) => r.email === 'template-recipient@documenso.com');
     expect(templateRecipient).toBeDefined();
 
     const defaultRecipient = document.recipients.find(

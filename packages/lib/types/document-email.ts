@@ -18,21 +18,15 @@ export const ZDocumentEmailSettingsSchema = z
   .object({
     recipientSigningRequest: z
       .boolean()
-      .describe(
-        'Whether to send an email to all recipients that the document is ready for them to sign.',
-      )
+      .describe('Whether to send an email to all recipients that the document is ready for them to sign.')
       .default(true),
     recipientRemoved: z
       .boolean()
-      .describe(
-        'Whether to send an email to the recipient who was removed from a pending document.',
-      )
+      .describe('Whether to send an email to the recipient who was removed from a pending document.')
       .default(true),
     recipientSigned: z
       .boolean()
-      .describe(
-        'Whether to send an email to the document owner when a recipient has signed the document.',
-      )
+      .describe('Whether to send an email to the document owner when a recipient has signed the document.')
       .default(true),
     documentPending: z
       .boolean()
@@ -46,9 +40,7 @@ export const ZDocumentEmailSettingsSchema = z
       .default(true),
     documentDeleted: z
       .boolean()
-      .describe(
-        'Whether to send an email to all recipients if a pending document has been deleted.',
-      )
+      .describe('Whether to send an email to all recipients if a pending document has been deleted.')
       .default(true),
     ownerDocumentCompleted: z
       .boolean()
@@ -56,15 +48,11 @@ export const ZDocumentEmailSettingsSchema = z
       .default(true),
     ownerRecipientExpired: z
       .boolean()
-      .describe(
-        "Whether to send an email to the document owner when a recipient's signing window has expired.",
-      )
+      .describe("Whether to send an email to the document owner when a recipient's signing window has expired.")
       .default(true),
     ownerDocumentCreated: z
       .boolean()
-      .describe(
-        'Whether to send an email to the document owner when a document is created from a direct template.',
-      )
+      .describe('Whether to send an email to the document owner when a document is created from a direct template.')
       .default(true),
   })
   .strip()
@@ -72,15 +60,10 @@ export const ZDocumentEmailSettingsSchema = z
 
 export type TDocumentEmailSettings = z.infer<typeof ZDocumentEmailSettingsSchema>;
 
-export const extractDerivedDocumentEmailSettings = (
-  documentMeta?: DocumentMeta | null,
-): TDocumentEmailSettings => {
+export const extractDerivedDocumentEmailSettings = (documentMeta?: DocumentMeta | null): TDocumentEmailSettings => {
   const emailSettings = ZDocumentEmailSettingsSchema.parse(documentMeta?.emailSettings ?? {});
 
-  if (
-    !documentMeta?.distributionMethod ||
-    documentMeta?.distributionMethod === DocumentDistributionMethod.EMAIL
-  ) {
+  if (!documentMeta?.distributionMethod || documentMeta?.distributionMethod === DocumentDistributionMethod.EMAIL) {
     return emailSettings;
   }
 

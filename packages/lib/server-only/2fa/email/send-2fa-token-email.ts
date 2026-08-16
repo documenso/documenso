@@ -1,12 +1,9 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType } from '@prisma/client';
-
-import { mailer } from '@documenso/email/mailer';
 import { AccessAuth2FAEmailTemplate } from '@documenso/email/templates/access-auth-2fa';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import { EnvelopeType } from '@prisma/client';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
@@ -81,7 +78,7 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
     email: recipient.email,
   });
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail, emailTransport } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -110,7 +107,7 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
 
   // Send email outside any transaction to avoid holding a connection
   // open during network I/O.
-  await mailer.sendMail({
+  await emailTransport.sendMail({
     to: {
       address: recipient.email,
       name: recipient.name,

@@ -1,6 +1,6 @@
 ---
 title: Storage Configuration
-description: Configure file storage for uploaded documents and signed PDFs using database storage (default) or S3-compatible object storage.
+description: Configure file storage for uploaded documents and signed PDFs using database storage (default), S3-compatible object storage, or Azure Blob Storage.
 ---
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
@@ -10,10 +10,11 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Storage Options
 
-| Backend    | Best For                         | Scalability | Configuration |
-| ---------- | -------------------------------- | ----------- | ------------- |
-| `database` | Small deployments, simplicity    | Limited     | None required |
-| `s3`       | Production, large files, backups | High        | Required      |
+| Backend      | Best For                                | Scalability | Configuration |
+| ------------ | --------------------------------------- | ----------- | ------------- |
+| `database`   | Small deployments, simplicity           | Limited     | None required |
+| `s3`         | Production, large files, backups        | High        | Required      |
+| `azure-blob` | Production on Azure, native Blob access | High        | Required      |
 
 Select the storage backend with the `NEXT_PUBLIC_UPLOAD_TRANSPORT` environment variable:
 
@@ -23,6 +24,9 @@ NEXT_PUBLIC_UPLOAD_TRANSPORT=database
 
 # S3-compatible storage
 NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+
+# Azure Blob Storage (native)
+NEXT_PUBLIC_UPLOAD_TRANSPORT=azure-blob
 ```
 
 ---
@@ -280,6 +284,111 @@ NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-wasabi-key
 NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-wasabi-secret
 NEXT_PRIVATE_UPLOAD_REGION=us-east-1
 ```
+
+---
+
+## Azure Blob Storage
+
+Azure Blob Storage is supported as a native transport (not S3-compatible). Documenso uses the official `@azure/storage-blob` SDK and signs SAS URLs with the Storage Account key for browser uploads and downloads.
+
+### Required Variables
+
+| Variable                                | Description                                       |
+| --------------------------------------- | ------------------------------------------------- |
+| `NEXT_PUBLIC_UPLOAD_TRANSPORT`          | Set to `azure-blob`                               |
+| `NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_NAME` | Azure Storage Account name                        |
+| `NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_KEY`  | Azure Storage Account access key                  |
+| `NEXT_PRIVATE_UPLOAD_AZURE_CONTAINER`    | Container name where uploads are stored          |
+
+### Optional Variables
+
+| Variable                            | Description                                                                                                                  | Default                                       |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `NEXT_PRIVATE_UPLOAD_AZURE_ENDPOINT` | Custom Blob endpoint URL. Useful for local development against Azurite (for example `http://127.0.0.1:10000`).               | `https://<account>.blob.core.windows.net`     |
+
+### Azure Setup
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Create a Storage Account and Container
+
+Create a Storage Account in the Azure Portal or via the Azure CLI, then create a container inside it:
+
+```bash
+az storage account create \
+  --name yourstorageaccount \
+  --resource-group your-rg \
+  --location eastus \
+  --sku Standard_LRS
+
+az storage container create \
+  --name documenso-documents \
+  --account-name yourstorageaccount
+```
+
+</Step>
+<Step>
+### Configure CORS on the container
+
+The browser uploads documents directly to Azure Blob using a SAS URL, and downloads them the same way, so the Storage Account needs CORS rules that allow your application origin:
+
+```bash
+az storage cors add \
+  --services b \
+  --methods GET PUT \
+  --origins https://your-documenso-domain.com \
+  --allowed-headers "Content-Type" "x-ms-blob-type" "Authorization" \
+  --exposed-headers "*" \
+  --max-age 3600 \
+  --account-name yourstorageaccount
+```
+
+</Step>
+<Step>
+### Configure Environment Variables
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=azure-blob
+NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_NAME=yourstorageaccount
+NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_KEY=your-account-key
+NEXT_PRIVATE_UPLOAD_AZURE_CONTAINER=documenso-documents
+```
+
+</Step>
+</Steps>
+
+### Local Development with Azurite
+
+Azurite is the official Azure Storage emulator. It supports the Blob REST API with account-key authentication.
+
+```bash
+docker run -d --name azurite \
+  -p 10000:10000 -p 10001:10001 -p 10002:10002 \
+  mcr.microsoft.com/azure-storage/azurite
+```
+
+Create the container against the well-known development account:
+
+```bash
+az storage container create \
+  --name documenso-documents \
+  --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+```
+
+Configure environment variables to point at the emulator:
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=azure-blob
+NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_NAME=devstoreaccount1
+NEXT_PRIVATE_UPLOAD_AZURE_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+NEXT_PRIVATE_UPLOAD_AZURE_CONTAINER=documenso-documents
+NEXT_PRIVATE_UPLOAD_AZURE_ENDPOINT=http://127.0.0.1:10000
+```
+
+<Callout type="info">
+  The Azurite key shown above is the public well-known development key, published by Microsoft for emulator use. Never reuse it in production.
+</Callout>
 
 ---
 

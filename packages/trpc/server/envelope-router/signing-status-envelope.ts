@@ -1,7 +1,6 @@
-import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { maybeAuthenticatedProcedure } from '../trpc';
 import {
@@ -66,8 +65,7 @@ export const signingStatusEnvelopeRoute = maybeAuthenticatedProcedure
     const isComplete =
       envelope.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
       envelope.recipients.every(
-        (recipient) =>
-          recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
+        (recipient) => recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
       );
 
     if (isComplete) {
