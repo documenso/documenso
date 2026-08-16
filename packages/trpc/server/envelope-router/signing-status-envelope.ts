@@ -1,6 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getSigningStatus } from '@documenso/lib/server-only/document/get-signing-status';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
+import { EnvelopeType } from '@prisma/client';
 
 import { maybeAuthenticatedProcedure } from '../trpc';
 import {
@@ -33,9 +34,6 @@ export const signingStatusEnvelopeRoute = maybeAuthenticatedProcedure
       include: {
         recipients: {
           select: {
-            id: true,
-            name: true,
-            email: true,
             signingStatus: true,
             role: true,
           },
@@ -49,32 +47,9 @@ export const signingStatusEnvelopeRoute = maybeAuthenticatedProcedure
       });
     }
 
-    // Check if envelope is rejected
-    if (envelope.status === DocumentStatus.REJECTED) {
-      return {
-        status: 'REJECTED',
-      };
-    }
-
-    if (envelope.status === DocumentStatus.COMPLETED) {
-      return {
-        status: 'COMPLETED',
-      };
-    }
-
-    const isComplete =
-      envelope.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
-      envelope.recipients.every(
-        (recipient) => recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
-      );
-
-    if (isComplete) {
-      return {
-        status: 'PROCESSING',
-      };
-    }
+    const status = await getSigningStatus(envelope);
 
     return {
-      status: 'PENDING',
+      status,
     };
   });

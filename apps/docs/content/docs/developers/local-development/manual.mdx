@@ -84,9 +84,17 @@ npm run prisma:seed -w @documenso/prisma
 </Step>
 
 <Step>
-### Optional: configure job provider
+### Configure the job provider
 
-The default local job provider does not support scheduled jobs required for document reminders.
+For local development, **BullMQ is recommended**. It uses the Redis service from `docker/development/compose.yml` and reliably processes background jobs such as `internal.seal-document` (document sealing after signing).
+
+```bash
+NEXT_PRIVATE_JOBS_PROVIDER=bullmq
+NEXT_PRIVATE_REDIS_URL=redis://localhost:63790
+NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000
+```
+
+The default `local` provider dispatches jobs via HTTP self-callbacks and can leave jobs stuck in `PENDING` when the app cannot reach itself (for example behind a reverse proxy). Set `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` to the direct dev server URL if you use it.
 
 See the [Background Jobs](/docs/self-hosting/configuration/background-jobs) page for more information.
 

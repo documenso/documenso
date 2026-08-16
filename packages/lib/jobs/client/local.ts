@@ -37,9 +37,12 @@ type CronJobEntry = {
 const CRON_POLL_INTERVAL_MS = 30_000; // 30 seconds
 const CRON_POLL_JITTER_MS = 5_000; // 0-5 seconds random offset
 
-export class LocalJobProvider extends BaseJobProvider {
-  private static _instance: LocalJobProvider;
+declare global {
+  // eslint-disable-next-line no-var
+  var __documenso_local_job_provider__: LocalJobProvider | undefined;
+}
 
+export class LocalJobProvider extends BaseJobProvider {
   private _jobDefinitions: Record<string, JobDefinition> = {};
   private _cronJobs: CronJobEntry[] = [];
   private _cronPoller: NodeJS.Timeout | null = null;
@@ -48,12 +51,20 @@ export class LocalJobProvider extends BaseJobProvider {
     super();
   }
 
+  /**
+   * Uses globalThis so the singleton is shared across Vite/React Router and
+   * Hono bundles at runtime (same pattern as BullMQJobProvider).
+   */
   static getInstance() {
-    if (!LocalJobProvider._instance) {
-      LocalJobProvider._instance = new LocalJobProvider();
+    if (globalThis.__documenso_local_job_provider__) {
+      return globalThis.__documenso_local_job_provider__;
     }
 
-    return LocalJobProvider._instance;
+    const instance = new LocalJobProvider();
+
+    globalThis.__documenso_local_job_provider__ = instance;
+
+    return instance;
   }
 
   public defineJob<N extends string, T>(definition: JobDefinition<N, T>) {
@@ -195,8 +206,6 @@ export class LocalJobProvider extends BaseJobProvider {
 
     await Promise.all(
       eligibleJobs.map(async (job) => {
-        // Ideally we will change this to a createMany with returning later once we upgrade Prisma
-        // @see: https://github.com/prisma/prisma/releases/tag/5.14.0
         const pendingJob = await prisma.backgroundJob.create({
           data: {
             jobId: job.id,
@@ -207,7 +216,9 @@ export class LocalJobProvider extends BaseJobProvider {
           },
         });
 
-        await this.submitJobToEndpoint({
+        // Dispatch without awaiting — the HTTP handler runs the full job and may take
+        // minutes (e.g. seal-document with TSA). Errors are logged inside submitJobToEndpoint.
+        void this.submitJobToEndpoint({
           jobId: pendingJob.id,
           jobDefinitionId: pendingJob.jobId,
           data: options,
@@ -272,7 +283,7 @@ export class LocalJobProvider extends BaseJobProvider {
         payload = result.data;
       }
 
-      console.log(`[JOBS]: Triggering job ${options.name} with payload`, payload);
+      console.log(`[JOBS]: Executing job ${options.name} (${jobId}) with payload`, payload);
 
       let backgroundJob = await prisma.backgroundJob
         .update({
@@ -311,7 +322,7 @@ export class LocalJobProvider extends BaseJobProvider {
           },
         });
       } catch (error) {
-        console.log(`[JOBS]: Job ${options.name} failed`, error);
+        console.error(`[JOBS]: Job ${options.name} failed`, error);
 
         const taskHasExceededRetries = error instanceof BackgroundTaskExceededRetriesError;
         const jobHasExceededRetries =
@@ -375,17 +386,23 @@ export class LocalJobProvider extends BaseJobProvider {
       headers['X-Job-Retry'] = '1';
     }
 
-    console.log('Submitting job to endpoint:', endpoint);
-    await Promise.race([
-      fetch(endpoint, {
+    console.log('[JOBS]: Submitting job to endpoint:', endpoint);
+
+    try {
+      const response = await fetch(endpoint, {
         method: 'POST',
         body: JSON.stringify(data),
         headers,
-      }).catch(() => null),
-      new Promise((resolve) => {
-        setTimeout(resolve, 150);
-      }),
-    ]);
+      });
+
+      if (!response.ok) {
+        const body = await response.text().catch(() => '');
+
+        console.error(`[JOBS]: Failed to dispatch job ${jobId} (${jobDefinitionId}): HTTP ${response.status}`, body);
+      }
+    } catch (error) {
+      console.error(`[JOBS]: Failed to dispatch job ${jobId} (${jobDefinitionId}):`, error);
+    }
   }
 
   private createJobRunIO(jobId: string): JobRunIO {

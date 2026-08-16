@@ -2,6 +2,8 @@ import { NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY } from '@documenso/lib/constan
 import { HttpTimestampAuthority } from '@libpdf/core';
 import { once } from 'remeda';
 
+import { createTsaFetch } from './tsa-fetch';
+
 const setupTimestampAuthorities = once(() => {
   const timestampAuthority = NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY();
 
@@ -9,13 +11,19 @@ const setupTimestampAuthorities = once(() => {
     return null;
   }
 
-  const timestampAuthorities = timestampAuthority
+  const urls = timestampAuthority
     .trim()
     .split(',')
-    .filter(Boolean)
-    .map((url) => {
-      return new HttpTimestampAuthority(url);
+    .map((url) => url.trim())
+    .filter(Boolean);
+
+  const tsaFetch = createTsaFetch();
+
+  const timestampAuthorities = urls.map((url) => {
+    return new HttpTimestampAuthority(url, {
+      fetch: tsaFetch,
     });
+  });
 
   return timestampAuthorities;
 });

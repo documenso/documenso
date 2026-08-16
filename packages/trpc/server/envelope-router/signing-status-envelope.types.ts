@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const EnvelopeSigningStatus = z.enum(['PENDING', 'PROCESSING', 'COMPLETED', 'REJECTED']);
+export const EnvelopeSigningStatus = z.enum(['PENDING', 'PROCESSING', 'COMPLETED', 'REJECTED', 'FAILED']);
 
 export const ZSigningStatusEnvelopeRequestSchema = z.object({
   token: z.string().describe('The recipient token to check the signing status for'),

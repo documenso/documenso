@@ -60,6 +60,7 @@ export class BullMQJobProvider extends BaseJobProvider {
     this._worker = new Worker(
       QUEUE_NAME,
       async (job: Job) => {
+        console.log(`[JOBS]: Worker picking up job ${job.name} (${job.id})`);
         await this.processJob(job);
       },
       {
@@ -68,6 +69,14 @@ export class BullMQJobProvider extends BaseJobProvider {
         concurrency,
       },
     );
+
+    this._worker.on('active', (job) => {
+      console.log(`[JOBS]: Job ${job.id} is now active`);
+    });
+
+    this._worker.on('completed', (job) => {
+      console.log(`[JOBS]: Job ${job.id} completed`);
+    });
 
     this._worker.on('failed', (job, error) => {
       console.error(`[JOBS]: Job ${job?.name ?? 'unknown'} failed`, error);

@@ -19,7 +19,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { CheckCircle2, Clock8, DownloadIcon, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock8, DownloadIcon, Loader2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -127,7 +127,15 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
       token: recipient?.token || '',
     },
     {
-      refetchInterval: 3000,
+      refetchInterval: (query) => {
+        const status = query.state.data?.status;
+
+        if (status === 'COMPLETED' || status === 'REJECTED' || status === 'FAILED') {
+          return false;
+        }
+
+        return 3000;
+      },
       initialData: match(document?.status)
         .with(DocumentStatus.COMPLETED, () => ({ status: 'COMPLETED' }) as const)
         .with(DocumentStatus.REJECTED, () => ({ status: 'REJECTED' }) as const)
@@ -204,6 +212,14 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                   </span>
                 </div>
               ))
+              .with({ status: 'FAILED' }, () => (
+                <div className="mt-4 flex items-center text-center text-red-600">
+                  <AlertCircle className="mr-2 h-5 w-5" />
+                  <span className="text-sm">
+                    <Trans>Document sealing failed</Trans>
+                  </span>
+                </div>
+              ))
               .with({ deletedAt: null }, () => (
                 <div className="mt-4 flex items-center text-center text-blue-600">
                   <Clock8 className="mr-2 h-5 w-5" />
@@ -233,6 +249,11 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                     All recipients have signed. The document is being processed and you will receive an email copy
                     shortly.
                   </Trans>
+                </p>
+              ))
+              .with({ status: 'FAILED' }, () => (
+                <p className="mt-2.5 max-w-[60ch] text-center font-medium text-muted-foreground/60 text-sm md:text-base">
+                  <Trans>Something went wrong while finalizing the document. Please contact the document owner.</Trans>
                 </p>
               ))
               .with({ deletedAt: null }, () => (
