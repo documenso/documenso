@@ -1,8 +1,55 @@
 import { AppError } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { exportJWK, generateKeyPair, SignJWT } from 'jose';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { handleOAuthRevocation } from './handle-oauth-revocation';
+
+const BACKCHANNEL_LOGOUT_EVENT = 'http://schemas.openid.net/event/backchannel-logout';
+
+const hoisted = vi.hoisted(() => ({
+  issuer: 'https://accounts.google.com',
+  audience: 'test-google-client-id',
+  publicJwk: null as any,
+}));
+
+vi.mock('jose', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('jose')>();
+
+  return {
+    ...actual,
+    createRemoteJWKSet: vi.fn(() =>
+      hoisted.publicJwk
+        ? actual.createLocalJWKSet({ keys: [hoisted.publicJwk] })
+        : actual.createRemoteJWKSet(new URL('https://example.com/jwks')),
+    ),
+  };
+});
+
+vi.mock('../../config', () => ({
+  GoogleAuthOptions: {
+    id: 'google',
+    clientId: hoisted.audience,
+    wellKnownUrl: 'https://accounts.google.com/.well-known/openid-configuration',
+  },
+  MicrosoftAuthOptions: {
+    id: 'microsoft',
+    clientId: 'test-microsoft-client-id',
+    wellKnownUrl: 'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration',
+  },
+  OidcAuthOptions: {
+    id: 'oidc',
+    clientId: '',
+    wellKnownUrl: '',
+  },
+}));
+
+vi.mock('./open-id', () => ({
+  getOpenIdConfiguration: vi.fn().mockResolvedValue({
+    issuer: hoisted.issuer,
+    jwks_uri: 'https://example.com/jwks',
+  }),
+}));
 
 vi.mock('@prisma/client', () => ({
   UserSecurityAuditLogType: {
@@ -10,30 +57,6 @@ vi.mock('@prisma/client', () => ({
     SIGN_OUT: 'SIGN_OUT',
     ACCOUNT_SSO_UNLINK: 'ACCOUNT_SSO_UNLINK',
   },
-}));
-
-vi.mock('jose', () => ({
-  decodeJwt: vi.fn((token: string) => {
-    if (token.includes('invalid') || token.includes('throws_error')) {
-      throw new Error('Invalid JWT signature or payload');
-    }
-    const parts = token.split('.');
-    if (parts.length < 2) {
-      return {};
-    }
-    const base64Url = parts[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = Buffer.from(base64, 'base64').toString('utf8');
-    return JSON.parse(jsonPayload);
-  }),
-  jwtVerify: vi.fn().mockResolvedValue({}),
-  createRemoteJWKSet: vi.fn().mockReturnValue(() => ({})),
-}));
-
-vi.mock('./open-id', () => ({
-  getOpenIdConfiguration: vi.fn().mockResolvedValue({
-    jwks_uri: 'https://example.com/jwks',
-  }),
 }));
 
 vi.mock('@documenso/prisma', () => {
@@ -69,92 +92,58 @@ describe('OAuth Access Revocation & Session Invalidation Handler', () => {
     json: vi.fn().mockImplementation((data, status) => ({ data, status })),
   };
 
+  let privateKey: any;
+
+  const signLogoutToken = async (
+    overrides: {
+      iss?: string;
+      sub?: string;
+      nonce?: string;
+      events?: Record<string, unknown>;
+      signature?: string;
+    } = {},
+  ): Promise<string> => {
+    const jwt = new SignJWT({
+      events: overrides.events !== undefined ? overrides.events : { [BACKCHANNEL_LOGOUT_EVENT]: {} },
+      ...(overrides.nonce !== undefined ? { nonce: overrides.nonce } : {}),
+    })
+      .setProtectedHeader({ alg: 'RS256', typ: 'JWT' })
+      .setIssuer(overrides.iss ?? hoisted.issuer)
+      .setAudience(hoisted.audience)
+      .setIssuedAt()
+      .setExpirationTime('10m');
+
+    if (overrides.sub !== undefined) {
+      jwt.setSubject(overrides.sub);
+    }
+
+    const signed = await jwt.sign(privateKey);
+
+    if (overrides.signature !== undefined) {
+      const [header, payload] = signed.split('.');
+      return `${header}.${payload}.${overrides.signature}`;
+    }
+
+    return signed;
+  };
+
+  beforeAll(async () => {
+    const { publicKey, privateKey: signingKey } = await generateKeyPair('RS256');
+    const publicJwk = await exportJWK(publicKey);
+
+    publicJwk.alg = 'RS256';
+    publicJwk.use = 'sig';
+
+    hoisted.publicJwk = publicJwk;
+    privateKey = signingKey;
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('1. should invalidate active sessions and remove account link when providerAccountId is supplied', async () => {
-    vi.mocked(prisma.account.findFirst).mockResolvedValueOnce({
-      id: 'acc_123',
-      userId: 42,
-      provider: 'google',
-    } as any);
-    vi.mocked(prisma.session.findMany).mockResolvedValueOnce([{ id: 'sess_1' }, { id: 'sess_2' }] as any);
-    vi.mocked(prisma.session.deleteMany).mockResolvedValueOnce({ count: 2 } as any);
-    vi.mocked(prisma.userSecurityAuditLog.createMany).mockResolvedValueOnce({ count: 2 } as any);
-    vi.mocked(prisma.userSecurityAuditLog.create).mockResolvedValueOnce({} as any);
-    vi.mocked(prisma.account.delete).mockResolvedValueOnce({} as any);
-
-    const res = await handleOAuthRevocation({
-      c: mockContext as any,
-      providerAccountId: 'google_user_sub_99',
-      provider: 'google',
-    });
-
-    expect(prisma.account.findFirst).toHaveBeenCalledWith({
-      where: { providerAccountId: 'google_user_sub_99', provider: 'google' },
-      select: { id: true, userId: true, provider: true },
-    });
-    expect(prisma.session.deleteMany).toHaveBeenCalledWith({ where: { userId: 42 } });
-    expect(prisma.userSecurityAuditLog.createMany).toHaveBeenCalledWith({
-      data: [
-        { userId: 42, ipAddress: '127.0.0.1', userAgent: 'Vitest-Agent', type: 'SESSION_REVOKED' },
-        { userId: 42, ipAddress: '127.0.0.1', userAgent: 'Vitest-Agent', type: 'SESSION_REVOKED' },
-      ],
-    });
-    expect(prisma.account.delete).toHaveBeenCalledWith({ where: { id: 'acc_123' } });
-    expect(prisma.userSecurityAuditLog.create).toHaveBeenCalledWith({
-      data: { userId: 42, ipAddress: '127.0.0.1', userAgent: 'Vitest-Agent', type: 'ACCOUNT_SSO_UNLINK' },
-    });
-    expect(res).toEqual({
-      data: { success: true, message: 'OAuth access revoked and sessions terminated' },
-      status: 200,
-    });
-  });
-
-  it('2. should handle non-existent user/account gracefully (idempotent HTTP 200)', async () => {
-    vi.mocked(prisma.account.findFirst).mockResolvedValueOnce(null);
-
-    const res = await handleOAuthRevocation({
-      c: mockContext as any,
-      providerAccountId: 'non_existent_sub_000',
-    });
-
-    expect(prisma.account.findFirst).toHaveBeenCalledWith({
-      where: { providerAccountId: 'non_existent_sub_000' },
-      select: { id: true, userId: true, provider: true },
-    });
-    expect(prisma.session.findMany).not.toHaveBeenCalled();
-    expect(prisma.account.delete).not.toHaveBeenCalled();
-    expect(res).toEqual({
-      data: { success: true, message: 'No associated account found' },
-      status: 200,
-    });
-  });
-
-  it('3. should throw INVALID_REQUEST when neither logoutToken nor providerAccountId is provided', async () => {
-    await expect(
-      handleOAuthRevocation({
-        c: mockContext as any,
-      }),
-    ).rejects.toThrowError(AppError);
-  });
-
-  it('4. should throw INVALID_REQUEST when logout_token is malformed/invalid JWT', async () => {
-    const malformedJwt = 'header.invalid_base64_json_%%%!!!.signature';
-
-    await expect(
-      handleOAuthRevocation({
-        c: mockContext as any,
-        logoutToken: malformedJwt,
-      }),
-    ).rejects.toThrowError(AppError);
-  });
-
-  it('5. should parse valid logout_token JWT with sub claim, infer provider, and perform back-channel logout', async () => {
-    // Payload: {"iss":"https://accounts.google.com","sub":"backchannel_sub_456","events":{"http://schemas.openid.net/event/backchannel-logout":{} }}
-    const validLogoutToken =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJzdWIiOiJiYWNrY2hhbm5lbF9zdWJfNDU2IiwiZXZlbnRzIjp7Imh0dHA6Ly9zY2hlbWFzLm9wZW5pZC5uZXQvZXZlbnQvYmFja2NoYW5uZWwtbG9nb3V0Ijp7fX19.sig';
+  it('1. verifies a real signed logout token, invalidates sessions and unlinks the account', async () => {
+    const logoutToken = await signLogoutToken({ sub: 'backchannel_sub_456' });
 
     vi.mocked(prisma.account.findFirst).mockResolvedValueOnce({
       id: 'acc_456',
@@ -169,7 +158,7 @@ describe('OAuth Access Revocation & Session Invalidation Handler', () => {
 
     const res = await handleOAuthRevocation({
       c: mockContext as any,
-      logoutToken: validLogoutToken,
+      logoutToken,
     });
 
     expect(prisma.account.findFirst).toHaveBeenCalledWith({
@@ -187,24 +176,98 @@ describe('OAuth Access Revocation & Session Invalidation Handler', () => {
     });
   });
 
-  it('6. should throw INVALID_REQUEST when logout_token JWT lacks a sub claim', async () => {
-    // Payload: {"iss":"https://accounts.google.com","events":{"http://schemas.openid.net/event/backchannel-logout":{} }}
-    const logoutTokenNoSub =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJldmVudHMiOnsiaHR0cDovL3NjaGVtYXMub3BlbmlkLm5ldC9ldmVudC9iYWNrY2hhbm5lbC1sb2dvdXQiOnt9fX0.sig';
+  it('2. returns idempotent 200 when the account no longer exists', async () => {
+    vi.mocked(prisma.account.findFirst).mockResolvedValueOnce(null);
+
+    const res = await handleOAuthRevocation({
+      c: mockContext as any,
+      logoutToken: await signLogoutToken({ sub: 'non_existent_sub_000' }),
+    });
+
+    expect(prisma.session.findMany).not.toHaveBeenCalled();
+    expect(prisma.account.delete).not.toHaveBeenCalled();
+    expect(res).toEqual({
+      data: { success: true, message: 'No associated account found' },
+      status: 200,
+    });
+  });
+
+  it('3. throws INVALID_REQUEST when no logout token is provided', async () => {
+    await expect(
+      handleOAuthRevocation({
+        c: mockContext as any,
+      }),
+    ).rejects.toThrowError(AppError);
+  });
+
+  it('4. throws INVALID_REQUEST for a malformed JWT', async () => {
+    await expect(
+      handleOAuthRevocation({
+        c: mockContext as any,
+        logoutToken: 'header.invalid_payload.signature',
+      }),
+    ).rejects.toThrowError(AppError);
+  });
+
+  it('5. rejects a token with a tampered signature before touching the database', async () => {
+    const logoutToken = await signLogoutToken({
+      sub: 'backchannel_sub_456',
+      signature: 'tampered_signature',
+    });
 
     await expect(
       handleOAuthRevocation({
         c: mockContext as any,
-        logoutToken: logoutTokenNoSub,
+        logoutToken,
       }),
-    ).rejects.toThrowError('Missing provider account ID (sub) for revocation');
+    ).rejects.toThrowError(AppError);
+
+    expect(prisma.account.findFirst).not.toHaveBeenCalled();
   });
 
-  it('7. should process revocation cleanly when user has 0 active sessions', async () => {
+  it('6. rejects a token whose issuer does not match the pinned provider issuer', async () => {
+    const logoutToken = await signLogoutToken({
+      iss: 'https://accounts.google.com.evil.com',
+      sub: 'backchannel_sub_456',
+    });
+
+    await expect(
+      handleOAuthRevocation({
+        c: mockContext as any,
+        logoutToken,
+      }),
+    ).rejects.toThrowError(AppError);
+
+    expect(prisma.account.findFirst).not.toHaveBeenCalled();
+  });
+
+  it('7. rejects a validly signed token without a subject (sub) claim', async () => {
+    const logoutToken = await signLogoutToken({});
+
+    await expect(
+      handleOAuthRevocation({
+        c: mockContext as any,
+        logoutToken,
+      }),
+    ).rejects.toThrowError('Logout token is missing the subject (sub) claim');
+  });
+
+  it('8. rejects a logout token containing a nonce', async () => {
+    const logoutToken = await signLogoutToken({ sub: 'backchannel_sub_456', nonce: 'unexpected' });
+
+    await expect(
+      handleOAuthRevocation({
+        c: mockContext as any,
+        logoutToken,
+      }),
+    ).rejects.toThrowError('Logout token must not contain a nonce');
+  });
+
+  it('9. unlinks the account and logs even when the user has no active sessions', async () => {
     vi.mocked(prisma.account.findFirst).mockResolvedValueOnce({
       id: 'acc_789',
       userId: 99,
-      provider: 'microsoft',
+      provider: 'google',
     } as any);
     vi.mocked(prisma.session.findMany).mockResolvedValueOnce([]);
     vi.mocked(prisma.account.delete).mockResolvedValueOnce({} as any);
@@ -212,8 +275,7 @@ describe('OAuth Access Revocation & Session Invalidation Handler', () => {
 
     const res = await handleOAuthRevocation({
       c: mockContext as any,
-      providerAccountId: 'ms_sub_789',
-      provider: 'microsoft',
+      logoutToken: await signLogoutToken({ sub: 'ms_sub_789' }),
     });
 
     expect(prisma.session.deleteMany).not.toHaveBeenCalled();
@@ -226,5 +288,18 @@ describe('OAuth Access Revocation & Session Invalidation Handler', () => {
       data: { success: true, message: 'OAuth access revoked and sessions terminated' },
       status: 200,
     });
+  });
+
+  it('10. rejects a validly signed token without the back-channel logout event', async () => {
+    const logoutToken = await signLogoutToken({ sub: 'backchannel_sub_456', events: {} });
+
+    await expect(
+      handleOAuthRevocation({
+        c: mockContext as any,
+        logoutToken,
+      }),
+    ).rejects.toThrowError('Missing back-channel logout event claim');
+
+    expect(prisma.account.findFirst).not.toHaveBeenCalled();
   });
 });

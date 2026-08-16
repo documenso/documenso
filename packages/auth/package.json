@@ -5,6 +5,7 @@
   "types": "./index.ts",
   "license": "MIT",
   "scripts": {
+    "test": "vitest run",
     "clean": "rimraf node_modules"
   },
   "dependencies": {

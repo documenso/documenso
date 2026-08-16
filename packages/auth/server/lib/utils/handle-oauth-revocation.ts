@@ -11,99 +11,119 @@ import { getOpenIdConfiguration } from './open-id';
 type HandleOAuthRevocationOptions = {
   c: Context;
   logoutToken?: string;
-  providerAccountId?: string;
-  provider?: string;
 };
 
-export const handleOAuthRevocation = async (options: HandleOAuthRevocationOptions) => {
-  const { c, logoutToken, providerAccountId, provider } = options;
+type ResolvedClientOptions = {
+  clientOptions: typeof GoogleAuthOptions;
+  provider: string;
+};
 
-  const requestMeta = c.get('requestMetadata') ?? {};
-  let targetSub = providerAccountId;
-  let detectedProvider = provider;
+const BACKCHANNEL_LOGOUT_EVENT = 'http://schemas.openid.net/event/backchannel-logout';
 
-  if (logoutToken) {
-    try {
-      // Decode JWT without verification to read the issuer (iss)
-      const decoded = decodeJwt(logoutToken);
-      const iss = decoded.iss;
-
-      if (typeof iss !== 'string') {
-        throw new Error('Missing issuer (iss) claim');
-      }
-
-      // Match OIDC provider client configuration and provider name based on issuer
-      let clientOptions: typeof GoogleAuthOptions;
-      if (iss.includes('accounts.google.com')) {
-        clientOptions = GoogleAuthOptions;
-        detectedProvider = detectedProvider ?? 'google';
-      } else if (iss.includes('login.microsoftonline.com')) {
-        clientOptions = MicrosoftAuthOptions;
-        detectedProvider = detectedProvider ?? 'microsoft';
-      } else if (OidcAuthOptions.wellKnownUrl) {
-        clientOptions = OidcAuthOptions;
-        detectedProvider = detectedProvider ?? 'oidc';
-      } else {
-        throw new Error(`Unsupported issuer: ${iss}`);
-      }
-
-      // Retrieve public keys (JWKS) via OIDC discovery
-      const oidcConfig = await getOpenIdConfiguration(clientOptions.wellKnownUrl);
-      const jwksUri = oidcConfig.jwks_uri;
-      if (!jwksUri) {
-        throw new Error('OIDC provider configuration lacks jwks_uri');
-      }
-
-      // Verify signature and claims (iss, aud, exp) cryptographically
-      const JWKS = createRemoteJWKSet(new URL(jwksUri));
-      await jwtVerify(logoutToken, JWKS, {
-        issuer: iss,
-        audience: clientOptions.clientId,
-      });
-
-      // Assert OIDC Back-Channel Logout specific requirements
-      const events = decoded.events as Record<string, unknown> | undefined;
-      if (!events || !events['http://schemas.openid.net/event/backchannel-logout']) {
-        throw new Error('Missing back-channel logout event claim');
-      }
-
-      if (decoded.nonce) {
-        throw new Error('Logout token must not contain a nonce');
-      }
-
-      if (decoded.sub && typeof decoded.sub === 'string') {
-        targetSub = decoded.sub;
-      } else if (decoded.sid && typeof decoded.sid === 'string') {
-        targetSub = decoded.sid;
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        console.error('OAuth revocation JWT error:', err.message);
-      }
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: err instanceof Error ? err.message : 'Invalid logout_token signature or claims',
-      });
-    }
+const resolveClientOptions = (iss: string): ResolvedClientOptions => {
+  if (iss.includes('accounts.google.com')) {
+    return { clientOptions: GoogleAuthOptions, provider: 'google' };
   }
 
-  if (!targetSub) {
+  if (iss.includes('login.microsoftonline.com')) {
+    return { clientOptions: MicrosoftAuthOptions, provider: 'microsoft' };
+  }
+
+  if (OidcAuthOptions.wellKnownUrl) {
+    return { clientOptions: OidcAuthOptions, provider: 'oidc' };
+  }
+
+  throw new Error(`Unsupported issuer: ${iss}`);
+};
+
+type VerifyLogoutTokenResult = {
+  sub: string;
+  provider: string;
+};
+
+const verifyLogoutToken = async (logoutToken: string): Promise<VerifyLogoutTokenResult> => {
+  // Decode JWT without verification to read the issuer (iss).
+  const decoded = decodeJwt(logoutToken);
+  const iss = decoded.iss;
+
+  if (typeof iss !== 'string') {
+    throw new Error('Missing issuer (iss) claim');
+  }
+
+  const { clientOptions, provider } = resolveClientOptions(iss);
+
+  // Retrieve provider metadata (issuer + JWKS) via OIDC discovery.
+  const oidcConfig = await getOpenIdConfiguration(clientOptions.wellKnownUrl);
+  const jwksUri = oidcConfig.jwks_uri;
+
+  if (!jwksUri) {
+    throw new Error('OIDC provider configuration lacks jwks_uri');
+  }
+
+  // Pin the issuer to the value advertised by the provider discovery document.
+  // Multi-tenant providers (e.g. Microsoft "common") expose a `{tenantid}`
+  // placeholder, so they fall back to the token's own issuer.
+  const discoveredIssuer = oidcConfig.issuer;
+  const expectedIssuer = discoveredIssuer && !discoveredIssuer.includes('{tenantid}') ? discoveredIssuer : iss;
+
+  // Verify signature and claims (iss, aud, exp) cryptographically.
+  const JWKS = createRemoteJWKSet(new URL(jwksUri));
+
+  const { payload } = await jwtVerify(logoutToken, JWKS, {
+    issuer: expectedIssuer,
+    audience: clientOptions.clientId,
+  });
+
+  // Assert OIDC Back-Channel Logout specific requirements on the verified payload.
+  const events = payload.events as Record<string, unknown> | undefined;
+
+  if (!events || !events[BACKCHANNEL_LOGOUT_EVENT]) {
+    throw new Error('Missing back-channel logout event claim');
+  }
+
+  if (payload.nonce) {
+    throw new Error('Logout token must not contain a nonce');
+  }
+
+  if (typeof payload.sub !== 'string' || payload.sub.length === 0) {
+    throw new Error('Logout token is missing the subject (sub) claim');
+  }
+
+  return { sub: payload.sub, provider };
+};
+
+export const handleOAuthRevocation = async ({ c, logoutToken }: HandleOAuthRevocationOptions) => {
+  const requestMeta = c.get('requestMetadata') ?? {};
+
+  if (!logoutToken) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Missing provider account ID (sub) for revocation',
+      message: 'Missing logout_token for revocation',
     });
   }
 
-  const whereCondition: { providerAccountId: string; provider?: string } = {
-    providerAccountId: targetSub,
-  };
+  let targetSub: string;
+  let detectedProvider: string;
 
-  if (detectedProvider) {
-    whereCondition.provider = detectedProvider;
+  try {
+    ({ sub: targetSub, provider: detectedProvider } = await verifyLogoutToken(logoutToken));
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error('OAuth revocation JWT error:', err.message);
+    }
+
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: err instanceof Error ? err.message : 'Invalid logout_token signature or claims',
+    });
   }
 
-  // Execute database query, session invalidation, audit logging, and account deletion inside an atomic transaction
+  // Execute database query, session invalidation, audit logging, and account
+  // deletion inside an atomic transaction.
   return await prisma.$transaction(async (tx) => {
     const existingAccount = await tx.account.findFirst({
-      where: whereCondition,
+      where: {
+        providerAccountId: targetSub,
+        provider: detectedProvider,
+      },
       select: {
         id: true,
         userId: true,
