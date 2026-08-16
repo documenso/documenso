@@ -7,14 +7,14 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 <Callout type="error">
-  Account deletion is permanent and irreversible. All documents, signatures, templates, and account
-  data will be permanently removed. Any active subscription will be cancelled.
+  Account deletion is permanent and irreversible. Your account, signatures, and personal data will be
+  permanently removed, and any active subscription will be cancelled. How your organisations and
+  documents are handled is explained below.
 </Callout>
 
 ## Before Deleting
 
 - Download any documents you need to keep
-- Cancel any active subscriptions
 - Disable two-factor authentication (required before deletion)
 
 ## Delete Your Account
@@ -34,6 +34,31 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 <Callout type="info">
   If you have two-factor authentication enabled, you must disable it before deleting your account.
+</Callout>
+
+## What Happens to Your Organisations
+
+When you delete your account, the organisations you **own** are permanently deleted along with all of
+their teams. If an owned organisation has an active subscription, it is scheduled for cancellation at
+the end of the current billing period.
+
+Organisations that you are only a **member** of are not deleted. You are simply removed from them, and
+the organisation continues to operate as normal.
+
+## What Happens to Your Documents
+
+The way your documents and templates are handled depends on whether you owned the organisation they
+belong to:
+
+- **Organisations you owned** — Completed and in-progress documents are retained in an anonymized form
+  (reassigned to an internal system account) so the other parties keep their records. Draft documents
+  and templates are permanently removed.
+- **Organisations you were a member of** — Your documents and templates are transferred to the
+  organisation owner, so they remain accessible to the organisation after you leave.
+
+<Callout type="warn">
+  Documents that are retained in anonymized form are no longer associated with your account and cannot
+  be recovered or accessed by you after deletion. Download anything you need to keep beforehand.
 </Callout>
 
 ---

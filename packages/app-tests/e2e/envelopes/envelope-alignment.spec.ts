@@ -1,17 +1,16 @@
-import { createCanvas } from '@napi-rs/canvas';
-import type { TestInfo } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-import { DocumentStatus, EnvelopeType, FieldType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
-import pixelMatch from 'pixelmatch';
-import { PNG } from 'pngjs';
-
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { seedAlignmentTestDocument } from '@documenso/prisma/seed/initial-seed';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { createCanvas } from '@napi-rs/canvas';
+import type { TestInfo } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { DocumentStatus, EnvelopeType, FieldType } from '@prisma/client';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import pixelMatch from 'pixelmatch';
+import { PNG } from 'pngjs';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../lib/constants/app';
 import { isBase64Image } from '../../../lib/constants/signatures';
@@ -31,6 +30,9 @@ const baseUrl = `${WEBAPP_BASE_URL}/api/v2`;
 
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
+/**
+ * DON'T COMMIT THIS WITHOUT THE "SKIP" COMMAND.
+ */
 test.skip('seed alignment test document', async ({ page }) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -69,9 +71,7 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
   });
 
   // Step 1: Create initial envelope with Prisma (with first envelope item)
-  const alignmentPdf = fs.readFileSync(
-    path.join(__dirname, '../../../../assets/field-font-alignment.pdf'),
-  );
+  const alignmentPdf = fs.readFileSync(path.join(__dirname, '../../../../assets/field-font-alignment.pdf'));
 
   const fieldMetaPdf = fs.readFileSync(path.join(__dirname, '../../../../assets/field-meta.pdf'));
 
@@ -220,15 +220,51 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
             ? {
                 create: {
                   recipientId: envelope.recipients[0].id,
-                  signatureImageAsBase64: isBase64Image(foundField.signature)
-                    ? foundField.signature
-                    : null,
+                  signatureImageAsBase64: isBase64Image(foundField.signature) ? foundField.signature : null,
                   typedSignature: isBase64Image(foundField.signature) ? null : foundField.signature,
                 },
               }
             : undefined,
         },
       });
+    }),
+  );
+
+  // Override email fields with test values after distribution.
+  // Email fields are auto-inserted with the signer's email during distribution,
+  // so we override customText directly to test with specific values.
+  const emailFields = await prisma.field.findMany({
+    where: {
+      envelopeId: envelope.id,
+      type: FieldType.EMAIL,
+    },
+    include: {
+      envelopeItem: {
+        select: {
+          title: true,
+        },
+      },
+    },
+  });
+
+  await Promise.all(
+    emailFields.map(async (field) => {
+      const testFields = field.envelopeItem.title === 'alignment-pdf' ? ALIGNMENT_TEST_FIELDS : FIELD_META_TEST_FIELDS;
+
+      const foundField = testFields.find(
+        (f) =>
+          f.type === FieldType.EMAIL &&
+          field.page === f.page &&
+          Number(field.positionX).toFixed(2) === f.positionX.toFixed(2) &&
+          Number(field.positionY).toFixed(2) === f.positionY.toFixed(2),
+      );
+
+      if (foundField) {
+        await prisma.field.update({
+          where: { id: field.id },
+          data: { customText: foundField.customText },
+        });
+      }
     }),
   );
 
@@ -334,6 +370,42 @@ test.skip('download envelope images', async ({ page, request }) => {
   });
 
   expect(distributeEnvelopeRequest.ok()).toBeTruthy();
+
+  // Override email fields with test values after distribution.
+  const emailFields = await prisma.field.findMany({
+    where: {
+      envelopeId: envelope.id,
+      type: FieldType.EMAIL,
+    },
+    include: {
+      envelopeItem: {
+        select: {
+          title: true,
+        },
+      },
+    },
+  });
+
+  await Promise.all(
+    emailFields.map(async (field) => {
+      const testFields = field.envelopeItem.title === 'alignment-pdf' ? ALIGNMENT_TEST_FIELDS : FIELD_META_TEST_FIELDS;
+
+      const foundField = testFields.find(
+        (f) =>
+          f.type === FieldType.EMAIL &&
+          field.page === f.page &&
+          Number(field.positionX).toFixed(2) === f.positionX.toFixed(2) &&
+          Number(field.positionY).toFixed(2) === f.positionY.toFixed(2),
+      );
+
+      if (foundField) {
+        await prisma.field.update({
+          where: { id: field.id },
+          data: { customText: foundField.customText },
+        });
+      }
+    }),
+  );
 
   const token = envelope.recipients[0].token;
 
@@ -445,17 +517,10 @@ type CompareSignedPdfWithImagesOptions = {
   testInfo: TestInfo;
 };
 
-const compareSignedPdfWithImages = async ({
-  id,
-  pdfData,
-  images,
-  testInfo,
-}: CompareSignedPdfWithImagesOptions) => {
+const compareSignedPdfWithImages = async ({ id, pdfData, images, testInfo }: CompareSignedPdfWithImagesOptions) => {
   const renderedImages = await renderPdfToImage(pdfData);
 
-  const blankCertificateFile = fs.readFileSync(
-    path.join(__dirname, '../../visual-regression/blank-certificate.png'),
-  );
+  const blankCertificateFile = fs.readFileSync(path.join(__dirname, '../../visual-regression/blank-certificate.png'));
   const blankCertificateImage = PNG.sync.read(blankCertificateFile).data;
 
   for (const [index, { image, width, height }] of renderedImages.entries()) {

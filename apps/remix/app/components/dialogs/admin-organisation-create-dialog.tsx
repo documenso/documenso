@@ -1,13 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import type { z } from 'zod';
-
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { ZCreateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/create-admin-organisation.types';
@@ -22,16 +12,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
+import type { z } from 'zod';
 
 export type OrganisationCreateDialogProps = {
   trigger?: React.ReactNode;
@@ -44,11 +34,7 @@ const ZCreateAdminOrganisationFormSchema = ZCreateAdminOrganisationRequestSchema
 
 type TCreateOrganisationFormSchema = z.infer<typeof ZCreateAdminOrganisationFormSchema>;
 
-export const AdminOrganisationCreateDialog = ({
-  trigger,
-  ownerUserId,
-  ...props
-}: OrganisationCreateDialogProps) => {
+export const AdminOrganisationCreateDialog = ({ trigger, ownerUserId, ...props }: OrganisationCreateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -101,11 +87,7 @@ export const AdminOrganisationCreateDialog = ({
   }, [open, form]);
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button className="flex-shrink-0" variant="secondary">
@@ -127,10 +109,7 @@ export const AdminOrganisationCreateDialog = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset
-              className="flex h-full flex-col space-y-4"
-              disabled={form.formState.isSubmitting}
-            >
+            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="name"
@@ -149,10 +128,7 @@ export const AdminOrganisationCreateDialog = ({
 
               <Alert variant="neutral">
                 <AlertDescription className="mt-0">
-                  <Trans>
-                    You will need to configure any claims or subscription after creating this
-                    organisation
-                  </Trans>
+                  <Trans>You will need to configure any claims or subscription after creating this organisation</Trans>
                 </AlertDescription>
               </Alert>
 

@@ -1,4 +1,4 @@
 {
   "title": "Signing Certificate",
-  "pages": ["...index", "local", "google-cloud-hsm", "timestamp-server", "troubleshooting"]
+  "pages": ["...index", "local", "google-cloud-hsm", "csc-qes", "timestamp-server", "troubleshooting"]
 }

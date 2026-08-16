@@ -1,7 +1,6 @@
+import { prisma } from '@documenso/prisma';
 import type { Passkey } from '@prisma/client';
 import { Prisma } from '@prisma/client';
-
-import { prisma } from '@documenso/prisma';
 
 import type { FindResultResponse } from '../../types/search-params';
 
@@ -17,13 +16,7 @@ export interface FindPasskeysOptions {
   };
 }
 
-export const findPasskeys = async ({
-  userId,
-  query = '',
-  page = 1,
-  perPage = 10,
-  orderBy,
-}: FindPasskeysOptions) => {
+export const findPasskeys = async ({ userId, query = '', page = 1, perPage = 10, orderBy }: FindPasskeysOptions) => {
   const orderByColumn = orderBy?.column ?? 'lastUsedAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
   const orderByNulls: Prisma.NullsOrder | undefined = orderBy?.nulls ?? 'last';

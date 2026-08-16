@@ -1,10 +1,9 @@
 import { DeleteEmailIdentityCommand } from '@aws-sdk/client-sesv2';
-import { EmailDomainStatus } from '@prisma/client';
-
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { prisma } from '@documenso/prisma';
+import { EmailDomainStatus } from '@prisma/client';
 
 import { getSesClient, verifyDomainWithDKIM } from './create-email-domain';
 

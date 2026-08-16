@@ -1,13 +1,10 @@
-import { EnvelopeType } from '@prisma/client';
-
-import { createAttachment } from '@documenso/lib/server-only/envelope-attachment/create-attachment';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 
+import { createAttachment } from '@documenso/lib/server-only/envelope-attachment/create-attachment';
+import { EnvelopeType } from '@prisma/client';
+
 import { authenticatedProcedure } from '../../trpc';
-import {
-  ZCreateAttachmentRequestSchema,
-  ZCreateAttachmentResponseSchema,
-} from './create-attachment.types';
+import { ZCreateAttachmentRequestSchema, ZCreateAttachmentResponseSchema } from './create-attachment.types';
 
 export const createAttachmentRoute = authenticatedProcedure
   .meta({

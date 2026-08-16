@@ -21,4 +21,4 @@ jobs:
           stale-pr-message: 'This PR has not seen activitiy for a while. It will be closed in 30 days unless further activity is detected.'
           close-pr-message: 'This PR has been closed because of inactivity.'
           exempt-pr-labels: 'WIP,on-hold,needs review'
-          exempt-issue-labels: 'WIP,on-hold,needs review,roadmap,assigned,needs triage'
+          exempt-issue-labels: 'WIP,on-hold,needs review,roadmap,status: assigned,status: triage'

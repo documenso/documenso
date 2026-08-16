@@ -1,3 +1,4 @@
+import { isHttpUrl } from '@documenso/lib/utils/is-http-url';
 import { z } from 'zod';
 
 import { ZSuccessResponseSchema } from '../../schema';
@@ -17,7 +18,7 @@ export const ZUpdateAttachmentRequestSchema = z.object({
   id: z.string(),
   data: z.object({
     label: z.string().min(1, 'Label is required'),
-    data: z.string().url('Must be a valid URL'),
+    data: z.string().url('Must be a valid URL').refine(isHttpUrl, 'URL must use the http or https protocol'),
   }),
 });
 

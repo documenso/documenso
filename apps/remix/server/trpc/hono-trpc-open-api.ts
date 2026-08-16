@@ -1,20 +1,16 @@
-import type { Context } from 'hono';
-
 import { API_V2_BETA_URL, API_V2_URL } from '@documenso/lib/constants/app';
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { createTrpcContext } from '@documenso/trpc/server/context';
 import { appRouter } from '@documenso/trpc/server/router';
 import { createOpenApiFetchHandler } from '@documenso/trpc/utils/openapi-fetch-handler';
 import { handleTrpcRouterError } from '@documenso/trpc/utils/trpc-error-handler';
+import type { Context } from 'hono';
 
 type OpenApiTrpcServerHandlerOptions = {
   isBeta: boolean;
 };
 
-export const openApiTrpcServerHandler = async (
-  c: Context,
-  { isBeta }: OpenApiTrpcServerHandlerOptions,
-) => {
+export const openApiTrpcServerHandler = async (c: Context, { isBeta }: OpenApiTrpcServerHandlerOptions) => {
   return createOpenApiFetchHandler<typeof appRouter>({
     endpoint: isBeta ? API_V2_BETA_URL : API_V2_URL,
     router: appRouter,

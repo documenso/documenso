@@ -1,13 +1,12 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans, useLingui as useLinguiMacro } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
-
 import type { TDefaultRecipient } from '@documenso/lib/types/default-recipients';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
 import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans, useLingui as useLinguiMacro } from '@lingui/react/macro';
+import { RecipientRole } from '@prisma/client';
 
 type DefaultRecipientsMultiSelectComboboxProps = {
   listValues: TDefaultRecipient[];
@@ -26,18 +25,17 @@ export const DefaultRecipientsMultiSelectCombobox = ({
   const { t } = useLinguiMacro();
   const { toast } = useToast();
 
-  const { data: organisationData, isLoading: isLoadingOrganisation } =
-    trpc.organisation.member.find.useQuery(
-      {
-        organisationId: organisationId!,
-        query: '',
-        page: 1,
-        perPage: 100,
-      },
-      {
-        enabled: !!organisationId,
-      },
-    );
+  const { data: organisationData, isLoading: isLoadingOrganisation } = trpc.organisation.member.find.useQuery(
+    {
+      organisationId: organisationId!,
+      query: '',
+      page: 1,
+      perPage: 100,
+    },
+    {
+      enabled: !!organisationId,
+    },
+  );
 
   const { data: teamData, isLoading: isLoadingTeam } = trpc.team.member.find.useQuery(
     {
@@ -65,9 +63,7 @@ export const DefaultRecipientsMultiSelectCombobox = ({
   }));
 
   const onSelectionChange = (selected: Option[]) => {
-    const invalidEmails = selected.filter(
-      (option) => !isRecipientEmailValidForSending({ email: option.value }),
-    );
+    const invalidEmails = selected.filter((option) => !isRecipientEmailValidForSending({ email: option.value }));
 
     if (invalidEmails.length > 0) {
       toast({

@@ -1,6 +1,5 @@
-import { DateTime } from 'luxon';
-
 import { kyselyPrisma, sql } from '@documenso/prisma';
+import { DateTime } from 'luxon';
 
 export const getUserMonthlyGrowth = async () => {
   const qb = kyselyPrisma.$kysely

@@ -1,13 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { AlertTriangle, Building2, Database, Eye, Settings, UserCircle2 } from 'lucide-react';
-import { data, isRouteErrorResponse } from 'react-router';
-import { useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER } from '@documenso/lib/constants/organisations';
 import { ZOrganisationAccountLinkMetadataSchema } from '@documenso/lib/types/organisation';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
@@ -19,19 +9,19 @@ import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@documenso/ui/primitives/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { Separator } from '@documenso/ui/primitives/separator';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { AlertTriangle, Building2, Database, Eye, Settings, UserCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { data, isRouteErrorResponse, useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
 
-import { GenericErrorLayout, defaultErrorCodeMap } from '~/components/general/generic-error-layout';
+import { defaultErrorCodeMap, GenericErrorLayout } from '~/components/general/generic-error-layout';
 
 import type { Route } from './+types/organisation.sso.confirmation.$token';
 
@@ -46,9 +36,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     }))
     .otherwise(() => defaultErrorCodeMap[500]);
 
-  return (
-    <GenericErrorLayout errorCode={500} errorCodeMap={{ 500: errorMap }} secondaryButton={null} />
-  );
+  return <GenericErrorLayout errorCode={500} errorCodeMap={{ 500: errorMap }} secondaryButton={null} />;
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
@@ -171,21 +159,13 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
       <Card className="w-full max-w-2xl border">
         <CardHeader>
           <CardTitle>
-            {type === 'link' ? (
-              <Trans>Account Linking Request</Trans>
-            ) : (
-              <Trans>Account Creation Request</Trans>
-            )}
+            {type === 'link' ? <Trans>Account Linking Request</Trans> : <Trans>Account Creation Request</Trans>}
           </CardTitle>
           <CardDescription>
             {type === 'link' ? (
-              <Trans>
-                An organisation wants to link your account. Please review the details below.
-              </Trans>
+              <Trans>An organisation wants to link your account. Please review the details below.</Trans>
             ) : (
-              <Trans>
-                An organisation wants to create an account for you. Please review the details below.
-              </Trans>
+              <Trans>An organisation wants to create an account for you. Please review the details below.</Trans>
             )}
           </CardDescription>
         </CardHeader>
@@ -242,21 +222,16 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
               <Trans>Important: What This Means</Trans>
             </h3>
             <div className="space-y-3 rounded-lg border p-4">
-              <p className="text-sm font-medium">
-                <Trans>
-                  By accepting this request, you grant {organisation.name} the following
-                  permissions:
-                </Trans>
+              <p className="font-medium text-sm">
+                <Trans>By accepting this request, you grant {organisation.name} the following permissions:</Trans>
               </p>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2">
                   <Eye className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <span>
                     <Trans>
-                      <span className="font-semibold text-muted-foreground">
-                        Full account access:
-                      </span>{' '}
-                      View all your profile information, settings, and activity
+                      <span className="font-semibold text-muted-foreground">Full account access:</span> View all your
+                      profile information, settings, and activity
                     </Trans>
                   </span>
                 </li>
@@ -264,10 +239,8 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
                   <Settings className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <span>
                     <Trans>
-                      <span className="font-semibold text-muted-foreground">
-                        Account management:
-                      </span>{' '}
-                      Modify your account settings, permissions, and preferences
+                      <span className="font-semibold text-muted-foreground">Account management:</span> Modify your
+                      account settings, permissions, and preferences
                     </Trans>
                   </span>
                 </li>
@@ -275,8 +248,8 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
                   <Database className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <span>
                     <Trans>
-                      <span className="font-semibold text-muted-foreground">Data access:</span>{' '}
-                      Access all data associated with your account
+                      <span className="font-semibold text-muted-foreground">Data access:</span> Access all data
+                      associated with your account
                     </Trans>
                   </span>
                 </li>
@@ -285,9 +258,8 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
               <Alert variant="warning" className="mt-3">
                 <AlertDescription>
                   <Trans>
-                    This organisation will have administrative control over your account. You can
-                    revoke this access later, but they will retain access to any data they've
-                    already collected.
+                    This organisation will have administrative control over your account. You can revoke this access
+                    later, but they will retain access to any data they've already collected.
                   </Trans>
                 </AlertDescription>
               </Alert>
@@ -298,13 +270,11 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
             <Checkbox
               id={`accept-conditions`}
               checked={isConfirmationChecked}
-              onCheckedChange={(checked) =>
-                setIsConfirmationChecked(checked === 'indeterminate' ? false : checked)
-              }
+              onCheckedChange={(checked) => setIsConfirmationChecked(checked === 'indeterminate' ? false : checked)}
             />
 
             <label
-              className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
+              className="ml-2 flex flex-row items-center text-muted-foreground text-sm"
               htmlFor={`accept-conditions`}
             >
               <Trans>I agree to link my account with this organization</Trans>

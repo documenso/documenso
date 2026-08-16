@@ -1,37 +1,23 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import type { Recipient } from '@prisma/client';
-import { EnvelopeType, RecipientRole } from '@prisma/client';
-import { SendStatus, SigningStatus } from '@prisma/client';
-import { isDeepEqual } from 'remeda';
-
-import { mailer } from '@documenso/email/mailer';
-import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
-import {
-  type TRecipientActionAuthTypes,
-  ZRecipientAuthOptionsSchema,
-} from '@documenso/lib/types/document-auth';
+import { type TRecipientActionAuthTypes, ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid } from '@documenso/lib/universal/id';
-import {
-  createDocumentAuditLogData,
-  diffRecipientChanges,
-} from '@documenso/lib/utils/document-audit-logs';
+import { createDocumentAuditLogData, diffRecipientChanges } from '@documenso/lib/utils/document-audit-logs';
 import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
+import type { Recipient } from '@prisma/client';
+import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+import { isDeepEqual } from 'remeda';
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { getEmailContext } from '../email/get-email-context';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export interface SetDocumentRecipientsOptions {
   userId: number;
@@ -88,18 +74,11 @@ export const setDocumentRecipients = async ({
     throw new Error('Document not found');
   }
 
+  assertEnvelopeMutable(envelope);
+
   if (envelope.completedAt) {
     throw new Error('Document already complete');
   }
-
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId,
-    },
-    meta: envelope.documentMeta,
-  });
 
   const recipientsHaveActionAuth = recipients.some(
     (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
@@ -112,6 +91,13 @@ export const setDocumentRecipients = async ({
     });
   }
 
+  for (const recipient of recipients) {
+    assertCompatibleRecipientRole({
+      signatureLevel: envelope.signatureLevel,
+      role: recipient.role,
+    });
+  }
+
   const normalizedRecipients = recipients.map((recipient) => ({
     ...recipient,
     email: recipient.email.toLowerCase(),
@@ -120,17 +106,13 @@ export const setDocumentRecipients = async ({
   const existingRecipients = envelope.recipients;
 
   const removedRecipients = existingRecipients.filter(
-    (existingRecipient) =>
-      !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
+    (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
   );
 
   const linkedRecipients = normalizedRecipients.map((recipient) => {
-    const existing = existingRecipients.find(
-      (existingRecipient) => existingRecipient.id === recipient.id,
-    );
+    const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
 
-    const canPersistedRecipientBeModified =
-      existing && canRecipientBeModified(existing, envelope.fields);
+    const canPersistedRecipientBeModified = existing && canRecipientBeModified(existing, envelope.fields);
 
     if (
       existing &&
@@ -150,6 +132,8 @@ export const setDocumentRecipients = async ({
   });
 
   const persistedRecipients = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     return await Promise.all(
       linkedRecipients.map(async (recipient) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
@@ -180,8 +164,7 @@ export const setDocumentRecipients = async ({
             signingOrder: recipient.signingOrder,
             envelopeId: envelope.id,
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
-            signingStatus:
-              recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+            signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
             authOptions,
           },
           create: {
@@ -192,8 +175,7 @@ export const setDocumentRecipients = async ({
             token: nanoid(),
             envelopeId: envelope.id,
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
-            signingStatus:
-              recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+            signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
             authOptions,
           },
         });
@@ -220,9 +202,7 @@ export const setDocumentRecipients = async ({
           recipientRole: upsertedRecipient.role,
         };
 
-        const changes = recipient._persisted
-          ? diffRecipientChanges(recipient._persisted, upsertedRecipient)
-          : [];
+        const changes = recipient._persisted ? diffRecipientChanges(recipient._persisted, upsertedRecipient) : [];
 
         // Handle recipient updated audit log.
         if (recipient._persisted && changes.length > 0) {
@@ -290,60 +270,37 @@ export const setDocumentRecipients = async ({
       });
     });
 
-    const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
-      envelope.documentMeta,
-    ).recipientRemoved;
+    const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).recipientRemoved;
 
-    // Send emails to deleted recipients who have emails.
-    await Promise.all(
-      removedRecipients.map(async (recipient) => {
-        if (
-          recipient.sendStatus !== SendStatus.SENT ||
-          recipient.role === RecipientRole.CC ||
-          !isRecipientRemovedEmailEnabled ||
-          !isRecipientEmailValidForSending(recipient)
-        ) {
-          return;
-        }
+    if (isRecipientRemovedEmailEnabled) {
+      await Promise.all(
+        removedRecipients.map(async (recipient) => {
+          if (
+            recipient.sendStatus !== SendStatus.SENT ||
+            recipient.role === RecipientRole.CC ||
+            !isRecipientEmailValidForSending(recipient)
+          ) {
+            return;
+          }
 
-        const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-
-        const template = createElement(RecipientRemovedFromDocumentTemplate, {
-          documentName: envelope.title,
-          inviterName: user.name || undefined,
-          assetBaseUrl,
-        });
-
-        const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-          renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
-        ]);
-
-        const i18n = await getI18nInstance(emailLanguage);
-
-        await mailer.sendMail({
-          to: {
-            address: recipient.email,
-            name: recipient.name,
-          },
-          from: senderEmail,
-          replyTo: replyToEmail,
-          subject: i18n._(msg`You have been removed from a document`),
-          html,
-          text,
-        });
-      }),
-    );
+          await jobs.triggerJob({
+            name: 'send.recipient.removed.email',
+            payload: {
+              envelopeId: envelope.id,
+              recipientEmail: recipient.email,
+              recipientName: recipient.name,
+              inviterName: user.name || undefined,
+            },
+          });
+        }),
+      );
+    }
   }
 
   // Filter out recipients that have been removed or have been updated.
   const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
-    const isRemoved = removedRecipients.find(
-      (removedRecipient) => removedRecipient.id === recipient.id,
-    );
-    const isUpdated = persistedRecipients.find(
-      (persistedRecipient) => persistedRecipient.id === recipient.id,
-    );
+    const isRemoved = removedRecipients.find((removedRecipient) => removedRecipient.id === recipient.id);
+    const isUpdated = persistedRecipients.find((persistedRecipient) => persistedRecipient.id === recipient.id);
 
     return !isRemoved && !isUpdated;
   });

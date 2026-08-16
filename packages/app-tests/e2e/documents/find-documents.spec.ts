@@ -1,11 +1,3 @@
-import { expect, test } from '@playwright/test';
-import {
-  DocumentStatus,
-  DocumentVisibility,
-  OrganisationMemberRole,
-  TeamMemberRole,
-} from '@prisma/client';
-
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import {
@@ -17,6 +9,8 @@ import {
 import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
 import { seedTeam, seedTeamEmail, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
+import { DocumentStatus, DocumentVisibility, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
@@ -66,9 +60,7 @@ test.describe('Find Documents UI - Personal Context', () => {
     await checkDocumentTabCount(page, 'Completed', 1);
   });
 
-  test('received documents from other teams should NOT appear in personal context', async ({
-    page,
-  }) => {
+  test('received documents from other teams should NOT appear in personal context', async ({ page }) => {
     // The UI always uses the team code path (findTeamDocumentsFilter) which filters by teamId.
     // Documents sent TO a user by another user's team live on the sender's teamId,
     // so they do NOT appear in the recipient's personal team context.
@@ -97,12 +89,8 @@ test.describe('Find Documents UI - Personal Context', () => {
     // Only the owner's own doc should appear (received docs are on sender's team)
     await checkDocumentTabCount(page, 'All', 1);
     await expect(page.getByRole('link', { name: 'Owner Own Draft' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Received Pending Doc', exact: true }),
-    ).not.toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Received Completed Doc', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Received Pending Doc', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Received Completed Doc', exact: true })).not.toBeVisible();
   });
 
   test('should NOT show documents from other users', async ({ page }) => {
@@ -120,9 +108,7 @@ test.describe('Find Documents UI - Personal Context', () => {
     });
 
     await checkDocumentTabCount(page, 'All', 0);
-    await expect(
-      page.getByRole('link', { name: 'UserB Secret Document', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'UserB Secret Document', exact: true })).not.toBeVisible();
   });
 
   test('personal context without team email should show 0 inbox', async ({ page }) => {
@@ -175,9 +161,7 @@ test.describe('Find Documents UI - Personal Context', () => {
 
     await checkDocumentTabCount(page, 'All', 1);
     await expect(page.getByRole('link', { name: 'Quarterly Report 2024' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Annual Budget Plan', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Annual Budget Plan', exact: true })).not.toBeVisible();
   });
 
   test('should not show deleted documents', async ({ page }) => {
@@ -203,9 +187,7 @@ test.describe('Find Documents UI - Personal Context', () => {
 
     await checkDocumentTabCount(page, 'All', 1);
     await expect(page.getByRole('link', { name: 'Active Personal Doc' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Deleted Personal Doc', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Deleted Personal Doc', exact: true })).not.toBeVisible();
   });
 
   test('should only show root-level documents when not in a folder', async ({ page }) => {
@@ -235,9 +217,7 @@ test.describe('Find Documents UI - Personal Context', () => {
 
     await checkDocumentTabCount(page, 'All', 1);
     await expect(page.getByRole('link', { name: 'Root Level Doc' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Folder Level Doc', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Folder Level Doc', exact: true })).not.toBeVisible();
   });
 });
 
@@ -290,9 +270,7 @@ test.describe('Find Documents UI - Team Context', () => {
       await expect(page.getByRole('link', { name: 'Team Pending Doc' })).toBeVisible();
       await expect(page.getByRole('link', { name: 'Team Draft Doc' })).toBeVisible();
       await expect(page.getByRole('link', { name: 'Team Completed Doc' })).toBeVisible();
-      await expect(
-        page.getByRole('link', { name: 'Outside Noise Doc', exact: true }),
-      ).not.toBeVisible();
+      await expect(page.getByRole('link', { name: 'Outside Noise Doc', exact: true })).not.toBeVisible();
 
       await apiSignout({ page });
     }
@@ -346,9 +324,7 @@ test.describe('Find Documents UI - Team Context', () => {
     await expect(page.getByRole('link', { name: 'Team A Draft' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Team A Completed' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Team B Draft', exact: true })).not.toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Team B Completed', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Team B Completed', exact: true })).not.toBeVisible();
   });
 
   test('should NOT show personal documents in team context', async ({ page }) => {
@@ -383,9 +359,7 @@ test.describe('Find Documents UI - Team Context', () => {
     });
 
     await expect(page.getByRole('link', { name: 'Team Doc by Member' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Personal Doc not in Team', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Personal Doc not in Team', exact: true })).not.toBeVisible();
   });
 
   test('should enforce ADMIN visibility correctly across roles', async ({ page }) => {
@@ -478,16 +452,12 @@ test.describe('Find Documents UI - Team Context', () => {
     });
     await checkDocumentTabCount(page, 'Completed', 1);
     await expect(page.getByRole('link', { name: 'Everyone Doc' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Manager Plus Doc', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Manager Plus Doc', exact: true })).not.toBeVisible();
     await expect(page.getByRole('link', { name: 'Admin Only Doc', exact: true })).not.toBeVisible();
     await apiSignout({ page });
   });
 
-  test('document owner sees their document regardless of visibility restriction', async ({
-    page,
-  }) => {
+  test('document owner sees their document regardless of visibility restriction', async ({ page }) => {
     const { team, owner } = await seedTeam();
 
     const member = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.MEMBER });
@@ -538,9 +508,7 @@ test.describe('Find Documents UI - Team Context', () => {
     await checkDocumentTabCount(page, 'Completed', 2);
     await expect(page.getByRole('link', { name: 'Member Owned Admin Doc' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Everyone Doc Control' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Owner Admin Doc Hidden', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Owner Admin Doc Hidden', exact: true })).not.toBeVisible();
 
     await apiSignout({ page });
   });
@@ -596,9 +564,7 @@ test.describe('Find Documents UI - Team Context', () => {
     await checkDocumentTabCount(page, 'Completed', 2);
     await expect(page.getByRole('link', { name: 'Admin Doc Member Recipient' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Everyone Doc Baseline' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Admin Doc No Member', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Admin Doc No Member', exact: true })).not.toBeVisible();
 
     await apiSignout({ page });
   });
@@ -785,9 +751,7 @@ test.describe('Find Documents UI - Team with Team Email', () => {
     await checkDocumentTabCount(page, 'All', 2);
     await expect(page.getByRole('link', { name: 'Sent by Holder Pending' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Sent by Holder Completed' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'External Own Draft', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'External Own Draft', exact: true })).not.toBeVisible();
   });
 });
 
@@ -846,15 +810,9 @@ test.describe('Find Documents UI - Data Isolation & No Leaking', () => {
     // Verify no B docs leaked
     await page.getByRole('tab', { name: 'All' }).click();
     await expect(page.getByRole('link', { name: 'A Own Draft' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'B Draft Private', exact: true }),
-    ).not.toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'B Pending Private', exact: true }),
-    ).not.toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'B Completed Private', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'B Draft Private', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'B Pending Private', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'B Completed Private', exact: true })).not.toBeVisible();
   });
 
   test('team member cannot see documents from another team via search', async ({ page }) => {
@@ -903,9 +861,7 @@ test.describe('Find Documents UI - Data Isolation & No Leaking', () => {
     // Should find the TeamA doc but NOT the TeamB doc
     await checkDocumentTabCount(page, 'All', 1);
     await expect(page.getByRole('link', { name: 'Super Secret TeamA Document' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Super Secret TeamB Document', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Super Secret TeamB Document', exact: true })).not.toBeVisible();
   });
 
   test('search by recipient name should respect team visibility', async ({ page }) => {
@@ -957,9 +913,7 @@ test.describe('Find Documents UI - Data Isolation & No Leaking', () => {
     await apiSignout({ page });
   });
 
-  test('outside user does NOT see cross-team received docs in their personal context', async ({
-    page,
-  }) => {
+  test('outside user does NOT see cross-team received docs in their personal context', async ({ page }) => {
     // The UI always uses the team code path (findTeamDocumentsFilter) which filters by teamId.
     // Documents from team.id will NOT appear in outsideTeam's context.
     const { team, owner } = await seedTeam();
@@ -1009,12 +963,8 @@ test.describe('Find Documents UI - Data Isolation & No Leaking', () => {
     await checkDocumentTabCount(page, 'Inbox', 0); // No team email → 0
     await checkDocumentTabCount(page, 'All', 1); // Check All tab last so we can verify visible links
     await expect(page.getByRole('link', { name: 'Outside Own Draft' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Team Doc For Outside User', exact: true }),
-    ).not.toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Team Doc For Other User Only', exact: true }),
-    ).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Team Doc For Outside User', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Team Doc For Other User Only', exact: true })).not.toBeVisible();
   });
 });
 

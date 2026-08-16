@@ -1,9 +1,8 @@
-import satori from 'satori';
-import { P, match } from 'ts-pattern';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRecipientOrSenderByShareLinkSlug } from '@documenso/lib/server-only/document/get-recipient-or-sender-by-share-link-slug';
 import { svgToPng } from '@documenso/lib/utils/images/svg-to-png';
+import satori from 'satori';
+import { match, P } from 'ts-pattern';
 
 import type { Route } from './+types/share.$slug.opengraph';
 
@@ -30,15 +29,9 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
   const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
 
   const [interSemiBold, interRegular, caveatRegular] = await Promise.all([
-    fetch(new URL(`${baseUrl}/fonts/inter-semibold.ttf`, import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(new URL(`${baseUrl}/fonts/inter-regular.ttf`, import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(new URL(`${baseUrl}/fonts/caveat-regular.ttf`, import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
+    fetch(new URL(`${baseUrl}/fonts/inter-semibold.ttf`, import.meta.url)).then(async (res) => res.arrayBuffer()),
+    fetch(new URL(`${baseUrl}/fonts/inter-regular.ttf`, import.meta.url)).then(async (res) => res.arrayBuffer()),
+    fetch(new URL(`${baseUrl}/fonts/caveat-regular.ttf`, import.meta.url)).then(async (res) => res.arrayBuffer()),
   ]);
 
   const recipientOrSender = await getRecipientOrSenderByShareLinkSlug({

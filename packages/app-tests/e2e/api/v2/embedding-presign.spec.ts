@@ -1,16 +1,13 @@
-import { expect, test } from '@playwright/test';
-import type { APIRequestContext } from 'playwright-core';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import type { CreateEmbeddingPresignTokenOptions } from '@documenso/lib/server-only/embedding-presign/create-embedding-presign-token';
 import type { VerifyEmbeddingPresignTokenOptions } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
+import type { APIRequestContext } from 'playwright-core';
 
 test.describe('Embedding Presign API', () => {
-  test('createEmbeddingPresignToken: should create a token with default expiration', async ({
-    request,
-  }) => {
+  test('createEmbeddingPresignToken: should create a token with default expiration', async ({ request }) => {
     const { user, team } = await seedUser();
 
     const { token } = await createApiToken({
@@ -34,9 +31,7 @@ test.describe('Embedding Presign API', () => {
     expect(responseData.expiresIn).toBe(3600); // Default 1 hour in seconds
   });
 
-  test('createEmbeddingPresignToken: should create a token with custom expiration', async ({
-    request,
-  }) => {
+  test('createEmbeddingPresignToken: should create a token with custom expiration', async ({ request }) => {
     const { user, team } = await seedUser();
 
     const { token } = await createApiToken({
@@ -187,9 +182,7 @@ test.describe('Embedding Presign API', () => {
     expect(verifyResponseData.success).toBe(true);
   });
 
-  test('verifyEmbeddingPresignToken: should reject a scope mismatched token', async ({
-    request,
-  }) => {
+  test('verifyEmbeddingPresignToken: should reject a scope mismatched token', async ({ request }) => {
     const { user, team } = await seedUser();
 
     const { token } = await createApiToken({
@@ -233,19 +226,16 @@ const createPresignToken = async (
   apiToken: string,
   data?: Partial<CreateEmbeddingPresignTokenOptions>,
 ) => {
-  return await request.post(
-    `${NEXT_PUBLIC_WEBAPP_URL()}/api/v2-beta/embedding/create-presign-token`,
-    {
-      headers: {
-        Authorization: `Bearer ${apiToken}`,
-        'Content-Type': 'application/json',
-      },
-      data: {
-        apiToken,
-        ...data,
-      },
+  return await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/v2-beta/embedding/create-presign-token`, {
+    headers: {
+      Authorization: `Bearer ${apiToken}`,
+      'Content-Type': 'application/json',
     },
-  );
+    data: {
+      apiToken,
+      ...data,
+    },
+  });
 };
 
 const verifyPresignToken = async (
@@ -253,14 +243,11 @@ const verifyPresignToken = async (
   apiToken: string,
   data: VerifyEmbeddingPresignTokenOptions,
 ) => {
-  return await request.post(
-    `${NEXT_PUBLIC_WEBAPP_URL()}/api/v2-beta/embedding/verify-presign-token`,
-    {
-      headers: {
-        Authorization: `Bearer ${apiToken}`,
-        'Content-Type': 'application/json',
-      },
-      data,
+  return await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/v2-beta/embedding/verify-presign-token`, {
+    headers: {
+      Authorization: `Bearer ${apiToken}`,
+      'Content-Type': 'application/json',
     },
-  );
+    data,
+  });
 };

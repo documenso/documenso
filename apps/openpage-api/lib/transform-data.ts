@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { type TransformedData, addZeroMonth } from './add-zero-month';
+import { addZeroMonth, type TransformedData } from './add-zero-month';
 
 type MetricKeys = {
   stars: number;
@@ -24,13 +24,7 @@ const FRIENDLY_METRIC_NAMES: { [key in MetricKey]: string } = {
   earlyAdopters: 'Customers',
 };
 
-export function transformData({
-  data,
-  metric,
-}: {
-  data: DataEntry;
-  metric: MetricKey;
-}): TransformedData {
+export function transformData({ data, metric }: { data: DataEntry; metric: MetricKey }): TransformedData {
   try {
     if (!data || Object.keys(data).length === 0) {
       return {

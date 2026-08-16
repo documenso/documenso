@@ -1,10 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { MailsIcon } from 'lucide-react';
-import { Link, redirect, useSearchParams } from 'react-router';
-
 import { authClient } from '@documenso/auth/client';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -12,6 +5,11 @@ import { prisma } from '@documenso/prisma';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { MailsIcon } from 'lucide-react';
+import { useState } from 'react';
+import { Link, redirect, useSearchParams } from 'react-router';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { appMetaTags } from '~/utils/meta';
@@ -126,18 +124,18 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
     return (
       <div className="w-screen max-w-lg px-4">
         <div className="flex items-start">
-          <div className="mr-4 mt-1 hidden md:block">
+          <div className="mt-1 mr-4 hidden md:block">
             <MailsIcon className="h-10 w-10 text-primary" strokeWidth={2} />
           </div>
           <div className="">
-            <h2 className="text-2xl font-bold md:text-4xl">
+            <h2 className="font-bold text-2xl md:text-4xl">
               <Trans>Confirmation email sent</Trans>
             </h2>
 
             <p className="mt-4 text-muted-foreground">
               <Trans>
-                To gain access to your account, please confirm your email address by clicking on the
-                confirmation link from your inbox.
+                To gain access to your account, please confirm your email address by clicking on the confirmation link
+                from your inbox.
               </Trans>
             </p>
 
@@ -157,11 +155,11 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
   return (
     <div className="w-screen max-w-lg px-4">
       <div className="z-10 rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
-        <h1 className="text-2xl font-semibold">
+        <h1 className="font-semibold text-2xl">
           <Trans>Welcome to {organisationName}</Trans>
         </h1>
 
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-muted-foreground text-sm">
           <Trans>Sign in to your account</Trans>
         </p>
 
@@ -171,18 +169,15 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
           <Checkbox
             id={`flag-3rd-party-service`}
             checked={isConfirmationChecked}
-            onCheckedChange={(checked) =>
-              setIsConfirmationChecked(checked === 'indeterminate' ? false : checked)
-            }
+            onCheckedChange={(checked) => setIsConfirmationChecked(checked === 'indeterminate' ? false : checked)}
           />
 
           <label
-            className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
+            className="ml-2 flex flex-row items-center text-muted-foreground text-sm"
             htmlFor={`flag-3rd-party-service`}
           >
             <Trans>
-              I understand that I am providing my credentials to a 3rd party service configured by
-              this organisation
+              I understand that I am providing my credentials to a 3rd party service configured by this organisation
             </Trans>
           </label>
         </div>
@@ -207,7 +202,7 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
           <div className="h-px flex-1 bg-border" />
         </div>
 
-        <div className="mt-1 flex items-center justify-center text-xs text-muted-foreground">
+        <div className="mt-1 flex items-center justify-center text-muted-foreground text-xs">
           <Link to="/signin">
             <Trans>Return to Documenso sign in page here</Trans>
           </Link>

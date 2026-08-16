@@ -1,9 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { trpc } from '@documenso/trpc/react';
@@ -21,6 +15,10 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
 
 export type AccountDeleteDialogProps = {
   className?: string;
@@ -36,8 +34,7 @@ export const AccountDeleteDialog = ({ className }: AccountDeleteDialogProps) => 
 
   const [enteredEmail, setEnteredEmail] = useState<string>('');
 
-  const { mutateAsync: deleteAccount, isPending: isDeletingAccount } =
-    trpc.profile.deleteAccount.useMutation();
+  const { mutateAsync: deleteAccount, isPending: isDeletingAccount } = trpc.profile.deleteAccount.useMutation();
 
   const onDeleteAccount = async () => {
     try {
@@ -63,18 +60,15 @@ export const AccountDeleteDialog = ({ className }: AccountDeleteDialogProps) => 
 
   return (
     <div className={className}>
-      <Alert
-        className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row"
-        variant="neutral"
-      >
+      <Alert className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row" variant="neutral">
         <div>
           <AlertTitle>
             <Trans>Delete Account</Trans>
           </AlertTitle>
           <AlertDescription className="mr-2">
             <Trans>
-              Delete your account and all its contents, including completed documents. This action
-              is irreversible and will cancel your subscription, so proceed with caution.
+              Delete your account and all its contents, including completed documents. This action is irreversible and
+              will cancel your subscription, so proceed with caution.
             </Trans>
           </AlertDescription>
         </div>
@@ -109,10 +103,8 @@ export const AccountDeleteDialog = ({ className }: AccountDeleteDialogProps) => 
 
                 <DialogDescription>
                   <Trans>
-                    Documenso will delete{' '}
-                    <span className="font-semibold">all of your documents</span>, along with all of
-                    your completed documents, signatures, and all other resources belonging to your
-                    Account.
+                    Documenso will delete <span className="font-semibold">all of your documents</span>, along with all
+                    of your completed documents, signatures, and all other resources belonging to your Account.
                   </Trans>
                 </DialogDescription>
               </DialogHeader>
@@ -121,9 +113,7 @@ export const AccountDeleteDialog = ({ className }: AccountDeleteDialogProps) => 
                 <div>
                   <Label>
                     <Trans>
-                      Please type{' '}
-                      <span className="text-muted-foreground font-semibold">{user.email}</span> to
-                      confirm.
+                      Please type <span className="font-semibold text-muted-foreground">{user.email}</span> to confirm.
                     </Trans>
                   </Label>
 

@@ -1,11 +1,3 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { Plural, Trans, useLingui } from '@lingui/react/macro';
-import { Building2Icon, InboxIcon, SettingsIcon, UsersIcon } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link, redirect } from 'react-router';
-
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
@@ -16,6 +8,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/av
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ScrollArea, ScrollBar } from '@documenso/ui/primitives/scroll-area';
+import { msg } from '@lingui/core/macro';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
+import { Building2Icon, InboxIcon, SettingsIcon, UsersIcon } from 'lucide-react';
+import { DateTime } from 'luxon';
+import { useMemo } from 'react';
+import { Link, redirect } from 'react-router';
 
 import { OrganisationInvitations } from '~/components/general/organisations/organisation-invitations';
 import { InboxTable } from '~/components/tables/inbox-table';
@@ -52,7 +50,7 @@ export default function DashboardPage() {
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <div className="container">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">
+          <h1 className="font-bold text-3xl">
             <Trans>Dashboard</Trans>
           </h1>
           <p className="mt-1 text-muted-foreground">
@@ -63,14 +61,14 @@ export default function DashboardPage() {
         </div>
 
         {organisations.length === 0 && (
-          <div className="mb-12 mt-6 flex flex-col items-center justify-center rounded-lg border py-32">
+          <div className="mt-6 mb-12 flex flex-col items-center justify-center rounded-lg border py-32">
             <Building2Icon className="h-10 w-10" />
 
             <div className="mt-2 flex flex-col items-center gap-0.5">
               <p className="font-semibold">
                 <Trans>No organisations found</Trans>
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 <Trans>Create an organisation to get started.</Trans>
               </p>
             </div>
@@ -89,7 +87,7 @@ export default function DashboardPage() {
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Building2Icon className="h-5 w-5 text-muted-foreground" />
-                <h2 className="text-xl font-semibold">
+                <h2 className="font-semibold text-xl">
                   <Trans>Organisations</Trans>
                 </h2>
               </div>
@@ -109,17 +107,15 @@ export default function DashboardPage() {
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10 border border-solid">
-                            {org.avatarImageId && (
-                              <AvatarImage src={formatAvatarUrl(org.avatarImageId)} />
-                            )}
-                            <AvatarFallback className="text-sm text-gray-400">
+                            {org.avatarImageId && <AvatarImage src={formatAvatarUrl(org.avatarImageId)} />}
+                            <AvatarFallback className="text-gray-400 text-sm">
                               {org.name.slice(0, 1).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
 
                           <div className="flex-1">
                             <h3 className="font-medium">{org.name}</h3>
-                            <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+                            <div className="mt-1 flex items-center gap-3 text-muted-foreground text-xs">
                               <div className="flex items-center gap-1">
                                 <UsersIcon className="h-3 w-3" />
                                 <span>
@@ -145,11 +141,8 @@ export default function DashboardPage() {
                     </Card>
                   </Link>
 
-                  {canExecuteOrganisationAction(
-                    'MANAGE_ORGANISATION',
-                    org.currentOrganisationRole,
-                  ) && (
-                    <div className="absolute right-4 top-4 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                  {canExecuteOrganisationAction('MANAGE_ORGANISATION', org.currentOrganisationRole) && (
+                    <div className="absolute top-4 right-4 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                       <Link to={`/o/${org.url}/settings`}>
                         <SettingsIcon className="h-4 w-4" />
                       </Link>
@@ -167,7 +160,7 @@ export default function DashboardPage() {
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <UsersIcon className="h-5 w-5 text-muted-foreground" />
-                <h2 className="text-xl font-semibold">
+                <h2 className="font-semibold text-xl">
                   <Trans>Teams</Trans>
                 </h2>
               </div>
@@ -188,17 +181,15 @@ export default function DashboardPage() {
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10 border border-solid">
-                              {team.avatarImageId && (
-                                <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
-                              )}
-                              <AvatarFallback className="text-sm text-gray-400">
+                              {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
+                              <AvatarFallback className="text-gray-400 text-sm">
                                 {team.name.slice(0, 1).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
 
                             <div className="flex-1">
                               <h3 className="font-medium">{team.name}</h3>
-                              <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+                              <div className="mt-1 flex items-center gap-3 text-muted-foreground text-xs">
                                 <div className="flex items-center gap-1">
                                   <UsersIcon className="h-3 w-3" />
                                   {team.organisation.ownerUserId === user.id
@@ -212,18 +203,15 @@ export default function DashboardPage() {
                               </div>
                             </div>
                           </div>
-                          <div className="mt-3 text-xs text-muted-foreground">
-                            <Trans>
-                              Joined{' '}
-                              {DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })}
-                            </Trans>
+                          <div className="mt-3 text-muted-foreground text-xs">
+                            <Trans>Joined {DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })}</Trans>
                           </div>
                         </CardContent>
                       </Card>
                     </Link>
 
                     {canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole) && (
-                      <div className="absolute right-4 top-4 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      <div className="absolute top-4 right-4 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                         <Link to={`/t/${team.url}/settings`}>
                           <SettingsIcon className="h-4 w-4" />
                         </Link>
@@ -242,7 +230,7 @@ export default function DashboardPage() {
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <InboxIcon className="h-5 w-5 text-muted-foreground" />
-              <h2 className="text-xl font-semibold">
+              <h2 className="font-semibold text-xl">
                 <Trans>Personal Inbox</Trans>
               </h2>
             </div>

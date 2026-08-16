@@ -1,22 +1,3 @@
-import { useMemo, useState } from 'react';
-import { useEffect } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
-import {
-  CheckCircle2Icon,
-  ChevronRightIcon,
-  PencilIcon,
-  TerminalIcon,
-  XCircleIcon,
-} from 'lucide-react';
-import { useNavigate } from 'react-router';
-import { useLocation, useSearchParams } from 'react-router';
-import { Link } from 'react-router';
-import { z } from 'zod';
-
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -35,6 +16,13 @@ import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
+import { CheckCircle2Icon, ChevronRightIcon, PencilIcon, TerminalIcon, XCircleIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
+import { z } from 'zod';
 
 import { WebhookEditDialog } from '~/components/dialogs/webhook-edit-dialog';
 import { WebhookTestDialog } from '~/components/dialogs/webhook-test-dialog';
@@ -71,9 +59,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
 
-  const parsedSearchParams = WebhookSearchParamsSchema.parse(
-    Object.fromEntries(searchParams ?? []),
-  );
+  const parsedSearchParams = WebhookSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
   const { data: webhook, isLoading } = trpc.webhook.getWebhookById.useQuery(
     {
@@ -151,10 +137,8 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
         accessorKey: 'event',
         cell: ({ row }) => (
           <div>
-            <p className="text-sm font-semibold text-foreground">
-              {toFriendlyWebhookEventName(row.original.event)}
-            </p>
-            <p className="text-xs text-muted-foreground">{row.original.id}</p>
+            <p className="font-semibold text-foreground text-sm">{toFriendlyWebhookEventName(row.original.event)}</p>
+            <p className="text-muted-foreground text-xs">{row.original.id}</p>
           </div>
         ),
       },
@@ -170,7 +154,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
               })}
             </p>
 
-            <div className="data-state-selected:block opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="opacity-0 transition-opacity group-hover:opacity-100 data-state-selected:block">
               <ChevronRightIcon className="h-4 w-4" />
             </div>
           </div>
@@ -330,9 +314,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
           }}
         >
           {(table) =>
-            results.totalPages > 1 && (
-              <DataTablePagination additionalInformation="VisibleCount" table={table} />
-            )
+            results.totalPages > 1 && <DataTablePagination additionalInformation="VisibleCount" table={table} />
           }
         </DataTable>
       </div>

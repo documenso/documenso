@@ -1,9 +1,8 @@
-import { expect, test } from '@playwright/test';
-
 import { FolderType } from '@documenso/prisma/client';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { expectToastTextToBeVisible } from '../fixtures/generic';

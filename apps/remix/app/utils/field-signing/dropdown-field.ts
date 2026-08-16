@@ -1,8 +1,7 @@
-import { FieldType } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TFieldDropdown } from '@documenso/lib/types/field';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
+import { FieldType } from '@prisma/client';
 
 import { SignFieldDropdownDialog } from '~/components/dialogs/sign-field-dropdown-dialog';
 

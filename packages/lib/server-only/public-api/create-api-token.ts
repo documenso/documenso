@@ -1,7 +1,6 @@
+import { prisma } from '@documenso/prisma';
 import type { Duration } from 'luxon';
 import { DateTime } from 'luxon';
-
-import { prisma } from '@documenso/prisma';
 
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
 // temporary choice for testing only
@@ -22,12 +21,7 @@ type CreateApiTokenInput = {
   expiresIn: string | null;
 };
 
-export const createApiToken = async ({
-  userId,
-  teamId,
-  tokenName,
-  expiresIn,
-}: CreateApiTokenInput) => {
+export const createApiToken = async ({ userId, teamId, tokenName, expiresIn }: CreateApiTokenInput) => {
   const apiToken = `api_${alphaid(16)}`;
 
   const hashedToken = hashString(apiToken);

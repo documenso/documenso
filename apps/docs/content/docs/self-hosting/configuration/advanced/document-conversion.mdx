@@ -1,0 +1,408 @@
+---
+title: Document Conversion
+description: Enable DOCX uploads on a self-hosted Documenso instance by running a Gotenberg sidecar that converts Word documents to PDF.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
+
+Documenso can accept `.docx` uploads in addition to PDFs. When a user uploads a Word document, the Documenso server sends it to a [Gotenberg](https://gotenberg.dev) service which uses LibreOffice to convert it to PDF. The converted PDF is what gets stored, signed, and downloaded. The original DOCX is discarded.
+
+This feature is **opt-in for self-hosted instances**. When the conversion service is not configured, DOCX uploads are rejected in the UI and only PDFs are accepted.
+
+| Property                | Value                                                                |
+| ----------------------- | -------------------------------------------------------------------- |
+| Conversion engine       | [Gotenberg](https://gotenberg.dev) + LibreOffice                     |
+| Input format            | `.docx` (Office Open XML Word documents)                             |
+| Output format           | PDF                                                                  |
+| Network requirement     | Documenso must reach the Gotenberg HTTP API                          |
+| Default request timeout | 30 seconds per file                                                  |
+| Failure handling        | An internal circuit breaker opens for 30 seconds after a failure |
+
+<Callout type="info">
+  Only `.docx` is accepted. Legacy `.doc`, `.odt`, `.rtf`, and other LibreOffice-supported formats
+  are rejected at the upload step even when Gotenberg is configured.
+</Callout>
+
+---
+
+## Requirements
+
+- A running Gotenberg 8 instance with the LibreOffice module (`gotenberg/gotenberg:8-libreoffice` or newer).
+- Network reachability from the Documenso container to the Gotenberg HTTP API.
+- A version of Documenso that includes the document conversion feature.
+
+## Build the Gotenberg Image
+
+The upstream `gotenberg/gotenberg:8-libreoffice` image works out of the box, but it ships only **metric-compatible font substitutes** (Carlito for Calibri, Liberation for Arial/Times/Courier). Layout widths are preserved but documents will look noticeably different from Word.
+
+For better fidelity, especially for non-Latin scripts, build a derived image that adds Microsoft Core Fonts and additional language fonts. The Documenso repository ships a reference Dockerfile at [`docker/development/Dockerfile.gotenberg`](https://github.com/documenso/documenso/blob/main/docker/development/Dockerfile.gotenberg) that you can use as a starting point:
+
+```dockerfile
+FROM gotenberg/gotenberg:8-libreoffice
+
+USER root
+
+RUN echo "deb http://deb.debian.org/debian trixie contrib non-free" \
+      > /etc/apt/sources.list.d/contrib.list \
+    && echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" \
+      | debconf-set-selections \
+    && apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
+        ca-certificates \
+        ttf-mscorefonts-installer \
+        fonts-symbola \
+        fonts-noto-extra \
+        fonts-hosny-amiri \
+        fonts-thai-tlwg \
+        fonts-sil-padauk \
+        fonts-sarai \
+        fonts-samyak-taml \
+        culmus \
+        libfribidi0 \
+        libharfbuzz0b \
+    && fc-cache -f \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+USER gotenberg
+```
+
+<Callout type="warn">
+  `ttf-mscorefonts-installer` accepts the Microsoft Core Fonts EULA on your behalf via debconf. By
+  installing this image you are agreeing to those licence terms. Review them before publishing the
+  image.
+</Callout>
+
+Build and publish the image to a registry you control:
+
+```bash
+docker build -t registry.example.com/documenso/gotenberg:8 \
+  -f Dockerfile.gotenberg .
+docker push registry.example.com/documenso/gotenberg:8
+```
+
+If you do not need extra fonts, skip the build step entirely and reference `gotenberg/gotenberg:8-libreoffice` directly in the next section.
+
+## Deploy the Service
+
+The Gotenberg service should run **alongside** your Documenso container, not exposed to the public internet. The conversion service has no built-in authorisation beyond HTTP Basic auth, so it should sit on a private network or behind your existing reverse proxy.
+
+<Tabs items={['Docker Compose', 'Kubernetes', 'External Instance']}>
+<Tab value="Docker Compose">
+
+Add a `gotenberg` service to the `compose.yml` you use for Documenso:
+
+```yaml
+services:
+  gotenberg:
+    image: registry.example.com/documenso/gotenberg:8
+    # Or use upstream directly:
+    # image: gotenberg/gotenberg:8-libreoffice
+    restart: unless-stopped
+    environment:
+      GOTENBERG_API_BASIC_AUTH_USERNAME: ${GOTENBERG_USERNAME}
+      GOTENBERG_API_BASIC_AUTH_PASSWORD: ${GOTENBERG_PASSWORD}
+    command:
+      - gotenberg
+      - --api-enable-basic-auth
+      - --libreoffice-deny-private-ips
+      - --api-timeout=500s
+      - --libreoffice-auto-start
+      - --libreoffice-start-timeout=300s
+      - --pdfengines-disable-routes
+      - --webhook-disable
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://localhost:3000/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  documenso:
+    # existing config
+    environment:
+      NEXT_PRIVATE_DOCUMENT_CONVERSION_URL: http://gotenberg:3000
+      NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME: ${GOTENBERG_USERNAME}
+      NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD: ${GOTENBERG_PASSWORD}
+    depends_on:
+      gotenberg:
+        condition: service_healthy
+```
+
+Do **not** publish Gotenberg's port (`3000`) to the host. Documenso reaches it over the internal Docker network using the service name (`http://gotenberg:3000`).
+
+</Tab>
+<Tab value="Kubernetes">
+
+Create a Deployment, Service, and Secret. Example manifests:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gotenberg-auth
+  namespace: documenso
+stringData:
+  username: documenso
+  password: replace-me-with-a-strong-password
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gotenberg
+  namespace: documenso
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: gotenberg }
+  template:
+    metadata:
+      labels: { app: gotenberg }
+    spec:
+      containers:
+        - name: gotenberg
+          image: registry.example.com/documenso/gotenberg:8
+          args:
+            - gotenberg
+            - --api-enable-basic-auth
+            - --libreoffice-deny-private-ips
+            - --api-timeout=500s
+            - --libreoffice-auto-start
+            - --libreoffice-start-timeout=300s
+            - --pdfengines-disable-routes
+            - --webhook-disable
+          env:
+            - name: GOTENBERG_API_BASIC_AUTH_USERNAME
+              valueFrom: { secretKeyRef: { name: gotenberg-auth, key: username } }
+            - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
+              valueFrom: { secretKeyRef: { name: gotenberg-auth, key: password } }
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet: { path: /health, port: 3000 }
+          livenessProbe:
+            httpGet: { path: /health, port: 3000 }
+            initialDelaySeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gotenberg
+  namespace: documenso
+spec:
+  selector: { app: gotenberg }
+  ports:
+    - port: 3000
+      targetPort: 3000
+```
+
+Then reference the in-cluster URL from Documenso's environment:
+
+```
+NEXT_PRIVATE_DOCUMENT_CONVERSION_URL=http://gotenberg.documenso.svc.cluster.local:3000
+NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME=documenso
+NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD=replace-me-with-a-strong-password
+```
+
+</Tab>
+<Tab value="External Instance">
+
+Documenso does not have to colocate with Gotenberg. You can point it at any reachable Gotenberg deployment: a managed instance, a shared internal service, or a Gotenberg-compatible API.
+
+```bash
+NEXT_PRIVATE_DOCUMENT_CONVERSION_URL=https://gotenberg.internal.example.com
+NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME=documenso
+NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD=replace-me-with-a-strong-password
+```
+
+The remote instance must:
+
+- Expose the LibreOffice route `/forms/libreoffice/convert`.
+- Be reachable from the Documenso container with low enough latency that the 30 second per-request timeout is comfortable.
+- Be on a private network or require authentication. Uploaded documents are sent to it as multipart form data and may contain sensitive content.
+
+</Tab>
+</Tabs>
+
+## Recommended Gotenberg Flags
+
+The flags in the examples above are not arbitrary. Each one matters for a production deployment.
+
+| Flag                              | Why it matters                                                                                                                                                                                                                                                       |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--api-enable-basic-auth`         | Requires HTTP Basic credentials on every API route. Without this, anyone with network access to the container can convert arbitrary documents.                                                                                                                       |
+| `--libreoffice-deny-private-ips`  | Rejects any outbound fetch LibreOffice tries to make to private, loopback, link-local, or cloud-metadata addresses while processing a document. Mitigates SSRF via malicious `.docx` files that embed `TargetMode="External"` references. Requires Gotenberg 8.32.0. |
+| `--api-timeout=500s`              | Server-side request ceiling. Documenso aborts at 30 s by default, so this is a safety net for very large documents.                                                                                                                                                  |
+| `--libreoffice-auto-start`        | Starts LibreOffice at container boot so the first request is not slow.                                                                                                                                                                                               |
+| `--libreoffice-start-timeout=300s`| Allows LibreOffice up to 5 minutes to come up under load.                                                                                                                                                                                                            |
+| `--pdfengines-disable-routes`     | Disables the PDF engines routes Documenso does not use. Shrinks the attack surface.                                                                                                                                                                                  |
+| `--webhook-disable`               | Disables webhook callbacks. Documenso uses synchronous requests only.                                                                                                                                                                                                |
+
+## Configure Documenso
+
+Set the following environment variables on the Documenso container and restart it.
+
+### Required
+
+| Variable                              | Description                                                            |
+| ------------------------------------- | ---------------------------------------------------------------------- |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL`| Base URL of the Gotenberg service (e.g., `http://gotenberg:3000`). Leave unset to disable the feature. |
+
+### Optional
+
+| Variable                                    | Default | Description                                                                                  |
+| ------------------------------------------- | ------- | -------------------------------------------------------------------------------------------- |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME` |         | HTTP Basic auth username. Set when Gotenberg runs with `--api-enable-basic-auth`.            |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD` |         | HTTP Basic auth password. Set together with the username.                                    |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_TIMEOUT_MS`| `30000` | Per-request timeout in milliseconds. Increase for very large documents.                      |
+
+<Callout type="info">
+  When `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL` is set, the public flag
+  `NEXT_PUBLIC_DOCUMENT_CONVERSION_ENABLED` is derived automatically on server start. You do not
+  need to set it yourself, and setting it manually has no effect.
+</Callout>
+
+### Example `.env` Snippet
+
+```bash
+# Document conversion (DOCX -> PDF)
+NEXT_PRIVATE_DOCUMENT_CONVERSION_URL=http://gotenberg:3000
+NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME=documenso
+NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD=replace-me-with-a-strong-password
+# NEXT_PRIVATE_DOCUMENT_CONVERSION_TIMEOUT_MS=60000
+```
+
+## Verify the Setup
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Restart the Documenso container
+
+Restart so the new environment variables are picked up.
+
+</Step>
+<Step>
+### Confirm Gotenberg is healthy
+
+From a shell inside the Documenso container or another container on the same network:
+
+```bash
+curl -fsS http://gotenberg:3000/health
+```
+
+The endpoint is exempt from basic auth and should return `200 OK`.
+
+</Step>
+<Step>
+### Upload a test DOCX
+
+In the Documenso web UI, open **Documents** and try uploading a small `.docx` file. The upload dropzone should accept it, and after a few seconds the editor should open with the converted PDF.
+
+</Step>
+<Step>
+### Check the server logs
+
+Successful conversions log a `document_conversion_attempt` event with `result: "success"`, the duration, and the file size. Failures log the same event with `result: "error"` and an error code (`CONVERSION_SERVICE_UNAVAILABLE`, `CONVERSION_FAILED`, or `UNSUPPORTED_FILE_TYPE`).
+
+</Step>
+</Steps>
+
+## Security Considerations
+
+- **Treat the conversion service as untrusted internal infrastructure.** Documents pass through Gotenberg in plain form. Run it on a private network and require HTTP Basic auth.
+- **Run with `--libreoffice-deny-private-ips`.** Without this flag, a malicious `.docx` can trigger LibreOffice to fetch URLs from your internal network (SSRF).
+- **Disable unused routes.** `--pdfengines-disable-routes` and `--webhook-disable` reduce attack surface. Documenso only uses the LibreOffice convert route.
+- **Do not expose Gotenberg to the public internet.** Even with basic auth, this is a document-processing service with a non-trivial CPU and memory footprint; exposing it invites abuse.
+- **Rotate credentials.** Rotating the basic auth secret is a config change in both Gotenberg and Documenso, followed by a restart of each.
+
+## Resource Sizing
+
+Conversion is CPU- and memory-bound on LibreOffice. As a starting point:
+
+| Workload                      | Suggested resources                  |
+| ----------------------------- | ------------------------------------ |
+| Light (a few DOCX per minute) | 1 vCPU, 1 GB RAM                     |
+| Moderate (sustained uploads)  | 2 vCPU, 2 GB RAM                     |
+| Heavy / multi-tenant          | Horizontally scale Gotenberg replicas behind a load balancer |
+
+Gotenberg is stateless. Each container handles one or more concurrent requests independently. Scale horizontally rather than vertically once a single replica is saturated.
+
+## Troubleshooting
+
+<Accordions type="multiple">
+  <Accordion title="DOCX uploads are rejected with 'Only PDF and DOCX files are allowed'">
+    The Documenso server does not see `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL`. Check the value is set
+    on the running container (`docker exec documenso printenv | grep DOCUMENT_CONVERSION`) and
+    restart after changing it.
+  </Accordion>
+
+  <Accordion title="Uploads fail with 'Document conversion service is currently unavailable'">
+    Documenso could not reach Gotenberg. Verify:
+
+    - The URL in `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL` is resolvable from the Documenso container
+      (use the Docker service name or in-cluster DNS, not `localhost`).
+    - Gotenberg's `/health` endpoint returns `200`.
+    - Basic auth credentials match between the two services.
+
+    After repeated failures, an internal circuit breaker opens for 30 seconds. Subsequent uploads
+    will fail fast during that window; this is intentional and self-recovers.
+
+  </Accordion>
+
+  <Accordion title="Uploads fail with 'Failed to convert document to PDF'">
+    Gotenberg was reachable but returned a non-2xx response. Check the Gotenberg container logs:
+
+    ```bash
+    docker compose logs -f gotenberg
+    ```
+
+    Common causes: corrupted `.docx` file, exotic embedded objects LibreOffice cannot render, or a
+    file that genuinely exceeded the conversion timeout. Increase
+    `NEXT_PRIVATE_DOCUMENT_CONVERSION_TIMEOUT_MS` for very large documents.
+
+  </Accordion>
+
+  <Accordion title="Converted PDFs look different from the Word document">
+    LibreOffice is not byte-identical to Microsoft Word. Layout, font metrics, and complex elements
+    (Charts, SmartArt, ActiveX controls) may differ. To improve fidelity:
+
+    - Use the custom Dockerfile in this guide to install Microsoft Core Fonts and additional
+      language fonts.
+    - Make sure any custom fonts referenced by your documents are installed in the Gotenberg image.
+    - For pixel-perfect output, ask users to export to PDF from Word before uploading.
+
+  </Accordion>
+
+  <Accordion title="Form controls in the DOCX appear blank or missing">
+    Documenso disables Gotenberg's `exportFormFields` flag during conversion. Word content controls
+    (`<w:sdt>`) become static graphics in the output PDF, which prevents Documenso's later
+    flattening step from making them invisible. This is intentional. Use Documenso fields
+    (signature, text, date, etc.) for anything that needs to be filled in by signers.
+  </Accordion>
+
+  <Accordion title="Conversion is slow on the first request">
+    LibreOffice starts lazily by default. Pass `--libreoffice-auto-start` to Gotenberg so it warms
+    up at container boot. Allow up to a minute on first start before considering the service
+    unhealthy.
+  </Accordion>
+
+  <Accordion title="The circuit breaker keeps opening">
+    Repeated failures open an in-process circuit breaker for 30 seconds. If you see this in
+    production, the underlying problem is the Gotenberg service. Check its logs, resource usage,
+    and connectivity. The breaker is per-process and resets on restart.
+  </Accordion>
+</Accordions>
+
+---
+
+## See Also
+
+- [Upload Documents (User Guide)](/docs/users/documents/upload) - End-user view of DOCX uploads
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Full configuration reference
+- [Docker Compose Deployment](/docs/self-hosting/deployment/docker-compose) - Compose-based deployment patterns
+- [Gotenberg Documentation](https://gotenberg.dev/docs/getting-started/introduction) - Upstream Gotenberg docs

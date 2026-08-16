@@ -1,8 +1,7 @@
-import { createElement } from 'react';
-
 import { mailer } from '@documenso/email/mailer';
 import { ResetPasswordTemplate } from '@documenso/email/templates/reset-password';
 import { prisma } from '@documenso/prisma';
+import { createElement } from 'react';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { env } from '../../utils/env';

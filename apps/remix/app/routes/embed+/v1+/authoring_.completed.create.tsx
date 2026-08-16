@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
-
 import { Trans } from '@lingui/react/macro';
 import { CheckCircle2 } from 'lucide-react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 
 export default function EmbeddingAuthoringCompletedPage() {
@@ -34,13 +33,13 @@ export default function EmbeddingAuthoringCompletedPage() {
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center p-6 text-center">
       <div className="mx-auto w-full max-w-md">
-        <CheckCircle2 className="text-primary mx-auto h-16 w-16" />
+        <CheckCircle2 className="mx-auto h-16 w-16 text-primary" />
 
-        <h1 className="mt-6 text-2xl font-bold">
+        <h1 className="mt-6 font-bold text-2xl">
           {type === 'template' ? <Trans>Template Created</Trans> : <Trans>Document Created</Trans>}
         </h1>
 
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           {type === 'template' ? (
             <Trans>Your template has been created successfully</Trans>
           ) : (

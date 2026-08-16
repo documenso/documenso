@@ -1,8 +1,3 @@
-import { Trans } from '@lingui/react/macro';
-import { FileIcon } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link, redirect } from 'react-router';
-
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { getPublicProfileByUrl } from '@documenso/lib/server-only/profile/get-public-profile-by-url';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
@@ -10,15 +5,12 @@ import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@documenso/ui/primitives/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@documenso/ui/primitives/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import { Trans } from '@lingui/react/macro';
+import { FileIcon } from 'lucide-react';
+import { DateTime } from 'luxon';
+import { Link, redirect } from 'react-router';
 
 import type { Route } from './+types/p.$url';
 
@@ -65,17 +57,13 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
     <div className="flex flex-col items-center justify-center py-4 sm:py-32">
       <div className="flex flex-col items-center">
         <Avatar className="h-24 w-24 border-2 border-solid dark:border-border">
-          {publicProfile.avatarImageId && (
-            <AvatarImage src={formatAvatarUrl(publicProfile.avatarImageId)} />
-          )}
+          {publicProfile.avatarImageId && <AvatarImage src={formatAvatarUrl(publicProfile.avatarImageId)} />}
 
-          <AvatarFallback className="text-sm text-gray-400">
-            {extractInitials(publicProfile.name)}
-          </AvatarFallback>
+          <AvatarFallback className="text-gray-400 text-sm">{extractInitials(publicProfile.name)}</AvatarFallback>
         </Avatar>
 
         <div className="mt-4 flex flex-row items-center justify-center">
-          <h2 className="text-xl font-semibold md:text-2xl">{publicProfile.name}</h2>
+          <h2 className="font-semibold text-xl md:text-2xl">{publicProfile.name}</h2>
 
           {publicProfile.badge && (
             <Tooltip>
@@ -89,7 +77,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                 />
               </TooltipTrigger>
 
-              <TooltipContent className="flex flex-row items-start py-2 !pl-3 !pr-3.5">
+              <TooltipContent className="!pl-3 !pr-3.5 flex flex-row items-start py-2">
                 <img
                   className="mt-0.5"
                   alt="Profile badge"
@@ -99,13 +87,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                 />
 
                 <div className="ml-2">
-                  <p className="text-base font-semibold text-foreground">
-                    {BADGE_DATA[publicProfile.badge.type].name}
-                  </p>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    <Trans>
-                      Since {DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')}
-                    </Trans>
+                  <p className="font-semibold text-base text-foreground">{BADGE_DATA[publicProfile.badge.type].name}</p>
+                  <p className="mt-0.5 text-muted-foreground text-sm">
+                    <Trans>Since {DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')}</Trans>
                   </p>
                 </div>
               </TooltipContent>
@@ -115,10 +99,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
 
         <div className="mt-4 space-y-1 text-muted-foreground">
           {(profile.bio ?? '').split('\n').map((line, index) => (
-            <p
-              key={index}
-              className="max-w-[60ch] whitespace-pre-wrap break-words text-center text-sm"
-            >
+            <p key={index} className="max-w-[60ch] whitespace-pre-wrap break-words text-center text-sm">
               {line}
             </p>
           ))}
@@ -127,15 +108,13 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
 
       {templates.length === 0 && (
         <div className="mt-4 w-full max-w-xl border-t pt-4">
-          <p className="max-w-[60ch] whitespace-pre-wrap break-words text-center text-sm leading-relaxed text-muted-foreground">
-            <Trans>
-              It looks like {publicProfile.name} hasn't added any documents to their profile yet.
-            </Trans>{' '}
+          <p className="max-w-[60ch] whitespace-pre-wrap break-words text-center text-muted-foreground text-sm leading-relaxed">
+            <Trans>It looks like {publicProfile.name} hasn't added any documents to their profile yet.</Trans>{' '}
             {!user?.id && (
               <span className="mt-2 inline-block">
                 <Trans>
-                  While waiting for them to do so you can create your own Documenso account and get
-                  started with document signing right away.
+                  While waiting for them to do so you can create your own Documenso account and get started with
+                  document signing right away.
                 </Trans>
               </span>
             )}
@@ -167,19 +146,16 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
             <TableBody>
               {templates.map((template) => (
                 <TableRow key={template.id}>
-                  <TableCell className="flex flex-col justify-between overflow-hidden text-sm text-muted-foreground sm:flex-row">
+                  <TableCell className="flex flex-col justify-between overflow-hidden text-muted-foreground text-sm sm:flex-row">
                     <div className="flex flex-1 items-start justify-start gap-2">
-                      <FileIcon
-                        className="h-8 w-8 flex-shrink-0 text-muted-foreground/40"
-                        strokeWidth={1.5}
-                      />
+                      <FileIcon className="h-8 w-8 flex-shrink-0 text-muted-foreground/40" strokeWidth={1.5} />
 
                       <div className="flex flex-1 flex-col gap-4 overflow-hidden md:flex-row md:items-start md:justify-between">
                         <div>
-                          <p className="break-all text-sm font-semibold leading-none text-foreground">
+                          <p className="break-all font-semibold text-foreground text-sm leading-none">
                             {template.publicTitle}
                           </p>
-                          <p className="mt-1 line-clamp-3 max-w-[70ch] whitespace-normal break-all text-xs text-muted-foreground">
+                          <p className="mt-1 line-clamp-3 max-w-[70ch] whitespace-normal break-all text-muted-foreground text-xs">
                             {template.publicDescription}
                           </p>
                         </div>

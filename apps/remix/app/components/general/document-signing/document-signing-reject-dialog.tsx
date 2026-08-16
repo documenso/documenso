@@ -1,13 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import { useSearchParams } from 'react-router';
-import { z } from 'zod';
-
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -19,15 +9,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useSearchParams } from 'react-router';
+import { z } from 'zod';
 
 const ZRejectDocumentFormSchema = z.object({
   reason: z.string().max(500, msg`Reason must be less than 500 characters`),
@@ -50,13 +41,11 @@ export function DocumentSigningRejectDialog({
 }: DocumentSigningRejectDialogProps) {
   const { t } = useLingui();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const { mutateAsync: rejectDocumentWithToken } =
-    trpc.recipient.rejectDocumentWithToken.useMutation();
+  const { mutateAsync: rejectDocumentWithToken } = trpc.recipient.rejectDocumentWithToken.useMutation();
 
   const form = useForm<TRejectDocumentFormSchema>({
     resolver: zodResolver(ZRejectDocumentFormSchema),
@@ -84,7 +73,7 @@ export function DocumentSigningRejectDialog({
       if (onRejected) {
         await onRejected(reason);
       } else {
-        await navigate(`/sign/${token}/rejected`);
+        window.location.href = `/sign/${token}/rejected`;
       }
     } catch (err) {
       toast({
@@ -125,9 +114,7 @@ export function DocumentSigningRejectDialog({
           </DialogTitle>
 
           <DialogDescription>
-            <Trans>
-              Are you sure you want to reject this document? This action cannot be undone.
-            </Trans>
+            <Trans>Are you sure you want to reject this document? This action cannot be undone.</Trans>
           </DialogDescription>
         </DialogHeader>
 

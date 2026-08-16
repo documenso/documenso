@@ -1,10 +1,3 @@
-import { useLayoutEffect, useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberRole, OrganisationType, TeamMemberRole } from '@prisma/client';
-import { Outlet, isRouteErrorResponse, useLoaderData } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { PAID_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
 import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
@@ -17,6 +10,11 @@ import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
 import type { OrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
 import { Spinner } from '@documenso/ui/primitives/spinner';
+import { Trans } from '@lingui/react/macro';
+import { OrganisationMemberRole, OrganisationType, TeamMemberRole } from '@prisma/client';
+import { useLayoutEffect, useState } from 'react';
+import { isRouteErrorResponse, Outlet, useLoaderData } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { TeamProvider } from '~/providers/team';
 import { injectCss } from '~/utils/css-vars';
@@ -143,9 +141,7 @@ export default function AuthoringLayout() {
   return (
     <OrganisationProvider organisation={organisation}>
       <TeamProvider team={team}>
-        <TrpcProvider
-          headers={{ authorization: `Bearer ${token}`, 'x-team-Id': team.id.toString() }}
-        >
+        <TrpcProvider headers={{ authorization: `Bearer ${token}`, 'x-team-Id': team.id.toString() }}>
           <LimitsProvider
             disableLimitsFetch={true}
             initialValue={{
@@ -187,8 +183,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
               </li>
               <li>
                 <Trans>
-                  If you are using staging, ensure that you have set the host prop on the embedding
-                  component to the staging domain (https://stg-app.documenso.com)
+                  If you are using staging, ensure that you have set the host prop on the embedding component to the
+                  staging domain (https://stg-app.documenso.com)
                 </Trans>
               </li>
             </ul>

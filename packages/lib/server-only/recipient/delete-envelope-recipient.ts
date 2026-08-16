@@ -1,23 +1,15 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType, SendStatus } from '@prisma/client';
-
-import { mailer } from '@documenso/email/mailer';
-import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType, RecipientRole, SendStatus } from '@prisma/client';
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { buildTeamWhereQuery } from '../../utils/teams';
-import { getEmailContext } from '../email/get-email-context';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface DeleteEnvelopeRecipientOptions {
@@ -73,6 +65,8 @@ export const deleteEnvelopeRecipient = async ({
     });
   }
 
+  assertEnvelopeMutable(envelope);
+
   if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
@@ -110,6 +104,8 @@ export const deleteEnvelopeRecipient = async ({
   });
 
   const deletedRecipient = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     if (envelope.type === EnvelopeType.DOCUMENT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
@@ -134,51 +130,26 @@ export const deleteEnvelopeRecipient = async ({
     });
   });
 
-  const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).recipientRemoved;
+  const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).recipientRemoved;
 
   // Send email to deleted recipient.
   if (
     recipientToDelete.sendStatus === SendStatus.SENT &&
+    recipientToDelete.role !== RecipientRole.CC &&
     isRecipientRemovedEmailEnabled &&
     envelope.type === EnvelopeType.DOCUMENT &&
     isRecipientEmailValidForSending(recipientToDelete)
   ) {
-    const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-
-    const template = createElement(RecipientRemovedFromDocumentTemplate, {
-      documentName: envelope.title,
-      inviterName: envelope.team?.name || user.name || undefined,
-      assetBaseUrl,
-    });
-
-    const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
+    // Enqueue the "removed from document" email as a background job so a
+    // transient mail outage doesn't fail the request and the send is retried.
+    await jobs.triggerJob({
+      name: 'send.recipient.removed.email',
+      payload: {
+        envelopeId: envelope.id,
+        recipientEmail: recipientToDelete.email,
+        recipientName: recipientToDelete.name,
+        inviterName: envelope.team?.name || user.name || undefined,
       },
-      meta: envelope.documentMeta,
-    });
-
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
-    ]);
-
-    const i18n = await getI18nInstance(emailLanguage);
-
-    await mailer.sendMail({
-      to: {
-        address: recipientToDelete.email,
-        name: recipientToDelete.name,
-      },
-      from: senderEmail,
-      replyTo: replyToEmail,
-      subject: i18n._(msg`You have been removed from a document`),
-      html,
-      text,
     });
   }
 

@@ -1,10 +1,9 @@
-import { type Page, expect, test } from '@playwright/test';
-import type { Document, Team } from '@prisma/client';
-
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, type Page, test } from '@playwright/test';
+import type { Document, Team } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 import { signSignaturePad } from '../fixtures/signature';
@@ -12,11 +11,7 @@ import { signSignaturePad } from '../fixtures/signature';
 /**
  * Test helper to complete the document creation flow with duplicate recipients
  */
-const completeDocumentFlowWithDuplicateRecipients = async (options: {
-  page: Page;
-  team: Team;
-  document: Document;
-}) => {
+const completeDocumentFlowWithDuplicateRecipients = async (options: { page: Page; team: Team; document: Document }) => {
   const { page, team, document } = options;
 
   // Step 1: Settings - Continue with defaults
@@ -97,9 +92,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     await expect(page).toHaveURL(new RegExp(`/t/${team.url}/documents`));
   });
 
-  test('should allow adding duplicate recipient after saving document initially', async ({
-    page,
-  }) => {
+  test('should allow adding duplicate recipient after saving document initially', async ({ page }) => {
     const { user, team } = await seedUser();
     const document = await seedBlankDocument(user, team.id);
 
@@ -162,10 +155,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     await expect(page.getByRole('link', { name: document.title })).toBeVisible();
   });
 
-  test('should isolate fields per recipient token even with duplicate emails', async ({
-    page,
-    context,
-  }) => {
+  test('should isolate fields per recipient token even with duplicate emails', async ({ page, context }) => {
     const { user, team } = await seedUser();
 
     const document = await seedBlankDocument(user, team.id);
@@ -208,9 +198,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
       await page.waitForSelector(PDF_VIEWER_PAGE_SELECTOR);
 
       // Verify only one signature field is visible for this recipient
-      expect(
-        await page.locator(`[data-field-type="SIGNATURE"]:not([data-readonly="true"])`).all(),
-      ).toHaveLength(1);
+      expect(await page.locator(`[data-field-type="SIGNATURE"]:not([data-readonly="true"])`).all()).toHaveLength(1);
 
       // Verify recipient name is correct
       await expect(page.getByLabel('Full Name')).toHaveValue(recipient.name);
@@ -218,10 +206,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
       // Sign the document
       await signSignaturePad(page);
 
-      await page
-        .locator('[data-field-type="SIGNATURE"]:not([data-readonly="true"])')
-        .first()
-        .click();
+      await page.locator('[data-field-type="SIGNATURE"]:not([data-readonly="true"])').first().click();
 
       await page.getByRole('button', { name: 'Complete' }).click();
       await page.getByRole('button', { name: 'Sign' }).click();
@@ -232,9 +217,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     }
   });
 
-  test('should handle duplicate recipient workflow with different field types', async ({
-    page,
-  }) => {
+  test('should handle duplicate recipient workflow with different field types', async ({ page }) => {
     const { user, team } = await seedUser();
     const document = await seedBlankDocument(user, team.id);
 
@@ -300,9 +283,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     await expect(page.getByRole('link', { name: document.title })).toBeVisible();
   });
 
-  test('should preserve field assignments when editing document with duplicates', async ({
-    page,
-  }) => {
+  test('should preserve field assignments when editing document with duplicates', async ({ page }) => {
     const { user, team } = await seedUser();
     const document = await seedBlankDocument(user, team.id);
 
@@ -333,18 +314,14 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     await page.getByText('Duplicate Recipient 1 (duplicate@example.com)').click();
 
     // Verify their field is visible and can be selected
-    const firstRecipientFields = await page
-      .locator(`[data-field-type="SIGNATURE"]:not(:disabled)`)
-      .all();
+    const firstRecipientFields = await page.locator(`[data-field-type="SIGNATURE"]:not(:disabled)`).all();
     expect(firstRecipientFields.length).toBeGreaterThan(0);
 
     // Switch to second duplicate recipient
     await page.getByText('Duplicate Recipient 2 (duplicate@example.com)').click();
 
     // Verify they have their own field
-    const secondRecipientFields = await page
-      .locator(`[data-field-type="SIGNATURE"]:not(:disabled)`)
-      .all();
+    const secondRecipientFields = await page.locator(`[data-field-type="SIGNATURE"]:not(:disabled)`).all();
     expect(secondRecipientFields.length).toBeGreaterThan(0);
 
     // Add another field to the second duplicate

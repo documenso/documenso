@@ -1,18 +1,14 @@
-import { useEffect, useState } from 'react';
+import { cn } from '@documenso/ui/lib/utils';
 
 import { SearchIcon } from 'lucide-react';
-
-import { cn } from '@documenso/ui/lib/utils';
+import { useEffect, useState } from 'react';
 
 export type AnimatedDocumentScannerProps = {
   className?: string;
   interval?: number;
 };
 
-export const AnimatedDocumentScanner = ({
-  className,
-  interval = 2500,
-}: AnimatedDocumentScannerProps) => {
+export const AnimatedDocumentScanner = ({ className, interval = 2500 }: AnimatedDocumentScannerProps) => {
   const [magPosition, setMagPosition] = useState({ x: 0, y: 0, page: 0 });
 
   useEffect(() => {
@@ -46,7 +42,7 @@ export const AnimatedDocumentScanner = ({
         <div className="relative h-full w-full" style={{ transformStyle: 'preserve-3d' }}>
           {/* Left page */}
           <div
-            className="absolute left-0 top-0 h-full w-[calc(50%)] origin-right overflow-hidden rounded-l-md border border-border bg-card shadow-md"
+            className="absolute top-0 left-0 h-full w-[calc(50%)] origin-right overflow-hidden rounded-l-md border border-border bg-card shadow-md"
             style={{ transform: 'rotateY(15deg) skewY(-1deg)' }}
           >
             <div className="absolute inset-3 space-y-2">
@@ -54,13 +50,13 @@ export const AnimatedDocumentScanner = ({
               <div className="h-1.5 w-full rounded-sm bg-muted" />
               <div className="h-1.5 w-5/6 rounded-sm bg-muted" />
               <div className="h-1.5 w-2/3 rounded-sm bg-muted" />
-              <div className="mt-3 h-6 w-3/4 rounded border border-dashed border-primary" />
+              <div className="mt-3 h-6 w-3/4 rounded border border-primary border-dashed" />
             </div>
           </div>
 
           {/* Right page */}
           <div
-            className="absolute right-0 top-0 h-full w-[calc(50%)] origin-left overflow-hidden rounded-r-md border border-border bg-card shadow-md"
+            className="absolute top-0 right-0 h-full w-[calc(50%)] origin-left overflow-hidden rounded-r-md border border-border bg-card shadow-md"
             style={{ transform: 'rotateY(-15deg) skewY(1deg)' }}
           >
             <div className="absolute inset-3 space-y-2">
@@ -68,7 +64,7 @@ export const AnimatedDocumentScanner = ({
               <div className="h-1.5 w-4/5 rounded-sm bg-muted" />
               <div className="h-1.5 w-full rounded-sm bg-muted" />
               <div className="h-1.5 w-3/5 rounded-sm bg-muted" />
-              <div className="mt-3 h-6 w-2/3 rounded border border-dashed border-primary" />
+              <div className="mt-3 h-6 w-2/3 rounded border border-primary border-dashed" />
             </div>
           </div>
         </div>

@@ -22,7 +22,7 @@ export const createEmbeddingPresignToken = async ({
 }: CreateEmbeddingPresignTokenOptions) => {
   try {
     // Validate the API token
-    const validatedToken = await getApiTokenByToken({ token: apiToken });
+    const validatedToken = await getApiTokenByToken({ token: apiToken, bypassRateLimit: true });
 
     const now = DateTime.now();
 
@@ -32,8 +32,7 @@ export const createEmbeddingPresignToken = async ({
     const minExpirationMinutes = isDevelopment ? 0 : 5;
 
     // Ensure expiresIn is at least the minimum allowed value
-    const effectiveExpiresIn =
-      expiresIn !== undefined && expiresIn >= minExpirationMinutes ? expiresIn : 60; // Default to 1 hour if not specified or below minimum
+    const effectiveExpiresIn = expiresIn !== undefined && expiresIn >= minExpirationMinutes ? expiresIn : 60; // Default to 1 hour if not specified or below minimum
 
     const expiresAt = now.plus({ minutes: effectiveExpiresIn });
 

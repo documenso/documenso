@@ -2,9 +2,9 @@ import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/c
 
 import { authenticatedProcedure } from '../../trpc';
 import {
+  createEnvelopeRecipientsMeta,
   ZCreateEnvelopeRecipientsRequestSchema,
   ZCreateEnvelopeRecipientsResponseSchema,
-  createEnvelopeRecipientsMeta,
 } from './create-envelope-recipients.types';
 
 export const createEnvelopeRecipientsRoute = authenticatedProcedure

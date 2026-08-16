@@ -1,10 +1,9 @@
-import { Trans } from '@lingui/react/macro';
-import { File, User2 } from 'lucide-react';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { VerifiedIcon } from '@documenso/ui/icons/verified';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { Trans } from '@lingui/react/macro';
+import { File, User2 } from 'lucide-react';
 
 export type UserProfileSkeletonProps = {
   className?: string;
@@ -19,13 +18,8 @@ export const UserProfileSkeleton = ({ className, user, rows = 2 }: UserProfileSk
   const baseUrl = new URL(NEXT_PUBLIC_WEBAPP_URL() ?? 'http://localhost:3000');
 
   return (
-    <div
-      className={cn(
-        'flex flex-col items-center rounded-xl bg-neutral-100 p-4 dark:bg-background',
-        className,
-      )}
-    >
-      <div className="inline-block max-w-full truncate rounded-md border border-border bg-background px-2.5 py-1.5 text-sm lowercase text-muted-foreground">
+    <div className={cn('flex flex-col items-center rounded-xl bg-neutral-100 p-4 dark:bg-background', className)}>
+      <div className="inline-block max-w-full truncate rounded-md border border-border bg-background px-2.5 py-1.5 text-muted-foreground text-sm lowercase">
         {baseUrl.host}/u/{user.url}
       </div>
 
@@ -39,7 +33,7 @@ export const UserProfileSkeleton = ({ className, user, rows = 2 }: UserProfileSk
 
       <div className="mt-6">
         <div className="flex items-center justify-center gap-x-2">
-          <h2 className="max-w-[12rem] truncate text-2xl font-semibold">{user.name}</h2>
+          <h2 className="max-w-[12rem] truncate font-semibold text-2xl">{user.name}</h2>
 
           <VerifiedIcon className="h-8 w-8 text-primary" />
         </div>
@@ -57,10 +51,7 @@ export const UserProfileSkeleton = ({ className, user, rows = 2 }: UserProfileSk
           {Array(rows)
             .fill(0)
             .map((_, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between gap-x-6 bg-background p-4"
-              >
+              <div key={index} className="flex items-center justify-between gap-x-6 bg-background p-4">
                 <div className="flex items-center gap-x-2">
                   <File className="h-8 w-8 text-muted-foreground/80" strokeWidth={1.5} />
 

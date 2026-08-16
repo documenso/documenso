@@ -1,7 +1,7 @@
 import { DocumentVisibility, OrganisationGroupType, TeamMemberRole } from '@prisma/client';
 
-export const TEAM_URL_ROOT_REGEX = new RegExp('^/t/[^/]+/?$');
-export const TEAM_URL_REGEX = new RegExp('^/t/[^/]+');
+export const TEAM_URL_ROOT_REGEX = /^\/t\/[^/]+\/?$/;
+export const TEAM_URL_REGEX = /^\/t\/[^/]+/;
 
 export const LOWEST_TEAM_ROLE = TeamMemberRole.MEMBER;
 
@@ -34,11 +34,7 @@ export const TEAM_MEMBER_ROLE_PERMISSIONS_MAP = {
 } satisfies Record<string, TeamMemberRole[]>;
 
 export const TEAM_DOCUMENT_VISIBILITY_MAP = {
-  [TeamMemberRole.ADMIN]: [
-    DocumentVisibility.ADMIN,
-    DocumentVisibility.MANAGER_AND_ABOVE,
-    DocumentVisibility.EVERYONE,
-  ],
+  [TeamMemberRole.ADMIN]: [DocumentVisibility.ADMIN, DocumentVisibility.MANAGER_AND_ABOVE, DocumentVisibility.EVERYONE],
   [TeamMemberRole.MANAGER]: [DocumentVisibility.MANAGER_AND_ABOVE, DocumentVisibility.EVERYONE],
   [TeamMemberRole.MEMBER]: [DocumentVisibility.EVERYONE],
 } satisfies Record<TeamMemberRole, DocumentVisibility[]>;

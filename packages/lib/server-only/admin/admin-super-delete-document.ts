@@ -1,11 +1,8 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { DocumentStatus, SendStatus } from '@prisma/client';
-
-import { mailer } from '@documenso/email/mailer';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import { DocumentStatus, SendStatus } from '@prisma/client';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -23,10 +20,7 @@ export type AdminSuperDeleteDocumentOptions = {
   requestMetadata?: RequestMetadata;
 };
 
-export const adminSuperDeleteDocument = async ({
-  envelopeId,
-  requestMetadata,
-}: AdminSuperDeleteDocumentOptions) => {
+export const adminSuperDeleteDocument = async ({ envelopeId, requestMetadata }: AdminSuperDeleteDocumentOptions) => {
   const envelope = await prisma.envelope.findUnique({
     where: {
       id: envelopeId,
@@ -50,7 +44,7 @@ export const adminSuperDeleteDocument = async ({
     });
   }
 
-  const { branding, settings, senderEmail, replyToEmail } = await getEmailContext({
+  const { branding, settings, senderEmail, replyToEmail, emailTransport } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -61,20 +55,12 @@ export const adminSuperDeleteDocument = async ({
 
   const { status, user } = envelope;
 
-  const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).documentDeleted;
+  const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).documentDeleted;
 
-  const recipientsToNotify = envelope.recipients.filter((recipient) =>
-    isRecipientEmailValidForSending(recipient),
-  );
+  const recipientsToNotify = envelope.recipients.filter((recipient) => isRecipientEmailValidForSending(recipient));
 
   // if the document is pending, send cancellation emails to all recipients
-  if (
-    status === DocumentStatus.PENDING &&
-    recipientsToNotify.length > 0 &&
-    isDocumentDeletedEmailEnabled
-  ) {
+  if (status === DocumentStatus.PENDING && recipientsToNotify.length > 0 && isDocumentDeletedEmailEnabled) {
     await Promise.all(
       recipientsToNotify.map(async (recipient) => {
         if (recipient.sendStatus !== SendStatus.SENT) {
@@ -102,7 +88,7 @@ export const adminSuperDeleteDocument = async ({
 
         const i18n = await getI18nInstance(lang);
 
-        await mailer.sendMail({
+        await emailTransport.sendMail({
           to: {
             address: recipient.email,
             name: recipient.name,

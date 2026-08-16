@@ -1,12 +1,3 @@
-import { useEffect, useMemo, useState, useTransition } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { Role, Subscription } from '@prisma/client';
-import { Edit, Loader } from 'lucide-react';
-import { Link } from 'react-router';
-
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { Button } from '@documenso/ui/primitives/button';
@@ -14,6 +5,13 @@ import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Input } from '@documenso/ui/primitives/input';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { Role, Subscription } from '@prisma/client';
+import { Edit, Loader } from 'lucide-react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
+import { Link } from 'react-router';
 
 type UserData = {
   id: number;
@@ -24,10 +22,7 @@ type UserData = {
   documentCount: number;
 };
 
-type SubscriptionLite = Pick<
-  Subscription,
-  'id' | 'status' | 'planId' | 'priceId' | 'createdAt' | 'periodEnd'
->;
+type SubscriptionLite = Pick<Subscription, 'id' | 'status' | 'planId' | 'priceId' | 'createdAt' | 'periodEnd'>;
 
 type AdminDashboardUsersTableProps = {
   users: UserData[];
@@ -36,12 +31,7 @@ type AdminDashboardUsersTableProps = {
   page: number;
 };
 
-export const AdminDashboardUsersTable = ({
-  users,
-  totalPages,
-  perPage,
-  page,
-}: AdminDashboardUsersTableProps) => {
+export const AdminDashboardUsersTable = ({ users, totalPages, perPage, page }: AdminDashboardUsersTableProps) => {
   const { _ } = useLingui();
 
   const [isPending, startTransition] = useTransition();
@@ -82,7 +72,7 @@ export const AdminDashboardUsersTable = ({
           return (
             <Button className="w-24" asChild>
               <Link to={`/admin/users/${row.original.id}`}>
-                <Edit className="-ml-1 mr-2 h-4 w-4" />
+                <Edit className="mr-2 -ml-1 h-4 w-4" />
                 <Trans>Edit</Trans>
               </Link>
             </Button>

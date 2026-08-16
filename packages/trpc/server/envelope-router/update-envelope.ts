@@ -2,9 +2,9 @@ import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envel
 
 import { authenticatedProcedure } from '../trpc';
 import {
+  updateEnvelopeMeta,
   ZUpdateEnvelopeRequestSchema,
   ZUpdateEnvelopeResponseSchema,
-  updateEnvelopeMeta,
 } from './update-envelope.types';
 
 export const updateEnvelopeRoute = authenticatedProcedure

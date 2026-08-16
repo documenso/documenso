@@ -1,14 +1,13 @@
-import type { Page } from '@playwright/test';
-import { expect } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { DEFAULT_EMBEDDED_EDITOR_CONFIG } from '@documenso/lib/types/envelope-editor';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import type { Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 import { apiSignin } from './authentication';
 
@@ -216,9 +215,7 @@ export const openEmbeddedEnvelopeEditor = async (
       darkModeDisabled,
     });
 
-    await page.goto(
-      `/embed/v2/authoring/envelope/create?token=${encodeURIComponent(embeddedToken)}#${hash}`,
-    );
+    await page.goto(`/embed/v2/authoring/envelope/create?token=${encodeURIComponent(embeddedToken)}#${hash}`);
   }
 
   await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
@@ -235,14 +232,11 @@ export const openEmbeddedEnvelopeEditor = async (
   };
 };
 
-export const getEnvelopeEditorSettingsTrigger = (root: Page) =>
-  root.locator('button[title="Settings"]');
+export const getEnvelopeEditorSettingsTrigger = (root: Page) => root.locator('button[title="Settings"]');
 
-export const getEnvelopeItemTitleInputs = (root: Page) =>
-  root.locator('[data-testid^="envelope-item-title-input-"]');
+export const getEnvelopeItemTitleInputs = (root: Page) => root.locator('[data-testid^="envelope-item-title-input-"]');
 
-export const getEnvelopeItemDragHandles = (root: Page) =>
-  root.locator('[data-testid^="envelope-item-drag-handle-"]');
+export const getEnvelopeItemDragHandles = (root: Page) => root.locator('[data-testid^="envelope-item-drag-handle-"]');
 
 export const getEnvelopeItemRemoveButtons = (root: Page) =>
   root.locator('[data-testid^="envelope-item-remove-button-"]');
@@ -261,25 +255,18 @@ export const addEnvelopeItemPdf = async (root: Page, fileName = 'embedded-envelo
   });
 };
 
-export const getRecipientEmailInputs = (root: Page) =>
-  root.locator('[data-testid="signer-email-input"]');
+export const getRecipientEmailInputs = (root: Page) => root.locator('[data-testid="signer-email-input"]');
 
-export const getRecipientNameInputs = (root: Page) =>
-  root.locator('input[placeholder^="Recipient "]');
+export const getRecipientNameInputs = (root: Page) => root.locator('input[placeholder^="Recipient "]');
 
 export const getRecipientRows = (root: Page) =>
   root.locator('[data-testid="signer-email-input"]').locator('xpath=ancestor::fieldset[1]');
 
-export const getRecipientRemoveButtons = (root: Page) =>
-  root.locator('[data-testid="remove-signer-button"]');
+export const getRecipientRemoveButtons = (root: Page) => root.locator('[data-testid="remove-signer-button"]');
 
-export const getSigningOrderInputs = (root: Page) =>
-  root.locator('[data-testid="signing-order-input"]');
+export const getSigningOrderInputs = (root: Page) => root.locator('[data-testid="signing-order-input"]');
 
-export const clickEnvelopeEditorStep = async (
-  root: Page,
-  stepId: 'upload' | 'addFields' | 'preview',
-) => {
+export const clickEnvelopeEditorStep = async (root: Page, stepId: 'upload' | 'addFields' | 'preview') => {
   await root.waitForTimeout(200);
   await root.locator(`[data-testid="envelope-editor-step-${stepId}"]`).first().click();
 };
@@ -303,12 +290,7 @@ export const setRecipientName = async (root: Page, index: number, name: string) 
 export const setRecipientRole = async (
   root: Page,
   index: number,
-  roleLabel:
-    | 'Needs to sign'
-    | 'Needs to approve'
-    | 'Needs to view'
-    | 'Receives copy'
-    | 'Can prepare',
+  roleLabel: 'Needs to sign' | 'Needs to approve' | 'Needs to view' | 'Receives copy' | 'Can prepare',
 ) => {
   const row = getRecipientRows(root).nth(index);
 
@@ -319,12 +301,7 @@ export const setRecipientRole = async (
 export const assertRecipientRole = async (
   root: Page,
   index: number,
-  roleLabel:
-    | 'Needs to sign'
-    | 'Needs to approve'
-    | 'Needs to view'
-    | 'Receives copy'
-    | 'Can prepare',
+  roleLabel: 'Needs to sign' | 'Needs to approve' | 'Needs to view' | 'Receives copy' | 'Can prepare',
 ) => {
   const row = getRecipientRows(root).nth(index);
   const roleValueByLabel: Record<typeof roleLabel, string> = {
@@ -335,10 +312,7 @@ export const assertRecipientRole = async (
     'Can prepare': 'ASSISTANT',
   };
 
-  await expect(row.locator('button[role="combobox"]').first()).toHaveAttribute(
-    'title',
-    roleValueByLabel[roleLabel],
-  );
+  await expect(row.locator('button[role="combobox"]').first()).toHaveAttribute('title', roleValueByLabel[roleLabel]);
 };
 
 export const toggleSigningOrder = async (root: Page, enabled: boolean) => {
@@ -397,11 +371,7 @@ export const persistEmbeddedEnvelope = async (surface: TEnvelopeEditorSurface) =
   await expect(surface.root.getByRole('heading', { name: completionHeading })).toBeVisible();
 };
 
-const resolveEmbeddingToken = async (
-  page: Page,
-  inputToken: string,
-  scope?: string,
-): Promise<string> => {
+const resolveEmbeddingToken = async (page: Page, inputToken: string, scope?: string): Promise<string> => {
   if (!inputToken.startsWith('api_')) {
     return inputToken;
   }

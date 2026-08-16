@@ -1,12 +1,11 @@
-import { type APIRequestContext, type Page, expect, test } from '@playwright/test';
-import { DocumentStatus, EnvelopeType, FieldType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
-
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { type APIRequestContext, expect, type Page, test } from '@playwright/test';
+import { DocumentStatus, EnvelopeType, FieldType } from '@prisma/client';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../lib/constants/app';
 import { createApiToken } from '../../../lib/server-only/public-api/create-api-token';
@@ -202,10 +201,7 @@ test('cert and audit log pages match A4 page dimensions', async ({ page, request
   });
 });
 
-test('cert and audit log pages match tabloid landscape page dimensions', async ({
-  page,
-  request,
-}) => {
+test('cert and audit log pages match tabloid landscape page dimensions', async ({ page, request }) => {
   await signAndVerifyPageDimensions({
     page,
     request,

@@ -1,8 +1,7 @@
-import type { Transporter } from 'nodemailer';
-import { createTransport } from 'nodemailer';
-
 import { env } from '@documenso/lib/utils/env';
 import { ResendTransport } from '@documenso/nodemailer-resend';
+import type { Transporter } from 'nodemailer';
+import { createTransport } from 'nodemailer';
 
 import { MailChannelsTransport } from './transports/mailchannels';
 
@@ -77,9 +76,7 @@ const getTransport = (): Transporter => {
 
   if (transport === 'smtp-api') {
     if (!env('NEXT_PRIVATE_SMTP_HOST') || !env('NEXT_PRIVATE_SMTP_APIKEY')) {
-      throw new Error(
-        'SMTP API transport requires NEXT_PRIVATE_SMTP_HOST and NEXT_PRIVATE_SMTP_APIKEY',
-      );
+      throw new Error('SMTP API transport requires NEXT_PRIVATE_SMTP_HOST and NEXT_PRIVATE_SMTP_APIKEY');
     }
 
     return createTransport({

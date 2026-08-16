@@ -1,21 +1,18 @@
-import type { Recipient } from '@prisma/client';
-import { EnvelopeType, RecipientRole } from '@prisma/client';
-
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
 } from '@documenso/lib/constants/direct-templates';
 import { prisma } from '@documenso/prisma';
+import type { Recipient } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import {
-  type TRecipientActionAuthTypes,
-  ZRecipientAuthOptionsSchema,
-} from '../../types/document-auth';
+import { type TRecipientActionAuthTypes, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export type SetTemplateRecipientsOptions = {
   userId: number;
@@ -24,12 +21,7 @@ export type SetTemplateRecipientsOptions = {
   recipients: RecipientData[];
 };
 
-export const setTemplateRecipients = async ({
-  userId,
-  teamId,
-  id,
-  recipients,
-}: SetTemplateRecipientsOptions) => {
+export const setTemplateRecipients = async ({ userId, teamId, id, recipients }: SetTemplateRecipientsOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
     type: EnvelopeType.TEMPLATE,
@@ -69,6 +61,13 @@ export const setTemplateRecipients = async ({
     });
   }
 
+  for (const recipient of recipients) {
+    assertCompatibleRecipientRole({
+      signatureLevel: envelope.signatureLevel,
+      role: recipient.role,
+    });
+  }
+
   const normalizedRecipients = recipients.map((recipient) => {
     // Force replace any changes to the name or email of the direct recipient.
     if (envelope.directLink && recipient.id === envelope.directLink.directTemplateRecipientId) {
@@ -88,8 +87,7 @@ export const setTemplateRecipients = async ({
   const existingRecipients = envelope.recipients;
 
   const removedRecipients = existingRecipients.filter(
-    (existingRecipient) =>
-      !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
+    (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
   );
 
   if (envelope.directLink !== null) {
@@ -115,9 +113,7 @@ export const setTemplateRecipients = async ({
   }
 
   const linkedRecipients = normalizedRecipients.map((recipient) => {
-    const existing = existingRecipients.find(
-      (existingRecipient) => existingRecipient.id === recipient.id,
-    );
+    const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
 
     return {
       ...recipient,
@@ -196,12 +192,8 @@ export const setTemplateRecipients = async ({
 
   // Filter out recipients that have been removed or have been updated.
   const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
-    const isRemoved = removedRecipients.find(
-      (removedRecipient) => removedRecipient.id === recipient.id,
-    );
-    const isUpdated = persistedRecipients.find(
-      (persistedRecipient) => persistedRecipient.id === recipient.id,
-    );
+    const isRemoved = removedRecipients.find((removedRecipient) => removedRecipient.id === recipient.id);
+    const isUpdated = persistedRecipients.find((persistedRecipient) => persistedRecipient.id === recipient.id);
 
     return !isRemoved && !isUpdated;
   });

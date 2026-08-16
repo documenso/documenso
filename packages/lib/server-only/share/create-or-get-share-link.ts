@@ -1,11 +1,11 @@
-import { EnvelopeType } from '@prisma/client';
-import { P, match } from 'ts-pattern';
-
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
+import { match, P } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { alphaid } from '../../universal/id';
 import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type CreateSharingIdOptions =
   | {
@@ -28,6 +28,7 @@ export const createOrGetShareLink = async ({ documentId, ...options }: CreateSha
     ),
     select: {
       id: true,
+      teamId: true,
     },
   });
 
@@ -47,6 +48,31 @@ export const createOrGetShareLink = async ({ documentId, ...options }: CreateSha
         .then((recipient) => recipient?.email);
     })
     .with({ userId: P.number }, async ({ userId }) => {
+      // Ensure the authenticated user actually has visibility-aware access to the
+      // envelope before allowing them to create a share link. The share route does
+      // not carry a teamId, so we derive it from the envelope and reuse the canonical
+      // visibility check (owner OR team member with sufficient visibility).
+      const { envelopeWhereInput } = await getEnvelopeWhereInput({
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
+        userId,
+        teamId: envelope.teamId,
+        type: EnvelopeType.DOCUMENT,
+      });
+
+      const accessibleEnvelope = await prisma.envelope.findFirst({
+        where: envelopeWhereInput,
+        select: {
+          id: true,
+        },
+      });
+
+      if (!accessibleEnvelope) {
+        throw new AppError(AppErrorCode.NOT_FOUND);
+      }
+
       return await prisma.user
         .findFirst({
           where: {

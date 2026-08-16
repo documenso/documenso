@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+/**
+ * A CSS length value: `0`, or a positive number followed by a length unit.
+ * Used for the radius field, which is interpolated raw into a `<style>`
+ * block at render time. Anything outside this shape is a CSS-injection
+ * vector — DO NOT loosen without re-checking `toNativeCssVars`.
+ */
+export const CSS_LENGTH_REGEX = /^(0|\d+(\.\d+)?(rem|px|em|%|pt|))$/i;
+
 export const ZCssVarsSchema = z
   .object({
     background: z.string().optional().describe('Base background color'),
@@ -28,7 +36,11 @@ export const ZCssVarsSchema = z
     destructive: z.string().optional().describe('Destructive/danger action color'),
     destructiveForeground: z.string().optional().describe('Destructive/danger text color'),
     ring: z.string().optional().describe('Focus ring color'),
-    radius: z.string().optional().describe('Border radius size in REM units'),
+    radius: z
+      .string()
+      .regex(CSS_LENGTH_REGEX, 'Must be a CSS length such as 0.5rem, 8px, or 0')
+      .optional()
+      .describe('Border radius — must be a CSS length (rem/px/em/%/pt or 0)'),
     warning: z.string().optional().describe('Warning/alert color'),
     envelopeEditorBackground: z.string().optional().describe('Envelope editor background color'),
   })

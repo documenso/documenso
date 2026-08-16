@@ -1,19 +1,12 @@
-import type { Prisma } from '@prisma/client';
-import { WebhookCallStatus } from '@prisma/client';
-
 import { executeWebhookCall } from '@documenso/lib/server-only/webhooks/execute-webhook-call';
 import { prisma } from '@documenso/prisma';
+import type { Prisma } from '@prisma/client';
+import { WebhookCallStatus } from '@prisma/client';
 
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TExecuteWebhookJobDefinition } from './execute-webhook';
 
-export const run = async ({
-  payload,
-  io: _io,
-}: {
-  payload: TExecuteWebhookJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ payload, io: _io }: { payload: TExecuteWebhookJobDefinition; io: JobRunIO }) => {
   const { event, webhookId, data } = payload;
 
   const webhook = await prisma.webhook.findUniqueOrThrow({

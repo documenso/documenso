@@ -1,17 +1,16 @@
-import { EnvelopeType } from '@prisma/client';
-import { match } from 'ts-pattern';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
+import { match } from 'ts-pattern';
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
 import {
+  deleteEnvelopeMeta,
   ZDeleteEnvelopeRequestSchema,
   ZDeleteEnvelopeResponseSchema,
-  deleteEnvelopeMeta,
 } from './delete-envelope.types';
 
 export const deleteEnvelopeRoute = authenticatedProcedure

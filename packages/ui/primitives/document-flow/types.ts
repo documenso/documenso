@@ -1,10 +1,9 @@
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { zEmail } from '@documenso/lib/utils/zod';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { FieldType } from '@prisma/client';
 import { z } from 'zod';
-
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { zEmail } from '@documenso/lib/utils/zod';
 
 export const ZDocumentFlowFormSchema = z.object({
   title: z.string().min(1),

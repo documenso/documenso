@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZDownloadDocumentCertificateRequestSchema = z.object({
-  documentId: z.number(),
+  envelopeId: z.string(),
 });
 
 export const ZDownloadDocumentCertificateResponseSchema = z.object({
@@ -9,9 +9,5 @@ export const ZDownloadDocumentCertificateResponseSchema = z.object({
   envelopeTitle: z.string(),
 });
 
-export type TDownloadDocumentCertificateRequest = z.infer<
-  typeof ZDownloadDocumentCertificateRequestSchema
->;
-export type TDownloadDocumentCertificateResponse = z.infer<
-  typeof ZDownloadDocumentCertificateResponseSchema
->;
+export type TDownloadDocumentCertificateRequest = z.infer<typeof ZDownloadDocumentCertificateRequestSchema>;
+export type TDownloadDocumentCertificateResponse = z.infer<typeof ZDownloadDocumentCertificateResponseSchema>;

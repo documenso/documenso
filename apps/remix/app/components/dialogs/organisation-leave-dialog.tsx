@@ -1,9 +1,3 @@
-import { useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type { OrganisationMemberRole } from '@prisma/client';
-
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { trpc } from '@documenso/trpc/react';
@@ -20,6 +14,9 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type { OrganisationMemberRole } from '@prisma/client';
+import { useState } from 'react';
 
 export type OrganisationLeaveDialogProps = {
   organisationId: string;
@@ -41,26 +38,25 @@ export const OrganisationLeaveDialog = ({
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: leaveOrganisation, isPending: isLeavingOrganisation } =
-    trpc.organisation.leave.useMutation({
-      onSuccess: () => {
-        toast({
-          title: t`Success`,
-          description: t`You have successfully left this organisation.`,
-          duration: 5000,
-        });
+  const { mutateAsync: leaveOrganisation, isPending: isLeavingOrganisation } = trpc.organisation.leave.useMutation({
+    onSuccess: () => {
+      toast({
+        title: t`Success`,
+        description: t`You have successfully left this organisation.`,
+        duration: 5000,
+      });
 
-        setOpen(false);
-      },
-      onError: () => {
-        toast({
-          title: t`An unknown error occurred`,
-          description: t`We encountered an unknown error while attempting to leave this organisation. Please try again later.`,
-          variant: 'destructive',
-          duration: 10000,
-        });
-      },
-    });
+      setOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: t`An unknown error occurred`,
+        description: t`We encountered an unknown error while attempting to leave this organisation. Please try again later.`,
+        variant: 'destructive',
+        duration: 10000,
+      });
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isLeavingOrganisation && setOpen(value)}>

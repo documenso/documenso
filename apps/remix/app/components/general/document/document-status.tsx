@@ -1,14 +1,12 @@
-import type { HTMLAttributes } from 'react';
-
+import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import { SignatureIcon } from '@documenso/ui/icons/signature';
+import { cn } from '@documenso/ui/lib/utils';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { CheckCircle2, Clock, File, XCircle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
-
-import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
-import { SignatureIcon } from '@documenso/ui/icons/signature';
-import { cn } from '@documenso/ui/lib/utils';
+import type { HTMLAttributes } from 'react';
 
 type FriendlyStatus = {
   label: MessageDescriptor;
@@ -42,6 +40,12 @@ export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus>
     icon: XCircle,
     color: 'text-red-500 dark:text-red-300',
   },
+  CANCELLED: {
+    label: msg`Cancelled`,
+    labelExtended: msg`Document cancelled`,
+    icon: XCircle,
+    color: 'text-red-500 dark:text-red-300',
+  },
   INBOX: {
     label: msg`Inbox`,
     labelExtended: msg`Document inbox`,
@@ -60,12 +64,7 @@ export type DocumentStatusProps = HTMLAttributes<HTMLSpanElement> & {
   inheritColor?: boolean;
 };
 
-export const DocumentStatus = ({
-  className,
-  status,
-  inheritColor,
-  ...props
-}: DocumentStatusProps) => {
+export const DocumentStatus = ({ className, status, inheritColor, ...props }: DocumentStatusProps) => {
   const { _ } = useLingui();
 
   const { label, icon: Icon, color } = FRIENDLY_STATUS_MAP[status];

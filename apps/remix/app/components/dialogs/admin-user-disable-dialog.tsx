@@ -1,10 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { match } from 'ts-pattern';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
@@ -21,23 +14,24 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { match } from 'ts-pattern';
 
 export type AdminUserDisableDialogProps = {
   className?: string;
   userToDisable: TGetUserResponse;
 };
 
-export const AdminUserDisableDialog = ({
-  className,
-  userToDisable,
-}: AdminUserDisableDialogProps) => {
+export const AdminUserDisableDialog = ({ className, userToDisable }: AdminUserDisableDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
   const [email, setEmail] = useState('');
 
-  const { mutateAsync: disableUser, isPending: isDisablingUser } =
-    trpc.admin.user.disable.useMutation();
+  const { mutateAsync: disableUser, isPending: isDisablingUser } = trpc.admin.user.disable.useMutation();
 
   const onDisableAccount = async () => {
     try {
@@ -69,16 +63,13 @@ export const AdminUserDisableDialog = ({
 
   return (
     <div className={className}>
-      <Alert
-        className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row"
-        variant="neutral"
-      >
+      <Alert className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row" variant="neutral">
         <div>
           <AlertTitle>Disable Account</AlertTitle>
           <AlertDescription className="mr-2">
             <Trans>
-              Disabling the user results in the user not being able to use the account. It also
-              disables all the related contents such as subscription, webhooks, teams, and API keys.
+              Disabling the user results in the user not being able to use the account. It also disables all the related
+              contents such as subscription, webhooks, teams, and API keys.
             </Trans>
           </AlertDescription>
         </div>
@@ -100,9 +91,8 @@ export const AdminUserDisableDialog = ({
                 <Alert variant="destructive">
                   <AlertDescription className="selection:bg-red-100">
                     <Trans>
-                      This action is reversible, but please be careful as the account may be
-                      affected permanently (e.g. their settings and contents not being restored
-                      properly).
+                      This action is reversible, but please be careful as the account may be affected permanently (e.g.
+                      their settings and contents not being restored properly).
                     </Trans>
                   </AlertDescription>
                 </Alert>
@@ -116,12 +106,7 @@ export const AdminUserDisableDialog = ({
                   </Trans>
                 </DialogDescription>
 
-                <Input
-                  className="mt-2"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                <Input className="mt-2" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
 
               <DialogFooter>

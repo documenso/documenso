@@ -1,7 +1,6 @@
+import { prisma } from '@documenso/prisma';
 import crypto from 'crypto';
 import { DateTime } from 'luxon';
-
-import { prisma } from '@documenso/prisma';
 
 import { USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER } from '../../constants/email';
 import { ONE_HOUR } from '../../constants/time';
@@ -10,10 +9,7 @@ import { getMostRecentEmailVerificationToken } from './get-most-recent-email-ver
 
 type SendConfirmationTokenOptions = { email: string; force?: boolean };
 
-export const sendConfirmationToken = async ({
-  email,
-  force = false,
-}: SendConfirmationTokenOptions) => {
+export const sendConfirmationToken = async ({ email, force = false }: SendConfirmationTokenOptions) => {
   const token = crypto.randomBytes(20).toString('hex');
 
   const user = await prisma.user.findFirst({

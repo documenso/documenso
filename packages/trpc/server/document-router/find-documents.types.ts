@@ -1,8 +1,7 @@
-import { DocumentSource, DocumentStatus } from '@prisma/client';
-import { z } from 'zod';
-
 import { ZDocumentManySchema } from '@documenso/lib/types/document';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { DocumentSource, DocumentStatus } from '@prisma/client';
+import { z } from 'zod';
 
 import type { TrpcRouteMeta } from '../trpc';
 
@@ -17,18 +16,9 @@ export const ZFindDocumentsMeta: TrpcRouteMeta = {
 };
 
 export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
-  templateId: z
-    .number()
-    .describe('Filter documents by the template ID used to create it.')
-    .optional(),
-  source: z
-    .nativeEnum(DocumentSource)
-    .describe('Filter documents by how it was created.')
-    .optional(),
-  status: z
-    .nativeEnum(DocumentStatus)
-    .describe('Filter documents by the current status')
-    .optional(),
+  templateId: z.number().describe('Filter documents by the template ID used to create it.').optional(),
+  source: z.nativeEnum(DocumentSource).describe('Filter documents by how it was created.').optional(),
+  status: z.nativeEnum(DocumentStatus).describe('Filter documents by the current status').optional(),
   folderId: z.string().describe('Filter documents by folder ID').optional(),
   orderByColumn: z.enum(['createdAt']).optional(),
   orderByDirection: z.enum(['asc', 'desc']).describe('').default('desc'),

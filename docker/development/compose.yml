@@ -48,6 +48,52 @@ services:
     entrypoint: sh
     command: -c 'mkdir -p /data/documenso && minio server /data --console-address ":9001" --address ":9002"'
 
+  gotenberg:
+    build:
+      context: .
+      dockerfile: Dockerfile.gotenberg
+    image: documenso-dev-gotenberg:latest
+    container_name: gotenberg
+    restart: unless-stopped
+    ports:
+      - 3005:3000
+    environment:
+      # Basic auth credentials Gotenberg checks when `--api-enable-basic-auth`
+      # is passed. Dev defaults are non-secret — match
+      # `NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME` / `_PASSWORD` in `.env`.
+      GOTENBERG_API_BASIC_AUTH_USERNAME: documenso
+      GOTENBERG_API_BASIC_AUTH_PASSWORD: password
+    command:
+      - gotenberg
+      # Require basic auth on every API route — prevents anyone with network
+      # access to the container from invoking conversions.
+      - --api-enable-basic-auth
+      # SSRF defence in depth: reject any outbound fetch LibreOffice tries to
+      # make to a private/loopback/link-local/cloud-metadata address while
+      # processing an uploaded document. Mitigates CVE-2026-42591 (malicious
+      # docx files embedding `TargetMode="External"` references to internal
+      # services). Added in Gotenberg 8.32.0.
+      - --libreoffice-deny-private-ips
+      # Generous server-side timeout; the Node client aborts at 30 s by
+      # default, so this is just a safety net.
+      - --api-timeout=500s
+      # Pre-warm LibreOffice at boot so the first request isn't cold.
+      - --libreoffice-auto-start
+      - --libreoffice-start-timeout=300s
+      # Disable surfaces we don't use to shrink the attack surface.
+      - --pdfengines-disable-routes
+      - --webhook-disable
+      # Verbose logs for the dev compose only.
+      - --log-level=debug
+    healthcheck:
+      # `/health` is exempt from `--api-enable-basic-auth` so the check
+      # doesn't need to authenticate.
+      test: ['CMD', 'curl', '-fsS', 'http://localhost:3000/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
 volumes:
   minio:
   redis:

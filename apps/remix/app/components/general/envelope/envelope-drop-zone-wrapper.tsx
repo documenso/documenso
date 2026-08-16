@@ -1,21 +1,11 @@
-import { type ReactNode, useState } from 'react';
-
-import { plural } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { Loader } from 'lucide-react';
-import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
-import { Link, useNavigate, useParams } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { getAllowedUploadMimeTypes } from '@documenso/lib/constants/document-conversion';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
@@ -23,8 +13,16 @@ import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-rou
 import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { plural } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
+import { Loader } from 'lucide-react';
+import { type ReactNode, useState } from 'react';
+import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import { useCurrentTeam } from '~/providers/team';
+import { getUploadErrorMessage } from '~/utils/toast-error-messages';
 
 export interface EnvelopeDropZoneWrapperProps {
   children: ReactNode;
@@ -32,11 +30,7 @@ export interface EnvelopeDropZoneWrapperProps {
   className?: string;
 }
 
-export const EnvelopeDropZoneWrapper = ({
-  children,
-  type,
-  className,
-}: EnvelopeDropZoneWrapperProps) => {
+export const EnvelopeDropZoneWrapper = ({ children, type, className }: EnvelopeDropZoneWrapperProps) => {
   const { t, i18n } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();
@@ -107,10 +101,7 @@ export const EnvelopeDropZoneWrapper = ({
         });
       }
 
-      const pathPrefix =
-        type === EnvelopeType.DOCUMENT
-          ? formatDocumentsPath(team.url)
-          : formatTemplatesPath(team.url);
+      const pathPrefix = type === EnvelopeType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
       const aiQueryParam = team.preferences.aiFeaturesEnabled ? '?ai=true' : '';
 
@@ -118,21 +109,11 @@ export const EnvelopeDropZoneWrapper = ({
     } catch (err) {
       const error = AppError.parseError(err);
 
-      const errorMessage = match(error.code)
-        .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs.`)
-        .with(
-          AppErrorCode.LIMIT_EXCEEDED,
-          () => t`You have reached your document limit for this month. Please upgrade your plan.`,
-        )
-        .with(
-          'ENVELOPE_ITEM_LIMIT_EXCEEDED',
-          () => t`You have reached the limit of the number of files per envelope.`,
-        )
-        .otherwise(() => t`An error occurred during upload.`);
+      const errorMessage = getUploadErrorMessage(error.code);
 
       toast({
-        title: t`Error`,
-        description: errorMessage,
+        title: i18n._(errorMessage.title),
+        description: i18n._(errorMessage.description),
         variant: 'destructive',
         duration: 7500,
       });
@@ -171,9 +152,7 @@ export const EnvelopeDropZoneWrapper = ({
     });
   };
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: {
-      'application/pdf': ['.pdf'],
-    },
+    accept: getAllowedUploadMimeTypes(),
     multiple: true,
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
     maxFiles: maximumEnvelopeItemCount,
@@ -189,24 +168,20 @@ export const EnvelopeDropZoneWrapper = ({
       {children}
 
       {isDragActive && (
-        <div className="fixed left-0 top-0 z-[9999] h-full w-full bg-muted/60 backdrop-blur-[4px]">
+        <div className="fixed top-0 left-0 z-[9999] h-full w-full bg-muted/60 backdrop-blur-[4px]">
           <div className="pointer-events-none flex h-full w-full flex-col items-center justify-center">
-            <h2 className="text-2xl font-semibold text-foreground">
-              {type === EnvelopeType.DOCUMENT ? (
-                <Trans>Upload Document</Trans>
-              ) : (
-                <Trans>Upload Template</Trans>
-              )}
+            <h2 className="font-semibold text-2xl text-foreground">
+              {type === EnvelopeType.DOCUMENT ? <Trans>Upload Document</Trans> : <Trans>Upload Template</Trans>}
             </h2>
 
-            <p className="text-md mt-4 text-muted-foreground">
-              <Trans>Drag and drop your PDF file here</Trans>
+            <p className="mt-4 text-base text-muted-foreground">
+              <Trans>Drag and drop your document here</Trans>
             </p>
 
             {isUploadDisabled && IS_BILLING_ENABLED() && (
               <Link
                 to={`/o/${organisation.url}/settings/billing`}
-                className="mt-4 text-sm text-amber-500 hover:underline dark:text-amber-400"
+                className="mt-4 text-amber-500 text-sm hover:underline dark:text-amber-400"
               >
                 <Trans>Upgrade your plan to upload more documents</Trans>
               </Link>
@@ -216,7 +191,7 @@ export const EnvelopeDropZoneWrapper = ({
               team?.id === undefined &&
               remaining.documents > 0 &&
               Number.isFinite(remaining.documents) && (
-                <p className="mt-4 text-sm text-muted-foreground/80">
+                <p className="mt-4 text-muted-foreground/80 text-sm">
                   <Trans>
                     {remaining.documents} of {quota.documents} documents remaining this month.
                   </Trans>

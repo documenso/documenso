@@ -16,10 +16,7 @@ export type CardProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  (
-    { className, children, gradient = false, degrees = 120, backdropBlur = true, ...props },
-    ref,
-  ) => {
+  ({ className, children, gradient = false, degrees = 120, backdropBlur = true, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -30,15 +27,14 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           } as React.CSSProperties
         }
         className={cn(
-          'bg-background text-foreground group relative rounded-lg border-2',
+          'group relative rounded-lg border-2 bg-background text-foreground',
           {
             'backdrop-blur-[2px]': backdropBlur,
             'gradient-border-mask before:pointer-events-none before:absolute before:-inset-[2px] before:rounded-lg before:p-[2px] before:[background:linear-gradient(var(--card-gradient-degrees),theme(colors.primary.DEFAULT/50%)_5%,theme(colors.border/80%)_30%)]':
               gradient,
             'dark:gradient-border-mask before:pointer-events-none before:absolute before:-inset-[2px] before:rounded-lg before:p-[2px] before:[background:linear-gradient(var(--card-gradient-degrees),theme(colors.primary.DEFAULT/70%)_5%,theme(colors.border/80%)_30%)]':
               gradient,
-            'shadow-[0_0_0_4px_theme(colors.gray.100/70%),0_0_0_1px_theme(colors.gray.100/70%),0_0_0_0.5px_var(colors.primary.DEFAULT/70%)]':
-              true,
+            'shadow-[0_0_0_4px_theme(colors.gray.100/70%),0_0_0_1px_theme(colors.gray.100/70%),0_0_0_0.5px_var(colors.primary.DEFAULT/70%)]': true,
             'dark:shadow-[0]': true,
           },
           className,
@@ -63,29 +59,22 @@ CardHeader.displayName = 'CardHeader';
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3
-      ref={ref}
-      className={cn('text-lg font-semibold leading-none tracking-tight', className)}
-      {...props}
-    />
+    <h3 ref={ref} className={cn('font-semibold text-lg leading-none tracking-tight', className)} {...props} />
   ),
 );
 
 CardTitle.displayName = 'CardTitle';
 
-const CardDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn('text-muted-foreground text-sm', className)} {...props} />
-));
+const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, ...props }, ref) => (
+    <p ref={ref} className={cn('text-muted-foreground text-sm', className)} {...props} />
+  ),
+);
 
 CardDescription.displayName = 'CardDescription';
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
-  ),
+  ({ className, ...props }, ref) => <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />,
 );
 
 CardContent.displayName = 'CardContent';
@@ -98,4 +87,4 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 
 CardFooter.displayName = 'CardFooter';
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };

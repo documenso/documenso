@@ -1,21 +1,16 @@
-import { type Page, expect, test } from '@playwright/test';
-import type { Envelope, Team } from '@prisma/client';
-
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { prisma } from '@documenso/prisma';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, type Page, test } from '@playwright/test';
+import type { Envelope, Team } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 
 /**
  * Test helper to complete template creation with duplicate recipients
  */
-const completeTemplateFlowWithDuplicateRecipients = async (options: {
-  page: Page;
-  team: Team;
-  template: Envelope;
-}) => {
+const completeTemplateFlowWithDuplicateRecipients = async (options: { page: Page; team: Team; template: Envelope }) => {
   const { page, team, template } = options;
   // Step 1: Settings - Continue with defaults
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -85,10 +80,7 @@ test.describe('[TEMPLATE_FLOW]: Duplicate Recipients', () => {
     await expect(page).toHaveURL(`/t/${team.url}/templates`);
   });
 
-  test('should create document from template with duplicate recipients using same email', async ({
-    page,
-    context,
-  }) => {
+  test('should create document from template with duplicate recipients using same email', async ({ page, context }) => {
     const { user, team } = await seedUser();
 
     const template = await seedBlankTemplate(user, team.id);
@@ -105,10 +97,7 @@ test.describe('[TEMPLATE_FLOW]: Duplicate Recipients', () => {
     // Navigate to template and create document
     await page.goto(`/t/${team.url}/templates`);
 
-    await page
-      .getByRole('row', { name: template.title })
-      .getByRole('button', { name: 'Use Template' })
-      .click();
+    await page.getByRole('row', { name: template.title }).getByRole('button', { name: 'Use Template' }).click();
 
     // Fill recipient information with same email for both instances
     await expect(page.getByRole('heading', { name: 'Create document' })).toBeVisible();
@@ -172,9 +161,7 @@ test.describe('[TEMPLATE_FLOW]: Duplicate Recipients', () => {
       await expect(page.getByLabel('Full Name')).toHaveValue(recipient.name);
 
       // Verify only one signature field is visible for this recipient
-      expect(
-        await page.locator(`[data-field-type="SIGNATURE"]:not([data-readonly="true"])`).all(),
-      ).toHaveLength(1);
+      expect(await page.locator(`[data-field-type="SIGNATURE"]:not([data-readonly="true"])`).all()).toHaveLength(1);
     }
   });
 

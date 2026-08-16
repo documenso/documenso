@@ -1,11 +1,9 @@
-import { useEffect } from 'react';
-
-import { Outlet, useNavigate } from 'react-router';
-
 import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { TrpcProvider } from '@documenso/trpc/react';
+import { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router';
 
 import { TeamProvider } from '~/providers/team';
 
