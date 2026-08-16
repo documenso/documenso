@@ -41,10 +41,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
   const documentsPath = formatDocumentsPath(team.url);
   const formatPath = `${documentsPath}/${row.envelopeId}/edit`;
 
-  // TODO: Consider if want to keep this logic for hiding viewing for CC'ers
-  if (recipient?.role === RecipientRole.CC && isComplete === false) {
-    return null;
-  }
+  // Allow CC'ers to view the document progress even if incomplete
 
   return match({
     isOwner,

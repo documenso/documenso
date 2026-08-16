@@ -187,10 +187,7 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
     return null;
   }
 
-  // TODO: Consider if want to keep this logic for hiding viewing for CC'ers
-  if (recipient?.role === RecipientRole.CC && isComplete === false) {
-    return null;
-  }
+  // Allow CC'ers to view the document progress even if incomplete
 
   return match({
     isPending,
