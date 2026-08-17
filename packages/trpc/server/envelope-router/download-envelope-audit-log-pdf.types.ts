@@ -5,7 +5,7 @@ import type { TrpcRouteMeta } from '../trpc';
 export const downloadEnvelopeAuditLogPdfMeta: TrpcRouteMeta = {
   openapi: {
     method: 'GET',
-    path: '/envelope/{envelopeId}/audit-log/pdf',
+    path: '/envelope/{envelopeId}/audit-log/download',
     summary: 'Download envelope audit log PDF',
     description: 'Download the audit log for a document as a PDF.',
     tags: ['Envelope'],

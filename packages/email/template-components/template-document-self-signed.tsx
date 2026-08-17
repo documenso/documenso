@@ -26,7 +26,11 @@ export const TemplateDocumentSelfSigned = ({ documentName, assetBaseUrl }: Templ
         <Section>
           <Column align="center">
             <Text className="font-semibold text-base text-foreground">
-              <Img src={getAssetUrl('/static/completed.png')} className="-mt-0.5 mr-2 inline h-7 w-7 align-middle" />
+              <Img
+                src={getAssetUrl('/static/completed.png')}
+                className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
+                alt=""
+              />
               <Trans>Completed</Trans>
             </Text>
           </Column>
@@ -51,7 +55,11 @@ export const TemplateDocumentSelfSigned = ({ documentName, assetBaseUrl }: Templ
             href={signUpUrl}
             className="mr-4 rounded-lg border border-border border-solid px-4 py-2 text-center font-medium text-foreground text-sm no-underline"
           >
-            <Img src={getAssetUrl('/static/user-plus.png')} className="mr-2 mb-0.5 inline h-5 w-5 align-middle" />
+            <Img
+              src={getAssetUrl('/static/user-plus.png')}
+              className="mr-2 mb-0.5 inline h-5 w-5 align-middle"
+              alt=""
+            />
             <Trans>Create account</Trans>
           </Button>
 
@@ -59,7 +67,7 @@ export const TemplateDocumentSelfSigned = ({ documentName, assetBaseUrl }: Templ
             className="rounded-lg border border-border border-solid px-4 py-2 text-center font-medium text-foreground text-sm no-underline"
             href="https://documenso.com/pricing"
           >
-            <Img src={getAssetUrl('/static/review.png')} className="mr-2 mb-0.5 inline h-5 w-5 align-middle" />
+            <Img src={getAssetUrl('/static/review.png')} className="mr-2 mb-0.5 inline h-5 w-5 align-middle" alt="" />
             <Trans>View plans</Trans>
           </Button>
         </Section>

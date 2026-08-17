@@ -1,0 +1,249 @@
+---
+title: Migrating to Envelopes
+description: Why Documenso unified documents and templates into envelopes, and how to migrate from the deprecated document and template create endpoints.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Summary
+
+The following items have been deprecated and will be removed on the <strong>1st of March 2027</strong>:
+
+- <strong>API V1</strong>
+- <strong>A subset of SDK/API V2 endpoints</strong>
+- <strong>Legacy documents and templates</strong>
+- <strong>EmbedCreateDocumentV1</strong>
+- <strong>EmbedCreateTemplateV1</strong>
+- <strong>EmbedUpdateDocumentV1</strong>
+- <strong>EmbedUpdateTemplateV1</strong>
+
+The beta endpoint `/api/v2-beta` will also be removed. Use `/api/v2` instead, which is a drop-in replacement.
+
+Nothing breaks before 1st of March 2027, so you can migrate at your own pace.
+
+## What are legacy documents and templates
+
+These are documents and templates created by the following endpoints:
+
+- `POST /api/v2/document/create`
+- `POST /api/v2/document/create/beta`
+- `POST /api/v2/template/create`
+- `POST /api/v2/template/create/beta`
+- `POST /api/v1/documents`
+- `POST /api/v1/templates`
+- `POST /api/v1/templates/create-document`
+- `POST /api/v1/templates/generate-document`
+
+## What replaces legacy documents and templates
+
+At the end of 2025 we introduced a unified system for documents and templates, called <strong>envelopes</strong>.
+
+We still reference documents and templates throughout the documentation and application to distinguish them, but internally they are envelopes.
+
+Moving to the envelope system gives you:
+
+- **Multiple PDFs in one envelope.** Send several documents to sign in a single request.
+- **One API for documents and templates.** Learn one set of endpoints instead of two misaligned ones.
+- **A better editor and signing experience** for you and your recipients.
+
+## How to migrate
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    ### Switch to the envelope endpoints
+
+    Replace each deprecated endpoint with its `/api/v2/envelope/*` equivalent from the [mapping tables](#endpoint-mapping-reference) below.
+  </Step>
+  <Step>
+    ### Set the envelope `type` on create
+
+    A single endpoint, `POST /api/v2/envelope/create`, can create both documents and templates. Set `type` to `DOCUMENT` or `TEMPLATE`. You can now upload more than one PDF using the `files` field.
+  </Step>
+  <Step>
+    ### Update how you store IDs
+
+    Envelope IDs are **strings** (for example `envelope_abc123`), not numbers. Update any code that stores, parses, or compares IDs.
+  </Step>
+  <Step>
+    ### Test, then remove the old calls
+
+    Verify the new flow against your account, then delete the deprecated calls.
+  </Step>
+</Steps>
+
+The main data differences are as follows:
+- ID format changed from number to string (e.g. `42` to `envelope_abc123`)
+- pageNumber becomes page
+- pageX becomes positionX
+- pageY becomes positionY
+
+See the [Documents API](/docs/developers/api/documents) and [Templates API](/docs/developers/api/templates) for the full envelope reference.
+
+### Deprecated V1 API Endpoints
+
+Full reference in the [V1 OpenAPI reference](https://openapi-v1.documenso.com).
+
+| Deprecated endpoint                                      | Replacement                                           |
+| -------------------------------------------------------- | ----------------------------------------------------- |
+| `GET /api/v1/documents`                                  | `GET /api/v2/envelope`                                |
+| `GET /api/v1/documents/{id}`                             | `GET /api/v2/envelope/{envelopeId}`                   |
+| `POST /api/v1/documents`                                 | `POST /api/v2/envelope/create`                        |
+| `POST /api/v1/documents/{id}/send`                       | `POST /api/v2/envelope/distribute`                    |
+| `POST /api/v1/documents/{id}/resend`                     | `POST /api/v2/envelope/redistribute`                  |
+| `DELETE /api/v1/documents/{id}`                          | `POST /api/v2/envelope/delete`                        |
+| `GET /api/v1/documents/{id}/download`                    | `GET /api/v2/envelope/item/{envelopeItemId}/download` |
+| `POST /api/v1/documents/{id}/recipients`                 | `POST /api/v2/envelope/recipient/create-many`         |
+| `PATCH /api/v1/documents/{id}/recipients/{recipientId}`  | `POST /api/v2/envelope/recipient/update-many`         |
+| `DELETE /api/v1/documents/{id}/recipients/{recipientId}` | `POST /api/v2/envelope/recipient/delete`              |
+| `POST /api/v1/documents/{id}/fields`                     | `POST /api/v2/envelope/field/create-many`             |
+| `PATCH /api/v1/documents/{id}/fields/{fieldId}`          | `POST /api/v2/envelope/field/update-many`             |
+| `DELETE /api/v1/documents/{id}/fields/{fieldId}`         | `POST /api/v2/envelope/field/delete`                  |
+| `GET /api/v1/templates`                                  | `GET /api/v2/envelope` (with `type=TEMPLATE`)         |
+| `GET /api/v1/templates/{id}`                             | `GET /api/v2/envelope/{envelopeId}`                   |
+| `POST /api/v1/templates`                                 | `POST /api/v2/envelope/create` (`type=TEMPLATE`)      |
+| `DELETE /api/v1/templates/{id}`                          | `POST /api/v2/envelope/delete`                        |
+| `POST /api/v1/templates/{templateId}/create-document`    | `POST /api/v2/envelope/use`                           |
+| `POST /api/v1/templates/{templateId}/generate-document`  | `POST /api/v2/envelope/use`                           |
+
+### Deprecated V2 API Endpoints
+
+Full reference in the [V2 OpenAPI reference](https://openapi.documenso.com).
+
+#### Documents
+
+| Deprecated endpoint                               | Replacement                                           |
+| ------------------------------------------------- | ----------------------------------------------------- |
+| `GET /api/v2/document`                            | `GET /api/v2/envelope`                                |
+| `GET /api/v2/document/{documentId}`               | `GET /api/v2/envelope/{envelopeId}`                   |
+| `POST /api/v2/document/get-many`                  | `POST /api/v2/envelope/get-many`                      |
+| `POST /api/v2/document/create`                    | `POST /api/v2/envelope/create`                        |
+| `POST /api/v2/document/create/beta`               | `POST /api/v2/envelope/create`                        |
+| `POST /api/v2/document/update`                    | `POST /api/v2/envelope/update`                        |
+| `POST /api/v2/document/delete`                    | `POST /api/v2/envelope/delete`                        |
+| `POST /api/v2/document/duplicate`                 | `POST /api/v2/envelope/duplicate`                     |
+| `POST /api/v2/document/distribute`                | `POST /api/v2/envelope/distribute`                    |
+| `POST /api/v2/document/redistribute`              | `POST /api/v2/envelope/redistribute`                  |
+| `GET /api/v2/document/attachment`                 | `GET /api/v2/envelope/attachment`                     |
+| `POST /api/v2/document/attachment/create`         | `POST /api/v2/envelope/attachment/create`             |
+| `POST /api/v2/document/attachment/update`         | `POST /api/v2/envelope/attachment/update`             |
+| `POST /api/v2/document/attachment/delete`         | `POST /api/v2/envelope/attachment/delete`             |
+| `GET /api/v2/document/{documentId}/download`      | `GET /api/v2/envelope/item/{envelopeItemId}/download` |
+| `GET /api/v2/document/{documentId}/download-beta` | `GET /api/v2/envelope/item/{envelopeItemId}/download` |
+
+#### Templates
+
+| Deprecated endpoint                   | Replacement                                      |
+| ------------------------------------- | ------------------------------------------------ |
+| `GET /api/v2/template`                | `GET /api/v2/envelope` (with `type=TEMPLATE`)    |
+| `GET /api/v2/template/{templateId}`   | `GET /api/v2/envelope/{envelopeId}`              |
+| `POST /api/v2/template/get-many`      | `POST /api/v2/envelope/get-many`                 |
+| `POST /api/v2/template/create`        | `POST /api/v2/envelope/create` (`type=TEMPLATE`) |
+| `POST /api/v2/template/create/beta`   | `POST /api/v2/envelope/create` (`type=TEMPLATE`) |
+| `POST /api/v2/template/update`        | `POST /api/v2/envelope/update`                   |
+| `POST /api/v2/template/duplicate`     | `POST /api/v2/envelope/duplicate`                |
+| `POST /api/v2/template/delete`        | `POST /api/v2/envelope/delete`                   |
+| `POST /api/v2/template/use`           | `POST /api/v2/envelope/use`                      |
+| `POST /api/v2/template/direct/create` | **Pending replacement**                               |
+| `POST /api/v2/template/direct/delete` | **Pending replacement**                               |
+| `POST /api/v2/template/direct/toggle` | **Pending replacement**                               |
+
+#### Document fields
+
+| Deprecated endpoint                       | Replacement                               |
+| ----------------------------------------- | ----------------------------------------- |
+| `GET /api/v2/document/field/{fieldId}`    | `GET /api/v2/envelope/field/{fieldId}`    |
+| `POST /api/v2/document/field/create`      | `POST /api/v2/envelope/field/create-many` |
+| `POST /api/v2/document/field/create-many` | `POST /api/v2/envelope/field/create-many` |
+| `POST /api/v2/document/field/update`      | `POST /api/v2/envelope/field/update-many` |
+| `POST /api/v2/document/field/update-many` | `POST /api/v2/envelope/field/update-many` |
+| `POST /api/v2/document/field/delete`      | `POST /api/v2/envelope/field/delete`      |
+
+#### Template fields
+
+| Deprecated endpoint                       | Replacement                               |
+| ----------------------------------------- | ----------------------------------------- |
+| `GET /api/v2/template/field/{fieldId}`    | `GET /api/v2/envelope/field/{fieldId}`    |
+| `POST /api/v2/template/field/create`      | `POST /api/v2/envelope/field/create-many` |
+| `POST /api/v2/template/field/create-many` | `POST /api/v2/envelope/field/create-many` |
+| `POST /api/v2/template/field/update`      | `POST /api/v2/envelope/field/update-many` |
+| `POST /api/v2/template/field/update-many` | `POST /api/v2/envelope/field/update-many` |
+| `POST /api/v2/template/field/delete`      | `POST /api/v2/envelope/field/delete`      |
+
+#### Document recipients
+
+| Deprecated endpoint                            | Replacement                                    |
+| ---------------------------------------------- | ---------------------------------------------- |
+| `GET /api/v2/document/recipient/{recipientId}` | `GET /api/v2/envelope/recipient/{recipientId}` |
+| `POST /api/v2/document/recipient/create`       | `POST /api/v2/envelope/recipient/create-many`  |
+| `POST /api/v2/document/recipient/create-many`  | `POST /api/v2/envelope/recipient/create-many`  |
+| `POST /api/v2/document/recipient/update`       | `POST /api/v2/envelope/recipient/update-many`  |
+| `POST /api/v2/document/recipient/update-many`  | `POST /api/v2/envelope/recipient/update-many`  |
+| `POST /api/v2/document/recipient/delete`       | `POST /api/v2/envelope/recipient/delete`       |
+
+#### Template recipients
+
+| Deprecated endpoint                            | Replacement                                    |
+| ---------------------------------------------- | ---------------------------------------------- |
+| `GET /api/v2/template/recipient/{recipientId}` | `GET /api/v2/envelope/recipient/{recipientId}` |
+| `POST /api/v2/template/recipient/create`       | `POST /api/v2/envelope/recipient/create-many`  |
+| `POST /api/v2/template/recipient/create-many`  | `POST /api/v2/envelope/recipient/create-many`  |
+| `POST /api/v2/template/recipient/update`       | `POST /api/v2/envelope/recipient/update-many`  |
+| `POST /api/v2/template/recipient/update-many`  | `POST /api/v2/envelope/recipient/update-many`  |
+| `POST /api/v2/template/recipient/delete`       | `POST /api/v2/envelope/recipient/delete`       |
+
+### Embedding components
+
+| Deprecated component    | Replacement           |
+| ----------------------- | --------------------- |
+| `EmbedCreateDocumentV1` | `EmbedCreateEnvelope` |
+| `EmbedCreateTemplateV1` | `EmbedCreateEnvelope` |
+| `EmbedUpdateDocumentV1` | `EmbedUpdateEnvelope` |
+| `EmbedUpdateTemplateV1` | `EmbedUpdateEnvelope` |
+
+See the [embedding guide](/docs/developers/embedding) for the envelope components.
+
+## FAQ
+
+<Accordions>
+  <Accordion title="What happens on 1 March 2027?">
+    The deprecated V1 API, the V2 endpoints listed above, and the V1 embedding components are removed.
+    Requests to them will fail, so migrate to the envelope API before that date.
+  </Accordion>
+  <Accordion title="Will my existing documents and templates keep working?">
+    Yes. Documents and templates you already created remain in your account and continue to work. They will automatically be converted to envelopes. Only
+    the deprecated endpoints you call are going away. Your data is not deleted.
+  </Accordion>
+  <Accordion title="Do I need a new API token?">
+    No. Authentication is unchanged. The same API token works for the envelope endpoints under
+    `https://app.documenso.com/api/v2`.
+  </Accordion>
+  <Accordion title="What is the difference between a document and a template now?">
+    Both are envelopes, distinguished by a `type` field of `DOCUMENT` or `TEMPLATE`. They share the same
+    endpoints, recipients, fields, and attachments.
+  </Accordion>
+  <Accordion title="I use an official SDK, what should I do?">
+    The function calls to the legacy endpoints will break on the 1st of March 2027. Update to the latest SDK version and switch to its envelope methods.
+    The deprecated document and template methods map to the envelope endpoints in the tables above.
+  </Accordion>
+  <Accordion title="I need more time or help migrating">
+    Reach out to [support@documenso.com](mailto:support@documenso.com) with your use case and we will
+    help you plan the migration.
+  </Accordion>
+</Accordions>
+
+## Getting help
+
+- [V2 OpenAPI reference](https://openapi.documenso.com): the up-to-date envelope API.
+- [V1 OpenAPI reference](https://openapi-v1.documenso.com): the deprecated V1 API.
+- [support@documenso.com](mailto:support@documenso.com): migration questions and extensions.
+
+## See also
+
+- [Documents API](/docs/developers/api/documents): create and manage envelopes
+- [Templates API](/docs/developers/api/templates): work with templates and direct links
+- [Fields API](/docs/developers/api/fields) and [Recipients API](/docs/developers/api/recipients)
+- [API Versioning](/docs/developers/api/versioning): how Documenso versions the public API

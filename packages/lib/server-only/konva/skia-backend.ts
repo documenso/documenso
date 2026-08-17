@@ -2,8 +2,9 @@
  * !: This is a workaround to fix the memory leak in the skia-canvas library.
  * !: Internals are ported from the original `konva/skia-backend.js` file.
  */
+
+import { Canvas, DOMMatrix, Image, Path2D } from '@documenso/skia-canvas';
 import { Konva } from 'konva/lib/_CoreInternals';
-import { Canvas, DOMMatrix, Image, Path2D } from 'skia-canvas';
 
 // @ts-expect-error skia-canvas satisfies the requirements
 global.DOMMatrix = DOMMatrix;
@@ -37,6 +38,6 @@ Konva.Util.createImageElement = () => {
   return node as unknown as HTMLImageElement;
 };
 
-Konva._renderBackend = 'skia-canvas';
+Konva._renderBackend = '@documenso/skia-canvas';
 
 export default Konva;

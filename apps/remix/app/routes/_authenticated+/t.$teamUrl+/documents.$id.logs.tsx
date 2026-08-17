@@ -71,7 +71,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       updatedAt: envelope.updatedAt,
       documentMeta: envelope.documentMeta,
     },
-    recipients: envelope.recipients,
+    recipients: envelope.recipients.map((recipient) => ({
+      id: recipient.id,
+      email: recipient.email,
+      name: recipient.name,
+      role: recipient.role,
+    })),
     documentRootPath,
     userId: user.id,
   };
@@ -113,7 +118,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
     },
   ];
 
-  const formatRecipientText = (recipient: Recipient) => {
+  const formatRecipientText = (recipient: Pick<Recipient, 'email' | 'name' | 'role'>) => {
     let text = recipient.email;
 
     if (recipient.name) {

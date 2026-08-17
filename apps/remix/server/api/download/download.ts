@@ -146,7 +146,7 @@ export const downloadRoute = new Hono<HonoEnv>()
    * Requires API key authentication via Authorization header.
    */
   .get(
-    '/envelope/:envelopeId/audit-log/pdf',
+    '/envelope/:envelopeId/audit-log/download',
     sValidator('param', ZDownloadEnvelopeAuditLogPdfRequestParamsSchema),
     async (c) => {
       const logger = c.get('logger');
@@ -220,7 +220,7 @@ export const downloadRoute = new Hono<HonoEnv>()
    * Requires API key authentication via Authorization header.
    */
   .get(
-    '/envelope/:envelopeId/certificate/pdf',
+    '/envelope/:envelopeId/certificate/download',
     sValidator('param', ZDownloadEnvelopeCertificatePdfRequestParamsSchema),
     async (c) => {
       const logger = c.get('logger');
