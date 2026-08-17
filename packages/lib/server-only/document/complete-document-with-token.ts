@@ -178,7 +178,7 @@ export const completeDocumentWithToken = async ({
     });
   }
 
-  let fields = await prisma.field.findMany({
+  const fields = await prisma.field.findMany({
     where: {
       envelopeId: envelope.id,
       recipientId: recipient.id,
@@ -217,68 +217,21 @@ export const completeDocumentWithToken = async ({
     });
   }
 
-  // Auto-insert all un-inserted date fields for V2 envelopes at completion time.
-  if (envelope.internalVersion === 2 && uninsertedDateFields.length > 0) {
-    const formattedDate = DateTime.now()
-      .setZone(envelope.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
-      .toFormat(envelope.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+  // Auto-inserted DATE fields are stamped inside the completion transaction below.
+  // Treat them as inserted for validation purposes so the validation can run first
+  // without persisting anything.
+  const shouldAutoInsertDateFields = envelope.internalVersion === 2 && uninsertedDateFields.length > 0;
 
-    const newDateFieldValues = {
-      customText: formattedDate,
-      inserted: true,
-    };
+  const autoInsertedDateFieldIds = new Set(
+    shouldAutoInsertDateFields ? uninsertedDateFields.map((field) => field.id) : [],
+  );
 
-    await prisma.field.updateMany({
-      where: {
-        id: {
-          in: uninsertedDateFields.map((field) => field.id),
-        },
-      },
-      data: {
-        ...newDateFieldValues,
-      },
-    });
+  const fieldsForValidation = fields.map((field) =>
+    autoInsertedDateFieldIds.has(field.id) ? { ...field, inserted: true } : field,
+  );
 
-    // Create audit log entries for each auto-inserted date field.
-    await prisma.documentAuditLog.createMany({
-      data: uninsertedDateFields.map((field) =>
-        createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
-          envelopeId: envelope.id,
-          user: {
-            email: recipientEmail,
-            name: recipientName,
-          },
-          requestMetadata,
-          data: {
-            recipientEmail: recipientEmail,
-            recipientId: recipient.id,
-            recipientName: recipientName,
-            recipientRole: recipient.role,
-            fieldId: field.secondaryId,
-            field: {
-              type: FieldType.DATE,
-              data: formattedDate,
-            },
-          },
-        }),
-      ),
-    });
-
-    // Update the local fields array so the subsequent validation check passes.
-    fields = fields.map((field) => {
-      if (field.type === FieldType.DATE && !field.inserted) {
-        return {
-          ...field,
-          ...newDateFieldValues,
-        };
-      }
-
-      return field;
-    });
-  }
-
-  if (fieldsContainUnsignedRequiredField(fields)) {
+  // Validate before any write so a failed attempt cannot leave a stamped date behind.
+  if (fieldsContainUnsignedRequiredField(fieldsForValidation)) {
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
   }
 
@@ -308,6 +261,54 @@ export const completeDocumentWithToken = async ({
       throw new AppError(AppErrorCode.RECIPIENT_ALREADY_SIGNED, {
         message: `Recipient ${recipient.id} has already signed`,
         statusCode: 400,
+      });
+    }
+
+    // Auto-insert all un-inserted date fields for V2 envelopes at completion time.
+    // This happens inside the transaction so the stamped date is rolled back along
+    // with everything else if the completion fails, rather than freezing the date of
+    // a failed attempt onto the document.
+    if (shouldAutoInsertDateFields) {
+      const formattedDate = DateTime.now()
+        .setZone(envelope.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+        .toFormat(envelope.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+
+      await tx.field.updateMany({
+        where: {
+          id: {
+            in: uninsertedDateFields.map((field) => field.id),
+          },
+        },
+        data: {
+          customText: formattedDate,
+          inserted: true,
+        },
+      });
+
+      // Create audit log entries for each auto-inserted date field.
+      await tx.documentAuditLog.createMany({
+        data: uninsertedDateFields.map((field) =>
+          createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+            envelopeId: envelope.id,
+            user: {
+              email: recipientEmail,
+              name: recipientName,
+            },
+            requestMetadata,
+            data: {
+              recipientEmail: recipientEmail,
+              recipientId: recipient.id,
+              recipientName: recipientName,
+              recipientRole: recipient.role,
+              fieldId: field.secondaryId,
+              field: {
+                type: FieldType.DATE,
+                data: formattedDate,
+              },
+            },
+          }),
+        ),
       });
     }
 
