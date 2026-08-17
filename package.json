@@ -89,7 +89,7 @@
     "zod-prisma-types": "3.3.5"
   },
   "dependencies": {
-    "@ai-sdk/google-vertex": "3.0.81",
+    "@ai-sdk/google-vertex": "5.0.48",
     "@documenso/prisma": "*",
     "@libpdf/core": "^0.4.1",
     "@lingui/conf": "^5.6.0",
@@ -122,7 +122,7 @@
     "@radix-ui/react-toggle": "^1.1.14",
     "@radix-ui/react-toggle-group": "^1.1.15",
     "@radix-ui/react-tooltip": "^1.2.12",
-    "ai": "^5.0.104",
+    "ai": "^7.0.58",
     "cron-parser": "^5.5.0",
     "fflate": "^0.8.3",
     "luxon": "^3.7.2",

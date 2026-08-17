@@ -15,7 +15,7 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@ai-sdk/google-vertex": "3.0.81",
+    "@ai-sdk/google-vertex": "5.0.48",
     "@aws-sdk/client-s3": "^3.998.0",
     "@aws-sdk/client-sesv2": "^3.998.0",
     "@aws-sdk/cloudfront-signer": "^3.998.0",
@@ -43,7 +43,7 @@
     "@sindresorhus/slugify": "^3.0.0",
     "@team-plain/typescript-sdk": "^5.11.0",
     "@vvo/tzdb": "^6.196.0",
-    "ai": "^5.0.104",
+    "ai": "^7.0.58",
     "bullmq": "^5.71.1",
     "colord": "^2.9.3",
     "csv-parse": "^6.1.0",
