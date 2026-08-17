@@ -7,6 +7,7 @@ import {
 } from '@documenso/lib/constants/branding';
 import { DEFAULT_BRAND_COLORS, DEFAULT_BRAND_RADIUS } from '@documenso/lib/constants/theme';
 import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';
+import { normalizeBrandingColors } from '@documenso/lib/utils/normalize-branding-colors';
 import { cn } from '@documenso/ui/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
 import { Button } from '@documenso/ui/primitives/button';
@@ -23,10 +24,12 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { BrandingPreferencesResetDialog } from '~/components/dialogs/branding-preferences-reset-dialog';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { useCspNonce } from '~/utils/nonce';
 
 import { FormStickySaveBar } from './form-sticky-save-bar';
+import { InheritableField } from './inheritable-field';
 
 const ZBrandingPreferencesFormSchema = z.object({
   brandingEnabled: z.boolean().nullable(),
@@ -74,6 +77,7 @@ export function BrandingPreferencesForm({
 
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [hasLoadedPreview, setHasLoadedPreview] = useState(false);
+  const [colorPickerKey, setColorPickerKey] = useState(0);
 
   const parsedColors = ZCssVarsSchema.safeParse(settings.brandingColors);
   const initialColors = parsedColors.success ? parsedColors.data : {};
@@ -95,6 +99,42 @@ export function BrandingPreferencesForm({
   });
 
   const isBrandingEnabled = form.watch('brandingEnabled');
+
+  const hasResetBrandingColors =
+    settings.brandingColors === null ||
+    settings.brandingColors === undefined ||
+    (parsedColors.success && normalizeBrandingColors(parsedColors.data) === null);
+
+  // Only show the reset action when the saved settings actually differ from the
+  // defaults, so it never renders as a pointless disabled button.
+  const isResetToDefaultsVisible =
+    settings.brandingEnabled !== (canInherit ? null : false) ||
+    !!settings.brandingLogo ||
+    !!settings.brandingUrl ||
+    !!settings.brandingCompanyDetails ||
+    !!settings.brandingCss ||
+    !hasResetBrandingColors;
+
+  const handleResetToDefaults = async () => {
+    const data: TBrandingPreferencesFormSchema = {
+      brandingEnabled: canInherit ? null : false,
+      brandingLogo: null,
+      brandingUrl: '',
+      brandingCompanyDetails: '',
+      brandingColors: {},
+      brandingCss: '',
+    };
+
+    await onFormSubmit(data);
+
+    if (previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    setPreviewUrl('');
+    setColorPickerKey((key) => key + 1);
+    form.reset(data);
+  };
 
   const getSavedLogoPreviewUrl = () => {
     if (!settings.brandingLogo) {
@@ -171,11 +211,13 @@ export function BrandingPreferencesForm({
             control={form.control}
             name="brandingEnabled"
             render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>
-                  <Trans>Enable Custom Branding</Trans>
-                </FormLabel>
-
+              <InheritableField
+                className="flex-1"
+                canInherit={canInherit}
+                isInherited={field.value === null}
+                label={<Trans>Enable Custom Branding</Trans>}
+                testId="branding-enabled"
+              >
                 <FormControl>
                   <Select
                     {...field}
@@ -213,7 +255,7 @@ export function BrandingPreferencesForm({
                     <Trans>Enable custom branding for all documents in this organisation</Trans>
                   )}
                 </FormDescription>
-              </FormItem>
+              </InheritableField>
             )}
           />
 
@@ -224,11 +266,13 @@ export function BrandingPreferencesForm({
               control={form.control}
               name="brandingLogo"
               render={({ field: { value: _value, onChange, ...field } }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <Trans>Branding Logo</Trans>
-                  </FormLabel>
-
+                <InheritableField
+                  className="flex-1"
+                  canInherit={canInherit}
+                  isInherited={!previewUrl}
+                  label={<Trans>Branding Logo</Trans>}
+                  testId="branding-logo"
+                >
                   <div className="flex flex-col gap-4">
                     <div className="relative h-48 w-full overflow-hidden rounded-lg border border-border bg-background">
                       {previewUrl ? (
@@ -306,7 +350,7 @@ export function BrandingPreferencesForm({
                       )}
                     </FormDescription>
                   </div>
-                </FormItem>
+                </InheritableField>
               )}
             />
 
@@ -314,11 +358,13 @@ export function BrandingPreferencesForm({
               control={form.control}
               name="brandingUrl"
               render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <Trans>Brand Website</Trans>
-                  </FormLabel>
-
+                <InheritableField
+                  className="flex-1"
+                  canInherit={canInherit}
+                  isInherited={!field.value}
+                  label={<Trans>Brand Website</Trans>}
+                  testId="branding-url"
+                >
                   <FormControl>
                     <Input type="url" placeholder="https://example.com" disabled={!isBrandingEnabled} {...field} />
                   </FormControl>
@@ -333,7 +379,7 @@ export function BrandingPreferencesForm({
                       </span>
                     )}
                   </FormDescription>
-                </FormItem>
+                </InheritableField>
               )}
             />
 
@@ -341,11 +387,13 @@ export function BrandingPreferencesForm({
               control={form.control}
               name="brandingCompanyDetails"
               render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <Trans>Brand Details</Trans>
-                  </FormLabel>
-
+                <InheritableField
+                  className="flex-1"
+                  canInherit={canInherit}
+                  isInherited={!field.value}
+                  label={<Trans>Brand Details</Trans>}
+                  testId="branding-company-details"
+                >
                   <FormControl>
                     <Textarea
                       placeholder={t`Enter your brand details`}
@@ -365,7 +413,7 @@ export function BrandingPreferencesForm({
                       </span>
                     )}
                   </FormDescription>
-                </FormItem>
+                </InheritableField>
               )}
             />
           </div>
@@ -397,6 +445,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`background-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.background}
@@ -420,6 +469,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`foreground-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.foreground}
@@ -443,6 +493,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`primary-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.primary}
@@ -466,6 +517,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`primary-foreground-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.primaryForeground}
@@ -489,6 +541,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`border-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.border}
@@ -512,6 +565,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`ring-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.ring}
@@ -593,6 +647,15 @@ export function BrandingPreferencesForm({
             isDirty={hasUnsavedChanges}
             isSubmitting={form.formState.isSubmitting}
             onReset={handleReset}
+            resetToDefaults={
+              isResetToDefaultsVisible ? (
+                <BrandingPreferencesResetDialog
+                  hasAdvancedBranding={hasAdvancedBranding}
+                  isSubmitting={form.formState.isSubmitting}
+                  onReset={handleResetToDefaults}
+                />
+              ) : undefined
+            }
           />
         </fieldset>
       </form>

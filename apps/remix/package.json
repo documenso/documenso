@@ -44,7 +44,7 @@
     "autoprefixer": "^10.4.22",
     "colord": "^2.9.3",
     "content-disposition": "^1.0.1",
-    "framer-motion": "^12.23.24",
+    "framer-motion": "^12.43.0",
     "hono": "^4.12.14",
     "hono-react-router-adapter": "^0.6.5",
     "input-otp": "^1.4.2",
@@ -57,9 +57,9 @@
     "papaparse": "^5.5.3",
     "posthog-js": "^1.297.2",
     "posthog-node": "4.18.0",
-    "react": "^18",
+    "react": "^19.2.7",
     "react-call": "^1.8.1",
-    "react-dom": "^18",
+    "react-dom": "^19.2.7",
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.66.1",
     "react-hotkeys-hook": "^4.6.2",
@@ -93,8 +93,8 @@
     "@types/luxon": "^3.7.1",
     "@types/node": "^20",
     "@types/papaparse": "^5.5.0",
-    "@types/react": "18.3.27",
-    "@types/react-dom": "^18",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "@types/ua-parser-js": "^0.7.39",
     "cross-env": "^10.1.0",
     "esbuild": "^0.27.0",
@@ -106,5 +106,5 @@
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.15.0"
+  "version": "2.16.0"
 }
