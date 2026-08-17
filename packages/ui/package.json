@@ -35,7 +35,7 @@
     "clsx": "^1.2.1",
     "cmdk": "^1.1.1",
     "colord": "^2.9.3",
-    "framer-motion": "^12.23.24",
+    "framer-motion": "^12.43.0",
     "lucide-react": "^0.554.0",
     "luxon": "^3.7.2",
     "pdfjs-dist": "5.4.296",

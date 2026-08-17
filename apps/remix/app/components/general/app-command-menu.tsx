@@ -1,5 +1,6 @@
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { formatPath } from '@documenso/lib/constants/app';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import {
   DOCUMENTS_PAGE_SHORTCUT,
@@ -287,7 +288,7 @@ export const AppCommandMenu = ({ open, onOpenChange }: AppCommandMenuProps) => {
       {
         id: 'settings-main',
         label: msg`Settings`,
-        path: '/settings',
+        path: '/settings/profile',
         icon: SettingsIcon,
         shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', ''),
       },
@@ -389,7 +390,7 @@ export const AppCommandMenu = ({ open, onOpenChange }: AppCommandMenuProps) => {
 
   const formatChipCount = (count: number, isCapped: boolean) => (isCapped ? `≥${count}` : `${count}`);
 
-  const goToSettings = useCallback(() => push('/settings'), [push]);
+  const goToSettings = useCallback(() => push('/settings/profile'), [push]);
   const goToDocuments = useCallback(() => {
     if (teamUrl) {
       push(`/t/${teamUrl}/documents?status=ALL`);
@@ -862,7 +863,7 @@ const PromptLanguageCommands = ({
 
       formData.append('lang', lang);
 
-      const response = await fetch('/api/locale', {
+      const response = await fetch(formatPath('/api/locale'), {
         method: 'post',
         body: formData,
       });

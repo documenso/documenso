@@ -29,6 +29,7 @@
     "@documenso/email": "*",
     "@documenso/prisma": "*",
     "@documenso/signing": "*",
+    "@documenso/skia-canvas": "^3.0.8-documenso.3",
     "@lingui/core": "^5.6.0",
     "@lingui/macro": "^5.6.0",
     "@lingui/react": "^5.6.0",
@@ -67,7 +68,6 @@
     "react": "^19.2.7",
     "remeda": "^2.32.0",
     "sharp": "0.34.5",
-    "skia-canvas": "^3.0.8",
     "stripe": "^12.18.0",
     "ts-pattern": "^5.9.0",
     "zod": "^3.25.76"
