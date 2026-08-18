@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import type { JobDefinition } from '../../client/_internal/job';
 
+import { resolveSweepCron } from './sweep-crons';
+
 const SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION_ID = 'internal.send-signing-reminders-sweep';
 
 const SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION_SCHEMA = z.object({});
@@ -17,7 +19,7 @@ export const SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION = {
   trigger: {
     name: SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION_ID,
     schema: SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION_SCHEMA,
-    cron: '*/15 * * * *', // Every 15 minutes.
+    cron: resolveSweepCron('NEXT_PRIVATE_JOBS_SIGNING_REMINDERS_SWEEP_CRON'), // Every 15 minutes by default; see #2811.
   },
   handler: async ({ payload, io }) => {
     const handler = await import('./send-signing-reminders-sweep.handler');

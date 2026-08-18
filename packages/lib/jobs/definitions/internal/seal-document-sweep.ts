@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import type { JobDefinition } from '../../client/_internal/job';
 
+import { resolveSweepCron } from './sweep-crons';
+
 const SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_ID = 'internal.seal-document-sweep';
 
 const SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_SCHEMA = z.object({});
@@ -15,7 +17,7 @@ export const SEAL_DOCUMENT_SWEEP_JOB_DEFINITION = {
   trigger: {
     name: SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_ID,
     schema: SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_SCHEMA,
-    cron: '*/15 * * * *', // Every 15 minutes.
+    cron: resolveSweepCron('NEXT_PRIVATE_JOBS_SEAL_DOCUMENT_SWEEP_CRON'), // Every 15 minutes by default; see #2811.
   },
   handler: async ({ payload, io }) => {
     const handler = await import('./seal-document-sweep.handler');

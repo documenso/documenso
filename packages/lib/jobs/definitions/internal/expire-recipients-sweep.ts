@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import type { JobDefinition } from '../../client/_internal/job';
 
+import { resolveSweepCron } from './sweep-crons';
+
 const EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION_ID = 'internal.expire-recipients-sweep';
 
 const EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION_SCHEMA = z.object({});
@@ -15,7 +17,7 @@ export const EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION = {
   trigger: {
     name: EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION_ID,
     schema: EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION_SCHEMA,
-    cron: '*/15 * * * *', // Every 15 minutes.
+    cron: resolveSweepCron('NEXT_PRIVATE_JOBS_EXPIRE_RECIPIENTS_SWEEP_CRON'), // Every 15 minutes by default; see #2811.
   },
   handler: async ({ payload, io }) => {
     const handler = await import('./expire-recipients-sweep.handler');
