@@ -185,54 +185,60 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     reportUrl,
   });
 
-  if (isRecipientEmailValidForSending(recipient)) {
-    try {
-      await assertOrganisationRatesAndLimits({
-        organisationId,
-        organisationClaim: claims,
-        type: 'email',
-        count: 1,
-      });
-    } catch (_err) {
-      io.logger.warn({
-        msg: 'Recipient signing email dropped: org rate limit exceeded',
-        organisationId,
-        recipientId: recipient.id,
-        envelopeId: envelope.id,
-      });
-
-      // Job is consumed and NOT retried.
-      return;
-    }
-
-    await io.runTask('send-signing-email', async () => {
-      const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-        renderEmailWithI18N(template, {
-          lang: emailLanguage,
-          branding,
-          plainText: true,
-        }),
-      ]);
-
-      await emailTransport.sendMail({
-        to: {
-          name: recipient.name,
-          address: recipient.email,
-        },
-        from: senderEmail,
-        replyTo: replyToEmail,
-        subject: renderCustomEmailTemplate(documentMeta?.subject || emailSubject, customEmailTemplate),
-        html,
-        text,
-        headers: buildEnvelopeEmailHeaders({
-          userId,
-          envelopeId: envelope.id,
-          teamId: envelope.teamId,
-        }),
-      });
-    });
+  if (!isRecipientEmailValidForSending(recipient)) {
+    // An explicitly empty email (the in-person signer the recipient schema
+    // sanctions) means no email is sent: no sendStatus=SENT, no sentAt, and
+    // no EMAIL_SENT audit entry. That entry feeds the signing certificate and
+    // must attest only to deliveries that actually happened (#3194).
+    return;
   }
+
+  try {
+    await assertOrganisationRatesAndLimits({
+      organisationId,
+      organisationClaim: claims,
+      type: 'email',
+      count: 1,
+    });
+  } catch (_err) {
+    io.logger.warn({
+      msg: 'Recipient signing email dropped: org rate limit exceeded',
+      organisationId,
+      recipientId: recipient.id,
+      envelopeId: envelope.id,
+    });
+
+    // Job is consumed and NOT retried.
+    return;
+  }
+
+  await io.runTask('send-signing-email', async () => {
+    const [html, text] = await Promise.all([
+      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+      renderEmailWithI18N(template, {
+        lang: emailLanguage,
+        branding,
+        plainText: true,
+      }),
+    ]);
+
+    await emailTransport.sendMail({
+      to: {
+        name: recipient.name,
+        address: recipient.email,
+      },
+      from: senderEmail,
+      replyTo: replyToEmail,
+      subject: renderCustomEmailTemplate(documentMeta?.subject || emailSubject, customEmailTemplate),
+      html,
+      text,
+      headers: buildEnvelopeEmailHeaders({
+        userId,
+        envelopeId: envelope.id,
+        teamId: envelope.teamId,
+      }),
+    });
+  });
 
   const sentAt = new Date();
 
