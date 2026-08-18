@@ -333,27 +333,42 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
     },
   });
 
-  await triggerWebhook({
-    event: isRejected ? WebhookTriggerEvents.DOCUMENT_REJECTED : WebhookTriggerEvents.DOCUMENT_COMPLETED,
-    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedEnvelope)),
-    userId: updatedEnvelope.userId,
-    teamId: updatedEnvelope.teamId ?? undefined,
-  });
-
   let shouldSendCompletedEmail = sendEmail && !isResealing && !isRejected;
 
   if (isResealing && !isDocumentCompleted(envelopeStatus)) {
     shouldSendCompletedEmail = sendEmail;
   }
 
-  if (shouldSendCompletedEmail) {
-    await jobs.triggerJob({
-      name: 'send.document.completed.emails',
-      payload: {
-        envelopeId,
-        requestMetadata,
-      },
+  // The seal transaction above has already committed. Dispatch the webhook and the
+  // completion email as independent post-seal side effects: a failure in one must
+  // neither fail this job for an already-sealed envelope nor block the other (#2814).
+  try {
+    await io.runTask('seal-document--trigger-webhook', async () => {
+      await triggerWebhook({
+        event: isRejected ? WebhookTriggerEvents.DOCUMENT_REJECTED : WebhookTriggerEvents.DOCUMENT_COMPLETED,
+        data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedEnvelope)),
+        userId: updatedEnvelope.userId,
+        teamId: updatedEnvelope.teamId ?? undefined,
+      });
     });
+  } catch (err) {
+    io.logger.error('Failed to dispatch completion webhook for sealed envelope', err);
+  }
+
+  if (shouldSendCompletedEmail) {
+    try {
+      await io.runTask('seal-document--send-completed-emails', async () => {
+        await jobs.triggerJob({
+          name: 'send.document.completed.emails',
+          payload: {
+            envelopeId,
+            requestMetadata,
+          },
+        });
+      });
+    } catch (err) {
+      io.logger.error('Failed to queue completion emails for sealed envelope', err);
+    }
   }
 };
 
