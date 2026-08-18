@@ -69,6 +69,20 @@ export default function ApiTokensPage() {
         },
       },
       {
+        header: t`Last Used`,
+        cell: ({ row }) => {
+          if (!row.original.lastUsedAt) {
+            return (
+              <span className="text-muted-foreground">
+                <Trans>Never</Trans>
+              </span>
+            );
+          }
+
+          return <span className="text-foreground">{i18n.date(row.original.lastUsedAt)}</span>;
+        },
+      },
+      {
         header: t`Actions`,
         cell: ({ row }) => (
           <TokenDeleteDialog token={row.original}>

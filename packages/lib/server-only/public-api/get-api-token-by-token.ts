@@ -96,6 +96,17 @@ export const getApiTokenByToken = async ({ token, bypassRateLimit = false }: Get
     });
   }
 
+  void prisma.apiToken
+    .update({
+      where: {
+        id: apiToken.id,
+      },
+      data: {
+        lastUsedAt: new Date(),
+      },
+    })
+    .catch(() => null);
+
   return {
     ...apiToken,
     user,
