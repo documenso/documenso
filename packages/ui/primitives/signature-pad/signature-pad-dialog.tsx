@@ -109,7 +109,22 @@ export const SignaturePadDialog = ({
         )}
       </motion.button>
 
-      <Dialog open={showSignatureModal} onOpenChange={disabled ? undefined : setShowSignatureModal}>
+      <Dialog
+        open={showSignatureModal}
+        onOpenChange={(open) => {
+          if (disabled) return;
+
+          // Reset the local draft when the dialog closes: the Radix content
+          // unmounts on close, so the reopened pad remounts from the parent's
+          // value -- an abandoned drawing kept here would diverge from what is
+          // displayed and be committed by the next confirm (#3203).
+          if (!open) {
+            setSignature(value ?? '');
+          }
+
+          setShowSignatureModal(open);
+        }}
+      >
         <DialogContent hideClose={true} className="p-6 pt-4">
           <SignaturePad
             id="signature"
