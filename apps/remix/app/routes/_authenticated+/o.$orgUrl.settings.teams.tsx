@@ -30,6 +30,11 @@ export default function OrganisationSettingsTeamsPage() {
       params.delete('query');
     }
 
+    // A new query can shrink the result set below the current page, and the
+    // pagination unmounts on a single page of results -- leaving the user on
+    // an empty table with no way back. Always return to the first page (#3199).
+    params.delete('page');
+
     setSearchParams(params);
   }, [debouncedSearchQuery, pathname, searchParams]);
 

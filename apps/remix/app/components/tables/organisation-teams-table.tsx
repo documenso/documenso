@@ -138,7 +138,11 @@ export const OrganisationTeamsTable = () => {
         ),
       }}
     >
-      {(table) => results.totalPages > 1 && <DataTablePagination additionalInformation="VisibleCount" table={table} />}
+      {(table) =>
+        // Mount the pagination whenever a page beyond the first is active, even
+        // if the current result set fits one page: without it, a search that
+        // shrinks the results strands the user on an empty page (#3199).
+        (results.totalPages > 1 || results.currentPage > 1) && <DataTablePagination additionalInformation="VisibleCount" table={table} />}
     </DataTable>
   );
 };

@@ -36,6 +36,11 @@ export default function TeamsSettingsMembersPage() {
       params.delete('query');
     }
 
+    // A new query can shrink the result set below the current page, and the
+    // pagination unmounts on a single page of results -- leaving the user on
+    // an empty table with no way back. Always return to the first page (#3199).
+    params.delete('page');
+
     // If nothing  to change then do nothing.
     if (params.toString() === searchParams?.toString()) {
       return;
