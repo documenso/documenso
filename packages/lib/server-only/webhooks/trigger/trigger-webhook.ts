@@ -6,7 +6,8 @@ import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigg
 export type TriggerWebhookOptions = {
   event: WebhookTriggerEvents;
   data: Record<string, unknown>;
-  userId: number;
+  /** Omit for internal jobs: they act system-side, not as the author (#3192). */
+  userId?: number;
   teamId: number;
 };
 
