@@ -24,8 +24,10 @@ export const executeWebhookCall = async (options: {
   url: string;
   body: unknown;
   secret: string | null;
+  /** Stable delivery identifier, sent as a header for easy deduplication. */
+  deliveryId?: string;
 }): Promise<WebhookCallResult> => {
-  const { url, body, secret } = options;
+  const { url, body, secret, deliveryId } = options;
 
   try {
     await assertNotPrivateUrl(url);
@@ -38,6 +40,7 @@ export const executeWebhookCall = async (options: {
       headers: {
         'Content-Type': 'application/json',
         'X-Documenso-Secret': secret ?? '',
+        ...(deliveryId ? { 'X-Documenso-Delivery-Id': deliveryId } : {}),
       },
     });
 
