@@ -77,16 +77,22 @@ export const EnvelopeDistributeDialog = ({
 
   const { mutateAsync: distributeEnvelope } = trpcReact.envelope.distribute.useMutation();
 
-  const form = useForm<TEnvelopeDistributeFormSchema>({
-    defaultValues: {
-      meta: {
-        emailId: envelope.documentMeta?.emailId ?? null,
-        emailReplyTo: envelope.documentMeta?.emailReplyTo || undefined,
-        subject: envelope.documentMeta?.subject ?? '',
-        message: envelope.documentMeta?.message ?? '',
-        distributionMethod: envelope.documentMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
-      },
+  // Derived per open, not per mount: the dialog stays mounted for the whole
+  // editor session, so defaultValues alone would freeze whatever the subject
+  // and message were on first render -- and the send would write those stale
+  // values back into documentMeta (#3197).
+  const createDefaultValues = () => ({
+    meta: {
+      emailId: envelope.documentMeta?.emailId ?? null,
+      emailReplyTo: envelope.documentMeta?.emailReplyTo || undefined,
+      subject: envelope.documentMeta?.subject ?? '',
+      message: envelope.documentMeta?.message ?? '',
+      distributionMethod: envelope.documentMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
     },
+  });
+
+  const form = useForm<TEnvelopeDistributeFormSchema>({
+    defaultValues: createDefaultValues(),
     resolver: zodResolver(ZEnvelopeDistributeFormSchema),
   });
 
@@ -228,15 +234,18 @@ export const EnvelopeDistributeDialog = ({
   };
 
   useEffect(() => {
-    // Default the distribution method tab to the envelope's configured setting.
-    if (isOpen && envelope.documentMeta) {
-      setValue('meta.distributionMethod', envelope.documentMeta.distributionMethod);
+    if (isOpen) {
+      // Re-seed from the envelope's current meta on every open (the pattern
+      // envelope-editor-settings-dialog uses), so values edited in Settings
+      // since first mount are what the dialog shows -- and sends.
+      form.reset(createDefaultValues());
     }
 
     // Resync the whole envelope if the envelope is mid saving.
     if (isOpen && (isAutosaving || autosaveError)) {
       void handleSync();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   if (envelope.status !== DocumentStatus.DRAFT || envelope.type !== EnvelopeType.DOCUMENT) {
