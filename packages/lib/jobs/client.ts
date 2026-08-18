@@ -7,6 +7,7 @@ import { SEND_DOCUMENT_CREATED_FROM_DIRECT_TEMPLATE_EMAIL_JOB_DEFINITION } from 
 import { SEND_DOCUMENT_DELETED_EMAILS_JOB_DEFINITION } from './definitions/emails/send-document-deleted-emails';
 import { SEND_DOCUMENT_PENDING_EMAIL_JOB_DEFINITION } from './definitions/emails/send-document-pending-email';
 import { SEND_ORGANISATION_LIMIT_ALERT_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-limit-alert-email';
+import { SEND_ORGANISATION_INVITE_DECLINED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-invite-declined-email';
 import { SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-member-joined-email';
 import { SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-member-left-email';
 import { SEND_OWNER_RECIPIENT_EXPIRED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-owner-recipient-expired-email';
@@ -42,6 +43,7 @@ export const jobsClient = new JobClient([
   SEND_CONFIRMATION_EMAIL_JOB_DEFINITION,
   SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION,
   SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION,
+  SEND_ORGANISATION_INVITE_DECLINED_EMAIL_JOB_DEFINITION,
   SEND_ORGANISATION_LIMIT_ALERT_EMAIL_JOB_DEFINITION,
   SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION,
   SEAL_DOCUMENT_JOB_DEFINITION,

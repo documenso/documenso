@@ -20,6 +20,7 @@ import { ForgotPasswordTemplate } from '../../../templates/forgot-password';
 import { OrganisationAccountLinkConfirmationTemplate } from '../../../templates/organisation-account-link-confirmation';
 import { OrganisationDeleteEmailTemplate } from '../../../templates/organisation-delete';
 import { OrganisationInviteEmailTemplate } from '../../../templates/organisation-invite';
+import { OrganisationInviteDeclinedEmailTemplate } from '../../../templates/organisation-invite-declined';
 import { OrganisationJoinEmailTemplate } from '../../../templates/organisation-join';
 import { OrganisationLeaveEmailTemplate } from '../../../templates/organisation-leave';
 import { OrganisationLimitAlertEmailTemplate } from '../../../templates/organisation-limit-alert';
@@ -267,6 +268,15 @@ export const templates: Record<string, TemplateDefinition> = {
     component: OrganisationJoinEmailTemplate,
     fields: {
       memberName: { type: 'text', label: 'Member name', default: 'Lucas Smith' },
+      organisationName: { type: 'text', label: 'Organisation name', default: 'Documenso' },
+    },
+  },
+  'organisation-invite-declined': {
+    name: 'Organisation invite declined',
+    group: 'Organisations',
+    component: OrganisationInviteDeclinedEmailTemplate,
+    fields: {
+      inviteeEmail: { type: 'text', label: 'Invitee email', default: 'lucas@documenso.com' },
       organisationName: { type: 'text', label: 'Organisation name', default: 'Documenso' },
     },
   },
