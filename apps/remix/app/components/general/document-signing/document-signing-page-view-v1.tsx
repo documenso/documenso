@@ -131,12 +131,17 @@ export const DocumentSigningPageViewV1 = ({
     }
   };
 
-  let senderName = document.user.name ?? '';
-  let senderEmail = `(${document.user.email})`;
+  // includeSenderDetails=true shows the individual sender ("send on behalf of
+  // the team"); false hides them behind the team identity. This matches the
+  // canonical server-side helper (get-envelope-for-recipient-signing.ts) — the
+  // branches here used to be inverted, disclosing the sender's name and email
+  // in exactly the configuration chosen to hide them (#3198).
+  let senderName = document.team?.name ?? '';
+  let senderEmail = document.team?.teamEmail?.email ? `(${document.team.teamEmail.email})` : '';
 
   if (includeSenderDetails) {
-    senderName = document.team?.name ?? '';
-    senderEmail = document.team?.teamEmail?.email ? `(${document.team.teamEmail.email})` : '';
+    senderName = document.user.name ?? '';
+    senderEmail = `(${document.user.email})`;
   }
 
   const selectedSigner = allRecipients?.find((r) => r.id === selectedSignerId);
