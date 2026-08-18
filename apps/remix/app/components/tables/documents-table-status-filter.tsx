@@ -27,7 +27,7 @@ export const DocumentsTableStatusFilter = ({ stats }: DocumentsTableStatusFilter
       status: documentsSearchParams.status,
       page: documentsSearchParams.page,
     },
-    { history: 'push' },
+    { history: 'push', shallow: false },
   );
 
   const selectableStatuses = useMemo(
