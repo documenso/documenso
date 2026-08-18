@@ -220,12 +220,13 @@ enum ApiTokenAlgorithm {
 }
 
 model ApiToken {
-  id        Int               @id @default(autoincrement())
-  name      String
-  token     String            @unique
-  algorithm ApiTokenAlgorithm @default(SHA512)
-  expires   DateTime?
-  createdAt DateTime          @default(now())
+  id         Int               @id @default(autoincrement())
+  name       String
+  token      String            @unique
+  algorithm  ApiTokenAlgorithm @default(SHA512)
+  expires    DateTime?
+  createdAt  DateTime          @default(now())
+  lastUsedAt DateTime?
   userId    Int?
   user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId    Int

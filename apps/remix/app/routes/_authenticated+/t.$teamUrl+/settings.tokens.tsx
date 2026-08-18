@@ -47,6 +47,20 @@ export default function ApiTokensPage() {
         cell: ({ row }) => i18n.date(row.original.createdAt),
       },
       {
+        header: t`Last used`,
+        cell: ({ row }) => {
+          if (!row.original.lastUsedAt) {
+            return (
+              <span className='text-muted-foreground'>
+                <Trans>Never</Trans>
+              </span>
+            );
+          }
+
+          return i18n.date(row.original.lastUsedAt);
+        },
+      },
+      {
         header: t`Expires`,
         cell: ({ row }) => {
           if (!row.original.expires) {

@@ -81,6 +81,17 @@ export const getApiTokenByToken = async ({ token, bypassRateLimit = false }: Get
     });
   }
 
+  // Record usage without blocking the request: token hygiene relies on
+  // knowing which tokens are actively used, not on when this write lands.
+  void prisma.apiToken
+    .update({
+      where: { id: apiToken.id },
+      data: { lastUsedAt: new Date() },
+    })
+    .catch(() => {
+      // A failed usage stamp must never fail the API request it recorded.
+    });
+
   // Handle a silly choice from many moons ago
   if (apiToken.team && !apiToken.user) {
     apiToken.user = apiToken.team.organisation.owner;
