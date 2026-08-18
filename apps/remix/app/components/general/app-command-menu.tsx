@@ -17,7 +17,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import { keepPreviousData } from '@tanstack/react-query';
 import { defaultFilter as commandScore } from 'cmdk';
 import {
@@ -596,9 +596,15 @@ export const AppCommandMenu = ({ open, onOpenChange }: AppCommandMenuProps) => {
 
             <span className="ml-auto text-muted-foreground text-xs">
               {hasValidSearch ? (
-                <Trans>{formatChipCount(totalVisibleCount, isVisibleCountCapped)} results</Trans>
+                isVisibleCountCapped ? (
+                  <Trans>
+                    ≥{totalVisibleCount} <Plural value={totalVisibleCount} one="result" other="results" />
+                  </Trans>
+                ) : (
+                  <Plural value={totalVisibleCount} one="# result" other="# results" />
+                )
               ) : (
-                <Trans>{totalVisibleCount} items</Trans>
+                <Plural value={totalVisibleCount} one="# item" other="# items" />
               )}
             </span>
           </div>
