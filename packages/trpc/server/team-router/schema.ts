@@ -1,5 +1,5 @@
-import { URL_PATTERN, ZNameSchema } from '@documenso/lib/constants/auth';
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { TeamMemberRole } from '@prisma/client';
 import { z } from 'zod';
@@ -30,15 +30,6 @@ export const ZTeamUrlSchema = z
   .regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, 'Team URL can only contain letters, numbers, dashes and underscores.')
   .refine((value) => !PROTECTED_TEAM_URLS.includes(value), {
     message: 'This URL is already in use.',
-  });
-
-export const ZTeamNameSchema = z
-  .string()
-  .trim()
-  .min(3, { message: 'Team name must be at least 3 characters long.' })
-  .max(30, { message: 'Team name must not exceed 30 characters.' })
-  .refine((value) => !URL_PATTERN.test(value), {
-    message: 'Team name cannot contain URLs.',
   });
 
 export const ZCreateTeamEmailVerificationMutationSchema = z.object({

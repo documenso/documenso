@@ -26,11 +26,13 @@ import { appMetaTags } from '~/utils/meta';
 
 const TEMPLATE_VIEWS = ['team', 'organisation'] as const;
 
-type TemplateView = (typeof TEMPLATE_VIEWS)[number];
-
 export function meta() {
   return appMetaTags(msg`Templates`);
 }
+
+// Stable initial value: `useSessionStorage` keeps its setter identity stable
+// only while the initial value reference is stable.
+const EMPTY_ROW_SELECTION: RowSelectionState = {};
 
 export default function TemplatesPage() {
   const team = useCurrentTeam();
@@ -47,7 +49,11 @@ export default function TemplatesPage() {
   const isOrgView = view === 'organisation';
   const showOrgTab = organisation.type !== OrganisationType.PERSONAL;
 
-  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('templates-bulk-selection', {});
+  // Scoped by team so selections made in one team never leak into another.
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
+    `templates-bulk-selection-${team.id}`,
+    EMPTY_ROW_SELECTION,
+  );
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 

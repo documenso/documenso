@@ -15,9 +15,9 @@ export default function SettingsSecurityActivity() {
   return (
     <div>
       <SettingsHeader
+        hideDivider
         title={_(msg`Security activity`)}
         subtitle={_(msg`View all security activity related to your account.`)}
-        hideDivider={true}
       />
 
       <div className="mt-4">

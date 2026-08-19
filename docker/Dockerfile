@@ -19,7 +19,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install -g "turbo@^1.9.3"
+RUN npm install -g "turbo@^2.10.0"
 
 # Outputs to the /out folder
 # source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
@@ -50,6 +50,12 @@ ENV NEXT_PRIVATE_ENCRYPTION_KEY="$NEXT_PRIVATE_ENCRYPTION_KEY"
 ARG NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="DEADBEEF"
 ENV NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="$NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY"
 
+# Sub-path the app is served under (e.g. "/ESign"). Empty = root.
+# Baked into the client bundle by Vite/React Router at build time; also
+# required at runtime for SSR so window.__ENV__ exposes it to the client.
+ARG NEXT_PUBLIC_BASE_PATH=""
+ENV NEXT_PUBLIC_BASE_PATH="$NEXT_PUBLIC_BASE_PATH"
+
 # Telemetry credentials (optional, baked into image at build time)
 ARG NEXT_PRIVATE_TELEMETRY_KEY=""
 ENV NEXT_PRIVATE_TELEMETRY_KEY="$NEXT_PRIVATE_TELEMETRY_KEY"
@@ -70,7 +76,6 @@ COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
 
 COPY --from=builder /app/lingui.config.ts ./lingui.config.ts
-COPY --from=builder /app/patches ./patches
 
 RUN npm ci
 
@@ -79,7 +84,7 @@ COPY --from=builder /app/out/full/ .
 # Finally copy the turbo.json file so that we can run turbo commands
 COPY turbo.json turbo.json
 
-RUN npm install -g "turbo@^1.9.3"
+RUN npm install -g "turbo@^2.10.0"
 
 RUN turbo run build --filter=@documenso/remix...
 
@@ -109,8 +114,6 @@ WORKDIR /app
 COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
 # Copy the tailwind config files across
 COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
-# Copy the patches across
-COPY --from=builder --chown=nodejs:nodejs /app/patches ./patches
 
 RUN npm ci --only=production
 

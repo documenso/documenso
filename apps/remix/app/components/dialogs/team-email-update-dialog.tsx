@@ -1,4 +1,5 @@
 import { trpc } from '@documenso/trpc/react';
+import { ZUpdateTeamEmailMutationSchema } from '@documenso/trpc/server/team-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -19,20 +20,21 @@ import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 export type TeamEmailUpdateDialogProps = {
-  teamEmail: TeamEmail;
+  teamId: number;
+  teamEmail: Pick<TeamEmail, 'email' | 'name'>;
   trigger?: React.ReactNode;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-const ZUpdateTeamEmailFormSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
-});
+const ZUpdateTeamEmailFormSchema = ZUpdateTeamEmailMutationSchema.pick({
+  data: true,
+}).shape.data;
 
 type TUpdateTeamEmailFormSchema = z.infer<typeof ZUpdateTeamEmailFormSchema>;
 
-export const TeamEmailUpdateDialog = ({ teamEmail, trigger, ...props }: TeamEmailUpdateDialogProps) => {
+export const TeamEmailUpdateDialog = ({ teamId, teamEmail, trigger, ...props }: TeamEmailUpdateDialogProps) => {
   const [open, setOpen] = useState(false);
 
   const { t } = useLingui();
@@ -44,6 +46,7 @@ export const TeamEmailUpdateDialog = ({ teamEmail, trigger, ...props }: TeamEmai
     defaultValues: {
       name: teamEmail.name,
     },
+    mode: 'onSubmit',
   });
 
   const { mutateAsync: updateTeamEmail } = trpc.team.email.update.useMutation();
@@ -51,7 +54,7 @@ export const TeamEmailUpdateDialog = ({ teamEmail, trigger, ...props }: TeamEmai
   const onFormSubmit = async ({ name }: TUpdateTeamEmailFormSchema) => {
     try {
       await updateTeamEmail({
-        teamId: teamEmail.teamId,
+        teamId,
         data: {
           name,
         },
