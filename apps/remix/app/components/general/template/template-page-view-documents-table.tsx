@@ -175,7 +175,11 @@ export const TemplatePageViewDocumentsTable = ({ templateId }: TemplatePageViewD
 
         <SearchParamSelector
           paramKey="status"
-          isValueValid={(value) => [...DocumentStatusEnum.COMPLETED].includes(value as unknown as string)}
+          isValueValid={(value) =>
+            [DocumentStatusEnum.COMPLETED, DocumentStatusEnum.PENDING, DocumentStatusEnum.DRAFT].includes(
+              value as unknown as DocumentStatusEnum,
+            )
+          }
         >
           <SelectItem value="all">
             <Trans>Any Status</Trans>
@@ -193,7 +197,7 @@ export const TemplatePageViewDocumentsTable = ({ templateId }: TemplatePageViewD
 
         <SearchParamSelector
           paramKey="source"
-          isValueValid={(value) => [...DocumentSource.TEMPLATE].includes(value as unknown as string)}
+          isValueValid={(value) => [DocumentSource.TEMPLATE].includes(value as unknown as DocumentSource)}
         >
           <SelectItem value="all">
             <Trans>Any Source</Trans>
