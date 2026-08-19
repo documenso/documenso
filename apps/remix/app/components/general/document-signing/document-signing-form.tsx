@@ -151,7 +151,7 @@ export const DocumentSigningForm = ({
                     completeDocument({ nextSigner, accessAuthOptions })
                   }
                   recipient={recipient}
-                  allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
+                  allowDictateNextSigner={nextRecipient && document.documentMeta?.allowDictateNextSigner}
                   defaultNextSigner={
                     nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined
                   }
