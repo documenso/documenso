@@ -3,6 +3,8 @@ import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@prisma/client';
 import { WebhookCallStatus } from '@prisma/client';
 
+import { nanoid } from 'nanoid';
+
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TExecuteWebhookJobDefinition } from './execute-webhook';
 
@@ -17,14 +19,19 @@ export const run = async ({ payload, io: _io }: { payload: TExecuteWebhookJobDef
 
   const { webhookUrl: url, secret } = webhook;
 
+  // Stable across retry attempts: minted when the job payload was built. The
+  // fallback only applies to jobs queued before the field existed.
+  const deliveryId = payload.deliveryId ?? nanoid();
+
   const payloadData = {
+    deliveryId,
     event,
     payload: data,
     createdAt: new Date().toISOString(),
     webhookEndpoint: url,
   };
 
-  const result = await executeWebhookCall({ url, body: payloadData, secret });
+  const result = await executeWebhookCall({ url, body: payloadData, secret, deliveryId });
 
   await prisma.webhookCall.create({
     data: {

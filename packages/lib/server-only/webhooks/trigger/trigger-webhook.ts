@@ -1,4 +1,5 @@
 import type { WebhookTriggerEvents } from '@prisma/client';
+import { nanoid } from 'nanoid';
 
 import { jobs } from '../../../jobs/client';
 import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';
@@ -26,6 +27,9 @@ export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWeb
             event,
             webhookId: webhook.id,
             data,
+            // Minted per delivery and constant across retry attempts, so
+            // consumers can deduplicate the retries the queue performs (#3204).
+            deliveryId: nanoid(),
           },
         });
       }),

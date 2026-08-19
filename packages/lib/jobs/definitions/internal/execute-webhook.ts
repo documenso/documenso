@@ -10,6 +10,10 @@ const EXECUTE_WEBHOOK_JOB_DEFINITION_SCHEMA = z.object({
   event: z.nativeEnum(WebhookTriggerEvents),
   webhookId: z.string(),
   data: z.unknown(),
+  // Minted when the job payload is built so it stays constant across retry
+  // attempts; optional because jobs queued before the field existed must
+  // still validate. The handler falls back to generating one.
+  deliveryId: z.string().optional(),
   requestMetadata: ZRequestMetadataSchema.optional(),
 });
 
