@@ -26,6 +26,7 @@ import { useState } from 'react';
 import { match, P } from 'ts-pattern';
 
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
+import { getSigningCompletionErrorMessage } from '~/utils/toast-error-messages';
 
 import { useRequiredDocumentSigningContext } from '../../general/document-signing/document-signing-provider';
 import { DocumentSigningRejectDialog } from '../../general/document-signing/document-signing-reject-dialog';
@@ -141,9 +142,12 @@ export const MultiSignDocumentSigningView = ({
     } catch (err) {
       onDocumentError?.();
 
+      const error = AppError.parseError(err);
+      const toastMessage = getSigningCompletionErrorMessage(error.code);
+
       toast({
-        title: _(msg`Error`),
-        description: _(msg`Failed to complete the document. Please try again.`),
+        title: _(toastMessage.title),
+        description: _(toastMessage.description),
         variant: 'destructive',
       });
     } finally {

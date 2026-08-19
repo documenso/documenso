@@ -125,11 +125,10 @@ export const updateTeamSettingsRoute = authenticatedProcedure
     const isChangingIncludeSenderDetails =
       includeSenderDetails !== undefined && includeSenderDetails !== currentIncludeSenderDetails;
 
-    if (isPersonalOrganisation && isChangingIncludeSenderDetails) {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'Personal teams cannot update the sender details',
-      });
-    }
+    // Personal teams cannot change the sender details — drop the field (no-op)
+    // instead of rejecting the whole update.
+    const derivedIncludeSenderDetails =
+      isPersonalOrganisation && isChangingIncludeSenderDetails ? undefined : includeSenderDetails;
 
     // Sanitize custom branding CSS at write time. `null` means inherit-from-org
     // for teams, so only run the sanitiser when an explicit string is provided.
@@ -164,7 +163,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             documentLanguage,
             documentTimezone,
             documentDateFormat,
-            includeSenderDetails,
+            includeSenderDetails: derivedIncludeSenderDetails,
             includeSigningCertificate,
             includeAuditLog,
             typedSignatureEnabled,
