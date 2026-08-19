@@ -148,15 +148,11 @@ export const EnvelopeSignerCompleteDialog = () => {
       const error = AppError.parseError(err);
 
       if (error.code !== AppErrorCode.TWO_FACTOR_AUTH_FAILED) {
-        toast({
-          title: t`Something went wrong`,
-          description: t`We were unable to submit this document at this time. Please try again later.`,
-          variant: 'destructive',
-        });
-
         onDocumentError?.();
       }
 
+      // Rethrow so DocumentSigningCompleteDialog can handle 2FA retries and
+      // toast a specific completion error message.
       throw err;
     }
   };
@@ -224,14 +220,11 @@ export const EnvelopeSignerCompleteDialog = () => {
       }
     } catch (err) {
       console.log('err', err);
-      toast({
-        title: t`Something went wrong`,
-        description: t`We were unable to submit this document at this time. Please try again later.`,
-        variant: 'destructive',
-      });
 
       onDocumentError?.();
 
+      // Rethrow so DocumentSigningCompleteDialog can toast a specific
+      // completion error message.
       throw err;
     }
   };
