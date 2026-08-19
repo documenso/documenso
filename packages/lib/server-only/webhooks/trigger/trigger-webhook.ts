@@ -6,13 +6,19 @@ import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigg
 export type TriggerWebhookOptions = {
   event: WebhookTriggerEvents;
   data: Record<string, unknown>;
+  /**
+   * Retained for caller compatibility and context, but NOT used to scope the
+   * lookup: webhooks are delivered to every enabled webhook on `teamId` for the
+   * event, regardless of which user owns the triggering resource. See
+   * get-all-webhooks-by-event-trigger.ts for why.
+   */
   userId: number;
   teamId: number;
 };
 
-export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWebhookOptions) => {
+export const triggerWebhook = async ({ event, data, teamId }: TriggerWebhookOptions) => {
   try {
-    const registeredWebhooks = await getAllWebhooksByEventTrigger({ event, userId, teamId });
+    const registeredWebhooks = await getAllWebhooksByEventTrigger({ event, teamId });
 
     if (registeredWebhooks.length === 0) {
       return;
