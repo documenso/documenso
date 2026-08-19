@@ -24,6 +24,7 @@ import {
   UserIcon,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
@@ -88,11 +89,18 @@ export const fieldButtonList = [
 type EnvelopeEditorFieldDragDropProps = {
   selectedRecipientId: number | null;
   selectedEnvelopeItemId: string | null;
+
+  /**
+   * Called when the user picks a field type from the palette, before the field
+   * is placed on the document.
+   */
+  onFieldSelect?: (fieldType: FieldType) => void;
 };
 
 export const EnvelopeEditorFieldDragDrop = ({
   selectedRecipientId,
   selectedEnvelopeItemId,
+  onFieldSelect,
 }: EnvelopeEditorFieldDragDropProps) => {
   const { envelope, editorFields, isTemplate, getRecipientColorKey } = useCurrentEnvelopeEditor();
 
@@ -245,7 +253,10 @@ export const EnvelopeEditorFieldDragDrop = ({
             disabled={isFieldsDisabled}
             key={field.type}
             type="button"
-            onClick={() => setSelectedField(field.type)}
+            onClick={() => {
+              setSelectedField(field.type);
+              onFieldSelect?.(field.type);
+            }}
             onMouseDown={() => setSelectedField(field.type)}
             data-selected={selectedField === field.type ? true : undefined}
             className={cn(
@@ -267,27 +278,35 @@ export const EnvelopeEditorFieldDragDrop = ({
         ))}
       </div>
 
-      {selectedField && (
-        <div
-          className={cn(
-            'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white font-noto text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted',
-            selectedRecipientStyles.base,
-            selectedField === FieldType.SIGNATURE && 'font-signature',
-            {
-              '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
-              'dark:text-black/60': isFieldWithinBounds,
-            },
-          )}
-          style={{
-            top: coords.y,
-            left: coords.x,
-            height: fieldBounds.current.height,
-            width: fieldBounds.current.width,
-          }}
-        >
-          <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">{t(FRIENDLY_FIELD_TYPE[selectedField])}</span>
-        </div>
-      )}
+      {/*
+       * Portalled to the body because the fields panel ancestor carries a CSS
+       * transform (the slide-in overlay below `md`), which would otherwise
+       * become the containing block for this fixed-position preview and pin
+       * it inside the panel instead of the viewport.
+       */}
+      {selectedField &&
+        createPortal(
+          <div
+            className={cn(
+              'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white font-noto text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted',
+              selectedRecipientStyles.base,
+              selectedField === FieldType.SIGNATURE && 'font-signature',
+              {
+                '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
+                'dark:text-black/60': isFieldWithinBounds,
+              },
+            )}
+            style={{
+              top: coords.y,
+              left: coords.x,
+              height: fieldBounds.current.height,
+              width: fieldBounds.current.width,
+            }}
+          >
+            <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">{t(FRIENDLY_FIELD_TYPE[selectedField])}</span>
+          </div>,
+          document.body,
+        )}
     </>
   );
 };

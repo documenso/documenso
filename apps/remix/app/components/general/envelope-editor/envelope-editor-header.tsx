@@ -70,17 +70,18 @@ export default function EnvelopeEditorHeader() {
   return (
     <nav className="w-full border-border border-b bg-background px-4 py-3 md:px-6">
       <div className="flex items-center justify-between gap-4">
-        <div className="flex min-w-0 flex-1 items-center space-x-4">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
+          {/* The logo and separator are hidden on small viewports to leave room for the title. */}
           {editorConfig.embedded?.customBrandingLogo ? (
-            <img src={`/api/branding/logo/team/${envelope.teamId}`} alt="Logo" className="h-6 w-auto" />
+            <img src={`/api/branding/logo/team/${envelope.teamId}`} alt="Logo" className="hidden h-6 w-auto sm:block" />
           ) : (
-            <Link to="/">
+            <Link to="/" className="hidden sm:block">
               <BrandingLogo className="h-6 w-auto" />
             </Link>
           )}
-          <Separator orientation="vertical" className="h-6 shrink-0" />
+          <Separator orientation="vertical" className="hidden h-6 shrink-0 sm:block" />
 
-          <div className="flex min-w-0 items-center space-x-2">
+          <div className="flex min-w-0 items-center gap-2">
             <EnvelopeItemTitleInput
               dataTestId="envelope-title-input"
               disabled={!envelopeItemPermissions.canTitleBeChanged || !allowConfigureEnvelopeTitle}
@@ -98,19 +99,19 @@ export default function EnvelopeEditorHeader() {
             {envelope.type === EnvelopeType.TEMPLATE && (
               <>
                 {envelope.templateType === TemplateType.PRIVATE && (
-                  <Badge variant="secondary" className="shrink-0">
+                  <Badge variant="secondary" className="hidden shrink-0 sm:inline-flex">
                     <LockIcon className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-300" />
                     <Trans>Private Template</Trans>
                   </Badge>
                 )}
                 {envelope.templateType === TemplateType.ORGANISATION && (
-                  <Badge variant="orange" className="shrink-0">
+                  <Badge variant="orange" className="hidden shrink-0 sm:inline-flex">
                     <Building2Icon className="mr-2 size-4" />
                     <Trans>Organisation Template</Trans>
                   </Badge>
                 )}
                 {envelope.templateType === TemplateType.PUBLIC && (
-                  <Badge variant="default" className="shrink-0">
+                  <Badge variant="default" className="hidden shrink-0 sm:inline-flex">
                     <Globe2Icon className="mr-2 h-4 w-4 text-green-500 dark:text-green-300" />
                     <Trans>Public Template</Trans>
                   </Badge>
@@ -118,7 +119,7 @@ export default function EnvelopeEditorHeader() {
 
                 {envelope.directLink?.token && (
                   <TemplateDirectLinkBadge
-                    className="shrink-0 py-1"
+                    className="hidden shrink-0 py-1 sm:flex"
                     token={envelope.directLink.token}
                     enabled={envelope.directLink.enabled}
                   />
@@ -180,9 +181,9 @@ export default function EnvelopeEditorHeader() {
         <div className="flex shrink-0 items-center space-x-2">
           {allowAttachments &&
             (isEmbedded ? (
-              <EmbeddedEditorAttachmentPopover buttonSize="sm" />
+              <EmbeddedEditorAttachmentPopover buttonSize="sm" collapseLabelOnMobile />
             ) : (
-              <DocumentAttachmentsPopover envelopeId={envelope.id} buttonSize="sm" />
+              <DocumentAttachmentsPopover envelopeId={envelope.id} buttonSize="sm" collapseLabelOnMobile />
             ))}
 
           {editorConfig.settings && (
@@ -202,8 +203,10 @@ export default function EnvelopeEditorHeader() {
                   documentRootPath={relativePath.documentRootPath}
                   trigger={
                     <Button size="sm">
-                      <SendIcon className="mr-2 h-4 w-4" />
-                      <Trans>Send Document</Trans>
+                      <SendIcon className="h-4 w-4 sm:mr-2" />
+                      <span className="sr-only sm:not-sr-only">
+                        <Trans>Send Document</Trans>
+                      </span>
                     </Button>
                   }
                 />
@@ -212,8 +215,10 @@ export default function EnvelopeEditorHeader() {
                   envelope={envelope}
                   trigger={
                     <Button size="sm">
-                      <SendIcon className="mr-2 h-4 w-4" />
-                      <Trans>Resend Document</Trans>
+                      <SendIcon className="h-4 w-4 sm:mr-2" />
+                      <span className="sr-only sm:not-sr-only">
+                        <Trans>Resend Document</Trans>
+                      </span>
                     </Button>
                   }
                 />
