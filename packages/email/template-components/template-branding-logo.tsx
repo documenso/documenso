@@ -25,7 +25,9 @@ export const TemplateBrandingLogo = ({ assetBaseUrl, className = 'mb-4 h-6' }: T
     return <Img src={documensoLogoUrl} alt="Documenso Logo" className={className} />;
   }
 
-  const brandingLogo = <Img src={branding.brandingLogo} alt="Branding Logo" className={className} />;
+  const brandingLogoClassName = className.replace(/\bh-\S+\b/, '').trim() + ` ${branding.brandingLogoSize}`;
+
+  const brandingLogo = <Img src={branding.brandingLogo} alt="Branding Logo" className={brandingLogoClassName} />;
 
   const safeBrandingUrl = getSafeBrandingUrl(branding.brandingUrl);
 
