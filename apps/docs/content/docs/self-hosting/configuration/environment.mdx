@@ -443,11 +443,11 @@ Telemetry collects only: app version, installation ID, and node ID. No personal 
 
 ## Enterprise Features
 
-These variables require an active [Enterprise Edition](/docs/policies/enterprise-edition) license. Obtain a license key from [license.documenso.com](https://license.documenso.com) and set it below to unlock enterprise features such as SSO, embed editor, and 21 CFR Part 11 compliance.
+These variables require an active [Enterprise Edition](/docs/policies/enterprise-edition) license. Obtain a license key from [license.documenso.com](https://license.documenso.com) and set it below to unlock enterprise features such as SSO, embed editor, and 21 CFR Part 11 compliance. See [Apply Your License Key](/docs/self-hosting/configuration/license) for step-by-step setup.
 
 | Variable                             | Description                                      |
 | ------------------------------------ | ------------------------------------------------ |
-| `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` | License key for enterprise features              |
+| `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` | License key for enterprise features — see [Apply Your License Key](/docs/self-hosting/configuration/license) for how to apply it |
 | `NEXT_PRIVATE_STRIPE_API_KEY`        | Stripe API key for billing                       |
 | `NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET` | Stripe webhook secret                            |
 | `NEXT_PRIVATE_SES_ACCESS_KEY_ID`     | AWS SES access key for email domain verification |
@@ -510,4 +510,5 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password"
 - [Email Configuration](/docs/self-hosting/configuration/email) - Configure email delivery
 - [Storage Configuration](/docs/self-hosting/configuration/storage) - Set up S3 storage
 - [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Configure document signing
+- [Organisation Limits](/docs/self-hosting/configuration/organisation-limits) - Set per-organisation document, email, and API limits from the admin panel
 - [Troubleshooting](/docs/self-hosting/maintenance/troubleshooting) - Common configuration issues

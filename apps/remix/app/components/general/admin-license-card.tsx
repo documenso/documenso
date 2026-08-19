@@ -1,3 +1,4 @@
+import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import type { TCachedLicense } from '@documenso/lib/types/license';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
 import { trpc } from '@documenso/trpc/react';
@@ -9,6 +10,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import {
   ArrowRightIcon,
   CheckCircle2Icon,
+  CopyIcon,
   EyeIcon,
   EyeOffIcon,
   KeyRoundIcon,
@@ -29,6 +31,8 @@ type AdminLicenseCardProps = {
 
 export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
   const { t, i18n } = useLingui();
+  const { toast } = useToast();
+  const [, copy] = useCopyToClipboard();
   const [isLicenseKeyVisible, setIsLicenseKeyVisible] = useState(false);
 
   const { license } = licenseData || {};
@@ -87,7 +91,7 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
           <KeyRoundIcon className="h-4 w-4 text-muted-foreground" />
         </div>
 
-        <h3 className="mb-2 flex items-end font-medium text-primary-forground text-sm leading-tight">
+        <h3 className="mb-2 flex items-end font-medium text-foreground text-sm leading-tight">
           <Trans>Documenso License</Trans>
         </h3>
 
@@ -146,6 +150,24 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
               onClick={() => setIsLicenseKeyVisible((prevState) => !prevState)}
             >
               {isLicenseKeyVisible ? <EyeOffIcon className="h-3.5 w-3.5" /> : <EyeIcon className="h-3.5 w-3.5" />}
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 text-muted-foreground"
+              aria-label={t`Copy license key`}
+              onClick={async () =>
+                copy(license.licenseKey).then(() => {
+                  toast({
+                    title: t`Copied to clipboard`,
+                    description: t`The license key has been copied to your clipboard`,
+                  });
+                })
+              }
+            >
+              <CopyIcon className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>

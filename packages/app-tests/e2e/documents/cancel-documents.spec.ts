@@ -7,7 +7,7 @@ import { expect, type Page, test } from '@playwright/test';
 import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
-import { checkDocumentTabCount } from '../fixtures/documents';
+import { checkDocumentCounts, selectDocumentStatusFilter } from '../fixtures/documents';
 import { expectToastTextToBeVisible, openDropdownMenu } from '../fixtures/generic';
 
 test.describe.configure({ mode: 'serial' });
@@ -61,13 +61,10 @@ test('[DOCUMENTS]: cancelling a pending document keeps it in the owner dashboard
   await expectToastTextToBeVisible(page, 'Document cancelled');
 
   // The document must remain in the dashboard, unlike deleting a pending document.
-  await checkDocumentTabCount(page, 'Inbox', 0);
-  await checkDocumentTabCount(page, 'Pending', 0);
-  await checkDocumentTabCount(page, 'Cancelled', 1);
-  await checkDocumentTabCount(page, 'All', 1);
+  await checkDocumentCounts(page, { inbox: 0, pending: 0, cancelled: 1, all: 1 });
 
   // The cancelled document is still listed.
-  await page.getByRole('tab', { name: 'Cancelled' }).click();
+  await selectDocumentStatusFilter(page, 'Cancelled');
   await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).toBeVisible();
 
   // The envelope status is persisted as CANCELLED.
@@ -131,7 +128,7 @@ test('[DOCUMENTS]: a cancelled document can be deleted, hiding it from the owner
   await expectToastTextToBeVisible(page, 'Document cancelled');
 
   // Delete the now-cancelled document. Being terminal, it should soft delete (hide).
-  await page.getByRole('tab', { name: 'Cancelled' }).click();
+  await selectDocumentStatusFilter(page, 'Cancelled');
 
   const documentActionBtn = page
     .locator('tr', { hasText: 'Document 1 - Pending' })
