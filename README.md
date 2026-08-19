@@ -68,7 +68,7 @@ Join us in creating the next generation of open trust infrastructure.
 
 Contact us if you are interested in our Enterprise plan for large organizations that need extra flexibility and control.
 
-<a href="https://cal.com/timurercan/enterprise-customers?utm_source=banner&utm_campaign=oss"><img alt="Book us with Cal.com" src="https://cal.com/book-with-cal-dark.svg" /></a>
+<a href="https://cal.com/timurercan/30min"><img alt="Book us with Cal.com" src="https://cal.com/book-with-cal-dark.svg" /></a>
 
 ## Tech Stack
 
