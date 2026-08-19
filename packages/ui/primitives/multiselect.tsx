@@ -259,33 +259,40 @@ const MultiSelect = ({
       setOptions(transToGroupOption(res || [], groupBy));
     };
 
-    // eslint-disable-next-line @typescript-eslint/require-await
-    const exec = async () => {
+    const exec = () => {
       if (!onSearchSync || !open) {
         return;
       }
 
-      if (triggerSearchOnFocus) {
-        doSearchSync();
-      }
-
-      if (debouncedSearchTerm) {
+      if (debouncedSearchTerm || triggerSearchOnFocus) {
         doSearchSync();
       }
     };
 
-    void exec();
+    exec();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm, groupBy, open, triggerSearchOnFocus]);
 
   useEffect(() => {
     /** async search */
 
+    let cancelled = false;
+
     const doSearch = async () => {
       setIsLoading(true);
-      const res = await onSearch?.(debouncedSearchTerm);
-      setOptions(transToGroupOption(res || [], groupBy));
-      setIsLoading(false);
+      try {
+        const res = await onSearch?.(debouncedSearchTerm);
+        if (cancelled) {
+          return;
+        }
+        setOptions(transToGroupOption(res || [], groupBy));
+      } catch {
+        // Swallow search errors; isLoading is reset in the finally block.
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
     };
 
     const exec = async () => {
@@ -293,16 +300,16 @@ const MultiSelect = ({
         return;
       }
 
-      if (triggerSearchOnFocus) {
-        await doSearch();
-      }
-
-      if (debouncedSearchTerm) {
+      if (debouncedSearchTerm || triggerSearchOnFocus) {
         await doSearch();
       }
     };
 
     void exec();
+
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm, groupBy, open, triggerSearchOnFocus]);
 
@@ -431,6 +438,7 @@ const MultiSelect = ({
               >
                 {option.label}
                 <button
+                  type="button"
                   className="absolute -inset-y-px -end-px flex size-7 items-center justify-center rounded-e-md border border-transparent p-0 text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -439,7 +447,7 @@ const MultiSelect = ({
                   }}
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
+                    e.stopPropagation();  
                   }}
                   onClick={() => handleUnselect(option)}
                   aria-label="Remove"
@@ -467,9 +475,6 @@ const MultiSelect = ({
             }}
             onFocus={(event) => {
               setOpen(true);
-              if (triggerSearchOnFocus) {
-                void onSearch?.(debouncedSearchTerm);
-              }
               inputProps?.onFocus?.(event);
             }}
             placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
