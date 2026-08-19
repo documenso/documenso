@@ -161,6 +161,9 @@ export default function ApiTokensPage() {
                   <Skeleton className="h-4 w-16 rounded-full" />
                 </TableCell>
                 <TableCell>
+                  <Skeleton className="h-4 w-16 rounded-full" />
+                </TableCell>
+                <TableCell>
                   <Skeleton className="h-4 w-12 rounded-full" />
                 </TableCell>
               </>

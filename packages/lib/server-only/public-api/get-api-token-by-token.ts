@@ -1,6 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { logger } from '../../utils/logger';
 import { hashString } from '../auth/hash';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 
@@ -105,7 +106,13 @@ export const getApiTokenByToken = async ({ token, bypassRateLimit = false }: Get
         lastUsedAt: new Date(),
       },
     })
-    .catch(() => null);
+    .catch((err) => {
+      logger.warn({
+        msg: 'Failed to update API token lastUsedAt',
+        apiTokenId: apiToken.id,
+        err,
+      });
+    });
 
   return {
     ...apiToken,
