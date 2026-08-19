@@ -13,7 +13,7 @@ export const getDocumentStats = async () => {
     },
   });
 
-  const stats: Record<Exclude<ExtendedDocumentStatus, 'INBOX'>, number> = {
+  const stats: Record<Exclude<ExtendedDocumentStatus, 'INBOX' | 'EXPIRED'>, number> = {
     [ExtendedDocumentStatus.DRAFT]: 0,
     [ExtendedDocumentStatus.PENDING]: 0,
     [ExtendedDocumentStatus.COMPLETED]: 0,
