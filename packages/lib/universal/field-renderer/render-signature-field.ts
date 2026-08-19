@@ -14,7 +14,7 @@ let SkiaImage: any;
 
 void (async () => {
   if (typeof window === 'undefined') {
-    const mod = await import('skia-canvas');
+    const mod = await import('@documenso/skia-canvas');
     SkiaImage = mod.Image;
   }
 })();

@@ -270,7 +270,7 @@ export const EnvelopeEditorFieldDragDrop = ({
       {selectedField && (
         <div
           className={cn(
-            'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white font-noto text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted-background',
+            'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white font-noto text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted',
             selectedRecipientStyles.base,
             selectedField === FieldType.SIGNATURE && 'font-signature',
             {

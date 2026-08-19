@@ -56,6 +56,7 @@ import { useCurrentTeam } from '~/providers/team';
 
 import { EnvelopeEditorFieldDragDrop } from './envelope-editor-fields-drag-drop';
 import { EnvelopeEditorFieldsPageRenderer } from './envelope-editor-fields-page-renderer';
+import { EnvelopeEditorInvalidDirectTemplateAlert } from './envelope-editor-invalid-direct-template-alert';
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
 
@@ -299,6 +300,8 @@ export const EnvelopeEditorFieldsPage = () => {
               : undefined
           }
         />
+
+        <EnvelopeEditorInvalidDirectTemplateAlert />
 
         {/* Document View */}
         <div className="mt-4 flex h-full flex-col items-center justify-center">
