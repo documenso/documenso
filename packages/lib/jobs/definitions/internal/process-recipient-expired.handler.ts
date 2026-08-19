@@ -68,7 +68,6 @@ export const run = async ({ payload, io }: { payload: TProcessRecipientExpiredJo
   await triggerWebhook({
     event: WebhookTriggerEvents.RECIPIENT_EXPIRED,
     data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
-    userId: envelope.userId,
     teamId: envelope.teamId,
   });
 

@@ -239,7 +239,6 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_REMINDER_SENT,
       data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
-      userId: envelope.userId,
       teamId: envelope.teamId,
     });
   }
