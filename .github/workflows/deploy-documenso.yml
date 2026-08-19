@@ -4,11 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      run_migrations:
-        description: 'Run Prisma database migrations'
-        type: boolean
-        default: false
 
 env:
   GCP_PROJECT_ID: heimwatt-app-ffe6c
@@ -57,14 +52,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Run Prisma migrations
-        if: inputs.run_migrations == true
-        run: |
-          gcloud run jobs execute documenso-migrate \
-            --region=${{ env.GCP_REGION }} \
-            --project=${{ env.GCP_PROJECT_ID }} \
-            --wait
-
+      # Migrationen laufen nicht hier: docker/start.sh ruft beim Start jedes
+      # Containers `prisma migrate deploy` auf. Der frueher an dieser Stelle
+      # aufgerufene Job documenso-migrate war defekt (fehlendes --schema) und
+      # dadurch wirkungslos — er ist entfernt.
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
