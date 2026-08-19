@@ -54,10 +54,11 @@ export const updateSubscriptionClaimRoute = adminProcedure
     }
   });
 
-function getNewTruthyFlags(a: Partial<TClaimFlags>, b: Partial<TClaimFlags>): Record<keyof TClaimFlags, true> {
+function getNewTruthyFlags(a: Partial<TClaimFlags>, b: Partial<TClaimFlags>) {
   const flags: { [key in keyof TClaimFlags]?: true } = {};
 
   for (const key in b) {
+    // SAFETY: `b` is a Partial<TClaimFlags>, so its enumerable keys are TClaimFlags keys.
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const typedKey = key as keyof TClaimFlags;
 
@@ -66,6 +67,5 @@ function getNewTruthyFlags(a: Partial<TClaimFlags>, b: Partial<TClaimFlags>): Re
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return flags as Record<keyof TClaimFlags, true>;
+  return flags;
 }
