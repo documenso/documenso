@@ -312,6 +312,12 @@ msgstr "Campo {0}"
 msgid "{0} has invited you to {recipientActionVerb} the document \"{1}\"."
 msgstr "{0} ti ha invitato a {recipientActionVerb} il documento \"{1}\"."
 
+#. placeholder {0}: organisation.name
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "{0} has invited you to sign this document."
+msgstr ""
+
 #. placeholder {0}: team.name
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 msgid "{0} invited you to {recipientActionVerb} a document"
@@ -1221,6 +1227,10 @@ msgstr ""
 msgid "Account unlinked"
 msgstr "Account scollegato"
 
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Accounts are automatically added to your organisation on sign-in"
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Acknowledgment"
 msgstr "Riconoscimento"
@@ -1817,10 +1827,6 @@ msgstr "Si è verificato un errore durante la firma automatica del documento, al
 #: apps/remix/app/components/dialogs/envelopes-bulk-cancel-dialog.tsx
 msgid "An error occurred while cancelling the documents."
 msgstr "Si è verificato un errore durante l’annullamento dei documenti."
-
-#: apps/remix/app/components/general/document-signing/document-signing-form.tsx
-msgid "An error occurred while completing the document. Please try again."
-msgstr "Si è verificato un errore durante il completamento del documento. Riprova."
 
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "An error occurred while creating document from template."
@@ -2455,6 +2461,10 @@ msgstr "Dimensione del raggio del bordo in unità REM (ad es. 0.5rem)."
 msgid "Bottom"
 msgstr "Inferiore"
 
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Brand accent"
+msgstr ""
+
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Colours"
 msgstr "Colori del brand"
@@ -2988,6 +2998,14 @@ msgstr "Elenco di domini email, separati da virgola, da bloccare per la registra
 msgid "Communication"
 msgstr "Comunicazione"
 
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Company details"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Company details and website in email footers"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Compare all plans and features in detail"
 msgstr "Confronta tutti i piani e le caratteristiche in dettaglio"
@@ -3174,6 +3192,11 @@ msgstr "Consenso alle transazioni elettroniche"
 msgid "Contact Information"
 msgstr "Informazioni di contatto"
 
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Contact Sales"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Contact sales here"
 msgstr "Contatta le vendite qui"
@@ -3181,6 +3204,10 @@ msgstr "Contatta le vendite qui"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Contact us"
 msgstr "Contattaci"
+
+#: apps/remix/app/components/general/settings-upsell/settings-upsell-card.tsx
+msgid "Contact your organisation owner to upgrade plans."
+msgstr ""
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Content"
@@ -3233,6 +3260,10 @@ msgstr "Continua visualizzando il documento."
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "Continue to login"
 msgstr "Continua per accedere"
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Continue with SSO"
+msgstr ""
 
 #: apps/remix/app/components/forms/reminder-preferences-form.tsx
 msgid "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
@@ -4335,6 +4366,10 @@ msgstr "Autenticazione accesso documento aggiornata"
 msgid "Document All"
 msgstr "Documenta Tutto"
 
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "Document already completed"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-signing/envelope-signing-complete-dialog.tsx
 msgid "Document already signed"
 msgstr ""
@@ -4345,6 +4380,7 @@ msgstr "Documento Approvato"
 
 #: apps/remix/app/components/dialogs/envelope-cancel-dialog.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
+#: apps/remix/app/utils/toast-error-messages.ts
 msgid "Document cancelled"
 msgstr "Documento annullato"
 
@@ -4519,9 +4555,17 @@ msgctxt "Audit log format"
 msgid "Document moved to team"
 msgstr "Documento spostato al team"
 
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "Document no longer available"
+msgstr ""
+
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Document no longer available to sign"
 msgstr "Documento non più disponibile per la firma"
+
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "Document not ready"
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
@@ -4550,6 +4594,7 @@ msgstr "Preferenze del documento aggiornate"
 
 #: apps/remix/app/components/general/document-signing/document-signing-reject-dialog.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
+#: apps/remix/app/utils/toast-error-messages.ts
 msgid "Document rejected"
 msgstr "Documento rifiutato"
 
@@ -4977,6 +5022,10 @@ msgstr "Es. 100"
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "e.g. Resend (free plans)"
 msgstr "es. Resend (piani gratuiti)"
+
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Easy DNS setup with auto-generated DKIM and SPF records"
+msgstr ""
 
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
@@ -5496,6 +5545,8 @@ msgid "Enter your text here"
 msgstr "Inserisci il tuo testo qui"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
 msgid "Enterprise"
 msgstr "Impresa"
 
@@ -5562,7 +5613,6 @@ msgstr "Busta aggiornata"
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
-#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx
@@ -5573,7 +5623,6 @@ msgstr "Busta aggiornata"
 #: apps/remix/app/components/general/document-signing/document-signing-dropdown-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-email-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-email-field.tsx
-#: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-initials-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-initials-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
@@ -5742,10 +5791,6 @@ msgstr "Estrazione dei dettagli di contatto in corso"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Failed"
 msgstr "Non riuscito"
-
-#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
-msgid "Failed to complete the document. Please try again."
-msgstr "Impossibile completare il documento. Riprova."
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
 msgid "Failed to create document. Please try again."
@@ -6147,6 +6192,10 @@ msgstr "Genera link"
 msgid "German"
 msgstr "Tedesco"
 
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Give your members a dedicated single sign-on portal. The SSO portal is available on the Enterprise plan."
+msgstr ""
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Global"
@@ -6378,6 +6427,10 @@ msgstr "Ciao, {userName} <0>({userEmail})</0>"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Hide"
 msgstr "Nascondi"
+
+#: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
+msgid "Hide field"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Hide license key"
@@ -6789,6 +6842,10 @@ msgstr "Attualmente non è il tuo turno di firmare. Torna presto a controllare p
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "Al momento, non è il tuo turno di firmare. Riceverai un'email con le istruzioni quando sarà il tuo turno di firmare il documento."
 
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "It's not your turn to sign yet"
+msgstr ""
+
 #: packages/lib/constants/i18n.ts
 msgid "Italian"
 msgstr "Italiano"
@@ -7105,6 +7162,7 @@ msgstr "Gestisci"
 msgid "Manage {0}'s profile"
 msgstr "Gestisci il profilo di {0}"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Manage a custom SSO login portal for your organisation."
 msgstr "Gestisci un portale di accesso SSO personalizzato per la tua organizzazione."
@@ -7531,6 +7589,10 @@ msgstr "Nome richiesto"
 msgid "Name Settings"
 msgstr "Impostazioni Nome"
 
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Named senders with defaults per team, template or document"
+msgstr ""
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Navigate"
 msgstr ""
@@ -7944,6 +8006,10 @@ msgstr "Una volta configurato il tuo modello, condividi il link ovunque tu vogli
 msgid "One of the documents in the current bundle has a signing role that is not compatible with the current signing experience."
 msgstr "Uno dei documenti nel pacchetto corrente ha un ruolo di firma non compatibile con l'esperienza di firma corrente."
 
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "One or more of your required fields have not been saved. Please refresh the page, complete any empty required fields, and try again."
+msgstr ""
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Only admins can access and view the document"
 msgstr "Solo gli amministratori possono accedere e visualizzare il documento"
@@ -8127,6 +8193,7 @@ msgstr "Ruolo dell'organizzazione"
 msgid "Organisation Settings"
 msgstr "Impostazioni dell'organizzazione"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Organisation SSO Portal"
@@ -8673,6 +8740,11 @@ msgstr "Seleziona almeno un membro da aggiungere al team."
 msgid "Please select how you'd like to receive your verification code."
 msgstr "Seleziona come desideri ricevere il tuo codice di verifica."
 
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Please sign: Example.pdf"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Please try a different domain."
 msgstr "Si prega di provare un altro dominio."
@@ -8858,6 +8930,10 @@ msgstr "Modello pubblico"
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
 msgstr "I modelli pubblici sono collegati al tuo profilo pubblico. Ogni modifica ai modelli pubblici apparirà anche nel tuo profilo pubblico."
+
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Put your own brand on every document you send. Branding is available on the Teams plan and above."
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Quick Actions"
@@ -9185,6 +9261,10 @@ msgstr "Reindirizzamento"
 #. placeholder {0}: oidcProviderLabel || 'OIDC'
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
 msgid "Redirecting to {0}..."
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Redirecting to your identity provider"
 msgstr ""
 
 #: apps/remix/app/components/forms/signup.tsx
@@ -9554,6 +9634,10 @@ msgstr "Header di risposta"
 #: packages/ui/components/document/document-share-button.tsx
 msgid "Rest assured, your document is strictly confidential and will never be shared. Only your signing experience will be highlighted. Share your personalized signing card to showcase your signature!"
 msgstr "Stai tranquillo, il tuo documento è strettamente confidenziale e non sarà mai condiviso. Solo la tua esperienza di firma sarà evidenziata. Condividi la tua carta di firma personalizzata per mostrare la tua firma!"
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Restrict sign-ins by email domain and choose the default role"
+msgstr ""
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Restricted Access"
@@ -10071,6 +10155,10 @@ msgstr "Invia documento"
 msgid "Send Document"
 msgstr "Invia documento"
 
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Send documents from your own domain. Email domains are available on the Enterprise plan."
+msgstr ""
+
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Send documents on behalf of the team using the email address"
 msgstr "Invia documenti a nome del team utilizzando l'indirizzo email"
@@ -10078,6 +10166,10 @@ msgstr "Invia documenti a nome del team utilizzando l'indirizzo email"
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Send documents to recipients immediately"
 msgstr "Invia documenti ai destinatari immediatamente"
+
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Send emails to recipients from your domain"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Send Envelope"
@@ -10125,6 +10217,14 @@ msgstr "Mittente"
 msgid "Sender reported"
 msgstr "Mittente segnalato"
 
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Sending from app.documenso.com"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Sending from your domain"
+msgstr ""
+
 #: apps/remix/app/components/forms/forgot-password.tsx
 msgid "Sending Reset Email..."
 msgstr "Invio dell'email di ripristino..."
@@ -10143,6 +10243,10 @@ msgstr "Inviato"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "Sent this period"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Separate branding per team"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
@@ -10250,6 +10354,7 @@ msgstr "Mostra utilizzo con quote"
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
 #: apps/remix/app/components/general/user-profile-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
@@ -10421,6 +10526,10 @@ msgctxt "Signed document (adjective)"
 msgid "Signed"
 msgstr "Firmato"
 
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Signed in"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-header.tsx
 msgid "Signer"
 msgstr "Firmatario"
@@ -10485,6 +10594,10 @@ msgstr "Firma per"
 msgid "Signing in..."
 msgstr "Accesso in corso..."
 
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "Signing link expired"
+msgstr ""
+
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 msgid "Signing Links"
@@ -10537,6 +10650,10 @@ msgstr "La registrazione è al momento disabilitata o non disponibile per il tuo
 msgid "Since {0}"
 msgstr "Dal {0}"
 
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Single sign-on"
+msgstr ""
+
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Site Banner"
 msgstr "Banner del sito"
@@ -10554,6 +10671,10 @@ msgstr "Salta"
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
+msgstr ""
+
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "Some fields were not saved"
 msgstr ""
 
 #: apps/remix/app/components/general/app-command-menu.tsx
@@ -10577,7 +10698,6 @@ msgstr "Alcuni firmatari non hanno un campo firma assegnato. Assegna almeno 1 ca
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
-#: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -10587,8 +10707,6 @@ msgstr "Alcuni firmatari non hanno un campo firma assegnato. Assegna almeno 1 ca
 #: apps/remix/app/components/general/document-signing/document-signing-auth-page.tsx
 #: apps/remix/app/components/general/document/document-audit-log-download-button.tsx
 #: apps/remix/app/components/general/document/document-certificate-download-button.tsx
-#: apps/remix/app/components/general/envelope-signing/envelope-signing-complete-dialog.tsx
-#: apps/remix/app/components/general/envelope-signing/envelope-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-portal-button.tsx
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
@@ -10609,6 +10727,7 @@ msgstr "Alcuni firmatari non hanno un campo firma assegnato. Assegna almeno 1 ca
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
+#: apps/remix/app/utils/toast-error-messages.ts
 #: apps/remix/app/utils/toast-error-messages.ts
 #: apps/remix/app/utils/toast-error-messages.ts
 #: packages/ui/components/document/document-share-button.tsx
@@ -11137,6 +11256,7 @@ msgstr "URL del team"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
 #: apps/remix/app/components/general/use-admin-search-categories.ts
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -11892,6 +12012,10 @@ msgstr ""
 msgid "This direct link template cannot be used because one or more signers do not have a signature field assigned. Please contact the sender to update the template."
 msgstr ""
 
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "This document can no longer be signed. It may have been removed by the sender, or your signing access may have been revoked. Please contact the sender for a new signing link."
+msgstr ""
+
 #: packages/email/template-components/template-document-super-delete.tsx
 msgid "This document can not be recovered, if you would like to dispute the reason for future documents please contact support."
 msgstr "Questo documento non può essere recuperato, se vuoi contestare la ragione per i documenti futuri, contatta il supporto."
@@ -11920,6 +12044,10 @@ msgstr "Questo documento non può essere duplicato in questo momento. Riprova."
 msgid "This document could not be saved as a template at this time. Please try again."
 msgstr "Questo documento non può essere salvato come modello in questo momento. Riprova."
 
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "This document has already been completed and no further signatures can be added."
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-recipient-selector.tsx
 #: packages/ui/primitives/recipient-selector.tsx
 msgid "This document has already been sent to this recipient. You can no longer edit this recipient."
@@ -11938,13 +12066,25 @@ msgstr "Questo documento è stato annullato dal proprietario e non è più dispo
 msgid "This document has been cancelled by the owner."
 msgstr "Questo documento è stato annullato dal proprietario."
 
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "This document has been cancelled by the sender and can no longer be signed. Please contact the sender if you believe this is a mistake."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "This document has been rejected by a recipient"
 msgstr "Questo documento è stato rifiutato da un destinatario"
 
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "This document has been rejected by a recipient and can no longer be signed."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "This document has been signed by all recipients"
 msgstr "Questo documento è stato firmato da tutti i destinatari"
+
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "This document has not been sent for signing yet. Please wait for the sender to send it before signing."
+msgstr ""
 
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "This document has too many recipients. Please remove some recipients or contact support if you need more."
@@ -11957,6 +12097,10 @@ msgstr "Questo documento è disponibile nel tuo account Documenso. Puoi visualiz
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "This document is currently a draft and has not been sent"
 msgstr "Questo documento è attualmente una bozza e non è stato inviato"
+
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "This document is signed in a set order and other recipients must sign before you. You will receive an email when it is your turn."
+msgstr ""
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "This document is using legacy field insertion, we recommend using the new field insertion method for more accurate results."
@@ -12673,6 +12817,18 @@ msgstr "Documenti illimitati, API e altro"
 msgid "Unlink"
 msgstr "Scollega"
 
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Unlock Branding Preferences"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
+msgid "Unlock Email Domains"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Unlock the Organisation SSO Portal"
+msgstr ""
+
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Unpin"
 msgstr "Rimuovi"
@@ -12845,6 +13001,10 @@ msgstr "Aggiorna"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Upgrade <0>{0}</0> to {planName}"
 msgstr "Aggiorna <0>{0}</0> al {planName}"
+
+#: apps/remix/app/components/general/settings-upsell/settings-upsell-card.tsx
+msgid "Upgrade Plan"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "Upgrade your plan to upload more documents"
@@ -13662,9 +13822,7 @@ msgstr "Non siamo riusciti a impostare il tuo profilo pubblico come pubblico. Pe
 msgid "We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again."
 msgstr "Non siamo riusciti a impostare l'autenticazione a due fattori per il tuo account. Assicurati di aver inserito correttamente il tuo codice e riprova."
 
-#: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
-#: apps/remix/app/components/general/envelope-signing/envelope-signing-complete-dialog.tsx
-#: apps/remix/app/components/general/envelope-signing/envelope-signing-complete-dialog.tsx
+#: apps/remix/app/utils/toast-error-messages.ts
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "We were unable to submit this document at this time. Please try again later."
 msgstr "Non siamo riusciti a inviare questo documento in questo momento. Per favore riprova più tardi."
@@ -13830,6 +13988,11 @@ msgstr "Bentornato, siamo fortunati ad averti."
 msgid "Welcome back! Here's an overview of your account."
 msgstr "Bentornato! Ecco una panoramica del tuo account."
 
+#. placeholder {0}: organisation.name
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Welcome to {0}"
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Welcome to {organisationName}"
 msgstr "Benvenuto a {organisationName}"
@@ -13905,6 +14068,10 @@ msgstr "Ritiro del consenso"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "Within limit"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
+msgid "Works with any OIDC provider — Okta, Entra ID, Google and more"
 msgstr ""
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
@@ -14924,6 +15091,10 @@ msgstr "La tua busta è stata distribuita con successo."
 msgid "Your envelope has been resent successfully."
 msgstr "La tua busta è stata reinviata con successo."
 
+#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
+msgid "Your logo on signing pages and emails"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Your Name"
 msgstr "Il tuo nome"
@@ -15056,6 +15227,10 @@ msgstr "La tua autorizzazione alla firma è scaduta prima che la firma potesse e
 #: apps/remix/app/components/general/document-signing/csc-recipient-blocked-page.tsx
 msgid "Your signing certificate is invalid, expired, or missing a required key. Contact your administrator or signing provider for assistance."
 msgstr "Il tuo certificato di firma non è valido, è scaduto o manca di una chiave richiesta. Contatta l'amministratore o il provider di firma per assistenza."
+
+#: apps/remix/app/utils/toast-error-messages.ts
+msgid "Your signing link has expired. Please contact the sender to request a new one."
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Your signing provider authentication failed"
