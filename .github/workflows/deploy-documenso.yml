@@ -4,6 +4,14 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      preview:
+        description: >-
+          Preview: Revision ohne Traffic unter dem Tag "preview" deployen
+          (URL https://preview---documenso-isexjmthjq-ey.a.run.app). Prod bleibt unberührt.
+          Ohne Haken = normales Deploy mit Traffic.
+        type: boolean
+        default: false
 
 env:
   GCP_PROJECT_ID: heimwatt-app-ffe6c
@@ -45,10 +53,12 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: true
+          # Preview-Builds bekommen nur den Commit-Tag, damit :production/:latest
+          # weiter auf den Stand zeigen, der Traffic hat.
           tags: |
             ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
-            ${{ env.IMAGE_NAME }}:production
-            ${{ env.IMAGE_NAME }}:latest
+            ${{ inputs.preview != true && format('{0}:production', env.IMAGE_NAME) || '' }}
+            ${{ inputs.preview != true && format('{0}:latest', env.IMAGE_NAME) || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -56,16 +66,24 @@ jobs:
       # Containers `prisma migrate deploy` auf. Der frueher an dieser Stelle
       # aufgerufene Job documenso-migrate war defekt (fehlendes --schema) und
       # dadurch wirkungslos — er ist entfernt.
+      # Preview (workflow_dispatch mit Haken): Revision ohne Traffic, erreichbar
+      # nur über die Tag-URL. Zum Freigeben später Traffic umschalten:
+      #   gcloud run services update-traffic documenso --region europe-west3 --to-latest
+      # oder einfach auf main mergen (normales Deploy).
       - name: Deploy to Cloud Run
+        id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.GCP_REGION }}
           image: ${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+          no_traffic: ${{ inputs.preview == true }}
+          tag: ${{ inputs.preview == true && 'preview' || '' }}
 
       - name: Smoke test
         run: |
-          URL="https://esign.heim-watt.de/api/health"
+          URL="${{ inputs.preview == true && steps.deploy.outputs.url || 'https://esign.heim-watt.de' }}/api/health"
+          echo "Checking $URL"
           for i in $(seq 1 10); do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL" 2>/dev/null || echo "000")
             if [ "$STATUS" = "200" ]; then

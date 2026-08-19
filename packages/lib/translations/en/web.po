@@ -1551,6 +1551,10 @@ msgstr "AI features are disabled for your team. Please ask your team owner or or
 msgid "All"
 msgstr "All"
 
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "All {total} fields set"
+msgstr "All {total} fields set"
+
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "All claims"
@@ -2913,6 +2917,7 @@ msgstr "Compare all plans and features in detail"
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
@@ -3480,6 +3485,10 @@ msgstr "Create your account and start using state-of-the-art document signing."
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
 msgstr "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
+
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Create your signature"
+msgstr "Create your signature"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
@@ -4713,11 +4722,16 @@ msgstr "Drag and drop or click to upload"
 msgid "Drag and drop your document here"
 msgstr "Drag and drop your document here"
 
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgctxt "Draw signature"
 msgid "Draw"
 msgstr "Draw"
+
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Draw it once with your finger"
+msgstr "Draw it once with your finger"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Draw signature"
@@ -5797,6 +5811,10 @@ msgstr "Fill in the details to create a new subscription claim."
 msgid "Filter by status"
 msgstr "Filter by status"
 
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Finish to sign bindingly"
+msgstr "Finish to sign bindingly"
+
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Focus ring colour."
 msgstr "Focus ring colour."
@@ -6010,6 +6028,10 @@ msgstr "Go home"
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Go to document"
 msgstr "Go to document"
+
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Go to field"
+msgstr "Go to field"
 
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Go to first page"
@@ -10202,6 +10224,10 @@ msgstr "Signing links have been generated for this document."
 msgid "Signing order is enabled."
 msgstr "Signing order is enabled."
 
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Signing progress"
+msgstr "Signing progress"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Signing Reminders"
 msgstr "Signing Reminders"
@@ -10662,6 +10688,14 @@ msgstr "System Requirements"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "System Theme"
 msgstr "System Theme"
+
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Tap field {index} of {total}"
+msgstr "Tap field {index} of {total}"
+
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Tap the highlighted field in the document"
+msgstr "Tap the highlighted field in the document"
 
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 msgid "Target Organisation"

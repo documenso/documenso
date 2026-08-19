@@ -1,8 +1,10 @@
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { deriveGuidedSigningStep, isGuidedSigningEligible } from '@documenso/lib/heimwatt/guided-signing';
 import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
-import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import { isFieldUnsignedAndRequired, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
+import { env } from '@documenso/lib/utils/env';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
@@ -14,6 +16,7 @@ import {
   DocumentReadOnlyFields,
 } from '@documenso/ui/components/document/document-read-only-fields';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
@@ -41,6 +44,7 @@ import { EmbedClientLoading } from './embed-client-loading';
 import { EmbedDocumentCompleted } from './embed-document-completed';
 import { EmbedDocumentFields } from './embed-document-fields';
 import { EmbedDocumentRejected } from './embed-document-rejected';
+import { GuidedSigningBar } from './heimwatt/guided-signing-bar';
 
 export type EmbedSignDocumentV1ClientPageProps = {
   token: string;
@@ -114,6 +118,15 @@ export const EmbedSignDocumentV1ClientPage = ({
   const signatureValid = !hasSignatureField || (signature && signature.trim() !== '');
 
   const assistantSignersId = useId();
+
+  // heimWatt: guided mobile signing replaces the collapsible widget below md
+  // (HEIMWATT.md). Flag off or any unsupported state → upstream widget only.
+  const isGuidedSigning = isGuidedSigningEligible({
+    featureFlag: env('NEXT_PUBLIC_HEIMWATT_GUIDED_SIGNING'),
+    isAssistantMode,
+    isNameLocked,
+    isEmailLocked,
+  });
 
   const onNextFieldClick = () => {
     validateFieldsInserted(fieldsRequiringValidation);
@@ -301,10 +314,35 @@ export const EmbedSignDocumentV1ClientPage = ({
             />
           </div>
 
+          {/* heimWatt: guided bar below md; the upstream widget is hidden there while it is active */}
+          {isGuidedSigning && (
+            <GuidedSigningBar
+              step={deriveGuidedSigningStep({
+                hasSignatureField,
+                hasSignature: Boolean(signatureValid),
+                requiredFieldCount: fields.filter(
+                  (field) => field.recipientId === recipient.id && isRequiredField(field),
+                ).length,
+                pendingFieldCount: pendingFields.length,
+              })}
+              onNextField={onNextFieldClick}
+              onComplete={throttledOnCompleteClick}
+              isCompleting={isSubmitting}
+              completeDisabled={isThrottled}
+              fullName={fullName}
+              signature={signature ?? ''}
+              onSignatureChange={setSignature}
+              metadata={metadata}
+            />
+          )}
+
           {/* Widget */}
           <div
             key={isExpanded ? 'expanded' : 'collapsed'}
-            className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:bottom-[unset] md:z-auto md:w-[350px] md:px-0"
+            className={cn(
+              'embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:bottom-[unset] md:z-auto md:w-[350px] md:px-0',
+              isGuidedSigning && 'hidden md:block', // heimWatt
+            )}
             data-expanded={isExpanded || undefined}
           >
             <div className="embed--DocumentWidget flex w-full flex-col rounded-xl border border-border bg-widget px-4 py-4 md:py-6">

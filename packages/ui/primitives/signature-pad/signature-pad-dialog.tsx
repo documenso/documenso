@@ -22,6 +22,12 @@ export type SignaturePadDialogProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'o
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
+  // heimWatt: optional controlled mode so an external button (the guided
+  // signing bar, see HEIMWATT.md) can open the pad directly. Leave all three
+  // unset to get the upstream behaviour: a clickable pad preview owning its state.
+  open?: boolean;
+  onOpenChange?: (_open: boolean) => void;
+  hideTrigger?: boolean;
 };
 
 export const SignaturePadDialog = ({
@@ -35,11 +41,67 @@ export const SignaturePadDialog = ({
   uploadSignatureEnabled,
   drawSignatureEnabled,
   dialogConfirmText,
+  open: controlledOpen,
+  onOpenChange,
+  hideTrigger = false,
 }: SignaturePadDialogProps) => {
   const { i18n } = useLingui();
 
-  const [showSignatureModal, setShowSignatureModal] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const [signature, setSignature] = useState<string>(value ?? '');
+
+  // heimWatt: controlled when `open` is passed, otherwise upstream's local state.
+  const showSignatureModal = controlledOpen ?? uncontrolledOpen;
+
+  const setShowSignatureModal = (next: boolean) => {
+    if (controlledOpen === undefined) {
+      setUncontrolledOpen(next);
+    }
+
+    onOpenChange?.(next);
+  };
+
+  const dialog = (
+    <Dialog open={showSignatureModal} onOpenChange={disabled ? undefined : setShowSignatureModal}>
+      <DialogContent hideClose={true} className="p-6 pt-4">
+        <SignaturePad
+          id="signature"
+          fullName={fullName}
+          value={value}
+          className={className}
+          disabled={disabled}
+          onChange={({ value }) => setSignature(value)}
+          typedSignatureEnabled={typedSignatureEnabled}
+          uploadSignatureEnabled={uploadSignatureEnabled}
+          drawSignatureEnabled={drawSignatureEnabled}
+        />
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="ghost">
+              <Trans>Cancel</Trans>
+            </Button>
+          </DialogClose>
+
+          <Button
+            type="button"
+            disabled={!signature}
+            onClick={() => {
+              onChange(signature);
+              setShowSignatureModal(false);
+            }}
+          >
+            {dialogConfirmText ? parseMessageDescriptor(i18n._, dialogConfirmText) : <Trans>Next</Trans>}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
+  // heimWatt: the guided bar brings its own button — render only the dialog.
+  if (hideTrigger) {
+    return dialog;
+  }
 
   return (
     <div
@@ -109,40 +171,7 @@ export const SignaturePadDialog = ({
         )}
       </motion.button>
 
-      <Dialog open={showSignatureModal} onOpenChange={disabled ? undefined : setShowSignatureModal}>
-        <DialogContent hideClose={true} className="p-6 pt-4">
-          <SignaturePad
-            id="signature"
-            fullName={fullName}
-            value={value}
-            className={className}
-            disabled={disabled}
-            onChange={({ value }) => setSignature(value)}
-            typedSignatureEnabled={typedSignatureEnabled}
-            uploadSignatureEnabled={uploadSignatureEnabled}
-            drawSignatureEnabled={drawSignatureEnabled}
-          />
-
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="ghost">
-                <Trans>Cancel</Trans>
-              </Button>
-            </DialogClose>
-
-            <Button
-              type="button"
-              disabled={!signature}
-              onClick={() => {
-                onChange(signature);
-                setShowSignatureModal(false);
-              }}
-            >
-              {dialogConfirmText ? parseMessageDescriptor(i18n._, dialogConfirmText) : <Trans>Next</Trans>}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {dialog}
     </div>
   );
 };

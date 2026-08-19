@@ -1556,6 +1556,10 @@ msgstr "KI-Funktionen sind für Ihr Team deaktiviert. Bitte bitten Sie den Teamb
 msgid "All"
 msgstr "Alle"
 
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "All {total} fields set"
+msgstr "Alle {total} Felder gesetzt"
+
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "All claims"
@@ -2918,6 +2922,7 @@ msgstr "Vergleichen Sie alle Pläne und Funktionen im Detail"
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
@@ -3485,6 +3490,10 @@ msgstr "Erstellen Sie Ihr Konto und beginnen Sie mit dem modernen Dokumentensign
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
 msgstr "Erstellen Sie Ihr Konto und beginnen Sie mit dem modernen Dokumentensignieren. Offenes und schönes Signieren liegt in Ihrer Reichweite."
+
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Create your signature"
+msgstr "Unterschrift anlegen"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
@@ -4718,11 +4727,16 @@ msgstr "Ziehen Sie die Datei hierher oder klicken Sie, um hochzuladen"
 msgid "Drag and drop your document here"
 msgstr "Ziehen Sie Ihr Dokument hierher"
 
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgctxt "Draw signature"
 msgid "Draw"
 msgstr "Zeichnen"
+
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Draw it once with your finger"
+msgstr "Einmal mit dem Finger zeichnen"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Draw signature"
@@ -5802,6 +5816,10 @@ msgstr "Füllen Sie die Details aus, um einen neuen Abonnementsanspruch zu erste
 msgid "Filter by status"
 msgstr "Nach Status filtern"
 
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Finish to sign bindingly"
+msgstr "Jetzt verbindlich abschließen"
+
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Focus ring colour."
 msgstr "Fokus-Ringfarbe."
@@ -6015,6 +6033,10 @@ msgstr "Nach Hause gehen"
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Go to document"
 msgstr "Zum Dokument gehen"
+
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Go to field"
+msgstr "Zum Feld"
 
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Go to first page"
@@ -10207,6 +10229,10 @@ msgstr "Unterzeichnungslinks wurden für dieses Dokument erstellt."
 msgid "Signing order is enabled."
 msgstr "Unterzeichnungsreihenfolge ist aktiviert."
 
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Signing progress"
+msgstr "Fortschritt der Unterschrift"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Signing Reminders"
 msgstr "Signatur-Erinnerungen"
@@ -10667,6 +10693,14 @@ msgstr "Systemanforderungen"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "System Theme"
 msgstr "Systemthema"
+
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Tap field {index} of {total}"
+msgstr "Feld {index} von {total} antippen"
+
+#: apps/remix/app/components/embed/heimwatt/guided-signing-bar.tsx
+msgid "Tap the highlighted field in the document"
+msgstr "Markiertes Feld im Dokument antippen"
 
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 msgid "Target Organisation"
