@@ -66,13 +66,7 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         title={_(msg`Security`)}
         subtitle={_(msg`Here you can manage your password and security settings.`)}
       />
-      {hasEmailPasswordAccount && (
-        <>
-          <PasswordForm user={user} />
-
-          <hr className="mt-6 border-border/50" />
-        </>
-      )}
+      {hasEmailPasswordAccount && <PasswordForm user={user} />}
 
       <Alert className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
         <div className="mb-4 sm:mb-0">
