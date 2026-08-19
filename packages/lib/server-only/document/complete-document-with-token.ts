@@ -245,6 +245,18 @@ export const completeDocumentWithToken = async ({
     });
   }
 
+  // Validate required non-DATE fields BEFORE auto-stamping dates: the stamps
+  // are persisted outside the transaction below and are never corrected on a
+  // later attempt, so a failed completion must not freeze its date into the
+  // document. DATE fields are excluded from this early check because the block
+  // right after auto-inserts them for V2 envelopes (#3193).
+  if (fieldsContainUnsignedRequiredField(fields.filter((field) => field.type !== FieldType.DATE))) {
+    throw new AppError(AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS, {
+      message: `Recipient ${recipient.id} has unsigned fields`,
+      statusCode: 400,
+    });
+  }
+
   // Auto-insert all un-inserted date fields for V2 envelopes at completion time.
   if (envelope.internalVersion === 2 && uninsertedDateFields.length > 0) {
     const formattedDate = DateTime.now()
