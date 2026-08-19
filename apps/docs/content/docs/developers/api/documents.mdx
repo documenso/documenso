@@ -28,35 +28,62 @@ Each document contains one or more PDF files, a list of recipients, and the fiel
 
 A document object contains the following properties:
 
-| Property        | Type           | Description                                                    |
-| --------------- | -------------- | -------------------------------------------------------------- |
-| `id`            | string         | Unique identifier (e.g., `envelope_abc123`)                    |
-| `type`          | string         | `DOCUMENT` or `TEMPLATE`                                       |
-| `status`        | string         | Current status: `DRAFT`, `PENDING`, `COMPLETED`, or `REJECTED` |
-| `title`         | string         | Document title                                                 |
-| `source`        | string         | How the document was created: `DOCUMENT`, `TEMPLATE`, `API`    |
-| `visibility`    | string         | Who can view: `EVERYONE`, `ADMIN`, `MANAGER_AND_ABOVE`         |
-| `externalId`    | string \| null | Your custom identifier for the document                        |
-| `createdAt`     | string         | ISO 8601 timestamp                                             |
-| `updatedAt`     | string         | ISO 8601 timestamp                                             |
-| `completedAt`   | string \| null | Timestamp when all recipients completed signing                |
-| `deletedAt`     | string \| null | Timestamp if soft-deleted                                      |
-| `recipients`    | array          | List of recipients and their signing status                    |
-| `fields`        | array          | Signature and form fields on the document                      |
-| `envelopeItems` | array          | PDF files attached to the document                             |
-| `documentMeta`  | object         | Email settings, redirect URL, signing options                  |
+| Property            | Type           | Description                                                                                  |
+| ------------------- | -------------- | -------------------------------------------------------------------------------------------- |
+| `id`                | string         | Unique identifier (e.g., `envelope_abc123`)                                                  |
+| `secondaryId`       | string         | Legacy identifier in prefixed form (`document_123` for documents, `template_123` for templates) |
+| `internalVersion`   | number         | Internal envelope schema version                                                             |
+| `type`              | string         | `DOCUMENT` or `TEMPLATE`                                                                     |
+| `status`            | string         | Current status: `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED`, or `CANCELLED`                  |
+| `title`             | string         | Document title                                                                               |
+| `source`            | string         | How the document was created: `DOCUMENT`, `TEMPLATE`, `TEMPLATE_DIRECT_LINK`                 |
+| `visibility`        | string         | Who can view: `EVERYONE`, `ADMIN`, `MANAGER_AND_ABOVE`                                       |
+| `templateType`      | string         | Template visibility: `PUBLIC`, `PRIVATE`, or `ORGANISATION` (only meaningful for templates)  |
+| `externalId`        | string \| null | Your custom identifier for the document                                                      |
+| `userId`            | number         | ID of the user who owns the document                                                         |
+| `teamId`            | number         | ID of the team the document belongs to                                                       |
+| `folderId`          | string \| null | ID of the folder containing the document                                                     |
+| `templateId`        | number \| null | Legacy ID of the template this document was created from                                     |
+| `authOptions`       | object \| null | Access and action authentication requirements                                                |
+| `formValues`        | object \| null | Pre-filled form values                                                                       |
+| `publicTitle`       | string         | Public title shown on profile and direct-link pages                                          |
+| `publicDescription` | string         | Public description shown on profile and direct-link pages                                    |
+| `createdAt`         | string         | ISO 8601 timestamp                                                                           |
+| `updatedAt`         | string         | ISO 8601 timestamp                                                                           |
+| `completedAt`       | string \| null | Timestamp when all recipients completed signing                                              |
+| `deletedAt`         | string \| null | Timestamp if soft-deleted                                                                    |
+| `recipients`        | array          | List of recipients and their signing status                                                  |
+| `fields`            | array          | Signature and form fields on the document                                                    |
+| `envelopeItems`     | array          | PDF files attached to the document                                                           |
+| `directLink`        | object \| null | Direct-link signing configuration (`id`, `token`, `enabled`, `directTemplateRecipientId`)    |
+| `team`              | object         | Owning team (`id`, `url`)                                                                    |
+| `user`              | object         | Document owner (`id`, `name`, `email`)                                                       |
+| `documentMeta`      | object         | Email settings, redirect URL, signing options                                                |
+
+Documents created through the API have `source: "DOCUMENT"` — there is no separate `API` source value. To tag documents created by your integration, set `externalId` when creating them.
 
 ### Example Document Object
 
 ```json
 {
   "id": "envelope_abc123xyz",
+  "secondaryId": "document_123",
+  "internalVersion": 2,
   "type": "DOCUMENT",
   "status": "PENDING",
-  "source": "API",
+  "source": "DOCUMENT",
   "visibility": "EVERYONE",
+  "templateType": "PRIVATE",
   "title": "Service Agreement",
   "externalId": "contract-2025-001",
+  "userId": 1,
+  "teamId": 1,
+  "folderId": null,
+  "templateId": null,
+  "authOptions": null,
+  "formValues": null,
+  "publicTitle": "",
+  "publicDescription": "",
   "createdAt": "2025-01-15T10:30:00.000Z",
   "updatedAt": "2025-01-15T10:35:00.000Z",
   "completedAt": null,
@@ -73,23 +100,41 @@ A document object contains the following properties:
   ],
   "fields": [
     {
-      "id": "field_123",
+      "id": 123,
+      "secondaryId": "field_abc123",
       "type": "SIGNATURE",
+      "recipientId": 1,
+      "envelopeId": "envelope_abc123xyz",
+      "envelopeItemId": "envelope_item_xyz",
       "page": 1,
-      "positionX": 10,
-      "positionY": 80,
-      "width": 30,
-      "height": 5,
-      "recipientId": 1
+      "positionX": "10",
+      "positionY": "80",
+      "width": "30",
+      "height": "5",
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": null
     }
   ],
   "envelopeItems": [
     {
       "id": "envelope_item_xyz",
+      "envelopeId": "envelope_abc123xyz",
+      "documentDataId": "doc_data_abc123",
       "title": "contract.pdf",
       "order": 1
     }
   ],
+  "directLink": null,
+  "team": {
+    "id": 1,
+    "url": "your-team"
+  },
+  "user": {
+    "id": 1,
+    "name": "Jane Smith",
+    "email": "jane@example.com"
+  },
   "documentMeta": {
     "subject": "Please sign this document",
     "message": "Hi, please review and sign this agreement.",
@@ -98,6 +143,8 @@ A document object contains the following properties:
   }
 }
 ```
+
+Field position and size values are stored as decimals and serialized as strings in API responses.
 
 ## List Documents
 
@@ -114,7 +161,7 @@ GET /envelope
 | `page`             | integer | Page number (default: 1)                                      |
 | `perPage`          | integer | Results per page (default: 10, max: 100)                      |
 | `type`             | string  | Filter by `DOCUMENT` or `TEMPLATE`                            |
-| `status`           | string  | Filter by status: `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED` |
+| `status`           | string  | Filter by status: `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED`, `CANCELLED` |
 | `source`           | string  | Filter by creation source                                     |
 | `folderId`         | string  | Filter by folder ID                                           |
 | `orderByColumn`    | string  | Sort field (only `createdAt` supported)                       |
@@ -154,8 +201,8 @@ const response = await fetch(`${BASE_URL}/envelope`, {
   },
 });
 
-const { data, pagination } = await response.json();
-console.log(`Found ${pagination.totalItems} documents`);
+const { data, count } = await response.json();
+console.log(`Found ${count} documents`);
 
 // Filter by status
 const pendingResponse = await fetch(
@@ -197,12 +244,10 @@ const pendingDocs = await pendingResponse.json();
       ]
     }
   ],
-  "pagination": {
-    "page": 1,
-    "perPage": 10,
-    "totalPages": 5,
-    "totalItems": 42
-  }
+  "count": 42,
+  "currentPage": 1,
+  "perPage": 10,
+  "totalPages": 5
 }
 ```
 
@@ -628,6 +673,72 @@ The response includes signing URLs for each recipient:
 
 ---
 
+## Cancel Document
+
+Cancel a pending document. This changes its status from `PENDING` to `CANCELLED`.
+
+```
+POST /envelope/cancel
+```
+
+### Request Body
+
+| Field        | Type   | Required | Description                         |
+| ------------ | ------ | -------- | ----------------------------------- |
+| `envelopeId` | string | Yes      | Document ID                         |
+| `reason`     | string | No       | Reason for cancelling the document |
+
+### Code Examples
+
+<Tabs items={['curl', 'TypeScript']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/envelope/cancel" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "envelopeId": "envelope_abc123",
+    "reason": "The agreement is no longer needed."
+  }'
+```
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch('https://app.documenso.com/api/v2/envelope/cancel', {
+  method: 'POST',
+  headers: {
+    Authorization: 'api_xxxxxxxxxxxxxxxx',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    envelopeId: 'envelope_abc123',
+    reason: 'The agreement is no longer needed.',
+  }),
+});
+
+const { success } = await response.json();
+```
+</Tab>
+</Tabs>
+
+### Response
+
+```json
+{
+  "success": true
+}
+```
+
+### Behavior
+
+- Only documents in `PENDING` status can be cancelled. Other statuses return `400`.
+- Cancellation is not idempotent. Cancelling the same document again returns `400`.
+- The document owner and team members with `MANAGER` or higher permissions can cancel it. Requests for documents you cannot view return `404`; requests for visible documents without sufficient permissions return `401`.
+- A successful cancellation fires the `DOCUMENT_CANCELLED` webhook.
+- Cancellation emails are sent only to eligible non-CC, non-rejected recipients who were sent or opened the document.
+
+---
+
 ## Delete Document
 
 Delete a document. Completed documents cannot be deleted.
@@ -670,7 +781,7 @@ const response = await fetch('https://app.documenso.com/api/v2/envelope/delete',
 
 const { success } = await response.json();
 
-````
+```
 </Tab>
 </Tabs>
 
@@ -680,7 +791,7 @@ const { success } = await response.json();
 {
   "success": true
 }
-````
+```
 
 ---
 
@@ -694,9 +805,11 @@ POST /envelope/get-many
 
 ### Request Body
 
-| Field         | Type  | Required | Description           |
-| ------------- | ----- | -------- | --------------------- |
-| `envelopeIds` | array | Yes      | Array of document IDs |
+| Field      | Type   | Required | Description                                                                  |
+| ---------- | ------ | -------- | ---------------------------------------------------------------------------- |
+| `ids`      | object | Yes      | ID selector containing `type` and `ids`                                      |
+| `ids.type` | string | Yes      | `envelopeId`, `documentId`, or `templateId`                                  |
+| `ids.ids`  | array  | Yes      | 1-20 IDs: strings for `envelopeId`; numbers for `documentId` or `templateId` |
 
 ### Code Examples
 
@@ -707,12 +820,17 @@ curl -X POST "https://app.documenso.com/api/v2/envelope/get-many" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
-    "envelopeIds": ["envelope_abc123", "envelope_def456", "envelope_ghi789"]
+    "ids": {
+      "type": "envelopeId",
+      "ids": ["envelope_abc123", "envelope_def456", "envelope_ghi789"]
+    }
   }'
 ```
 </Tab>
 <Tab value="TypeScript">
 ```typescript
+const requestedIds = ['envelope_abc123', 'envelope_def456', 'envelope_ghi789'];
+
 const response = await fetch('https://app.documenso.com/api/v2/envelope/get-many', {
   method: 'POST',
   headers: {
@@ -720,15 +838,35 @@ const response = await fetch('https://app.documenso.com/api/v2/envelope/get-many
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    envelopeIds: ['envelope_abc123', 'envelope_def456', 'envelope_ghi789'],
+    ids: {
+      type: 'envelopeId',
+      ids: requestedIds,
+    },
   }),
 });
 
-const documents = await response.json();
+const { data } = await response.json();
 
-````
+```
 </Tab>
 </Tabs>
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "id": "envelope_abc123",
+      "type": "DOCUMENT",
+      "status": "PENDING",
+      "title": "Service Agreement"
+    }
+  ]
+}
+```
+
+The endpoint silently omits envelopes you cannot access instead of returning `404`. Compare `data.length` with `requestedIds.length` to detect omissions.
 
 ---
 
@@ -740,6 +878,7 @@ const documents = await response.json();
 | `PENDING` | Document has been sent. Waiting for recipients to sign. |
 | `COMPLETED` | All recipients have signed. Document is sealed. |
 | `REJECTED` | A recipient rejected the document. |
+| `CANCELLED` | The document was cancelled by its owner or a team member with `MANAGER` or higher permissions. |
 
 ### Status Transitions
 
@@ -747,11 +886,13 @@ const documents = await response.json();
 flowchart LR
   DRAFT --> PENDING --> COMPLETED
   PENDING --> REJECTED
+  PENDING --> CANCELLED
 ```
 
 - **DRAFT to PENDING**: Call the distribute endpoint
 - **PENDING to COMPLETED**: All recipients complete their signing
 - **PENDING to REJECTED**: A recipient rejects the document
+- **PENDING to CANCELLED**: The document owner or a team member with `MANAGER` or higher permissions cancels the document
 
 <Callout type="warn">
   You cannot modify recipients or fields after a document moves to `PENDING` status.
@@ -773,8 +914,8 @@ flowchart LR
 | Parameter  | Values                                      | Description               |
 | ---------- | ------------------------------------------- | ------------------------- |
 | `type`     | `DOCUMENT`, `TEMPLATE`                      | Filter by envelope type   |
-| `status`   | `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED` | Filter by status          |
-| `source`   | `DOCUMENT`, `TEMPLATE`, `API`               | Filter by creation source |
+| `status`   | `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED`, `CANCELLED` | Filter by status          |
+| `source`   | `DOCUMENT`, `TEMPLATE`, `TEMPLATE_DIRECT_LINK`          | Filter by creation source |
 | `folderId` | string                                      | Filter by folder          |
 
 ### Sorting
@@ -800,10 +941,10 @@ async function getAllPendingDocuments() {
       },
     );
 
-    const { data, pagination } = await response.json();
+    const { data, currentPage, totalPages } = await response.json();
     documents.push(...data);
 
-    hasMore = page < pagination.totalPages;
+    hasMore = currentPage < totalPages;
     page++;
   }
 
