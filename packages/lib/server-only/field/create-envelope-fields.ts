@@ -15,6 +15,11 @@ import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { type BoundingBox, whiteoutRegions } from '../pdf/auto-place-fields';
+import {
+  mapBoundingBoxToFieldPosition,
+  pickPageSize,
+  resolveEffectivePageSizes,
+} from './placeholder-page-size';
 
 type CoordinatePosition = {
   page: number;
@@ -119,6 +124,10 @@ export const createEnvelopeFields = async ({
     over resolved placeholders before saving back.
   */
   const pdfCache = new Map<string, PDF>();
+  // Inheritance-resolved page sizes (see resolveEffectivePageSizes): the
+  // percentage math below divides by the size the viewer shows, not the
+  // US-Letter fallback a /Pages-declared MediaBox reads as (#3267).
+  const pageSizeCache = new Map<string, Awaited<ReturnType<typeof resolveEffectivePageSizes>>>();
 
   if (hasPlaceholderFields) {
     for (const item of envelope.envelopeItems) {
@@ -126,6 +135,13 @@ export const createEnvelopeFields = async ({
       const pdfDoc = await PDF.load(new Uint8Array(bytes));
 
       pdfCache.set(item.id, pdfDoc);
+
+      try {
+        pageSizeCache.set(item.id, await resolveEffectivePageSizes(new Uint8Array(bytes)));
+      } catch {
+        // Size resolution is advisory: a PDF pdf-lib cannot parse for sizing
+        // keeps @libpdf/core's page dimensions, the pre-fix behavior.
+      }
     }
   }
 
@@ -189,9 +205,14 @@ export const createEnvelopeFields = async ({
 
       const matchesToProcess = field.matchAll ? matches : [matches[0]];
       const pages = pdfDoc.getPages();
+      const effectiveSizes = pageSizeCache.get(envelopeItemId);
 
       return matchesToProcess.map((match) => {
         const page = pages[match.pageIndex];
+        const pageSize = pickPageSize(effectiveSizes?.[match.pageIndex], {
+          width: page.width,
+          height: page.height,
+        });
 
         /*
           Record this placeholder's bounding box for whiteout. The bbox is in
@@ -210,10 +231,11 @@ export const createEnvelopeFields = async ({
           Convert point-based coordinates (bottom-left origin) to percentage-based
           coordinates (top-left origin) matching the system's field coordinate format.
         */
-        const topLeftY = page.height - match.bbox.y - match.bbox.height;
-
-        const widthPercent = field.width ?? (match.bbox.width / page.width) * 100;
-        const heightPercent = field.height ?? (match.bbox.height / page.height) * 100;
+        const { positionX, positionY, width, height } = mapBoundingBoxToFieldPosition(
+          match.bbox,
+          pageSize,
+          { width: field.width, height: field.height },
+        );
 
         return {
           type: field.type,
@@ -222,10 +244,10 @@ export const createEnvelopeFields = async ({
           envelopeItemId,
           recipientEmail: recipient.email,
           page: match.pageIndex + 1,
-          positionX: (match.bbox.x / page.width) * 100,
-          positionY: (topLeftY / page.height) * 100,
-          width: widthPercent,
-          height: heightPercent,
+          positionX,
+          positionY,
+          width,
+          height,
         };
       });
     }
