@@ -23,8 +23,26 @@ export class S3Provider implements StorageProvider {
       // `InvalidDigest` error, which breaks uploads against third-party storage. Only
       // send/validate checksums when the operation actually requires them so the default
       // configuration keeps working with non-AWS backends.
-      requestChecksumCalculation: 'WHEN_REQUIRED',
-      responseChecksumValidation: 'WHEN_REQUIRED',
+      //
+      // Buckets with S3 Object Lock are the counter-case: S3 REQUIRES a
+      // Content-MD5 or x-amz-checksum-* header on PutObject requests that
+      // carry Object Lock parameters, and WHEN_REQUIRED sends neither — the
+      // seal write fails with "Content-MD5 OR x-amz-checksum- HTTP header is
+      // required" and documents stay PENDING after all recipients signed.
+      // Because the value is set explicitly here, the SDK's standard
+      // AWS_REQUEST_CHECKSUM_CALCULATION env var is also disabled, so operators
+      // had no way to opt in. A dedicated env var restores that choice without
+      // changing the WHEN_REQUIRED default third-party backends depend on
+      // (#3282). The ternary preserves the literal union type — reading the
+      // env value directly widens it to string and fails typecheck.
+      requestChecksumCalculation:
+        env('NEXT_PRIVATE_UPLOAD_CHECKSUM_CALCULATION') === 'WHEN_SUPPORTED'
+          ? 'WHEN_SUPPORTED'
+          : 'WHEN_REQUIRED',
+      responseChecksumValidation:
+        env('NEXT_PRIVATE_UPLOAD_CHECKSUM_CALCULATION') === 'WHEN_SUPPORTED'
+          ? 'WHEN_SUPPORTED'
+          : 'WHEN_REQUIRED',
       credentials: hasCredentials
         ? {
             accessKeyId: String(env('NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID')),
