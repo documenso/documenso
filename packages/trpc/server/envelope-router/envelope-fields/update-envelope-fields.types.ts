@@ -1,5 +1,5 @@
 import { ZFieldSchema } from '@documenso/lib/types/field';
-import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZEnvelopeFieldUpdateAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { z } from 'zod';
 
 import type { TrpcRouteMeta } from '../../trpc';
@@ -15,7 +15,10 @@ export const updateEnvelopeFieldsMeta: TrpcRouteMeta = {
   },
 };
 
-const ZUpdateFieldBaseSchema = ZEnvelopeFieldAndMetaSchema.and(
+// The update schema carries no create-time fieldMeta defaults: an omitted
+// fieldMeta must arrive as undefined so the service leaves the stored
+// configuration untouched instead of wiping it to type defaults (#3286).
+const ZUpdateFieldBaseSchema = ZEnvelopeFieldUpdateAndMetaSchema.and(
   z.object({
     id: z.number().describe('The ID of the field to update.'),
     envelopeItemId: z
