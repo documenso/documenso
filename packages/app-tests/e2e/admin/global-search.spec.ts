@@ -484,3 +484,51 @@ test('[ADMIN][GLOBAL_SEARCH]: capped recipients group links to the admin documen
     await expect(page.getByRole('link', { name: document.title })).toBeVisible();
   }
 });
+
+test('[ADMIN][GLOBAL_SEARCH]: view all results updates the documents page when already on it', async ({ page }) => {
+  const { user: adminUser } = await seedUser({ isAdmin: true });
+  const { user: sender, team } = await seedUser();
+
+  const recipientPrefix = `viewall-live-${nanoid()}`;
+
+  // Seed 5 documents with recipients matching the prefix to hit the cap, and
+  // one control document whose recipient does not match: with a stale
+  // (unfiltered) query the control would show, with the filter it must not.
+  const documents = [];
+
+  for (let i = 0; i < 5; i++) {
+    documents.push(
+      await seedPendingDocument(sender, team.id, [`${recipientPrefix}-${i}@test.documenso.com`], {
+        createDocumentOptions: { title: `recipient-live-${nanoid()}` },
+      }),
+    );
+  }
+
+  const controlDocument = await seedPendingDocument(sender, team.id, [`control-${nanoid()}@test.documenso.com`], {
+    createDocumentOptions: { title: `recipient-live-control-${nanoid()}` },
+  });
+
+  await apiSignin({ page, email: adminUser.email });
+
+  // Start ON the admin documents page: the buggy state initializer has
+  // already run with an empty term.
+  await page.goto('/admin/documents');
+
+  await expect(page.getByPlaceholder(/Search by document title/)).toBeVisible();
+
+  await openCommandMenu(page, ADMIN_PROMPT_PLACEHOLDER);
+
+  await page.getByPlaceholder(ADMIN_PROMPT_PLACEHOLDER).first().fill(recipientPrefix);
+
+  await expect(page.getByText('Global Recipients', { exact: true })).toBeVisible();
+
+  await page.getByRole('option').filter({ hasText: 'View all results' }).first().click();
+
+  await page.waitForURL((url) => url.searchParams.get('term') === `recipient:${recipientPrefix}`);
+
+  // The same-route navigation must update both the input and the results.
+  await expect(page.getByPlaceholder(/Search by document title/)).toHaveValue(`recipient:${recipientPrefix}`);
+
+  await expect(page.getByRole('link', { name: documents[0].title })).toBeVisible();
+  await expect(page.getByRole('link', { name: controlDocument.title })).toHaveCount(0);
+});

@@ -12,7 +12,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
@@ -29,6 +29,12 @@ export default function AdminDocumentsPage() {
 
   const page = searchParams?.get?.('page') ? Number(searchParams.get('page')) : undefined;
   const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
+
+  const urlTerm = searchParams?.get?.('term') ?? '';
+
+  useEffect(() => {
+    setTerm(urlTerm);
+  }, [urlTerm]);
 
   const { data: findDocumentsData, isPending: isFindDocumentsLoading } = trpc.admin.document.find.useQuery(
     {
