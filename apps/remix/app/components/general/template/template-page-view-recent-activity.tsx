@@ -71,7 +71,7 @@ export const TemplatePageViewRecentActivity = ({
                 </div>
 
                 <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-widget">
-                  <div className="h-1.5 w-1.5 rounded-full bg-widget ring-1 ring-gray-300 dark:ring-neutral-600" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-widget ring-1 ring-border" />
                 </div>
 
                 <button
@@ -108,7 +108,7 @@ export const TemplatePageViewRecentActivity = ({
                 </div>
 
                 <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-widget text-foreground/40">
-                  <div className="h-1.5 w-1.5 rounded-full bg-widget ring-1 ring-gray-300 dark:ring-neutral-600" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-widget ring-1 ring-border" />
                 </div>
 
                 <Link

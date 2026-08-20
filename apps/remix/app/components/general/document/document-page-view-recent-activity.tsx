@@ -75,7 +75,7 @@ export const DocumentPageViewRecentActivity = ({ documentId, userId }: DocumentP
                 </div>
 
                 <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-widget">
-                  <div className="h-1.5 w-1.5 rounded-full bg-widget ring-1 ring-gray-300 dark:ring-neutral-600" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-widget ring-1 ring-border" />
                 </div>
 
                 <button
@@ -109,27 +109,27 @@ export const DocumentPageViewRecentActivity = ({ documentId, userId }: DocumentP
                 <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-widget text-foreground/40">
                   {match(auditLog.type)
                     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED, () => (
-                      <div className="rounded-full border border-gray-300 bg-widget p-1 dark:border-neutral-600">
+                      <div className="rounded-full border border-border bg-widget p-1">
                         <CheckCheckIcon className="h-3 w-3" aria-hidden="true" />
                       </div>
                     ))
                     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED, () => (
-                      <div className="rounded-full border border-gray-300 bg-widget p-1 dark:border-neutral-600">
+                      <div className="rounded-full border border-border bg-widget p-1">
                         <CheckIcon className="h-3 w-3" aria-hidden="true" />
                       </div>
                     ))
                     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED, () => (
-                      <div className="rounded-full border border-gray-300 bg-widget p-1 dark:border-neutral-600">
+                      <div className="rounded-full border border-border bg-widget p-1">
                         <AlertTriangle className="h-3 w-3" aria-hidden="true" />
                       </div>
                     ))
                     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED, () => (
-                      <div className="rounded-full border border-gray-300 bg-widget p-1 dark:border-neutral-600">
+                      <div className="rounded-full border border-border bg-widget p-1">
                         <MailOpen className="h-3 w-3" aria-hidden="true" />
                       </div>
                     ))
                     .otherwise(() => (
-                      <div className="h-1.5 w-1.5 rounded-full bg-widget ring-1 ring-gray-300 dark:ring-neutral-600" />
+                      <div className="h-1.5 w-1.5 rounded-full bg-widget ring-1 ring-border" />
                     ))}
                 </div>
 
