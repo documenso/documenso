@@ -448,3 +448,66 @@ export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
 ]);
 
 export type TEnvelopeFieldAndMeta = z.infer<typeof ZEnvelopeFieldAndMetaSchema>;
+
+/**
+ * The update counterpart of {@link ZEnvelopeFieldAndMetaSchema}: identical
+ * shape but `fieldMeta` is OPTIONAL WITH NO DEFAULT, so an update request
+ * that omits `fieldMeta` yields `undefined` instead of the create-time
+ * defaults — and the service leaves the stored configuration untouched.
+ *
+ * The create schema's defaults are correct for create; on update they made
+ * every partial `update-many` call that didn't resend the complete
+ * `fieldMeta` wipe the field's configuration to the type defaults behind a
+ * 200 (a TEXT field lost its label/placeholder/required/character limit; a
+ * RADIO's option list collapsed to one blank option). `type` is the union
+ * discriminator and mandatory, so the default was always materialised and
+ * the wipe was unavoidable from the client side (#3286).
+ */
+export const ZEnvelopeFieldUpdateAndMetaSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal(FieldType.SIGNATURE),
+    fieldMeta: ZSignatureFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.FREE_SIGNATURE),
+    fieldMeta: z.undefined(),
+  }),
+  z.object({
+    type: z.literal(FieldType.INITIALS),
+    fieldMeta: ZInitialsFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.NAME),
+    fieldMeta: ZNameFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.EMAIL),
+    fieldMeta: ZEmailFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.DATE),
+    fieldMeta: ZDateFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.TEXT),
+    fieldMeta: ZTextFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.NUMBER),
+    fieldMeta: ZNumberFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.RADIO),
+    fieldMeta: ZRadioFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.CHECKBOX),
+    fieldMeta: ZCheckboxFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.DROPDOWN),
+    fieldMeta: ZDropdownFieldMeta.optional(),
+  }),
+]);
+
+export type TEnvelopeFieldUpdateAndMeta = z.infer<typeof ZEnvelopeFieldUpdateAndMetaSchema>;

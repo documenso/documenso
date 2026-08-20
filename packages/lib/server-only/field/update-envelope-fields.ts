@@ -133,7 +133,11 @@ export const updateEnvelopeFields = async ({
             positionY: updateData.pageY,
             width: updateData.width,
             height: updateData.height,
-            fieldMeta: updateData.fieldMeta,
+            // undefined (omitted) leaves the stored fieldMeta untouched —
+            // the update schema no longer defaults them, and Prisma skips
+            // undefined keys in update data. Resending a complete fieldMeta
+            // still replaces it (#3286).
+            ...(updateData.fieldMeta !== undefined ? { fieldMeta: updateData.fieldMeta } : {}),
             envelopeItemId: updateData.envelopeItemId,
           },
         });
