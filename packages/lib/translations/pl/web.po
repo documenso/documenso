@@ -496,10 +496,6 @@ msgstr "{remaningLength, plural, one {Pozostał # znak} few {Pozostały # znaki}
 msgid "{selectedCount} selected"
 msgstr "Zaznaczono {selectedCount}"
 
-#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
-msgid "{sender} has sent you a document to sign"
-msgstr ""
-
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
 msgstr "Użytkownik {signerName} odrzucił dokument „{documentName}”."
@@ -4296,7 +4292,6 @@ msgstr "Documenso usunie <0>wszystkie Twoje dokumenty</0> (w tym zakończone), p
 
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
-#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Document"
 msgstr "Dokument"
 
@@ -6034,10 +6029,6 @@ msgstr "Folder został zaktualizowany"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Font Size"
 msgstr "Rozmiar czcionki"
-
-#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
-msgid "For {recipientName}"
-msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
@@ -10288,7 +10279,6 @@ msgstr "Podpisz jako<0>{0} <1>({1})</1></0>"
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
-#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Sign document"
 msgstr "Podpisz dokument"
 
@@ -10399,10 +10389,6 @@ msgstr "Podpis jest zbyt mały"
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Signature Pad cannot be empty."
 msgstr "Pole podpisu nie może być puste."
-
-#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
-msgid "Signature requested"
-msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Signature Settings"
