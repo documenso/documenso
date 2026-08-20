@@ -246,6 +246,10 @@ export const DocumentSigningTextField = ({ field, onSignField, onUnsignField }: 
           <div>
             <Textarea
               id="custom-text"
+              // Focus the input the moment the dialog opens: on documents with
+              // many fields, making the signer click into the textarea before
+              // typing is pure friction (#3280).
+              autoFocus
               placeholder={parsedFieldMeta?.placeholder ?? _(msg`Enter your text here`)}
               className={cn('mt-2 w-full rounded-md', {
                 'border-2 border-red-300 text-left ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
