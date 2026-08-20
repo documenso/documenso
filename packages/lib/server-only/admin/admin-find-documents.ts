@@ -76,7 +76,7 @@ export const adminFindDocuments = async ({ query, page = 1, perPage = 10 }: Admi
     // to the text search, mirroring the admin global search.
     const parsedRecipientId = ZPositiveIntegerSchema.safeParse(recipientQuery);
 
-    if (parsedRecipientId.success) {
+    if (/^\d+$/.test(recipientQuery) && parsedRecipientId.success) {
       termFilters = {
         recipients: {
           some: {
