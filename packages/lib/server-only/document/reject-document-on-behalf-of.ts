@@ -113,6 +113,25 @@ export async function rejectDocumentOnBehalfOf({
   // Update the recipient status to rejected and record an external rejection
   // audit log within the same transaction.
   const [updatedRecipient] = await prisma.$transaction([
+    // Flip the envelope to REJECTED in the SAME transaction as the recipient
+    // row. The status was previously written only by the async seal job —
+    // after the whole PDF pipeline — so a 200 from this endpoint left the
+    // envelope PENDING, and every `status === PENDING` guard
+    // (sign-field-with-token, complete-document-with-token) kept letting the
+    // OTHER recipients act on a document the product had already cancelled
+    // (the cancellation emails are queued by this very request). When the
+    // seal job fails — and it demonstrably does — the window never closed.
+    // The seal job's own status write is idempotent (it writes REJECTED
+    // again) and the stamped PDF/certificate reflect the rejection either
+    // way (#3287).
+    prisma.envelope.update({
+      where: {
+        id: envelope.id,
+      },
+      data: {
+        status: DocumentStatus.REJECTED,
+      },
+    }),
     prisma.recipient.update({
       where: {
         id: recipient.id,
