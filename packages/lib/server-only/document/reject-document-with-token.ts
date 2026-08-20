@@ -55,6 +55,17 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
 
   // Update the recipient status to rejected
   const [updatedRecipient] = await prisma.$transaction([
+    // Same-transaction envelope flip as the API path: the document is
+    // Rejected the moment the rejection lands, and the PENDING-keyed
+    // guards close immediately (#3287).
+    prisma.envelope.update({
+      where: {
+        id: envelope.id,
+      },
+      data: {
+        status: DocumentStatus.REJECTED,
+      },
+    }),
     prisma.recipient.update({
       where: {
         id: recipient.id,
