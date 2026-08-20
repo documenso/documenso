@@ -251,6 +251,8 @@ export const DocumentSigningNumberField = ({ field, onSignField, onUnsignField }
           <div>
             <Input
               type="text"
+              // Same friction as the text field: focus on open (#3280).
+              autoFocus
               placeholder={parsedFieldMeta?.placeholder ?? ''}
               className={cn('mt-2 w-full rounded-md', {
                 'border-2 border-red-300 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
