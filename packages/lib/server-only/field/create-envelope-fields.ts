@@ -8,6 +8,7 @@ import { prisma } from '@documenso/prisma';
 import { PDF } from '@libpdf/core';
 import { EnvelopeType } from '@prisma/client';
 
+import { validateFieldMetaConfiguration } from '../../advanced-fields-validation/validate-field-meta-configuration';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
@@ -160,6 +161,19 @@ export const createEnvelopeFields = async ({
     if (!canRecipientFieldsBeModified(recipient, envelope.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Recipient type cannot have fields, or they have already interacted with the document.',
+      });
+    }
+
+    // Enforce the documented field meta configuration rules upfront — the
+    // editor's setFields path and signing time both reject a field that is
+    // simultaneously required and read-only or a read-only field without a
+    // default value, so a configuration that would fail there must not be
+    // creatable over the API.
+    const fieldMetaErrors = validateFieldMetaConfiguration(field.type, field.fieldMeta);
+
+    if (fieldMetaErrors.length > 0) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Invalid field meta for recipient ${field.recipientId}: ${fieldMetaErrors.join(', ')}`,
       });
     }
 

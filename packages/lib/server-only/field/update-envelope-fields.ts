@@ -5,6 +5,7 @@ import { createDocumentAuditLogData, diffFieldChanges } from '@documenso/lib/uti
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType, type FieldType } from '@prisma/client';
 
+import { validateFieldMetaConfiguration } from '../../advanced-fields-validation/validate-field-meta-configuration';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
@@ -101,6 +102,18 @@ export const updateEnvelopeFields = async ({
     if (envelope.internalVersion === 2 && fieldMetaType && fieldMetaType.toLowerCase() !== fieldType.toLowerCase()) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Field meta type does not match the field type',
+      });
+    }
+
+    // The update replaces fieldMeta wholesale, so the meta it writes must
+    // satisfy the documented configuration rules — the same ones the create
+    // path enforces and signing time reports. An omitted fieldMeta keeps
+    // the stored one untouched and skips this check.
+    const fieldMetaErrors = validateFieldMetaConfiguration(fieldType, field.fieldMeta);
+
+    if (fieldMetaErrors.length > 0) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Invalid field meta for field ${field.id}: ${fieldMetaErrors.join(', ')}`,
       });
     }
 
