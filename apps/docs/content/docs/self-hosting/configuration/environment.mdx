@@ -21,10 +21,11 @@ These variables must be set for Documenso to function:
 
 ## Server Configuration
 
-| Variable                           | Description                                                  | Default                          |
-| ---------------------------------- | ------------------------------------------------------------ | -------------------------------- |
-| `PORT`                             | Port the server listens on                                   | `3000`                           |
-| `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` | Internal URL for the app to request itself (background jobs) | Same as `NEXT_PUBLIC_WEBAPP_URL` |
+| Variable                                  | Description                                                                                                                                                                                   | Default                          |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `PORT`                                    | Port the server listens on                                                                                                                                                                    | `3000`                           |
+| `NEXT_PRIVATE_INTERNAL_WEBAPP_URL`        | Internal URL for the app to request itself (background jobs)                                                                                                                                  | Same as `NEXT_PUBLIC_WEBAPP_URL` |
+| `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS`  | Comma-separated hostnames or IPs whose webhook deliveries are allowed to resolve to private or loopback addresses (e.g., `internal.example.com,192.168.1.5`). Leave empty to block all private-address webhook targets. |                                  |
 
 ---
 
