@@ -81,6 +81,7 @@ route.get(
     // Check whether the user has access to the document.
     const hasAccess = await checkEnvelopeFileAccess({
       userId,
+      envelopeId: envelopeItem.envelope.id,
       teamId: envelopeItem.envelope.teamId,
       envelopeType: envelopeItem.envelope.type,
       templateType: envelopeItem.envelope.templateType,
