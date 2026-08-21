@@ -70,7 +70,18 @@ export const EnvelopeRedistributeDialog = ({ envelope, envelopeType, trigger }: 
 
   const onFormSubmit = async ({ recipients }: TEnvelopeRedistributeFormSchema) => {
     try {
-      await redistributeEnvelope({ envelopeId: envelope.id, recipients });
+      const updatedEnvelope = await redistributeEnvelope({ envelopeId: envelope.id, recipients });
+
+      const selectedRecipientCount = recipients.length;
+      const resentRecipientCount = updatedEnvelope.recipients.filter((recipient) =>
+        recipients.includes(recipient.id),
+      ).length;
+      const failedRecipientCount = Math.max(selectedRecipientCount - resentRecipientCount, 0);
+      const allSelectedRecipientsFailed = selectedRecipientCount > 0 && resentRecipientCount === 0;
+
+      if (allSelectedRecipientsFailed) {
+        throw new AppError('DOCUMENT_SEND_FAILED');
+      }
 
       const successMessage = match(envelopeType)
         .with(EnvelopeType.DOCUMENT, () => ({
@@ -87,8 +98,11 @@ export const EnvelopeRedistributeDialog = ({ envelope, envelopeType, trigger }: 
         }));
 
       toast({
-        title: successMessage.title,
-        description: successMessage.description,
+        title: failedRecipientCount > 0 ? t`Envelope partially resent` : successMessage.title,
+        description:
+          failedRecipientCount > 0
+            ? t`${resentRecipientCount} reminder(s) sent, ${failedRecipientCount} failed.`
+            : successMessage.description,
         duration: 5000,
       });
 
