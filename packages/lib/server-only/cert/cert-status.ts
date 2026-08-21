@@ -3,7 +3,13 @@ import * as fs from 'node:fs';
 import { env } from '@documenso/lib/utils/env';
 
 export const getCertificateStatus = () => {
-  if (env('NEXT_PRIVATE_SIGNING_TRANSPORT') !== 'local') {
+  // Resolve the transport exactly as the signer does: unset means 'local',
+  // not "some other transport" whose certificate is irrelevant. Otherwise a
+  // deployment that never sets the variable reports the local certificate as
+  // available even when the file is missing and every seal fails.
+  const transport = env('NEXT_PRIVATE_SIGNING_TRANSPORT') || 'local';
+
+  if (transport !== 'local') {
     return { isAvailable: true };
   }
 
