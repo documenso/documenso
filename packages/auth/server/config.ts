@@ -33,7 +33,7 @@ export const MicrosoftAuthOptions: OAuthClientOptions = {
   clientSecret: env('NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET') ?? '',
   redirectUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/callback/microsoft`,
   wellKnownUrl: 'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration',
-  bypassEmailVerification: false,
+  bypassEmailVerification: env('NEXT_PRIVATE_MICROSOFT_SKIP_VERIFY') === 'true',
 };
 
 export const OidcAuthOptions: OAuthClientOptions = {
