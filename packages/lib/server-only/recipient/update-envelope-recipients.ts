@@ -14,6 +14,7 @@ import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertAssistantCompatibleSigningOrder } from '../signature-level/assert-assistant-compatible-signing-order';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export interface UpdateEnvelopeRecipientsOptions {
@@ -51,6 +52,7 @@ export const updateEnvelopeRecipients = async ({
     include: {
       fields: true,
       recipients: true,
+      documentMeta: true,
       team: {
         select: {
           organisation: {
@@ -96,6 +98,11 @@ export const updateEnvelopeRecipients = async ({
     assertCompatibleRecipientRole({
       signatureLevel: envelope.signatureLevel,
       role: recipient.role,
+    });
+
+    assertAssistantCompatibleSigningOrder({
+      role: recipient.role,
+      signingOrder: envelope.documentMeta?.signingOrder,
     });
   }
 
