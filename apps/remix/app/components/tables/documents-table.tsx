@@ -13,7 +13,6 @@ import { TableCell } from '@documenso/ui/primitives/table';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
-import { DateTime } from 'luxon';
 import { useMemo, useTransition } from 'react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
@@ -85,7 +84,7 @@ export const DocumentsTable = ({
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+        cell: ({ row }) => i18n.date(row.original.createdAt, { dateStyle: 'medium', timeStyle: 'short' }),
       },
       {
         header: _(msg`Title`),
