@@ -1,4 +1,5 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 
@@ -24,14 +25,26 @@ export const declineOrganisationMemberInviteRoute = maybeAuthenticatedProcedure
       throw new AppError(AppErrorCode.NOT_FOUND);
     }
 
-    await prisma.organisationMemberInvite.update({
+    // Only a PENDING invite can transition to DECLINED. Guarding on the previous
+    // status keeps repeated decline requests idempotent and stops them from
+    // re-notifying the organisation managers.
+    const { count } = await prisma.organisationMemberInvite.updateMany({
       where: {
         id: organisationMemberInvite.id,
+        status: OrganisationMemberInviteStatus.PENDING,
       },
       data: {
         status: OrganisationMemberInviteStatus.DECLINED,
       },
     });
 
-    // TODO: notify the team owner
+    if (count === 1) {
+      await jobs.triggerJob({
+        name: 'send.organisation-invite-declined.email',
+        payload: {
+          organisationId: organisationMemberInvite.organisationId,
+          inviteeEmail: organisationMemberInvite.email,
+        },
+      });
+    }
   });
