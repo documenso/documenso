@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { GoogleAuthOptions, MicrosoftAuthOptions, OidcAuthOptions } from '../config';
 import { handleOAuthAuthorizeUrl } from '../lib/utils/handle-oauth-authorize-url';
+import { handleOAuthRevocation } from '../lib/utils/handle-oauth-revocation';
 import { getOrganisationAuthenticationPortalOptions } from '../lib/utils/organisation-portal';
 import type { HonoAuthContext } from '../types/context';
 
@@ -65,5 +66,24 @@ export const oauthRoute = new Hono<HonoAuthContext>()
       c,
       clientOptions,
       prompt: 'select_account',
+    });
+  })
+  /**
+   * OpenID Connect Back-Channel Logout & OAuth Revocation endpoint.
+   */
+  .post('/backchannel-logout', async (c) => {
+    let logoutToken: string | undefined;
+    const contentType = c.req.header('content-type') ?? '';
+    if (contentType.includes('application/json')) {
+      const json = await c.req.json().catch(() => ({}));
+      logoutToken = typeof json.logout_token === 'string' ? json.logout_token : undefined;
+    } else {
+      const body = await c.req.parseBody().catch(() => ({}));
+      logoutToken = typeof body.logout_token === 'string' ? body.logout_token : undefined;
+    }
+
+    return handleOAuthRevocation({
+      c,
+      logoutToken,
     });
   });
