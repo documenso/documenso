@@ -9,7 +9,6 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -45,10 +44,18 @@ export const InboxTable = () => {
 
   const page = searchParams?.get?.('page') ? Number(searchParams.get('page')) : undefined;
   const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
+  const query = searchParams?.get?.('query') || undefined;
+  const statusSearchParam = searchParams?.get?.('status') || undefined;
+  const status =
+    statusSearchParam === DocumentStatusEnum.PENDING || statusSearchParam === DocumentStatusEnum.COMPLETED
+      ? statusSearchParam
+      : undefined;
 
   const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery({
     page: page || 1,
     perPage: perPage || 10,
+    query,
+    status,
   });
 
   const columns = useMemo(() => {
@@ -173,7 +180,6 @@ export type InboxTableActionButtonProps = {
 
 export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => {
   const { user } = useSession();
-  const { toast } = useToast();
   const { _ } = useLingui();
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);

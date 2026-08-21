@@ -2,9 +2,12 @@
 
 import { ZDocumentManySchema } from '@documenso/lib/types/document';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import type { z } from 'zod';
+import { DocumentStatus } from '@prisma/client';
+import { z } from 'zod';
 
-export const ZFindInboxRequestSchema = ZFindSearchParamsSchema;
+export const ZFindInboxRequestSchema = ZFindSearchParamsSchema.extend({
+  status: z.nativeEnum(DocumentStatus).optional(),
+});
 
 export const ZFindInboxResponseSchema = ZFindResultResponse.extend({
   data: ZDocumentManySchema.array(),
