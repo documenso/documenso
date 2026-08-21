@@ -117,7 +117,7 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
         const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
         const errors = validateTextField(textFieldParsedMeta.text || '', textFieldParsedMeta);
         if (errors.length > 0) {
-          throw new Error(errors.join(', '));
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: errors.join(', ') });
         }
       }
 
@@ -125,13 +125,15 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
         const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
         const errors = validateNumberField(String(numberFieldParsedMeta.value || ''), numberFieldParsedMeta);
         if (errors.length > 0) {
-          throw new Error(errors.join(', '));
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: errors.join(', ') });
         }
       }
 
       if (field.type === FieldType.CHECKBOX) {
         if (!field.fieldMeta) {
-          throw new Error('Checkbox field is missing required metadata');
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'Checkbox field is missing required metadata',
+          });
         }
         const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
         const errors = validateCheckboxField(
@@ -139,30 +141,34 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
           checkboxFieldParsedMeta,
         );
         if (errors.length > 0) {
-          throw new Error(errors.join(', '));
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: errors.join(', ') });
         }
       }
 
       if (field.type === FieldType.RADIO) {
         if (!field.fieldMeta) {
-          throw new Error('Radio field is missing required metadata');
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'Radio field is missing required metadata',
+          });
         }
         const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
         const checkedRadioFieldValue = radioFieldParsedMeta.values?.find((option) => option.checked)?.value;
         const errors = validateRadioField(checkedRadioFieldValue, radioFieldParsedMeta);
         if (errors.length > 0) {
-          throw new Error(errors.join('. '));
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: errors.join('. ') });
         }
       }
 
       if (field.type === FieldType.DROPDOWN) {
         if (!field.fieldMeta) {
-          throw new Error('Dropdown field is missing required metadata');
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'Dropdown field is missing required metadata',
+          });
         }
         const dropdownFieldParsedMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
         const errors = validateDropdownField(undefined, dropdownFieldParsedMeta);
         if (errors.length > 0) {
-          throw new Error(errors.join('. '));
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: errors.join('. ') });
         }
       }
 
