@@ -46,10 +46,15 @@ export const InboxTable = () => {
   const page = searchParams?.get?.('page') ? Number(searchParams.get('page')) : undefined;
   const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
 
-  const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery({
-    page: page || 1,
-    perPage: perPage || 10,
-  });
+  const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery(
+    {
+      page: page || 1,
+      perPage: perPage || 10,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const columns = useMemo(() => {
     return [
