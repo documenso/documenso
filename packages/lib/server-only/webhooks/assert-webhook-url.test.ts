@@ -88,10 +88,10 @@ describe('assertNotPrivateUrl', () => {
   });
 
   describe('DNS failure handling', () => {
-    it('should silently allow when DNS lookup throws', async () => {
+    it('should reject when DNS lookup throws', async () => {
       const lookup = vi.fn().mockRejectedValue(new Error('ENOTFOUND'));
 
-      await expect(assertNotPrivateUrl('https://nonexistent.example.com', { lookup })).resolves.toBeUndefined();
+      await expect(assertNotPrivateUrl('https://nonexistent.example.com', { lookup })).rejects.toThrow(AppError);
     });
 
     it('should re-throw AppError even within the catch block', async () => {
