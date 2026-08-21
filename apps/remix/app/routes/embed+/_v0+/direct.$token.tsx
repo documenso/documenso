@@ -266,6 +266,7 @@ const EmbedDirectTemplatePageV1 = ({ data }: { data: Awaited<ReturnType<typeof h
       typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
       uploadSignatureEnabled={template.templateMeta?.uploadSignatureEnabled}
       drawSignatureEnabled={template.templateMeta?.drawSignatureEnabled}
+      qrSignatureEnabled={template.templateMeta?.qrSignatureEnabled}
     >
       <DocumentSigningAuthProvider documentAuthOptions={template.authOptions} recipient={recipient} user={user}>
         <DocumentSigningRecipientProvider recipient={recipient}>

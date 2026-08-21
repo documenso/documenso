@@ -408,6 +408,7 @@ export const DocumentSigningPageViewV1 = ({
                     typedSignatureEnabled={documentMeta?.typedSignatureEnabled}
                     uploadSignatureEnabled={documentMeta?.uploadSignatureEnabled}
                     drawSignatureEnabled={documentMeta?.drawSignatureEnabled}
+                    qrSignatureEnabled={documentMeta?.qrSignatureEnabled}
                   />
                 ))
                 .with(FieldType.INITIALS, () => <DocumentSigningInitialsField key={field.id} field={field} />)

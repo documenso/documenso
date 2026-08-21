@@ -238,6 +238,7 @@ export default function MultisignPage() {
           typedSignatureEnabled={selectedDocument.documentMeta?.typedSignatureEnabled}
           uploadSignatureEnabled={selectedDocument.documentMeta?.uploadSignatureEnabled}
           drawSignatureEnabled={selectedDocument.documentMeta?.drawSignatureEnabled}
+          qrSignatureEnabled={selectedDocument.documentMeta?.qrSignatureEnabled}
         >
           <DocumentSigningAuthProvider
             documentAuthOptions={selectedDocument.authOptions}

@@ -260,14 +260,14 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
   });
 
   return (
-    <div className={cn('h-full w-full', className)}>
+    <div className={cn('h-full w-full select-none', className)}>
       <canvas
         data-testid="signature-pad-draw"
         ref={$el}
         className={cn('h-full w-full', {
           'dark:hue-rotate-180 dark:invert': selectedColor === 'black',
         })}
-        style={{ touchAction: 'none' }}
+        style={{ touchAction: 'none', WebkitTouchCallout: 'none' }}
         onPointerMove={(event) => onMouseMove(event)}
         onPointerDown={(event) => onMouseDown(event)}
         onPointerUp={(event) => onMouseUp(event)}

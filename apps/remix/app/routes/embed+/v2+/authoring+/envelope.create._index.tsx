@@ -224,6 +224,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
         typedSignatureEnabled: envelope.documentMeta.typedSignatureEnabled ?? undefined,
         uploadSignatureEnabled: envelope.documentMeta.uploadSignatureEnabled ?? undefined,
         drawSignatureEnabled: envelope.documentMeta.drawSignatureEnabled ?? undefined,
+        qrSignatureEnabled: envelope.documentMeta.qrSignatureEnabled ?? undefined,
         dateFormat: (envelope.documentMeta.dateFormat as TDocumentMetaDateFormat) ?? undefined,
         language: envelope.documentMeta.language as SupportedLanguageCodes,
       },

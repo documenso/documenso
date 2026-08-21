@@ -470,6 +470,7 @@ export const EmbedDirectTemplateClientPage = ({
                       typedSignatureEnabled={metadata?.typedSignatureEnabled}
                       uploadSignatureEnabled={metadata?.uploadSignatureEnabled}
                       drawSignatureEnabled={metadata?.drawSignatureEnabled}
+                      qrSignatureEnabled={metadata?.qrSignatureEnabled}
                     />
                   </div>
                 )}
