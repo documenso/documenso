@@ -177,7 +177,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
 
   const recipientsToNotify = envelope.recipients.filter((recipient) => isRecipientEmailValidForSending(recipient));
 
-  await Promise.all(
+  const results = await Promise.allSettled(
     recipientsToNotify.map(async (recipient) => {
       // A CC recipient never asked to be part of this document, so their completion
       // email is effectively unsolicited. Meter it against the organisation email
@@ -271,4 +271,20 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
       });
     }),
   );
+
+  const failedSends = results.filter((result) => result.status === 'rejected') as PromiseRejectedResult[];
+
+  if (failedSends.length > 0) {
+    if (failedSends.length === recipientsToNotify.length) {
+      throw new Error(`Failed to send completion emails to all recipients: ${failedSends[0].reason}`);
+    } else {
+      failedSends.forEach((failure) => {
+        io.logger.error({
+          msg: 'Failed to send completion email to a recipient',
+          error: failure.reason,
+          envelopeId: envelope.id,
+        });
+      });
+    }
+  }
 };
