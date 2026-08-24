@@ -1,9 +1,9 @@
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
-export const ADMIN_SEARCH_RESULTS_PER_TYPE = 5;
+import { MAX_POSTGRES_INT } from '../../constants/database';
 
-const MAX_POSTGRES_INT = 2147483647;
+export const ADMIN_SEARCH_RESULTS_PER_TYPE = 5;
 
 const GROUP_ORDER = ['document', 'user', 'organisation', 'team', 'recipient', 'subscription'] as const;
 

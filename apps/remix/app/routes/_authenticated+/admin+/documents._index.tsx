@@ -131,7 +131,7 @@ export default function AdminDocumentsPage() {
         <div>
           <Input
             type="search"
-            placeholder={_(msg`Search by document title, team:123 or user:123`)}
+            placeholder={_(msg`Search by document title, team:123, user:123 or recipient:email@example.com`)}
             value={term}
             onChange={(e) => setTerm(e.target.value)}
           />

@@ -2,6 +2,7 @@ import { prisma } from '@documenso/prisma';
 import { EnvelopeType, type Prisma } from '@prisma/client';
 import { z } from 'zod';
 
+import { MAX_POSTGRES_INT } from '../../constants/database';
 import type { FindResultResponse } from '../../types/search-params';
 
 export interface AdminFindDocumentsOptions {
@@ -10,7 +11,7 @@ export interface AdminFindDocumentsOptions {
   perPage?: number;
 }
 
-const ZPositiveIntegerSchema = z.coerce.number().int().positive();
+const ZPositiveIntegerSchema = z.coerce.number().int().positive().max(MAX_POSTGRES_INT);
 
 const emptyResponse = {
   data: [],
@@ -56,6 +57,40 @@ export const adminFindDocuments = async ({ query, page = 1, perPage = 10 }: Admi
     } else {
       return emptyResponse;
     }
+  }
+
+  if (query?.startsWith('recipient:')) {
+    const recipientQuery = query.slice('recipient:'.length).trim();
+
+    if (!recipientQuery) {
+      return emptyResponse;
+    }
+
+    // Match admin-global-search semantics: only bare digit strings are ID
+    // lookups, so numeric-looking email fragments (1e3, 0x10, +40) stay text.
+    const isRecipientIdLookup = /^\d+$/.test(recipientQuery);
+
+    const parsedRecipientId = ZPositiveIntegerSchema.safeParse(recipientQuery);
+
+    termFilters =
+      isRecipientIdLookup && parsedRecipientId.success
+        ? {
+            recipients: {
+              some: {
+                id: parsedRecipientId.data,
+              },
+            },
+          }
+        : {
+            recipients: {
+              some: {
+                email: {
+                  contains: recipientQuery,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          };
   }
 
   if (query && query?.startsWith('envelope_')) {
