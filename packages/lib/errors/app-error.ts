@@ -37,6 +37,27 @@ export enum AppErrorCode {
   ENVELOPE_TSP_LOCKED = 'ENVELOPE_TSP_LOCKED',
 
   /**
+   * A completion request was made for a recipient that has already signed.
+   * Thrown for retried, stale or concurrent duplicate submissions so callers
+   * can resolve them idempotently instead of surfacing an error.
+   */
+  RECIPIENT_ALREADY_SIGNED = 'RECIPIENT_ALREADY_SIGNED',
+
+  /**
+   * A completion request was made for a recipient that still has required
+   * fields which have not been inserted. Usually indicates the client's field
+   * state is out of sync with the server (e.g. a field insert failed to
+   * persist before submission).
+   */
+  RECIPIENT_HAS_UNSIGNED_FIELDS = 'RECIPIENT_HAS_UNSIGNED_FIELDS',
+
+  /**
+   * A completion request was made by a recipient in a sequential signing flow
+   * before the preceding recipients have signed.
+   */
+  RECIPIENT_OUT_OF_TURN = 'RECIPIENT_OUT_OF_TURN',
+
+  /**
    * A signer recipient does not have a signature field assigned. Thrown when
    * distributing an envelope or using a direct template where at least one
    * signer has no signature field.
@@ -92,6 +113,8 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.ENVELOPE_LEGACY]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_TSP_LOCKED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.MISSING_SIGNATURE_FIELD]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.RECIPIENT_OUT_OF_TURN]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.CSC_INSTANCE_MODE_MISMATCH]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.CSC_UNLICENSED]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.CSC_PROVIDER_INFO_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
@@ -300,6 +323,8 @@ export class AppError extends Error {
         AppErrorCode.ENVELOPE_LEGACY,
         AppErrorCode.ENVELOPE_TSP_LOCKED,
         AppErrorCode.MISSING_SIGNATURE_FIELD,
+        AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS,
+        AppErrorCode.RECIPIENT_OUT_OF_TURN,
         AppErrorCode.CSC_INSTANCE_MODE_MISMATCH,
         AppErrorCode.CSC_CREDENTIAL_LIST_EMPTY,
         AppErrorCode.CSC_CERT_INVALID,

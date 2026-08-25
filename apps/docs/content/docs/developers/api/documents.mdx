@@ -28,35 +28,62 @@ Each document contains one or more PDF files, a list of recipients, and the fiel
 
 A document object contains the following properties:
 
-| Property        | Type           | Description                                                    |
-| --------------- | -------------- | -------------------------------------------------------------- |
-| `id`            | string         | Unique identifier (e.g., `envelope_abc123`)                    |
-| `type`          | string         | `DOCUMENT` or `TEMPLATE`                                       |
-| `status`        | string         | Current status: `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED`, or `CANCELLED` |
-| `title`         | string         | Document title                                                 |
-| `source`        | string         | How the document was created: `DOCUMENT`, `TEMPLATE`, `TEMPLATE_DIRECT_LINK` |
-| `visibility`    | string         | Who can view: `EVERYONE`, `ADMIN`, `MANAGER_AND_ABOVE`         |
-| `externalId`    | string \| null | Your custom identifier for the document                        |
-| `createdAt`     | string         | ISO 8601 timestamp                                             |
-| `updatedAt`     | string         | ISO 8601 timestamp                                             |
-| `completedAt`   | string \| null | Timestamp when all recipients completed signing                |
-| `deletedAt`     | string \| null | Timestamp if soft-deleted                                      |
-| `recipients`    | array          | List of recipients and their signing status                    |
-| `fields`        | array          | Signature and form fields on the document                      |
-| `envelopeItems` | array          | PDF files attached to the document                             |
-| `documentMeta`  | object         | Email settings, redirect URL, signing options                  |
+| Property            | Type           | Description                                                                                  |
+| ------------------- | -------------- | -------------------------------------------------------------------------------------------- |
+| `id`                | string         | Unique identifier (e.g., `envelope_abc123`)                                                  |
+| `secondaryId`       | string         | Legacy identifier in prefixed form (`document_123` for documents, `template_123` for templates) |
+| `internalVersion`   | number         | Internal envelope schema version                                                             |
+| `type`              | string         | `DOCUMENT` or `TEMPLATE`                                                                     |
+| `status`            | string         | Current status: `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED`, or `CANCELLED`                  |
+| `title`             | string         | Document title                                                                               |
+| `source`            | string         | How the document was created: `DOCUMENT`, `TEMPLATE`, `TEMPLATE_DIRECT_LINK`                 |
+| `visibility`        | string         | Who can view: `EVERYONE`, `ADMIN`, `MANAGER_AND_ABOVE`                                       |
+| `templateType`      | string         | Template visibility: `PUBLIC`, `PRIVATE`, or `ORGANISATION` (only meaningful for templates)  |
+| `externalId`        | string \| null | Your custom identifier for the document                                                      |
+| `userId`            | number         | ID of the user who owns the document                                                         |
+| `teamId`            | number         | ID of the team the document belongs to                                                       |
+| `folderId`          | string \| null | ID of the folder containing the document                                                     |
+| `templateId`        | number \| null | Legacy ID of the template this document was created from                                     |
+| `authOptions`       | object \| null | Access and action authentication requirements                                                |
+| `formValues`        | object \| null | Pre-filled form values                                                                       |
+| `publicTitle`       | string         | Public title shown on profile and direct-link pages                                          |
+| `publicDescription` | string         | Public description shown on profile and direct-link pages                                    |
+| `createdAt`         | string         | ISO 8601 timestamp                                                                           |
+| `updatedAt`         | string         | ISO 8601 timestamp                                                                           |
+| `completedAt`       | string \| null | Timestamp when all recipients completed signing                                              |
+| `deletedAt`         | string \| null | Timestamp if soft-deleted                                                                    |
+| `recipients`        | array          | List of recipients and their signing status                                                  |
+| `fields`            | array          | Signature and form fields on the document                                                    |
+| `envelopeItems`     | array          | PDF files attached to the document                                                           |
+| `directLink`        | object \| null | Direct-link signing configuration (`id`, `token`, `enabled`, `directTemplateRecipientId`)    |
+| `team`              | object         | Owning team (`id`, `url`)                                                                    |
+| `user`              | object         | Document owner (`id`, `name`, `email`)                                                       |
+| `documentMeta`      | object         | Email settings, redirect URL, signing options                                                |
+
+Documents created through the API have `source: "DOCUMENT"` — there is no separate `API` source value. To tag documents created by your integration, set `externalId` when creating them.
 
 ### Example Document Object
 
 ```json
 {
   "id": "envelope_abc123xyz",
+  "secondaryId": "document_123",
+  "internalVersion": 2,
   "type": "DOCUMENT",
   "status": "PENDING",
   "source": "DOCUMENT",
   "visibility": "EVERYONE",
+  "templateType": "PRIVATE",
   "title": "Service Agreement",
   "externalId": "contract-2025-001",
+  "userId": 1,
+  "teamId": 1,
+  "folderId": null,
+  "templateId": null,
+  "authOptions": null,
+  "formValues": null,
+  "publicTitle": "",
+  "publicDescription": "",
   "createdAt": "2025-01-15T10:30:00.000Z",
   "updatedAt": "2025-01-15T10:35:00.000Z",
   "completedAt": null,
@@ -74,22 +101,40 @@ A document object contains the following properties:
   "fields": [
     {
       "id": 123,
+      "secondaryId": "field_abc123",
       "type": "SIGNATURE",
+      "recipientId": 1,
+      "envelopeId": "envelope_abc123xyz",
+      "envelopeItemId": "envelope_item_xyz",
       "page": 1,
       "positionX": "10",
       "positionY": "80",
       "width": "30",
       "height": "5",
-      "recipientId": 1
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": null
     }
   ],
   "envelopeItems": [
     {
       "id": "envelope_item_xyz",
+      "envelopeId": "envelope_abc123xyz",
+      "documentDataId": "doc_data_abc123",
       "title": "contract.pdf",
       "order": 1
     }
   ],
+  "directLink": null,
+  "team": {
+    "id": 1,
+    "url": "your-team"
+  },
+  "user": {
+    "id": 1,
+    "name": "Jane Smith",
+    "email": "jane@example.com"
+  },
   "documentMeta": {
     "subject": "Please sign this document",
     "message": "Hi, please review and sign this agreement.",

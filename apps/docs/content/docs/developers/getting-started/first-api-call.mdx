@@ -441,7 +441,7 @@ The API returns standard HTTP status codes and JSON error responses:
 | `400` | Bad request - check your request payload |
 | `401` | Unauthorized - invalid or missing API token |
 | `404` | Not found - resource doesn't exist |
-| `429` | Rate limited - wait for the duration in the `Retry-After` header |
+| `429` | Rate limit or plan quota. If `Retry-After` is present, retry the request. |
 | `500` | Server error - retry or contact support |
 
 ### Error Response Format
@@ -485,7 +485,9 @@ The API returns standard HTTP status codes and JSON error responses:
 
 ### Handling Rate Limits
 
-The API allows 1000 requests per minute per IP address. Your organisation may have its own lower rate limits. Every response includes `X-RateLimit-Remaining` and `X-RateLimit-Reset` (an epoch timestamp in seconds). When you receive a `429` response, read the `Retry-After` header and wait for that many seconds before retrying. See [Error Handling Patterns](/docs/developers/examples/common-workflows#error-handling-patterns) for a more complete retry strategy.
+The API has a limit of 1000 requests per minute for each IP address, and your organisation can have a lower limit. Each response includes `X-RateLimit-Remaining` and `X-RateLimit-Reset` (an epoch timestamp in seconds). A windowed rate-limit `429` response includes `Retry-After`. Wait for that number of seconds before you send the request again. A quota `429` response does not include `Retry-After` because a wait cannot correct the quota error. If `Retry-After` is not present, do not send the request again automatically.
+
+Refer to [Error Handling Patterns](/docs/developers/examples/common-workflows#error-handling-patterns) for more retry information.
 
 ```javascript
 async function fetchWithRetry(url, options, maxRetries = 3) {
@@ -493,8 +495,14 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
     const response = await fetch(url, options);
 
     if (response.status === 429) {
-      const retryAfterSeconds = Number.parseInt(response.headers.get('Retry-After') ?? '1', 10);
-      console.log(`Rate limited, waiting ${retryAfterSeconds} seconds...`);
+      const retryAfter = response.headers.get('Retry-After');
+
+      if (!retryAfter) {
+        return response;
+      }
+
+      const retryAfterSeconds = Number.parseInt(retryAfter, 10);
+      console.log(`Rate limit. Wait ${retryAfterSeconds} seconds...`);
       await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
       continue;
     }
