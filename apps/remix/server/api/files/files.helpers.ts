@@ -11,6 +11,10 @@ import {
   DocumentStatus,
   type EnvelopeType,
   EnvelopeType as EnvelopeTypeEnum,
+  FieldType,
+  type Prisma,
+  type Recipient,
+  RecipientRole,
   SigningStatus,
   type TemplateType,
   TemplateType as TemplateTypeEnum,
@@ -56,6 +60,8 @@ type EnvelopeForPendingDownload = {
   internalVersion: number;
 };
 
+type PendingDownloadRecipient = Pick<Recipient, 'role' | 'signingOrder'>;
+
 /**
  * Options shape varies by `version`:
  * - `signed` / `original`: serves stored bytes; only needs envelope `status` for cache headers.
@@ -78,11 +84,11 @@ type HandleEnvelopeItemFileRequestOptions = {
       envelope: EnvelopeForPendingDownload;
 
       /**
-       * When set, only fields from recipients who have signed, plus the fields of
-       * the recipient owning this token, are burned in. Keeps recipient downloads
-       * in parity with what the signing page shows them.
+       * Limits the PDF to fields visible to this recipient. Assistants can also
+       * see non-signature fields for unsigned recipients after them.
        */
       recipientToken?: string;
+      recipient?: PendingDownloadRecipient;
     }
 );
 
@@ -168,6 +174,7 @@ const handlePendingFileRequest = async ({
   envelope,
   documentData,
   recipientToken,
+  recipient,
   context: c,
 }: PendingFileRequestOptions) => {
   if (envelope.status !== DocumentStatus.PENDING) {
@@ -190,17 +197,44 @@ const handlePendingFileRequest = async ({
     });
   }
 
+  let visibleFieldWhere: Prisma.FieldWhereInput = {};
+
+  if (recipient?.role === RecipientRole.ASSISTANT) {
+    visibleFieldWhere = {
+      OR: [
+        {
+          recipient: {
+            signingStatus: SigningStatus.SIGNED,
+          },
+        },
+        {
+          type: {
+            not: FieldType.SIGNATURE,
+          },
+          recipient: {
+            signingStatus: {
+              not: SigningStatus.SIGNED,
+            },
+            signingOrder: {
+              gt: recipient.signingOrder ?? 0,
+            },
+          },
+        },
+      ],
+    };
+  } else if (recipientToken) {
+    visibleFieldWhere = {
+      recipient: {
+        OR: [{ signingStatus: SigningStatus.SIGNED }, { token: recipientToken }],
+      },
+    };
+  }
+
   const fields = await prisma.field.findMany({
     where: {
       envelopeItemId,
       inserted: true,
-      ...(recipientToken
-        ? {
-            recipient: {
-              OR: [{ signingStatus: SigningStatus.SIGNED }, { token: recipientToken }],
-            },
-          }
-        : {}),
+      ...visibleFieldWhere,
     },
     include: {
       signature: true,

@@ -324,6 +324,80 @@ test.describe('API V2 partial signed PDF downloads', () => {
     expect(afterCompletionResponse.headers().etag).toBe(recipientOneResponse.headers().etag);
   });
 
+  test('includes fields filled by an assistant in their partial PDF', async ({ request }) => {
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+      recipients: [
+        {
+          email: 'partial-assistant@test.documenso.com',
+          name: 'Partial Assistant',
+          role: 'ASSISTANT',
+          signingOrder: 1,
+        },
+        {
+          email: 'partial-assisted-signer@test.documenso.com',
+          name: 'Partial Assisted Signer',
+          role: 'SIGNER',
+          signingOrder: 2,
+        },
+        {
+          email: 'partial-other-signer@test.documenso.com',
+          name: 'Partial Other Signer',
+          role: 'SIGNER',
+          signingOrder: 3,
+        },
+      ],
+      fieldsPerRecipient: [
+        [],
+        [
+          { type: FieldType.SIGNATURE, page: 1, positionX: 5, positionY: 5, width: 15, height: 5 },
+          { type: FieldType.TEXT, page: 1, positionX: 5, positionY: 15, width: 15, height: 5 },
+        ],
+        [{ type: FieldType.SIGNATURE, page: 1, positionX: 5, positionY: 25, width: 15, height: 5 }],
+      ],
+    });
+
+    const assistant = distributeResult.recipients.find(
+      (recipient) => recipient.email === 'partial-assistant@test.documenso.com',
+    );
+    const signer = distributeResult.recipients.find(
+      (recipient) => recipient.email === 'partial-assisted-signer@test.documenso.com',
+    );
+    const other = distributeResult.recipients.find(
+      (recipient) => recipient.email === 'partial-other-signer@test.documenso.com',
+    );
+    const textField = envelope.fields.find(
+      (field) => field.recipientId === signer?.id && field.type === FieldType.TEXT,
+    );
+
+    if (!assistant || !signer || !other || !textField) {
+      throw new Error('Expected assistant test fields');
+    }
+
+    await trpcMutation(request, 'field.signFieldWithToken', {
+      token: assistant.token,
+      fieldId: textField.id,
+      value: 'Filled by assistant',
+      isBase64: false,
+    });
+
+    const download = (token: string) =>
+      request.get(
+        `${WEBAPP_BASE_URL}/api/files/token/${token}/envelopeItem/${envelope.envelopeItems[0].id}/download/pending`,
+      );
+
+    const [assistantPdf, signerPdf, otherPdf] = await Promise.all([
+      download(assistant.token),
+      download(signer.token),
+      download(other.token),
+    ]);
+
+    expect(assistantPdf.status()).toBe(200);
+    expect(signerPdf.status()).toBe(200);
+    expect(otherPdf.status()).toBe(200);
+    expect(assistantPdf.headers().etag).toBe(signerPdf.headers().etag);
+    expect(assistantPdf.headers().etag).not.toBe(otherPdf.headers().etag);
+  });
+
   test('rejects a recipient token pending download once the envelope is completed', async ({ request }) => {
     const { envelope, distributeResult } = await apiSeedPendingDocument(request);
 

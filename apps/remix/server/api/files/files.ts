@@ -311,7 +311,20 @@ export const filesRoute = new Hono<HonoEnv>()
         const envelopeItem = await prisma.envelopeItem.findUnique({
           where: envelopeWhereQuery,
           include: {
-            envelope: true,
+            envelope: {
+              include: {
+                recipients: {
+                  where: {
+                    token,
+                  },
+                  select: {
+                    role: true,
+                    signingOrder: true,
+                    token: true,
+                  },
+                },
+              },
+            },
             documentData: true,
           },
         });
@@ -338,6 +351,7 @@ export const filesRoute = new Hono<HonoEnv>()
             envelopeItemId: envelopeItem.id,
             envelope: envelopeItem.envelope,
             recipientToken: token,
+            recipient: envelopeItem.envelope.recipients[0],
           });
         }
 
