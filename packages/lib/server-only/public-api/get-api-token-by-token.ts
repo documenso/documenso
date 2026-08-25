@@ -5,6 +5,8 @@ import { logger } from '../../utils/logger';
 import { hashString } from '../auth/hash';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 
+const LAST_USED_AT_UPDATE_INTERVAL = 60_000; // 1 minute
+
 type GetApiTokenByTokenOptions = {
   token: string;
 
@@ -97,22 +99,28 @@ export const getApiTokenByToken = async ({ token, bypassRateLimit = false }: Get
     });
   }
 
-  void prisma.apiToken
-    .update({
-      where: {
-        id: apiToken.id,
-      },
-      data: {
-        lastUsedAt: new Date(),
-      },
-    })
-    .catch((err) => {
-      logger.warn({
-        msg: 'Failed to update API token lastUsedAt',
-        apiTokenId: apiToken.id,
-        err,
+  // Only update the lastUsedAt after X amount of time has passed to reduce
+  // the number of writes to the database
+  if (!apiToken.lastUsedAt || apiToken.lastUsedAt.getTime() < Date.now() - LAST_USED_AT_UPDATE_INTERVAL) {
+    void prisma.apiToken
+      .updateMany({
+        where: {
+          id: apiToken.id,
+          // Optimistic guard: skip if another request beat us
+          lastUsedAt: apiToken.lastUsedAt,
+        },
+        data: {
+          lastUsedAt: new Date(),
+        },
+      })
+      .catch((err) => {
+        logger.warn({
+          msg: 'Failed to update API token lastUsedAt',
+          apiTokenId: apiToken.id,
+          err,
+        });
       });
-    });
+  }
 
   return {
     ...apiToken,
