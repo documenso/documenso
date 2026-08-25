@@ -6,7 +6,7 @@ import type { RefObject } from 'react';
  * valid, by measuring the percentage of non-transparent pixels against
  * SIGNATURE_MIN_COVERAGE_THRESHOLD.
  */
-export const checkSignatureValidity = (element: RefObject<HTMLCanvasElement>) => {
+export const checkSignatureValidity = (element: RefObject<HTMLCanvasElement | null>) => {
   if (!element.current) {
     return false;
   }
