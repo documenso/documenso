@@ -13,6 +13,12 @@ describe('NEXT_PRIVATE_SIGNING_REASON', () => {
     expect(NEXT_PRIVATE_SIGNING_REASON()).toBe('Signed by Documenso');
   });
 
+  it('uses the default for an empty signing reason', () => {
+    vi.stubEnv('NEXT_PRIVATE_SIGNING_REASON', '');
+
+    expect(NEXT_PRIVATE_SIGNING_REASON()).toBe('Signed by Documenso');
+  });
+
   it('uses the configured signing reason verbatim', () => {
     vi.stubEnv('NEXT_PRIVATE_SIGNING_REASON', 'Signed by Objective');
 
