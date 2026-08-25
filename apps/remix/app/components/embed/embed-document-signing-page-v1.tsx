@@ -2,6 +2,7 @@ import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
@@ -33,6 +34,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 import { BrandingLogo } from '~/components/general/branding-logo';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { injectCss } from '~/utils/css-vars';
+import { getSigningCompletionErrorMessage } from '~/utils/toast-error-messages';
 
 import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
 import { useRequiredDocumentSigningContext } from '../general/document-signing/document-signing-provider';
@@ -172,9 +174,12 @@ export const EmbedSignDocumentV1ClientPage = ({
         );
       }
 
+      const error = AppError.parseError(err);
+      const toastMessage = getSigningCompletionErrorMessage(error.code);
+
       toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`We were unable to submit this document at this time. Please try again later.`),
+        title: _(toastMessage.title),
+        description: _(toastMessage.description),
         variant: 'destructive',
       });
     }

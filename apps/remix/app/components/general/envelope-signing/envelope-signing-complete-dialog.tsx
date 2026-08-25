@@ -149,15 +149,11 @@ export const EnvelopeSignerCompleteDialog = () => {
           envelopeId: envelope.id,
         });
 
-        toast({
-          title: t`Something went wrong`,
-          description: t`We were unable to submit this document at this time. Please try again later.`,
-          variant: 'destructive',
-        });
-
         onDocumentError?.();
       }
 
+      // Rethrow so DocumentSigningCompleteDialog can handle 2FA retries and
+      // toast a specific completion error message.
       throw err;
     }
   };
@@ -233,14 +229,10 @@ export const EnvelopeSignerCompleteDialog = () => {
         envelopeId: envelope.id,
       });
 
-      toast({
-        title: t`Something went wrong`,
-        description: t`We were unable to submit this document at this time. Please try again later.`,
-        variant: 'destructive',
-      });
-
       onDocumentError?.();
 
+      // Rethrow so DocumentSigningCompleteDialog can toast a specific
+      // completion error message.
       throw err;
     }
   };

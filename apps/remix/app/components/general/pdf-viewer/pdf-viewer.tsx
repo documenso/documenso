@@ -222,7 +222,7 @@ export default function PDFViewer({
 
 type VirtualizedPageListProps = {
   scrollParentRef: ScrollTarget;
-  constraintRef: React.RefObject<HTMLDivElement>;
+  constraintRef: React.RefObject<HTMLDivElement | null>;
   pages: PageMeta[];
   numPages: number;
   pdf: pdfjsLib.PDFDocumentProxy;
