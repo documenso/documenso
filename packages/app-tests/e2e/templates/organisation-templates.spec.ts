@@ -149,6 +149,18 @@ test.describe('Organisation Templates - Listing', () => {
     await expect(page.getByText(orgTemplate.title)).toBeVisible();
   });
 
+  test('should use default pagination when URL values are zero', async ({ page }) => {
+    const { memberB, teamB, orgTemplate } = await seedOrgTemplateScenario();
+
+    await apiSignin({
+      page,
+      email: memberB.email,
+      redirectPath: `/t/${teamB.url}/templates?view=organisation&page=0&perPage=0`,
+    });
+
+    await expect(page.getByText(orgTemplate.title)).toBeVisible();
+  });
+
   test('should not show private templates from other teams under the organisation view', async ({ page }) => {
     const { ownerA, teamA, memberB, teamB } = await seedOrgTemplateScenario();
 

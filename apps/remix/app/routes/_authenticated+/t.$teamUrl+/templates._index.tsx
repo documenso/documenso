@@ -41,6 +41,8 @@ export default function TemplatesPage() {
   const [findTemplateSearchParams] = useQueryStates(templatesSearchParams, {
     history: 'push',
   });
+  const page = findTemplateSearchParams.page || undefined;
+  const perPage = findTemplateSearchParams.perPage || undefined;
 
   const isOrgView = findTemplateSearchParams.view === 'organisation';
   const showOrgFilter = organisation.type !== OrganisationType.PERSONAL;
@@ -62,8 +64,8 @@ export default function TemplatesPage() {
 
   const teamTemplatesQuery = trpc.template.findTemplates.useQuery(
     {
-      page: findTemplateSearchParams.page ?? undefined,
-      perPage: findTemplateSearchParams.perPage ?? undefined,
+      page,
+      perPage,
       folderId,
     },
     {
@@ -73,8 +75,8 @@ export default function TemplatesPage() {
 
   const orgTemplatesQuery = trpc.template.findOrganisationTemplates.useQuery(
     {
-      page: findTemplateSearchParams.page ?? undefined,
-      perPage: findTemplateSearchParams.perPage ?? undefined,
+      page,
+      perPage,
     },
     {
       enabled: isOrgView,
