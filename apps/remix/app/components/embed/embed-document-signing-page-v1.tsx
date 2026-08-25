@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
@@ -73,6 +74,7 @@ export const EmbedSignDocumentV1ClientPage = ({
 }: EmbedSignDocumentV1ClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const { fullName, email, signature, setFullName, setEmail, setSignature } = useRequiredDocumentSigningContext();
 
@@ -152,6 +154,14 @@ export const EmbedSignDocumentV1ClientPage = ({
 
       setHasCompletedDocument(true);
     } catch (err) {
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'complete_document',
+        recipientId: recipient.id,
+        documentId,
+        envelopeId,
+      });
+
       if (window.parent) {
         window.parent.postMessage(
           {
@@ -231,6 +241,15 @@ export const EmbedSignDocumentV1ClientPage = ({
       }
     } catch (err) {
       console.error(err);
+
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'embed_init',
+        recipientId: recipient.id,
+        documentId,
+        envelopeId,
+      });
+
       setHasFinishedInit(true);
     }
 

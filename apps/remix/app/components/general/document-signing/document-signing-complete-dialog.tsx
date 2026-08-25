@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { type TRecipientAccessAuth, ZDocumentAccessAuthSchema } from '@documenso/lib/types/document-auth';
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
@@ -86,6 +87,7 @@ export const DocumentSigningCompleteDialog = ({
   disableNameInput = false,
 }: DocumentSigningCompleteDialogProps) => {
   const { t } = useLingui();
+  const analytics = useAnalytics();
 
   const [showDialog, setShowDialog] = useState(false);
 
@@ -174,6 +176,11 @@ export const DocumentSigningCompleteDialog = ({
 
         return;
       }
+
+      analytics.captureException(error, {
+        source: 'signing',
+        location: 'complete_document',
+      });
     }
   };
 
