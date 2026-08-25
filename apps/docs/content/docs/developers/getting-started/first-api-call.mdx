@@ -78,12 +78,10 @@ A successful response returns a list of your documents (envelopes):
       "createdAt": "2025-01-15T10:30:00.000Z"
     }
   ],
-  "pagination": {
-    "page": 1,
-    "perPage": 10,
-    "totalPages": 1,
-    "totalItems": 1
-  }
+  "count": 1,
+  "currentPage": 1,
+  "perPage": 10,
+  "totalPages": 1
 }
 ````
 
@@ -228,9 +226,12 @@ After creating a document, it's in `DRAFT` status. To send it to recipients, use
 <Tabs items={['curl', 'JavaScript']}>
 <Tab value="curl">
 ```bash
-curl -X POST "https://app.documenso.com/api/v2/envelope/envelope_abc123/distribute" \
+curl -X POST "https://app.documenso.com/api/v2/envelope/distribute" \
   -H "Authorization: YOUR_API_TOKEN" \
-  -H "Content-Type: application/json"
+  -H "Content-Type: application/json" \
+  -d '{
+    "envelopeId": "envelope_abc123"
+  }'
 ````
 
 </Tab>
@@ -238,16 +239,14 @@ curl -X POST "https://app.documenso.com/api/v2/envelope/envelope_abc123/distribu
 ```javascript
 const envelopeId = 'envelope_abc123';
 
-const response = await fetch(
-  `https://app.documenso.com/api/v2/envelope/${envelopeId}/distribute`,
-  {
-    method: 'POST',
-    headers: {
-      Authorization: 'YOUR_API_TOKEN',
-      'Content-Type': 'application/json',
-    },
+const response = await fetch('https://app.documenso.com/api/v2/envelope/distribute', {
+  method: 'POST',
+  headers: {
+    Authorization: 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json',
   },
-);
+  body: JSON.stringify({ envelopeId }),
+});
 
 const data = await response.json();
 console.log('Document sent:', data);
@@ -337,16 +336,14 @@ async function createAndSendDocument(pdfPath, recipientEmail, recipientName) {
   console.log('Created envelope:', envelope.id);
 
   // Step 2: Send the document for signing
-  const distributeResponse = await fetch(
-    `${BASE_URL}/envelope/${envelope.id}/distribute`,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': API_TOKEN,
-        'Content-Type': 'application/json',
-      },
-    }
-  );
+  const distributeResponse = await fetch(`${BASE_URL}/envelope/distribute`, {
+    method: 'POST',
+    headers: {
+      'Authorization': API_TOKEN,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ envelopeId: envelope.id }),
+  });
 
   if (!distributeResponse.ok) {
     const error = await distributeResponse.json();
@@ -422,9 +419,12 @@ echo "Created envelope: ${ENVELOPE_ID}"
 # Step 2: Send the document for signing
 
 echo "Sending document..."
-curl -s -X POST "${BASE_URL}/envelope/${ENVELOPE_ID}/distribute" \
+curl -s -X POST "${BASE_URL}/envelope/distribute" \
   -H "Authorization: ${API_TOKEN}" \
-  -H "Content-Type: application/json"
+  -H "Content-Type: application/json" \
+  -d "{
+    \"envelopeId\": \"${ENVELOPE_ID}\"
+  }"
 
 echo "Document sent for signing!"
 
@@ -441,7 +441,7 @@ The API returns standard HTTP status codes and JSON error responses:
 | `400` | Bad request - check your request payload |
 | `401` | Unauthorized - invalid or missing API token |
 | `404` | Not found - resource doesn't exist |
-| `429` | Rate limited - wait 60 seconds and retry |
+| `429` | Rate limit or plan quota. If `Retry-After` is present, retry the request. |
 | `500` | Server error - retry or contact support |
 
 ### Error Response Format
@@ -485,7 +485,9 @@ The API returns standard HTTP status codes and JSON error responses:
 
 ### Handling Rate Limits
 
-The API allows 1000 requests per minute per IP address. Your organisation may have its own lower rate limits. When rate limited, wait at least 60 seconds before retrying:
+The API has a limit of 1000 requests per minute for each IP address, and your organisation can have a lower limit. Each response includes `X-RateLimit-Remaining` and `X-RateLimit-Reset` (an epoch timestamp in seconds). A windowed rate-limit `429` response includes `Retry-After`. Wait for that number of seconds before you send the request again. A quota `429` response does not include `Retry-After` because a wait cannot correct the quota error. If `Retry-After` is not present, do not send the request again automatically.
+
+Refer to [Error Handling Patterns](/docs/developers/examples/common-workflows#error-handling-patterns) for more retry information.
 
 ```javascript
 async function fetchWithRetry(url, options, maxRetries = 3) {
@@ -493,8 +495,15 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
     const response = await fetch(url, options);
 
     if (response.status === 429) {
-      console.log('Rate limited, waiting 60 seconds...');
-      await new Promise((resolve) => setTimeout(resolve, 60000));
+      const retryAfter = response.headers.get('Retry-After');
+
+      if (!retryAfter) {
+        return response;
+      }
+
+      const retryAfterSeconds = Number.parseInt(retryAfter, 10);
+      console.log(`Rate limit. Wait ${retryAfterSeconds} seconds...`);
+      await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
       continue;
     }
 
