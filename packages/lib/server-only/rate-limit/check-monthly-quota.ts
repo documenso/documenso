@@ -31,22 +31,49 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
   const period = currentMonthlyPeriod();
   const column = COUNTER_COLUMN[opts.counter];
 
-  const latestMonthlyStat = await prisma.organisationMonthlyStat.upsert({
-    where: {
-      organisationId_period: {
+  const { alertKind } = await prisma.$transaction(async (tx) => {
+    const latestMonthlyStat = await tx.organisationMonthlyStat.upsert({
+      where: {
+        organisationId_period: {
+          organisationId: opts.organisationId,
+          period,
+        },
+      },
+      update: {
+        [column]: { increment: opts.count },
+      },
+      create: {
+        id: generateDatabaseId('org_monthly_stat'),
         organisationId: opts.organisationId,
         period,
+        [column]: opts.count,
       },
-    },
-    update: {
-      [column]: { increment: opts.count },
-    },
-    create: {
-      id: generateDatabaseId('org_monthly_stat'),
-      organisationId: opts.organisationId,
-      period,
-      [column]: opts.count,
-    },
+    });
+
+    if (opts.quota === null) {
+      return { alertKind: null };
+    }
+
+    const currentCount = latestMonthlyStat[column];
+    const previousCount = currentCount - opts.count;
+
+    const calculatedAlertKind = getQuotaAlertKind({
+      previousCount,
+      newCount: currentCount,
+      quota: opts.quota,
+    });
+
+    if (currentCount > opts.quota) {
+      throw new AppError(AppErrorCode.TOO_MANY_REQUESTS, {
+        message:
+          'Your request could not be completed at this time due to your account exceeding the fair use limits of your current plan. Please contact support.',
+        // Not tossing headers here to avoid confusion, this isn't rate limits.
+      });
+    }
+
+    return {
+      alertKind: calculatedAlertKind,
+    };
   });
 
   // For unlimited quotas, we still allow the request to send so we can collect the monthly stat.
@@ -54,22 +81,7 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
     return;
   }
 
-  const newCount = latestMonthlyStat[column];
-  const previousCount = newCount - opts.count;
-
-  // Returns 'quota' on the single request that reached (or jumped past) the quota,
-  // 'quotaNearing' on the single request that reached the warning threshold,
-  // otherwise null. See getQuotaAlertKind for the exactly-once guarantee.
-  const alertKind = getQuotaAlertKind({
-    previousCount,
-    newCount,
-    quota: opts.quota,
-  });
-
-  // Trigger the alert before the over-quota check — the 'quota' alert usually fires
-  // on the successful request that consumes the last unit of allowance, but when a
-  // batch jumps past the boundary it fires on this rejected request. Either way it
-  // will never fire again this period, so it must be enqueued before any throw.
+  // Trigger the alert when nearing or reaching quota.
   if (alertKind) {
     await jobsClient
       .triggerJob({
@@ -89,13 +101,5 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
 
         // Do nothing.
       });
-  }
-
-  if (newCount > opts.quota) {
-    throw new AppError(AppErrorCode.TOO_MANY_REQUESTS, {
-      message:
-        'Your request could not be completed at this time due to your account exceeding the fair use limits of your current plan. Please contact support.',
-      // Not tossing headers here to avoid confusion, this isn't rate limits.
-    });
   }
 };
