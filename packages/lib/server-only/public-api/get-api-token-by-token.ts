@@ -101,7 +101,7 @@ export const getApiTokenByToken = async ({ token, bypassRateLimit = false }: Get
 
   // Only update the lastUsedAt after X amount of time has passed to reduce
   // the number of writes to the database
-  if (!apiToken.lastUsedAt || apiToken.lastUsedAt.getTime() < Date.now() - LAST_USED_AT_UPDATE_INTERVAL) {
+  if (!apiToken.lastUsedAt || apiToken.lastUsedAt.getTime() + LAST_USED_AT_UPDATE_INTERVAL < Date.now()) {
     void prisma.apiToken
       .updateMany({
         where: {
