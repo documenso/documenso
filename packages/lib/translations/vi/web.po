@@ -1,17 +1,5 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-07-24 13:01+1000\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Generator: @lingui/cli\n"
-"Language: en\n"
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Plural-Forms: \n"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
@@ -307,12 +295,6 @@ msgstr "{0} field"
 msgid "{0} has invited you to {recipientActionVerb} the document \"{1}\"."
 msgstr "{0} has invited you to {recipientActionVerb} the document \"{1}\"."
 
-#. placeholder {0}: organisation.name
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-msgid "{0} has invited you to sign this document."
-msgstr "{0} has invited you to sign this document."
-
 #. placeholder {0}: team.name
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 msgid "{0} invited you to {recipientActionVerb} a document"
@@ -434,10 +416,6 @@ msgstr "{inviterName} on behalf of \"{teamName}\" has invited you to {0}<0/>\"{d
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
 msgstr "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
 
-#: apps/remix/app/components/dialogs/envelopes-bulk-download-dialog.tsx
-msgid "{MAX_BULK_DOWNLOAD_ENVELOPES, plural, one {You can download up to # document at a time. Deselect some documents to continue.} other {You can download up to # documents at a time. Deselect some documents to continue.}}"
-msgstr "{MAX_BULK_DOWNLOAD_ENVELOPES, plural, one {You can download up to # document at a time. Deselect some documents to continue.} other {You can download up to # documents at a time. Deselect some documents to continue.}}"
-
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "{MAXIMUM_PASSKEYS, plural, one {You cannot have more than # passkey.} other {You cannot have more than # passkeys.}}"
 msgstr "{MAXIMUM_PASSKEYS, plural, one {You cannot have more than # passkey.} other {You cannot have more than # passkeys.}}"
@@ -518,12 +496,8 @@ msgid "{teamName} has invited you to {action} {documentName}"
 msgstr "{teamName} has invited you to {action} {documentName}"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
-msgid "{totalVisibleCount, plural, one {# item} other {# items}}"
-msgstr "{totalVisibleCount, plural, one {# item} other {# items}}"
-
-#: apps/remix/app/components/general/app-command-menu.tsx
-msgid "{totalVisibleCount, plural, one {# result} other {# results}}"
-msgstr "{totalVisibleCount, plural, one {# result} other {# results}}"
+msgid "{totalVisibleCount} items"
+msgstr "{totalVisibleCount} items"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} added a field"
@@ -741,7 +715,7 @@ msgstr "<0>{organisationName}</0> has requested to create an account on your beh
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "<0>{organisationName}</0> has requested to link your current Documenso account to their organisation."
-msgstr "<0>{organisationName}</0> has requested to link your current Documenso account to their organisation."
+msgstr "<0>{organisationName}</0> has requested to link your current Crove Sign account to their organisation."
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v1.tsx
 msgid "<0>{senderName} {senderEmail}</0> has invited you to approve this document"
@@ -781,7 +755,7 @@ msgstr "<0>{senderName} {senderEmail}</0> on behalf of \"{0}\" has invited you t
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
-msgstr "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
+msgstr "<0>{teamName}</0> has requested to use your email address for their team on Crove Sign."
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "<0>{teamName}</0> would like to use <1>{email}</1> as their team email."
@@ -789,7 +763,7 @@ msgstr "<0>{teamName}</0> would like to use <1>{email}</1> as their team email."
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "<0>Account management:</0> Modify your account settings, permissions, and preferences"
-msgstr "<0>Account management:</0> Modify your account settings, permissions, and preferences"
+msgstr "<0>Account management:</0> Modify your cài đặt tài khoản, permissions, and preferences"
 
 #: packages/ui/components/document/document-visibility-select.tsx
 msgid "<0>Admins only</0> - Only admins can access and view the document"
@@ -860,7 +834,7 @@ msgstr "<0>Private</0> templates can only be used by your team."
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Public</0> templates are linked to your public profile."
-msgstr "<0>Public</0> templates are linked to your public profile."
+msgstr "<0>Public</0> templates are linked to your hồ sơ công khai."
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx
@@ -934,7 +908,7 @@ msgstr "404 Document not found"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "404 Email domain not found"
-msgstr "404 Email domain not found"
+msgstr "404 tên miền email not found"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "404 not found"
@@ -1036,7 +1010,7 @@ msgstr "A means to print or download documents for your records"
 
 #: packages/email/templates/organisation-join.tsx
 msgid "A member has joined your organisation on Documenso"
-msgstr "A member has joined your organisation on Documenso"
+msgstr "A member has joined your organisation on Crove Sign"
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-left-email.handler.ts
 msgid "A member has left your organisation"
@@ -1048,7 +1022,7 @@ msgstr "A member has left your organisation {organisationName}"
 
 #: packages/email/templates/organisation-leave.tsx
 msgid "A member has left your organisation on Documenso"
-msgstr "A member has left your organisation on Documenso"
+msgstr "A member has left your organisation on Crove Sign"
 
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 msgid "A name to help you identify this token later."
@@ -1085,17 +1059,17 @@ msgstr "A request has been made to create an account for you"
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "A request has been made to link your Documenso account"
-msgstr "A request has been made to link your Documenso account"
+msgstr "A request has been made to link your Crove Sign account"
 
 #. placeholder {0}: team.name
 #: packages/lib/server-only/team/create-team-email-verification.ts
 msgid "A request to use your email has been initiated by {0} on Documenso"
-msgstr "A request to use your email has been initiated by {0} on Documenso"
+msgstr "A request to use your email has been initiated by {0} on Crove Sign"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso."
-msgstr "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso."
+msgstr "A secret that will be sent to your URL so you can verify that the request has been sent by Crove Sign."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "A stable internet connection"
@@ -1144,11 +1118,11 @@ msgstr "Accept & Link Account"
 
 #: packages/email/templates/organisation-invite.tsx
 msgid "Accept invitation to join an organisation on Documenso"
-msgstr "Accept invitation to join an organisation on Documenso"
+msgstr "Accept invitation to join an organisation on Crove Sign"
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Accept team email request for {teamName} on Documenso"
-msgstr "Accept team email request for {teamName} on Documenso"
+msgstr "Accept team email request for {teamName} on Crove Sign"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Acceptance and Consent"
@@ -1169,7 +1143,7 @@ msgstr "Access enabled"
 #: apps/remix/app/components/general/unified-settings-sidebar-mobile.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Account"
-msgstr "Account"
+msgstr "Tài khoản"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/generate-certificate-pdf.ts
@@ -1217,15 +1191,11 @@ msgstr "Account Re-Authentication"
 #: apps/remix/app/components/general/settings-scope-breadcrumb.tsx
 #: apps/remix/app/components/general/unified-settings-sidebar.tsx
 msgid "Account Settings"
-msgstr "Account Settings"
+msgstr "cài đặt tài khoản"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Account unlinked"
 msgstr "Account unlinked"
-
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Accounts are automatically added to your organisation on sign-in"
-msgstr "Accounts are automatically added to your organisation on sign-in"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Acknowledgment"
@@ -1380,7 +1350,7 @@ msgstr "Add Attachment"
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Add Custom Email Domain"
-msgstr "Add Custom Email Domain"
+msgstr "Add Custom tên miền email"
 
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "Add email"
@@ -1392,7 +1362,7 @@ msgstr "Add Email"
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Add Email Domain"
-msgstr "Add Email Domain"
+msgstr "Add tên miền email"
 
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
 msgid "Add Email Transport"
@@ -1632,7 +1602,7 @@ msgstr "All documents related to the electronic signing process will be provided
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "All email domains have been synced successfully"
-msgstr "All email domains have been synced successfully"
+msgstr "All tên miền email have been synced successfully"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
@@ -1658,7 +1628,7 @@ msgstr "All recipients will be notified"
 
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 msgid "All rights reserved."
-msgstr "All rights reserved."
+msgstr "Đã đăng ký bản quyền."
 
 #: packages/email/template-components/template-document-cancel.tsx
 msgid "All signatures have been voided."
@@ -1702,7 +1672,7 @@ msgstr "Allow signers to dictate next signer"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Allowed Email Domains"
-msgstr "Allowed Email Domains"
+msgstr "Allowed tên miền email"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
@@ -1738,11 +1708,11 @@ msgstr "An admin has deleted your document \"{documentName}\"."
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "An administrator has created a Documenso account for you."
-msgstr "An administrator has created a Documenso account for you."
+msgstr "An administrator has created a Crove Sign account for you."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
-msgstr "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
+msgstr "An chữ ký điện tử provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "An email account"
@@ -1823,13 +1793,17 @@ msgstr "An error occurred while auto-signing the document, some fields may not b
 msgid "An error occurred while cancelling the documents."
 msgstr "An error occurred while cancelling the documents."
 
+#: apps/remix/app/components/general/document-signing/document-signing-form.tsx
+msgid "An error occurred while completing the document. Please try again."
+msgstr "An error occurred while completing the document. vui lòng thử lại."
+
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "An error occurred while creating document from template."
 msgstr "An error occurred while creating document from template."
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "An error occurred while creating the webhook. Please try again."
-msgstr "An error occurred while creating the webhook. Please try again."
+msgstr "An error occurred while creating the webhook. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "An error occurred while deleting the items."
@@ -1874,7 +1848,7 @@ msgstr "An error occurred while moving the items."
 
 #: apps/remix/app/components/general/document-signing/document-signing-reject-dialog.tsx
 msgid "An error occurred while rejecting the document. Please try again."
-msgstr "An error occurred while rejecting the document. Please try again."
+msgstr "An error occurred while rejecting the document. vui lòng thử lại."
 
 #: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx
@@ -1957,7 +1931,7 @@ msgstr "An error occurred while uploading your document."
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "An error occurred. Please try again later."
-msgstr "An error occurred. Please try again later."
+msgstr "An error occurred. vui lòng thử lại later."
 
 #: packages/lib/jobs/definitions/emails/send-organisation-limit-alert-email.handler.ts
 msgid "An organisation has exceeded their fair use limits"
@@ -2154,7 +2128,7 @@ msgstr "Approving"
 
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 msgid "Are you sure you want to complete the document? This action cannot be undone. Please ensure that you have completed prefilling all relevant fields before proceeding."
-msgstr "Are you sure you want to complete the document? This action cannot be undone. Please ensure that you have completed prefilling all relevant fields before proceeding."
+msgstr "Are you sure you want to complete the document? hành động này không thể hoàn tác. Please ensure that you have completed prefilling all relevant fields before proceeding."
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Are you sure you want to delete the following claim?"
@@ -2170,7 +2144,7 @@ msgstr "Are you sure you want to delete this folder?"
 
 #: apps/remix/app/components/general/document-signing/document-signing-reject-dialog.tsx
 msgid "Are you sure you want to reject this document? This action cannot be undone."
-msgstr "Are you sure you want to reject this document? This action cannot be undone."
+msgstr "Are you sure you want to reject this document? hành động này không thể hoàn tác."
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "Are you sure you want to remove the <0>{passkeyName}</0> passkey?"
@@ -2295,7 +2269,7 @@ msgstr "Nhật ký kiểm toán"
 
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 msgid "Audit Log Details"
-msgstr "Audit Log Details"
+msgstr "nhật ký kiểm toán Details"
 
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
@@ -2412,7 +2386,7 @@ msgstr "Black"
 
 #: apps/remix/app/components/general/admin-email-blocklist-section.tsx
 msgid "Block signups from additional email domains on top of the bundled disposable email list. Subdomains are matched automatically (e.g. blocking \"bad.com\" also blocks \"foo.bad.com\")."
-msgstr "Block signups from additional email domains on top of the bundled disposable email list. Subdomains are matched automatically (e.g. blocking \"bad.com\" also blocks \"foo.bad.com\")."
+msgstr "Block signups from additional tên miền email on top of the bundled disposable email list. Subdomains are matched automatically (e.g. blocking \"bad.com\" also blocks \"foo.bad.com\")."
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "Blocked"
@@ -2445,10 +2419,6 @@ msgstr "Border radius size in REM units (e.g. 0.5rem)."
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
 msgstr "Bottom"
-
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
-msgid "Brand accent"
-msgstr "Brand accent"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Colours"
@@ -2566,11 +2536,11 @@ msgstr "By enabling 2FA, you will be required to enter a code from your authenti
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "By proceeding to use the electronic signature service provided by Documenso, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
-msgstr "By proceeding to use the electronic signature service provided by Documenso, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
+msgstr "By proceeding to use the chữ ký điện tử service provided by Crove Sign, you affirm that you have read and understood this disclosure. You agree to all điều khoản và điều kiện related to the use of chữ ký điện tử and electronic transactions as outlined herein."
 
 #: apps/remix/app/components/general/document-signing/document-signing-disclosure.tsx
 msgid "By proceeding with your electronic signature, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
-msgstr "By proceeding with your electronic signature, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
+msgstr "By proceeding with your chữ ký điện tử, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "By proceeding, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
@@ -2578,7 +2548,7 @@ msgstr "By proceeding, you agree to our <0>Terms of Service</0> and <1>Privacy P
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
-msgstr "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
+msgstr "By using the chữ ký điện tử feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your chữ ký điện tử on documents is binding and that you accept the terms outlined in the documents you are signing."
 
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Can prepare"
@@ -2776,7 +2746,7 @@ msgstr "Certificate preferences updated"
 #: packages/lib/utils/settings-nav.ts
 #: packages/lib/utils/settings-nav.ts
 msgid "Certificates"
-msgstr "Certificates"
+msgstr "Chứng chỉ & Chứng thư"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Field Type"
@@ -2881,7 +2851,7 @@ msgstr "Claims"
 
 #: apps/remix/app/components/general/filter-pill.tsx
 msgid "Clear"
-msgstr "Clear"
+msgstr "Xóa vẽ lại"
 
 #: packages/ui/primitives/data-table.tsx
 msgid "Clear filters"
@@ -2976,19 +2946,11 @@ msgstr "Collapse sidebar"
 
 #: apps/remix/app/components/general/admin-email-blocklist-section.tsx
 msgid "Comma-separated list of email domains to block from signing up."
-msgstr "Comma-separated list of email domains to block from signing up."
+msgstr "Comma-separated list of tên miền email to block from signing up."
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Communication"
 msgstr "Communication"
-
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
-msgid "Company details"
-msgstr "Company details"
-
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
-msgid "Company details and website in email footers"
-msgstr "Company details and website in email footers"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Compare all plans and features in detail"
@@ -3176,11 +3138,6 @@ msgstr "Consent to Electronic Transactions"
 msgid "Contact Information"
 msgstr "Contact Information"
 
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Contact Sales"
-msgstr "Contact Sales"
-
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Contact sales here"
 msgstr "Contact sales here"
@@ -3188,10 +3145,6 @@ msgstr "Contact sales here"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Contact us"
 msgstr "Contact us"
-
-#: apps/remix/app/components/general/settings-upsell/settings-upsell-card.tsx
-msgid "Contact your organisation owner to upgrade plans."
-msgstr "Contact your organisation owner to upgrade plans."
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Content"
@@ -3245,25 +3198,21 @@ msgstr "Continue by viewing the document."
 msgid "Continue to login"
 msgstr "Continue to login"
 
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Continue with SSO"
-msgstr "Continue with SSO"
-
 #: apps/remix/app/components/forms/reminder-preferences-form.tsx
 msgid "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
 msgstr "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Controls the default email settings when new documents or templates are created. Updating these settings will not affect existing documents or templates."
-msgstr "Controls the default email settings when new documents or templates are created. Updating these settings will not affect existing documents or templates."
+msgstr "Controls the Email mặc định settings when new documents or templates are created. Updating these settings will not affect existing documents or templates."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
-msgstr "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
+msgstr "Kiểm soát ngôn ngữ mặc định của tài liệu được tải lên. Ngôn ngữ này sẽ được sử dụng trong các email gửi tới người nhận."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Controls the default visibility of an uploaded document."
-msgstr "Controls the default visibility of an uploaded document."
+msgstr "Kiểm soát quyền hiển thị mặc định của tài liệu được tải lên."
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
@@ -3280,7 +3229,7 @@ msgstr "Controls when and how often reminder emails are sent to recipients who h
 
 #: apps/remix/app/components/forms/certificate-preferences-form.tsx
 msgid "Controls whether the audit logs will be included in the document when it is downloaded. The audit logs can still be downloaded from the logs page separately."
-msgstr "Controls whether the audit logs will be included in the document when it is downloaded. The audit logs can still be downloaded from the logs page separately."
+msgstr "Controls whether the nhật ký kiểm toán will be included in the document when it is downloaded. The nhật ký kiểm toán can still be downloaded from the logs page separately."
 
 #: apps/remix/app/components/forms/certificate-preferences-form.tsx
 msgid "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
@@ -3288,7 +3237,7 @@ msgstr "Controls whether the signing certificate will be included in the documen
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Controls which signatures are allowed to be used when signing a document."
-msgstr "Controls which signatures are allowed to be used when signing a document."
+msgstr "Kiểm soát các loại chữ ký được phép sử dụng khi ký tài liệu."
 
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
@@ -3440,7 +3389,7 @@ msgstr "Create an organisation to get started."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Create and manage API tokens. See our <0>documentation</0> for more information."
-msgstr "Create and manage API tokens. See our <0>documentation</0> for more information."
+msgstr "Create and manage mã API tokens. See our <0>documentation</0> for more information."
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create and send"
@@ -3448,7 +3397,7 @@ msgstr "Create and send"
 
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 msgid "Create API token"
-msgstr "Create API token"
+msgstr "Create mã API token"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create as draft"
@@ -3685,7 +3634,7 @@ msgstr "Currently branding can only be configured for Teams and above plans."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
 msgid "Currently email domains can only be configured for Platform and above plans."
-msgstr "Currently email domains can only be configured for Platform and above plans."
+msgstr "Currently tên miền email can only be configured for Platform and above plans."
 
 #. placeholder {0}: (field.value.size / (1024 * 1024)).toFixed(2)
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
@@ -3694,7 +3643,7 @@ msgstr "Custom {0} MB file"
 
 #: apps/remix/app/components/dialogs/branding-preferences-reset-dialog.tsx
 msgid "Custom branding enabled setting"
-msgstr "Custom branding enabled setting"
+msgstr "thương hiệu tùy chỉnh enabled setting"
 
 #: apps/remix/app/components/dialogs/branding-preferences-reset-dialog.tsx
 msgid "Custom CSS"
@@ -3819,15 +3768,15 @@ msgstr "Email mặc định"
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Default Email Settings"
-msgstr "Default Email Settings"
+msgstr "Cài đặt Email mặc định"
 
 #: apps/remix/app/components/forms/reminder-preferences-form.tsx
 msgid "Default Envelope Expiration"
-msgstr "Default Envelope Expiration"
+msgstr "Thời hạn gói tài liệu mặc định"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Default file"
-msgstr "Default file"
+msgstr "Tệp mặc định"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Default Organisation Role for New Users"
@@ -3835,11 +3784,11 @@ msgstr "Default Organisation Role for New Users"
 
 #: apps/remix/app/components/dialogs/document-preferences-reset-dialog.tsx
 msgid "Default recipients"
-msgstr "Default recipients"
+msgstr "Người nhận mặc định"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Recipients"
-msgstr "Default Recipients"
+msgstr "Người nhận mặc định"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Default settings applied to this organisation."
@@ -3851,11 +3800,11 @@ msgstr "Default settings applied to this team. Inherited values come from the or
 
 #: apps/remix/app/components/dialogs/document-preferences-reset-dialog.tsx
 msgid "Default signature settings"
-msgstr "Default signature settings"
+msgstr "Cài đặt chữ ký mặc định"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Signature Settings"
-msgstr "Default Signature Settings"
+msgstr "Cài đặt chữ ký mặc định"
 
 #: apps/remix/app/components/forms/reminder-preferences-form.tsx
 msgid "Default Signing Reminders"
@@ -3863,11 +3812,11 @@ msgstr "Default Signing Reminders"
 
 #: apps/remix/app/components/dialogs/document-preferences-reset-dialog.tsx
 msgid "Default time zone"
-msgstr "Default time zone"
+msgstr "Múi giờ mặc định"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Time Zone"
-msgstr "Default Time Zone"
+msgstr "Múi giờ mặc định"
 
 #: apps/remix/app/components/forms/editor/editor-field-radio-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx
@@ -3976,7 +3925,7 @@ msgstr "Delete document"
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Delete Document"
-msgstr "Delete Document"
+msgstr "Xóa tài liệu"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Delete Documents"
@@ -3989,11 +3938,11 @@ msgstr "Delete email"
 #: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Delete email domain"
-msgstr "Delete email domain"
+msgstr "Delete tên miền email"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Delete Email Domain"
-msgstr "Delete Email Domain"
+msgstr "Delete tên miền email"
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
 msgid "Delete Email Transport"
@@ -4039,7 +3988,7 @@ msgstr "Delete team group"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Delete Template"
-msgstr "Delete Template"
+msgstr "Xóa mẫu tài liệu"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Delete Templates"
@@ -4047,11 +3996,11 @@ msgstr "Delete Templates"
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete the document. This action is irreversible so proceed with caution."
-msgstr "Delete the document. This action is irreversible so proceed with caution."
+msgstr "Delete the document. hành động này không thể đảo ngược so proceed with caution."
 
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 msgid "Delete the users account and all its contents. This action is irreversible and will cancel their subscription, so proceed with caution."
-msgstr "Delete the users account and all its contents. This action is irreversible and will cancel their subscription, so proceed with caution."
+msgstr "Delete the users account and all its contents. hành động này không thể đảo ngược and will cancel their subscription, so proceed with caution."
 
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 msgid "Delete token"
@@ -4063,7 +4012,7 @@ msgstr "Delete Webhook"
 
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Delete your account and all its contents, including completed documents. This action is irreversible and will cancel your subscription, so proceed with caution."
-msgstr "Delete your account and all its contents, including completed documents. This action is irreversible and will cancel your subscription, so proceed with caution."
+msgstr "Delete your account and all its contents, including completed documents. hành động này không thể đảo ngược and will cancel your subscription, so proceed with caution."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
@@ -4299,11 +4248,11 @@ msgstr "Do not proceed if you are unsure about this request."
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Documenso License"
-msgstr "Documenso License"
+msgstr "Crove Sign License"
 
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
-msgstr "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
+msgstr "Crove Sign will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
 
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
@@ -4349,10 +4298,6 @@ msgstr "Document access auth updated"
 msgid "Document All"
 msgstr "Document All"
 
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "Document already completed"
-msgstr "Document already completed"
-
 #: apps/remix/app/components/general/envelope-signing/envelope-signing-complete-dialog.tsx
 msgid "Document already signed"
 msgstr "Document already signed"
@@ -4363,7 +4308,6 @@ msgstr "Document Approved"
 
 #: apps/remix/app/components/dialogs/envelope-cancel-dialog.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
-#: apps/remix/app/utils/toast-error-messages.ts
 msgid "Document cancelled"
 msgstr "Document cancelled"
 
@@ -4400,7 +4344,7 @@ msgstr "Document Completed!"
 
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "Document conversion is temporarily unavailable. Please try again shortly or upload a PDF."
-msgstr "Document conversion is temporarily unavailable. Please try again shortly or upload a PDF."
+msgstr "Document conversion is temporarily unavailable. vui lòng thử lại shortly or upload a PDF."
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Document created"
@@ -4532,17 +4476,9 @@ msgstr "Document metrics"
 msgid "Document moved to team"
 msgstr "Document moved to team"
 
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "Document no longer available"
-msgstr "Document no longer available"
-
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Document no longer available to sign"
 msgstr "Document no longer available to sign"
-
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "Document not ready"
-msgstr "Document not ready"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Document opened"
@@ -4561,16 +4497,15 @@ msgstr "Document pending email"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "Document Preferences"
-msgstr "Document Preferences"
+msgstr "Tùy chọn tài liệu"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "Document preferences updated"
-msgstr "Document preferences updated"
+msgstr "Tùy chọn tài liệu updated"
 
 #: apps/remix/app/components/general/document-signing/document-signing-reject-dialog.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
-#: apps/remix/app/utils/toast-error-messages.ts
 msgid "Document rejected"
 msgstr "Document rejected"
 
@@ -4840,11 +4775,11 @@ msgstr "Tải xuống"
 #: apps/remix/app/components/general/document/document-audit-log-download-button.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Download Audit Logs"
-msgstr "Download Audit Logs"
+msgstr "Download nhật ký kiểm toán"
 
 #: apps/remix/app/components/general/document/document-certificate-download-button.tsx
 msgid "Download Certificate"
-msgstr "Download Certificate"
+msgstr "Tải xuống chứng chỉ ký"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-download-dialog.tsx
 msgid "Download Documents"
@@ -4906,7 +4841,7 @@ msgstr "Drag and drop your document here"
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgid "Draw"
-msgstr "Draw"
+msgstr "Vẽ chữ ký"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Draw signature"
@@ -4924,7 +4859,7 @@ msgstr "Drop your document here"
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Dropdown"
-msgstr "Menu chọn"
+msgstr "Danh sách chọn"
 
 #: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
 msgid "Dropdown must have at least one option"
@@ -4991,10 +4926,6 @@ msgstr "E.g. 100"
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "e.g. Resend (free plans)"
 msgstr "e.g. Resend (free plans)"
-
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-msgid "Easy DNS setup with auto-generated DKIM and SPF records"
-msgstr "Easy DNS setup with auto-generated DKIM and SPF records"
 
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
@@ -5141,15 +5072,15 @@ msgstr "Email document settings"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Email Domain"
-msgstr "Email Domain"
+msgstr "tên miền email"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Email domain not found"
-msgstr "Email domain not found"
+msgstr "tên miền email not found"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Email Domain Settings"
-msgstr "Email Domain Settings"
+msgstr "tên miền email Settings"
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
@@ -5162,7 +5093,7 @@ msgstr "Tên miền Email"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Email domains synced"
-msgstr "Email domains synced"
+msgstr "tên miền email synced"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 msgid "Email is required"
@@ -5339,15 +5270,15 @@ msgstr "Enable Authenticator App"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Enable Custom Branding"
-msgstr "Enable Custom Branding"
+msgstr "Enable thương hiệu tùy chỉnh"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Enable custom branding for all documents in this organisation"
-msgstr "Enable custom branding for all documents in this organisation"
+msgstr "Enable thương hiệu tùy chỉnh for all documents in this organisation"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Enable custom branding for all documents in this team"
-msgstr "Enable custom branding for all documents in this team"
+msgstr "Enable thương hiệu tùy chỉnh for all documents in this team"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Enable direct link signing"
@@ -5371,7 +5302,7 @@ msgstr "Enable SSO portal"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Enable team API tokens to delegate document ownership to another team member."
-msgstr "Enable team API tokens to delegate document ownership to another team member."
+msgstr "Enable team mã API tokens to delegate document ownership to another team member."
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
@@ -5407,7 +5338,7 @@ msgstr "Tiếng Anh"
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
 msgid "Ensure that you are using the embedding token, not the API token"
-msgstr "Ensure that you are using the embedding token, not the API token"
+msgstr "Ensure that you are using the embedding token, not the mã API token"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
@@ -5512,8 +5443,6 @@ msgid "Enter your text here"
 msgstr "Enter your text here"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
 msgid "Enterprise"
 msgstr "Enterprise"
 
@@ -5576,6 +5505,7 @@ msgstr "Envelope updated"
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx
@@ -5586,6 +5516,7 @@ msgstr "Envelope updated"
 #: apps/remix/app/components/general/document-signing/document-signing-dropdown-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-email-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-email-field.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-initials-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-initials-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
@@ -5683,7 +5614,7 @@ msgstr "Everyone"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Everyone can access and view the document"
-msgstr "Everyone can access and view the document"
+msgstr "Mọi người đều có thể truy cập và xem tài liệu"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Everyone has signed"
@@ -5754,9 +5685,13 @@ msgstr "Extracting contact details"
 msgid "Failed"
 msgstr "Failed"
 
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
+msgid "Failed to complete the document. Please try again."
+msgstr "Failed to complete the document. vui lòng thử lại."
+
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
 msgid "Failed to create document. Please try again."
-msgstr "Failed to create document. Please try again."
+msgstr "Failed to create document. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Failed to create folder"
@@ -5788,7 +5723,7 @@ msgstr "Failed to delete transport."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to download audit logs. Please try again later."
-msgstr "Failed to download audit logs. Please try again later."
+msgstr "Failed to download nhật ký kiểm toán. vui lòng thử lại later."
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Failed to load document"
@@ -5800,11 +5735,11 @@ msgstr "Failed to move folder"
 
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 msgid "Failed to move subscription. Please try again."
-msgstr "Failed to move subscription. Please try again."
+msgstr "Failed to move subscription. vui lòng thử lại."
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Failed to re-register email domain"
-msgstr "Failed to re-register email domain"
+msgstr "Failed to re-register tên miền email"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Failed to read file"
@@ -5856,7 +5791,7 @@ msgstr "Failed to update document"
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
 msgid "Failed to update envelope. Please try again."
-msgstr "Failed to update envelope. Please try again."
+msgstr "Failed to update envelope. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Failed to update item"
@@ -6036,7 +5971,7 @@ msgstr "Font Size"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
-msgstr "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
+msgstr "For any questions regarding this disclosure, chữ ký điện tử, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "For each recipient, provide their email (required) and name (optional) in separate columns. Download the template CSV below for the correct format."
@@ -6148,10 +6083,6 @@ msgstr "Generate Links"
 msgid "German"
 msgstr "Tiếng Đức"
 
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Give your members a dedicated single sign-on portal. The SSO portal is available on the Enterprise plan."
-msgstr "Give your members a dedicated single sign-on portal. The SSO portal is available on the Enterprise plan."
-
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Global"
@@ -6236,7 +6167,7 @@ msgstr "Go to team"
 
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "Go to your <0>public profile settings</0> to add documents."
-msgstr "Go to your <0>public profile settings</0> to add documents."
+msgstr "Go to your <0>hồ sơ công khai settings</0> to add documents."
 
 #: apps/remix/app/components/general/unified-settings-layout.tsx
 msgid "Go to your settings"
@@ -6271,7 +6202,7 @@ msgstr "Group Name"
 #: packages/lib/utils/settings-nav.ts
 #: packages/lib/utils/settings-nav.ts
 msgid "Groups"
-msgstr "Groups"
+msgstr "Nhóm quyền"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -6300,7 +6231,7 @@ msgstr "Help the AI assign fields to the right recipients."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
 msgid "Here you can add email domains to your organisation."
-msgstr "Here you can add email domains to your organisation."
+msgstr "Here you can add tên miền email to your organisation."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "Here you can edit your organisation details."
@@ -6328,15 +6259,15 @@ msgstr "Here you can set branding preferences for your team."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.certificates.tsx
 msgid "Here you can set certificate and audit log preferences for your organisation. Teams will inherit these settings by default."
-msgstr "Here you can set certificate and audit log preferences for your organisation. Teams will inherit these settings by default."
+msgstr "Here you can set certificate and nhật ký kiểm toán preferences for your organisation. Teams will inherit these settings by default."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.certificates.tsx
 msgid "Here you can set certificate and audit log preferences for your team."
-msgstr "Here you can set certificate and audit log preferences for your team."
+msgstr "Here you can set certificate and nhật ký kiểm toán preferences for your team."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
 msgid "Here you can set document preferences for your organisation. Teams will inherit these settings by default."
-msgstr "Here you can set document preferences for your organisation. Teams will inherit these settings by default."
+msgstr "Here you can set Tùy chọn tài liệu for your organisation. Teams will inherit these settings by default."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.reminders.tsx
 msgid "Here you can set expiration and signing reminder preferences for your organisation. Teams will inherit these settings by default."
@@ -6383,10 +6314,6 @@ msgstr "Hi, {userName} <0>({userEmail})</0>"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Hide"
 msgstr "Hide"
-
-#: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
-msgid "Hide field"
-msgstr "Hide field"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Hide license key"
@@ -6535,7 +6462,7 @@ msgstr "Inbox documents"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Include audit log"
-msgstr "Include audit log"
+msgstr "Include nhật ký kiểm toán"
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
@@ -6557,7 +6484,7 @@ msgstr "Include signing certificate"
 
 #: apps/remix/app/components/forms/certificate-preferences-form.tsx
 msgid "Include the Audit Logs in the Document"
-msgstr "Include the Audit Logs in the Document"
+msgstr "Include the nhật ký kiểm toán in the Document"
 
 #: apps/remix/app/components/forms/certificate-preferences-form.tsx
 msgid "Include the Signing Certificate in the Document"
@@ -6638,7 +6565,7 @@ msgstr "Instance Stats"
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "Invalid code. Please try again."
-msgstr "Invalid code. Please try again."
+msgstr "Invalid code. vui lòng thử lại."
 
 #: apps/remix/app/components/general/direct-template/direct-template-invalid-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-invalid-direct-template-alert.tsx
@@ -6669,7 +6596,7 @@ msgstr "Invalid License Key"
 
 #: apps/remix/app/components/general/admin-license-status-banner.tsx
 msgid "Invalid License Type - Your Documenso instance is using features that are not part of your license."
-msgstr "Invalid License Type - Your Documenso instance is using features that are not part of your license."
+msgstr "Invalid License Type - Your Crove Sign instance is using features that are not part of your license."
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Invalid link"
@@ -6685,7 +6612,7 @@ msgstr "Invalid Token"
 
 #: apps/remix/app/components/forms/reset-password.tsx
 msgid "Invalid token provided. Please try again."
-msgstr "Invalid token provided. Please try again."
+msgstr "Invalid token provided. vui lòng thử lại."
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "Invitation accepted"
@@ -6722,7 +6649,7 @@ msgstr "Invite member"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "Invite Members"
-msgstr "Invite Members"
+msgstr "Mời các thành viên"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
@@ -6797,10 +6724,6 @@ msgstr "It's currently not your turn to sign. Please check back soon as this doc
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "It's not your turn to sign yet"
-msgstr "It's not your turn to sign yet"
-
 #: packages/lib/constants/i18n.ts
 msgid "Italian"
 msgstr "Tiếng Ý"
@@ -6811,7 +6734,7 @@ msgstr "Tiếng Nhật"
 
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
-msgstr "Join {organisationName} on Documenso"
+msgstr "Join {organisationName} on Crove Sign"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Join our community on <0>Discord</0> for community support and discussion."
@@ -6859,7 +6782,7 @@ msgstr "Label"
 #: packages/ui/primitives/document-flow/add-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Language"
-msgstr "Language"
+msgstr "Ngôn ngữ"
 
 #: apps/remix/app/components/general/period-selector.tsx
 #: apps/remix/app/components/tables/documents-table-period-filter.tsx
@@ -6919,10 +6842,6 @@ msgstr "Last updated at"
 msgid "Last used"
 msgstr "Last used"
 
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
-msgid "Last Used"
-msgstr "Last Used"
-
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Last Verified"
@@ -6965,7 +6884,7 @@ msgstr "Left"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Legality of Electronic Signatures"
-msgstr "Legality of Electronic Signatures"
+msgstr "Legality of chữ ký điện tử"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Letter spacing"
@@ -7002,7 +6921,7 @@ msgstr "Light Mode"
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Like to have your own public profile with agreements?"
-msgstr "Like to have your own public profile with agreements?"
+msgstr "Like to have your own hồ sơ công khai with agreements?"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "Limit reached"
@@ -7034,7 +6953,7 @@ msgstr "Link template"
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "Link your Documenso account"
-msgstr "Link your Documenso account"
+msgstr "Link your Crove Sign account"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
@@ -7088,7 +7007,7 @@ msgstr "Loading..."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Local timezone"
-msgstr "Local timezone"
+msgstr "Múi giờ địa phương"
 
 #: apps/remix/app/components/general/direct-template/direct-template-signing-auth-page.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
@@ -7120,7 +7039,6 @@ msgstr "Manage"
 msgid "Manage {0}'s profile"
 msgstr "Manage {0}'s profile"
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Manage a custom SSO login portal for your organisation."
 msgstr "Manage a custom SSO login portal for your organisation."
@@ -7256,7 +7174,7 @@ msgstr "Manage users"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Manage your email domain settings."
-msgstr "Manage your email domain settings."
+msgstr "Manage your tên miền email settings."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Manage your organisation group settings."
@@ -7404,7 +7322,7 @@ msgstr "Min"
 
 #: apps/remix/app/components/general/admin-license-status-banner.tsx
 msgid "Missing License - Your Documenso instance is using features that require a license."
-msgstr "Missing License - Your Documenso instance is using features that require a license."
+msgstr "Missing License - Your Crove Sign instance is using features that require a license."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Missing Recipients"
@@ -7547,10 +7465,6 @@ msgstr "Name is required"
 msgid "Name Settings"
 msgstr "Name Settings"
 
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-msgid "Named senders with defaults per team, template or document"
-msgstr "Named senders with defaults per team, template or document"
-
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Navigate"
 msgstr "Navigate"
@@ -7577,7 +7491,6 @@ msgstr "Needs to view"
 
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Never"
 msgstr "Never"
@@ -7648,7 +7561,7 @@ msgstr "No document selected"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "No documents found"
-msgstr "No documents found"
+msgstr "Không tìm thấy tài liệu nào"
 
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 msgid "No eligible organisations found. The target must be on the free plan."
@@ -7731,7 +7644,7 @@ msgstr "No organisations found"
 
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "No public profile templates found"
-msgstr "No public profile templates found"
+msgstr "No hồ sơ công khai templates found"
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
 msgid "No recent activity"
@@ -7892,7 +7805,7 @@ msgstr "Notifications"
 #: packages/ui/primitives/document-flow/types.ts
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Number"
-msgstr "Number"
+msgstr "Số"
 
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -7964,10 +7877,6 @@ msgstr "Once your template is set up, share the link anywhere you want. The pers
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "One of the documents in the current bundle has a signing role that is not compatible with the current signing experience."
 msgstr "One of the documents in the current bundle has a signing role that is not compatible with the current signing experience."
-
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "One or more of your required fields have not been saved. Please refresh the page, complete any empty required fields, and try again."
-msgstr "One or more of your required fields have not been saved. Please refresh the page, complete any empty required fields, and try again."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Only admins can access and view the document"
@@ -8150,9 +8059,8 @@ msgstr "Organisation Role"
 #: apps/remix/app/components/general/unified-settings-sidebar.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "Organisation Settings"
-msgstr "Organisation Settings"
+msgstr "cài đặt tổ chức"
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Organisation SSO Portal"
@@ -8243,7 +8151,7 @@ msgstr "Override"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Override organisation settings"
-msgstr "Override organisation settings"
+msgstr "Override cài đặt tổ chức"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
@@ -8475,7 +8383,7 @@ msgstr "Personal Account"
 #: apps/remix/app/routes/_authenticated+/inbox.tsx
 #: apps/remix/app/routes/_authenticated+/inbox.tsx
 msgid "Personal Inbox"
-msgstr "Personal Inbox"
+msgstr "Hộp thư cá nhân"
 
 #: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
@@ -8649,11 +8557,11 @@ msgstr "Please note that this action is <0>irreversible</0>. Once confirmed, thi
 
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 msgid "Please note that this action is irreversible. Once confirmed, your token will be permanently deleted."
-msgstr "Please note that this action is irreversible. Once confirmed, your token will be permanently deleted."
+msgstr "Please note that hành động này không thể đảo ngược. Once confirmed, your token will be permanently deleted."
 
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 msgid "Please note that this action is irreversible. Once confirmed, your webhook will be permanently deleted."
-msgstr "Please note that this action is irreversible. Once confirmed, your webhook will be permanently deleted."
+msgstr "Please note that hành động này không thể đảo ngược. Once confirmed, your webhook will be permanently deleted."
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Please note that you will lose access to all documents associated with this team & all the members will be removed and notified"
@@ -8695,22 +8603,17 @@ msgstr "Please select at least one member to add to the team."
 msgid "Please select how you'd like to receive your verification code."
 msgstr "Please select how you'd like to receive your verification code."
 
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-msgid "Please sign: Example.pdf"
-msgstr "Please sign: Example.pdf"
-
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Please try a different domain."
 msgstr "Please try a different domain."
 
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
 msgid "Please try again and make sure you enter the correct email address."
-msgstr "Please try again and make sure you enter the correct email address."
+msgstr "vui lòng thử lại and make sure you enter the correct email address."
 
 #: apps/remix/app/components/general/pdf-viewer/pdf-viewer-states.tsx
 msgid "Please try again or contact our support."
-msgstr "Please try again or contact our support."
+msgstr "vui lòng thử lại or contact our support."
 
 #. placeholder {0}: `'${t(deleteMessage)}'`
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
@@ -8770,7 +8673,7 @@ msgstr "Pre-formatted CSV template with example data."
 #: packages/lib/utils/settings-nav.ts
 #: packages/lib/utils/settings-nav.ts
 msgid "Preferences"
-msgstr "Preferences"
+msgstr "Tùy chọn"
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
@@ -8876,7 +8779,7 @@ msgstr "Hồ sơ công khai"
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Public profile URL"
-msgstr "Public profile URL"
+msgstr "hồ sơ công khai URL"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 msgid "Public Template"
@@ -8884,11 +8787,7 @@ msgstr "Public Template"
 
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
-msgstr "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
-
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
-msgid "Put your own brand on every document you send. Branding is available on the Teams plan and above."
-msgstr "Put your own brand on every document you send. Branding is available on the Teams plan and above."
+msgstr "Public templates are connected to your hồ sơ công khai. Any modifications to public templates will also appear in your hồ sơ công khai."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Quick Actions"
@@ -8901,7 +8800,7 @@ msgstr "Quick Actions"
 #: packages/ui/primitives/document-flow/types.ts
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Radio"
-msgstr "Nút chọn"
+msgstr "Nút chọn một"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Radio Settings"
@@ -8919,7 +8818,7 @@ msgstr "Re-register"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Re-register Email Domain"
-msgstr "Re-register Email Domain"
+msgstr "Re-register tên miền email"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
@@ -8927,16 +8826,16 @@ msgstr "Re-register Email Domain"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Read only"
-msgstr "Read only"
+msgstr "Chỉ đọc"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
 msgid "Read Only"
-msgstr "Read Only"
+msgstr "Chỉ đọc"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Read our documentation to get started with Documenso."
-msgstr "Đọc tài liệu hướng dẫn để bắt đầu sử dụng Documenso."
+msgstr "Read our documentation to get started with Crove Sign."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Read Status"
@@ -9154,7 +9053,7 @@ msgstr "Recipients metrics"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Recipients that will be automatically added to new documents."
-msgstr "Recipients that will be automatically added to new documents."
+msgstr "Những người nhận sẽ được tự động thêm vào các tài liệu mới."
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 msgid "Recipients will be able to sign the document once sent"
@@ -9216,10 +9115,6 @@ msgstr "Redirecting"
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
 msgid "Redirecting to {0}..."
 msgstr "Redirecting to {0}..."
-
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Redirecting to your identity provider"
-msgstr "Redirecting to your identity provider"
 
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
@@ -9311,7 +9206,7 @@ msgstr "Reminder: Please {recipientActionVerb} your document"
 #: packages/lib/utils/settings-nav.ts
 #: packages/lib/utils/settings-nav.ts
 msgid "Reminders"
-msgstr "Reminders"
+msgstr "Nhắc nhở ký"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-team-member-delete-dialog.tsx
@@ -9339,7 +9234,7 @@ msgstr "Remove"
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Remove email domain"
-msgstr "Remove email domain"
+msgstr "Remove tên miền email"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-team-member-delete-dialog.tsx
@@ -9385,7 +9280,7 @@ msgstr "Remove Team Member"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 msgid "Rename"
-msgstr "Rename"
+msgstr "Đổi tên"
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Rename Document"
@@ -9527,7 +9422,7 @@ msgstr "Reset branding preferences"
 
 #: apps/remix/app/components/dialogs/document-preferences-reset-dialog.tsx
 msgid "Reset document preferences"
-msgstr "Reset document preferences"
+msgstr "Reset Tùy chọn tài liệu"
 
 #: apps/remix/app/components/forms/forgot-password.tsx
 msgid "Reset email sent"
@@ -9544,7 +9439,7 @@ msgstr "Reset Password"
 
 #: apps/remix/app/components/dialogs/admin-user-reset-two-factor-dialog.tsx
 msgid "Reset the users two factor authentication. This action is irreversible and will disable two factor authentication for the user."
-msgstr "Reset the users two factor authentication. This action is irreversible and will disable two factor authentication for the user."
+msgstr "Reset the users two factor authentication. hành động này không thể đảo ngược and will disable two factor authentication for the user."
 
 #: apps/remix/app/components/dialogs/branding-preferences-reset-dialog.tsx
 #: apps/remix/app/components/dialogs/branding-preferences-reset-dialog.tsx
@@ -9589,10 +9484,6 @@ msgstr "Response Headers"
 msgid "Rest assured, your document is strictly confidential and will never be shared. Only your signing experience will be highlighted. Share your personalized signing card to showcase your signature!"
 msgstr "Rest assured, your document is strictly confidential and will never be shared. Only your signing experience will be highlighted. Share your personalized signing card to showcase your signature!"
 
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Restrict sign-ins by email domain and choose the default role"
-msgstr "Restrict sign-ins by email domain and choose the default role"
-
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Restricted Access"
 msgstr "Restricted Access"
@@ -9624,7 +9515,7 @@ msgstr "Return Home"
 
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Return to Documenso sign in page here"
-msgstr "Quay lại trang đăng nhập Documenso tại đây"
+msgstr "Return to Crove Sign sign in page here"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Return to documents"
@@ -9716,7 +9607,7 @@ msgstr "Save as Template"
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
 #: apps/remix/app/components/forms/form-sticky-save-bar.tsx
 msgid "Save changes"
-msgstr "Save changes"
+msgstr "Lưu thay đổi"
 
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
@@ -9743,7 +9634,7 @@ msgstr "Sealing job started"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.members.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Search"
-msgstr "Tìm kiếm"
+msgstr "Search"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Search and manage all organisations"
@@ -9754,8 +9645,8 @@ msgid "Search by claim ID or name"
 msgstr "Search by claim ID or name"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
-msgid "Search by document title, recipient:123, team:123 or user:123"
-msgstr "Search by document title, recipient:123, team:123 or user:123"
+msgid "Search by document title, team:123 or user:123"
+msgstr "Search by document title, team:123 or user:123"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Search by domain or organisation name"
@@ -9806,7 +9697,7 @@ msgstr "Search groups by name"
 
 #: packages/ui/components/common/language-switcher-dialog.tsx
 msgid "Search languages..."
-msgstr "Search languages..."
+msgstr "Tìm kiếm ngôn ngữ..."
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Search languages…"
@@ -9893,11 +9784,11 @@ msgstr "Select a team to view its dashboard"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Select a template you'd like to display on your public profile"
-msgstr "Select a template you'd like to display on your public profile"
+msgstr "Select a template you'd like to display on your hồ sơ công khai"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Select a template you'd like to display on your team's public profile"
-msgstr "Select a template you'd like to display on your team's public profile"
+msgstr "Select a template you'd like to display on your team's hồ sơ công khai"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Select a time zone"
@@ -9994,7 +9885,7 @@ msgstr "Select or add recipients"
 
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 msgid "Select or enter email address"
-msgstr "Select or enter email address"
+msgstr "Chọn hoặc nhập địa chỉ email"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
@@ -10100,7 +9991,7 @@ msgstr "Send confirmation email"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Send document"
-msgstr "Send document"
+msgstr "Gửi tài liệu"
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
@@ -10109,10 +10000,6 @@ msgstr "Send document"
 msgid "Send Document"
 msgstr "Gửi tài liệu"
 
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-msgid "Send documents from your own domain. Email domains are available on the Enterprise plan."
-msgstr "Send documents from your own domain. Email domains are available on the Enterprise plan."
-
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Send documents on behalf of the team using the email address"
 msgstr "Send documents on behalf of the team using the email address"
@@ -10120,10 +10007,6 @@ msgstr "Send documents on behalf of the team using the email address"
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Send documents to recipients immediately"
 msgstr "Send documents to recipients immediately"
-
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-msgid "Send emails to recipients from your domain"
-msgstr "Send emails to recipients from your domain"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Send Envelope"
@@ -10171,14 +10054,6 @@ msgstr "Sender"
 msgid "Sender reported"
 msgstr "Sender reported"
 
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-msgid "Sending from app.documenso.com"
-msgstr "Sending from app.documenso.com"
-
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-msgid "Sending from your domain"
-msgstr "Sending from your domain"
-
 #: apps/remix/app/components/forms/forgot-password.tsx
 msgid "Sending Reset Email..."
 msgstr "Sending Reset Email..."
@@ -10198,10 +10073,6 @@ msgstr "Sent"
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "Sent this period"
 msgstr "Sent this period"
-
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
-msgid "Separate branding per team"
-msgstr "Separate branding per team"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Session revoked"
@@ -10229,7 +10100,7 @@ msgstr "Set up your template properties and recipient information"
 
 #: packages/email/templates/admin-user-created.tsx
 msgid "Set your password for Documenso"
-msgstr "Set your password for Documenso"
+msgstr "Set your password for Crove Sign"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
@@ -10289,7 +10160,7 @@ msgstr "Show license key"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
-msgstr "Show templates in your public profile for your audience to sign and get started quickly"
+msgstr "Show templates in your hồ sơ công khai for your audience to sign and get started quickly"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Show usage"
@@ -10308,7 +10179,6 @@ msgstr "Show usage with quotas"
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
 #: apps/remix/app/components/general/user-profile-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
@@ -10338,7 +10208,7 @@ msgstr "Sign as<0>{0} <1>({1})</1></0>"
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Sign document"
-msgstr "Sign document"
+msgstr "Ký tài liệu"
 
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v1.tsx
@@ -10349,7 +10219,7 @@ msgstr "Ký tài liệu"
 
 #: apps/remix/app/routes/_recipient+/_layout.tsx
 msgid "Sign Document - Documenso"
-msgstr "Ký tài liệu - Documenso"
+msgstr "Ký tài liệu - Crove Sign"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
@@ -10477,10 +10347,6 @@ msgstr "Đã ký"
 msgid "Signed"
 msgstr "Đã ký"
 
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Signed in"
-msgstr "Signed in"
-
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-header.tsx
 msgid "Signer"
 msgstr "Người ký"
@@ -10542,10 +10408,6 @@ msgstr "Signing for"
 msgid "Signing in..."
 msgstr "Signing in..."
 
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "Signing link expired"
-msgstr "Signing link expired"
-
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 msgid "Signing Links"
@@ -10591,16 +10453,12 @@ msgstr "Signing window expired for {0}"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signup is currently disabled or not available for your email domain."
-msgstr "Signup is currently disabled or not available for your email domain."
+msgstr "Signup is currently disabled or not available for your tên miền email."
 
 #. placeholder {0}: DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "Since {0}"
 msgstr "Since {0}"
-
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Single sign-on"
-msgstr "Single sign-on"
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Site Banner"
@@ -10620,10 +10478,6 @@ msgstr "Skip"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
 msgstr "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
-
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "Some fields were not saved"
-msgstr "Some fields were not saved"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Some searches failed — results may be incomplete."
@@ -10646,6 +10500,7 @@ msgstr "Some signers have not been assigned a signature field. Please assign at 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
+#: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -10655,6 +10510,8 @@ msgstr "Some signers have not been assigned a signature field. Please assign at 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-page.tsx
 #: apps/remix/app/components/general/document/document-audit-log-download-button.tsx
 #: apps/remix/app/components/general/document/document-certificate-download-button.tsx
+#: apps/remix/app/components/general/envelope-signing/envelope-signing-complete-dialog.tsx
+#: apps/remix/app/components/general/envelope-signing/envelope-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-portal-button.tsx
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
@@ -10675,7 +10532,6 @@ msgstr "Some signers have not been assigned a signature field. Please assign at 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
-#: apps/remix/app/utils/toast-error-messages.ts
 #: apps/remix/app/utils/toast-error-messages.ts
 #: apps/remix/app/utils/toast-error-messages.ts
 #: packages/ui/components/document/document-share-button.tsx
@@ -10704,11 +10560,11 @@ msgstr "Something went wrong while loading your passkeys."
 
 #: apps/remix/app/components/general/document-signing/csc-recipient-blocked-page.tsx
 msgid "Something went wrong while preparing the remote signature. Please try again."
-msgstr "Something went wrong while preparing the remote signature. Please try again."
+msgstr "Something went wrong while preparing the remote signature. vui lòng thử lại."
 
 #: packages/lib/constants/pdf-viewer-i18n.ts
 msgid "Something went wrong while rendering the document, please try again or contact our support."
-msgstr "Something went wrong while rendering the document, please try again or contact our support."
+msgstr "Something went wrong while rendering the document, vui lòng thử lại or contact our support."
 
 #: packages/lib/constants/pdf-viewer-i18n.ts
 #: packages/lib/constants/pdf-viewer-i18n.ts
@@ -10748,28 +10604,28 @@ msgstr "Something went wrong!"
 
 #: packages/ui/primitives/data-table.tsx
 msgid "Something went wrong."
-msgstr "Something went wrong."
+msgstr "Đã có sự cố xảy ra."
 
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 msgid "Something went wrong. Please try again later."
-msgstr "Something went wrong. Please try again later."
+msgstr "Something went wrong. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "Something went wrong. Please try again or contact support."
-msgstr "Something went wrong. Please try again or contact support."
+msgstr "Something went wrong. vui lòng thử lại or contact support."
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Something went wrong. Please try again."
-msgstr "Something went wrong. Please try again."
+msgstr "Something went wrong. vui lòng thử lại."
 
 #: apps/remix/app/components/general/document/document-audit-log-download-button.tsx
 msgid "Sorry, we were unable to download the audit logs. Please try again later."
-msgstr "Sorry, we were unable to download the audit logs. Please try again later."
+msgstr "Sorry, we were unable to download the nhật ký kiểm toán. vui lòng thử lại later."
 
 #: apps/remix/app/components/general/document/document-certificate-download-button.tsx
 msgid "Sorry, we were unable to download the certificate. Please try again later."
-msgstr "Sorry, we were unable to download the certificate. Please try again later."
+msgstr "Sorry, we were unable to download the certificate. vui lòng thử lại later."
 
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/tables/team-members-table.tsx
@@ -11011,7 +10867,7 @@ msgstr "Sync claims. This will overwrite the current claim with the one resolved
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync Email Domains"
-msgstr "Sync Email Domains"
+msgstr "Sync tên miền email"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 msgid "Sync failed, changes not saved"
@@ -11059,7 +10915,7 @@ msgstr "Đội nhóm"
 #. placeholder {0}: team.name
 #: packages/lib/server-only/team/delete-team.ts
 msgid "Team \"{0}\" has been deleted on Documenso"
-msgstr "Team \"{0}\" has been deleted on Documenso"
+msgstr "Team \"{0}\" has been deleted on Crove Sign"
 
 #: packages/lib/constants/teams-translations.ts
 msgid "Team Admin"
@@ -11111,7 +10967,7 @@ msgstr "Team email removed"
 
 #: packages/email/templates/team-email-removed.tsx
 msgid "Team email removed for {teamName} on Documenso"
-msgstr "Team email removed for {teamName} on Documenso"
+msgstr "Team email removed for {teamName} on Crove Sign"
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Team email verified!"
@@ -11188,7 +11044,7 @@ msgstr "Team Role"
 #: apps/remix/app/components/general/unified-settings-sidebar.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 msgid "Team Settings"
-msgstr "Team Settings"
+msgstr "cài đặt đội nhóm"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Team url"
@@ -11202,7 +11058,6 @@ msgstr "Team URL"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
 #: apps/remix/app/components/general/use-admin-search-categories.ts
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -11267,7 +11122,7 @@ msgstr "Template Editor"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Template has been removed from your public profile."
-msgstr "Template has been removed from your public profile."
+msgstr "Template has been removed from your hồ sơ công khai."
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Template has been updated."
@@ -11417,7 +11272,7 @@ msgstr "Thank you for letting us know, we have flagged this sender for review. I
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
-msgstr "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
+msgstr "Thank you for using Crove Sign to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of chữ ký điện tử on our platform. By opting to use an chữ ký điện tử, you are agreeing to the điều khoản và điều kiện outlined below."
 
 #: packages/email/template-components/template-forgot-password.tsx
 msgid "That's okay, it happens! Click the button below to reset your password."
@@ -11453,7 +11308,7 @@ msgstr "The content to show in the banner, HTML is allowed"
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "The default email to use when sending emails to recipients"
-msgstr "The default email to use when sending emails to recipients"
+msgstr "The Email mặc định to use when sending emails to recipients"
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "The deletion will run in the background, and can take up to a few minutes to complete. Do not re-run this deletion."
@@ -11574,7 +11429,7 @@ msgstr "The email blocklist has been updated successfully."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "The email domain you are looking for may have been removed, renamed or may have never existed."
-msgstr "The email domain you are looking for may have been removed, renamed or may have never existed."
+msgstr "The tên miền email you are looking for may have been removed, renamed or may have never existed."
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "The email or password provided is incorrect."
@@ -11735,7 +11590,7 @@ msgstr "The SES identity has been deleted and recreated with the same keys. DNS 
 
 #: packages/ui/components/document/document-share-button.tsx
 msgid "The sharing link could not be created at this time. Please try again."
-msgstr "The sharing link could not be created at this time. Please try again."
+msgstr "The sharing link could not be created at this time. vui lòng thử lại."
 
 #: packages/ui/components/document/document-share-button.tsx
 msgid "The sharing link has been copied to your clipboard."
@@ -11834,7 +11689,7 @@ msgstr "The types of signatures that recipients are allowed to use when signing 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "The URL for Documenso to send webhook events to."
-msgstr "URL endpoint để Documenso gửi sự kiện webhook đến."
+msgstr "The URL for Crove Sign to send webhook events to."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "The user you are looking for may have been removed, renamed or may have never existed."
@@ -11894,7 +11749,7 @@ msgstr "There are no rejected documents. Documents that a recipient declines to 
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "There was an error uploading your file. Please try again."
-msgstr "There was an error uploading your file. Please try again."
+msgstr "There was an error uploading your file. vui lòng thử lại."
 
 #: packages/lib/constants/pdf-viewer-i18n.ts
 msgid "There was an issue rendering some fields, please review the fields and try again."
@@ -11926,7 +11781,7 @@ msgstr "This account has not been verified. Please verify your account before si
 
 #: apps/remix/app/components/dialogs/admin-user-reset-two-factor-dialog.tsx
 msgid "This action is irreversible. Please ensure you have informed the user before proceeding."
-msgstr "This action is irreversible. Please ensure you have informed the user before proceeding."
+msgstr "hành động này không thể đảo ngược. Please ensure you have informed the user before proceeding."
 
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
@@ -11957,10 +11812,6 @@ msgstr "This direct link template cannot be used because one or more signers do 
 msgid "This direct link template cannot be used because one or more signers do not have a signature field assigned. Please contact the sender to update the template."
 msgstr "This direct link template cannot be used because one or more signers do not have a signature field assigned. Please contact the sender to update the template."
 
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "This document can no longer be signed. It may have been removed by the sender, or your signing access may have been revoked. Please contact the sender for a new signing link."
-msgstr "This document can no longer be signed. It may have been removed by the sender, or your signing access may have been revoked. Please contact the sender for a new signing link."
-
 #: packages/email/template-components/template-document-super-delete.tsx
 msgid "This document can not be recovered, if you would like to dispute the reason for future documents please contact support."
 msgstr "This document can not be recovered, if you would like to dispute the reason for future documents please contact support."
@@ -11971,27 +11822,23 @@ msgstr "This document cannot be changed"
 
 #: apps/remix/app/components/dialogs/envelope-cancel-dialog.tsx
 msgid "This document could not be cancelled at this time. Please try again."
-msgstr "This document could not be cancelled at this time. Please try again."
+msgstr "This document could not be cancelled at this time. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "This document could not be deleted at this time. Please try again."
-msgstr "This document could not be deleted at this time. Please try again."
+msgstr "This document could not be deleted at this time. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgid "This document could not be downloaded at this time. Please try again."
-msgstr "This document could not be downloaded at this time. Please try again."
+msgstr "This document could not be downloaded at this time. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "This document could not be duplicated at this time. Please try again."
-msgstr "This document could not be duplicated at this time. Please try again."
+msgstr "This document could not be duplicated at this time. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 msgid "This document could not be saved as a template at this time. Please try again."
-msgstr "This document could not be saved as a template at this time. Please try again."
-
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "This document has already been completed and no further signatures can be added."
-msgstr "This document has already been completed and no further signatures can be added."
+msgstr "This document could not be saved as a template at this time. vui lòng thử lại."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-recipient-selector.tsx
 #: packages/ui/primitives/recipient-selector.tsx
@@ -12011,25 +11858,13 @@ msgstr "This document has been cancelled by the owner and is no longer available
 msgid "This document has been cancelled by the owner."
 msgstr "This document has been cancelled by the owner."
 
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "This document has been cancelled by the sender and can no longer be signed. Please contact the sender if you believe this is a mistake."
-msgstr "This document has been cancelled by the sender and can no longer be signed. Please contact the sender if you believe this is a mistake."
-
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "This document has been rejected by a recipient"
 msgstr "This document has been rejected by a recipient"
 
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "This document has been rejected by a recipient and can no longer be signed."
-msgstr "This document has been rejected by a recipient and can no longer be signed."
-
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "This document has been signed by all recipients"
 msgstr "This document has been signed by all recipients"
-
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "This document has not been sent for signing yet. Please wait for the sender to send it before signing."
-msgstr "This document has not been sent for signing yet. Please wait for the sender to send it before signing."
 
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "This document has too many recipients. Please remove some recipients or contact support if you need more."
@@ -12037,15 +11872,11 @@ msgstr "This document has too many recipients. Please remove some recipients or 
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
-msgstr "Tài liệu này khả dụng trong tài khoản Documenso của bạn. Bạn có thể xem thêm chi tiết, người nhận và nhật ký kiểm toán tại đó."
+msgstr "This document is available in your Crove Sign account. You can view more details, recipients, and nhật ký kiểm toán there."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "This document is currently a draft and has not been sent"
 msgstr "This document is currently a draft and has not been sent"
-
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "This document is signed in a set order and other recipients must sign before you. You will receive an email when it is your turn."
-msgstr "This document is signed in a set order and other recipients must sign before you. You will receive an email when it is your turn."
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "This document is using legacy field insertion, we recommend using the new field insertion method for more accurate results."
@@ -12065,7 +11896,7 @@ msgstr "This document was created using a direct link."
 
 #: packages/email/template-components/template-footer.tsx
 msgid "This document was sent using <0>Documenso</0>."
-msgstr "This document was sent using <0>Documenso</0>."
+msgstr "This document was sent using <0>Crove Sign</0>."
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "This document will be duplicated."
@@ -12114,7 +11945,7 @@ msgstr "This feature is not available on your current plan"
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
-msgstr "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
+msgstr "This field cannot be modified or deleted. When you share this template's direct link or add it to your hồ sơ công khai, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "This file type isn't supported. Please upload a PDF or Word document."
@@ -12180,7 +12011,7 @@ msgstr "This recipient can no longer be modified as they have signed a field, or
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "This session has expired. Please try again."
-msgstr "This session has expired. Please try again."
+msgstr "This session has expired. vui lòng thử lại."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
@@ -12193,11 +12024,11 @@ msgstr "This team, and any associated data excluding billing invoices will be pe
 
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "This template could not be deleted at this time. Please try again."
-msgstr "This template could not be deleted at this time. Please try again."
+msgstr "This template could not be deleted at this time. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "This template could not be duplicated at this time. Please try again."
-msgstr "This template could not be duplicated at this time. Please try again."
+msgstr "This template could not be duplicated at this time. vui lòng thử lại."
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "This template is using legacy field insertion, we recommend using the new field insertion method for more accurate results."
@@ -12235,7 +12066,7 @@ msgstr "This will be sent to the document owner when a recipient's signing windo
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "This will check and sync the status of all email domains for this organisation"
-msgstr "This will check and sync the status of all email domains for this organisation"
+msgstr "This will check and sync the status of all tên miền email for this organisation"
 
 #. placeholder {0}: emailDomain.domain
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
@@ -12253,7 +12084,7 @@ msgstr "This will ONLY backport feature flags which are set to true, anything di
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "This will remove all emails associated with this email domain"
-msgstr "This will remove all emails associated with this email domain"
+msgstr "This will remove all emails associated with this tên miền email"
 
 #: apps/remix/app/components/dialogs/branding-preferences-reset-dialog.tsx
 msgid "This will reset all branding preferences to their default values and save the changes immediately."
@@ -12261,7 +12092,7 @@ msgstr "This will reset all branding preferences to their default values and sav
 
 #: apps/remix/app/components/dialogs/document-preferences-reset-dialog.tsx
 msgid "This will reset all document preferences to their default values and save the changes immediately."
-msgstr "This will reset all document preferences to their default values and save the changes immediately."
+msgstr "This will reset all Tùy chọn tài liệu to their default values and save the changes immediately."
 
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
@@ -12420,7 +12251,7 @@ msgstr "To sign this field, you need to be logged in."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "To use our electronic signature service, you must have access to:"
-msgstr "To use our electronic signature service, you must have access to:"
+msgstr "To use our chữ ký điện tử service, you must have access to:"
 
 #: apps/remix/app/components/embed/embed-authentication-required.tsx
 msgid "To view this document you need to be signed into your account, please sign in to continue."
@@ -12472,7 +12303,7 @@ msgstr "Token deleted"
 
 #: apps/remix/app/components/forms/reset-password.tsx
 msgid "Token has expired. Please try again."
-msgstr "Token has expired. Please try again."
+msgstr "Token has expired. vui lòng thử lại."
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
 msgid "Token Not Found"
@@ -12595,12 +12426,12 @@ msgstr "Two-Factor Re-Authentication"
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Type"
-msgstr "Type"
+msgstr "Nhập chữ"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgid "Type"
-msgstr "Type"
+msgstr "Nhập chữ"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Type a command or search..."
@@ -12628,7 +12459,7 @@ msgstr "Uh oh! Looks like you're missing a token"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Unable to change the language at this time. Please try again later."
-msgstr "Unable to change the language at this time. Please try again later."
+msgstr "Unable to change the language at this time. vui lòng thử lại later."
 
 #: apps/remix/app/components/forms/2fa/recovery-code-list.tsx
 msgid "Unable to copy recovery code"
@@ -12636,7 +12467,7 @@ msgstr "Unable to copy recovery code"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Unable to create direct template access. Please try again later."
-msgstr "Unable to create direct template access. Please try again later."
+msgstr "Unable to create direct template access. vui lòng thử lại later."
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
@@ -12645,7 +12476,7 @@ msgstr "Unable to decline this invitation at this time."
 
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 msgid "Unable to delete invitation. Please try again."
-msgstr "Unable to delete invitation. Please try again."
+msgstr "Unable to delete invitation. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Unable to delete team"
@@ -12669,23 +12500,23 @@ msgstr "Unable to load documents"
 
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "Unable to load your public profile templates at this time"
-msgstr "Unable to load your public profile templates at this time"
+msgstr "Unable to load your hồ sơ công khai templates at this time"
 
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
 msgid "Unable to remove email verification at this time. Please try again."
-msgstr "Unable to remove email verification at this time. Please try again."
+msgstr "Unable to remove email verification at this time. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
 msgid "Unable to remove team email at this time. Please try again."
-msgstr "Unable to remove team email at this time. Please try again."
+msgstr "Unable to remove team email at this time. vui lòng thử lại."
 
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 msgid "Unable to resend invitation. Please try again."
-msgstr "Unable to resend invitation. Please try again."
+msgstr "Unable to resend invitation. vui lòng thử lại."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.general.tsx
 msgid "Unable to resend verification at this time. Please try again."
-msgstr "Unable to resend verification at this time. Please try again."
+msgstr "Unable to resend verification at this time. vui lòng thử lại."
 
 #: apps/remix/app/routes/_unauthenticated+/reset-password._index.tsx
 msgid "Unable to reset password"
@@ -12760,18 +12591,6 @@ msgstr "Unlimited documents, API and more"
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Unlink"
 msgstr "Unlink"
-
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
-msgid "Unlock Branding Preferences"
-msgstr "Unlock Branding Preferences"
-
-#: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
-msgid "Unlock Email Domains"
-msgstr "Unlock Email Domains"
-
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Unlock the Organisation SSO Portal"
-msgstr "Unlock the Organisation SSO Portal"
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Unpin"
@@ -12946,10 +12765,6 @@ msgstr "Upgrade"
 msgid "Upgrade <0>{0}</0> to {planName}"
 msgstr "Upgrade <0>{0}</0> to {planName}"
 
-#: apps/remix/app/components/general/settings-upsell/settings-upsell-card.tsx
-msgid "Upgrade Plan"
-msgstr "Upgrade Plan"
-
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "Upgrade your plan to upload more documents"
 msgstr "Upgrade your plan to upload more documents"
@@ -13014,7 +12829,7 @@ msgstr "Upload signature"
 
 #: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
 msgid "Upload Signature"
-msgstr "Upload Signature"
+msgstr "Tải lên ảnh chữ ký"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: packages/ui/primitives/document-upload-button.tsx
@@ -13070,7 +12885,7 @@ msgstr "Use a unique window for each rate limit"
 
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 msgid "Use API tokens to authenticate with the Documenso API."
-msgstr "Sử dụng API tokens để xác thực với Documenso API."
+msgstr "Use mã API tokens to authenticate with the Crove Sign API."
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
@@ -13297,7 +13112,7 @@ msgstr "View and manage all login methods linked to your account."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "View Audit Logs"
-msgstr "View Audit Logs"
+msgstr "View nhật ký kiểm toán"
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "View Codes"
@@ -13384,7 +13199,7 @@ msgstr "View teams"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "View the DNS records for this email domain"
-msgstr "View the DNS records for this email domain"
+msgstr "View the DNS records for this tên miền email"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "View, sort and filter monthly usage stats across organisations"
@@ -13430,8 +13245,8 @@ msgid "Waiting for others"
 msgstr "Waiting for others"
 
 #: packages/lib/jobs/definitions/emails/send-document-pending-email.handler.ts
-msgid "Waiting for others to complete signing"
-msgstr "Waiting for others to complete signing"
+msgid "Waiting for others to complete signing."
+msgstr "Waiting for others to complete signing."
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Waiting for others to sign"
@@ -13445,11 +13260,11 @@ msgstr "Waiting for Your Turn"
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 msgid "Want to send slick signing links like this one? <0>Check out Documenso</0>."
-msgstr "Want to send slick signing links like this one? <0>Check out Documenso</0>."
+msgstr "Want to send slick signing links like this one? <0>Check out Crove Sign</0>."
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Want your own public profile?"
-msgstr "Want your own public profile?"
+msgstr "Want your own hồ sơ công khai?"
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
 msgid "Warning, this email transport is currently being used by:"
@@ -13470,15 +13285,15 @@ msgstr "Warning: Assistant as last signer"
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-portal-button.tsx
 msgid "We are unable to proceed to the billing portal at this time. Please try again, or contact support."
-msgstr "We are unable to proceed to the billing portal at this time. Please try again, or contact support."
+msgstr "We are unable to proceed to the billing portal at this time. vui lòng thử lại, or contact support."
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "We are unable to remove this passkey at the moment. Please try again later."
-msgstr "We are unable to remove this passkey at the moment. Please try again later."
+msgstr "We are unable to remove this passkey at the moment. vui lòng thử lại later."
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "We are unable to update this passkey at the moment. Please try again later."
-msgstr "We are unable to update this passkey at the moment. Please try again later."
+msgstr "We are unable to update this passkey at the moment. vui lòng thử lại later."
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "We couldn’t complete the search. Try again."
@@ -13490,33 +13305,33 @@ msgstr "We couldn't convert this file. Please check it's a valid Word document o
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't create a Stripe customer. Please try again."
-msgstr "We couldn't create a Stripe customer. Please try again."
+msgstr "We couldn't create a Stripe customer. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "We couldn't enable AI features right now. Please try again."
-msgstr "We couldn't enable AI features right now. Please try again."
+msgstr "We couldn't enable AI features right now. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-team-member-delete-dialog.tsx
 msgid "We couldn't remove this member. Please try again later."
-msgstr "We couldn't remove this member. Please try again later."
+msgstr "We couldn't remove this member. vui lòng thử lại later."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "We couldn't update the group. Please try again."
-msgstr "We couldn't update the group. Please try again."
+msgstr "We couldn't update the group. vui lòng thử lại."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't update the organisation. Please try again."
-msgstr "We couldn't update the organisation. Please try again."
+msgstr "We couldn't update the organisation. vui lòng thử lại."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "We couldn't update the provider. Please try again."
-msgstr "We couldn't update the provider. Please try again."
+msgstr "We couldn't update the provider. vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "We encountered an error while attempting to delete this organisation. Please try again later."
-msgstr "We encountered an error while attempting to delete this organisation. Please try again later."
+msgstr "We encountered an error while attempting to delete this organisation. vui lòng thử lại later."
 
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
@@ -13526,15 +13341,15 @@ msgstr "We encountered an error while attempting to save your changes. Your chan
 
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 msgid "We encountered an error while creating the email. Please try again later."
-msgstr "We encountered an error while creating the email. Please try again later."
+msgstr "We encountered an error while creating the email. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "We encountered an error while creating the user. Please try again later."
-msgstr "We encountered an error while creating the user. Please try again later."
+msgstr "We encountered an error while creating the user. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "We encountered an error while removing the direct template link. Please try again later."
-msgstr "We encountered an error while removing the direct template link. Please try again later."
+msgstr "We encountered an error while removing the direct template link. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "We encountered an error while sending the test webhook. Please check your endpoint and try again."
@@ -13542,57 +13357,57 @@ msgstr "We encountered an error while sending the test webhook. Please check you
 
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "We encountered an error while updating the webhook. Please try again later."
-msgstr "We encountered an error while updating the webhook. Please try again later."
+msgstr "We encountered an error while updating the webhook. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "We encountered an unknown error while attempting to add team members. Please try again later."
-msgstr "We encountered an unknown error while attempting to add team members. Please try again later."
+msgstr "We encountered an unknown error while attempting to add team members. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "We encountered an unknown error while attempting to add this email. Please try again later."
-msgstr "We encountered an unknown error while attempting to add this email. Please try again later."
+msgstr "We encountered an unknown error while attempting to add this email. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "We encountered an unknown error while attempting to add your domain. Please try again later."
-msgstr "We encountered an unknown error while attempting to add your domain. Please try again later."
+msgstr "We encountered an unknown error while attempting to add your domain. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "We encountered an unknown error while attempting to create a group. Please try again later."
-msgstr "We encountered an unknown error while attempting to create a group. Please try again later."
+msgstr "We encountered an unknown error while attempting to create a group. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "We encountered an unknown error while attempting to create a organisation. Please try again later."
-msgstr "We encountered an unknown error while attempting to create a organisation. Please try again later."
+msgstr "We encountered an unknown error while attempting to create a organisation. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 msgid "We encountered an unknown error while attempting to create a team. Please try again later."
-msgstr "We encountered an unknown error while attempting to create a team. Please try again later."
+msgstr "We encountered an unknown error while attempting to create a team. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to delete it. Please try again later."
-msgstr "We encountered an unknown error while attempting to delete it. Please try again later."
+msgstr "We encountered an unknown error while attempting to delete it. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to delete this organisation. Please try again later."
-msgstr "We encountered an unknown error while attempting to delete this organisation. Please try again later."
+msgstr "We encountered an unknown error while attempting to delete this organisation. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to delete this team. Please try again later."
-msgstr "We encountered an unknown error while attempting to delete this team. Please try again later."
+msgstr "We encountered an unknown error while attempting to delete this team. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to delete this token. Please try again later."
-msgstr "We encountered an unknown error while attempting to delete this token. Please try again later."
+msgstr "We encountered an unknown error while attempting to delete this token. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to delete your account. Please try again later."
-msgstr "We encountered an unknown error while attempting to delete your account. Please try again later."
+msgstr "We encountered an unknown error while attempting to delete your account. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to delete your document. Please try again later."
-msgstr "We encountered an unknown error while attempting to delete your document. Please try again later."
+msgstr "We encountered an unknown error while attempting to delete your document. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/team-inherit-member-disable-dialog.tsx
 msgid "We encountered an unknown error while attempting to disable access."
@@ -13604,114 +13419,114 @@ msgstr "We encountered an unknown error while attempting to enable access."
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "We encountered an unknown error while attempting to invite organisation members. Please try again later."
-msgstr "We encountered an unknown error while attempting to invite organisation members. Please try again later."
+msgstr "We encountered an unknown error while attempting to invite organisation members. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 msgid "We encountered an unknown error while attempting to leave this organisation. Please try again later."
-msgstr "We encountered an unknown error while attempting to leave this organisation. Please try again later."
+msgstr "We encountered an unknown error while attempting to leave this organisation. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to remove this email domain. Please try again later."
-msgstr "We encountered an unknown error while attempting to remove this email domain. Please try again later."
+msgstr "We encountered an unknown error while attempting to remove this tên miền email. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to remove this email. Please try again later."
-msgstr "We encountered an unknown error while attempting to remove this email. Please try again later."
+msgstr "We encountered an unknown error while attempting to remove this email. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to remove this envelope item. Please try again later."
-msgstr "We encountered an unknown error while attempting to remove this envelope item. Please try again later."
+msgstr "We encountered an unknown error while attempting to remove this envelope item. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to remove this group. Please try again later."
-msgstr "We encountered an unknown error while attempting to remove this group. Please try again later."
+msgstr "We encountered an unknown error while attempting to remove this group. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "We encountered an unknown error while attempting to remove this template from your profile. Please try again later."
-msgstr "We encountered an unknown error while attempting to remove this template from your profile. Please try again later."
+msgstr "We encountered an unknown error while attempting to remove this template from your profile. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to remove this user. Please try again later."
-msgstr "We encountered an unknown error while attempting to remove this user. Please try again later."
+msgstr "We encountered an unknown error while attempting to remove this user. vui lòng thử lại later."
 
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "We encountered an unknown error while attempting to request the two-factor authentication code. Please try again later."
-msgstr "We encountered an unknown error while attempting to request the two-factor authentication code. Please try again later."
+msgstr "We encountered an unknown error while attempting to request the two-factor authentication code. vui lòng thử lại later."
 
 #: apps/remix/app/components/forms/reset-password.tsx
 msgid "We encountered an unknown error while attempting to reset your password. Please try again later."
-msgstr "We encountered an unknown error while attempting to reset your password. Please try again later."
+msgstr "We encountered an unknown error while attempting to reset your password. vui lòng thử lại later."
 
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "We encountered an unknown error while attempting to revoke access. Please try again or contact support."
-msgstr "We encountered an unknown error while attempting to revoke access. Please try again or contact support."
+msgstr "We encountered an unknown error while attempting to revoke access. vui lòng thử lại or contact support."
 
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "We encountered an unknown error while attempting to sign you In. Please try again later."
-msgstr "We encountered an unknown error while attempting to sign you In. Please try again later."
+msgstr "We encountered an unknown error while attempting to sign you In. vui lòng thử lại later."
 
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/forms/signup.tsx
 msgid "We encountered an unknown error while attempting to sign you Up. Please try again later."
-msgstr "We encountered an unknown error while attempting to sign you Up. Please try again later."
+msgstr "We encountered an unknown error while attempting to sign you Up. vui lòng thử lại later."
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "We encountered an unknown error while attempting to update the banner. Please try again later."
-msgstr "We encountered an unknown error while attempting to update the banner. Please try again later."
+msgstr "We encountered an unknown error while attempting to update the banner. vui lòng thử lại later."
 
 #: apps/remix/app/components/general/admin-email-blocklist-section.tsx
 msgid "We encountered an unknown error while attempting to update the email blocklist. Please try again later."
-msgstr "We encountered an unknown error while attempting to update the email blocklist. Please try again later."
+msgstr "We encountered an unknown error while attempting to update the email blocklist. vui lòng thử lại later."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "We encountered an unknown error while attempting to update the envelope. Please try again later."
-msgstr "We encountered an unknown error while attempting to update the envelope. Please try again later."
+msgstr "We encountered an unknown error while attempting to update the envelope. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "We encountered an unknown error while attempting to update the template. Please try again later."
-msgstr "We encountered an unknown error while attempting to update the template. Please try again later."
+msgstr "We encountered an unknown error while attempting to update the template. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 msgid "We encountered an unknown error while attempting to update this organisation member. Please try again later."
-msgstr "We encountered an unknown error while attempting to update this organisation member. Please try again later."
+msgstr "We encountered an unknown error while attempting to update this organisation member. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 msgid "We encountered an unknown error while attempting to update this team member. Please try again later."
-msgstr "We encountered an unknown error while attempting to update this team member. Please try again later."
+msgstr "We encountered an unknown error while attempting to update this team member. vui lòng thử lại later."
 
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 msgid "We encountered an unknown error while attempting to update your organisation. Please try again later."
-msgstr "We encountered an unknown error while attempting to update your organisation. Please try again later."
+msgstr "We encountered an unknown error while attempting to update your organisation. vui lòng thử lại later."
 
 #: apps/remix/app/components/forms/avatar-image.tsx
 #: apps/remix/app/components/forms/password.tsx
 msgid "We encountered an unknown error while attempting to update your password. Please try again later."
-msgstr "We encountered an unknown error while attempting to update your password. Please try again later."
+msgstr "We encountered an unknown error while attempting to update your password. vui lòng thử lại later."
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "We encountered an unknown error while attempting to update your public profile. Please try again later."
-msgstr "We encountered an unknown error while attempting to update your public profile. Please try again later."
+msgstr "We encountered an unknown error while attempting to update your hồ sơ công khai. vui lòng thử lại later."
 
 #: apps/remix/app/components/forms/team-update-form.tsx
 msgid "We encountered an unknown error while attempting to update your team. Please try again later."
-msgstr "We encountered an unknown error while attempting to update your team. Please try again later."
+msgstr "We encountered an unknown error while attempting to update your team. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 msgid "We encountered an unknown error while attempting update the team email. Please try again later."
-msgstr "We encountered an unknown error while attempting update the team email. Please try again later."
+msgstr "We encountered an unknown error while attempting update the team email. vui lòng thử lại later."
 
 #: apps/remix/app/components/forms/profile.tsx
 msgid "We encountered an unknown error while attempting update your profile. Please try again later."
-msgstr "We encountered an unknown error while attempting update your profile. Please try again later."
+msgstr "We encountered an unknown error while attempting update your profile. vui lòng thử lại later."
 
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "We have sent a confirmation email for verification."
@@ -13723,11 +13538,11 @@ msgstr "We need your signature to sign documents"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "We were unable to add you to <0>{organisationName}</0> at this time. Please try again later, or contact the organisation administrator."
-msgstr "We were unable to add you to <0>{organisationName}</0> at this time. Please try again later, or contact the organisation administrator."
+msgstr "We were unable to add you to <0>{organisationName}</0> at this time. vui lòng thử lại later, or contact the organisation administrator."
 
 #: apps/remix/app/components/forms/2fa/recovery-code-list.tsx
 msgid "We were unable to copy your recovery code to your clipboard. Please try again."
-msgstr "We were unable to copy your recovery code to your clipboard. Please try again."
+msgstr "We were unable to copy your recovery code to your clipboard. vui lòng thử lại."
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. If you already have an account, try signing in instead."
@@ -13749,60 +13564,62 @@ msgstr "We were unable to log you out at this time."
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "We were unable to report this sender at this time. Please try again later."
-msgstr "We were unable to report this sender at this time. Please try again later."
+msgstr "We were unable to report this sender at this time. vui lòng thử lại later."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "We were unable to set your public profile to public. Please try again."
-msgstr "We were unable to set your public profile to public. Please try again."
+msgstr "We were unable to set your hồ sơ công khai to public. vui lòng thử lại."
 
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
 msgid "We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again."
 msgstr "We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again."
 
-#: apps/remix/app/utils/toast-error-messages.ts
+#: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
+#: apps/remix/app/components/general/envelope-signing/envelope-signing-complete-dialog.tsx
+#: apps/remix/app/components/general/envelope-signing/envelope-signing-complete-dialog.tsx
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "We were unable to submit this document at this time. Please try again later."
-msgstr "We were unable to submit this document at this time. Please try again later."
+msgstr "We were unable to submit this document at this time. vui lòng thử lại later."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "We were unable to update your branding preferences at this time, please try again later"
-msgstr "We were unable to update your branding preferences at this time, please try again later"
+msgstr "We were unable to update your branding preferences at this time, vui lòng thử lại later"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.certificates.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.certificates.tsx
 msgid "We were unable to update your certificate preferences at this time, please try again later"
-msgstr "We were unable to update your certificate preferences at this time, please try again later"
+msgstr "We were unable to update your certificate preferences at this time, vui lòng thử lại later"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "We were unable to update your document preferences at this time, please try again later"
-msgstr "We were unable to update your document preferences at this time, please try again later"
+msgstr "We were unable to update your Tùy chọn tài liệu at this time, vui lòng thử lại later"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
 msgid "We were unable to update your email preferences at this time, please try again later"
-msgstr "We were unable to update your email preferences at this time, please try again later"
+msgstr "We were unable to update your email preferences at this time, vui lòng thử lại later"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.reminders.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.reminders.tsx
 msgid "We were unable to update your reminder preferences at this time, please try again later"
-msgstr "We were unable to update your reminder preferences at this time, please try again later"
+msgstr "We were unable to update your reminder preferences at this time, vui lòng thử lại later"
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "We were unable to verify that you're human. Please try again."
-msgstr "We were unable to verify that you're human. Please try again."
+msgstr "We were unable to verify that you're human. vui lòng thử lại."
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "We were unable to verify this email at this time. Please try again later."
-msgstr "We were unable to verify this email at this time. Please try again later."
+msgstr "We were unable to verify this email at this time. vui lòng thử lại later."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
 msgid "We were unable to verify your details. Please try again or contact support"
-msgstr "We were unable to verify your details. Please try again or contact support"
+msgstr "We were unable to verify your details. vui lòng thử lại or contact support"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "We were unable to verify your email at this time."
@@ -13810,7 +13627,7 @@ msgstr "We were unable to verify your email at this time."
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
-msgstr "We were unable to verify your email. If your email is not verified already, please try again."
+msgstr "We were unable to verify your email. If your email is not verified already, vui lòng thử lại."
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
@@ -13926,23 +13743,18 @@ msgstr "Welcome back, we are lucky to have you."
 msgid "Welcome back! Here's an overview of your account."
 msgstr "Welcome back! Here's an overview of your account."
 
-#. placeholder {0}: organisation.name
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Welcome to {0}"
-msgstr "Welcome to {0}"
-
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Welcome to {organisationName}"
 msgstr "Welcome to {organisationName}"
 
 #: packages/lib/jobs/definitions/emails/send-admin-user-created-email.handler.ts
 msgid "Welcome to Documenso"
-msgstr "Chào mừng bạn đến với Documenso"
+msgstr "Chào mừng bạn đến với Crove Sign"
 
 #: packages/email/template-components/template-admin-user-created.tsx
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Welcome to Documenso!"
-msgstr "Chào mừng bạn đến với Documenso!"
+msgstr "Chào mừng bạn đến với Crove Sign!"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Well-known URL is required"
@@ -13977,7 +13789,7 @@ msgstr "When you sign a document, we can automatically fill in and sign the foll
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
-msgstr "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
+msgstr "When you use our platform to affix your chữ ký điện tử to documents, you are consenting to do so under the chữ ký điện tử in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Whether to enable the SSO portal for your organisation"
@@ -13985,7 +13797,7 @@ msgstr "Whether to enable the SSO portal for your organisation"
 
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
-msgstr "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
+msgstr "While waiting for them to do so you can create your own Crove Sign account and get started with document signing right away."
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Whitelabeling, unlimited members and more"
@@ -14008,13 +13820,9 @@ msgstr "Withdrawing Consent"
 msgid "Within limit"
 msgstr "Within limit"
 
-#: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
-msgid "Works with any OIDC provider — Okta, Entra ID, Google and more"
-msgstr "Works with any OIDC provider — Okta, Entra ID, Google and more"
-
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Write a description to display on your public profile"
-msgstr "Write a description to display on your public profile"
+msgstr "Write a description to display on your hồ sơ công khai"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -14074,7 +13882,7 @@ msgstr "You are about to delete <0>\"{title}\"</0>"
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "You are about to delete <0>{0}</0>. All data related to this organisation such as teams, documents, and all other resources will be deleted. This action is irreversible."
-msgstr "You are about to delete <0>{0}</0>. All data related to this organisation such as teams, documents, and all other resources will be deleted. This action is irreversible."
+msgstr "You are about to delete <0>{0}</0>. All data related to this organisation such as teams, documents, and all other resources will be deleted. hành động này không thể đảo ngược."
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "You are about to delete <0>{organisationName}</0>. This action is not reversible. All teams will be removed and all documents will be orphaned to the deleted-account service account."
@@ -14107,7 +13915,7 @@ msgstr "You are about to remove the <0>{provider}</0> login method from your acc
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 msgid "You are about to remove the email domain <0>{emailDomain}</0> from <1>{0}</1>. All emails associated with this domain will be deleted."
-msgstr "You are about to remove the email domain <0>{emailDomain}</0> from <1>{0}</1>. All emails associated with this domain will be deleted."
+msgstr "You are about to remove the tên miền email <0>{emailDomain}</0> from <1>{0}</1>. All emails associated with this domain will be deleted."
 
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 msgid "You are about to remove the following document and all associated fields"
@@ -14260,6 +14068,10 @@ msgstr "You can choose to enable or disable the profile for public view."
 msgid "You can copy and share these links to recipients so they can action the document."
 msgstr "You can copy and share these links to recipients so they can action the document."
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-download-dialog.tsx
+msgid "You can download up to {MAX_BULK_DOWNLOAD_ENVELOPES} documents at a time. Deselect some documents to continue."
+msgstr "You can download up to {MAX_BULK_DOWNLOAD_ENVELOPES} documents at a time. Deselect some documents to continue."
+
 #: apps/remix/app/components/general/teams/team-inherit-member-alert.tsx
 msgid "You can enable access to allow all organisation members to access this team by default."
 msgstr "You can enable access to allow all organisation members to access this team by default."
@@ -14275,7 +14087,7 @@ msgstr "You can only detect fields in draft envelopes"
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "You can revoke access at any time in your team settings on Documenso <0>here</0>."
-msgstr "You can revoke access at any time in your team settings on Documenso <0>here</0>."
+msgstr "You can revoke access at any time in your cài đặt đội nhóm on Crove Sign <0>here</0>."
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "You can update the profile URL by updating the team URL in the general settings page."
@@ -14402,7 +14214,7 @@ msgstr "You do not have permission to create a token for this team."
 
 #: apps/remix/app/components/general/unified-settings-sidebar.tsx
 msgid "You don't have permission to manage this organisation. Switch to another one above, or continue in your team settings below."
-msgstr "You don't have permission to manage this organisation. Switch to another one above, or continue in your team settings below."
+msgstr "You don't have permission to manage this organisation. Switch to another one above, or continue in your cài đặt đội nhóm below."
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "You don't manage billing for any organisations."
@@ -14432,11 +14244,11 @@ msgstr "You have been invited by <0>{organisationName}</0> to join their organis
 #. placeholder {0}: organisation.name
 #: packages/lib/server-only/organisation/create-organisation-member-invites.ts
 msgid "You have been invited to join {0} on Documenso"
-msgstr "You have been invited to join {0} on Documenso"
+msgstr "You have been invited to join {0} on Crove Sign"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "You have been invited to join <0>{organisationName}</0> on Documenso."
-msgstr "You have been invited to join <0>{organisationName}</0> on Documenso."
+msgstr "You have been invited to join <0>{organisationName}</0> on Crove Sign."
 
 #: packages/email/templates/organisation-invite.tsx
 msgid "You have been invited to join the following organisation"
@@ -14462,7 +14274,7 @@ msgstr "You have initiated the document {0} that requires you to {recipientActio
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "You have no API tokens yet. Your tokens will be shown here once you create them."
-msgstr "You have no API tokens yet. Your tokens will be shown here once you create them."
+msgstr "You have no mã API tokens yet. Your tokens will be shown here once you create them."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "You have no webhooks yet. Your webhooks will be shown here once you create them."
@@ -14531,7 +14343,7 @@ msgstr "You have successfully registered. Please verify your account by clicking
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 msgid "You have successfully removed this email domain from the organisation."
-msgstr "You have successfully removed this email domain from the organisation."
+msgstr "You have successfully removed this tên miền email from the organisation."
 
 #: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 msgid "You have successfully removed this email from the organisation."
@@ -14563,7 +14375,7 @@ msgstr "You have successfully revoked access."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
-msgstr "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
+msgstr "You have the right to withdraw your consent to use chữ ký điện tử at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
 
 #: apps/remix/app/components/forms/form-sticky-save-bar.tsx
 msgid "You have unsaved changes"
@@ -14616,7 +14428,7 @@ msgstr "You need at least one recipient to send a document"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "You need to be an admin to manage API tokens."
-msgstr "You need to be an admin to manage API tokens."
+msgstr "You need to be an admin to manage mã API tokens."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-page.tsx
 msgid "You need to be logged in as <0>{email}</0> to view this page."
@@ -14990,7 +14802,7 @@ msgstr "Your document is processed securely using AI services that don't retain 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "Your document preferences have been updated"
-msgstr "Your document preferences have been updated"
+msgstr "Your Tùy chọn tài liệu have been updated"
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Your Email"
@@ -14998,11 +14810,11 @@ msgstr "Your Email"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "Your email has already been confirmed. You can now use all features of Documenso."
-msgstr "Email của bạn đã được xác nhận trước đó. Bạn có thể sử dụng tất cả tính năng của Documenso."
+msgstr "Your email has already been confirmed. You can now use all features of Crove Sign."
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "Your email has been successfully confirmed! You can now use all features of Documenso."
-msgstr "Email của bạn đã được xác nhận thành công! Bạn có thể sử dụng đầy đủ các tính năng của Documenso."
+msgstr "Your email has been successfully confirmed! You can now use all features of Crove Sign."
 
 #. placeholder {0}: teamEmail.team.name
 #. placeholder {1}: teamEmail.team.url
@@ -15023,17 +14835,13 @@ msgstr "Your envelope has been distributed successfully."
 msgid "Your envelope has been resent successfully."
 msgstr "Your envelope has been resent successfully."
 
-#: apps/remix/app/components/general/settings-upsell/branding-upsell.tsx
-msgid "Your logo on signing pages and emails"
-msgstr "Your logo on signing pages and emails"
-
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Your Name"
 msgstr "Your Name"
 
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 msgid "Your new API token"
-msgstr "Your new API token"
+msgstr "Your new mã API token"
 
 #: apps/remix/app/components/forms/password.tsx
 #: apps/remix/app/components/forms/reset-password.tsx
@@ -15120,7 +14928,7 @@ msgstr "Your plan does not support inviting members. Please upgrade or your plan
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Your plan is no longer valid. Please subscribe to a new plan to continue using Documenso."
-msgstr "Your plan is no longer valid. Please subscribe to a new plan to continue using Documenso."
+msgstr "Your plan is no longer valid. Please subscribe to a new plan to continue using Crove Sign."
 
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Your profile has been updated successfully."
@@ -15132,7 +14940,7 @@ msgstr "Your profile has been updated."
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Your public profile has been updated."
-msgstr "Your public profile has been updated."
+msgstr "Your hồ sơ công khai has been updated."
 
 #: apps/remix/app/components/forms/2fa/recovery-code-list.tsx
 msgid "Your recovery code has been copied to your clipboard."
@@ -15159,10 +14967,6 @@ msgstr "Your signing authorisation expired before the signature could be applied
 #: apps/remix/app/components/general/document-signing/csc-recipient-blocked-page.tsx
 msgid "Your signing certificate is invalid, expired, or missing a required key. Contact your administrator or signing provider for assistance."
 msgstr "Your signing certificate is invalid, expired, or missing a required key. Contact your administrator or signing provider for assistance."
-
-#: apps/remix/app/utils/toast-error-messages.ts
-msgid "Your signing link has expired. Please contact the sender to request a new one."
-msgstr "Your signing link has expired. Please contact the sender to request a new one."
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Your signing provider authentication failed"
