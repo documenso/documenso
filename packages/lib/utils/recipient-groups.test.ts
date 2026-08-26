@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   extractRecipientToNewStep,
-  filterRecipientsInFirstSigningGroup,
   flattenRecipientGroups,
   getNextDictatableRecipient,
+  getRecipientsInActiveSigningStep,
   groupRecipientsBySigningOrder,
   isRecipientTurnBySigningOrder,
   mergeSteps,
@@ -554,7 +554,7 @@ describe('isRecipientTurnBySigningOrder', () => {
   });
 });
 
-describe('filterRecipientsInFirstSigningGroup', () => {
+describe('getRecipientsInActiveSigningStep', () => {
   const candidate = (
     id: number,
     signingOrder: number | null,
@@ -565,17 +565,17 @@ describe('filterRecipientsInFirstSigningGroup', () => {
   it('returns every pending recipient sharing the lowest order', () => {
     const recipients = [candidate(3, 2), candidate(4, 2), candidate(5, 3)];
 
-    expect(filterRecipientsInFirstSigningGroup(recipients).map((r) => r.id)).toEqual([3, 4]);
+    expect(getRecipientsInActiveSigningStep(recipients).map((r) => r.id)).toEqual([3, 4]);
   });
 
   it('returns an empty array for no pending recipients', () => {
-    expect(filterRecipientsInFirstSigningGroup([])).toEqual([]);
+    expect(getRecipientsInActiveSigningStep([])).toEqual([]);
   });
 
   it('excludes recipients that have already signed', () => {
     const recipients = [candidate(1, 1, SigningStatus.SIGNED), candidate(2, 2)];
 
-    expect(filterRecipientsInFirstSigningGroup(recipients).map((r) => r.id)).toEqual([2]);
+    expect(getRecipientsInActiveSigningStep(recipients).map((r) => r.id)).toEqual([2]);
   });
 
   // A rejected recipient is not pending: advancing to them would re-activate
@@ -583,7 +583,7 @@ describe('filterRecipientsInFirstSigningGroup', () => {
   it('excludes rejected recipients', () => {
     const recipients = [candidate(1, 1, SigningStatus.REJECTED), candidate(2, 2)];
 
-    expect(filterRecipientsInFirstSigningGroup(recipients).map((r) => r.id)).toEqual([2]);
+    expect(getRecipientsInActiveSigningStep(recipients).map((r) => r.id)).toEqual([2]);
   });
 
   it('excludes CC recipients', () => {
@@ -592,13 +592,13 @@ describe('filterRecipientsInFirstSigningGroup', () => {
       candidate(2, 2, SigningStatus.NOT_SIGNED),
     ];
 
-    expect(filterRecipientsInFirstSigningGroup(recipients).map((r) => r.id)).toEqual([2]);
+    expect(getRecipientsInActiveSigningStep(recipients).map((r) => r.id)).toEqual([2]);
   });
 
   it('returns an empty array when every recipient is signed or rejected', () => {
     const recipients = [candidate(1, 1, SigningStatus.SIGNED), candidate(2, 2, SigningStatus.REJECTED)];
 
-    expect(filterRecipientsInFirstSigningGroup(recipients)).toEqual([]);
+    expect(getRecipientsInActiveSigningStep(recipients)).toEqual([]);
   });
 });
 

@@ -23,7 +23,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Trans } from '@lingui/react/macro';
-import type { Field } from '@prisma/client';
+import type { Field, Recipient } from '@prisma/client';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -61,6 +61,12 @@ export type DocumentSigningPageViewV1Props = {
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
+  /**
+   * The dictatable next recipient, computed server-side over the FULL
+   * recipient list — must not be re-derived from the role-scoped
+   * `allRecipients`.
+   */
+  nextRecipient?: Pick<Recipient, 'name' | 'email'>;
   branding: DocumentSigningBranding;
   includeSenderDetails: boolean;
 };
@@ -72,6 +78,7 @@ export const DocumentSigningPageViewV1 = ({
   completedFields,
   isRecipientsTurn,
   allRecipients = [],
+  nextRecipient,
   includeSenderDetails,
   branding,
 }: DocumentSigningPageViewV1Props) => {
@@ -141,34 +148,6 @@ export const DocumentSigningPageViewV1 = ({
 
   const selectedSigner = allRecipients?.find((r) => r.id === selectedSignerId);
   const targetSigner = recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
-
-  const nextRecipient = useMemo(() => {
-    if (!documentMeta?.signingOrder || documentMeta.signingOrder !== 'SEQUENTIAL') {
-      return undefined;
-    }
-
-    const sortedRecipients = [...allRecipients].sort((a, b) => {
-      // Sort by signingOrder first (nulls last), then by id
-      if (a.signingOrder === null && b.signingOrder === null) {
-        return a.id - b.id;
-      }
-      if (a.signingOrder === null) {
-        return 1;
-      }
-      if (b.signingOrder === null) {
-        return -1;
-      }
-      if (a.signingOrder === b.signingOrder) {
-        return a.id - b.id;
-      }
-      return a.signingOrder - b.signingOrder;
-    });
-
-    const currentIndex = sortedRecipients.findIndex((r) => r.id === recipient.id);
-    return currentIndex !== -1 && currentIndex < sortedRecipients.length - 1
-      ? sortedRecipients[currentIndex + 1]
-      : undefined;
-  }, [document.documentMeta?.signingOrder, allRecipients, recipient.id]);
 
   const pendingFields = fieldsRequiringValidation.filter((field) => !field.inserted);
   const hasPendingFields = pendingFields.length > 0;

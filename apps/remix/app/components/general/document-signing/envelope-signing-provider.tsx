@@ -6,6 +6,7 @@ import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/enve
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
+import { getNextDictatableRecipient } from '@documenso/lib/utils/recipient-groups';
 import { trpc } from '@documenso/trpc/react';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { EnvelopeType, type Field, FieldType, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
@@ -290,32 +291,14 @@ export const EnvelopeSigningProvider = ({
     .filter((field) => field.inserted);
 
   const nextRecipient = useMemo(() => {
-    if (!envelope.documentMeta.signingOrder || envelope.documentMeta.signingOrder !== 'SEQUENTIAL') {
+    if (envelope.documentMeta.signingOrder !== 'SEQUENTIAL') {
       return null;
     }
 
-    const sortedRecipients = [...envelope.recipients].sort((a, b) => {
-      // Sort by signingOrder first (nulls last), then by id
-      if (a.signingOrder === null && b.signingOrder === null) {
-        return a.id - b.id;
-      }
-      if (a.signingOrder === null) {
-        return 1;
-      }
-      if (b.signingOrder === null) {
-        return -1;
-      }
-      if (a.signingOrder === b.signingOrder) {
-        return a.id - b.id;
-      }
-      return a.signingOrder - b.signingOrder;
+    return getNextDictatableRecipient({
+      recipients: envelope.recipients,
+      currentRecipientId: recipient.id,
     });
-
-    const currentIndex = sortedRecipients.findIndex((r) => r.id === recipient.id);
-
-    return currentIndex !== -1 && currentIndex < sortedRecipients.length - 1
-      ? sortedRecipients[currentIndex + 1]
-      : null;
   }, [envelope.documentMeta?.signingOrder, envelope.recipients, recipient.id]);
 
   const signField = async (
