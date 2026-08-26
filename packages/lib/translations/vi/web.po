@@ -351,7 +351,6 @@ msgstr "{0} Teams"
 #. placeholder {0}: currentStepData.order
 #. placeholder {1}: envelopeEditorSteps.length
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
-msgctxt "The step counter"
 msgid "{0}/{1}"
 msgstr "{0}/{1}"
 
@@ -1020,17 +1019,14 @@ msgid "A draft document will be created"
 msgstr "A draft document will be created"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "A field was added"
 msgstr "A field was added"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "A field was removed"
 msgstr "A field was removed"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "A field was updated"
 msgstr "A field was updated"
 
@@ -1072,17 +1068,14 @@ msgid "A password reset email has been sent, if you have an account you should s
 msgstr "A password reset email has been sent, if you have an account you should see it in your inbox shortly."
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "A recipient was added"
 msgstr "A recipient was added"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "A recipient was removed"
 msgstr "A recipient was removed"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "A recipient was updated"
 msgstr "A recipient was updated"
 
@@ -1143,7 +1136,7 @@ msgstr "A verification email will be sent to the provided email."
 #: packages/email/templates/confirm-team-email.tsx
 #: packages/email/templates/organisation-invite.tsx
 msgid "Accept"
-msgstr "Accept"
+msgstr "Chấp nhận"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Accept & Link Account"
@@ -1291,7 +1284,6 @@ msgstr "Active"
 #: apps/remix/app/components/general/admin-license-card.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 #: packages/lib/constants/billing.ts
-msgctxt "Subscription status"
 msgid "Active"
 msgstr "Active"
 
@@ -1550,7 +1542,7 @@ msgstr "Additional brand information to display at the bottom of emails"
 #: packages/lib/constants/organisations-translations.ts
 #: packages/lib/constants/teams-translations.ts
 msgid "Admin"
-msgstr "Admin"
+msgstr "Quản trị viên"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
@@ -2092,7 +2084,7 @@ msgstr "API requests have been temporarily paused"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 #: packages/lib/utils/settings-nav.ts
 msgid "API Tokens"
-msgstr "API Tokens"
+msgstr "Mã API Tokens"
 
 #: apps/remix/app/components/general/organisations/organisation-quota-banner.tsx
 msgid "API usage is approaching fair use limits"
@@ -2126,7 +2118,6 @@ msgid "Approve"
 msgstr "Approve"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role action verb"
 msgid "Approve"
 msgstr "Approve"
 
@@ -2142,26 +2133,22 @@ msgid "Approved"
 msgstr "Approved"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role actioned"
 msgid "Approved"
 msgstr "Approved"
 
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-header.tsx
 msgid "Approver"
-msgstr "Approver"
+msgstr "Người phê duyệt"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role name"
 msgid "Approver"
-msgstr "Approver"
+msgstr "Người phê duyệt"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role plural name"
 msgid "Approvers"
 msgstr "Approvers"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role progressive verb"
 msgid "Approving"
 msgstr "Approving"
 
@@ -2223,7 +2210,6 @@ msgid "Assigned Teams"
 msgstr "Assigned Teams"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role action verb"
 msgid "Assist"
 msgstr "Assist"
 
@@ -2243,7 +2229,6 @@ msgid "Assistant"
 msgstr "Assistant"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role name"
 msgid "Assistant"
 msgstr "Assistant"
 
@@ -2252,7 +2237,6 @@ msgid "Assistant role is only available when the document is in sequential signi
 msgstr "Assistant role is only available when the document is in sequential signing mode."
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role plural name"
 msgid "Assistants"
 msgstr "Assistants"
 
@@ -2265,12 +2249,10 @@ msgid "Assisted"
 msgstr "Assisted"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role actioned"
 msgid "Assisted"
 msgstr "Assisted"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role progressive verb"
 msgid "Assisting"
 msgstr "Assisting"
 
@@ -2309,7 +2291,7 @@ msgstr "Attempts sealing the document again, useful for after a code change has 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Audit Log"
-msgstr "Audit Log"
+msgstr "Nhật ký kiểm toán"
 
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 msgid "Audit Log Details"
@@ -2318,7 +2300,7 @@ msgstr "Audit Log Details"
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Audit Logs"
-msgstr "Audit Logs"
+msgstr "Nhật ký kiểm toán"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/render-certificate.ts
@@ -2363,7 +2345,7 @@ msgstr "Awaiting email confirmation"
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/direct-template/direct-template-signing-form.tsx
 msgid "Back"
-msgstr "Back"
+msgstr "Quay lại"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Back home"
@@ -2418,7 +2400,7 @@ msgstr "Before you get started, please confirm your email address by clicking th
 #: packages/lib/utils/settings-nav.ts
 #: packages/lib/utils/settings-nav.ts
 msgid "Billing"
-msgstr "Billing"
+msgstr "Thanh toán & Gói dịch vụ"
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Bio"
@@ -2492,7 +2474,7 @@ msgstr "Brand website and brand details"
 #: packages/lib/utils/settings-nav.ts
 #: packages/lib/utils/settings-nav.ts
 msgid "Branding"
-msgstr "Branding"
+msgstr "Thương hiệu"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Branding company details"
@@ -2718,7 +2700,7 @@ msgstr "Can't find someone?"
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-dialog.tsx
 msgid "Cancel"
-msgstr "Cancel"
+msgstr "Hủy"
 
 #: apps/remix/app/components/dialogs/envelope-cancel-dialog.tsx
 msgid "Cancel document"
@@ -2737,7 +2719,7 @@ msgstr "Cancel Documents"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: packages/lib/constants/document.ts
 msgid "Cancelled"
-msgstr "Cancelled"
+msgstr "Đã hủy"
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "Cancelled by user"
@@ -2761,27 +2743,22 @@ msgid "Capabilities enabled for this organisation."
 msgstr "Capabilities enabled for this organisation."
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role name"
 msgid "Cc"
 msgstr "Cc"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role action verb"
 msgid "CC"
 msgstr "CC"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role progressive verb"
 msgid "CC"
 msgstr "CC"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role actioned"
 msgid "CC'd"
 msgstr "CC'd"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role plural name"
 msgid "Ccers"
 msgstr "Ccers"
 
@@ -2837,7 +2814,7 @@ msgstr "Charts"
 #: packages/ui/primitives/document-flow/types.ts
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Checkbox"
-msgstr "Checkbox"
+msgstr "Hộp kiểm"
 
 #: packages/ui/primitives/document-flow/field-content.tsx
 msgid "Checkbox option"
@@ -2860,11 +2837,11 @@ msgstr "Checkout"
 
 #: packages/lib/constants/i18n.ts
 msgid "Chinese"
-msgstr "Chinese"
+msgstr "Tiếng Trung"
 
 #: packages/lib/constants/i18n.ts
 msgid "Vietnamese"
-msgstr "Vietnamese"
+msgstr "Tiếng Việt"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
@@ -3048,7 +3025,7 @@ msgstr "Complete the fields for the following signers."
 #: packages/email/template-components/template-document-self-signed.tsx
 #: packages/lib/constants/document.ts
 msgid "Completed"
-msgstr "Completed"
+msgstr "Đã hoàn thành"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Completed At"
@@ -3162,7 +3139,7 @@ msgstr "Configure when and how often reminder emails are sent to recipients who 
 #: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Confirm"
-msgstr "Confirm"
+msgstr "Xác nhận"
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
@@ -3238,7 +3215,7 @@ msgstr "Context"
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 #: packages/ui/primitives/document-flow/document-flow-root.tsx
 msgid "Continue"
-msgstr "Continue"
+msgstr "Tiếp tục"
 
 #: packages/email/template-components/template-document-invite.tsx
 #: packages/email/template-components/template-document-reminder.tsx
@@ -3364,7 +3341,7 @@ msgstr "Copy license key"
 
 #: packages/ui/components/document/document-share-button.tsx
 msgid "Copy Link"
-msgstr "Copy Link"
+msgstr "Sao chép liên kết"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Copy organisation ID"
@@ -3499,7 +3476,7 @@ msgstr "Create Direct Signing Link"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 msgid "Create Document"
-msgstr "Create Document"
+msgstr "Tạo tài liệu"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create document from template"
@@ -3550,7 +3527,7 @@ msgstr "Create organisation"
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Create Organisation"
-msgstr "Create Organisation"
+msgstr "Tạo tổ chức"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Create separate organisation"
@@ -3582,11 +3559,11 @@ msgstr "Create team"
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Create Team"
-msgstr "Create Team"
+msgstr "Tạo đội nhóm"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 msgid "Create Template"
-msgstr "Create Template"
+msgstr "Tạo mẫu tài liệu"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create the document as pending and ready to sign."
@@ -3608,7 +3585,7 @@ msgstr "Create webhook"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Create Webhook"
-msgstr "Create Webhook"
+msgstr "Tạo Webhook"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Create your account and start using state-of-the-art document signing."
@@ -3683,7 +3660,7 @@ msgstr "Current"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "Current Password"
-msgstr "Current Password"
+msgstr "Mật khẩu hiện tại"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "Current password is incorrect."
@@ -3758,7 +3735,7 @@ msgstr "Dark Mode"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Dashboard"
-msgstr "Dashboard"
+msgstr "Bảng điều khiển"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx
@@ -3769,7 +3746,7 @@ msgstr "Dashboard"
 #: packages/ui/primitives/document-flow/types.ts
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Date"
-msgstr "Date"
+msgstr "Ngày tháng"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Date created"
@@ -3799,7 +3776,7 @@ msgstr "David is the Employee, Lucas is the Manager"
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 #: packages/email/templates/organisation-invite.tsx
 msgid "Decline"
-msgstr "Decline"
+msgstr "Từ chối"
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
@@ -3814,31 +3791,31 @@ msgstr "Default border colour."
 
 #: apps/remix/app/components/dialogs/document-preferences-reset-dialog.tsx
 msgid "Default date format"
-msgstr "Default date format"
+msgstr "Định dạng ngày mặc định"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Date Format"
-msgstr "Default Date Format"
+msgstr "Định dạng ngày mặc định"
 
 #: apps/remix/app/components/dialogs/document-preferences-reset-dialog.tsx
 msgid "Default document language"
-msgstr "Default document language"
+msgstr "Ngôn ngữ tài liệu mặc định"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Document Language"
-msgstr "Default Document Language"
+msgstr "Ngôn ngữ tài liệu mặc định"
 
 #: apps/remix/app/components/dialogs/document-preferences-reset-dialog.tsx
 msgid "Default document visibility"
-msgstr "Default document visibility"
+msgstr "Quyền hiển thị tài liệu mặc định"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Document Visibility"
-msgstr "Default Document Visibility"
+msgstr "Quyền hiển thị tài liệu mặc định"
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Default Email"
-msgstr "Default Email"
+msgstr "Email mặc định"
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Default Email Settings"
@@ -3954,7 +3931,7 @@ msgstr "delete"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "Delete"
-msgstr "Delete"
+msgstr "Xóa"
 
 #. placeholder {0}: folder.name
 #. placeholder {0}: organisation.name
@@ -4365,7 +4342,6 @@ msgid "Document access"
 msgstr "Document access"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document access auth updated"
 msgstr "Document access auth updated"
 
@@ -4392,7 +4368,6 @@ msgid "Document cancelled"
 msgstr "Document cancelled"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document cancelled"
 msgstr "Document cancelled"
 
@@ -4411,7 +4386,6 @@ msgstr "Document completed"
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document completed"
 msgstr "Document completed"
 
@@ -4433,7 +4407,6 @@ msgid "Document created"
 msgstr "Document created"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document created"
 msgstr "Document created"
 
@@ -4476,7 +4449,6 @@ msgid "Document deleted"
 msgstr "Document deleted"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document deleted"
 msgstr "Document deleted"
 
@@ -4512,7 +4484,6 @@ msgid "Document expired"
 msgstr "Document expired"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document external ID updated"
 msgstr "Document external ID updated"
 
@@ -4558,7 +4529,6 @@ msgid "Document metrics"
 msgstr "Document metrics"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document moved to team"
 msgstr "Document moved to team"
 
@@ -4575,7 +4545,6 @@ msgid "Document not ready"
 msgstr "Document not ready"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document opened"
 msgstr "Document opened"
 
@@ -4624,7 +4593,6 @@ msgid "Document sent"
 msgstr "Document sent"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document sent"
 msgstr "Document sent"
 
@@ -4638,7 +4606,6 @@ msgid "Document Signed"
 msgstr "Document Signed"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document signing auth updated"
 msgstr "Document signing auth updated"
 
@@ -4665,12 +4632,10 @@ msgid "Document Title"
 msgstr "Document Title"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document title updated"
 msgstr "Document title updated"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document updated"
 msgstr "Document updated"
 
@@ -4699,7 +4664,6 @@ msgid "Document usage is approaching fair use limits"
 msgstr "Document usage is approaching fair use limits"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document viewed"
 msgstr "Document viewed"
 
@@ -4716,7 +4680,6 @@ msgid "Document visibility"
 msgstr "Document visibility"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Document visibility updated"
 msgstr "Document visibility updated"
 
@@ -4754,7 +4717,7 @@ msgstr "Documentation"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "Documents"
-msgstr "Documents"
+msgstr "Tài liệu"
 
 #: apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
 msgid "Documents and resources related to this envelope."
@@ -4872,7 +4835,7 @@ msgstr "Done"
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Download"
-msgstr "Download"
+msgstr "Tải xuống"
 
 #: apps/remix/app/components/general/document/document-audit-log-download-button.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
@@ -4918,7 +4881,7 @@ msgstr "Downloading {progress} / {0}..."
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: packages/lib/constants/document.ts
 msgid "Draft"
-msgstr "Draft"
+msgstr "Bản nháp"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Draft documents"
@@ -4942,7 +4905,6 @@ msgstr "Drag and drop your document here"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
-msgctxt "Draw signature"
 msgid "Draw"
 msgstr "Draw"
 
@@ -4962,7 +4924,7 @@ msgstr "Drop your document here"
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Dropdown"
-msgstr "Dropdown"
+msgstr "Menu chọn"
 
 #: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
 msgid "Dropdown must have at least one option"
@@ -4987,7 +4949,7 @@ msgstr "Dropdown values"
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
 msgid "Duplicate"
-msgstr "Duplicate"
+msgstr "Nhân bản"
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
@@ -5014,7 +4976,7 @@ msgstr "Duplicate values are not allowed"
 
 #: packages/lib/constants/i18n.ts
 msgid "Dutch"
-msgstr "Dutch"
+msgstr "Tiếng Hà Lan"
 
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -5046,7 +5008,7 @@ msgstr "Easy DNS setup with auto-generated DKIM and SPF records"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Edit"
-msgstr "Edit"
+msgstr "Chỉnh sửa"
 
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
 msgid "Edit Email Transport"
@@ -5079,7 +5041,7 @@ msgstr "Electronic Delivery of Documents"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Electronic Signature Disclosure"
-msgstr "Electronic Signature Disclosure"
+msgstr "Công bố về Chữ ký Điện tử"
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
@@ -5139,7 +5101,7 @@ msgstr "Email address"
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Email Address"
-msgstr "Email Address"
+msgstr "Địa chỉ Email"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "Email already confirmed"
@@ -5196,7 +5158,7 @@ msgstr "Email Domain Settings"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
 #: packages/lib/utils/settings-nav.ts
 msgid "Email Domains"
-msgstr "Email Domains"
+msgstr "Tên miền Email"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Email domains synced"
@@ -5242,7 +5204,6 @@ msgid "Email reply-to"
 msgstr "Email reply-to"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Email resent"
 msgstr "Email resent"
 
@@ -5258,7 +5219,6 @@ msgid "Email sending has been temporarily paused"
 msgstr "Email sending has been temporarily paused"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Email sent"
 msgstr "Email sent"
 
@@ -5443,7 +5403,7 @@ msgstr "Endpoint (optional)"
 
 #: packages/lib/constants/i18n.ts
 msgid "English"
-msgstr "English"
+msgstr "Tiếng Anh"
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
 msgid "Ensure that you are using the embedding token, not the API token"
@@ -5576,22 +5536,18 @@ msgid "Envelope Item Count"
 msgstr "Envelope Item Count"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Envelope item created"
 msgstr "Envelope item created"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Envelope item deleted"
 msgstr "Envelope item deleted"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Envelope item PDF replaced"
 msgstr "Envelope item PDF replaced"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Envelope item updated"
 msgstr "Envelope item updated"
 
@@ -5758,12 +5714,11 @@ msgstr "Expiration"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.general.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Expired"
-msgstr "Expired"
+msgstr "Đã hết hạn"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
-msgctxt "Subscription status"
 msgid "Expired"
-msgstr "Expired"
+msgstr "Đã hết hạn"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
@@ -5988,17 +5943,14 @@ msgid "Field placeholder"
 msgstr "Field placeholder"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Field prefilled by assistant"
 msgstr "Field prefilled by assistant"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Field signed"
 msgstr "Field signed"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Field unsigned"
 msgstr "Field unsigned"
 
@@ -6117,18 +6069,15 @@ msgid "Forgot your password?"
 msgstr "Forgot your password?"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
-msgctxt "Plan price"
 msgid "Free"
 msgstr "Free"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
-msgctxt "Subscription status"
 msgid "Free"
 msgstr "Free"
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
-msgctxt "Subscription status"
 msgid "Free (Pending)"
 msgstr "Free (Pending)"
 
@@ -6143,7 +6092,7 @@ msgstr "Free Signature Settings"
 
 #: packages/lib/constants/i18n.ts
 msgid "French"
-msgstr "French"
+msgstr "Tiếng Pháp"
 
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
 msgid "From"
@@ -6167,7 +6116,7 @@ msgstr "From name"
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-form.tsx
 msgid "Full Name"
-msgstr "Full Name"
+msgstr "Họ và tên"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
@@ -6180,7 +6129,7 @@ msgstr "Full Name"
 #: packages/lib/utils/settings-nav.ts
 #: packages/lib/utils/settings-nav.ts
 msgid "General"
-msgstr "General"
+msgstr "Chung"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.general.tsx
 msgid "General settings"
@@ -6197,7 +6146,7 @@ msgstr "Generate Links"
 
 #: packages/lib/constants/i18n.ts
 msgid "German"
-msgstr "German"
+msgstr "Tiếng Đức"
 
 #: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
 msgid "Give your members a dedicated single sign-on portal. The SSO portal is available on the Enterprise plan."
@@ -6570,7 +6519,6 @@ msgstr "Important: What This Means"
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 #: packages/lib/constants/billing.ts
-msgctxt "Subscription status"
 msgid "Inactive"
 msgstr "Inactive"
 
@@ -6579,7 +6527,7 @@ msgstr "Inactive"
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Inbox"
-msgstr "Inbox"
+msgstr "Hộp thư"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Inbox documents"
@@ -6645,7 +6593,7 @@ msgstr "Inherit authentication method"
 #: apps/remix/app/components/forms/reminder-preferences-form.tsx
 #: apps/remix/app/components/forms/reminder-preferences-form.tsx
 msgid "Inherit from organisation"
-msgstr "Inherit from organisation"
+msgstr "Kế thừa từ tổ chức"
 
 #: apps/remix/app/components/general/teams/team-inherit-member-alert.tsx
 msgid "Inherit organisation members"
@@ -6670,7 +6618,7 @@ msgstr "Inherited subscription claim"
 #: packages/ui/primitives/document-flow/types.ts
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Initials"
-msgstr "Initials"
+msgstr "Chữ ký tắt"
 
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
 msgid "Initials are required"
@@ -6855,11 +6803,11 @@ msgstr "It's not your turn to sign yet"
 
 #: packages/lib/constants/i18n.ts
 msgid "Italian"
-msgstr "Italian"
+msgstr "Tiếng Ý"
 
 #: packages/lib/constants/i18n.ts
 msgid "Japanese"
-msgstr "Japanese"
+msgstr "Tiếng Nhật"
 
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
@@ -6890,7 +6838,7 @@ msgstr "Key identifiers and relationships for this team."
 
 #: packages/lib/constants/i18n.ts
 msgid "Korean"
-msgstr "Korean"
+msgstr "Tiếng Hàn"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
@@ -7081,7 +7029,6 @@ msgid "Link expires in 30 minutes."
 msgstr "Link expires in 30 minutes."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
-msgctxt "Action button to link template to public profile"
 msgid "Link template"
 msgstr "Link template"
 
@@ -7329,7 +7276,7 @@ msgstr "Manage your site settings here"
 #: packages/lib/constants/organisations-translations.ts
 #: packages/lib/constants/teams-translations.ts
 msgid "Manager"
-msgstr "Manager"
+msgstr "Quản lý"
 
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 #: packages/lib/constants/document-visibility.ts
@@ -7395,7 +7342,7 @@ msgstr "Maximum number of uploaded files per envelope allowed"
 #: packages/lib/constants/organisations-translations.ts
 #: packages/lib/constants/teams-translations.ts
 msgid "Member"
-msgstr "Member"
+msgstr "Thành viên"
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -7428,7 +7375,7 @@ msgstr "Member Since"
 #: packages/lib/utils/settings-nav.ts
 #: packages/lib/utils/settings-nav.ts
 msgid "Members"
-msgstr "Members"
+msgstr "Thành viên"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Members that currently belong to this team."
@@ -7590,7 +7537,7 @@ msgstr "N/A"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "Name"
-msgstr "Name"
+msgstr "Tên"
 
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
 msgid "Name is required"
@@ -7654,7 +7601,7 @@ msgstr "New option {0}"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "New Password"
-msgstr "New Password"
+msgstr "Mật khẩu mới"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
@@ -7663,7 +7610,7 @@ msgstr "New Password"
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-dialog.tsx
 msgid "Next"
-msgstr "Next"
+msgstr "Tiếp theo"
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Next Field"
@@ -8106,7 +8053,7 @@ msgstr "Or continue with"
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 #: packages/ui/components/template/template-type-select.tsx
 msgid "Organisation"
-msgstr "Organisation"
+msgstr "Tổ chức"
 
 #: packages/lib/server-only/organisation/delete-organisation-email.ts
 msgid "Organisation \"{organisationName}\" has been deleted"
@@ -8248,7 +8195,7 @@ msgstr "Organisation-level pending invites for this team's parent organisation."
 #: apps/remix/app/routes/_authenticated+/settings+/organisations.tsx
 #: packages/lib/utils/settings-nav.ts
 msgid "Organisations"
-msgstr "Organisations"
+msgstr "Các tổ chức"
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Organisations that the user is a member of."
@@ -8277,7 +8224,6 @@ msgstr "Organize your documents and templates"
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-download-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-download-dialog.tsx
-msgctxt "Original document (adjective)"
 msgid "Original"
 msgstr "Original"
 
@@ -8314,7 +8260,7 @@ msgstr "Override organisation settings"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Owner"
-msgstr "Owner"
+msgstr "Chủ sở hữu"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Owner document completed"
@@ -8343,13 +8289,11 @@ msgid "Page {pageNumber} of {numPages}"
 msgstr "Page {pageNumber} of {numPages}"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
-msgctxt "Subscription status"
 msgid "Paid"
 msgstr "Paid"
 
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-download-dialog.tsx
-msgctxt "Partially signed document (adjective)"
 msgid "Partial"
 msgstr "Partial"
 
@@ -8405,7 +8349,7 @@ msgstr "Passkeys are not supported on this browser"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
 msgid "Password"
-msgstr "Password"
+msgstr "Mật khẩu"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/generate-certificate-pdf.ts
@@ -8437,7 +8381,6 @@ msgstr "Password updated!"
 #: apps/remix/app/components/general/admin-license-card.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 #: packages/lib/constants/billing.ts
-msgctxt "Subscription status"
 msgid "Past Due"
 msgstr "Past Due"
 
@@ -8470,7 +8413,7 @@ msgstr "PDF Document"
 #: packages/ui/components/document/document-read-only-fields.tsx
 #: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
 msgid "Pending"
-msgstr "Pending"
+msgstr "Đang chờ ký"
 
 #: packages/email/templates/document-pending.tsx
 msgid "Pending Document"
@@ -8790,7 +8733,7 @@ msgstr "Please upload a logo"
 
 #: packages/lib/constants/i18n.ts
 msgid "Polish"
-msgstr "Polish"
+msgstr "Tiếng Ba Lan"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "Port"
@@ -8798,7 +8741,7 @@ msgstr "Port"
 
 #: packages/lib/constants/i18n.ts
 msgid "Portuguese (Brazil)"
-msgstr "Portuguese (Brazil)"
+msgstr "Tiếng Bồ Đào Nha (Brazil)"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -8832,7 +8775,7 @@ msgstr "Preferences"
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Preview"
-msgstr "Preview"
+msgstr "Xem trước"
 
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "Preview and configure template."
@@ -8892,7 +8835,7 @@ msgstr "Processing document"
 #: apps/remix/app/routes/_profile+/_layout.tsx
 #: packages/lib/utils/settings-nav.ts
 msgid "Profile"
-msgstr "Profile"
+msgstr "Hồ sơ cá nhân"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Profile is currently <0>hidden</0>."
@@ -8929,7 +8872,7 @@ msgstr "Public"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 #: packages/lib/utils/settings-nav.ts
 msgid "Public Profile"
-msgstr "Public Profile"
+msgstr "Hồ sơ công khai"
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Public profile URL"
@@ -8958,7 +8901,7 @@ msgstr "Quick Actions"
 #: packages/ui/primitives/document-flow/types.ts
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Radio"
-msgstr "Radio"
+msgstr "Nút chọn"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Radio Settings"
@@ -8993,7 +8936,7 @@ msgstr "Read Only"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Read our documentation to get started with Documenso."
-msgstr "Read our documentation to get started with Documenso."
+msgstr "Đọc tài liệu hướng dẫn để bắt đầu sử dụng Documenso."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Read Status"
@@ -9064,7 +9007,7 @@ msgstr "Recent documents"
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 msgid "Recipient"
-msgstr "Recipient"
+msgstr "Người nhận"
 
 #. placeholder {0}: index + 1
 #. placeholder {0}: recipient.index + 1
@@ -9166,7 +9109,6 @@ msgid "Recipient signing request email"
 msgstr "Recipient signing request email"
 
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "Recipient signing window expired"
 msgstr "Recipient signing window expired"
 
@@ -9200,7 +9142,7 @@ msgstr "Recipient's signing provider authentication failed"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Recipients"
-msgstr "Recipients"
+msgstr "Những người nhận"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-invalid-direct-template-alert.tsx
 msgid "Recipients cannot use this direct link template because the following signers are missing a signature field"
@@ -9286,7 +9228,7 @@ msgstr "Registration Successful"
 
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-header.tsx
 msgid "Reject"
-msgstr "Reject"
+msgstr "Từ chối"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-reject-dialog.tsx
@@ -9305,7 +9247,7 @@ msgstr "Reject Document"
 #: packages/lib/constants/document.ts
 #: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Rejected"
-msgstr "Rejected"
+msgstr "Đã từ chối"
 
 #: packages/email/template-components/template-document-rejection-confirmed.tsx
 msgid "Rejection Confirmed"
@@ -9544,7 +9486,7 @@ msgstr "Reseal document"
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Resend"
-msgstr "Resend"
+msgstr "Gửi lại"
 
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Resend code"
@@ -9682,7 +9624,7 @@ msgstr "Return Home"
 
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Return to Documenso sign in page here"
-msgstr "Return to Documenso sign in page here"
+msgstr "Quay lại trang đăng nhập Documenso tại đây"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Return to documents"
@@ -9742,7 +9684,7 @@ msgstr "Ring"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Role"
-msgstr "Role"
+msgstr "Vai trò"
 
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
@@ -9760,7 +9702,7 @@ msgstr "Rows per page"
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Save"
-msgstr "Save"
+msgstr "Lưu"
 
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
@@ -9801,7 +9743,7 @@ msgstr "Sealing job started"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.members.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Search"
-msgstr "Search"
+msgstr "Tìm kiếm"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Search and manage all organisations"
@@ -9899,7 +9841,7 @@ msgstr "Secret"
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 #: packages/lib/utils/settings-nav.ts
 msgid "Security"
-msgstr "Security"
+msgstr "Bảo mật"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.activity.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.activity.tsx
@@ -10142,7 +10084,7 @@ msgstr "Selector"
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 msgid "Send"
-msgstr "Send"
+msgstr "Gửi"
 
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
 msgid "Send a test email using this transport to verify the configuration."
@@ -10165,7 +10107,7 @@ msgstr "Send document"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 msgid "Send Document"
-msgstr "Send Document"
+msgstr "Gửi tài liệu"
 
 #: apps/remix/app/components/general/settings-upsell/email-domains-upsell.tsx
 msgid "Send documents from your own domain. Email domains are available on the Enterprise plan."
@@ -10302,7 +10244,7 @@ msgstr "Set your password for Documenso"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/_layout.tsx
 msgid "Settings"
-msgstr "Settings"
+msgstr "Cài đặt"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Setup"
@@ -10374,12 +10316,11 @@ msgstr "Show usage with quotas"
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "Sign"
-msgstr "Sign"
+msgstr "Ký"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role action verb"
 msgid "Sign"
-msgstr "Sign"
+msgstr "Ký"
 
 #. placeholder {0}: recipient.name
 #. placeholder {1}: recipient.email
@@ -10404,11 +10345,11 @@ msgstr "Sign document"
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: packages/email/template-components/template-document-reminder.tsx
 msgid "Sign Document"
-msgstr "Sign Document"
+msgstr "Ký tài liệu"
 
 #: apps/remix/app/routes/_recipient+/_layout.tsx
 msgid "Sign Document - Documenso"
-msgstr "Sign Document - Documenso"
+msgstr "Ký tài liệu - Documenso"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
@@ -10430,7 +10371,7 @@ msgstr "Sign Here"
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
 #: packages/email/template-components/template-reset-password.tsx
 msgid "Sign In"
-msgstr "Sign In"
+msgstr "Đăng nhập"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
@@ -10441,7 +10382,7 @@ msgstr "Sign in to your account"
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Sign Out"
-msgstr "Sign Out"
+msgstr "Đăng xuất"
 
 #: apps/remix/app/components/dialogs/sign-field-signature-dialog.tsx
 msgid "Sign Signature Field"
@@ -10459,7 +10400,7 @@ msgstr "Sign up"
 
 #: apps/remix/app/routes/_unauthenticated+/signup.tsx
 msgid "Sign Up"
-msgstr "Sign Up"
+msgstr "Đăng ký"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Sign Up with Google"
@@ -10492,7 +10433,7 @@ msgstr "Sign Up with OIDC"
 #: packages/ui/primitives/field-selector.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Signature"
-msgstr "Signature"
+msgstr "Chữ ký"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/render-certificate.ts
@@ -10525,18 +10466,16 @@ msgstr "Signatures Collected"
 #: packages/ui/components/document/document-read-only-fields.tsx
 #: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
 msgid "Signed"
-msgstr "Signed"
+msgstr "Đã ký"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role actioned"
 msgid "Signed"
-msgstr "Signed"
+msgstr "Đã ký"
 
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-download-dialog.tsx
-msgctxt "Signed document (adjective)"
 msgid "Signed"
-msgstr "Signed"
+msgstr "Đã ký"
 
 #: apps/remix/app/components/general/settings-upsell/sso-portal-upsell.tsx
 msgid "Signed in"
@@ -10544,12 +10483,11 @@ msgstr "Signed in"
 
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-header.tsx
 msgid "Signer"
-msgstr "Signer"
+msgstr "Người ký"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role name"
 msgid "Signer"
-msgstr "Signer"
+msgstr "Người ký"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/render-certificate.ts
@@ -10557,12 +10495,10 @@ msgid "Signer Events"
 msgstr "Signer Events"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role plural name"
 msgid "Signers"
 msgstr "Signers"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role progressive verb"
 msgid "Signing"
 msgstr "Signing"
 
@@ -10846,7 +10782,7 @@ msgstr "Space-separated list of domains. Leave empty to allow all domains."
 
 #: packages/lib/constants/i18n.ts
 msgid "Spanish"
-msgstr "Spanish"
+msgstr "Tiếng Tây Ban Nha"
 
 #: packages/lib/utils/settings-nav.ts
 msgid "SSO"
@@ -10878,7 +10814,6 @@ msgstr "Status"
 #. placeholder {0}: currentStepData.order
 #. placeholder {1}: envelopeEditorSteps.length
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
-msgctxt "The step counter"
 msgid "Step {0}/{1}"
 msgstr "Step {0}/{1}"
 
@@ -11059,7 +10994,7 @@ msgstr "support"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Support"
-msgstr "Support"
+msgstr "Hỗ trợ"
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "Support ticket created"
@@ -11095,7 +11030,6 @@ msgstr "Sync Stripe subscription"
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "System auto inserted fields"
 msgstr "System auto inserted fields"
 
@@ -11120,7 +11054,7 @@ msgstr "Target Organisation"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 msgid "Team"
-msgstr "Team"
+msgstr "Đội nhóm"
 
 #. placeholder {0}: team.name
 #: packages/lib/server-only/team/delete-team.ts
@@ -11277,7 +11211,7 @@ msgstr "Team URL"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.teams.tsx
 #: packages/lib/utils/settings-nav.ts
 msgid "Teams"
-msgstr "Teams"
+msgstr "Các đội nhóm"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Teams help you organise your work and collaborate with others. Create your first team to get started."
@@ -11398,7 +11332,7 @@ msgstr "Template uploaded"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
 msgid "Templates"
-msgstr "Templates"
+msgstr "Mẫu tài liệu"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Templates deleted"
@@ -11445,7 +11379,7 @@ msgstr "test@example.com"
 #: packages/ui/primitives/document-flow/types.ts
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Text"
-msgstr "Text"
+msgstr "Văn bản"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx
@@ -11572,7 +11506,6 @@ msgstr "The document owner has been notified of your decision. They may contact 
 #. placeholder {0}: data.delegatedOwnerName || data.delegatedOwnerEmail
 #. placeholder {1}: data.teamName
 #: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
 msgid "The document ownership was delegated to {0} on behalf of {1}"
 msgstr "The document ownership was delegated to {0} on behalf of {1}"
 
@@ -11901,7 +11834,7 @@ msgstr "The types of signatures that recipients are allowed to use when signing 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "The URL for Documenso to send webhook events to."
-msgstr "The URL for Documenso to send webhook events to."
+msgstr "URL endpoint để Documenso gửi sự kiện webhook đến."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "The user you are looking for may have been removed, renamed or may have never existed."
@@ -12104,7 +12037,7 @@ msgstr "This document has too many recipients. Please remove some recipients or 
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
-msgstr "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
+msgstr "Tài liệu này khả dụng trong tài khoản Documenso của bạn. Bạn có thể xem thêm chi tiết, người nhận và nhật ký kiểm toán tại đó."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "This document is currently a draft and has not been sent"
@@ -12666,7 +12599,6 @@ msgstr "Type"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
-msgctxt "Type signature"
 msgid "Type"
 msgstr "Type"
 
@@ -12882,7 +12814,7 @@ msgstr "Untitled Group"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Update"
-msgstr "Update"
+msgstr "Cập nhật"
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Update Banner"
@@ -13024,13 +12956,12 @@ msgstr "Upgrade your plan to upload more documents"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Upload"
-msgstr "Upload"
+msgstr "Tải lên"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
-msgctxt "Upload signature"
 msgid "Upload"
-msgstr "Upload"
+msgstr "Tải lên"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Upload a CSV file to create multiple documents from this template. Each row represents one document with its recipient details."
@@ -13064,7 +12995,7 @@ msgstr "Upload disabled"
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: packages/ui/primitives/document-upload-button.tsx
 msgid "Upload Document"
-msgstr "Upload Document"
+msgstr "Tải lên tài liệu"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Upload documents and add recipients"
@@ -13139,7 +13070,7 @@ msgstr "Use a unique window for each rate limit"
 
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 msgid "Use API tokens to authenticate with the Documenso API."
-msgstr "Use API tokens to authenticate with the Documenso API."
+msgstr "Sử dụng API tokens để xác thực với Documenso API."
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
@@ -13319,7 +13250,6 @@ msgid "View"
 msgstr "View"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role action verb"
 msgid "View"
 msgstr "View"
 
@@ -13468,26 +13398,22 @@ msgid "Viewed"
 msgstr "Viewed"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role actioned"
 msgid "Viewed"
 msgstr "Viewed"
 
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-header.tsx
 msgid "Viewer"
-msgstr "Viewer"
+msgstr "Người xem"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role name"
 msgid "Viewer"
-msgstr "Viewer"
+msgstr "Người xem"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role plural name"
 msgid "Viewers"
 msgstr "Viewers"
 
 #: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role progressive verb"
 msgid "Viewing"
 msgstr "Viewing"
 
@@ -14011,12 +13937,12 @@ msgstr "Welcome to {organisationName}"
 
 #: packages/lib/jobs/definitions/emails/send-admin-user-created-email.handler.ts
 msgid "Welcome to Documenso"
-msgstr "Welcome to Documenso"
+msgstr "Chào mừng bạn đến với Documenso"
 
 #: packages/email/template-components/template-admin-user-created.tsx
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Welcome to Documenso!"
-msgstr "Welcome to Documenso!"
+msgstr "Chào mừng bạn đến với Documenso!"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Well-known URL is required"
@@ -14194,13 +14120,11 @@ msgstr "You are about to remove the following email from <0>{0}</0>."
 
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
-msgctxt "Removing group from organisation"
 msgid "You are about to remove the following group from <0>{0}</0>."
 msgstr "You are about to remove the following group from <0>{0}</0>."
 
 #. placeholder {0}: team.name
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
-msgctxt "Removing group from team"
 msgid "You are about to remove the following group from <0>{0}</0>."
 msgstr "You are about to remove the following group from <0>{0}</0>."
 
@@ -15074,11 +14998,11 @@ msgstr "Your Email"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "Your email has already been confirmed. You can now use all features of Documenso."
-msgstr "Your email has already been confirmed. You can now use all features of Documenso."
+msgstr "Email của bạn đã được xác nhận trước đó. Bạn có thể sử dụng tất cả tính năng của Documenso."
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "Your email has been successfully confirmed! You can now use all features of Documenso."
-msgstr "Your email has been successfully confirmed! You can now use all features of Documenso."
+msgstr "Email của bạn đã được xác nhận thành công! Bạn có thể sử dụng đầy đủ các tính năng của Documenso."
 
 #. placeholder {0}: teamEmail.team.name
 #. placeholder {1}: teamEmail.team.url
