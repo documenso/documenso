@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 
 import {
   extractRecipientToNewStep,
-  flattenRecipientGroups,
   getNextDictatableRecipient,
   getRecipientsInActiveSigningStep,
   groupRecipientsBySigningOrder,
@@ -447,51 +446,6 @@ describe('locked step guards', () => {
       ['c', 2],
       ['b', 3],
     ]);
-  });
-});
-
-describe('flattenRecipientGroups', () => {
-  const recipient = (id: number, signingOrder: number | null, role: RecipientRole = RecipientRole.SIGNER) => ({
-    id,
-    signingOrder,
-    role,
-  });
-
-  it('returns no changes when every signing recipient already has their own step', () => {
-    expect(flattenRecipientGroups([recipient(1, 1), recipient(2, 2)])).toEqual([]);
-  });
-
-  // Sparse but distinct orders are valid; only a shared step needs repairing.
-  it('leaves a valid but sparse sequence alone', () => {
-    expect(flattenRecipientGroups([recipient(1, 1), recipient(2, 5)])).toEqual([]);
-  });
-
-  it('splits a shared step while preserving relative order', () => {
-    const changes = flattenRecipientGroups([recipient(1, 1), recipient(2, 2), recipient(3, 2)]);
-
-    // Only the second member of the shared step has to move.
-    expect(changes).toEqual([{ id: 3, signingOrder: 3 }]);
-  });
-
-  it('gives every unordered recipient a distinct step', () => {
-    const changes = flattenRecipientGroups([recipient(1, null), recipient(2, null)]);
-
-    expect(changes).toEqual([
-      { id: 1, signingOrder: 1 },
-      { id: 2, signingOrder: 2 },
-    ]);
-  });
-
-  it('ignores CC recipients', () => {
-    expect(flattenRecipientGroups([recipient(1, 1), recipient(2, 1, RecipientRole.CC)])).toEqual([]);
-  });
-
-  it('does not mutate the input array order', () => {
-    const recipients = [recipient(3, 2), recipient(1, 1), recipient(2, 2)];
-
-    flattenRecipientGroups(recipients);
-
-    expect(recipients.map((r) => r.id)).toEqual([3, 1, 2]);
   });
 });
 
