@@ -51,6 +51,24 @@ describe('recipient signing order helpers', () => {
     ]);
   });
 
+  it('detects an assistant anywhere in the last signing step (groups)', () => {
+    expect(
+      isAssistantLastSigner([
+        { role: RecipientRole.SIGNER, signingOrder: 1 },
+        { role: RecipientRole.ASSISTANT, signingOrder: 2 },
+        { role: RecipientRole.SIGNER, signingOrder: 2 },
+      ]),
+    ).toBe(true);
+
+    expect(
+      isAssistantLastSigner([
+        { role: RecipientRole.ASSISTANT, signingOrder: 1 },
+        { role: RecipientRole.SIGNER, signingOrder: 1 },
+        { role: RecipientRole.SIGNER, signingOrder: 2 },
+      ]),
+    ).toBe(false);
+  });
+
   it('checks whether the last non-CC recipient is an assistant', () => {
     expect(
       isAssistantLastSigner([
