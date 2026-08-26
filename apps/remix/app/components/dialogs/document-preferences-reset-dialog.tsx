@@ -18,7 +18,6 @@ export type DocumentPreferencesResetDialogProps = {
   onReset: () => Promise<void>;
   showAiFeatures?: boolean;
   showDocumentVisibility?: boolean;
-  showIncludeSenderDetails?: boolean;
 };
 
 export const DocumentPreferencesResetDialog = ({
@@ -26,7 +25,6 @@ export const DocumentPreferencesResetDialog = ({
   onReset,
   showAiFeatures = false,
   showDocumentVisibility = false,
-  showIncludeSenderDetails = false,
 }: DocumentPreferencesResetDialogProps) => {
   const [open, setOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -92,28 +90,11 @@ export const DocumentPreferencesResetDialog = ({
               <li>
                 <Trans>Default signature settings</Trans>
               </li>
-              {showIncludeSenderDetails && (
-                <li>
-                  <Trans>Send on behalf of team</Trans>
-                </li>
-              )}
-              <li>
-                <Trans>Include the signing certificate in the document</Trans>
-              </li>
-              <li>
-                <Trans>Include the audit logs in the document</Trans>
-              </li>
               <li>
                 <Trans>Default recipients</Trans>
               </li>
               <li>
                 <Trans>Delegate document ownership</Trans>
-              </li>
-              <li>
-                <Trans>Default envelope expiration</Trans>
-              </li>
-              <li>
-                <Trans>Default signing reminders</Trans>
               </li>
               {showAiFeatures && (
                 <li>

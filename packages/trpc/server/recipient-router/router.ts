@@ -1,5 +1,5 @@
 import { prepareCscRecipientSigning } from '@documenso/ee/server-only/signing/csc/prepare-recipient-signing';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
@@ -603,13 +603,23 @@ export const recipientRouter = router({
         // can't complete via this route — they go through the CSC sync sign
         // flow (`enterprise.csc.signEnvelope`). This route returns the redirect URL
         // for the credential-scope OAuth round-trip.
-        const envelope = await prisma.envelope.findFirstOrThrow({
+        const envelope = await prisma.envelope.findFirst({
           where: {
             ...unsafeBuildEnvelopeIdQuery({ type: 'documentId', id: documentId }, EnvelopeType.DOCUMENT),
             recipients: { some: { token } },
           },
           select: { signatureLevel: true, internalVersion: true },
         });
+
+        // The most common cause is a stale signing page: the document was
+        // deleted, or the recipient was removed, after the link was opened.
+        // Surface a NOT_FOUND instead of leaking a Prisma P2025 as a 500.
+        if (!envelope) {
+          throw new AppError(AppErrorCode.NOT_FOUND, {
+            message: 'Document not found for the provided signing token',
+            statusCode: 404,
+          });
+        }
 
         if (isTspEnvelope(envelope)) {
           return await prepareCscRecipientSigning({
@@ -633,6 +643,17 @@ export const recipientRouter = router({
 
         return { status: 'SIGNED' as const };
       } catch (err) {
+        // Resolve retried, stale or concurrent duplicate completion requests
+        // idempotently so the client routes the user to the completed page
+        // instead of surfacing an error for a document that is signed.
+        if (err instanceof AppError && err.code === AppErrorCode.RECIPIENT_ALREADY_SIGNED) {
+          ctx.logger.info({
+            message: 'Recipient attempted to complete a document they have already signed',
+          });
+
+          return { status: 'ALREADY_SIGNED' as const };
+        }
+
         // Log the error for debugging purposes.
         ctx.logger.error({
           message: 'Error completing document with token',

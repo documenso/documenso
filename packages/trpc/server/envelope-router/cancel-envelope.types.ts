@@ -8,13 +8,14 @@ export const cancelEnvelopeMeta: TrpcRouteMeta = {
     method: 'POST',
     path: '/envelope/cancel',
     summary: 'Cancel envelope',
+    description: 'Cancel a pending envelope',
     tags: ['Envelope'],
   },
 };
 
 export const ZCancelEnvelopeRequestSchema = z.object({
-  envelopeId: z.string(),
-  reason: z.string().optional(),
+  envelopeId: z.string().describe('The ID of the envelope to cancel.'),
+  reason: z.string().describe('The reason for cancelling the envelope.').optional(),
 });
 
 export const ZCancelEnvelopeResponseSchema = ZSuccessResponseSchema;

@@ -93,3 +93,34 @@ test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Document Signed' })).toBeVisible();
   await expect(page.getByRole('heading')).toContainText('Document Signed');
 });
+
+test('[PUBLIC_PROFILE]: empty-profile settings hint only shows to team managers', async ({ page }) => {
+  const { user, team } = await seedUser();
+
+  // Enable the team's public profile with no linked templates so the empty
+  // state (and its "manage your profile" hint) renders.
+  await prisma.teamProfile.upsert({
+    where: { teamId: team.id },
+    update: { enabled: true },
+    create: { teamId: team.id, enabled: true },
+  });
+
+  // The team owner manages the team → sees the hint linking straight to the
+  // team's public-profile settings.
+  await apiSignin({ page, email: user.email });
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/p/${team.url}`);
+
+  const settingsLink = page.getByRole('link', { name: 'public profile settings' });
+  await expect(settingsLink).toBeVisible();
+  await expect(settingsLink).toHaveAttribute('href', `/t/${team.url}/settings/public-profile`);
+
+  // A different signed-in user who doesn't manage this team sees the empty state
+  // but no settings hint.
+  const { user: stranger } = await seedUser();
+
+  await apiSignin({ page, email: stranger.email });
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/p/${team.url}`);
+
+  await expect(page.getByText("hasn't added any documents")).toBeVisible();
+  await expect(page.getByRole('link', { name: 'public profile settings' })).toHaveCount(0);
+});
