@@ -3,10 +3,10 @@ import {
   NEXT_PUBLIC_SIGNING_CONTACT_INFO,
   NEXT_PUBLIC_WEBAPP_URL,
 } from '@documenso/lib/constants/app';
-import { env } from '@documenso/lib/utils/env';
 import type { PDF, Signer } from '@libpdf/core';
 import { match } from 'ts-pattern';
 
+import { getSigningTransport } from './helpers/transport';
 import { getTimestampAuthority } from './helpers/tsa';
 import { createGoogleCloudSigner } from './transports/google-cloud';
 import { createLocalSigner } from './transports/local';
@@ -22,7 +22,7 @@ const getSigner = async () => {
     return signer;
   }
 
-  const transport = env('NEXT_PRIVATE_SIGNING_TRANSPORT') || 'local';
+  const transport = getSigningTransport();
 
   // eslint-disable-next-line require-atomic-updates
   signer = await match(transport)
