@@ -6,7 +6,7 @@ import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/enve
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
-import { getNextDictatableRecipient } from '@documenso/lib/utils/recipient-groups';
+import { effectiveOrder, getNextDictatableRecipient } from '@documenso/lib/utils/recipient-groups';
 import { trpc } from '@documenso/trpc/react';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { EnvelopeType, type Field, FieldType, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
@@ -241,7 +241,7 @@ export const EnvelopeSigningProvider = ({
    */
   const assistantRecipients =
     recipient.role === RecipientRole.ASSISTANT
-      ? envelope.recipients.filter((r) => (r.signingOrder ?? 0) > (recipient.signingOrder ?? 0))
+      ? envelope.recipients.filter((r) => effectiveOrder(r) > effectiveOrder(recipient))
       : [];
 
   /**
