@@ -1,6 +1,8 @@
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 
+import { getLaterSigningStepRecipientsWhereInput } from '../../utils/recipients';
+
 export type GetFieldsForTokenOptions = {
   token: string;
 };
@@ -31,10 +33,11 @@ export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => 
               signingStatus: {
                 not: SigningStatus.SIGNED,
               },
-              signingOrder: {
-                gte: recipient.signingOrder ?? 0,
-              },
               envelopeId: recipient.envelopeId,
+              // Assistants can only assist those in strictly later steps —
+              // never their own group peers, with null orders as the tail
+              // step. (Own fields are matched by the sibling OR arm.)
+              AND: [getLaterSigningStepRecipientsWhereInput(recipient)],
             },
             envelope: {
               id: recipient.envelopeId,
