@@ -1,7 +1,7 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
+import { assertRecipientNotExpired, getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 
@@ -25,21 +25,10 @@ export const removeSignedFieldWithToken = async ({
   const field = await prisma.field.findFirstOrThrow({
     where: {
       id: fieldId,
-      recipient: {
-        ...(recipient.role !== RecipientRole.ASSISTANT
-          ? {
-              id: recipient.id,
-            }
-          : {
-              signingOrder: {
-                gte: recipient.signingOrder ?? 0,
-              },
-              signingStatus: {
-                not: SigningStatus.SIGNED,
-              },
-              envelopeId: recipient.envelopeId,
-            }),
-      },
+      recipient: getRecipientFieldsWhereInput({
+        recipient,
+        allowAssistantAccessToOtherRecipients: true,
+      }),
     },
     include: {
       envelope: true,

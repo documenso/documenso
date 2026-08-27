@@ -4,7 +4,7 @@ import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
-import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
+import { assertRecipientNotExpired, getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
@@ -39,20 +39,10 @@ export const signEnvelopeFieldRoute = procedure
     const field = await prisma.field.findFirst({
       where: {
         id: fieldId,
-        recipient:
-          recipient.role === RecipientRole.ASSISTANT
-            ? {
-                signingStatus: {
-                  not: SigningStatus.SIGNED,
-                },
-                signingOrder: {
-                  gte: recipient.signingOrder ?? 0,
-                },
-                envelopeId: recipient.envelopeId,
-              }
-            : {
-                id: recipient.id,
-              },
+        recipient: getRecipientFieldsWhereInput({
+          recipient,
+          allowAssistantAccessToOtherRecipients: true,
+        }),
       },
       include: {
         envelope: {
