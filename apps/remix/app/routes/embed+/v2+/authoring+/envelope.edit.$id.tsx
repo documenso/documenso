@@ -1,5 +1,6 @@
 import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import type { SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
+import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getEditorEnvelopeById } from '@documenso/lib/server-only/envelope/get-editor-envelope-by-id';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
@@ -93,6 +94,18 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   if (settings.brandingEnabled && settings.brandingLogo) {
     brandingLogo = settings.brandingLogo;
   }
+
+  captureServerEvent({
+    event: 'App: Embed Session Started',
+    userId: result.userId,
+    organisationId: envelope.team.organisationId,
+    teamId: result.teamId ?? undefined,
+    properties: {
+      type: 'authoring',
+      version: 'v2',
+      envelopeId: envelope.id,
+    },
+  });
 
   return superLoaderJson({
     token,
