@@ -37,6 +37,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
 
+/** How far past a resize handle you can still grab it, in screen pixels. */
+const TRANSFORMER_ANCHOR_HIT_STROKE_PX = 24;
+
 export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
@@ -350,6 +353,9 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       shouldOverdrawWholeArea: true,
       ignoreStroke: true,
       flipEnabled: false,
+      anchorStyleFunc: (anchor) => {
+        anchor.hitStrokeWidth(TRANSFORMER_ANCHOR_HIT_STROKE_PX / scale);
+      },
       boundBoxFunc: (oldBox, newBox) => {
         // Enforce minimum size
         if (newBox.width < 30 || newBox.height < 20) {
