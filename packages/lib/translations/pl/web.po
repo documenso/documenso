@@ -8789,6 +8789,10 @@ msgstr "Prześlij dokument, aby kontynuować"
 msgid "Please upload a logo"
 msgstr "Prześlij logo"
 
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Please upload a valid image file."
+msgstr "Prześlij prawidłową grafikę."
+
 #: packages/lib/constants/i18n.ts
 msgid "Polish"
 msgstr "Polski"
@@ -11698,6 +11702,14 @@ msgstr "Brak pola podpisu dla następujących podpisujących:"
 msgid "The following team has been deleted. You will no longer be able to access this team and its documents"
 msgstr "Następujący zespół został usunięty. Nie będziesz mógł już uzyskać dostępu do tego zespołu i jego dokumentów"
 
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "The image could not be loaded. Please try again."
+msgstr "Nie można załadować grafiki. Spróbuj ponownie."
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "The image must be smaller than 5MB."
+msgstr "Maksymalny rozmiar grafiki to 5 MB."
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "The license key has been copied to your clipboard"
 msgstr "Klucz licencyjny został skopiowany do schowka"
@@ -12192,6 +12204,10 @@ msgstr "Typ pliku nie jest obsługiwany. Prześlij dokument PDF lub Word."
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "Folder zawiera wiele elementów. Usunięcie go spowoduje przeniesienie wszystkich dokumentów i szablonów znajdujących się w tym folderze do folderu głównego."
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "This image is invalid, please upload a valid image file."
+msgstr "Grafika jest nieprawidłowa. Prześlij prawidłowy plik."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
@@ -12775,6 +12791,10 @@ msgstr "Nie można się zalogować"
 msgid "Unable to start the signing flow"
 msgstr "Nie można rozpocząć procesu podpisywania"
 
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Unable to upload image"
+msgstr "Nie można przesłać grafiki"
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
@@ -13079,6 +13099,10 @@ msgstr "Prześlij dokumenty i dodaj odbiorców"
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "Upload failed"
 msgstr "Przesyłanie nie powiodło się"
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Upload New Image"
+msgstr "Prześlij nową grafikę"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Upload signature"
@@ -15324,3 +15348,14 @@ msgstr "Twój kod weryfikacyjny:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "twoja-domena.pl inna-domena.pl"
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Zoom in"
+msgstr "Powiększ"
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Zoom out"
+msgstr "Pomniejsz"
+
