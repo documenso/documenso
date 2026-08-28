@@ -136,6 +136,7 @@ docker run -d \
   -e NEXT_PUBLIC_WEBAPP_URL="https://sign.example.com" \
   -e NEXT_PRIVATE_INTERNAL_WEBAPP_URL="http://localhost:3000" \
   -e NEXT_PRIVATE_DATABASE_URL="postgresql://user:password@db-host:5432/documenso" \
+  -e NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH="/opt/documenso/cert.p12" \
   -e NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password" \
   -e NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth" \
   -e NEXT_PRIVATE_SMTP_HOST="smtp.example.com" \
@@ -153,6 +154,12 @@ A signing certificate is required for document signing. You have two options for
 
 - **Volume mount** — mount a `.p12` file from the host into the container at `/opt/documenso/cert.p12` (shown above). This is the simplest approach for small to moderate deployments.
 - **Base64-encoded contents** — set `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` with the base64-encoded certificate string. Use this when file mounting is not available (e.g., Railway, Vercel).
+
+<Callout type="warn">
+  Plain `docker run` deployments must set `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` explicitly. This
+  prevents production deployments from accidentally using the insecure example certificate.
+  Docker Compose sets the file path for you.
+</Callout>
 
 For production deployments that require Adobe Approved Trust List recognition, consider using a [Google Cloud HSM](/docs/self-hosting/configuration/signing-certificate/google-cloud-hsm) or another external HSM.
 
@@ -178,6 +185,7 @@ NEXT_PUBLIC_WEBAPP_URL=https://sign.example.com
 NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000
 NEXT_PRIVATE_DATABASE_URL=postgresql://user:password@db-host:5432/documenso
 NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://user:password@db-host:5432/documenso
+NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
 NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
 NEXT_PRIVATE_SMTP_TRANSPORT=smtp-auth
 NEXT_PRIVATE_SMTP_HOST=smtp.example.com
