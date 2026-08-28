@@ -102,7 +102,7 @@ See [Email Configuration](/docs/self-hosting/configuration/email) for other tran
 | Variable                                    | Description                                                    | Default                   |
 | ------------------------------------------- | -------------------------------------------------------------- | ------------------------- |
 | `PORT`                                      | Port the application listens on                                | `3000`                    |
-| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`      | Path to signing certificate inside container                   | `/opt/documenso/cert.p12` |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`      | Path to signing certificate inside container — set to the volume-mount path (e.g. `/opt/documenso/cert.p12`). Only Docker Compose defaults this; plain `docker run` must set it explicitly | -                         |
 | `NEXT_PRIVATE_SIGNING_PASSPHRASE`           | Passphrase for the signing certificate                         | -                         |
 | `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`  | Base64-encoded `.p12` certificate (alternative to file path)   | -                         |
 | `NEXT_PUBLIC_UPLOAD_TRANSPORT`              | Document storage: `database` or `s3`                           | `database`                |
