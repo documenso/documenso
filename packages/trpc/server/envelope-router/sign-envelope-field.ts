@@ -4,7 +4,8 @@ import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
-import { assertRecipientNotExpired, getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipients';
+import { getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipient-queries';
+import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { match } from 'ts-pattern';

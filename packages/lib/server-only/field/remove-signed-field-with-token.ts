@@ -1,7 +1,8 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { assertRecipientNotExpired, getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipients';
+import { getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipient-queries';
+import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 

@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 
-import { getLaterSigningStepRecipientsWhereInput } from '../../utils/recipients';
+import { getLaterSigningStepRecipientsWhereInput } from '../../utils/recipient-queries';
 
 export type GetFieldsForTokenOptions = {
   token: string;

@@ -25,7 +25,8 @@ import {
 } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { assertRecipientNotExpired, getRecipientFieldsWhereInput } from '../../utils/recipients';
+import { getRecipientFieldsWhereInput } from '../../utils/recipient-queries';
+import { assertRecipientNotExpired } from '../../utils/recipients';
 import { validateFieldAuth } from '../document/validate-field-auth';
 
 export type SignFieldWithTokenOptions = {

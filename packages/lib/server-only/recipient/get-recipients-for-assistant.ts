@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 import { FieldType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { getAssistableRecipientsWhereInput } from '../../utils/recipients';
+import { getAssistableRecipientsWhereInput } from '../../utils/recipient-queries';
 
 export interface GetRecipientsForAssistantOptions {
   token: string;
