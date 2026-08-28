@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
@@ -42,6 +43,7 @@ const TRANSFORMER_ANCHOR_HIT_STROKE_PX = 24;
 
 export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
+  const analytics = useAnalytics();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
 
@@ -279,6 +281,13 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       unsafeRenderFieldOnLayer(field);
     } catch (err) {
       console.error(err);
+
+      analytics.captureException(err, {
+        source: 'editor',
+        location: 'envelope_page_render',
+        envelopeId: envelope.id,
+      });
+
       setRenderError(true);
     }
   };
