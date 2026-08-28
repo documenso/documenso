@@ -8,6 +8,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { EnvelopeType } from '@prisma/client';
 import type { Logger } from 'pino';
+import { match, P } from 'ts-pattern';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
@@ -150,19 +151,11 @@ export const createEnvelopeRouteCaller = async ({
     accessAuth: recipient.accessAuth,
     actionAuth: recipient.actionAuth,
     fields: recipient.fields?.map((field) => {
-      let documentDataId: string | undefined;
-
-      if (typeof field.identifier === 'string') {
-        documentDataId = envelopeItems.find((item) => item.title === field.identifier)?.documentDataId;
-      }
-
-      if (typeof field.identifier === 'number') {
-        documentDataId = envelopeItems.at(field.identifier)?.documentDataId;
-      }
-
-      if (field.identifier === undefined) {
-        documentDataId = envelopeItems.at(0)?.documentDataId;
-      }
+      const documentDataId = match(field.identifier)
+        .with(P.string, (title) => envelopeItems.find((item) => item.title === title)?.documentDataId)
+        .with(P.number, (index) => envelopeItems.at(index)?.documentDataId)
+        .with(undefined, () => envelopeItems.at(0)?.documentDataId)
+        .exhaustive();
 
       if (!documentDataId) {
         throw new AppError(AppErrorCode.NOT_FOUND, {

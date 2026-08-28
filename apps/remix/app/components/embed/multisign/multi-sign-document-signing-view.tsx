@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
@@ -57,6 +58,7 @@ export const MultiSignDocumentSigningView = ({
 }: MultiSignDocumentSigningViewProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const { fullName, email, signature, setFullName, setSignature } = useRequiredDocumentSigningContext();
 
@@ -101,6 +103,13 @@ export const MultiSignDocumentSigningView = ({
 
       console.error(err);
 
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'sign_field',
+        recipientId,
+        documentId: document?.id,
+      });
+
       toast({
         title: _(msg`Error`),
         description: _(msg`An error occurred while signing the document.`),
@@ -120,6 +129,13 @@ export const MultiSignDocumentSigningView = ({
       }
 
       console.error(err);
+
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'remove_field',
+        recipientId,
+        documentId: document?.id,
+      });
     }
   };
 
@@ -140,6 +156,13 @@ export const MultiSignDocumentSigningView = ({
         recipientId,
       });
     } catch (err) {
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'complete_document',
+        recipientId,
+        documentId: document?.id,
+      });
+
       onDocumentError?.();
 
       const error = AppError.parseError(err);
