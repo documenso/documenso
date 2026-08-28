@@ -1,8 +1,11 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
+import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
+import { prisma } from '@documenso/prisma';
 import { Trans } from '@lingui/react/macro';
 import { SigningStatus } from '@prisma/client';
 import { useEffect, useLayoutEffect, useState } from 'react';
@@ -42,6 +45,15 @@ export async function loader({ request }: Route.LoaderArgs) {
   const firstDocument = envelopes[0]?.document;
 
   if (!firstDocument) {
+    captureServerEvent({
+      event: 'App: Embed Session Started',
+      userId: user?.id,
+      properties: {
+        type: 'signing',
+        version: 'v1',
+      },
+    });
+
     return superLoaderJson({
       envelopes,
       user,
@@ -54,6 +66,29 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const allowWhitelabelling = organisationClaim.flags.embedSigningWhiteLabel;
   const hidePoweredBy = organisationClaim.flags.hidePoweredBy;
+
+  fireAndForget(async () => {
+    const team = await prisma.team.findFirst({
+      where: {
+        id: firstDocument.teamId,
+      },
+      select: {
+        organisationId: true,
+      },
+    });
+
+    captureServerEvent({
+      event: 'App: Embed Session Started',
+      userId: user?.id,
+      organisationId: team?.organisationId,
+      teamId: firstDocument.teamId,
+      properties: {
+        type: 'signing',
+        version: 'v1',
+        envelopeId: firstDocument.envelopeId,
+      },
+    });
+  });
 
   return superLoaderJson({
     envelopes,

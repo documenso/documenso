@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
@@ -31,6 +32,7 @@ export const DocumentSigningRadioField = ({ field, onSignField, onUnsignField }:
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
+  const analytics = useAnalytics();
 
   const { recipient, targetSigner, isAssistantMode } = useDocumentSigningRecipientContext();
 
@@ -91,6 +93,13 @@ export const DocumentSigningRadioField = ({ field, onSignField, onUnsignField }:
 
       console.error(err);
 
+      analytics.captureException(err, {
+        source: 'signing',
+        location: 'sign_field',
+        fieldType: field.type,
+        recipientId: field.recipientId,
+      });
+
       toast({
         title: _(msg`Error`),
         description: isAssistantMode
@@ -120,6 +129,13 @@ export const DocumentSigningRadioField = ({ field, onSignField, onUnsignField }:
     } catch (err) {
       console.error(err);
 
+      analytics.captureException(err, {
+        source: 'signing',
+        location: 'remove_field',
+        fieldType: field.type,
+        recipientId: field.recipientId,
+      });
+
       toast({
         title: _(msg`Error`),
         description: _(msg`An error occurred while removing the selection.`),
@@ -146,14 +162,17 @@ export const DocumentSigningRadioField = ({ field, onSignField, onUnsignField }:
       {isLoading && <DocumentSigningFieldsLoader />}
 
       {!field.inserted && (
-        <RadioGroup onValueChange={(value) => handleSelectItem(value)} className="z-10 my-0.5 gap-y-1">
+        <RadioGroup
+          value={selectedOption}
+          onValueChange={(value) => handleSelectItem(value)}
+          className="z-10 my-0.5 gap-y-1"
+        >
           {values?.map((item, index) => (
             <div key={index} className="flex items-center">
               <RadioGroupItem
                 className="h-3 w-3 shrink-0"
                 value={item.value}
                 id={`option-${field.id}-${item.id}`}
-                checked={item.checked}
                 disabled={isReadOnly}
               />
               {!item.value.includes('empty-value-') && item.value && (
@@ -167,14 +186,13 @@ export const DocumentSigningRadioField = ({ field, onSignField, onUnsignField }:
       )}
 
       {field.inserted && (
-        <RadioGroup className="my-0.5 gap-y-1">
+        <RadioGroup value={field.customText ?? ''} className="my-0.5 gap-y-1">
           {values?.map((item, index) => (
             <div key={index} className="flex items-center">
               <RadioGroupItem
                 className="h-3 w-3"
                 value={item.value}
                 id={`option-${field.id}-${item.id}`}
-                checked={item.value === field.customText}
                 disabled={isReadOnly}
               />
               {!item.value.includes('empty-value-') && item.value && (

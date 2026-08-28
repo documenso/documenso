@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { type TRecipientAccessAuth, ZDocumentAccessAuthSchema } from '@documenso/lib/types/document-auth';
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
@@ -14,6 +15,7 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { Field, Recipient } from '@prisma/client';
@@ -26,6 +28,8 @@ import { z } from 'zod';
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { AccessAuth2FAForm } from '~/components/general/document-signing/access-auth-2fa-form';
 import { DocumentSigningDisclosure } from '~/components/general/document-signing/document-signing-disclosure';
+
+import { getSigningCompletionErrorMessage } from '~/utils/toast-error-messages';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 
@@ -85,7 +89,9 @@ export const DocumentSigningCompleteDialog = ({
   position,
   disableNameInput = false,
 }: DocumentSigningCompleteDialogProps) => {
-  const { t } = useLingui();
+  const analytics = useAnalytics();
+  const { t, i18n } = useLingui();
+  const { toast } = useToast();
 
   const [showDialog, setShowDialog] = useState(false);
 
@@ -174,6 +180,23 @@ export const DocumentSigningCompleteDialog = ({
 
         return;
       }
+
+      analytics.captureException(error, {
+        source: 'signing',
+        location: 'complete_document',
+      });
+
+      // This dialog owns the completion error toast for every signing surface
+      // so the user gets a specific, actionable message. Callers should run
+      // their own side effects (e.g. embeds posting document-error) and
+      // rethrow rather than toasting themselves.
+      const toastMessage = getSigningCompletionErrorMessage(err.code);
+
+      toast({
+        title: i18n._(toastMessage.title),
+        description: i18n._(toastMessage.description),
+        variant: 'destructive',
+      });
     }
   };
 
