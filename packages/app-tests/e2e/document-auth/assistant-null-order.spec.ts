@@ -13,7 +13,7 @@ const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
 /**
  * A recipient without a signing order sits in the LAST step — the convention
- * `effectiveOrder` encodes and the server sorts by (NULLS LAST). The
+ * `effectiveSigningOrder` encodes and the server sorts by (NULLS LAST). The
  * assistant scoping filters must agree with it:
  *
  * - an ordered assistant may assist a null-order recipient (they are in the

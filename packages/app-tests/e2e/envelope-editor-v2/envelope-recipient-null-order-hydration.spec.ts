@@ -9,7 +9,7 @@ import { getRecipientEmailInputs, getRecipientStepCards, setRecipientName } from
 
 /**
  * A recipient with no persisted signing order means "last" everywhere on the
- * server (queries sort NULLS LAST, and `effectiveOrder` maps null to the end).
+ * server (queries sort NULLS LAST, and `effectiveSigningOrder` maps null to the end).
  * The editor must not invent an order from array position: the guess can land
  * on a real order — which now means "same signing step" — or move the
  * recipient ahead of one that was meant to sign first.

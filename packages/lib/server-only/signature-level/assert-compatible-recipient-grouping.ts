@@ -2,7 +2,7 @@ import type { Recipient } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { isTspEnvelope } from '../../types/signature-level';
-import { effectiveOrder } from '../../utils/recipient-groups';
+import { effectiveSigningOrder } from '../../utils/recipient-groups';
 import { isCcRecipient } from '../../utils/recipients';
 
 type AssertCompatibleRecipientGroupingOptions = {
@@ -17,7 +17,7 @@ type AssertCompatibleRecipientGroupingOptions = {
  * they may then complete in any order — including at the same time. That is
  * parallel signing scoped to one step
  *
- * Recipients sharing a step are detected by {@link effectiveOrder}, so an
+ * Recipients sharing a step are detected by {@link effectiveSigningOrder}, so an
  * absent signing order counts too — every unordered recipient lands in the
  * same tail step and would sign in parallel.
  *
@@ -41,7 +41,7 @@ export const assertCompatibleRecipientGrouping = ({
       continue;
     }
 
-    const order = effectiveOrder(recipient);
+    const order = effectiveSigningOrder(recipient);
 
     if (seenOrders.has(order)) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
