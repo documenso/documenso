@@ -13,7 +13,10 @@ import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
  *
  * That recipient must never be treated as the next signing group — doing so
  * re-marks them as sent and emails them a signing request for a document they
- * declined. (For rejected TSP envelopes the seal job always throws, so this
+ * declined. Nor may the flow advance PAST them: the turn check treats a
+ * rejection as blocking, so a recipient in a later step would receive a
+ * signing request whose link redirects to /waiting and whose completion is
+ * refused. (For rejected TSP envelopes the seal job always throws, so this
  * state is permanent rather than a narrow race.)
  */
 
@@ -31,7 +34,7 @@ const expectSigningRequestJobCount = async (recipientId: number, expected: numbe
   expect(jobs.length).toBe(expected);
 };
 
-test('[REJECTED_ADVANCEMENT]: a rejected recipient is skipped when the next group is activated', async () => {
+test('[REJECTED_ADVANCEMENT]: no step is activated past a rejected recipient', async () => {
   const { user, team } = await seedUser();
   const { user: firstSigner } = await seedUser();
   const { user: rejectedSigner } = await seedUser();
@@ -83,7 +86,10 @@ test('[REJECTED_ADVANCEMENT]: a rejected recipient is skipped when the next grou
   expect(rejectedAfter.signingStatus).toBe(SigningStatus.REJECTED);
   await expectSigningRequestJobCount(rejected.id, 0);
 
-  // The genuinely pending next step is activated instead.
-  expect(laterAfter.sentAt).not.toBeNull();
-  await expectSigningRequestJobCount(later.id, 1);
+  // The later step is NOT activated either: the rejection blocks the flow
+  // (the turn check would refuse their completion), and the envelope is
+  // heading to REJECTED via the seal job. Emailing them would invite a
+  // signing session that can only dead-end at /waiting.
+  expect(laterAfter.sentAt).toBeNull();
+  await expectSigningRequestJobCount(later.id, 0);
 });

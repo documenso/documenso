@@ -25,7 +25,7 @@ import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
-import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
+import { getRecipientsInActiveSigningStep, isRecipientTurnBySigningOrder } from '../../utils/recipient-groups';
 import { assertRecipientNotExpired } from '../../utils/recipients';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -461,7 +461,12 @@ export const completeDocumentWithToken = async ({
         (pendingRecipient) => (pendingRecipient.signingOrder ?? Number.MAX_SAFE_INTEGER) > currentRecipientOrder,
       );
 
-      if (nextRecipients.length > 0 && hasCompletedCurrentStep) {
+      if (
+        nextRecipients.length > 0 &&
+        hasCompletedCurrentStep &&
+        // Ensure that the next recipient can actually act on the document.
+        isRecipientTurnBySigningOrder(pendingRecipients, nextRecipients[0])
+      ) {
         // Dictation is only allowed when advancing to a single-recipient step.
         const canDictateNextSigner =
           Boolean(dictatedNextSigner) &&

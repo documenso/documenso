@@ -21,7 +21,9 @@ export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => 
     return [];
   }
 
-  if (recipient.role === RecipientRole.ASSISTANT) {
+  // Assistants can only assist those in strictly later steps — never their
+  // own group peers. They must have a signing order.
+  if (recipient.role === RecipientRole.ASSISTANT && typeof recipient.signingOrder === 'number') {
     return await prisma.field.findMany({
       where: {
         OR: [
@@ -34,10 +36,12 @@ export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => 
                 not: SigningStatus.SIGNED,
               },
               envelopeId: recipient.envelopeId,
-              // Assistants can only assist those in strictly later steps —
-              // never their own group peers, with null orders as the tail
-              // step. (Own fields are matched by the sibling OR arm.)
-              AND: [getLaterSigningStepRecipientsWhereInput(recipient)],
+              AND: [
+                getLaterSigningStepRecipientsWhereInput({
+                  envelopeId: recipient.envelopeId,
+                  signingOrder: recipient.signingOrder,
+                }),
+              ],
             },
             envelope: {
               id: recipient.envelopeId,
