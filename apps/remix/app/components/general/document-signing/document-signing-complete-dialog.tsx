@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { type TRecipientAccessAuth, ZDocumentAccessAuthSchema } from '@documenso/lib/types/document-auth';
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
@@ -88,6 +89,7 @@ export const DocumentSigningCompleteDialog = ({
   position,
   disableNameInput = false,
 }: DocumentSigningCompleteDialogProps) => {
+  const analytics = useAnalytics();
   const { t, i18n } = useLingui();
   const { toast } = useToast();
 
@@ -180,6 +182,11 @@ export const DocumentSigningCompleteDialog = ({
 
         return;
       }
+
+      analytics.captureException(error, {
+        source: 'signing',
+        location: 'complete_document',
+      });
 
       // This dialog owns the completion error toast for every signing surface
       // so the user gets a specific, actionable message. Callers should run
