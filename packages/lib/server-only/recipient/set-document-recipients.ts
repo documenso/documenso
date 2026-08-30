@@ -348,7 +348,9 @@ const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: Recipie
     recipient.email !== newRecipientData.email ||
     recipient.name !== newRecipientData.name ||
     recipient.role !== newRecipientData.role ||
-    recipient.signingOrder !== newRecipientData.signingOrder ||
+    // Null and undefined both mean "no order": the request schema cannot
+    // carry null, so a persisted null arrives as undefined
+    (recipient.signingOrder ?? null) !== (newRecipientData.signingOrder ?? null) ||
     !isDeepEqual(authOptions.accessAuth, newRecipientAccessAuth) ||
     !isDeepEqual(authOptions.actionAuth, newRecipientActionAuth)
   );

@@ -3,14 +3,14 @@ import { ZRecipientActionAuthTypesSchema, ZRecipientAuthOptionsSchema } from '@d
 import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
+import { DocumentSigningOrder, EnvelopeType, RecipientRole } from '@prisma/client';
 import { useId } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { normalizeGroupedSigningOrders } from '../../utils/recipient-groups';
-import { isCcRecipient, sortRecipientsForSigningOrder } from '../../utils/recipients';
+import { canRecipientBeModified, isCcRecipient, sortRecipientsForSigningOrder } from '../../utils/recipients';
 
 const LocalRecipientSchema = z.object({
   formId: z.string().min(1),
@@ -154,6 +154,24 @@ export const useEditorRecipients = ({ envelope }: EditorRecipientsProps): UseEdi
 
     const sourceRecipients = sortRecipientsForSigningOrder(recipients || envelope.recipients);
 
+    // Locked recipients hold persisted values the server refuses to rewrite.
+    // Initialization must never assign or renumber their signing orders —
+    // doing so makes the very first autosave submit a "changed" locked
+    // recipient, which the server rejects on every subsequent save.
+    const isRecipientLocked = (recipientId: number) => {
+      if (envelope.type === EnvelopeType.TEMPLATE) {
+        return false;
+      }
+
+      const persistedRecipient = sourceRecipients.find((recipient) => recipient.id === recipientId);
+
+      if (!persistedRecipient) {
+        return false;
+      }
+
+      return !canRecipientBeModified(persistedRecipient, envelope.fields);
+    };
+
     // A recipient without a persisted order means "last" everywhere else — the
     // server sorts NULLS LAST. Continue numbering after the highest existing
     // order rather than guessing from array position: a guess can land on a
@@ -170,6 +188,10 @@ export const useEditorRecipients = ({ envelope }: EditorRecipientsProps): UseEdi
         signingOrderByRecipientId.set(recipient.id, undefined);
       } else if (typeof recipient.signingOrder === 'number') {
         signingOrderByRecipientId.set(recipient.id, recipient.signingOrder);
+      } else if (isRecipientLocked(recipient.id)) {
+        // A locked null order must round-trip as-is: a synthetic number would
+        // read as a change to a recipient the server refuses to modify.
+        signingOrderByRecipientId.set(recipient.id, undefined);
       } else {
         fallbackOrder += 1;
         signingOrderByRecipientId.set(recipient.id, fallbackOrder);
@@ -188,7 +210,7 @@ export const useEditorRecipients = ({ envelope }: EditorRecipientsProps): UseEdi
 
     const signers: TLocalRecipient[] =
       formRecipients.length > 0
-        ? normalizeGroupedSigningOrders(formRecipients)
+        ? normalizeGroupedSigningOrders(formRecipients, (formRecipient) => !isRecipientLocked(formRecipient.id))
         : [
             {
               formId: initialId,

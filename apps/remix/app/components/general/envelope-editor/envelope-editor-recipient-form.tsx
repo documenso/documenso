@@ -323,14 +323,17 @@ export const EnvelopeEditorRecipientForm = () => {
 
     const { data } = validatedFormValues;
 
-    // Weird edge case where the whole envelope is created via API
-    // with no signing order. If they come to this page it will show an error
-    // since they aren't equal and the recipient is no longer editable.
+    // Locked recipients hold persisted values the server refuses to rewrite,
+    // e.g. an envelope created via API with no signing order where a recipient
+    // has already signed. Restore their PERSISTED order so form normalization
+    // drift never submits a "changed" locked recipient the server rejects.
     const envelopeRecipients = data.signers.map((recipient) => {
       if (!canRecipientBeModified(recipient.id)) {
+        const persistedRecipient = recipients.find((envelopeRecipient) => envelopeRecipient.id === recipient.id);
+
         return {
           ...recipient,
-          signingOrder: recipient.signingOrder,
+          signingOrder: persistedRecipient?.signingOrder ?? undefined,
         };
       }
       return recipient;
@@ -356,7 +359,7 @@ export const EnvelopeEditorRecipientForm = () => {
           signer.email !== recipient.email ||
           signer.name !== recipient.name ||
           signer.role !== recipient.role ||
-          signer.signingOrder !== recipient.signingOrder ||
+          (signer.signingOrder ?? null) !== (recipient.signingOrder ?? null) ||
           !isDeepEqual(signerActionAuth, recipientActionAuth)
         );
       });
