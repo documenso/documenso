@@ -211,6 +211,12 @@ docker run -d \
 
 Documenso provides health check endpoints for monitoring:
 
+<Callout type="info">
+  If a certificate is mounted but signing fails, ensure `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`
+  explicitly points to its path inside the container. Production does not use the development
+  example certificate as a fallback.
+</Callout>
+
 | Endpoint                  | Purpose                                                        |
 | ------------------------- | -------------------------------------------------------------- |
 | `/api/health`             | Checks database connectivity and certificate status            |
