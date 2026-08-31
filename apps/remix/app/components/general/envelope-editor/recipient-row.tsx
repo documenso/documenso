@@ -106,6 +106,7 @@ const RecipientRowInner = ({
               <FormControl>
                 <RecipientAutoCompleteInput
                   type="email"
+                  aria-label={t`Email`}
                   placeholder={t`Email`}
                   value={field.value}
                   disabled={isFieldDisabled || isDirectRecipient}
@@ -138,6 +139,7 @@ const RecipientRowInner = ({
               <FormControl>
                 <RecipientAutoCompleteInput
                   type="text"
+                  aria-label={t`Name`}
                   placeholder={t`Recipient ${signerIndex + 1}`}
                   {...field}
                   disabled={isFieldDisabled || isDirectRecipient}
