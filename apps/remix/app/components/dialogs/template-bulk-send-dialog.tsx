@@ -340,7 +340,12 @@ export const TemplateBulkSendDialog = ({ templateId, recipients, trigger, onSucc
             />
 
             <DialogFooter className="mt-4">
-              <Button variant="secondary" onClick={() => onOpenChange(false)} type="button">
+              <Button
+                variant="secondary"
+                onClick={() => onOpenChange(false)}
+                disabled={form.formState.isSubmitting}
+                type="button"
+              >
                 <Trans>Cancel</Trans>
               </Button>
 
