@@ -26,6 +26,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
 
 import { EnvelopeItemDeleteDialog } from '~/components/dialogs/envelope-item-delete-dialog';
+import { useCspNonce } from '~/utils/nonce';
 
 import { EnvelopeEditorInvalidDirectTemplateAlert } from './envelope-editor-invalid-direct-template-alert';
 import { EnvelopeEditorRecipientForm } from './envelope-editor-recipient-form';
@@ -47,6 +48,7 @@ export const EnvelopeEditorUploadPage = () => {
   const { maximumEnvelopeItemCount, remaining } = useLimits();
   const { toast } = useToast();
   const analytics = useAnalytics();
+  const cspNonce = useCspNonce();
 
   const {
     envelope,
@@ -494,7 +496,7 @@ export const EnvelopeEditorUploadPage = () => {
 
           {/* Uploaded Files List */}
           <div className="mt-4">
-            <DragDropContext onDragEnd={onDragEnd}>
+            <DragDropContext nonce={cspNonce} onDragEnd={onDragEnd}>
               <Droppable droppableId="files">
                 {(provided) => (
                   <div

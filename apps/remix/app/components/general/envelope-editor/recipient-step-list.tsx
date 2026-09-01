@@ -24,6 +24,9 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { useCallback, useMemo, useState } from 'react';
+
+import { useCspNonce } from '~/utils/nonce';
+
 import { RecipientRow } from './recipient-row';
 import { type DraggingType, RecipientStepCard } from './recipient-step-card';
 
@@ -36,6 +39,7 @@ export type RecipientStepListProps = {
 export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
+  const cspNonce = useCspNonce();
 
   const { envelope, editorRecipients, isEmbedded, isCscMode } = useCurrentEnvelopeEditor();
   const { form } = editorRecipients;
@@ -317,7 +321,7 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
         </div>
       ) : (
         <>
-          <DragDropContext onBeforeCapture={onBeforeCapture} onDragEnd={onDragEnd}>
+          <DragDropContext nonce={cspNonce} onBeforeCapture={onBeforeCapture} onDragEnd={onDragEnd}>
             <Droppable droppableId="recipient-steps" type="STEP" isCombineEnabled={isGroupingEnabled}>
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef} className="flex w-full flex-col">
