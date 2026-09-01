@@ -1,5 +1,4 @@
 import { parse } from 'csv-parse/sync';
-import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { zEmail } from '../../utils/zod';
@@ -116,28 +115,3 @@ export const validateBulkSendCsv = ({
 
   return { success: true, data: rows };
 };
-
-/**
- * Format a bulk send CSV validation error into a readable string for logging
- * and internal error messages.
- */
-export const formatBulkSendCsvError = (error: TBulkSendCsvError): string =>
-  match(error)
-    .with({ type: 'PARSE_ERROR' }, () => 'The CSV could not be parsed')
-    .with({ type: 'EMPTY' }, () => 'The CSV contains no rows')
-    .with(
-      { type: 'ROW_LIMIT_EXCEEDED' },
-      ({ rowCount, maxRows }) => `The CSV contains ${rowCount} rows, a maximum of ${maxRows} rows is allowed`,
-    )
-    .with(
-      { type: 'MISSING_COLUMNS' },
-      ({ missingColumns }) => `The CSV is missing required columns: ${missingColumns.join(', ')}`,
-    )
-    .with(
-      { type: 'INVALID_RECIPIENTS' },
-      ({ rowErrors }) =>
-        `The CSV contains invalid recipient data: ${rowErrors
-          .map((rowError) => `Row ${rowError.row}: ${rowError.column} - ${rowError.message}`)
-          .join('; ')}`,
-    )
-    .exhaustive();
