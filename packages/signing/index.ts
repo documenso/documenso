@@ -1,4 +1,5 @@
 import {
+  NEXT_PRIVATE_SIGNING_REASON,
   NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER,
   NEXT_PUBLIC_SIGNING_CONTACT_INFO,
   NEXT_PUBLIC_WEBAPP_URL,
@@ -42,7 +43,7 @@ export const signPdf = async ({ pdf }: SignOptions) => {
 
   const { bytes } = await pdf.sign({
     signer,
-    reason: 'Signed by Documenso',
+    reason: NEXT_PRIVATE_SIGNING_REASON(),
     location: NEXT_PUBLIC_WEBAPP_URL(),
     contactInfo: NEXT_PUBLIC_SIGNING_CONTACT_INFO(),
     subFilter: NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER() ? 'adbe.pkcs7.detached' : 'ETSI.CAdES.detached',
