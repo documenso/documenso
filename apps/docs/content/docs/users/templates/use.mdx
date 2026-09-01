@@ -138,6 +138,41 @@ To create multiple documents from one template with different recipients, use bu
 
 This is useful for sending the same document to many people, such as offer letters or agreements.
 
+### CSV Header Format
+
+When creating a custom CSV file for Bulk Send, the column headers must follow the `recipient_{index}_{field}` naming convention. The index number corresponds to the recipient order configured in your template (starting at `1`), and `field` is either `email` or `name`.
+
+<Callout type="info" title="Recommended">
+  The easiest method is to click **Download template CSV** inside the Bulk Send modal. This
+  automatically generates a pre-formatted CSV with the exact column headers configured for that
+  specific template.
+</Callout>
+
+- `recipient_{index}_email` is **required** for every recipient in the template.
+- `recipient_{index}_name` is **optional**. Blank values fall back to the recipient details saved in the template.
+- Column order does not matter, but every header name must match exactly.
+- Each upload is limited to 100 rows and 4MB.
+
+#### CSV Examples
+
+**1. Template with 2 recipients (4 columns):**
+
+```csv
+recipient_1_name,recipient_1_email,recipient_2_name,recipient_2_email
+Alice Johnson,alice@example.com,Bob Smith,bob@example.com
+Charlie Brown,charlie@example.com,Diana Prince,diana@example.com
+```
+
+**2. Template with 3 recipients (6 columns):**
+
+```csv
+recipient_1_name,recipient_1_email,recipient_2_name,recipient_2_email,recipient_3_name,recipient_3_email
+John Doe,john@acme.com,Sarah Lee,sarah@acme.com,Legal Team,legal@acme.com
+Alex Wong,alex@partner.com,Emma Watson,emma@partner.com,Finance,finance@partner.com
+```
+
+Each row creates one document. Once processing finishes, you receive an email summarising how many documents were created and listing any rows that failed.
+
 ---
 
 ## See Also
