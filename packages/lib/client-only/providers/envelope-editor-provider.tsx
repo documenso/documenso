@@ -20,6 +20,7 @@ import { useSearchParams } from 'react-router';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
 import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
+import { useAnalytics } from '../hooks/use-analytics';
 import type { TLocalField } from '../hooks/use-editor-fields';
 import { useEditorFields } from '../hooks/use-editor-fields';
 import { useEditorRecipients } from '../hooks/use-editor-recipients';
@@ -104,6 +105,7 @@ export const EnvelopeEditorProvider = ({
 }: EnvelopeEditorProviderProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const [_searchParams, setSearchParams] = useSearchParams();
 
@@ -241,6 +243,12 @@ export const EnvelopeEditorProvider = ({
     } catch (err) {
       console.error(err);
 
+      analytics.captureException(err, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'autosave_recipients',
+        envelopeId: envelope.id,
+      });
+
       setAutosaveError(true);
 
       toast({
@@ -304,6 +312,12 @@ export const EnvelopeEditorProvider = ({
     } catch (err) {
       console.error(err);
 
+      analytics.captureException(err, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'autosave_fields',
+        envelopeId: envelope.id,
+      });
+
       setAutosaveError(true);
 
       toast({
@@ -358,6 +372,12 @@ export const EnvelopeEditorProvider = ({
       setAutosaveError(false);
     } catch (err) {
       console.error(err);
+
+      analytics.captureException(err, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'autosave_meta',
+        envelopeId: envelope.id,
+      });
 
       setAutosaveError(true);
 

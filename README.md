@@ -186,21 +186,37 @@ For full instructions, requirements, and configuration details, see the [Self Ho
 
 ### One-Click Deploys
 
-#### Railway
+> [!NOTE]
+> Want to see another provider listed here? Please [open a provider request](https://github.com/documenso/documenso/issues/new?template=deploy-provider-request.yml) instead of a PR so the community can signal interest. PRs adding deploy badges without a prior issue will be closed.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/DjrRRX?referralCode=EZR3s0&utm_medium=integration&utm_source=template&utm_campaign=generic)
-
-#### Render
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
-
-#### Koyeb
-
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
-
-#### Elestio
-
-[![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/documenso)
+<table>
+  <tr>
+    <td align="center" width="200">
+      <a href="https://railway.com/deploy/DjrRRX?referralCode=EZR3s0&utm_medium=integration&utm_source=template&utm_campaign=generic">
+        <img src="https://railway.com/button.svg" alt="Deploy on Railway" height="40" />
+      </a>
+    </td>
+    <td align="center" width="200">
+      <a href="https://render.com/deploy?repo=https://github.com/documenso/documenso">
+        <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" height="40" />
+      </a>
+    </td>
+    <td align="center" width="200">
+      <a href="https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile">
+        <img src="https://www.koyeb.com/static/images/deploy/button.svg" alt="Deploy to Koyeb" height="40" />
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="200">
+      <a href="https://elest.io/open-source/documenso">
+        <img src="https://elest.io/images/logos/deploy-to-elestio-btn.png" alt="Deploy on Elestio" height="40" />
+      </a>
+    </td>
+    <td align="center" width="200"></td>
+    <td align="center" width="200"></td>
+  </tr>
+</table>
 
 ## Security
 
