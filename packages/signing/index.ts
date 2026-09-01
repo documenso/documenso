@@ -49,6 +49,11 @@ export const signPdf = async ({ pdf }: SignOptions) => {
     timestampAuthority: tsa ?? undefined,
     longTermValidation: !!tsa,
     archivalTimestamp: !!tsa,
+    // A B-LTA signature (signer chain + RFC 3161 timestamp token + LTV
+    // revocation data) can exceed the 12288-byte default placeholder,
+    // depending on the signing certificate chain and the TSA responder.
+    // The unused portion is zero-padding, so over-reserving is cheap.
+    estimatedSize: tsa ? 32768 : undefined,
   });
 
   return bytes;
