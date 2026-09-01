@@ -51,16 +51,18 @@ Join us in creating the next generation of open trust infrastructure.
 
 ## Community and Next Steps 🎯
 
-- Check out the first source code release in this repository and test it.
+- Try Documenso by self-hosting it or signing up at [documenso.com](https://documenso.com).
 - Tell us what you think in the [Discussions](https://github.com/documenso/documenso/discussions).
-- Join the [Discord server](https://documen.so/discord) for any questions and getting to know to other community members.
+- Join the [Discord server](https://documen.so/discord) for any questions and getting to know other community members.
 - ⭐ the repository to help us raise awareness.
-- Spread the word on Twitter that Documenso is working towards a more open signing tool.
-- Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release.
+- Open detailed [issues](https://github.com/documenso/documenso/issues) to report bugs or propose features.
 
 ## Contributing
 
-- To contribute, please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
+> **Note**: We no longer accept external pull requests, aside from a small group of trusted contributors we reach out to directly. The best way to contribute is through detailed issues. Read [Why We're Pausing External Pull Requests](https://documenso.com/blog/why-we-re-pausing-external-pull-requests) for the reasoning.
+
+- Documenso stays open source. You can read, audit, run, and fork the code.
+- To report issues or propose changes, see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
 
 ## Contact us
 
@@ -81,17 +83,21 @@ Contact us if you are interested in our Enterprise plan for large organizations 
   <a href=""><img src="" alt=""></a>
 </p>
 
-- [Typescript](https://www.typescriptlang.org/) - Language
-- [ReactRouter](https://reactrouter.com/) - Framework
+- [TypeScript](https://www.typescriptlang.org/) - Language
+- [React Router v7](https://reactrouter.com/) - Framework
+- [Hono](https://hono.dev/) - Server
 - [Prisma](https://www.prisma.io/) - ORM
-- [Tailwind](https://tailwindcss.com/) - CSS
-- [shadcn/ui](https://ui.shadcn.com/) - Component Library
+- [Tailwind CSS](https://tailwindcss.com/) - CSS
+- [shadcn/ui](https://ui.shadcn.com/) + [Radix UI](https://www.radix-ui.com/) - Component Library
 - [react-email](https://react.email/) - Email Templates
+- [Lingui](https://lingui.dev/) - Internationalization
 - [tRPC](https://trpc.io/) - API
-- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - PDF Signatures (launching soon)
-- [React-PDF](https://github.com/wojtekmaj/react-pdf) - Viewing PDFs
-- [PDF-Lib](https://github.com/Hopding/pdf-lib) - PDF manipulation
+- [@libpdf/core](https://www.npmjs.com/package/@libpdf/core) - PDF Signatures
+- [pdf.js](https://mozilla.github.io/pdf.js/) - Viewing PDFs
+- [@cantoo/pdf-lib](https://github.com/cantoo-scribe/pdf-lib) - PDF manipulation
 - [Stripe](https://stripe.com/) - Payments
+- [Biome](https://biomejs.dev/) - Linting & Formatting
+- [Playwright](https://playwright.dev/) - E2E Testing
 
 <!-- - Support for [opensignpdf (requires Java on server)](https://github.com/open-pdf-sign) is currently planned. -->
 
@@ -180,21 +186,41 @@ For full instructions, requirements, and configuration details, see the [Self Ho
 
 ### One-Click Deploys
 
-#### Railway
+> [!NOTE]
+> Want to see another provider listed here? Please [open a provider request](https://github.com/documenso/documenso/issues/new?template=deploy-provider-request.yml) instead of a PR so the community can signal interest. PRs adding deploy badges without a prior issue will be closed.
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p)
+<table>
+  <tr>
+    <td align="center" width="200">
+      <a href="https://railway.com/deploy/DjrRRX?referralCode=EZR3s0&utm_medium=integration&utm_source=template&utm_campaign=generic">
+        <img src="https://railway.com/button.svg" alt="Deploy on Railway" height="40" />
+      </a>
+    </td>
+    <td align="center" width="200">
+      <a href="https://render.com/deploy?repo=https://github.com/documenso/documenso">
+        <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" height="40" />
+      </a>
+    </td>
+    <td align="center" width="200">
+      <a href="https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile">
+        <img src="https://www.koyeb.com/static/images/deploy/button.svg" alt="Deploy to Koyeb" height="40" />
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="200">
+      <a href="https://elest.io/open-source/documenso">
+        <img src="https://elest.io/images/logos/deploy-to-elestio-btn.png" alt="Deploy on Elestio" height="40" />
+      </a>
+    </td>
+    <td align="center" width="200"></td>
+    <td align="center" width="200"></td>
+  </tr>
+</table>
 
-#### Render
+## Security
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
-
-#### Koyeb
-
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
-
-#### Elestio
-
-[![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/documenso)
+If you believe you have found a security vulnerability in Documenso, please report it through our [Security Policy](https://github.com/documenso/documenso/security/policy). We prioritize private reports via [GitHub Security Advisories](https://github.com/documenso/documenso/security/advisories/new). See [SECURITY.md](./SECURITY.md) for scope and details.
 
 ## Troubleshooting
 

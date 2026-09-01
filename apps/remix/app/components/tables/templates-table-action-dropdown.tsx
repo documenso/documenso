@@ -11,15 +11,15 @@ import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, EnvelopeType, type TemplateDirectLink } from '@prisma/client';
 import { Copy, Download, Edit, FolderIcon, MoreHorizontal, Pencil, Share2Icon, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { EnvelopeDeleteDialog } from '../dialogs/envelope-delete-dialog';
 import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
 import { EnvelopeDuplicateDialog } from '../dialogs/envelope-duplicate-dialog';
 import { EnvelopeRenameDialog } from '../dialogs/envelope-rename-dialog';
+import { EnvelopesBulkMoveDialog } from '../dialogs/envelopes-bulk-move-dialog';
 import { TemplateBulkSendDialog } from '../dialogs/template-bulk-send-dialog';
 import { TemplateDirectLinkDialog } from '../dialogs/template-direct-link-dialog';
-import { TemplateMoveToFolderDialog } from '../dialogs/template-move-to-folder-dialog';
 
 export type TemplatesTableActionDropdownProps = {
   row: {
@@ -44,6 +44,7 @@ export const TemplatesTableActionDropdown = ({
   onDelete,
 }: TemplatesTableActionDropdownProps) => {
   const trpcUtils = trpcReact.useUtils();
+  const navigate = useNavigate();
 
   const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
   const [isMoveToFolderDialogOpen, setMoveToFolderDialogOpen] = useState(false);
@@ -153,12 +154,13 @@ export const TemplatesTableActionDropdown = ({
         )}
       </DropdownMenuContent>
 
-      <TemplateMoveToFolderDialog
-        templateId={row.id}
-        templateTitle={row.title}
-        isOpen={isMoveToFolderDialogOpen}
+      <EnvelopesBulkMoveDialog
+        envelopeIds={[row.envelopeId]}
+        envelopeType={EnvelopeType.TEMPLATE}
+        open={isMoveToFolderDialogOpen}
         onOpenChange={setMoveToFolderDialogOpen}
-        currentFolderId={row.folderId}
+        currentFolderId={row.folderId ?? undefined}
+        onSuccess={(folderId) => navigate(folderId ? `${templateRootPath}/f/${folderId}` : templateRootPath)}
       />
 
       <EnvelopeRenameDialog

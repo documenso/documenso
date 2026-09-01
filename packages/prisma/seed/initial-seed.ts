@@ -6,6 +6,7 @@ import { FIELD_META_TEST_FIELDS } from '@documenso/app-tests/constants/field-met
 import { OVERFLOW_TEST_FIELDS } from '@documenso/app-tests/constants/field-overflow-pdf';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { incrementDocumentId, incrementTemplateId } from '@documenso/lib/server-only/envelope/increment-id';
+import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL, DIRECT_TEMPLATE_RECIPIENT_NAME } from '../../lib/constants/direct-templates';
 import { prisma } from '..';
@@ -76,6 +77,7 @@ export const seedDatabase = async () => {
         id: prefixedId('envelope'),
         secondaryId: documentId.formattedDocumentId,
         internalVersion: 1,
+        signatureLevel: SignatureLevel.SES,
         type: EnvelopeType.DOCUMENT,
         documentMetaId: documentMeta.id,
         source: DocumentSource.DOCUMENT,
@@ -115,6 +117,7 @@ export const seedDatabase = async () => {
         id: prefixedId('envelope'),
         secondaryId: documentId.formattedDocumentId,
         internalVersion: 1,
+        signatureLevel: SignatureLevel.SES,
         type: EnvelopeType.DOCUMENT,
         source: DocumentSource.DOCUMENT,
         title: `Document ${i}`,
@@ -312,6 +315,7 @@ export const seedAlignmentTestDocument = async ({
       id: prefixedId('envelope'),
       secondaryId,
       internalVersion: 2,
+      signatureLevel: SignatureLevel.SES,
       type,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -357,9 +361,9 @@ export const seedAlignmentTestDocument = async ({
   const { id, recipients, envelopeItems } = createdEnvelope;
 
   if (isDirectTemplate) {
-    const directTemplateRecpient = recipients.find((recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL);
+    const directTemplateRecipient = recipients.find((recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL);
 
-    if (!directTemplateRecpient) {
+    if (!directTemplateRecipient) {
       throw new Error('Need to create a direct template recipient');
     }
 
@@ -368,7 +372,7 @@ export const seedAlignmentTestDocument = async ({
         envelopeId: id,
         enabled: true,
         token: directTemplateToken ?? Math.random().toString(),
-        directTemplateRecipientId: directTemplateRecpient.id,
+        directTemplateRecipientId: directTemplateRecipient.id,
       },
     });
   }
@@ -474,6 +478,7 @@ export const seedOverflowTestDocument = async ({
       id: prefixedId('envelope'),
       secondaryId,
       internalVersion: 2,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,

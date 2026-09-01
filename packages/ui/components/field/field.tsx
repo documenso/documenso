@@ -7,6 +7,7 @@ import { type Field, FieldType } from '@prisma/client';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { FIELD_ROOT_CONTAINER_CLASS_NAME } from '../../lib/field-root-container-classes';
 import type { RecipientColorStyles } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
 
@@ -117,7 +118,7 @@ export function FieldRootContainer({ field, children, color, className, readonly
         data-inserted={field.inserted ? 'true' : 'false'}
         data-readonly={readonly ? 'true' : 'false'}
         className={cn(
-          'field--FieldRootContainer field-card-container dark-mode-disabled group relative z-20 flex h-full w-full items-center rounded-[2px] bg-white/90 ring-2 ring-gray-200 transition-all',
+          FIELD_ROOT_CONTAINER_CLASS_NAME,
           color?.base,
           {
             'px-2': field.type !== FieldType.SIGNATURE && field.type !== FieldType.FREE_SIGNATURE,

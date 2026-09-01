@@ -16,8 +16,10 @@
     "@aws-sdk/client-sesv2": "^3.998.0",
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
+    "arctic": "^3.7.0",
+    "hono": "^4.12.14",
     "luxon": "^3.7.2",
-    "react": "^18",
+    "react": "^19.2.7",
     "ts-pattern": "^5.9.0",
     "zod": "^3.25.76"
   }

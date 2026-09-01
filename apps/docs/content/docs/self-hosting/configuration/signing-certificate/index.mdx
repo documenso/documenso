@@ -25,6 +25,11 @@ Self-hosted Documenso instances require a signing certificate. You can generate 
     href="/docs/self-hosting/configuration/signing-certificate/google-cloud-hsm"
   />
   <Card
+    title="CSC (AES / QES)"
+    description="Route signing through a third-party Trust Service Provider for Advanced and Qualified Electronic Signatures."
+    href="/docs/self-hosting/configuration/signing-certificate/csc-qes"
+  />
+  <Card
     title="Timestamp Server"
     description="Add trusted timestamps and customise signature appearance."
     href="/docs/self-hosting/configuration/signing-certificate/timestamp-server"
@@ -38,7 +43,7 @@ Self-hosted Documenso instances require a signing certificate. You can generate 
 
 ## Certificate Options
 
-<Tabs items={['Self-Signed', 'CA-Issued', 'Google Cloud HSM']}>
+<Tabs items={['Self-Signed', 'CA-Issued', 'Google Cloud HSM', 'CSC (AES / QES)']}>
 <Tab value="Self-Signed">
 
 A self-signed certificate is sufficient for most use cases where your industry has no special signing regulations.
@@ -78,6 +83,18 @@ For organisations requiring hardware-based key protection, Documenso supports Go
 - Audit logging of all cryptographic operations
 
 See [Google Cloud HSM](/docs/self-hosting/configuration/signing-certificate/google-cloud-hsm) for setup instructions.
+
+</Tab>
+<Tab value="CSC (AES / QES)">
+
+For Advanced and Qualified Electronic Signatures under eIDAS, Documenso integrates with third-party Trust Service Providers via the Cloud Signature Consortium API. Each recipient authenticates directly with the TSP, which holds the private key and issues the signature.
+
+- Per-recipient identity verification by an accredited TSP
+- Legally equivalent to a handwritten signature within the EU (QES)
+- Requires an [Enterprise Edition](/docs/policies/enterprise-edition) license
+- Instance-wide setting; one CSC provider per Documenso install
+
+See [CSC (AES / QES)](/docs/self-hosting/configuration/signing-certificate/csc-qes) for setup instructions.
 
 </Tab>
 </Tabs>

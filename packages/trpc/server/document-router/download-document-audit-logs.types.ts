@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZDownloadDocumentAuditLogsRequestSchema = z.object({
-  documentId: z.number(),
+  envelopeId: z.string(),
 });
 
 export const ZDownloadDocumentAuditLogsResponseSchema = z.object({

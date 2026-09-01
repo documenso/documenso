@@ -1,4 +1,5 @@
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useEnvelopeAutosave } from '@documenso/lib/client-only/hooks/use-envelope-autosave';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -26,6 +27,7 @@ import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 
 
 import { EnvelopeItemDeleteDialog } from '~/components/dialogs/envelope-item-delete-dialog';
 
+import { EnvelopeEditorInvalidDirectTemplateAlert } from './envelope-editor-invalid-direct-template-alert';
 import { EnvelopeEditorRecipientForm } from './envelope-editor-recipient-form';
 import { EnvelopeItemTitleInput } from './envelope-editor-title-input';
 
@@ -44,6 +46,7 @@ export const EnvelopeEditorUploadPage = () => {
   const { t, i18n } = useLingui();
   const { maximumEnvelopeItemCount, remaining } = useLimits();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const {
     envelope,
@@ -212,6 +215,12 @@ export const EnvelopeEditorUploadPage = () => {
     const { data } = await createPromise.catch((error) => {
       console.error(error);
 
+      analytics.captureException(error, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'create_envelope_items',
+        envelopeId: envelope.id,
+      });
+
       // Set error state on files in batch upload.
       setLocalFiles((prev) =>
         prev.map((uploadingFile) =>
@@ -288,6 +297,12 @@ export const EnvelopeEditorUploadPage = () => {
       await replacePromise;
     } catch (error) {
       console.error(error);
+
+      analytics.captureException(error, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'replace_pdf',
+        envelopeId: envelope.id,
+      });
 
       toast({
         title: t`Replace failed`,
@@ -449,6 +464,9 @@ export const EnvelopeEditorUploadPage = () => {
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-8">
       <input {...getReplaceInputProps()} />
+
+      <EnvelopeEditorInvalidDirectTemplateAlert className="max-w-none" />
+
       <Card backdropBlur={false} className="border">
         <CardHeader className="pb-3">
           <CardTitle>

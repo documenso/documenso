@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
@@ -45,7 +44,7 @@ export const adminSuperDeleteDocument = async ({ envelopeId, requestMetadata }: 
     });
   }
 
-  const { branding, settings, senderEmail, replyToEmail } = await getEmailContext({
+  const { branding, settings, senderEmail, replyToEmail, emailTransport } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -89,7 +88,7 @@ export const adminSuperDeleteDocument = async ({ envelopeId, requestMetadata }: 
 
         const i18n = await getI18nInstance(lang);
 
-        await mailer.sendMail({
+        await emailTransport.sendMail({
           to: {
             address: recipient.email,
             name: recipient.name,

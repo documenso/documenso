@@ -42,7 +42,11 @@ export const EnvelopeSignerCompleteDialog = () => {
 
   const { onDocumentCompleted, onDocumentError } = useEmbedSigningContext() || {};
 
-  const { mutateAsync: completeDocument, isPending } = trpc.recipient.completeDocumentWithToken.useMutation();
+  const {
+    mutateAsync: completeDocument,
+    isPending,
+    isSuccess,
+  } = trpc.recipient.completeDocumentWithToken.useMutation();
 
   const { mutateAsync: createDocumentFromDirectTemplate } =
     trpc.template.createDocumentFromDirectTemplate.useMutation();
@@ -89,7 +93,7 @@ export const EnvelopeSignerCompleteDialog = () => {
     recipientDetails?: { name: string; email: string },
   ) => {
     try {
-      await completeDocument({
+      const result = await completeDocument({
         token: recipient.token,
         documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
         accessAuthOptions,
@@ -97,11 +101,24 @@ export const EnvelopeSignerCompleteDialog = () => {
         ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
       });
 
-      analytics.capture('App: Recipient has completed signing', {
-        signerId: recipient.id,
-        documentId: envelope.id,
-        timestamp: new Date().toISOString(),
-      });
+      // TSP envelopes can't be completed via the SES path; the mutation returns
+      // a credential-scope OAuth URL the recipient must follow to acquire a SAD
+      // before the sync sign mutation can run. Short-circuit here so the
+      // analytics / completion handlers don't run with a still-unsigned doc.
+      if (result.status === 'REDIRECT') {
+        window.location.href = result.redirectUrl;
+        return;
+      }
+
+      // The document was already completed by an earlier request (retry,
+      // stale tab or concurrent submission). Let the user know this click
+      // didn't complete the document, then continue to the completed page.
+      if (result.status === 'ALREADY_SIGNED') {
+        toast({
+          title: t`Document already signed`,
+          description: t`This document was already signed and no further action was taken.`,
+        });
+      }
 
       if (onDocumentCompleted) {
         onDocumentCompleted({
@@ -119,21 +136,24 @@ export const EnvelopeSignerCompleteDialog = () => {
       if (envelope.documentMeta.redirectUrl) {
         window.location.href = envelope.documentMeta.redirectUrl;
       } else {
-        await navigate(`/sign/${recipient.token}/complete`);
+        window.location.href = `/sign/${recipient.token}/complete`;
       }
     } catch (err) {
       const error = AppError.parseError(err);
 
       if (error.code !== AppErrorCode.TWO_FACTOR_AUTH_FAILED) {
-        toast({
-          title: t`Something went wrong`,
-          description: t`We were unable to submit this document at this time. Please try again later.`,
-          variant: 'destructive',
+        analytics.captureException(err, {
+          source: 'signing',
+          location: 'complete_document',
+          recipientId: recipient.id,
+          envelopeId: envelope.id,
         });
 
         onDocumentError?.();
       }
 
+      // Rethrow so DocumentSigningCompleteDialog can handle 2FA retries and
+      // toast a specific completion error message.
       throw err;
     }
   };
@@ -197,18 +217,22 @@ export const EnvelopeSignerCompleteDialog = () => {
       if (redirectUrl) {
         window.location.href = redirectUrl;
       } else {
-        await navigate(`/sign/${token}/complete`);
+        window.location.href = `/sign/${token}/complete`;
       }
     } catch (err) {
       console.log('err', err);
-      toast({
-        title: t`Something went wrong`,
-        description: t`We were unable to submit this document at this time. Please try again later.`,
-        variant: 'destructive',
+
+      analytics.captureException(err, {
+        source: 'signing',
+        location: 'complete_document_next_signer',
+        recipientId: recipient.id,
+        envelopeId: envelope.id,
       });
 
       onDocumentError?.();
 
+      // Rethrow so DocumentSigningCompleteDialog can toast a specific
+      // completion error message.
       throw err;
     }
   };
@@ -237,7 +261,7 @@ export const EnvelopeSignerCompleteDialog = () => {
 
   return (
     <DocumentSigningCompleteDialog
-      isSubmitting={isPending}
+      isSubmitting={isPending || isSuccess}
       recipientPayload={recipientPayload}
       onSignatureComplete={isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick}
       documentTitle={envelope.title}

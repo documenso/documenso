@@ -12,6 +12,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { type BoundingBox, whiteoutRegions } from '../pdf/auto-place-fields';
 
@@ -92,6 +93,8 @@ export const createEnvelopeFields = async ({
       message: 'Envelope not found',
     });
   }
+
+  assertEnvelopeMutable(envelope);
 
   if (envelope.type === EnvelopeType.DOCUMENT && envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -242,6 +245,8 @@ export const createEnvelopeFields = async ({
   });
 
   const createdFields = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     const newlyCreatedFields = await tx.field.createManyAndReturn({
       data: validatedFields.map((field) => ({
         type: field.type,

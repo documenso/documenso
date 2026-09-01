@@ -29,7 +29,7 @@ import { useSearchParams } from 'react-router';
 
 import { useCurrentTeam } from '~/providers/team';
 
-import { TeamMemberDeleteDialog } from '../dialogs/team-member-delete-dialog';
+import { TeamMemberDeleteDialog, type TeamMemberDeleteDisableReason } from '../dialogs/team-member-delete-dialog';
 import { TeamMemberUpdateDialog } from '../dialogs/team-member-update-dialog';
 import { TeamInheritMemberAlert } from '../general/teams/team-inherit-member-alert';
 
@@ -86,6 +86,39 @@ export const TeamMembersTable = () => {
   );
 
   const columns = useMemo(() => {
+    // A member is a direct team member when they belong to one of the team's
+    // INTERNAL_TEAM groups. Otherwise they are inherited from an organisation or
+    // custom group and cannot be managed directly from this team.
+    const isMemberPartOfInternalTeamGroup = (memberId: string) =>
+      groups.some(
+        (group) =>
+          group.organisationGroupType === OrganisationGroupType.INTERNAL_TEAM &&
+          group.members.some((member) => member.id === memberId),
+      );
+
+    // Determine why a member can't be removed from the team (if at all). The delete
+    // dialog uses this to explain the reason instead of attempting a removal that
+    // would fail.
+    const getDeleteDisableReason = (member: (typeof results)['data'][number]): TeamMemberDeleteDisableReason | null => {
+      if (organisation.ownerUserId === member.userId) {
+        return 'TEAM_OWNER';
+      }
+
+      if (!isTeamRoleWithinUserHierarchy(team.currentTeamRole, member.teamRole)) {
+        return 'HIGHER_ROLE';
+      }
+
+      if (memberAccessTeamGroup !== undefined) {
+        return 'INHERIT_MEMBER_ENABLED';
+      }
+
+      if (!isMemberPartOfInternalTeamGroup(member.id)) {
+        return 'INHERITED_MEMBER';
+      }
+
+      return null;
+    };
+
     return [
       {
         header: _(msg`Team Member`),
@@ -111,15 +144,7 @@ export const TeamMembersTable = () => {
       },
       {
         header: _(msg`Source`),
-        cell: ({ row }) => {
-          const internalTeamGroupFound = groups.find(
-            (group) =>
-              group.organisationGroupType === OrganisationGroupType.INTERNAL_TEAM &&
-              group.members.some((member) => member.id === row.original.id),
-          );
-
-          return internalTeamGroupFound ? _(msg`Member`) : _(msg`Group`);
-        },
+        cell: ({ row }) => (isMemberPartOfInternalTeamGroup(row.original.id) ? _(msg`Member`) : _(msg`Group`)),
       },
       {
         header: _(msg`Actions`),
@@ -161,16 +186,9 @@ export const TeamMembersTable = () => {
                 memberId={row.original.id}
                 memberName={row.original.name ?? ''}
                 memberEmail={row.original.email}
-                isInheritMemberEnabled={memberAccessTeamGroup !== undefined}
+                disableReason={getDeleteDisableReason(row.original)}
                 trigger={
-                  <DropdownMenuItem
-                    onSelect={(e) => e.preventDefault()}
-                    disabled={
-                      organisation.ownerUserId === row.original.userId ||
-                      !isTeamRoleWithinUserHierarchy(team.currentTeamRole, row.original.teamRole)
-                    }
-                    title={_(msg`Remove team member`)}
-                  >
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} title={_(msg`Remove team member`)}>
                     <Trash2Icon className="mr-2 h-4 w-4" />
                     <Trans>Remove</Trans>
                   </DropdownMenuItem>

@@ -197,7 +197,9 @@ export const PublicProfileForm = ({ className, profile, onProfileUpdate }: Publi
 
               return (
                 <FormItem>
-                  <FormLabel>Bio</FormLabel>
+                  <FormLabel>
+                    <Trans>Bio</Trans>
+                  </FormLabel>
                   <FormControl>
                     <Textarea {...field} placeholder={_(msg`Write a description to display on your public profile`)} />
                   </FormControl>

@@ -6,7 +6,6 @@ import { OrganisationMemberRole, OrganisationType, Prisma, type SubscriptionClai
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { ORGANISATION_INTERNAL_GROUPS } from '../../constants/organisations';
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import type { InternalClaim } from '../../types/subscription';
 import { INTERNAL_CLAIM_ID } from '../../types/subscription';
 import { generateDatabaseId, prefixedId } from '../../universal/id';
 import { generateDefaultOrganisationSettings } from '../../utils/organisations';
@@ -18,7 +17,7 @@ type CreateOrganisationOptions = {
   type: OrganisationType;
   url?: string;
   customerId?: string;
-  claim: InternalClaim;
+  claim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
 };
 
 export const createOrganisation = async ({ name, url, type, userId, customerId, claim }: CreateOrganisationOptions) => {
@@ -191,21 +190,23 @@ export const createOrganisationClaimUpsertData = (
   subscriptionClaim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>,
 ) => {
   // Done like this to ensure type errors are thrown if items are added.
-  const data: Omit<Prisma.SubscriptionClaimCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'locked' | 'name'> = {
-    flags: {
-      ...subscriptionClaim.flags,
-    },
-    envelopeItemCount: subscriptionClaim.envelopeItemCount,
-    recipientCount: subscriptionClaim.recipientCount,
-    teamCount: subscriptionClaim.teamCount,
-    memberCount: subscriptionClaim.memberCount,
-    documentRateLimits: subscriptionClaim.documentRateLimits ?? [],
-    documentQuota: subscriptionClaim.documentQuota,
-    emailRateLimits: subscriptionClaim.emailRateLimits ?? [],
-    emailQuota: subscriptionClaim.emailQuota,
-    apiRateLimits: subscriptionClaim.apiRateLimits ?? [],
-    apiQuota: subscriptionClaim.apiQuota,
-  };
+  const data: Omit<Prisma.SubscriptionClaimUncheckedCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'locked' | 'name'> =
+    {
+      flags: {
+        ...subscriptionClaim.flags,
+      },
+      envelopeItemCount: subscriptionClaim.envelopeItemCount,
+      recipientCount: subscriptionClaim.recipientCount,
+      teamCount: subscriptionClaim.teamCount,
+      memberCount: subscriptionClaim.memberCount,
+      documentRateLimits: subscriptionClaim.documentRateLimits ?? [],
+      documentQuota: subscriptionClaim.documentQuota,
+      emailRateLimits: subscriptionClaim.emailRateLimits ?? [],
+      emailQuota: subscriptionClaim.emailQuota,
+      apiRateLimits: subscriptionClaim.apiRateLimits ?? [],
+      apiQuota: subscriptionClaim.apiQuota,
+      emailTransportId: subscriptionClaim.emailTransportId ?? null,
+    };
 
   return {
     ...data,

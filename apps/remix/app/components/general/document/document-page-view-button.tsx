@@ -38,7 +38,7 @@ export const DocumentPageViewButton = ({ envelope }: DocumentPageViewButtonProps
   })
     .with({ isRecipient: true, isPending: true, isSigned: false }, () => (
       <Button className="w-full" asChild>
-        <Link to={`/sign/${recipient?.token}`}>
+        <a href={`/sign/${recipient?.token}`}>
           {match(role)
             .with(RecipientRole.SIGNER, () => (
               <>
@@ -58,7 +58,7 @@ export const DocumentPageViewButton = ({ envelope }: DocumentPageViewButtonProps
                 <Trans>View</Trans>
               </>
             ))}
-        </Link>
+        </a>
       </Button>
     ))
     .with({ isComplete: false }, () => (

@@ -115,6 +115,21 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
 
   await root.locator('input[name="externalId"]').fill(externalId);
   await root.locator('input[name="meta.redirectUrl"]').fill(TEST_SETTINGS_VALUES.redirectUrl);
+  await root.getByRole('button', { name: 'Notifications' }).click();
+  // Fill email-content fields and toggle recipient-facing notification checkboxes
+  // while distributionMethod is still EMAIL. After it flips to NONE below, these
+  // controls are disabled because no email is sent to recipients.
+  await root.locator('input[name="meta.subject"]').fill(TEST_SETTINGS_VALUES.subject);
+  await root.locator('textarea[name="meta.message"]').fill(TEST_SETTINGS_VALUES.message);
+  await root.locator('input[name="meta.emailReplyTo"]').fill(TEST_SETTINGS_VALUES.replyTo);
+  await root.locator('#recipientSigned').click();
+  await root.locator('#recipientSigningRequest').click();
+  await root.locator('#recipientRemoved').click();
+  await root.locator('#documentPending').click();
+  await root.locator('#documentCompleted').click();
+  await root.locator('#documentDeleted').click();
+
+  await root.getByRole('button', { name: 'General' }).click();
 
   await root.locator('[data-testid="documentDistributionMethodSelectValue"]').click();
   await root.getByRole('option', { name: TEST_SETTINGS_VALUES.distributionMethod }).click();
@@ -190,19 +205,35 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
   await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatUnit }).click();
   await clickSettingsDialogHeader(root);
 
-  await root.getByRole('button', { name: 'Email' }).click();
-  await root.locator('#recipientSigned').click();
-  await root.locator('#recipientSigningRequest').click();
-  await root.locator('#recipientRemoved').click();
-  await root.locator('#documentPending').click();
-  await root.locator('#documentCompleted').click();
-  await root.locator('#documentDeleted').click();
+  await root.getByRole('button', { name: 'Notifications' }).click();
+
+  // Distribution is NONE: email-content fields stay rendered but disabled,
+  // recipient-facing checkboxes are hidden entirely and replaced by an alert,
+  // owner-facing checkboxes stay editable so we toggle them here.
+  await expect(root.locator('input[name="meta.subject"]')).toBeDisabled();
+  await expect(root.locator('textarea[name="meta.message"]')).toBeDisabled();
+  await expect(root.locator('input[name="meta.emailReplyTo"]')).toBeDisabled();
+  await expect(root.locator('#recipientSigned')).toHaveCount(0);
+  await expect(root.locator('#recipientSigningRequest')).toHaveCount(0);
+  await expect(root.locator('#recipientRemoved')).toHaveCount(0);
+  await expect(root.locator('#documentPending')).toHaveCount(0);
+  await expect(root.locator('#documentCompleted')).toHaveCount(0);
+  await expect(root.locator('#documentDeleted')).toHaveCount(0);
+  await expect(root.getByText(/Email distribution needs to be enabled/)).toBeVisible();
+
+  // Email Sender select only renders when the org has the emailDomains feature
+  // flag plus allowConfigureEmailSender, so the assertion is conditional.
+  const emailSenderSelect = getComboboxByLabel(root, 'Email Sender');
+  const hasEmailSenderSelect = (await emailSenderSelect.count()) > 0;
+
+  if (hasEmailSenderSelect) {
+    await expect(emailSenderSelect).toBeDisabled();
+  }
+
+  await expect(root.locator('#ownerDocumentCompleted')).toBeEnabled();
   await root.locator('#ownerDocumentCompleted').click();
   await root.locator('#ownerRecipientExpired').click();
   await root.locator('#ownerDocumentCreated').click();
-  await root.locator('input[name="meta.emailReplyTo"]').fill(TEST_SETTINGS_VALUES.replyTo);
-  await root.locator('input[name="meta.subject"]').fill(TEST_SETTINGS_VALUES.subject);
-  await root.locator('textarea[name="meta.message"]').fill(TEST_SETTINGS_VALUES.message);
 
   await root.getByRole('button', { name: 'Security' }).click();
   await selectMultiSelectOption(root, 'documentAccessSelectValue', TEST_SETTINGS_VALUES.accessAuth);
@@ -264,13 +295,17 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
     TEST_SETTINGS_VALUES.reminderRepeatUnit,
   );
 
-  await root.getByRole('button', { name: 'Email' }).click();
-  await expect(root.locator('#recipientSigned')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#recipientSigningRequest')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#recipientRemoved')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#documentPending')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#documentCompleted')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#documentDeleted')).toHaveAttribute('aria-checked', 'false');
+  await root.getByRole('button', { name: 'Notifications' }).click();
+  // Distribution persisted as NONE: recipient-facing checkboxes are hidden, owner-facing
+  // checkboxes remain visible and persist their stored values. Email-content fields are
+  // still rendered (disabled) and persist their stored values.
+  await expect(root.locator('#recipientSigned')).toHaveCount(0);
+  await expect(root.locator('#recipientSigningRequest')).toHaveCount(0);
+  await expect(root.locator('#recipientRemoved')).toHaveCount(0);
+  await expect(root.locator('#documentPending')).toHaveCount(0);
+  await expect(root.locator('#documentCompleted')).toHaveCount(0);
+  await expect(root.locator('#documentDeleted')).toHaveCount(0);
+  await expect(root.getByText(/Email distribution needs to be enabled/)).toBeVisible();
   await expect(root.locator('#ownerDocumentCompleted')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#ownerRecipientExpired')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#ownerDocumentCreated')).toHaveAttribute('aria-checked', 'false');

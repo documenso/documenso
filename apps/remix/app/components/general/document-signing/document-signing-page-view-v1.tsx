@@ -1,4 +1,3 @@
-import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
@@ -27,7 +26,6 @@ import type { Field } from '@prisma/client';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
 import { match, P } from 'ts-pattern';
 
 import { DocumentSigningAttachmentsPopover } from '~/components/general/document-signing/document-signing-attachments-popover';
@@ -50,6 +48,11 @@ import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-p
 import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
 import { DocumentSigningRecipientProvider } from './document-signing-recipient-provider';
 
+type DocumentSigningBranding = {
+  brandingEnabled: boolean;
+  brandingLogo: string;
+};
+
 export type DocumentSigningPageViewV1Props = {
   recipient: RecipientWithFields;
   document: DocumentAndSender;
@@ -57,6 +60,7 @@ export type DocumentSigningPageViewV1Props = {
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
+  branding: DocumentSigningBranding;
   includeSenderDetails: boolean;
 };
 
@@ -68,6 +72,7 @@ export const DocumentSigningPageViewV1 = ({
   isRecipientsTurn,
   allRecipients = [],
   includeSenderDetails,
+  branding,
 }: DocumentSigningPageViewV1Props) => {
   const { documentData, documentMeta } = document;
 
@@ -76,9 +81,6 @@ export const DocumentSigningPageViewV1 = ({
   const hasAuthenticator = authUser?.twoFactorEnabled
     ? authUser.twoFactorEnabled && authUser.email === recipient.email
     : false;
-
-  const navigate = useNavigate();
-  const analytics = useAnalytics();
 
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(allRecipients?.[0]?.id);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -113,16 +115,10 @@ export const DocumentSigningPageViewV1 = ({
 
     await completeDocumentWithToken(payload);
 
-    analytics.capture('App: Recipient has completed signing', {
-      signerId: recipient.id,
-      documentId: document.id,
-      timestamp: new Date().toISOString(),
-    });
-
     if (documentMeta?.redirectUrl) {
       window.location.href = documentMeta.redirectUrl;
     } else {
-      await navigate(`/sign/${recipient.token}/complete`);
+      window.location.href = `/sign/${recipient.token}/complete`;
     }
   };
 
@@ -168,10 +164,12 @@ export const DocumentSigningPageViewV1 = ({
   const pendingFields = fieldsRequiringValidation.filter((field) => !field.inserted);
   const hasPendingFields = pendingFields.length > 0;
 
+  const hasCustomBrandingLogo = branding.brandingEnabled && Boolean(branding.brandingLogo);
+
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
       <div className="mx-auto w-full max-w-screen-xl sm:px-6">
-        {document.team.teamGlobalSettings.brandingEnabled && document.team.teamGlobalSettings.brandingLogo && (
+        {hasCustomBrandingLogo && (
           <img
             src={`/api/branding/logo/team/${document.teamId}`}
             alt={`${document.team.name}'s Logo`}

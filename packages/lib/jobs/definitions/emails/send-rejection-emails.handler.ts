@@ -64,7 +64,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
     return;
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled, emailTransport } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -75,8 +75,10 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  // Send confirmation email to the recipient who rejected
-  if (isRecipientEmailValidForSending(recipient)) {
+  // Send confirmation email to the recipient who rejected.
+  // Skipped when the organisation has email sending disabled, since this is sent on its behalf.
+  // The owner notification below intentionally uses the internal Documenso email, so it still sends.
+  if (!emailsDisabled && isRecipientEmailValidForSending(recipient)) {
     await io.runTask('send-rejection-confirmation-email', async () => {
       const recipientTemplate = createElement(DocumentRejectionConfirmedEmail, {
         recipientName: recipient.name,
@@ -95,7 +97,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
         }),
       ]);
 
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: {
           name: recipient.name,
           address: recipient.email,

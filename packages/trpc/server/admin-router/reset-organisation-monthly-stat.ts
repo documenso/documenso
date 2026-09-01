@@ -1,4 +1,4 @@
-import { currentMonthlyPeriod } from '@documenso/lib/server-only/rate-limit/current-monthly-period';
+import { currentMonthlyPeriod } from '@documenso/lib/universal/monthly-period';
 import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@prisma/client';
 import { match } from 'ts-pattern';

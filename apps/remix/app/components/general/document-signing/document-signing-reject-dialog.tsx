@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -17,7 +18,7 @@ import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 
 const ZRejectDocumentFormSchema = z.object({
@@ -41,7 +42,7 @@ export function DocumentSigningRejectDialog({
 }: DocumentSigningRejectDialogProps) {
   const { t } = useLingui();
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const analytics = useAnalytics();
   const [searchParams] = useSearchParams();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -74,9 +75,15 @@ export function DocumentSigningRejectDialog({
       if (onRejected) {
         await onRejected(reason);
       } else {
-        await navigate(`/sign/${token}/rejected`);
+        window.location.href = `/sign/${token}/rejected`;
       }
     } catch (err) {
+      analytics.captureException(err, {
+        source: 'signing',
+        location: 'reject_document',
+        documentId,
+      });
+
       toast({
         title: t`Error`,
         description: t`An error occurred while rejecting the document. Please try again.`,

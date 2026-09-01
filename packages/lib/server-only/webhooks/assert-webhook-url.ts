@@ -71,10 +71,17 @@ const isBypassedHost = (url: string): boolean => {
 };
 
 /**
- * Asserts that a webhook URL does not resolve to a private or loopback
- * address. Throws an AppError with WEBHOOK_INVALID_REQUEST if it does.
+ * Assert that a webhook URL does not point at a private/loopback address,
+ * checking both the literal host and its resolved DNS records. Throws an
+ * AppError with WEBHOOK_INVALID_REQUEST if it does. Hosts listed in
+ * NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS skip all checks.
  *
- * Hosts listed in NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS skip all checks.
+ * This is best-effort, non-exhaustive SSRF defence, NOT a complete mitigation.
+ * It does not cover DNS rebinding (the resolved address can change between this
+ * check and the actual request), obscure IP encodings, or every IPv6 form, and
+ * it fails open on lookup errors/timeouts (see the catch below). Network-level
+ * SSRF protection (firewall/egress rules, blocking internal services and cloud
+ * metadata endpoints) remains the responsibility of the deployment.
  */
 export const assertNotPrivateUrl = async (
   url: string,

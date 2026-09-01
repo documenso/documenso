@@ -1,8 +1,10 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { ZDirectTemplateEmbedDataSchema } from '@documenso/lib/types/embed-direct-template-schema';
 import { isFieldUnsignedAndRequired, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
@@ -42,6 +44,7 @@ import { useSearchParams } from 'react-router';
 import { BrandingLogo } from '~/components/general/branding-logo';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { injectCss } from '~/utils/css-vars';
+import { getDirectTemplateErrorMessage } from '~/utils/toast-error-messages';
 
 import type { DirectTemplateLocalField } from '../general/direct-template/direct-template-signing-form';
 import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
@@ -75,6 +78,7 @@ export const EmbedDirectTemplateClientPage = ({
 }: EmbedDirectTemplateClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const [searchParams] = useSearchParams();
 
@@ -259,9 +263,19 @@ export const EmbedDirectTemplateClientPage = ({
         );
       }
 
+      const error = AppError.parseError(err);
+      const errorMessage = getDirectTemplateErrorMessage(error.code);
+
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'direct_template',
+        recipientId: recipient.id,
+        envelopeId,
+      });
+
       toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`We were unable to submit this document at this time. Please try again later.`),
+        title: _(errorMessage.title),
+        description: _(errorMessage.description),
         variant: 'destructive',
       });
     }
@@ -303,6 +317,14 @@ export const EmbedDirectTemplateClientPage = ({
       }
     } catch (err) {
       console.error(err);
+
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'embed_init',
+        recipientId: recipient.id,
+        envelopeId,
+      });
+
       setHasFinishedInit(true);
     }
 
