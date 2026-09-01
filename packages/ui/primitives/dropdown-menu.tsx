@@ -4,6 +4,19 @@ import * as React from 'react';
 
 import { cn } from '../lib/utils';
 
+/**
+ * Note: The underlying @radix-ui/react-menu package is patched, see
+ * patches/@radix-ui+react-menu+2.1.24.patch.
+ *
+ * Since @radix-ui/react-menu 2.1.18, Radix closes any open menu when the window fires a
+ * "blur" event. Opening a native file picker blurs the window, which would close the
+ * menu and unmount anything rendered within its content, such as dialogs containing
+ * file inputs, silently discarding the user's file selection. The patch removes that
+ * behaviour since there is currently no native prop to opt out of it, see
+ * https://github.com/radix-ui/primitives/issues/3618.
+ *
+ * Regression test: packages/app-tests/e2e/templates/template-bulk-send.spec.ts
+ */
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
