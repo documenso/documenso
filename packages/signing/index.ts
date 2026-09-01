@@ -1,4 +1,5 @@
 import {
+  NEXT_PRIVATE_SIGNING_TRANSPORT,
   NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER,
   NEXT_PUBLIC_SIGNING_CONTACT_INFO,
   NEXT_PUBLIC_WEBAPP_URL,
@@ -6,7 +7,6 @@ import {
 import type { PDF, Signer } from '@libpdf/core';
 import { match } from 'ts-pattern';
 
-import { getSigningTransport } from './helpers/transport';
 import { getTimestampAuthority } from './helpers/tsa';
 import { createGoogleCloudSigner } from './transports/google-cloud';
 import { createLocalSigner } from './transports/local';
@@ -22,7 +22,7 @@ const getSigner = async () => {
     return signer;
   }
 
-  const transport = getSigningTransport();
+  const transport = NEXT_PRIVATE_SIGNING_TRANSPORT();
 
   // eslint-disable-next-line require-atomic-updates
   signer = await match(transport)
