@@ -400,51 +400,85 @@ export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
   [FieldType.DROPDOWN]: FIELD_DROPDOWN_META_DEFAULT_VALUES,
 } as const;
 
-export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal(FieldType.SIGNATURE),
-    fieldMeta: ZSignatureFieldMeta.optional().default(FIELD_SIGNATURE_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.FREE_SIGNATURE),
-    fieldMeta: z.undefined(),
-  }),
-  z.object({
-    type: z.literal(FieldType.INITIALS),
-    fieldMeta: ZInitialsFieldMeta.optional().default(FIELD_INITIALS_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.NAME),
-    fieldMeta: ZNameFieldMeta.optional().default(FIELD_NAME_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.EMAIL),
-    fieldMeta: ZEmailFieldMeta.optional().default(FIELD_EMAIL_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.DATE),
-    fieldMeta: ZDateFieldMeta.optional().default(FIELD_DATE_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.TEXT),
-    fieldMeta: ZTextFieldMeta.optional().default(FIELD_TEXT_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.NUMBER),
-    fieldMeta: ZNumberFieldMeta.optional().default(FIELD_NUMBER_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.RADIO),
-    fieldMeta: ZRadioFieldMeta.optional().default(FIELD_RADIO_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.CHECKBOX),
-    fieldMeta: ZCheckboxFieldMeta.optional().default(FIELD_CHECKBOX_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.DROPDOWN),
-    fieldMeta: ZDropdownFieldMeta.optional().default(FIELD_DROPDOWN_META_DEFAULT_VALUES),
-  }),
-]);
+const buildEnvelopeFieldAndMetaSchema = (options: { applyMetaDefaults: boolean }) =>
+  z.discriminatedUnion('type', [
+    z.object({
+      type: z.literal(FieldType.SIGNATURE),
+      fieldMeta: options.applyMetaDefaults
+        ? ZSignatureFieldMeta.optional().default(FIELD_SIGNATURE_META_DEFAULT_VALUES)
+        : ZSignatureFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.FREE_SIGNATURE),
+      fieldMeta: z.undefined(),
+    }),
+    z.object({
+      type: z.literal(FieldType.INITIALS),
+      fieldMeta: options.applyMetaDefaults
+        ? ZInitialsFieldMeta.optional().default(FIELD_INITIALS_META_DEFAULT_VALUES)
+        : ZInitialsFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.NAME),
+      fieldMeta: options.applyMetaDefaults
+        ? ZNameFieldMeta.optional().default(FIELD_NAME_META_DEFAULT_VALUES)
+        : ZNameFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.EMAIL),
+      fieldMeta: options.applyMetaDefaults
+        ? ZEmailFieldMeta.optional().default(FIELD_EMAIL_META_DEFAULT_VALUES)
+        : ZEmailFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.DATE),
+      fieldMeta: options.applyMetaDefaults
+        ? ZDateFieldMeta.optional().default(FIELD_DATE_META_DEFAULT_VALUES)
+        : ZDateFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.TEXT),
+      fieldMeta: options.applyMetaDefaults
+        ? ZTextFieldMeta.optional().default(FIELD_TEXT_META_DEFAULT_VALUES)
+        : ZTextFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.NUMBER),
+      fieldMeta: options.applyMetaDefaults
+        ? ZNumberFieldMeta.optional().default(FIELD_NUMBER_META_DEFAULT_VALUES)
+        : ZNumberFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.RADIO),
+      fieldMeta: options.applyMetaDefaults
+        ? ZRadioFieldMeta.optional().default(FIELD_RADIO_META_DEFAULT_VALUES)
+        : ZRadioFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.CHECKBOX),
+      fieldMeta: options.applyMetaDefaults
+        ? ZCheckboxFieldMeta.optional().default(FIELD_CHECKBOX_META_DEFAULT_VALUES)
+        : ZCheckboxFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.DROPDOWN),
+      fieldMeta: options.applyMetaDefaults
+        ? ZDropdownFieldMeta.optional().default(FIELD_DROPDOWN_META_DEFAULT_VALUES)
+        : ZDropdownFieldMeta.optional(),
+    }),
+  ]);
+
+export const ZEnvelopeFieldAndMetaSchema = buildEnvelopeFieldAndMetaSchema({
+  applyMetaDefaults: true,
+});
+
+/**
+ * Same shape as `ZEnvelopeFieldAndMetaSchema` but without create-time defaults.
+ * For update routes: an omitted `fieldMeta` must stay `undefined` so the stored
+ * metadata is left untouched instead of being reset to the type defaults.
+ */
+export const ZEnvelopeFieldAndMetaUpdateSchema = buildEnvelopeFieldAndMetaSchema({
+  applyMetaDefaults: false,
+});
 
 export type TEnvelopeFieldAndMeta = z.infer<typeof ZEnvelopeFieldAndMetaSchema>;
