@@ -37,6 +37,8 @@ export function loader({ request }: Route.LoaderArgs) {
   return {
     isEmailPasswordSignupEnabled,
     isGoogleSignupEnabled,
+    termsUrl: process.env.NEXT_PUBLIC_TERMS_URL || 'https://documenso.com/terms',
+    privacyUrl: process.env.NEXT_PUBLIC_PRIVACY_URL || 'https://documenso.com/privacy',
     isMicrosoftSignupEnabled,
     isOidcSignupEnabled,
     returnTo,
@@ -50,6 +52,8 @@ export default function SignUp({ loaderData }: Route.ComponentProps) {
     isMicrosoftSignupEnabled,
     isOidcSignupEnabled,
     returnTo,
+    termsUrl,
+    privacyUrl,
   } = loaderData;
 
   return (
@@ -60,6 +64,8 @@ export default function SignUp({ loaderData }: Route.ComponentProps) {
       isMicrosoftSignupEnabled={isMicrosoftSignupEnabled}
       isOidcSignupEnabled={isOidcSignupEnabled}
       returnTo={returnTo}
+      termsUrl={termsUrl}
+      privacyUrl={privacyUrl}
     />
   );
 }
