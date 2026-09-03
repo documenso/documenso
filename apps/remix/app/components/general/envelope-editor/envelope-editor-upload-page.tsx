@@ -1,4 +1,5 @@
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useEnvelopeAutosave } from '@documenso/lib/client-only/hooks/use-envelope-autosave';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -45,6 +46,7 @@ export const EnvelopeEditorUploadPage = () => {
   const { t, i18n } = useLingui();
   const { maximumEnvelopeItemCount, remaining } = useLimits();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const {
     envelope,
@@ -213,6 +215,12 @@ export const EnvelopeEditorUploadPage = () => {
     const { data } = await createPromise.catch((error) => {
       console.error(error);
 
+      analytics.captureException(error, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'create_envelope_items',
+        envelopeId: envelope.id,
+      });
+
       // Set error state on files in batch upload.
       setLocalFiles((prev) =>
         prev.map((uploadingFile) =>
@@ -289,6 +297,12 @@ export const EnvelopeEditorUploadPage = () => {
       await replacePromise;
     } catch (error) {
       console.error(error);
+
+      analytics.captureException(error, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'replace_pdf',
+        envelopeId: envelope.id,
+      });
 
       toast({
         title: t`Replace failed`,
