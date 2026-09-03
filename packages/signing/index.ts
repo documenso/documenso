@@ -1,9 +1,9 @@
 import {
+  NEXT_PRIVATE_SIGNING_TRANSPORT,
   NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER,
   NEXT_PUBLIC_SIGNING_CONTACT_INFO,
   NEXT_PUBLIC_WEBAPP_URL,
 } from '@documenso/lib/constants/app';
-import { env } from '@documenso/lib/utils/env';
 import type { PDF, Signer } from '@libpdf/core';
 import { match } from 'ts-pattern';
 
@@ -22,7 +22,7 @@ const getSigner = async () => {
     return signer;
   }
 
-  const transport = env('NEXT_PRIVATE_SIGNING_TRANSPORT') || 'local';
+  const transport = NEXT_PRIVATE_SIGNING_TRANSPORT();
 
   // eslint-disable-next-line require-atomic-updates
   signer = await match(transport)
