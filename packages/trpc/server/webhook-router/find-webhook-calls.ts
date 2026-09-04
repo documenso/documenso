@@ -3,11 +3,11 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
-import type { Prisma, WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
   findWebhookCallsMeta,
+  type TFindWebhookCallsRequest,
   ZFindWebhookCallsRequestSchema,
   ZFindWebhookCallsResponseSchema,
 } from './find-webhook-calls.types';
@@ -38,13 +38,7 @@ export const findWebhookCallsRoute = authenticatedProcedure
 type FindWebhookCallsOptions = {
   userId: number;
   teamId: number;
-  webhookId: string;
-  page?: number;
-  perPage?: number;
-  status?: WebhookCallStatus;
-  events?: WebhookTriggerEvents[];
-  query?: string;
-};
+} & TFindWebhookCallsRequest;
 
 export const findWebhookCalls = async ({
   userId,
@@ -71,7 +65,7 @@ export const findWebhookCalls = async ({
     throw new AppError(AppErrorCode.NOT_FOUND);
   }
 
-  const whereClause: Prisma.WebhookCallWhereInput = {
+  const whereClause = {
     webhookId: webhook.id,
     status,
     id: query || undefined,

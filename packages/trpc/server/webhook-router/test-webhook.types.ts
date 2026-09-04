@@ -1,4 +1,4 @@
-import { WebhookTriggerEvents } from '@prisma/client';
+import WebhookTriggerEventsSchema from '@documenso/prisma/generated/zod/inputTypeSchemas/WebhookTriggerEventsSchema';
 import { z } from 'zod';
 
 import type { TrpcRouteMeta } from '../trpc';
@@ -15,7 +15,7 @@ export const testWebhookMeta: TrpcRouteMeta = {
 
 export const ZTestWebhookRequestSchema = z.object({
   id: z.string(),
-  event: z.nativeEnum(WebhookTriggerEvents),
+  event: WebhookTriggerEventsSchema,
 });
 
 export const ZTestWebhookResponseSchema = z.object({

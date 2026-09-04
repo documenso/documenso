@@ -1,6 +1,7 @@
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import WebhookCallStatusSchema from '@documenso/prisma/generated/zod/inputTypeSchemas/WebhookCallStatusSchema';
+import WebhookTriggerEventsSchema from '@documenso/prisma/generated/zod/inputTypeSchemas/WebhookTriggerEventsSchema';
 import WebhookCallSchema from '@documenso/prisma/generated/zod/modelSchema/WebhookCallSchema';
-import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 import { z } from 'zod';
 
 import type { TrpcRouteMeta } from '../trpc';
@@ -17,9 +18,8 @@ export const findWebhookCallsMeta: TrpcRouteMeta = {
 
 export const ZFindWebhookCallsRequestSchema = ZFindSearchParamsSchema.extend({
   webhookId: z.string(),
-  status: z.nativeEnum(WebhookCallStatus).optional(),
-  events: z
-    .array(z.nativeEnum(WebhookTriggerEvents))
+  status: WebhookCallStatusSchema.optional(),
+  events: WebhookTriggerEventsSchema.array()
     .optional()
     .refine((arr) => !arr || new Set(arr).size === arr.length, {
       message: 'Events must be unique',

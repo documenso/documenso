@@ -1,6 +1,6 @@
 import { isPrivateUrl } from '@documenso/lib/server-only/webhooks/is-private-url';
 import { URL_PATTERN } from '@documenso/lib/types/name';
-import { WebhookTriggerEvents } from '@prisma/client';
+import WebhookTriggerEventsSchema from '@documenso/prisma/generated/zod/inputTypeSchemas/WebhookTriggerEventsSchema';
 import { z } from 'zod';
 
 export const ZWebhookUrlSchema = z
@@ -19,9 +19,9 @@ export const ZWebhookUrlSchema = z
 
 export const ZCreateWebhookRequestSchema = z.object({
   webhookUrl: ZWebhookUrlSchema,
-  eventTriggers: z
-    .array(z.nativeEnum(WebhookTriggerEvents))
-    .min(1, { message: 'At least one event trigger is required' }),
+  eventTriggers: WebhookTriggerEventsSchema.array().min(1, {
+    message: 'At least one event trigger is required',
+  }),
   secret: z.string().nullable(),
   enabled: z.boolean(),
 });
@@ -48,7 +48,7 @@ export type TDeleteWebhookRequestSchema = z.infer<typeof ZDeleteWebhookRequestSc
 
 export const ZTriggerTestWebhookRequestSchema = z.object({
   id: z.string(),
-  event: z.nativeEnum(WebhookTriggerEvents),
+  event: WebhookTriggerEventsSchema,
 });
 
 export type TTriggerTestWebhookRequestSchema = z.infer<typeof ZTriggerTestWebhookRequestSchema>;
