@@ -215,7 +215,7 @@ export const TemplateDirectLinkDialog = ({
                     {DIRECT_TEMPLATE_DOCUMENTATION.map((step, index) => (
                       <li className="relative" key={index}>
                         <div className="absolute -left-12">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-neutral-200 font-bold text-sm">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-border font-bold text-sm">
                             {index + 1}
                           </div>
                         </div>
@@ -259,8 +259,8 @@ export const TemplateDirectLinkDialog = ({
               .with({ token: P.nullish, currentStep: 'SELECT_RECIPIENT' }, () => (
                 <DialogContent className="relative">
                   {isCreatingTemplateDirectLink && validDirectTemplateRecipients.length !== 0 && (
-                    <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/50 dark:bg-black/50">
-                      <LoaderIcon className="h-6 w-6 animate-spin text-gray-500" />
+                    <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-background/50">
+                      <LoaderIcon className="h-6 w-6 animate-spin text-muted-foreground" />
                     </div>
                   )}
 
@@ -317,9 +317,9 @@ export const TemplateDirectLinkDialog = ({
 
                             <TableCell>
                               {selectedRecipientId === row.id ? (
-                                <CircleDotIcon className="h-5 w-5 text-neutral-300" />
+                                <CircleDotIcon className="h-5 w-5 text-muted-foreground/40" />
                               ) : (
-                                <CircleIcon className="h-5 w-5 text-neutral-300" />
+                                <CircleIcon className="h-5 w-5 text-muted-foreground/40" />
                               )}
                             </TableCell>
                           </TableRow>
