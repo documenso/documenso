@@ -34,7 +34,7 @@ export default function WebhookPage() {
 
   const team = useCurrentTeam();
 
-  const { data, isLoading, isError } = trpc.webhook.getTeamWebhooks.useQuery();
+  const { data, isLoading, isError } = trpc.webhook.getTeamWebhooks.useQuery({});
 
   const results = {
     data: data ?? [],
