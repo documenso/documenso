@@ -20,7 +20,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import { Turnstile } from '@marsidev/react-turnstile';
-import { useEffect, useRef } from 'react';
+import { type ReactElement, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
@@ -65,6 +65,7 @@ export type SignUpFormProps = {
   lockedEmail?: string;
   hideSocialSignup?: boolean;
   hideMarketingPanel?: boolean;
+  sidePanel?: ReactElement;
   isEmailPasswordSignupEnabled?: boolean;
   isGoogleSignupEnabled?: boolean;
   isMicrosoftSignupEnabled?: boolean;
@@ -79,6 +80,7 @@ export const SignUpForm = ({
   lockedEmail,
   hideSocialSignup = false,
   hideMarketingPanel = false,
+  sidePanel,
   isEmailPasswordSignupEnabled = true,
   isGoogleSignupEnabled,
   isMicrosoftSignupEnabled,
@@ -222,32 +224,42 @@ export const SignUpForm = ({
     }
   }, [form]);
 
+  const hasSidePanel = sidePanel !== undefined;
+
   return (
-    <div className={cn('flex justify-center gap-x-12', className)}>
-      {!hideMarketingPanel && (
-        <div className="relative hidden flex-1 overflow-hidden rounded-xl border border-border xl:flex">
-          <div className="absolute -inset-8 -z-[2] backdrop-blur">
-            <img
-              src={communityCardsImage}
-              alt="community-cards"
-              className="h-full w-full object-cover dark:brightness-95 dark:contrast-[70%] dark:invert"
-            />
-          </div>
+    <div className={cn('flex flex-col justify-center gap-x-12 gap-y-6 xl:flex-row', className)}>
+      {hasSidePanel && <div className="w-full xl:hidden">{sidePanel}</div>}
 
-          <div className="absolute -inset-8 -z-[1] bg-background/50 backdrop-blur-[2px]" />
-
-          <div className="relative flex h-full w-full flex-col items-center justify-evenly">
-            <div className="rounded-2xl border bg-background px-4 py-1 font-medium text-sm">
-              <Trans>User profiles are here!</Trans>
-            </div>
-
-            <div className="w-full max-w-md">
-              <UserProfileTimur rows={2} className="rounded-2xl border border-border bg-background shadow-md" />
-            </div>
-
-            <div />
-          </div>
+      {hasSidePanel ? (
+        <div className="relative hidden min-h-[min(850px,80vh)] flex-1 overflow-hidden rounded-xl border border-border bg-muted/20 p-8 xl:flex">
+          {sidePanel}
         </div>
+      ) : (
+        !hideMarketingPanel && (
+          <div className="relative hidden flex-1 overflow-hidden rounded-xl border border-border xl:flex">
+            <div className="absolute -inset-8 -z-[2] backdrop-blur">
+              <img
+                src={communityCardsImage}
+                alt="community-cards"
+                className="h-full w-full object-cover dark:brightness-95 dark:contrast-[70%] dark:invert"
+              />
+            </div>
+
+            <div className="absolute -inset-8 -z-[1] bg-background/50 backdrop-blur-[2px]" />
+
+            <div className="relative flex h-full w-full flex-col items-center justify-evenly">
+              <div className="rounded-2xl border bg-background px-4 py-1 font-medium text-sm">
+                <Trans>User profiles are here!</Trans>
+              </div>
+
+              <div className="w-full max-w-md">
+                <UserProfileTimur rows={2} className="rounded-2xl border border-border bg-background shadow-md" />
+              </div>
+
+              <div />
+            </div>
+          </div>
+        )
       )}
 
       <div className="relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">

@@ -90,12 +90,38 @@ test.describe('Signup invite page', () => {
 
     await page.goto(`/signup-invite/${token}`);
 
+    await expect(page.getByText("You've been invited to create a Documenso account")).toBeVisible();
     await expect(page.getByText('Invitation details')).toBeVisible();
     await expect(page.getByText(email)).toBeVisible();
     await expect(page.getByText('Invited email')).toBeVisible();
     await expect(page.getByText('Expires')).toBeVisible();
     await expect(page.getByLabel('Email Address')).toHaveValue(email);
     await expect(page.getByLabel('Email Address')).toHaveAttribute('readonly', '');
+    await expect(page.getByRole('button', { name: 'Create account' })).toBeVisible();
+  });
+
+  test('should show two-column layout on desktop', async ({ page }) => {
+    const email = `desktop-invite-${Date.now()}@example.com`;
+    const token = nanoid();
+    const expiresAt = new Date();
+
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await prisma.signupInvite.create({
+      data: {
+        id: generateDatabaseId('signup_invite'),
+        email,
+        token,
+        expiresAt,
+        status: SignupInviteStatus.PENDING,
+      },
+    });
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(`/signup-invite/${token}`);
+
+    await expect(page.getByText("You've been invited to create a Documenso account")).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Create a new account' })).toBeVisible();
   });
 
   test('should show expired invite state', async ({ page }) => {

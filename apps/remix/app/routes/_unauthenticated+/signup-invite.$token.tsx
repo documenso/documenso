@@ -1,6 +1,5 @@
 import { getSignupInviteByToken } from '@documenso/lib/server-only/signup-invite/get-signup-invite-by-token';
 import { prisma } from '@documenso/prisma';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
@@ -9,7 +8,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 
 import { SignUpForm } from '~/components/forms/signup';
-import { SignupInviteStatusCard } from '~/components/general/signup-invite/signup-invite-status-card';
+import { SignupInviteSidePanel } from '~/components/general/signup-invite/signup-invite-side-panel';
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/signup-invite.$token';
@@ -165,28 +164,16 @@ export default function SignupInvitePage({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div className="w-full max-w-lg px-4">
-      <Alert className="mb-6">
-        <AlertTitle>
-          <Trans>You&apos;ve been invited to create a Documenso account</Trans>
-        </AlertTitle>
-        <AlertDescription>
-          <Trans>Complete the form below to create your account using this invitation.</Trans>
-        </AlertDescription>
-      </Alert>
-
-      <SignupInviteStatusCard email={loaderData.email} expiresAt={loaderData.expiresAt} />
-
-      <SignUpForm
-        className="w-full max-w-lg"
-        hideMarketingPanel
-        hideSocialSignup
-        isEmailPasswordSignupEnabled
-        inviteToken={loaderData.token}
-        lockedEmail={loaderData.email}
-        initialEmail={loaderData.email}
-      />
-    </div>
+    <SignUpForm
+      className="w-screen max-w-screen-2xl px-4 md:px-16 lg:-my-16"
+      sidePanel={<SignupInviteSidePanel email={loaderData.email} expiresAt={loaderData.expiresAt} />}
+      hideMarketingPanel
+      hideSocialSignup
+      isEmailPasswordSignupEnabled
+      inviteToken={loaderData.token}
+      lockedEmail={loaderData.email}
+      initialEmail={loaderData.email}
+    />
   );
 }
 

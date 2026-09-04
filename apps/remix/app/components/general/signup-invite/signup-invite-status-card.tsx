@@ -1,3 +1,4 @@
+import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { ClockIcon, MailIcon } from 'lucide-react';
@@ -7,11 +8,12 @@ import { useEffect, useState } from 'react';
 type SignupInviteStatusCardProps = {
   email: string;
   expiresAt: string;
+  variant?: 'default' | 'embedded';
 };
 
 const EXPIRING_SOON_THRESHOLD_MS = 24 * 60 * 60 * 1000;
 
-export const SignupInviteStatusCard = ({ email, expiresAt }: SignupInviteStatusCardProps) => {
+export const SignupInviteStatusCard = ({ email, expiresAt, variant = 'default' }: SignupInviteStatusCardProps) => {
   const { i18n } = useLingui();
   const [relativeExpiry, setRelativeExpiry] = useState<string | null>(null);
 
@@ -34,7 +36,12 @@ export const SignupInviteStatusCard = ({ email, expiresAt }: SignupInviteStatusC
   }, [expiresAt]);
 
   return (
-    <div className="mb-6 rounded-xl border border-border bg-background p-4">
+    <div
+      className={cn(
+        variant === 'default' && 'mb-6 rounded-xl border border-border bg-background p-4',
+        variant === 'embedded' && 'w-full max-w-md rounded-2xl border border-border bg-background p-5 shadow-sm',
+      )}
+    >
       <div className="mb-3 flex items-center justify-between gap-3">
         <p className="font-medium text-foreground text-sm">
           <Trans>Invitation details</Trans>
