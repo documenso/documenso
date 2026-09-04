@@ -46,7 +46,7 @@ export const EnvelopePdfViewer = ({ errorMessage, className, ...props }: Envelop
 
   return (
     <PDFViewerLazy
-      key={`${currentEnvelopeItem.envelopeId}-${currentEnvelopeItem.id}`}
+      key={`${currentEnvelopeItem.envelopeId}-${currentEnvelopeItem.id}-${currentEnvelopeItem.documentDataId}`}
       {...props}
       className={cn('h-full w-full max-w-[800px]', className)}
       data={currentEnvelopeItem.data}
