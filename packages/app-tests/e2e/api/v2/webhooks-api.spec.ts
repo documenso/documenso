@@ -1,12 +1,14 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
+import WebhookTriggerEventsSchema from '@documenso/prisma/generated/zod/inputTypeSchemas/WebhookTriggerEventsSchema';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type { TCreateWebhookResponse } from '@documenso/trpc/server/webhook-router/create-webhook.types';
 import type { TGetTeamWebhooksResponse } from '@documenso/trpc/server/webhook-router/get-team-webhooks.types';
 import type { TGetWebhookByIdResponse } from '@documenso/trpc/server/webhook-router/get-webhook-by-id.types';
 import { expect, test } from '@playwright/test';
-import { WebhookTriggerEvents } from '@prisma/client';
+
+const WebhookTriggerEvents = WebhookTriggerEventsSchema.enum;
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const baseUrl = `${WEBAPP_BASE_URL}/api/v2-beta`;
