@@ -8789,6 +8789,10 @@ msgstr "Veuillez télécharger un document pour continuer"
 msgid "Please upload a logo"
 msgstr "Veuillez télécharger un logo"
 
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Please upload a valid image file."
+msgstr ""
+
 #: packages/lib/constants/i18n.ts
 msgid "Polish"
 msgstr "Polonais"
@@ -10501,6 +10505,7 @@ msgid "Signature ID"
 msgstr "ID de signature"
 
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
 msgid "Signature is too small"
 msgstr "La signature est trop petite"
 
@@ -11697,6 +11702,14 @@ msgstr "Les signataires suivants manquent de champs de signature :"
 msgid "The following team has been deleted. You will no longer be able to access this team and its documents"
 msgstr "L'équipe suivante a été supprimée. Vous ne pourrez plus accéder à cette équipe et à ses documents"
 
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "The image could not be loaded. Please try again."
+msgstr ""
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "The image must be smaller than 5MB."
+msgstr ""
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "The license key has been copied to your clipboard"
 msgstr ""
@@ -12191,6 +12204,10 @@ msgstr "Ce type de fichier n’est pas pris en charge. Veuillez téléverser un 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "Ce dossier contient plusieurs éléments. Le supprimer supprimera tous les sous-dossiers et déplacera tous les documents et modèles intégrés vers le dossier racine."
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "This image is invalid, please upload a valid image file."
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
@@ -12774,6 +12791,10 @@ msgstr "Impossible de se connecter"
 msgid "Unable to start the signing flow"
 msgstr "Impossible de démarrer le flux de signature"
 
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Unable to upload image"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
@@ -12787,6 +12808,7 @@ msgid "Uncompleted"
 msgstr "Non complet"
 
 #: apps/remix/app/components/forms/form-sticky-save-bar.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Undo"
 msgstr "Annuler"
@@ -13077,6 +13099,10 @@ msgstr "Importer des documents et ajouter des destinataires"
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "Upload failed"
 msgstr "Échec de l'importation"
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Upload New Image"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Upload signature"
@@ -15322,3 +15348,13 @@ msgstr "Votre code de vérification :"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Zoom in"
+msgstr ""
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Zoom out"
+msgstr ""

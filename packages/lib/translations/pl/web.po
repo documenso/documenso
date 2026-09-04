@@ -15358,4 +15358,3 @@ msgstr "Powiększ"
 #: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
 msgid "Zoom out"
 msgstr "Pomniejsz"
-

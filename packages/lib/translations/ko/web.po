@@ -8789,6 +8789,10 @@ msgstr "계속하려면 문서를 업로드하세요"
 msgid "Please upload a logo"
 msgstr "로고를 업로드해 주세요."
 
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Please upload a valid image file."
+msgstr ""
+
 #: packages/lib/constants/i18n.ts
 msgid "Polish"
 msgstr "폴란드어"
@@ -10501,6 +10505,7 @@ msgid "Signature ID"
 msgstr "서명 ID"
 
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
 msgid "Signature is too small"
 msgstr "서명이 너무 작습니다."
 
@@ -11697,6 +11702,14 @@ msgstr "다음 서명자에게는 서명 필드가 없습니다:"
 msgid "The following team has been deleted. You will no longer be able to access this team and its documents"
 msgstr "다음 팀이 삭제되었습니다. 더 이상 이 팀과 그 문서에 접근할 수 없습니다."
 
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "The image could not be loaded. Please try again."
+msgstr ""
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "The image must be smaller than 5MB."
+msgstr ""
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "The license key has been copied to your clipboard"
 msgstr ""
@@ -12191,6 +12204,10 @@ msgstr "이 파일 형식은 지원되지 않습니다. PDF 또는 Word 문서�
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "이 폴더에는 여러 항목이 포함되어 있습니다. 삭제하면 모든 하위 폴더가 제거되고, 포함된 문서와 템플릿은 루트 폴더로 이동됩니다."
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "This image is invalid, please upload a valid image file."
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
@@ -12774,6 +12791,10 @@ msgstr "로그인할 수 없습니다"
 msgid "Unable to start the signing flow"
 msgstr "서명 플로우를 시작할 수 없습니다."
 
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Unable to upload image"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
@@ -12787,6 +12808,7 @@ msgid "Uncompleted"
 msgstr "미완료"
 
 #: apps/remix/app/components/forms/form-sticky-save-bar.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Undo"
 msgstr "실행 취소"
@@ -13077,6 +13099,10 @@ msgstr "문서를 업로드하고 수신자를 추가하세요"
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "Upload failed"
 msgstr "업로드 실패"
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Upload New Image"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Upload signature"
@@ -15322,3 +15348,13 @@ msgstr "인증 코드:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Zoom in"
+msgstr ""
+
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
+msgid "Zoom out"
+msgstr ""
