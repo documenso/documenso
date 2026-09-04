@@ -5,10 +5,16 @@ import { ZWebhookPayloadSchema } from '@documenso/lib/types/webhook-payload';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
+import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
-import { ZResendWebhookCallRequestSchema, ZResendWebhookCallResponseSchema } from './resend-webhook-call.types';
+import {
+  resendWebhookCallMeta,
+  ZResendWebhookCallRequestSchema,
+  ZResendWebhookCallResponseSchema,
+} from './resend-webhook-call.types';
 
 export const resendWebhookCallRoute = authenticatedProcedure
+  .meta(resendWebhookCallMeta)
   .input(ZResendWebhookCallRequestSchema)
   .output(ZResendWebhookCallResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -49,4 +55,6 @@ export const resendWebhookCallRoute = authenticatedProcedure
         data,
       },
     });
+
+    return ZGenericSuccessResponse;
   });

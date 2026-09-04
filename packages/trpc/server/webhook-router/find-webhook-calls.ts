@@ -6,9 +6,14 @@ import { prisma } from '@documenso/prisma';
 import type { Prisma, WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
-import { ZFindWebhookCallsRequestSchema, ZFindWebhookCallsResponseSchema } from './find-webhook-calls.types';
+import {
+  findWebhookCallsMeta,
+  ZFindWebhookCallsRequestSchema,
+  ZFindWebhookCallsResponseSchema,
+} from './find-webhook-calls.types';
 
 export const findWebhookCallsRoute = authenticatedProcedure
+  .meta(findWebhookCallsMeta)
   .input(ZFindWebhookCallsRequestSchema)
   .output(ZFindWebhookCallsResponseSchema)
   .query(async ({ input, ctx }) => {

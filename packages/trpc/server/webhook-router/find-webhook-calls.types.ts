@@ -3,6 +3,18 @@ import WebhookCallSchema from '@documenso/prisma/generated/zod/modelSchema/Webho
 import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 import { z } from 'zod';
 
+import type { TrpcRouteMeta } from '../trpc';
+
+export const findWebhookCallsMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'GET',
+    path: '/webhook/call',
+    summary: 'Find webhook calls',
+    description: 'Find delivery logs for a webhook subscription',
+    tags: ['Webhooks'],
+  },
+};
+
 export const ZFindWebhookCallsRequestSchema = ZFindSearchParamsSchema.extend({
   webhookId: z.string(),
   status: z.nativeEnum(WebhookCallStatus).optional(),

@@ -1,136 +1,28 @@
-import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
-import { createWebhook } from '@documenso/lib/server-only/webhooks/create-webhook';
-import { deleteWebhookById } from '@documenso/lib/server-only/webhooks/delete-webhook-by-id';
-import { editWebhook } from '@documenso/lib/server-only/webhooks/edit-webhook';
-import { getWebhookById } from '@documenso/lib/server-only/webhooks/get-webhook-by-id';
-import { getWebhooksByTeamId } from '@documenso/lib/server-only/webhooks/get-webhooks-by-team-id';
-import { triggerTestWebhook } from '@documenso/lib/server-only/webhooks/trigger-test-webhook';
-import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
-import { prisma } from '@documenso/prisma';
-
-import { authenticatedProcedure, router } from '../trpc';
+import { router } from '../trpc';
+import { createWebhookRoute } from './create-webhook';
+import { deleteWebhookRoute } from './delete-webhook';
+import { editWebhookRoute } from './edit-webhook';
 import { findWebhookCallsRoute } from './find-webhook-calls';
+import { getTeamWebhooksRoute } from './get-team-webhooks';
+import { getWebhookByIdRoute } from './get-webhook-by-id';
 import { resendWebhookCallRoute } from './resend-webhook-call';
-import {
-  ZCreateWebhookRequestSchema,
-  ZDeleteWebhookRequestSchema,
-  ZEditWebhookRequestSchema,
-  ZGetWebhookByIdRequestSchema,
-  ZTriggerTestWebhookRequestSchema,
-} from './schema';
+import { testWebhookRoute } from './test-webhook';
 
+/**
+ * Note: The order of the routes is important for public API routes.
+ *
+ * Example: GET /webhook/call must appear before GET /webhook/{id}
+ */
 export const webhookRouter = router({
   calls: {
     find: findWebhookCallsRoute,
     resend: resendWebhookCallRoute,
   },
 
-  getTeamWebhooks: authenticatedProcedure.query(async ({ ctx }) => {
-    ctx.logger.info({
-      input: {
-        teamId: ctx.teamId,
-      },
-    });
-
-    return await getWebhooksByTeamId(ctx.teamId, ctx.user.id);
-  }),
-
-  getWebhookById: authenticatedProcedure.input(ZGetWebhookByIdRequestSchema).query(async ({ input, ctx }) => {
-    const { id } = input;
-
-    ctx.logger.info({
-      input: {
-        id,
-      },
-    });
-
-    return await getWebhookById({
-      id,
-      userId: ctx.user.id,
-      teamId: ctx.teamId,
-    });
-  }),
-
-  createWebhook: authenticatedProcedure.input(ZCreateWebhookRequestSchema).mutation(async ({ input, ctx }) => {
-    const { enabled, eventTriggers, secret, webhookUrl } = input;
-
-    const webhook = await createWebhook({
-      enabled,
-      secret,
-      webhookUrl,
-      eventTriggers,
-      teamId: ctx.teamId,
-      userId: ctx.user.id,
-    });
-
-    fireAndForget(async () => {
-      const team = await prisma.team.findFirst({
-        where: { id: ctx.teamId },
-        select: { organisationId: true },
-      });
-
-      captureServerEvent({
-        event: 'App: Webhook Created',
-        userId: ctx.user.id,
-        teamId: ctx.teamId,
-        organisationId: team?.organisationId,
-        properties: {
-          triggerCount: eventTriggers.length,
-        },
-      });
-    });
-
-    return webhook;
-  }),
-
-  deleteWebhook: authenticatedProcedure.input(ZDeleteWebhookRequestSchema).mutation(async ({ input, ctx }) => {
-    const { id } = input;
-
-    ctx.logger.info({
-      input: {
-        id,
-      },
-    });
-
-    return await deleteWebhookById({
-      id,
-      teamId: ctx.teamId,
-      userId: ctx.user.id,
-    });
-  }),
-
-  editWebhook: authenticatedProcedure.input(ZEditWebhookRequestSchema).mutation(async ({ input, ctx }) => {
-    const { id, ...data } = input;
-
-    ctx.logger.info({
-      input: {
-        id,
-      },
-    });
-
-    return await editWebhook({
-      id,
-      data,
-      userId: ctx.user.id,
-      teamId: ctx.teamId,
-    });
-  }),
-
-  testWebhook: authenticatedProcedure.input(ZTriggerTestWebhookRequestSchema).mutation(async ({ input, ctx }) => {
-    const { id, event } = input;
-
-    ctx.logger.info({
-      input: {
-        id,
-        event,
-      },
-    });
-
-    return await triggerTestWebhook({
-      id,
-      event,
-      userId: ctx.user.id,
-      teamId: ctx.teamId,
-    });
-  }),
+  getTeamWebhooks: getTeamWebhooksRoute,
+  createWebhook: createWebhookRoute,
+  editWebhook: editWebhookRoute,
+  deleteWebhook: deleteWebhookRoute,
+  testWebhook: testWebhookRoute,
+  getWebhookById: getWebhookByIdRoute,
 });
