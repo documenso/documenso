@@ -15,7 +15,9 @@ export const AdminUserCreatedTemplate = ({
   const previewText = msg`Set your password for Documenso`;
 
   const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
+    // Resolve against a trailing-slash base so a sub-path (e.g. "/ESign") in assetBaseUrl is preserved.
+    const base = assetBaseUrl.endsWith('/') ? assetBaseUrl : `${assetBaseUrl}/`;
+    return new URL(path.replace(/^\//, ''), base).toString();
   };
 
   return (
