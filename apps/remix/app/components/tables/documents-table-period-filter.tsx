@@ -17,7 +17,7 @@ export const DocumentsTablePeriodFilter = () => {
       period: documentsSearchParams.period,
       page: documentsSearchParams.page,
     },
-    { history: 'push' },
+    { history: 'push', shallow: false },
   );
 
   const onChange = (newPeriod: string | null) => {
