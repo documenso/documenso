@@ -38,6 +38,7 @@ export const ZSignUpSchema = z.object({
   password: ZPasswordSchema,
   signature: z.string().nullish(),
   captchaToken: z.string().trim().optional(),
+  inviteToken: z.string().min(1).optional(),
 });
 
 export type TSignUpSchema = z.infer<typeof ZSignUpSchema>;

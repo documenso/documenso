@@ -30,6 +30,7 @@ type DatabaseIdPrefix =
   | 'org_setting'
   | 'member'
   | 'member_invite'
+  | 'signup_invite'
   | 'group_member'
   | 'team_group'
   | 'team_setting';

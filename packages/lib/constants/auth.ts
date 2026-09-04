@@ -167,8 +167,19 @@ export const isDisposableEmail = (email: string, additionalBlockedDomains: strin
  * Check if signup is enabled for the given provider.
  * The master switch takes precedence over the per-provider flags.
  */
-export const isSignupEnabledForProvider = (provider: 'email' | 'google' | 'microsoft' | 'oidc'): boolean => {
+export type SignupEnabledOptions = {
+  inviteToken?: string;
+};
+
+export const isSignupEnabledForProvider = (
+  provider: 'email' | 'google' | 'microsoft' | 'oidc',
+  options?: SignupEnabledOptions,
+): boolean => {
   if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
+    if (provider === 'email' && options?.inviteToken) {
+      return true;
+    }
+
     return false;
   }
 

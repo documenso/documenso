@@ -23,6 +23,8 @@ import {
   signupRateLimit,
   verifyEmailRateLimit,
 } from '@documenso/lib/server-only/rate-limit/rate-limits';
+import { consumeSignupInvite } from '@documenso/lib/server-only/signup-invite/consume-signup-invite';
+import { validateSignupInvite } from '@documenso/lib/server-only/signup-invite/validate-signup-invite';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
@@ -191,13 +193,13 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/signup', sValidator('json', ZSignUpSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    if (!isSignupEnabledForProvider('email')) {
+    const { name, email, password, signature, captchaToken, inviteToken } = c.req.valid('json');
+
+    if (!isSignupEnabledForProvider('email', { inviteToken })) {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
         statusCode: 400,
       });
     }
-
-    const { name, email, password, signature, captchaToken } = c.req.valid('json');
 
     const signupLimitResult = await signupRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
@@ -215,6 +217,13 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       token: captchaToken,
       ipAddress: requestMetadata.ipAddress,
     });
+
+    if (inviteToken) {
+      await validateSignupInvite({
+        token: inviteToken,
+        email,
+      });
+    }
 
     if (!isEmailDomainAllowedForSignup(email)) {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
@@ -234,6 +243,10 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       console.error(err);
       throw err;
     });
+
+    if (inviteToken) {
+      await consumeSignupInvite(inviteToken);
+    }
 
     await jobsClient.triggerJob({
       name: 'send.signup.confirmation.email',

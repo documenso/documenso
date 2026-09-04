@@ -111,3 +111,9 @@ export const fileUploadRateLimit = createRateLimit({
   max: 20,
   window: '1m',
 });
+
+export const signupInviteRateLimit = createRateLimit({
+  action: 'api.signup-invite',
+  max: 30,
+  window: '1h',
+});

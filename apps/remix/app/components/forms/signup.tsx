@@ -50,6 +50,8 @@ export const ZSignUpFormSchema = z
 export const SIGNUP_ERROR_MESSAGES: Record<string, MessageDescriptor> = {
   SIGNUP_DISABLED: msg`Signup is currently disabled or not available for your email domain.`,
   SIGNUP_DISPOSABLE_EMAIL: msg`Disposable email addresses are not allowed. Please sign up with a permanent email address.`,
+  SIGNUP_INVITE_INVALID: msg`This invitation is invalid or no longer available. Please request a new invite.`,
+  SIGNUP_INVITE_EXPIRED: msg`This invitation has expired. Please request a new invite.`,
   [AppErrorCode.ALREADY_EXISTS]: msg`We were unable to create your account. If you already have an account, try signing in instead.`,
   [AppErrorCode.INVALID_REQUEST]: msg`We were unable to create your account. Please review the information you provided and try again.`,
 };
@@ -59,6 +61,10 @@ export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
 export type SignUpFormProps = {
   className?: string;
   initialEmail?: string;
+  inviteToken?: string;
+  lockedEmail?: string;
+  hideSocialSignup?: boolean;
+  hideMarketingPanel?: boolean;
   isEmailPasswordSignupEnabled?: boolean;
   isGoogleSignupEnabled?: boolean;
   isMicrosoftSignupEnabled?: boolean;
@@ -69,6 +75,10 @@ export type SignUpFormProps = {
 export const SignUpForm = ({
   className,
   initialEmail,
+  inviteToken,
+  lockedEmail,
+  hideSocialSignup = false,
+  hideMarketingPanel = false,
   isEmailPasswordSignupEnabled = true,
   isGoogleSignupEnabled,
   isMicrosoftSignupEnabled,
@@ -87,12 +97,13 @@ export const SignUpForm = ({
   const turnstileSiteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
   const turnstileRef = useRef<TurnstileInstance>(null);
 
-  const hasSocialAuthEnabled = isGoogleSignupEnabled || isMicrosoftSignupEnabled || isOidcSignupEnabled;
+  const hasSocialAuthEnabled =
+    !hideSocialSignup && (isGoogleSignupEnabled || isMicrosoftSignupEnabled || isOidcSignupEnabled);
 
   const form = useForm<TSignUpFormSchema>({
     values: {
       name: '',
-      email: initialEmail ?? '',
+      email: lockedEmail ?? initialEmail ?? '',
       password: '',
       signature: '',
     },
@@ -126,6 +137,7 @@ export const SignUpForm = ({
         password,
         signature,
         captchaToken: token ?? undefined,
+        inviteToken,
       });
 
       await navigate(returnTo ? returnTo : '/unverified-account');
@@ -195,6 +207,10 @@ export const SignUpForm = ({
   };
 
   useEffect(() => {
+    if (lockedEmail) {
+      return;
+    }
+
     const hash = window.location.hash.slice(1);
 
     const params = new URLSearchParams(hash);
@@ -208,29 +224,31 @@ export const SignUpForm = ({
 
   return (
     <div className={cn('flex justify-center gap-x-12', className)}>
-      <div className="relative hidden flex-1 overflow-hidden rounded-xl border border-border xl:flex">
-        <div className="absolute -inset-8 -z-[2] backdrop-blur">
-          <img
-            src={communityCardsImage}
-            alt="community-cards"
-            className="h-full w-full object-cover dark:brightness-95 dark:contrast-[70%] dark:invert"
-          />
-        </div>
-
-        <div className="absolute -inset-8 -z-[1] bg-background/50 backdrop-blur-[2px]" />
-
-        <div className="relative flex h-full w-full flex-col items-center justify-evenly">
-          <div className="rounded-2xl border bg-background px-4 py-1 font-medium text-sm">
-            <Trans>User profiles are here!</Trans>
+      {!hideMarketingPanel && (
+        <div className="relative hidden flex-1 overflow-hidden rounded-xl border border-border xl:flex">
+          <div className="absolute -inset-8 -z-[2] backdrop-blur">
+            <img
+              src={communityCardsImage}
+              alt="community-cards"
+              className="h-full w-full object-cover dark:brightness-95 dark:contrast-[70%] dark:invert"
+            />
           </div>
 
-          <div className="w-full max-w-md">
-            <UserProfileTimur rows={2} className="rounded-2xl border border-border bg-background shadow-md" />
-          </div>
+          <div className="absolute -inset-8 -z-[1] bg-background/50 backdrop-blur-[2px]" />
 
-          <div />
+          <div className="relative flex h-full w-full flex-col items-center justify-evenly">
+            <div className="rounded-2xl border bg-background px-4 py-1 font-medium text-sm">
+              <Trans>User profiles are here!</Trans>
+            </div>
+
+            <div className="w-full max-w-md">
+              <UserProfileTimur rows={2} className="rounded-2xl border border-border bg-background shadow-md" />
+            </div>
+
+            <div />
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
         <div className="h-20">
@@ -278,8 +296,18 @@ export const SignUpForm = ({
                           <Trans>Email Address</Trans>
                         </FormLabel>
                         <FormControl>
-                          <Input type="email" {...field} />
+                          <Input
+                            type="email"
+                            readOnly={Boolean(lockedEmail)}
+                            className={lockedEmail ? 'bg-muted' : undefined}
+                            {...field}
+                          />
                         </FormControl>
+                        {lockedEmail && (
+                          <p className="text-muted-foreground text-xs">
+                            <Trans>This invite is for this email address.</Trans>
+                          </p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}

@@ -953,6 +953,26 @@ enum OrganisationMemberInviteStatus {
   DECLINED
 }
 
+enum SignupInviteStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+model SignupInvite {
+  id         String             @id
+  email      String
+  token      String             @unique
+  expiresAt  DateTime
+  status     SignupInviteStatus @default(PENDING)
+  createdAt  DateTime           @default(now())
+  acceptedAt DateTime?
+
+  @@index([email, status])
+  @@index([expiresAt])
+}
+
 /// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';", "import { ZEnvelopeReminderSettings as ZEnvelopeReminderSettingsSchema } from '@documenso/lib/constants/envelope-reminder';", "import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';"])
 model OrganisationGlobalSettings {
   id           String        @id
