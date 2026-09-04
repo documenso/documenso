@@ -19,11 +19,16 @@ export const AdminDocumentJobsTable = ({ envelopeId }: { envelopeId: string }) =
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isLoadingError, refetch, isFetching } = trpc.admin.document.findJobs.useQuery({
-    envelopeId: envelopeId,
-    page: parsedSearchParams.page,
-    perPage: parsedSearchParams.perPage,
-  });
+  const { data, isLoading, isLoadingError, refetch, isFetching } = trpc.admin.document.findJobs.useQuery(
+    {
+      envelopeId: envelopeId,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({
