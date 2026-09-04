@@ -15,7 +15,7 @@ import { msg } from '@lingui/core/macro';
 import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import type { Webhook } from '@prisma/client';
 import { EditIcon, Loader, MoreHorizontalIcon, ScrollTextIcon, Trash2Icon } from 'lucide-react';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Link } from 'react-router';
 
 import { WebhookCreateDialog } from '~/components/dialogs/webhook-create-dialog';
@@ -29,8 +29,121 @@ export function meta() {
   return appMetaTags(msg`Webhooks`);
 }
 
+type WebhookTableWebhookCellProps = {
+  webhook: Webhook;
+  teamUrl: string;
+};
+
+const WebhookTableWebhookCell = memo(({ webhook, teamUrl }: WebhookTableWebhookCellProps) => {
+  return (
+    <Link to={`/t/${teamUrl}/settings/webhooks/${webhook.id}`}>
+      <p className="text-muted-foreground text-xs">{webhook.id}</p>
+      <p className="max-w-sm truncate font-semibold text-foreground text-xs" title={webhook.webhookUrl}>
+        {webhook.webhookUrl}
+      </p>
+    </Link>
+  );
+});
+WebhookTableWebhookCell.displayName = 'WebhookTableWebhookCell';
+
+type WebhookTableStatusCellProps = {
+  enabled: boolean;
+};
+
+const WebhookTableStatusCell = memo(({ enabled }: WebhookTableStatusCellProps) => {
+  return (
+    <Badge variant={enabled ? 'default' : 'neutral'} size="small">
+      {enabled ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>}
+    </Badge>
+  );
+});
+WebhookTableStatusCell.displayName = 'WebhookTableStatusCell';
+
+type WebhookTableEventsCellProps = {
+  eventTriggers: Webhook['eventTriggers'];
+};
+
+const WebhookTableEventsCell = memo(({ eventTriggers }: WebhookTableEventsCellProps) => {
+  return (
+    <p className="text-foreground" title={eventTriggers.map((event) => toFriendlyWebhookEventName(event)).join(', ')}>
+      <Plural value={eventTriggers.length} one="# Event" other="# Events" />
+    </p>
+  );
+});
+WebhookTableEventsCell.displayName = 'WebhookTableEventsCell';
+
+type WebhookTableCreatedCellProps = {
+  createdAt: Date;
+};
+
+const WebhookTableCreatedCell = memo(({ createdAt }: WebhookTableCreatedCellProps) => {
+  const { i18n } = useLingui();
+
+  return i18n.date(createdAt);
+});
+WebhookTableCreatedCell.displayName = 'WebhookTableCreatedCell';
+
+type WebhookTableActionsCellProps = {
+  webhook: Webhook;
+};
+
+const WebhookTableActionsCell = memo(({ webhook }: WebhookTableActionsCellProps) => {
+  return <WebhookTableActionDropdown webhook={webhook} />;
+});
+WebhookTableActionsCell.displayName = 'WebhookTableActionsCell';
+
+type CreateWebhookTableColumnsOptions = {
+  teamUrl: string;
+  t: (template: TemplateStringsArray) => string;
+};
+
+const createWebhookTableColumns = ({ teamUrl, t }: CreateWebhookTableColumnsOptions) => {
+  function WebhookColumnCell({ row }: Readonly<{ row: { original: Webhook } }>) {
+    return <WebhookTableWebhookCell webhook={row.original} teamUrl={teamUrl} />;
+  }
+
+  function StatusColumnCell({ row }: Readonly<{ row: { original: Webhook } }>) {
+    return <WebhookTableStatusCell enabled={row.original.enabled} />;
+  }
+
+  function EventsColumnCell({ row }: Readonly<{ row: { original: Webhook } }>) {
+    return <WebhookTableEventsCell eventTriggers={row.original.eventTriggers} />;
+  }
+
+  function CreatedColumnCell({ row }: Readonly<{ row: { original: Webhook } }>) {
+    return <WebhookTableCreatedCell createdAt={row.original.createdAt} />;
+  }
+
+  function ActionsColumnCell({ row }: Readonly<{ row: { original: Webhook } }>) {
+    return <WebhookTableActionsCell webhook={row.original} />;
+  }
+
+  return [
+    {
+      header: t`Webhook`,
+      cell: WebhookColumnCell,
+    },
+    {
+      header: t`Status`,
+      cell: StatusColumnCell,
+    },
+    {
+      header: t`Listening to`,
+      cell: EventsColumnCell,
+    },
+    {
+      header: t`Created`,
+      cell: CreatedColumnCell,
+    },
+    {
+      header: t`Actions`,
+      cell: ActionsColumnCell,
+    },
+  ] satisfies DataTableColumnDef<Webhook>[];
+};
+
 export default function WebhookPage() {
-  const { t, i18n } = useLingui();
+  const { t } = useLingui();
 
   const team = useCurrentTeam();
 
@@ -43,48 +156,7 @@ export default function WebhookPage() {
     totalPages: 0,
   };
 
-  const columns = useMemo(() => {
-    return [
-      {
-        header: t`Webhook`,
-        cell: ({ row }) => (
-          <Link to={`/t/${team.url}/settings/webhooks/${row.original.id}`}>
-            <p className="text-muted-foreground text-xs">{row.original.id}</p>
-            <p className="max-w-sm truncate font-semibold text-foreground text-xs" title={row.original.webhookUrl}>
-              {row.original.webhookUrl}
-            </p>
-          </Link>
-        ),
-      },
-      {
-        header: t`Status`,
-        cell: ({ row }) => (
-          <Badge variant={row.original.enabled ? 'default' : 'neutral'} size="small">
-            {row.original.enabled ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>}
-          </Badge>
-        ),
-      },
-      {
-        header: t`Listening to`,
-        cell: ({ row }) => (
-          <p
-            className="text-foreground"
-            title={row.original.eventTriggers.map((event) => toFriendlyWebhookEventName(event)).join(', ')}
-          >
-            <Plural value={row.original.eventTriggers.length} one="# Event" other="# Events" />
-          </p>
-        ),
-      },
-      {
-        header: t`Created`,
-        cell: ({ row }) => i18n.date(row.original.createdAt),
-      },
-      {
-        header: t`Actions`,
-        cell: ({ row }) => <WebhookTableActionDropdown webhook={row.original} />,
-      },
-    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, []);
+  const columns = useMemo(() => createWebhookTableColumns({ teamUrl: team.url, t }), [t, team.url]);
 
   return (
     <div>
