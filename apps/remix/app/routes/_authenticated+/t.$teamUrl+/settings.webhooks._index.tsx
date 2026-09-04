@@ -92,56 +92,6 @@ const WebhookTableActionsCell = memo(({ webhook }: WebhookTableActionsCellProps)
 });
 WebhookTableActionsCell.displayName = 'WebhookTableActionsCell';
 
-type CreateWebhookTableColumnsOptions = {
-  teamUrl: string;
-  t: (template: TemplateStringsArray) => string;
-};
-
-const createWebhookTableColumns = ({ teamUrl, t }: CreateWebhookTableColumnsOptions) => {
-  function WebhookColumnCell({ row }: Readonly<{ row: { original: Webhook } }>) {
-    return <WebhookTableWebhookCell webhook={row.original} teamUrl={teamUrl} />;
-  }
-
-  function StatusColumnCell({ row }: Readonly<{ row: { original: Webhook } }>) {
-    return <WebhookTableStatusCell enabled={row.original.enabled} />;
-  }
-
-  function EventsColumnCell({ row }: Readonly<{ row: { original: Webhook } }>) {
-    return <WebhookTableEventsCell eventTriggers={row.original.eventTriggers} />;
-  }
-
-  function CreatedColumnCell({ row }: Readonly<{ row: { original: Webhook } }>) {
-    return <WebhookTableCreatedCell createdAt={row.original.createdAt} />;
-  }
-
-  function ActionsColumnCell({ row }: Readonly<{ row: { original: Webhook } }>) {
-    return <WebhookTableActionsCell webhook={row.original} />;
-  }
-
-  return [
-    {
-      header: t`Webhook`,
-      cell: WebhookColumnCell,
-    },
-    {
-      header: t`Status`,
-      cell: StatusColumnCell,
-    },
-    {
-      header: t`Listening to`,
-      cell: EventsColumnCell,
-    },
-    {
-      header: t`Created`,
-      cell: CreatedColumnCell,
-    },
-    {
-      header: t`Actions`,
-      cell: ActionsColumnCell,
-    },
-  ] satisfies DataTableColumnDef<Webhook>[];
-};
-
 export default function WebhookPage() {
   const { t } = useLingui();
 
@@ -156,7 +106,35 @@ export default function WebhookPage() {
     totalPages: 0,
   };
 
-  const columns = useMemo(() => createWebhookTableColumns({ teamUrl: team.url, t }), [t, team.url]);
+  const columns = useMemo(() => {
+    return [
+      {
+        id: 'webhook',
+        header: t`Webhook`,
+        cell: ({ row }) => <WebhookTableWebhookCell webhook={row.original} teamUrl={team.url} />,
+      },
+      {
+        id: 'status',
+        header: t`Status`,
+        cell: ({ row }) => <WebhookTableStatusCell enabled={row.original.enabled} />,
+      },
+      {
+        id: 'events',
+        header: t`Listening to`,
+        cell: ({ row }) => <WebhookTableEventsCell eventTriggers={row.original.eventTriggers} />,
+      },
+      {
+        id: 'created',
+        header: t`Created`,
+        cell: ({ row }) => <WebhookTableCreatedCell createdAt={row.original.createdAt} />,
+      },
+      {
+        id: 'actions',
+        header: t`Actions`,
+        cell: ({ row }) => <WebhookTableActionsCell webhook={row.original} />,
+      },
+    ] satisfies DataTableColumnDef<Webhook>[];
+  }, [t, team.url]);
 
   return (
     <div>
