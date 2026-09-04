@@ -408,7 +408,7 @@ test('[BULK_ACTIONS]: can cancel multiple pending documents', async ({ page }) =
 
   await dialog.getByRole('button', { name: 'Cancel documents' }).click();
 
-  await expectToastTextToBeVisible(page, 'Documents cancelled');
+  await expectToastTextToBeVisible(page, 'Documents canceled');
 
   // Selection clears after a successful cancel.
   await expect(page.getByText(/\d+ selected/)).not.toBeVisible();
@@ -455,7 +455,7 @@ test('[BULK_ACTIONS]: bulk cancel only affects pending documents', async ({ page
   await dialog.getByRole('button', { name: 'Cancel documents' }).click();
 
   // Only one of the three was pending, so this is a partial result.
-  await expectToastTextToBeVisible(page, 'Documents partially cancelled');
+  await expectToastTextToBeVisible(page, 'Documents partially canceled');
 
   const pendingEnvelope = await prisma.envelope.findFirstOrThrow({
     where: { id: pending.id },
@@ -505,7 +505,7 @@ test('[BULK_ACTIONS]: a MEMBER cannot bulk cancel documents they do not own', as
 
   // The server rejects the cancellation for a document the MEMBER does not own,
   // so it reports zero cancelled (a partial result with the document in failedIds).
-  await expectToastTextToBeVisible(page, 'Documents partially cancelled');
+  await expectToastTextToBeVisible(page, 'Documents partially canceled');
 
   // The document remains pending.
   const envelope = await prisma.envelope.findFirstOrThrow({

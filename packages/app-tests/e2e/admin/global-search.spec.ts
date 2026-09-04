@@ -10,7 +10,7 @@ test.describe.configure({ mode: 'parallel' });
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
 
-const ADMIN_PROMPT_PLACEHOLDER = 'Search documents, users, organisations…';
+const ADMIN_PROMPT_PLACEHOLDER = 'Search documents, users, organizations…';
 
 test('[ADMIN][GLOBAL_SEARCH]: numeric query shows verified user result and navigates', async ({ page }) => {
   const { user: adminUser } = await seedUser({ isAdmin: true });
