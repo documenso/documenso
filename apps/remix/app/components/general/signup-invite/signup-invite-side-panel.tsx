@@ -9,7 +9,7 @@ type SignupInviteSidePanelProps = {
 
 export const SignupInviteSidePanel = ({ email, expiresAt }: SignupInviteSidePanelProps) => {
   return (
-    <div className="flex h-full w-full flex-col justify-center gap-8">
+    <div className="mx-auto flex h-full w-full max-w-md flex-col justify-center gap-8">
       <div className="rounded-2xl border bg-background px-4 py-1 font-medium text-sm">
         <Trans>Invitation-only signup</Trans>
       </div>

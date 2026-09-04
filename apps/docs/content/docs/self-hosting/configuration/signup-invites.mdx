@@ -1,0 +1,229 @@
+---
+title: Signup Invites
+description: Allow invite-only account creation when public signup is disabled on your self-hosted instance.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
+
+When `NEXT_PUBLIC_DISABLE_SIGNUP` is set to `true`, public registration is blocked for all signup methods. Signup invites let you create accounts for specific email addresses anyway.
+
+The invite flow works like this:
+
+1. An operator calls the internal signup invite API with a shared secret
+2. Documenso creates a pending invite and sends an email with a unique link
+3. The invitee opens `/signup-invite/{token}` and completes email/password registration
+4. The invite is consumed and cannot be reused
+
+<Callout type="info">
+  Invite bypass currently applies to **email/password signup only**. OAuth signup (Google, Microsoft, OIDC) remains blocked when the master signup switch is enabled.
+</Callout>
+
+---
+
+## Prerequisites
+
+Before using signup invites, configure:
+
+1. **Email delivery** — Invites are sent by email. See [Email Configuration](/docs/self-hosting/configuration/email).
+2. **Database migration** — The `SignupInvite` table must exist. Run pending Prisma migrations after upgrading.
+3. **Invite secret** — Set `NEXT_PRIVATE_SIGNUP_INVITE_SECRET` to enable the internal API.
+
+---
+
+## Environment Variables
+
+| Variable                               | Required | Default | Description |
+| -------------------------------------- | -------- | ------- | ----------- |
+| `NEXT_PRIVATE_SIGNUP_INVITE_SECRET`    | Yes      |         | Shared secret for the internal invite API. When unset, the API returns `503`. |
+| `NEXT_PRIVATE_SIGNUP_INVITE_EXPIRY_DAYS` | No     | `7`     | Default invite lifetime in days (max 30). Can be overridden per invite. |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`           | No       | `false` | Set to `true` to block public signup. Invited users can still register via email. |
+
+```bash
+# Block public signup
+NEXT_PUBLIC_DISABLE_SIGNUP="true"
+
+# Enable the invite API
+NEXT_PRIVATE_SIGNUP_INVITE_SECRET="your-long-random-secret"
+
+# Optional: default expiry (days)
+NEXT_PRIVATE_SIGNUP_INVITE_EXPIRY_DAYS="7"
+```
+
+<Callout type="warn">
+  Treat `NEXT_PRIVATE_SIGNUP_INVITE_SECRET` like a root credential. Anyone with this secret can create signup invites.
+</Callout>
+
+For the full list of signup-related flags, see [Environment Variables — Signup Restrictions](/docs/self-hosting/configuration/environment#signup-restrictions).
+
+---
+
+## Internal API
+
+Base path:
+
+```
+POST   /api/internal/signup-invites
+GET    /api/internal/signup-invites/{token}
+DELETE /api/internal/signup-invites/{token}
+```
+
+All endpoints require the invite secret in the `Authorization` header:
+
+```
+Authorization: Bearer your-long-random-secret
+```
+
+The API is rate-limited to 30 requests per hour per instance.
+
+### Create an Invite
+
+`POST /api/internal/signup-invites`
+
+| Field           | Type   | Required | Description |
+| --------------- | ------ | -------- | ----------- |
+| `email`         | string | Yes      | Email address to invite (normalized to lowercase) |
+| `expiresInDays` | number | No       | Override default expiry (1–30 days) |
+
+<Tabs items={['curl']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://documenso.example.com/api/internal/signup-invites" \
+  -H "Authorization: Bearer your-long-random-secret" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "newuser@example.com",
+    "expiresInDays": 7
+  }'
+```
+</Tab>
+</Tabs>
+
+Example `201` response:
+
+```json
+{
+  "id": "signup_invite_abc123",
+  "email": "newuser@example.com",
+  "token": "xYz789AbC",
+  "expiresAt": "2025-01-22T10:30:00.000Z",
+  "inviteUrl": "https://documenso.example.com/signup-invite/xYz789AbC",
+  "status": "PENDING"
+}
+```
+
+Creating a new invite for an email address automatically revokes any existing pending invites for that address.
+
+### Get an Invite
+
+`GET /api/internal/signup-invites/{token}`
+
+Returns invite metadata without exposing sensitive signup fields.
+
+<Tabs items={['curl']}>
+<Tab value="curl">
+```bash
+curl "https://documenso.example.com/api/internal/signup-invites/xYz789AbC" \
+  -H "Authorization: Bearer your-long-random-secret"
+```
+</Tab>
+</Tabs>
+
+### Revoke an Invite
+
+`DELETE /api/internal/signup-invites/{token}`
+
+Revokes a pending invite. Already accepted invites cannot be revoked.
+
+<Tabs items={['curl']}>
+<Tab value="curl">
+```bash
+curl -X DELETE "https://documenso.example.com/api/internal/signup-invites/xYz789AbC" \
+  -H "Authorization: Bearer your-long-random-secret"
+```
+</Tab>
+</Tabs>
+
+---
+
+## Invite Page
+
+Invited users open the link from their email:
+
+```
+https://documenso.example.com/signup-invite/{token}
+```
+
+The page shows invite details and a signup form with the email field locked to the invited address. Possible states:
+
+| Status    | What the user sees |
+| --------- | ------------------ |
+| `PENDING` | Invite details and signup form |
+| Expired   | "Invitation expired" message |
+| `REVOKED` | "Invitation revoked" message |
+| Accepted  | Redirect or confirmation that the invite was already used |
+
+After successful registration, the invite is marked as accepted and the token cannot be reused.
+
+---
+
+## Typical Setup
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Disable public signup
+
+Set `NEXT_PUBLIC_DISABLE_SIGNUP="true"` and restart the application.
+</Step>
+
+<Step>
+### Configure the invite secret
+
+Generate a long random string and set `NEXT_PRIVATE_SIGNUP_INVITE_SECRET`.
+</Step>
+
+<Step>
+### Verify email delivery
+
+Send a test invite and confirm the email arrives. Check [Email Configuration](/docs/self-hosting/configuration/email) if delivery fails.
+</Step>
+
+<Step>
+### Create invites programmatically
+
+Call `POST /api/internal/signup-invites` from your admin tooling, onboarding script, or identity provider workflow.
+</Step>
+</Steps>
+
+Example minimal configuration for a closed instance:
+
+```bash
+NEXT_PUBLIC_DISABLE_SIGNUP="true"
+NEXT_PRIVATE_SIGNUP_INVITE_SECRET="replace-with-a-long-random-secret"
+NEXT_PRIVATE_SIGNUP_INVITE_EXPIRY_DAYS="7"
+```
+
+---
+
+## Error Responses
+
+| Status | Meaning |
+| ------ | ------- |
+| `401`  | Missing or invalid `Authorization` header |
+| `503`  | `NEXT_PRIVATE_SIGNUP_INVITE_SECRET` is not configured |
+| `404`  | Invite token not found |
+| `400`  | Invite already accepted or cannot be revoked |
+| `429`  | Rate limit exceeded (30 requests per hour) |
+
+During signup, invalid or expired invites return application errors with codes `SIGNUP_INVITE_INVALID` or `SIGNUP_INVITE_EXPIRED`.
+
+---
+
+## See Also
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) — Full configuration reference
+- [Email Configuration](/docs/self-hosting/configuration/email) — Required for invite emails

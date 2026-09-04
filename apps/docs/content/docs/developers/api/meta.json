@@ -6,6 +6,7 @@
     "fields",
     "templates",
     "teams",
+    "webhooks",
     "rate-limits",
     "versioning",
     "migrate-to-envelopes",

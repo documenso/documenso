@@ -227,11 +227,17 @@ export const SignUpForm = ({
   const hasSidePanel = sidePanel !== undefined;
 
   return (
-    <div className={cn('flex flex-col justify-center gap-x-12 gap-y-6 xl:flex-row', className)}>
+    <div
+      className={cn(
+        'flex flex-col justify-center gap-x-8 gap-y-6 xl:flex-row',
+        hasSidePanel && 'mx-auto w-full max-w-5xl',
+        className,
+      )}
+    >
       {hasSidePanel && <div className="w-full xl:hidden">{sidePanel}</div>}
 
       {hasSidePanel ? (
-        <div className="relative hidden min-h-[min(850px,80vh)] flex-1 overflow-hidden rounded-xl border border-border bg-muted/20 p-8 xl:flex">
+        <div className="relative hidden min-h-[min(850px,80vh)] w-full overflow-hidden rounded-xl border border-border bg-muted/20 p-8 xl:flex xl:w-1/2 xl:flex-none">
           {sidePanel}
         </div>
       ) : (
@@ -262,7 +268,12 @@ export const SignUpForm = ({
         )
       )}
 
-      <div className="relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
+      <div
+        className={cn(
+          'relative z-10 flex min-h-[min(850px,80vh)] w-full flex-col rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background',
+          hasSidePanel ? 'xl:w-1/2 xl:max-w-none' : 'max-w-lg',
+        )}
+      >
         <div className="h-20">
           <h1 className="font-semibold text-xl md:text-2xl">
             <Trans>Create a new account</Trans>

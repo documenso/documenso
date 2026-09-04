@@ -1,0 +1,352 @@
+---
+title: Webhooks API
+description: Manage team webhook subscriptions programmatically with team-scoped API tokens.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+<Callout type="warn">
+  This guide may not reflect the latest endpoints or parameters. For an always up-to-date reference,
+  see the [OpenAPI Reference](https://openapi.documenso.com).
+</Callout>
+
+## Overview
+
+The Webhooks API lets you create, update, and delete webhook subscriptions for a team without using the dashboard. All endpoints require a [team-scoped API token](/docs/developers/api/teams#team-scoped-api-tokens) and operate on the team associated with that token.
+
+Use this API when you need to:
+
+- Provision webhooks automatically during deployment or tenant onboarding
+- Sync webhook configuration across environments
+- Inspect delivery logs and resend failed deliveries
+
+<Callout type="info">
+  To receive and verify webhook payloads, see [Webhook Setup](/docs/developers/webhooks/setup),
+  [Events](/docs/developers/webhooks/events), and [Verification](/docs/developers/webhooks/verification).
+</Callout>
+
+## Base URL
+
+```
+https://app.documenso.com/api/v2
+```
+
+For self-hosted instances, replace the host with your instance URL. Some deployments also expose the same routes under `/api/v2-beta`.
+
+## Authentication
+
+Pass your team API token in the `Authorization` header:
+
+```
+Authorization: api_xxxxxxxxxxxxxxxx
+```
+
+The token must belong to a team where you have permission to manage webhooks (typically `ADMIN` or `MANAGER`).
+
+---
+
+## Webhook Object
+
+| Property        | Type       | Description                                      |
+| --------------- | ---------- | ------------------------------------------------ |
+| `id`            | string     | Unique webhook identifier                        |
+| `webhookUrl`    | string     | Public HTTP or HTTPS endpoint that receives POST |
+| `eventTriggers` | string[]   | Subscribed event types                           |
+| `secret`        | string \| null | Optional signing secret for payload verification |
+| `enabled`       | boolean    | Whether the webhook is active                    |
+| `teamId`        | number     | Team this webhook belongs to                     |
+| `userId`        | number     | User who created the webhook                     |
+| `createdAt`     | string     | ISO 8601 creation timestamp                      |
+| `updatedAt`     | string     | ISO 8601 last update timestamp                   |
+
+### Example
+
+```json
+{
+  "id": "webhook_abc123",
+  "webhookUrl": "https://example.com/webhooks/documenso",
+  "eventTriggers": ["DOCUMENT_COMPLETED", "DOCUMENT_SIGNED"],
+  "secret": "my-webhook-secret",
+  "enabled": true,
+  "teamId": 42,
+  "userId": 7,
+  "createdAt": "2025-01-15T10:30:00.000Z",
+  "updatedAt": "2025-01-15T10:30:00.000Z"
+}
+```
+
+---
+
+## Endpoints
+
+| Method | Path                    | Description                          |
+| ------ | ----------------------- | ------------------------------------ |
+| `GET`  | `/webhook`              | List all webhooks for the token team |
+| `GET`  | `/webhook/{id}`         | Get a webhook by ID                  |
+| `POST` | `/webhook/create`       | Create a webhook                     |
+| `POST` | `/webhook/update`       | Update a webhook                     |
+| `POST` | `/webhook/delete`       | Delete a webhook                     |
+| `POST` | `/webhook/test`         | Send a test payload for an event     |
+| `GET`  | `/webhook/call`         | List delivery logs for a webhook     |
+| `POST` | `/webhook/call/resend`  | Resend a failed delivery             |
+
+---
+
+## Create a Webhook
+
+`POST /webhook/create`
+
+| Field           | Type       | Required | Description                                |
+| --------------- | ---------- | -------- | ------------------------------------------ |
+| `webhookUrl`    | string     | Yes      | Public HTTP or HTTPS endpoint              |
+| `eventTriggers` | string[]   | Yes      | At least one event (see [Events](/docs/developers/webhooks/events)) |
+| `secret`        | string \| null | No   | Optional signing secret                    |
+| `enabled`       | boolean    | Yes      | Whether the webhook starts active          |
+
+<Tabs items={['curl', 'TypeScript']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/webhook/create" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "webhookUrl": "https://example.com/webhooks/documenso",
+    "eventTriggers": ["DOCUMENT_COMPLETED", "DOCUMENT_SIGNED"],
+    "secret": "my-webhook-secret",
+    "enabled": true
+  }'
+```
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch('https://app.documenso.com/api/v2/webhook/create', {
+  method: 'POST',
+  headers: {
+    Authorization: process.env.DOCUMENSO_TEAM_API_TOKEN!,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    webhookUrl: 'https://example.com/webhooks/documenso',
+    eventTriggers: ['DOCUMENT_COMPLETED', 'DOCUMENT_SIGNED'],
+    secret: 'my-webhook-secret',
+    enabled: true,
+  }),
+});
+
+const webhook = await response.json();
+```
+</Tab>
+</Tabs>
+
+<Callout type="warn">
+  Webhook URLs pointing to private or loopback addresses (for example `http://127.0.0.1`) are rejected.
+  Self-hosters can allow specific hostnames via `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS`. See
+  [Webhook Setup](/docs/developers/webhooks/setup#webhook-url-requirements).
+</Callout>
+
+---
+
+## List Webhooks
+
+`GET /webhook`
+
+Returns all webhooks for the team associated with the API token.
+
+<Tabs items={['curl']}>
+<Tab value="curl">
+```bash
+curl "https://app.documenso.com/api/v2/webhook" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx"
+```
+</Tab>
+</Tabs>
+
+---
+
+## Get a Webhook
+
+`GET /webhook/{id}`
+
+Returns a single webhook. Returns `404` if the webhook does not exist or belongs to another team.
+
+<Tabs items={['curl']}>
+<Tab value="curl">
+```bash
+curl "https://app.documenso.com/api/v2/webhook/webhook_abc123" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx"
+```
+</Tab>
+</Tabs>
+
+---
+
+## Update a Webhook
+
+`POST /webhook/update`
+
+| Field           | Type       | Required | Description                   |
+| --------------- | ---------- | -------- | ----------------------------- |
+| `id`            | string     | Yes      | Webhook ID to update          |
+| `webhookUrl`    | string     | Yes      | Updated endpoint URL          |
+| `eventTriggers` | string[]   | Yes      | Updated event subscriptions   |
+| `secret`        | string \| null | No   | Updated signing secret        |
+| `enabled`       | boolean    | Yes      | Whether the webhook is active |
+
+<Tabs items={['curl']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/webhook/update" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "webhook_abc123",
+    "webhookUrl": "https://example.com/webhooks/documenso-v2",
+    "eventTriggers": ["DOCUMENT_SENT"],
+    "secret": "updated-secret",
+    "enabled": false
+  }'
+```
+</Tab>
+</Tabs>
+
+---
+
+## Delete a Webhook
+
+`POST /webhook/delete`
+
+| Field | Type   | Required | Description          |
+| ----- | ------ | -------- | -------------------- |
+| `id`  | string | Yes      | Webhook ID to delete |
+
+<Tabs items={['curl']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/webhook/delete" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{ "id": "webhook_abc123" }'
+```
+</Tab>
+</Tabs>
+
+---
+
+## Test a Webhook
+
+`POST /webhook/test`
+
+Sends a test payload for a subscribed event. The response indicates whether delivery succeeded.
+
+| Field   | Type   | Required | Description                              |
+| ------- | ------ | -------- | ---------------------------------------- |
+| `id`    | string | Yes      | Webhook ID                               |
+| `event` | string | Yes      | Event type the webhook must subscribe to |
+
+<Tabs items={['curl']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/webhook/test" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "webhook_abc123",
+    "event": "DOCUMENT_SENT"
+  }'
+```
+</Tab>
+</Tabs>
+
+Example response when the endpoint is unreachable:
+
+```json
+{
+  "success": false,
+  "message": "Webhook delivery failed"
+}
+```
+
+---
+
+## Find Webhook Calls
+
+`GET /webhook/call`
+
+Returns paginated delivery logs for a webhook.
+
+| Query param  | Type     | Required | Description                                      |
+| ------------ | -------- | -------- | ------------------------------------------------ |
+| `webhookId`  | string   | Yes      | Webhook to inspect                               |
+| `page`       | number   | No       | Page number, starts at 1 (default: 1)            |
+| `perPage`    | number   | No       | Items per page, max 100 (default: 20)            |
+| `status`     | string   | No       | Filter by delivery status                        |
+| `events`     | string[] | No       | Filter by event types                            |
+| `query`      | string   | No       | Filter by webhook call ID                        |
+
+<Tabs items={['curl']}>
+<Tab value="curl">
+```bash
+curl "https://app.documenso.com/api/v2/webhook/call?webhookId=webhook_abc123&page=1&perPage=20" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx"
+```
+</Tab>
+</Tabs>
+
+---
+
+## Resend a Webhook Call
+
+`POST /webhook/call/resend`
+
+Retries a failed delivery.
+
+| Field           | Type   | Required | Description              |
+| --------------- | ------ | -------- | ------------------------ |
+| `webhookId`     | string | Yes      | Parent webhook ID        |
+| `webhookCallId` | string | Yes      | Delivery log entry to retry |
+
+<Tabs items={['curl']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/webhook/call/resend" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "webhookId": "webhook_abc123",
+    "webhookCallId": "webhook_call_xyz789"
+  }'
+```
+</Tab>
+</Tabs>
+
+---
+
+## Team Isolation
+
+Webhook operations are scoped to the team of the API token:
+
+- Listing webhooks returns only that team's subscriptions
+- Getting, updating, or deleting a webhook from another team returns `404`
+- Creating a webhook always attaches it to the token's team
+
+---
+
+## Common Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401`  | Missing or invalid API token |
+| `404`  | Webhook not found or belongs to another team |
+| `400`  | Invalid URL, empty `eventTriggers`, or validation failure |
+
+See [Common Errors](/docs/developers/api/common-errors) for the full error reference.
+
+---
+
+## See Also
+
+- [Webhook Setup](/docs/developers/webhooks/setup) — Configure webhooks in the dashboard
+- [Webhook Events](/docs/developers/webhooks/events) — Event types and payload structure
+- [Webhook Verification](/docs/developers/webhooks/verification) — Verify signed payloads
+- [Teams API](/docs/developers/api/teams) — Team-scoped API tokens

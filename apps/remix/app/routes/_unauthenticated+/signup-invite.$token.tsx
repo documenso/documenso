@@ -165,7 +165,7 @@ export default function SignupInvitePage({ loaderData }: Route.ComponentProps) {
 
   return (
     <SignUpForm
-      className="w-screen max-w-screen-2xl px-4 md:px-16 lg:-my-16"
+      className="w-full px-4 lg:-my-16"
       sidePanel={<SignupInviteSidePanel email={loaderData.email} expiresAt={loaderData.expiresAt} />}
       hideMarketingPanel
       hideSocialSignup
