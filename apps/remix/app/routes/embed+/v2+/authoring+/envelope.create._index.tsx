@@ -1,5 +1,6 @@
 import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import type { SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
+import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
@@ -10,6 +11,7 @@ import {
   ZEmbedCreateEnvelopeAuthoringSchema,
 } from '@documenso/lib/types/envelope-editor';
 import type { TEnvelopeFieldAndMeta } from '@documenso/lib/types/field-meta';
+import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
 import { extractDerivedDocumentMeta } from '@documenso/lib/utils/document';
 import { buildEmbeddedEditorOptions, buildEmbeddedFeatures } from '@documenso/lib/utils/embed-config';
 import { prisma } from '@documenso/prisma';
@@ -74,6 +76,30 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       id: true,
       email: true,
     },
+  });
+
+  fireAndForget(async () => {
+    const team = result.teamId
+      ? await prisma.team.findFirst({
+          where: {
+            id: result.teamId,
+          },
+          select: {
+            organisationId: true,
+          },
+        })
+      : null;
+
+    captureServerEvent({
+      event: 'App: Embed Session Started',
+      userId: result.userId,
+      organisationId: team?.organisationId,
+      teamId: result.teamId ?? undefined,
+      properties: {
+        type: 'authoring',
+        version: 'v2',
+      },
+    });
   });
 
   return superLoaderJson({

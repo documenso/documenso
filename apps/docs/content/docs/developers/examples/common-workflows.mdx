@@ -1000,9 +1000,12 @@ async function fetchWithRetry(
       // Retry on rate limit
       if (response.status === 429) {
         const retryAfter = response.headers.get('Retry-After');
-        const delay = retryAfter ? parseInt(retryAfter) * 1000 : baseDelayMs * Math.pow(2, attempt);
+        // Honor Retry-After exactly; the cap only applies to the exponential fallback.
+        const delay = retryAfter
+          ? parseInt(retryAfter) * 1000
+          : Math.min(baseDelayMs * Math.pow(2, attempt), maxDelayMs);
         console.log(`Rate limited, waiting ${delay}ms...`);
-        await new Promise((resolve) => setTimeout(resolve, Math.min(delay, maxDelayMs)));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         continue;
       }
 

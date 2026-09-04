@@ -1,4 +1,5 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { getBasePath } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
@@ -9,6 +10,7 @@ import { getOrganisationSession } from '@documenso/trpc/server/organisation-rout
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
+import { useEffect } from 'react';
 import {
   data,
   isRouteErrorResponse,
@@ -200,11 +202,19 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  const analytics = useAnalytics();
+
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
 
   if (errorCode !== 404) {
     console.error('[RootErrorBoundary]', error);
   }
+
+  useEffect(() => {
+    if (errorCode !== 404) {
+      analytics.captureException(error, { source: 'app', location: 'root_boundary' });
+    }
+  }, [error]);
 
   return <GenericErrorLayout errorCode={errorCode} />;
 }

@@ -6,6 +6,7 @@ import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import { EnvelopeType } from '@prisma/client';
+import { match, P } from 'ts-pattern';
 
 import { authenticatedProcedure } from '../trpc';
 import { useEnvelopeMeta, ZUseEnvelopeRequestSchema, ZUseEnvelopeResponseSchema } from './use-envelope.types';
@@ -87,20 +88,11 @@ export const useEnvelopeRoute = authenticatedProcedure
 
     // Map custom document data using identifiers
     const customDocumentDataMapped = customDocumentData?.map((mapping) => {
-      let documentDataId: string | undefined;
-
       // Find the uploaded file by identifier
-      if (typeof mapping.identifier === 'string') {
-        documentDataId = uploadedFiles.find((file) => file.name === mapping.identifier)?.documentDataId;
-      }
-
-      if (typeof mapping.identifier === 'number') {
-        documentDataId = uploadedFiles.at(mapping.identifier)?.documentDataId;
-      }
-
-      if (mapping.identifier === undefined) {
-        documentDataId = uploadedFiles.at(0)?.documentDataId;
-      }
+      const documentDataId = match(mapping.identifier)
+        .with(P.string, (name) => uploadedFiles.find((file) => file.name === name)?.documentDataId)
+        .with(P.number, (index) => uploadedFiles.at(index)?.documentDataId)
+        .exhaustive();
 
       if (!documentDataId) {
         throw new AppError(AppErrorCode.NOT_FOUND, {

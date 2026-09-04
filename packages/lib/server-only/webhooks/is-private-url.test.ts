@@ -81,13 +81,20 @@ describe('isPrivateUrl', () => {
       expect(isPrivateUrl('http://[fd12::1]')).toBe(true);
     });
 
-    it('should not catch IPv4-mapped IPv6 in URL form (URL parser normalizes to hex)', () => {
-      // new URL() normalizes "::ffff:127.0.0.1" to "::ffff:7f00:1" which none
-      // of the checks handle. This is fine because dns.lookup never returns
-      // IPv4-mapped addresses — it returns plain IPv4 (family: 4) instead.
-      expect(isPrivateUrl('http://[::ffff:127.0.0.1]')).toBe(false);
-      expect(isPrivateUrl('http://[::ffff:10.0.0.1]')).toBe(false);
+    it('should detect private IPv4-mapped IPv6 addresses (URL parser normalizes to hex)', () => {
+      // new URL() normalizes "::ffff:127.0.0.1" to the hex form "::ffff:7f00:1",
+      // so the embedded IPv4 must be decoded and re-checked. Otherwise a literal
+      // host such as http://[::ffff:127.0.0.1] bypasses every dotted-decimal
+      // check above (SSRF, see #2901).
+      expect(isPrivateUrl('http://[::ffff:127.0.0.1]')).toBe(true);
+      expect(isPrivateUrl('http://[::ffff:10.0.0.1]')).toBe(true);
+      expect(isPrivateUrl('http://[::ffff:192.168.0.1]')).toBe(true);
+      expect(isPrivateUrl('http://[::ffff:169.254.169.254]')).toBe(true);
+    });
+
+    it('should still allow public IPv4-mapped IPv6 addresses', () => {
       expect(isPrivateUrl('http://[::ffff:8.8.8.8]')).toBe(false);
+      expect(isPrivateUrl('http://[::ffff:1.1.1.1]')).toBe(false);
     });
   });
 

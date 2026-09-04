@@ -1,8 +1,11 @@
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
+import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { ZBaseEmbedAuthoringSchema } from '@documenso/lib/types/embed-authoring-base-schema';
+import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
+import { prisma } from '@documenso/prisma';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 import { Trans } from '@lingui/react/macro';
@@ -35,6 +38,40 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     });
 
     allowEmbedAuthoringWhiteLabel = organisationClaim.flags.embedAuthoringWhiteLabel ?? false;
+
+    // Derive the kind of authoring session from the child route path, e.g.
+    // /embed/v1/authoring/document/create -> resource 'document', mode 'create'.
+    // Completed and error pages are not new sessions and are skipped.
+    const [resource, mode] = url.pathname.split('/').filter(Boolean).slice(3);
+
+    const isAuthoringSession =
+      (resource === 'document' || resource === 'template') && (mode === 'create' || mode === 'edit');
+
+    if (isAuthoringSession) {
+      fireAndForget(async () => {
+        const team = await prisma.team.findFirst({
+          where: {
+            id: result.teamId,
+          },
+          select: {
+            organisationId: true,
+          },
+        });
+
+        captureServerEvent({
+          event: 'App: Embed Session Started',
+          userId: result.userId,
+          organisationId: team?.organisationId,
+          teamId: result.teamId,
+          properties: {
+            type: 'authoring',
+            version: 'v1',
+            resource,
+            mode,
+          },
+        });
+      });
+    }
   }
 
   return {
