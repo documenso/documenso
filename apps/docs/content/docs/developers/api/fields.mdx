@@ -6,6 +6,8 @@ description: Add signature and form fields to documents via API.
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
+<EnvelopeWarning />
+
 <Callout type="warn">
   This guide may not reflect the latest endpoints or parameters. For an always up-to-date reference,
   see the [OpenAPI Reference](https://openapi.documenso.com).
@@ -19,13 +21,13 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 | `secondaryId`    | string         | Secondary identifier for audit logs          |
 | `type`           | string         | Field type (see [Field Types](#field-types)) |
 | `recipientId`    | number         | ID of the recipient assigned to this field   |
-| `envelopeId`     | number         | ID of the parent envelope                    |
+| `envelopeId`     | string         | ID of the parent envelope                    |
 | `envelopeItemId` | string         | ID of the PDF item the field is placed on    |
 | `page`           | number         | Page number (1-indexed)                      |
-| `positionX`      | number         | X coordinate as percentage (0-100)           |
-| `positionY`      | number         | Y coordinate as percentage (0-100)           |
-| `width`          | number         | Width as percentage of page (0-100)          |
-| `height`         | number         | Height as percentage of page (0-100)         |
+| `positionX`      | string         | X coordinate as percentage (0-100), a decimal serialized as a string |
+| `positionY`      | string         | Y coordinate as percentage (0-100), a decimal serialized as a string |
+| `width`          | string         | Width as percentage of page (0-100), a decimal serialized as a string |
+| `height`         | string         | Height as percentage of page (0-100), a decimal serialized as a string |
 | `customText`     | string         | Value entered by the recipient               |
 | `inserted`       | boolean        | Whether the field has been completed         |
 | `fieldMeta`      | object \| null | Type-specific configuration options          |
@@ -38,18 +40,19 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
   "secondaryId": "field_abc123",
   "type": "SIGNATURE",
   "recipientId": 123,
-  "envelopeId": 789,
-  "envelopeItemId": "envelope_item_xyz",
+  "envelopeId": "envelope_abcdefhiklmnorst",
+  "envelopeItemId": "envelope_item_abcdefhiklmnorst",
   "page": 1,
-  "positionX": 10,
-  "positionY": 80,
-  "width": 30,
-  "height": 5,
+  "positionX": "10",
+  "positionY": "80",
+  "width": "30",
+  "height": "5",
   "customText": "",
   "inserted": false,
   "fieldMeta": {
     "type": "signature",
-    "required": true
+    "required": true,
+    "overflow": "auto"
   }
 }
 ```
@@ -61,7 +64,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 | Type             | Description                               | Auto-filled |
 | ---------------- | ----------------------------------------- | ----------- |
 | `SIGNATURE`      | Drawn, typed, or uploaded signature       | No          |
-| `FREE_SIGNATURE` | Unrestricted signature without validation | No          |
+| `FREE_SIGNATURE` | Legacy free-form signature. Accepted by the v2 create schema but rejected by the v1 API and unsupported in the signing UI — avoid in new integrations | No          |
 | `INITIALS`       | Recipient's initials                      | No          |
 | `NAME`           | Recipient's full name                     | Yes         |
 | `EMAIL`          | Recipient's email address                 | Yes         |
@@ -134,10 +137,12 @@ POST /envelope/field/create-many
 
 ### Request Body
 
-| Field       | Type   | Required | Description                     |
-| ----------- | ------ | -------- | ------------------------------- |
-| `documentId`| number | Yes      | The document ID                 |
-| `fields`    | array  | Yes      | Array of field configurations   |
+| Field        | Type   | Required | Description                     |
+| ------------ | ------ | -------- | ------------------------------- |
+| `envelopeId` | string | Yes      | The envelope ID                 |
+| `data`       | array  | Yes      | Array of field configurations   |
+
+Each entry in `data` requires a `type`, a `recipientId`, and a position — either explicit coordinates (`page`, `positionX`, `positionY`, `width`, `height`) or a [text placeholder](#placeholder-based-field-positioning) (`placeholder` with optional `width`, `height`, and `matchAll`). Optional per-entry properties: `envelopeItemId` (which PDF in the envelope to place the field on; defaults to the first item) and `fieldMeta`.
 
 ### Code Examples
 
@@ -148,32 +153,32 @@ curl -X POST "https://app.documenso.com/api/v2/envelope/field/create-many" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
-    "documentId": 123,
-    "fields": [
+    "envelopeId": "envelope_abcdefhiklmnorst",
+    "data": [
       {
         "type": "SIGNATURE",
         "recipientId": 456,
-        "pageNumber": 1,
-        "pageX": 10,
-        "pageY": 80,
+        "page": 1,
+        "positionX": 10,
+        "positionY": 80,
         "width": 30,
         "height": 5
       },
       {
         "type": "DATE",
         "recipientId": 456,
-        "pageNumber": 1,
-        "pageX": 50,
-        "pageY": 80,
+        "page": 1,
+        "positionX": 50,
+        "positionY": 80,
         "width": 20,
         "height": 3
       },
       {
         "type": "TEXT",
         "recipientId": 456,
-        "pageNumber": 1,
-        "pageX": 10,
-        "pageY": 70,
+        "page": 1,
+        "positionX": 10,
+        "positionY": 70,
         "width": 40,
         "height": 4,
         "fieldMeta": {
@@ -199,32 +204,32 @@ const response = await fetch(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      documentId: 123,
-      fields: [
+      envelopeId: 'envelope_abcdefhiklmnorst',
+      data: [
         {
           type: 'SIGNATURE',
           recipientId: 456,
-          pageNumber: 1,
-          pageX: 10,
-          pageY: 80,
+          page: 1,
+          positionX: 10,
+          positionY: 80,
           width: 30,
           height: 5,
         },
         {
           type: 'DATE',
           recipientId: 456,
-          pageNumber: 1,
-          pageX: 50,
-          pageY: 80,
+          page: 1,
+          positionX: 50,
+          positionY: 80,
           width: 20,
           height: 3,
         },
         {
           type: 'TEXT',
           recipientId: 456,
-          pageNumber: 1,
-          pageX: 10,
-          pageY: 70,
+          page: 1,
+          positionX: 10,
+          positionY: 70,
           width: 40,
           height: 4,
           fieldMeta: {
@@ -239,8 +244,8 @@ const response = await fetch(
   }
 );
 
-const { fields } = await response.json();
-console.log(`Created ${fields.length} fields`);
+const { data } = await response.json();
+console.log(`Created ${data.length} fields`);
 
 ````
 </Tab>
@@ -250,36 +255,68 @@ console.log(`Created ${fields.length} fields`);
 
 ```json
 {
-  "fields": [
+  "data": [
     {
       "id": 101,
+      "secondaryId": "field_abc123",
+      "envelopeId": "envelope_abcdefhiklmnorst",
+      "envelopeItemId": "envelope_item_abcdefhiklmnorst",
       "type": "SIGNATURE",
       "recipientId": 456,
       "page": 1,
-      "positionX": 10,
-      "positionY": 80,
-      "width": 30,
-      "height": 5
+      "positionX": "10",
+      "positionY": "80",
+      "width": "30",
+      "height": "5",
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": {
+        "type": "signature",
+        "fontSize": 18,
+        "overflow": "auto"
+      }
     },
     {
       "id": 102,
+      "secondaryId": "field_def456",
+      "envelopeId": "envelope_abcdefhiklmnorst",
+      "envelopeItemId": "envelope_item_abcdefhiklmnorst",
       "type": "DATE",
       "recipientId": 456,
       "page": 1,
-      "positionX": 50,
-      "positionY": 80,
-      "width": 20,
-      "height": 3
+      "positionX": "50",
+      "positionY": "80",
+      "width": "20",
+      "height": "3",
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": {
+        "type": "date",
+        "fontSize": 12,
+        "textAlign": "left",
+        "overflow": "auto"
+      }
     },
     {
       "id": 103,
+      "secondaryId": "field_ghi789",
+      "envelopeId": "envelope_abcdefhiklmnorst",
+      "envelopeItemId": "envelope_item_abcdefhiklmnorst",
       "type": "TEXT",
       "recipientId": 456,
       "page": 1,
-      "positionX": 10,
-      "positionY": 70,
-      "width": 40,
-      "height": 4
+      "positionX": "10",
+      "positionY": "70",
+      "width": "40",
+      "height": "4",
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": {
+        "type": "text",
+        "label": "Job Title",
+        "placeholder": "Enter your job title",
+        "required": true
+      }
     }
   ]
 }
@@ -299,8 +336,10 @@ POST /envelope/field/update-many
 
 | Field        | Type   | Required | Description                   |
 | ------------ | ------ | -------- | ----------------------------- |
-| `documentId` | number | Yes      | The document ID               |
-| `fields`     | array  | Yes      | Array of field update objects |
+| `envelopeId` | string | Yes      | The envelope ID               |
+| `data`       | array  | Yes      | Array of field update objects |
+
+Each entry in `data` requires the field `id` and `type`. Position properties (`page`, `positionX`, `positionY`, `width`, `height`), `envelopeItemId`, and `fieldMeta` are optional — only supplied values are updated. Placeholder positioning is not supported when updating; use coordinates.
 
 ### Code Examples
 
@@ -311,17 +350,17 @@ curl -X POST "https://app.documenso.com/api/v2/envelope/field/update-many" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
-    "documentId": 123,
-    "fields": [
+    "envelopeId": "envelope_abcdefhiklmnorst",
+    "data": [
       {
         "id": 101,
         "type": "SIGNATURE",
-        "pageY": 85
+        "positionY": 85
       },
       {
         "id": 102,
         "type": "DATE",
-        "pageY": 85
+        "positionY": 85
       }
     ]
   }'
@@ -338,16 +377,16 @@ const response = await fetch(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      documentId: 123,
-      fields: [
-        { id: 101, type: 'SIGNATURE', pageY: 85 },
-        { id: 102, type: 'DATE', pageY: 85 },
+      envelopeId: 'envelope_abcdefhiklmnorst',
+      data: [
+        { id: 101, type: 'SIGNATURE', positionY: 85 },
+        { id: 102, type: 'DATE', positionY: 85 },
       ],
     }),
   }
 );
 
-const { fields } = await response.json();
+const { data } = await response.json();
 
 ````
 </Tab>
@@ -357,9 +396,48 @@ const { fields } = await response.json();
 
 ```json
 {
-  "fields": [
-    { "id": 101, "type": "SIGNATURE", "positionY": 85 },
-    { "id": 102, "type": "DATE", "positionY": 85 }
+  "data": [
+    {
+      "id": 101,
+      "secondaryId": "field_abc123",
+      "envelopeId": "envelope_abcdefhiklmnorst",
+      "envelopeItemId": "envelope_item_abcdefhiklmnorst",
+      "type": "SIGNATURE",
+      "recipientId": 456,
+      "page": 1,
+      "positionX": "10",
+      "positionY": "85",
+      "width": "30",
+      "height": "5",
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": {
+        "type": "signature",
+        "fontSize": 18,
+        "overflow": "auto"
+      }
+    },
+    {
+      "id": 102,
+      "secondaryId": "field_def456",
+      "envelopeId": "envelope_abcdefhiklmnorst",
+      "envelopeItemId": "envelope_item_abcdefhiklmnorst",
+      "type": "DATE",
+      "recipientId": 456,
+      "page": 1,
+      "positionX": "50",
+      "positionY": "85",
+      "width": "20",
+      "height": "3",
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": {
+        "type": "date",
+        "fontSize": 12,
+        "textAlign": "left",
+        "overflow": "auto"
+      }
+    }
   ]
 }
 ````
@@ -443,8 +521,8 @@ Fields use percentage-based coordinates relative to the PDF page dimensions.
 (0,0) ─────────────────────────── (100,0)
   │                                   │
   │    ┌─────────┐                    │
-  │    │  Field  │ (pageX: 10,        │
-  │    │         │  pageY: 20,        │
+  │    │  Field  │ (positionX: 10,    │
+  │    │         │  positionY: 20,    │
   │    └─────────┘  width: 30,        │
   │                 height: 5)        │
   │                                   │
@@ -457,9 +535,9 @@ Fields use percentage-based coordinates relative to the PDF page dimensions.
 const field = {
   type: 'SIGNATURE',
   recipientId: 123,
-  pageNumber: 1,
-  pageX: 60, // 60% from left
-  pageY: 85, // 85% from top (near bottom)
+  page: 1,
+  positionX: 60, // 60% from left
+  positionY: 85, // 85% from top (near bottom)
   width: 30, // 30% of page width
   height: 8, // 8% of page height
 };
@@ -478,6 +556,33 @@ This approach is useful when generating PDFs programmatically or using templates
 </Callout>
 
 See the [PDF Placeholders](/docs/users/documents/advanced/pdf-placeholders) guide for the full placeholder format reference, including supported field types, recipient identifiers, and field options.
+
+### Placeholder Positioning via the API
+
+`POST /envelope/field/create-many` accepts a placeholder position in place of coordinates. Instead of `page`, `positionX`, `positionY`, `width`, and `height`, pass:
+
+| Field         | Type    | Required | Description                                                                                                  |
+| ------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `placeholder` | string  | Yes      | Text to search for in the PDF (e.g. `{{name}}`). The field is placed at the bounding box of the first match. |
+| `width`       | number  | No       | Override the field width. Defaults to the width of the matched text.                                          |
+| `height`      | number  | No       | Override the field height. Defaults to the height of the matched text.                                        |
+| `matchAll`    | boolean | No       | Create a field at every occurrence of the placeholder instead of only the first.                              |
+
+```json
+{
+  "envelopeId": "envelope_abcdefhiklmnorst",
+  "data": [
+    {
+      "type": "SIGNATURE",
+      "recipientId": 456,
+      "placeholder": "{{signature}}",
+      "matchAll": true
+    }
+  ]
+}
+```
+
+`POST /envelope/field/update-many` does not accept placeholders — field updates are coordinate-only.
 
 ---
 
@@ -643,15 +748,15 @@ All field types support these base options:
 Create a document with a signature block containing multiple field types:
 
 ```typescript
-async function addSignatureBlock(documentId: number, recipientId: number) {
-  const fields = [
+async function addSignatureBlock(envelopeId: string, recipientId: number) {
+  const data = [
     // Signature
     {
       type: 'SIGNATURE',
       recipientId,
-      pageNumber: 1,
-      pageX: 10,
-      pageY: 80,
+      page: 1,
+      positionX: 10,
+      positionY: 80,
       width: 30,
       height: 8,
       fieldMeta: {
@@ -663,9 +768,9 @@ async function addSignatureBlock(documentId: number, recipientId: number) {
     {
       type: 'NAME',
       recipientId,
-      pageNumber: 1,
-      pageX: 10,
-      pageY: 90,
+      page: 1,
+      positionX: 10,
+      positionY: 90,
       width: 30,
       height: 4,
       fieldMeta: {
@@ -677,9 +782,9 @@ async function addSignatureBlock(documentId: number, recipientId: number) {
     {
       type: 'DATE',
       recipientId,
-      pageNumber: 1,
-      pageX: 50,
-      pageY: 80,
+      page: 1,
+      positionX: 50,
+      positionY: 80,
       width: 20,
       height: 4,
       fieldMeta: {
@@ -691,9 +796,9 @@ async function addSignatureBlock(documentId: number, recipientId: number) {
     {
       type: 'TEXT',
       recipientId,
-      pageNumber: 1,
-      pageX: 50,
-      pageY: 90,
+      page: 1,
+      positionX: 50,
+      positionY: 90,
       width: 30,
       height: 4,
       fieldMeta: {
@@ -710,7 +815,7 @@ async function addSignatureBlock(documentId: number, recipientId: number) {
       Authorization: 'api_xxxxxxxxxxxxxxxx',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ documentId, fields }),
+    body: JSON.stringify({ envelopeId, data }),
   });
 
   return response.json();
