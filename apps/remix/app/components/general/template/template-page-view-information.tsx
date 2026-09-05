@@ -31,7 +31,7 @@ export const TemplatePageViewInformation = ({ template, userId }: TemplatePageVi
       },
       {
         description: msg`Created`,
-        value: i18n.date(template.createdAt, { dateStyle: 'medium' }),
+        value: i18n.date(template.createdAt, { dateStyle: 'long' }),
       },
       {
         description: msg`Last modified`,
