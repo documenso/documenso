@@ -33,7 +33,12 @@ export type EmbedDocumentFieldsProps = {
   fields: Field[];
   metadata?: Pick<
     DocumentMeta,
-    'timezone' | 'dateFormat' | 'typedSignatureEnabled' | 'uploadSignatureEnabled' | 'drawSignatureEnabled'
+    | 'timezone'
+    | 'dateFormat'
+    | 'typedSignatureEnabled'
+    | 'uploadSignatureEnabled'
+    | 'drawSignatureEnabled'
+    | 'qrSignatureEnabled'
   > | null;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
@@ -53,6 +58,7 @@ export const EmbedDocumentFields = ({ fields, metadata, onSignField, onUnsignFie
               typedSignatureEnabled={metadata?.typedSignatureEnabled}
               uploadSignatureEnabled={metadata?.uploadSignatureEnabled}
               drawSignatureEnabled={metadata?.drawSignatureEnabled}
+              qrSignatureEnabled={metadata?.qrSignatureEnabled}
             />
           ))
           .with(FieldType.INITIALS, () => (

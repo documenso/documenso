@@ -269,6 +269,7 @@ export const DirectTemplateSigningForm = ({
                   typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
                   uploadSignatureEnabled={template.templateMeta?.uploadSignatureEnabled}
                   drawSignatureEnabled={template.templateMeta?.drawSignatureEnabled}
+                  qrSignatureEnabled={template.templateMeta?.qrSignatureEnabled}
                 />
               ))
               .with(FieldType.INITIALS, () => (
@@ -408,6 +409,7 @@ export const DirectTemplateSigningForm = ({
                 typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
                 uploadSignatureEnabled={template.templateMeta?.uploadSignatureEnabled}
                 drawSignatureEnabled={template.templateMeta?.drawSignatureEnabled}
+                qrSignatureEnabled={template.templateMeta?.qrSignatureEnabled}
               />
             </div>
           </div>

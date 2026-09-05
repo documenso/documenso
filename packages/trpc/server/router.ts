@@ -10,6 +10,7 @@ import { folderRouter } from './folder-router/router';
 import { organisationRouter } from './organisation-router/router';
 import { profileRouter } from './profile-router/router';
 import { recipientRouter } from './recipient-router/router';
+import { signatureRouter } from './signature-router/router';
 import { teamRouter } from './team-router/router';
 import { templateRouter } from './template-router/router';
 import { router } from './trpc';
@@ -24,6 +25,7 @@ export const appRouter = router({
   field: fieldRouter,
   folder: folderRouter,
   recipient: recipientRouter,
+  signature: signatureRouter,
   admin: adminRouter,
   organisation: organisationRouter,
   apiToken: apiTokenRouter,

@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import { AnonymousVerificationTokenType } from '@prisma/client';
 import { generateAuthenticationOptions } from '@simplewebauthn/server';
 import { DateTime } from 'luxon';
 
@@ -24,12 +25,14 @@ export const createPasskeySigninOptions = async ({ sessionId }: CreatePasskeySig
       id: sessionId,
     },
     update: {
+      type: AnonymousVerificationTokenType.PASSKEY,
       token: challenge,
       expiresAt: DateTime.now().plus({ minutes: 2 }).toJSDate(),
       createdAt: new Date(),
     },
     create: {
       id: sessionId,
+      type: AnonymousVerificationTokenType.PASSKEY,
       token: challenge,
       expiresAt: DateTime.now().plus({ minutes: 2 }).toJSDate(),
       createdAt: new Date(),

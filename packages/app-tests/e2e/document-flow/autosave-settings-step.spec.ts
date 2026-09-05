@@ -158,6 +158,7 @@ test.describe('AutoSave Settings Step', () => {
       expect(retrieved.documentMeta?.drawSignatureEnabled).toBe(false);
       expect(retrieved.documentMeta?.typedSignatureEnabled).toBe(false);
       expect(retrieved.documentMeta?.uploadSignatureEnabled).toBe(true);
+      expect(retrieved.documentMeta?.qrSignatureEnabled).toBe(true);
     }).toPass();
   });
 

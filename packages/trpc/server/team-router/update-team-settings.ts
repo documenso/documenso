@@ -36,6 +36,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       typedSignatureEnabled,
       uploadSignatureEnabled,
       drawSignatureEnabled,
+      qrSignatureEnabled,
       delegateDocumentOwnership,
       envelopeExpirationPeriod,
       reminderSettings,
@@ -66,7 +67,12 @@ export const updateTeamSettingsRoute = authenticatedProcedure
     }
 
     // Signatures will only be inherited if all are NULL.
-    if (typedSignatureEnabled === false && uploadSignatureEnabled === false && drawSignatureEnabled === false) {
+    if (
+      typedSignatureEnabled === false &&
+      uploadSignatureEnabled === false &&
+      drawSignatureEnabled === false &&
+      qrSignatureEnabled === false
+    ) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
         message: 'At least one signature type must be enabled',
       });
@@ -168,6 +174,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             typedSignatureEnabled,
             uploadSignatureEnabled,
             drawSignatureEnabled,
+            qrSignatureEnabled,
             delegateDocumentOwnership,
             envelopeExpirationPeriod: envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
             reminderSettings: reminderSettings === null ? Prisma.DbNull : reminderSettings,

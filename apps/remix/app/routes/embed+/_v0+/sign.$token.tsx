@@ -404,6 +404,7 @@ const EmbedSignDocumentPageV1 = ({ data }: { data: Awaited<ReturnType<typeof han
       typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
       uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
       drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
+      qrSignatureEnabled={document.documentMeta?.qrSignatureEnabled}
     >
       <DocumentSigningAuthProvider documentAuthOptions={document.authOptions} recipient={recipient} user={user}>
         <EmbedSignDocumentV1ClientPage

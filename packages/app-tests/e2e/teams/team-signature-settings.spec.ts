@@ -25,6 +25,7 @@ test('[TEAMS]: check that default team signature settings are all enabled', asyn
   await expect(page.getByRole('combobox').filter({ hasText: 'Type' })).toBeVisible();
   await expect(page.getByRole('combobox').filter({ hasText: 'Upload' })).toBeVisible();
   await expect(page.getByRole('combobox').filter({ hasText: 'Draw' })).toBeVisible();
+  await expect(page.getByRole('combobox').filter({ hasText: 'QR code' })).toBeVisible();
 
   // Go to document and check that the signatured tabs are correct.
   await page.goto(`/sign/${document.recipients[0].token}`);
@@ -34,6 +35,7 @@ test('[TEAMS]: check that default team signature settings are all enabled', asyn
   await expect(page.getByRole('tab', { name: 'Type' })).toBeVisible();
   await expect(page.getByRole('tab', { name: 'Upload' })).toBeVisible();
   await expect(page.getByRole('tab', { name: 'Draw' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Mobile' })).toBeVisible();
 });
 
 test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
@@ -45,8 +47,11 @@ test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
     redirectPath: `/t/${team.url}/settings/document`,
   });
 
-  const allTabs = ['Type', 'Upload', 'Draw'];
-  const tabTest = [['Type', 'Upload', 'Draw'], ['Type', 'Upload'], ['Type']];
+  // The 'QR code' signature type is surfaced as the 'Mobile' tab on the signing dialog.
+  const allSignatureOptions = ['Type', 'Upload', 'Draw', 'QR code'];
+  const tabNameForOption = (option: string) => (option === 'QR code' ? 'Mobile' : option);
+
+  const tabTest = [['Type', 'Upload', 'Draw', 'QR code'], ['Type', 'Upload'], ['Type']];
 
   for (const tabs of tabTest) {
     await page.goto(`/t/${team.url}/settings/document`);
@@ -57,9 +62,10 @@ test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
     await expect(page.getByRole('option', { name: 'Type' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'Upload' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'Draw' })).toBeVisible();
+    await expect(page.getByRole('option', { name: 'QR code' })).toBeVisible();
 
     // Clear all selected items.
-    for (const tab of allTabs) {
+    for (const tab of allSignatureOptions) {
       const item = page.getByRole('option', { name: tab });
 
       const isSelected = (await item.innerHTML()).includes('opacity-100');
@@ -90,12 +96,13 @@ test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
     await page.waitForSelector('[role="dialog"]');
 
     // Check the tab values
-    for (const tab of allTabs) {
-      if (tabs.includes(tab)) {
-        await expect(page.getByRole('tab', { name: tab })).toBeVisible();
+    for (const option of allSignatureOptions) {
+      const tabName = tabNameForOption(option);
+
+      if (tabs.includes(option)) {
+        await expect(page.getByRole('tab', { name: tabName })).toBeVisible();
       } else {
-        // await expect(page.getByRole('tab', { name: tab })).not.toBeVisible();
-        await expect(page.getByRole('tab', { name: tab })).toHaveCount(0);
+        await expect(page.getByRole('tab', { name: tabName })).toHaveCount(0);
       }
     }
   }
@@ -110,8 +117,8 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
     redirectPath: `/t/${team.url}/settings/document`,
   });
 
-  const allTabs = ['Type', 'Upload', 'Draw'];
-  const tabTest = [['Type', 'Upload', 'Draw'], ['Type', 'Upload'], ['Type']];
+  const allSignatureOptions = ['Type', 'Upload', 'Draw', 'QR code'];
+  const tabTest = [['Type', 'Upload', 'Draw', 'QR code'], ['Type', 'Upload'], ['Type']];
 
   for (const tabs of tabTest) {
     await page.goto(`/t/${team.url}/settings/document`);
@@ -122,9 +129,10 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
     await expect(page.getByRole('option', { name: 'Type' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'Upload' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'Draw' })).toBeVisible();
+    await expect(page.getByRole('option', { name: 'QR code' })).toBeVisible();
 
     // Clear all selected items.
-    for (const tab of allTabs) {
+    for (const tab of allSignatureOptions) {
       const item = page.getByRole('option', { name: tab });
 
       const isSelected = (await item.innerHTML()).includes('opacity-100');
@@ -176,5 +184,6 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
     expect(document?.documentMeta?.typedSignatureEnabled).toEqual(tabs.includes('Type'));
     expect(document?.documentMeta?.uploadSignatureEnabled).toEqual(tabs.includes('Upload'));
     expect(document?.documentMeta?.drawSignatureEnabled).toEqual(tabs.includes('Draw'));
+    expect(document?.documentMeta?.qrSignatureEnabled).toEqual(tabs.includes('QR code'));
   }
 });

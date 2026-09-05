@@ -68,6 +68,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   expect(teamSettings.typedSignatureEnabled).toEqual(true);
   expect(teamSettings.uploadSignatureEnabled).toEqual(false);
   expect(teamSettings.drawSignatureEnabled).toEqual(false);
+  expect(teamSettings.qrSignatureEnabled).toEqual(true);
 
   // Edit the team settings
   await page.goto(`/t/${team.url}/settings/document`);
@@ -102,6 +103,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   expect(updatedTeamSettings.typedSignatureEnabled).toEqual(true);
   expect(updatedTeamSettings.uploadSignatureEnabled).toEqual(false);
   expect(updatedTeamSettings.drawSignatureEnabled).toEqual(false);
+  expect(updatedTeamSettings.qrSignatureEnabled).toEqual(true);
 
   const document = await seedTeamDocumentWithMeta(team);
 
@@ -117,6 +119,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   expect(documentMeta.typedSignatureEnabled).toEqual(true);
   expect(documentMeta.uploadSignatureEnabled).toEqual(false);
   expect(documentMeta.drawSignatureEnabled).toEqual(false);
+  expect(documentMeta.qrSignatureEnabled).toEqual(true);
   expect(documentMeta.language).toEqual('pl');
   expect(documentMeta.timezone).toEqual('Europe/London');
   expect(documentMeta.dateFormat).toEqual('MM/dd/yyyy');

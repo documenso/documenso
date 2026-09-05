@@ -55,6 +55,7 @@ type SettingsSubset = Pick<
   | 'typedSignatureEnabled'
   | 'uploadSignatureEnabled'
   | 'drawSignatureEnabled'
+  | 'qrSignatureEnabled'
   | 'defaultRecipients'
   | 'delegateDocumentOwnership'
   | 'aiFeaturesEnabled'
