@@ -3,6 +3,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import * as React from 'react';
 
+import { useVisualViewport } from '../lib/use-visual-viewport';
 import { cn } from '../lib/utils';
 
 const Dialog = DialogPrimitive.Root;
@@ -15,19 +16,44 @@ const DialogPortal = ({
   children,
   position = 'start',
   ...props
-}: DialogPrimitive.DialogPortalProps & { position?: 'start' | 'end' | 'center' }) => (
-  <DialogPrimitive.Portal {...props}>
-    <div
-      className={cn('fixed inset-0 z-[1000] flex justify-center sm:items-center', {
-        'items-start': position === 'start',
-        'items-end': position === 'end',
-        'items-center': position === 'center',
-      })}
-    >
-      {children}
-    </div>
-  </DialogPrimitive.Portal>
-);
+}: DialogPrimitive.DialogPortalProps & { position?: 'start' | 'end' | 'center' }) => {
+  const visualViewport = useVisualViewport();
+
+  // `position: fixed` resolves against the layout viewport, so when the page is
+  // pinch-zoomed on a touch device the dialog is placed relative to the full
+  // unzoomed page and lands outside the visible (visual) viewport. When the
+  // visual viewport differs from the layout viewport, pin the dialog to it so it
+  // renders within the region the signer is currently looking at.
+  const isZoomed = visualViewport !== null && visualViewport.scale !== 1;
+
+  const viewportStyle = isZoomed
+    ? {
+        top: visualViewport.offsetTop,
+        left: visualViewport.offsetLeft,
+        width: visualViewport.width,
+        height: visualViewport.height,
+      }
+    : undefined;
+
+  return (
+    <DialogPrimitive.Portal {...props}>
+      <div
+        className={cn(
+          'fixed z-[1000] flex justify-center sm:items-center',
+          !isZoomed && 'inset-0',
+          {
+            'items-start': position === 'start',
+            'items-end': position === 'end',
+            'items-center': position === 'center',
+          },
+        )}
+        style={viewportStyle}
+      >
+        {children}
+      </div>
+    </DialogPrimitive.Portal>
+  );
+};
 
 DialogPortal.displayName = DialogPrimitive.Portal.displayName;
 
