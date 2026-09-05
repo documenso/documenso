@@ -21,4 +21,10 @@ export const ZGetEnvelopeItemsByTokenResponseSchema = z.object({
     title: true,
     order: true,
   }).array(),
+  /**
+   * The title of the parent envelope (document). Used to name downloads of
+   * single-item envelopes after the document rather than the (potentially stale)
+   * envelope item title.
+   */
+  envelopeTitle: z.string(),
 });
