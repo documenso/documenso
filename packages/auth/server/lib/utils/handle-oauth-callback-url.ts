@@ -18,6 +18,7 @@ import { deleteCookie } from 'hono/cookie';
 
 import type { OAuthClientOptions } from '../../config';
 import { AuthenticationErrorCode } from '../errors/error-codes';
+import { setOAuth2faPendingCookie } from '../session/session-cookies';
 import { onAuthorize } from './authorizer';
 import { getOpenIdConfiguration } from './open-id';
 
@@ -57,6 +58,23 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   // Directly log in user if account already exists.
   if (existingAccount) {
+    const user = await prisma.user.findUnique({
+      where: { id: existingAccount.user.id },
+      select: {
+        twoFactorEnabled: true,
+        twoFactorSecret: true,
+      },
+    });
+
+    if (user?.twoFactorEnabled && user?.twoFactorSecret) {
+      await setOAuth2faPendingCookie(c, {
+        userId: existingAccount.user.id,
+        redirectPath,
+      });
+
+      return c.redirect('/api/auth/callback/oauth/2fa', 302);
+    }
+
     await onAuthorize({ userId: existingAccount.user.id }, c);
 
     return c.redirect(redirectPath, 302);
@@ -113,6 +131,23 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
         });
       }
     });
+
+    const user = await prisma.user.findUnique({
+      where: { id: userWithSameEmail.id },
+      select: {
+        twoFactorEnabled: true,
+        twoFactorSecret: true,
+      },
+    });
+
+    if (user?.twoFactorEnabled && user?.twoFactorSecret) {
+      await setOAuth2faPendingCookie(c, {
+        userId: userWithSameEmail.id,
+        redirectPath,
+      });
+
+      return c.redirect('/api/auth/callback/oauth/2fa', 302);
+    }
 
     await onAuthorize({ userId: userWithSameEmail.id }, c);
 
