@@ -28,7 +28,7 @@ export const GoogleAuthOptions: OAuthClientOptions = {
 
 export const MicrosoftAuthOptions: OAuthClientOptions = {
   id: 'microsoft',
-  scope: ['openid', 'email', 'profile'],
+  scope: ['openid', 'email', 'profile', 'offline_access'],
   clientId: env('NEXT_PRIVATE_MICROSOFT_CLIENT_ID') ?? '',
   clientSecret: env('NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET') ?? '',
   redirectUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/callback/microsoft`,

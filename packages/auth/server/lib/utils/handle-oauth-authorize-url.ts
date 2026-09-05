@@ -63,6 +63,10 @@ export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOp
     scopes,
   );
 
+  if (clientOptions.id === 'google') {
+    url.searchParams.set('access_type', 'offline');
+  }
+
   // Pass the prompt to the authorization endpoint.
   if (process.env.NEXT_PRIVATE_OIDC_PROMPT && isOidcPrompt(process.env.NEXT_PRIVATE_OIDC_PROMPT)) {
     prompt = process.env.NEXT_PRIVATE_OIDC_PROMPT;
