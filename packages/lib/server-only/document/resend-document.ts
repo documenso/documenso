@@ -1,7 +1,7 @@
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -25,6 +25,7 @@ import { extractDerivedDocumentEmailSettings } from '../../types/document-email'
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { logger } from '../../utils/logger';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { buildEnvelopeEmailHeaders } from '../email/build-envelope-email-headers';
@@ -126,7 +127,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
       recipients.includes(recipient.id) &&
       recipient.signingStatus === SigningStatus.NOT_SIGNED &&
       recipient.role !== RecipientRole.CC,
-  );
+  ) as ((typeof envelope.recipients)[number] & { role: Exclude<RecipientRole, 'CC'> })[];
 
   if (expiresAt && recipientsToRemind.length > 0) {
     await prisma.recipient.updateMany({
@@ -198,10 +199,16 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     type: 'email',
   });
 
-  await Promise.all(
+  const reminderEmailResults = await Promise.allSettled(
     recipientsToRemind.map(async (recipient) => {
-      if (recipient.role === RecipientRole.CC || !isRecipientEmailValidForSending(recipient)) {
-        return;
+      if (!isRecipientEmailValidForSending(recipient)) {
+        logger.warn({
+          msg: 'Skipped document reminder email for invalid recipient',
+          envelopeId: envelope.id,
+          recipientId: recipient.id,
+        });
+
+        return false;
       }
 
       const i18n = await getI18nInstance(emailLanguage);
@@ -319,8 +326,38 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
           },
         }),
       });
+
+      return true;
     }),
   );
+
+  const sentReminderEmailCount = reminderEmailResults.filter(
+    (result) => result.status === 'fulfilled' && result.value,
+  ).length;
+  const failedReminderEmailResults = reminderEmailResults.filter((result) => result.status === 'rejected');
+
+  reminderEmailResults.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      return;
+    }
+
+    const recipient = recipientsToRemind[index];
+
+    logger.warn({
+      msg: 'Failed to send document reminder email',
+      error: result.reason,
+      envelopeId: envelope.id,
+      recipientId: recipient?.id,
+    });
+  });
+
+  if (sentReminderEmailCount === 0 && failedReminderEmailResults.length > 0) {
+    const reason = failedReminderEmailResults[0].reason;
+
+    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+      message: reason instanceof Error ? reason.message : 'Failed to send document reminder emails',
+    });
+  }
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_REMINDER_SENT,
