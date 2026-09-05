@@ -17,6 +17,7 @@ import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/
 import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export interface SetDocumentRecipientsOptions {
@@ -97,6 +98,11 @@ export const setDocumentRecipients = async ({
       role: recipient.role,
     });
   }
+
+  assertCompatibleRecipientGrouping({
+    signatureLevel: envelope.signatureLevel,
+    recipients,
+  });
 
   const normalizedRecipients = recipients.map((recipient) => ({
     ...recipient,
@@ -342,7 +348,9 @@ const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: Recipie
     recipient.email !== newRecipientData.email ||
     recipient.name !== newRecipientData.name ||
     recipient.role !== newRecipientData.role ||
-    recipient.signingOrder !== newRecipientData.signingOrder ||
+    // Null and undefined both mean "no order": the request schema cannot
+    // carry null, so a persisted null arrives as undefined
+    (recipient.signingOrder ?? null) !== (newRecipientData.signingOrder ?? null) ||
     !isDeepEqual(authOptions.accessAuth, newRecipientAccessAuth) ||
     !isDeepEqual(authOptions.actionAuth, newRecipientActionAuth)
   );

@@ -146,7 +146,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
           <style
             nonce={nonce(cspNonce)}
             dangerouslySetInnerHTML={{
-              __html: `*, *::before, *::after { animation: none !important; transition: none !important; }`,
+              __html: `*, *::before, *::after { animation: none !important; transition-duration: 0.001s !important; transition-delay: 0s !important; }`,
             }}
           />
         )}

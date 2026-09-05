@@ -14,6 +14,7 @@ import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export interface UpdateEnvelopeRecipientsOptions {
@@ -98,6 +99,16 @@ export const updateEnvelopeRecipients = async ({
       role: recipient.role,
     });
   }
+
+  assertCompatibleRecipientGrouping({
+    signatureLevel: envelope.signatureLevel,
+    // Combine the existing recipients with the new ones to see if the grouping is compatible.
+    recipients: envelope.recipients.map((existingRecipient) => {
+      const update = recipients.find((recipient) => recipient.id === existingRecipient.id);
+
+      return update ? { ...existingRecipient, ...update } : existingRecipient;
+    }),
+  });
 
   const recipientsToUpdate = recipients.map((recipient) => {
     const originalRecipient = envelope.recipients.find((existingRecipient) => existingRecipient.id === recipient.id);

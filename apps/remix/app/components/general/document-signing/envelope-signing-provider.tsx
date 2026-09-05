@@ -6,6 +6,7 @@ import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/enve
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
+import { effectiveSigningOrder, getNextDictatableRecipient } from '@documenso/lib/utils/recipient-groups';
 import { trpc } from '@documenso/trpc/react';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { EnvelopeType, type Field, FieldType, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
@@ -238,10 +239,13 @@ export const EnvelopeSigningProvider = ({
   /**
    * Assistant recipients are those that have a signing order after the assistant.
    */
-  const assistantRecipients =
-    recipient.role === RecipientRole.ASSISTANT
-      ? envelope.recipients.filter((r) => (r.signingOrder ?? 0) > (recipient.signingOrder ?? 0))
-      : [];
+  const assistantRecipients = useMemo(() => {
+    if (recipient.role !== RecipientRole.ASSISTANT) {
+      return [];
+    }
+
+    return envelope.recipients.filter((r) => effectiveSigningOrder(r) > effectiveSigningOrder(recipient));
+  }, [envelope.recipients, recipient]);
 
   /**
    * Assistant fields are those fulfill all of the following:
@@ -249,12 +253,11 @@ export const EnvelopeSigningProvider = ({
    * - After the assistant signing order
    * - Are not signature fields
    */
-  const assistantFields =
-    recipient.role === RecipientRole.ASSISTANT
-      ? assistantRecipients
-          .filter((r) => r.signingStatus !== SigningStatus.SIGNED)
-          .flatMap((r) => r.fields.filter((field) => field.type !== FieldType.SIGNATURE))
-      : [];
+  const assistantFields = useMemo(() => {
+    return assistantRecipients
+      .filter((r) => r.signingStatus !== SigningStatus.SIGNED)
+      .flatMap((r) => r.fields.filter((field) => field.type !== FieldType.SIGNATURE));
+  }, [assistantRecipients]);
 
   /**
    * The recipient that the assistant has currently selected to sign on behalf of.
@@ -269,7 +272,7 @@ export const EnvelopeSigningProvider = ({
 
   const selectedAssistantRecipientFields = useMemo(() => {
     return assistantFields.filter((field) => field.recipientId === selectedAssistantRecipient?.id);
-  }, [recipientFields, selectedAssistantRecipient]);
+  }, [assistantFields, selectedAssistantRecipient]);
 
   /**
    * Fields that have been completed by other recipients.
@@ -290,32 +293,14 @@ export const EnvelopeSigningProvider = ({
     .filter((field) => field.inserted);
 
   const nextRecipient = useMemo(() => {
-    if (!envelope.documentMeta.signingOrder || envelope.documentMeta.signingOrder !== 'SEQUENTIAL') {
+    if (envelope.documentMeta.signingOrder !== 'SEQUENTIAL') {
       return null;
     }
 
-    const sortedRecipients = [...envelope.recipients].sort((a, b) => {
-      // Sort by signingOrder first (nulls last), then by id
-      if (a.signingOrder === null && b.signingOrder === null) {
-        return a.id - b.id;
-      }
-      if (a.signingOrder === null) {
-        return 1;
-      }
-      if (b.signingOrder === null) {
-        return -1;
-      }
-      if (a.signingOrder === b.signingOrder) {
-        return a.id - b.id;
-      }
-      return a.signingOrder - b.signingOrder;
+    return getNextDictatableRecipient({
+      recipients: envelope.recipients,
+      currentRecipientId: recipient.id,
     });
-
-    const currentIndex = sortedRecipients.findIndex((r) => r.id === recipient.id);
-
-    return currentIndex !== -1 && currentIndex < sortedRecipients.length - 1
-      ? sortedRecipients[currentIndex + 1]
-      : null;
   }, [envelope.documentMeta?.signingOrder, envelope.recipients, recipient.id]);
 
   const signField = async (
