@@ -272,6 +272,136 @@ test.describe('document editor', () => {
     expect((auditLog!.data as Record<string, unknown>).recipientEmail).toBe(recipientEmail);
   });
 
+  test('resend document succeeds when one recipient send fails after another succeeds', async ({ page, request }) => {
+    const { user, team, envelopeId, recipientEmail } = await createPendingEnvelopeViaApi();
+    const { token } = await createApiToken({
+      userId: user.id,
+      teamId: team.id,
+      tokenName: 'e2e-resend-partial-failure-test',
+      expiresIn: null,
+    });
+
+    await apiSignin({
+      page,
+      email: user.email,
+      redirectPath: `/t/${team.url}/documents/${envelopeId}/edit`,
+    });
+
+    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
+
+    const envelope = await prisma.envelope.findUniqueOrThrow({
+      where: { id: envelopeId },
+      include: { recipients: true, envelopeItems: true },
+    });
+
+    const originalRecipient = envelope.recipients.find((recipient) => recipient.email === recipientEmail);
+
+    expect(originalRecipient).toBeDefined();
+
+    const failingRecipientEmail = `resend-fail-${Date.now()}@test.documenso.com`;
+
+    const createRecipientRes = await request.post(`${V2_API_BASE_URL}/envelope/recipient/create-many`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        envelopeId,
+        data: [
+          {
+            email: failingRecipientEmail,
+            name: 'Failing Recipient',
+            role: RecipientRole.SIGNER,
+            accessAuth: [],
+            actionAuth: [],
+          },
+        ],
+      } satisfies TCreateEnvelopeRecipientsRequest,
+    });
+
+    expect(createRecipientRes.ok()).toBeTruthy();
+
+    const refreshedEnvelope = await prisma.envelope.findUniqueOrThrow({
+      where: { id: envelopeId },
+      include: { recipients: true, envelopeItems: true },
+    });
+
+    const failingRecipient = refreshedEnvelope.recipients.find(
+      (recipient) => recipient.email === failingRecipientEmail,
+    );
+
+    expect(failingRecipient).toBeDefined();
+
+    const envelopeItem = refreshedEnvelope.envelopeItems[0];
+
+    expect(envelopeItem).toBeDefined();
+    expect(failingRecipient).toBeDefined();
+
+    const createFieldRes = await request.post(`${V2_API_BASE_URL}/envelope/field/create-many`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        envelopeId,
+        data: [
+          {
+            recipientId: failingRecipient.id,
+            envelopeItemId: envelopeItem.id,
+            type: FieldType.SIGNATURE,
+            page: 1,
+            positionX: 180,
+            positionY: 180,
+            width: 50,
+            height: 50,
+          },
+        ],
+      },
+    });
+
+    expect(createFieldRes.ok()).toBeTruthy();
+
+    await page.locator('button[title="Resend Envelope"]').click();
+    await expect(page.getByRole('heading', { name: 'Resend Document' })).toBeVisible();
+
+    await page.route('**/api/trpc/envelope.resendDocument?batch=1', async (route) => {
+      const requestBody = route.request().postDataJSON() as {
+        '0': { json: { recipients: number[] } };
+      };
+
+      const recipients = requestBody['0'].json.recipients;
+
+      if (recipients.length === 2) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify([
+            {
+              result: {
+                data: {
+                  json: {
+                    id: envelopeId,
+                  },
+                },
+              },
+            },
+          ]),
+        });
+
+        return;
+      }
+
+      await route.continue();
+    });
+
+    await page.getByLabel(recipientEmail).check();
+    await page.getByLabel(failingRecipientEmail).check();
+    await page.getByRole('button', { name: 'Send reminder' }).click();
+
+    await expectToastTextToBeVisible(page, 'Envelope partially resent');
+    await expectToastTextToBeVisible(page, '1 reminder(s) sent, 1 failed.');
+  });
+
   test('duplicate document', async ({ page }) => {
     const surface = await openDocumentEnvelopeEditor(page);
 
