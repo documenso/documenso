@@ -30,7 +30,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { AlertTriangleIcon, FileTextIcon, PencilIcon, SparklesIcon } from 'lucide-react';
+import { AlertTriangleIcon, FileTextIcon, MousePointerClickIcon, PencilIcon, SparklesIcon, XIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
@@ -88,6 +88,10 @@ export const EnvelopeEditorFieldsPage = () => {
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
   const { revalidate } = useRevalidator();
+
+  // Whether the fields panel overlay is open. Only relevant below the `md`
+  // breakpoint, where the panel is hidden behind a floating trigger button.
+  const [isMobileFieldsPanelOpen, setIsMobileFieldsPanelOpen] = useState(false);
 
   const envelopeItemPermissions = useMemo(
     () => getEnvelopeItemPermissions(envelope, envelope.recipients),
@@ -187,6 +191,10 @@ export const EnvelopeEditorFieldsPage = () => {
   }, []);
 
   const onDetectClick = () => {
+    // Close the panel overlay on small viewports so the document stays
+    // visible while the AI dialogs are open.
+    setIsMobileFieldsPanelOpen(false);
+
     if (!team.preferences.aiFeaturesEnabled) {
       setIsAiEnableDialogOpen(true);
       return;
@@ -308,212 +316,264 @@ export const EnvelopeEditorFieldsPage = () => {
 
       {/* Right Section - Form Fields Panel */}
       {currentEnvelopeItem && envelope.recipients.length > 0 && (
-        <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-border border-l bg-background py-4">
-          {/* Recipient selector section. */}
-          <section className="px-4">
-            <h3 className="mb-2 font-semibold text-foreground text-sm">
-              <Trans>Selected Recipient</Trans>
-            </h3>
+        <>
+          {/* Floating trigger for the fields panel, visible below the `md` breakpoint. */}
+          <Button
+            type="button"
+            className="fixed right-4 bottom-4 z-30 shadow-lg md:hidden"
+            onClick={() => setIsMobileFieldsPanelOpen(true)}
+          >
+            <MousePointerClickIcon className="mr-2 h-4 w-4" />
+            <Trans>Fields</Trans>
+          </Button>
 
-            <EnvelopeRecipientSelector
-              selectedRecipient={editorFields.selectedRecipient}
-              onSelectedRecipientChange={(recipient) => editorFields.setSelectedRecipient(recipient.id)}
-              recipients={envelope.recipients}
-              fields={envelope.fields}
-              className="w-full"
-              align="end"
+          {isMobileFieldsPanelOpen && (
+            <div
+              role="presentation"
+              className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
+              onClick={() => setIsMobileFieldsPanelOpen(false)}
             />
+          )}
 
-            {editorFields.selectedRecipient &&
-              !canRecipientFieldsBeModified(editorFields.selectedRecipient, envelope.fields) && (
-                <Alert className="mt-4" variant="warning">
-                  <AlertDescription>
-                    <Trans>
-                      This recipient can no longer be modified as they have signed a field, or completed the document.
-                    </Trans>
-                  </AlertDescription>
-                </Alert>
-              )}
-          </section>
-
-          <Separator className="my-4" />
-
-          {/* Add fields section. */}
-          <section className="px-4">
-            <h3 className="mb-2 font-semibold text-foreground text-sm">
-              <Trans>Add Fields</Trans>
-            </h3>
-
-            <EnvelopeEditorFieldDragDrop
-              selectedRecipientId={editorFields.selectedRecipient?.id ?? null}
-              selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
-            />
-
-            {editorConfig.fields?.allowAIDetection && (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-4 w-full"
-                  onClick={onDetectClick}
-                  disabled={envelope.status !== DocumentStatus.DRAFT}
-                  title={
-                    envelope.status !== DocumentStatus.DRAFT
-                      ? _(msg`You can only detect fields in draft envelopes`)
-                      : undefined
-                  }
-                >
-                  <SparklesIcon className="mr-2 -ml-1 h-4 w-4" />
-                  <Trans>Detect with AI</Trans>
-                </Button>
-
-                <AiFieldDetectionDialog
-                  open={isAiFieldDialogOpen}
-                  onOpenChange={setIsAiFieldDialogOpen}
-                  onComplete={onFieldDetectionComplete}
-                  envelopeId={envelope.id}
-                  teamId={envelope.teamId}
-                />
-
-                <AiFeaturesEnableDialog
-                  open={isAiEnableDialogOpen}
-                  onOpenChange={setIsAiEnableDialogOpen}
-                  onEnabled={onAiFeaturesEnabled}
-                />
-              </>
+          {/*
+           * Below `md` the panel is a slide-in overlay, from `md` upwards it is a
+           * static sidebar.
+           *
+           * This is deliberately one always-mounted element toggled with CSS rather
+           * than a Sheet/Drawer: the field palette registers window-level mouse
+           * listeners that must survive the panel closing mid click-to-place, and
+           * unmounting would also double-mount the field settings forms and AI
+           * dialogs. `invisible` (with the transition covering visibility) keeps the
+           * closed overlay out of the tab order and accessibility tree.
+           */}
+          <div
+            className={cn(
+              'fixed inset-y-0 right-0 z-50 w-80 max-w-[85vw] overflow-y-auto border-border border-l bg-background py-4 transition-[transform,visibility] duration-200',
+              isMobileFieldsPanelOpen ? 'translate-x-0 shadow-xl' : 'translate-x-full max-md:invisible',
+              'md:sticky md:top-0 md:z-auto md:h-full md:w-80 md:max-w-none md:flex-shrink-0 md:translate-x-0 md:shadow-none md:transition-none',
             )}
-          </section>
+          >
+            {/* Panel header with close button, visible below the `md` breakpoint. */}
+            <div className="mb-4 flex items-center justify-between px-4 md:hidden">
+              <h3 className="font-semibold text-foreground text-sm">
+                <Trans>Fields</Trans>
+              </h3>
 
-          {/* Field details section. */}
-          <AnimateGenericFadeInOut key={editorFields.selectedField?.formId}>
-            {selectedField && (
-              <section>
-                <Separator className="my-4" />
+              <Button variant="ghost" size="sm" onClick={() => setIsMobileFieldsPanelOpen(false)}>
+                <XIcon className="h-4 w-4" />
+                <span className="sr-only">
+                  <Trans>Close</Trans>
+                </span>
+              </Button>
+            </div>
 
-                {searchParams.get('devmode') && (
-                  <>
-                    <div className="px-4">
-                      <h3 className="mb-3 font-semibold text-foreground text-sm">
-                        <Trans>Developer Mode</Trans>
-                      </h3>
+            {/* Recipient selector section. */}
+            <section className="px-4">
+              <h3 className="mb-2 font-semibold text-foreground text-sm">
+                <Trans>Selected Recipient</Trans>
+              </h3>
 
-                      <div className="space-y-2 rounded-md border border-border bg-muted/50 p-3 text-foreground text-sm">
-                        {selectedField.id && (
+              <EnvelopeRecipientSelector
+                selectedRecipient={editorFields.selectedRecipient}
+                onSelectedRecipientChange={(recipient) => editorFields.setSelectedRecipient(recipient.id)}
+                recipients={envelope.recipients}
+                fields={envelope.fields}
+                className="w-full"
+                align="end"
+              />
+
+              {editorFields.selectedRecipient &&
+                !canRecipientFieldsBeModified(editorFields.selectedRecipient, envelope.fields) && (
+                  <Alert className="mt-4" variant="warning">
+                    <AlertDescription>
+                      <Trans>
+                        This recipient can no longer be modified as they have signed a field, or completed the document.
+                      </Trans>
+                    </AlertDescription>
+                  </Alert>
+                )}
+            </section>
+
+            <Separator className="my-4" />
+
+            {/* Add fields section. */}
+            <section className="px-4">
+              <h3 className="mb-2 font-semibold text-foreground text-sm">
+                <Trans>Add Fields</Trans>
+              </h3>
+
+              <EnvelopeEditorFieldDragDrop
+                selectedRecipientId={editorFields.selectedRecipient?.id ?? null}
+                selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
+                onFieldSelect={() => setIsMobileFieldsPanelOpen(false)}
+              />
+
+              {editorConfig.fields?.allowAIDetection && (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-4 w-full"
+                    onClick={onDetectClick}
+                    disabled={envelope.status !== DocumentStatus.DRAFT}
+                    title={
+                      envelope.status !== DocumentStatus.DRAFT
+                        ? _(msg`You can only detect fields in draft envelopes`)
+                        : undefined
+                    }
+                  >
+                    <SparklesIcon className="mr-2 -ml-1 h-4 w-4" />
+                    <Trans>Detect with AI</Trans>
+                  </Button>
+
+                  <AiFieldDetectionDialog
+                    open={isAiFieldDialogOpen}
+                    onOpenChange={setIsAiFieldDialogOpen}
+                    onComplete={onFieldDetectionComplete}
+                    envelopeId={envelope.id}
+                    teamId={envelope.teamId}
+                  />
+
+                  <AiFeaturesEnableDialog
+                    open={isAiEnableDialogOpen}
+                    onOpenChange={setIsAiEnableDialogOpen}
+                    onEnabled={onAiFeaturesEnabled}
+                  />
+                </>
+              )}
+            </section>
+
+            {/* Field details section. */}
+            <AnimateGenericFadeInOut key={editorFields.selectedField?.formId}>
+              {selectedField && (
+                <section>
+                  <Separator className="my-4" />
+
+                  {searchParams.get('devmode') && (
+                    <>
+                      <div className="px-4">
+                        <h3 className="mb-3 font-semibold text-foreground text-sm">
+                          <Trans>Developer Mode</Trans>
+                        </h3>
+
+                        <div className="space-y-2 rounded-md border border-border bg-muted/50 p-3 text-foreground text-sm">
+                          {selectedField.id && (
+                            <p>
+                              <span className="min-w-12 text-muted-foreground">
+                                <Trans>Field ID:</Trans>
+                              </span>{' '}
+                              {selectedField.id}
+                            </p>
+                          )}
                           <p>
                             <span className="min-w-12 text-muted-foreground">
-                              <Trans>Field ID:</Trans>
+                              <Trans>Recipient ID:</Trans>
                             </span>{' '}
-                            {selectedField.id}
+                            {selectedField.recipientId}
                           </p>
-                        )}
-                        <p>
-                          <span className="min-w-12 text-muted-foreground">
-                            <Trans>Recipient ID:</Trans>
-                          </span>{' '}
-                          {selectedField.recipientId}
-                        </p>
-                        <p>
-                          <span className="min-w-12 text-muted-foreground">
-                            <Trans>Pos X:</Trans>
-                          </span>{' '}
-                          {selectedField.positionX.toFixed(2)}
-                        </p>
-                        <p>
-                          <span className="min-w-12 text-muted-foreground">
-                            <Trans>Pos Y:</Trans>
-                          </span>{' '}
-                          {selectedField.positionY.toFixed(2)}
-                        </p>
-                        <p>
-                          <span className="min-w-12 text-muted-foreground">
-                            <Trans>Width:</Trans>
-                          </span>{' '}
-                          {selectedField.width.toFixed(2)}
-                        </p>
-                        <p>
-                          <span className="min-w-12 text-muted-foreground">
-                            <Trans>Height:</Trans>
-                          </span>{' '}
-                          {selectedField.height.toFixed(2)}
-                        </p>
+                          <p>
+                            <span className="min-w-12 text-muted-foreground">
+                              <Trans>Pos X:</Trans>
+                            </span>{' '}
+                            {selectedField.positionX.toFixed(2)}
+                          </p>
+                          <p>
+                            <span className="min-w-12 text-muted-foreground">
+                              <Trans>Pos Y:</Trans>
+                            </span>{' '}
+                            {selectedField.positionY.toFixed(2)}
+                          </p>
+                          <p>
+                            <span className="min-w-12 text-muted-foreground">
+                              <Trans>Width:</Trans>
+                            </span>{' '}
+                            {selectedField.width.toFixed(2)}
+                          </p>
+                          <p>
+                            <span className="min-w-12 text-muted-foreground">
+                              <Trans>Height:</Trans>
+                            </span>{' '}
+                            {selectedField.height.toFixed(2)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
 
-                    <Separator className="my-4" />
-                  </>
-                )}
+                      <Separator className="my-4" />
+                    </>
+                  )}
 
-                <div className="px-4 [&_label]:text-foreground/70 [&_label]:text-xs">
-                  <h3 className="font-semibold text-sm">{_(FieldSettingsTypeTranslations[selectedField.type])}</h3>
+                  <div className="px-4 [&_label]:text-foreground/70 [&_label]:text-xs">
+                    <h3 className="font-semibold text-sm">{_(FieldSettingsTypeTranslations[selectedField.type])}</h3>
 
-                  {match(selectedField.type)
-                    .with(FieldType.SIGNATURE, () => (
-                      <EditorFieldSignatureForm
-                        value={selectedField?.fieldMeta as TSignatureFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.CHECKBOX, () => (
-                      <EditorFieldCheckboxForm
-                        value={selectedField?.fieldMeta as TCheckboxFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.DATE, () => (
-                      <EditorFieldDateForm
-                        value={selectedField?.fieldMeta as TDateFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.DROPDOWN, () => (
-                      <EditorFieldDropdownForm
-                        value={selectedField?.fieldMeta as TDropdownFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.EMAIL, () => (
-                      <EditorFieldEmailForm
-                        value={selectedField?.fieldMeta as TEmailFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.INITIALS, () => (
-                      <EditorFieldInitialsForm
-                        value={selectedField?.fieldMeta as TInitialsFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.NAME, () => (
-                      <EditorFieldNameForm
-                        value={selectedField?.fieldMeta as TNameFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.NUMBER, () => (
-                      <EditorFieldNumberForm
-                        value={selectedField?.fieldMeta as TNumberFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.RADIO, () => (
-                      <EditorFieldRadioForm
-                        value={selectedField?.fieldMeta as TRadioFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.TEXT, () => (
-                      <EditorFieldTextForm
-                        value={selectedField?.fieldMeta as TTextFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .otherwise(() => null)}
-                </div>
-              </section>
-            )}
-          </AnimateGenericFadeInOut>
-        </div>
+                    {match(selectedField.type)
+                      .with(FieldType.SIGNATURE, () => (
+                        <EditorFieldSignatureForm
+                          value={selectedField?.fieldMeta as TSignatureFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.CHECKBOX, () => (
+                        <EditorFieldCheckboxForm
+                          value={selectedField?.fieldMeta as TCheckboxFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.DATE, () => (
+                        <EditorFieldDateForm
+                          value={selectedField?.fieldMeta as TDateFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.DROPDOWN, () => (
+                        <EditorFieldDropdownForm
+                          value={selectedField?.fieldMeta as TDropdownFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.EMAIL, () => (
+                        <EditorFieldEmailForm
+                          value={selectedField?.fieldMeta as TEmailFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.INITIALS, () => (
+                        <EditorFieldInitialsForm
+                          value={selectedField?.fieldMeta as TInitialsFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.NAME, () => (
+                        <EditorFieldNameForm
+                          value={selectedField?.fieldMeta as TNameFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.NUMBER, () => (
+                        <EditorFieldNumberForm
+                          value={selectedField?.fieldMeta as TNumberFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.RADIO, () => (
+                        <EditorFieldRadioForm
+                          value={selectedField?.fieldMeta as TRadioFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.TEXT, () => (
+                        <EditorFieldTextForm
+                          value={selectedField?.fieldMeta as TTextFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .otherwise(() => null)}
+                  </div>
+                </section>
+              )}
+            </AnimateGenericFadeInOut>
+          </div>
+        </>
       )}
     </div>
   );

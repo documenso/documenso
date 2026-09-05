@@ -592,7 +592,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
   return (
     <Card backdropBlur={false} className="border">
-      <CardHeader className="flex flex-row justify-between">
+      <CardHeader className="flex flex-col justify-between gap-4 space-y-0 sm:flex-row">
         <div>
           <CardTitle>
             <Trans>Recipients</Trans>
@@ -602,7 +602,7 @@ export const EnvelopeEditorRecipientForm = () => {
           </CardDescription>
         </div>
 
-        <div className="flex flex-row items-center space-x-2">
+        <div className="flex flex-row flex-wrap items-center gap-2">
           {editorConfig.recipients?.allowAIDetection && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -842,9 +842,9 @@ export const EnvelopeEditorRecipientForm = () => {
                                 'pr-3': isSigningOrderSequential,
                               })}
                             >
-                              <div className="flex flex-row items-center gap-x-2">
+                              <div className="flex flex-row flex-wrap items-center gap-2 sm:flex-nowrap">
                                 {isSigningOrderSequential && isCcRecipient(signer) && (
-                                  <div className="mt-auto h-10 w-[4.25rem] flex-shrink-0" />
+                                  <div className="mt-auto hidden h-10 w-[4.25rem] flex-shrink-0 sm:block" />
                                 )}
 
                                 {isSigningOrderSequential && !isCcRecipient(signer) && (
@@ -900,8 +900,9 @@ export const EnvelopeEditorRecipientForm = () => {
                                           !form.formState.errors.signers[index]?.email,
                                       })}
                                     >
-                                      {!showAdvancedSettings && index === 0 && (
-                                        <FormLabel>
+                                      {/* Below `sm` the rows are stacked, so every row needs its own labels. */}
+                                      {!showAdvancedSettings && (
+                                        <FormLabel className={cn(index !== 0 && 'sm:hidden')}>
                                           <Trans>Email</Trans>
                                         </FormLabel>
                                       )}
@@ -947,8 +948,8 @@ export const EnvelopeEditorRecipientForm = () => {
                                           !form.formState.errors.signers[index]?.name,
                                       })}
                                     >
-                                      {!showAdvancedSettings && index === 0 && (
-                                        <FormLabel>
+                                      {!showAdvancedSettings && (
+                                        <FormLabel className={cn(index !== 0 && 'sm:hidden')}>
                                           <Trans>Name</Trans>
                                         </FormLabel>
                                       )}
