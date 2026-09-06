@@ -18,6 +18,5 @@ export const embeddingPresignRouter = router({
   updateEmbeddingEnvelope: updateEmbeddingEnvelopeRoute,
   updateEmbeddingDocument: updateEmbeddingDocumentRoute,
   updateEmbeddingTemplate: updateEmbeddingTemplateRoute,
-  // applyMultiSignSignature: applyMultiSignSignatureRoute,
   getMultiSignDocument: getMultiSignDocumentRoute,
 });
