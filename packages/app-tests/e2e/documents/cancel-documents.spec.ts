@@ -41,7 +41,7 @@ const cancelDocumentViaUi = async (page: Page, documentTitle: string, reason?: s
   await expect(page.getByRole('heading', { name: 'Are you sure?' })).toBeVisible();
 
   if (reason) {
-    await page.getByPlaceholder('Add an optional reason for cancelling this document').fill(reason);
+    await page.getByPlaceholder('Add an optional reason for canceling this document').fill(reason);
   }
 
   await page.getByRole('button', { name: 'Cancel document' }).click();
@@ -58,13 +58,13 @@ test('[DOCUMENTS]: cancelling a pending document keeps it in the owner dashboard
 
   await cancelDocumentViaUi(page, 'Document 1 - Pending', 'No longer required');
 
-  await expectToastTextToBeVisible(page, 'Document cancelled');
+  await expectToastTextToBeVisible(page, 'Document canceled');
 
   // The document must remain in the dashboard, unlike deleting a pending document.
   await checkDocumentCounts(page, { inbox: 0, pending: 0, cancelled: 1, all: 1 });
 
   // The cancelled document is still listed.
-  await selectDocumentStatusFilter(page, 'Cancelled');
+  await selectDocumentStatusFilter(page, 'Canceled');
   await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).toBeVisible();
 
   // The envelope status is persisted as CANCELLED.
@@ -95,7 +95,7 @@ test('[DOCUMENTS]: cancelling a pending document retains it for recipients', asy
 
   await cancelDocumentViaUi(page, 'Document 1 - Pending');
 
-  await expectToastTextToBeVisible(page, 'Document cancelled');
+  await expectToastTextToBeVisible(page, 'Document canceled');
 
   await apiSignout({ page });
 
@@ -125,10 +125,10 @@ test('[DOCUMENTS]: a cancelled document can be deleted, hiding it from the owner
   });
 
   await cancelDocumentViaUi(page, 'Document 1 - Pending');
-  await expectToastTextToBeVisible(page, 'Document cancelled');
+  await expectToastTextToBeVisible(page, 'Document canceled');
 
   // Delete the now-cancelled document. Being terminal, it should soft delete (hide).
-  await selectDocumentStatusFilter(page, 'Cancelled');
+  await selectDocumentStatusFilter(page, 'Canceled');
 
   const documentActionBtn = page
     .locator('tr', { hasText: 'Document 1 - Pending' })
@@ -328,7 +328,7 @@ test('[DOCUMENTS]: a team ADMIN sees and can use the Cancel action on a document
 
   await cancelDocumentViaUi(page, 'Admin Cancellable Document');
 
-  await expectToastTextToBeVisible(page, 'Document cancelled');
+  await expectToastTextToBeVisible(page, 'Document canceled');
 
   const envelope = await prisma.envelope.findFirstOrThrow({
     where: { id: document.id },
