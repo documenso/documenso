@@ -317,10 +317,10 @@ export const EnvelopeEditorFieldsPage = () => {
       {/* Right Section - Form Fields Panel */}
       {currentEnvelopeItem && envelope.recipients.length > 0 && (
         <>
-          {/* Floating trigger for the fields panel, visible below the `md` breakpoint. */}
+          {/* Floating trigger for the fields panel, visible below the `md` breakpoint. Offset to clear the step bar. */}
           <Button
             type="button"
-            className="fixed right-4 bottom-4 z-30 shadow-lg md:hidden"
+            className="fixed right-4 bottom-[4.5rem] z-30 shadow-lg md:hidden"
             onClick={() => setIsMobileFieldsPanelOpen(true)}
           >
             <MousePointerClickIcon className="mr-2 h-4 w-4" />
@@ -349,8 +349,8 @@ export const EnvelopeEditorFieldsPage = () => {
           <div
             className={cn(
               'fixed inset-y-0 right-0 z-50 w-80 max-w-[85vw] overflow-y-auto border-border border-l bg-background py-4 transition-[transform,visibility] duration-200',
-              isMobileFieldsPanelOpen ? 'translate-x-0 shadow-xl' : 'translate-x-full max-md:invisible',
-              'md:sticky md:top-0 md:z-auto md:h-full md:w-80 md:max-w-none md:flex-shrink-0 md:translate-x-0 md:shadow-none md:transition-none',
+              isMobileFieldsPanelOpen ? 'translate-x-0 shadow-xl' : 'invisible translate-x-full',
+              'md:visible md:sticky md:top-0 md:z-auto md:h-full md:w-80 md:max-w-none md:flex-shrink-0 md:translate-x-0 md:shadow-none md:transition-none',
             )}
           >
             {/* Panel header with close button, visible below the `md` breakpoint. */}

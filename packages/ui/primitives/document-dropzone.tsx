@@ -87,10 +87,11 @@ export const DocumentDropzone = ({
         {...getRootProps()}
         {...props}
       >
-        <CardContent className="flex flex-col items-center justify-center p-6 text-muted-foreground/40">
+        <CardContent className="flex flex-col items-center justify-center px-4 py-2 text-muted-foreground/40 sm:p-6">
+          {/* Below `sm` the illustration is hidden and the dropzone is sized like a regular button. */}
           {disabled ? (
             // Disabled State
-            <div className="flex">
+            <div className="hidden sm:flex">
               <motion.div
                 className="a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-background/80 px-2 py-4 backdrop-blur-sm group-hover:border-destructive/10 group-hover:bg-destructive/2"
                 variants={DocumentDropzoneDisabledCardLeftVariants}
@@ -119,7 +120,7 @@ export const DocumentDropzone = ({
             </div>
           ) : (
             // Non Disabled State
-            <div className="flex">
+            <div className="hidden sm:flex">
               <motion.div
                 className="a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-background/80 px-2 py-4 backdrop-blur-sm group-hover:border-documenso/80"
                 variants={DocumentDropzoneCardLeftVariants}
@@ -147,9 +148,13 @@ export const DocumentDropzone = ({
 
           <input {...getInputProps()} />
 
-          <p className="mt-6 font-medium text-foreground">{_(heading[type])}</p>
+          <p className="flex items-center justify-center gap-2 text-center font-medium text-foreground text-sm sm:mt-6 sm:text-base">
+            {!disabled && <Plus className="h-4 w-4 sm:hidden" aria-hidden />}
+            {_(heading[type])}
+          </p>
 
-          <p className="mt-1 text-center text-muted-foreground/80 text-sm">
+          {/* The drag & drop hint is irrelevant on touch devices, but the disabled reason must always show. */}
+          <p className={cn('mt-1 text-center text-muted-foreground/80 text-sm', !disabled && 'hidden sm:block')}>
             {_(disabled ? disabledMessage : msg`Drag & drop your document here.`)}
           </p>
 

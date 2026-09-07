@@ -590,9 +590,15 @@ export const EnvelopeEditorRecipientForm = () => {
   const recipientCountLimit = organisation.organisationClaim.recipientCount;
   const isOverRecipientLimit = recipientCountLimit > 0 && signers.length > recipientCountLimit;
 
+  const aiDetectionLabel = team.preferences.aiFeaturesEnabled ? (
+    <Trans>Detect recipients with AI</Trans>
+  ) : (
+    <Trans>Enable AI detection</Trans>
+  );
+
   return (
     <Card backdropBlur={false} className="border">
-      <CardHeader className="flex flex-col justify-between gap-4 space-y-0 sm:flex-row">
+      <CardHeader className="flex flex-col justify-between gap-4 space-y-0 p-4 sm:flex-row sm:p-6">
         <div>
           <CardTitle>
             <Trans>Recipients</Trans>
@@ -610,27 +616,23 @@ export const EnvelopeEditorRecipientForm = () => {
                   variant="outline"
                   type="button"
                   size="sm"
+                  className="order-last w-full sm:order-none sm:w-auto"
                   disabled={isSubmitting}
                   onClick={onDetectRecipientsClick}
                 >
                   <SparklesIcon className="h-4 w-4" />
+                  <span className="ml-2 sm:hidden">{aiDetectionLabel}</span>
                 </Button>
               </TooltipTrigger>
 
-              <TooltipContent>
-                {team.preferences.aiFeaturesEnabled ? (
-                  <Trans>Detect recipients with AI</Trans>
-                ) : (
-                  <Trans>Enable AI detection</Trans>
-                )}
-              </TooltipContent>
+              <TooltipContent>{aiDetectionLabel}</TooltipContent>
             </Tooltip>
           )}
 
           {(!isEmbedded || hasCurrentEditorInfo) && (
             <Button
               variant="outline"
-              className="flex flex-row items-center"
+              className="flex flex-1 flex-row items-center sm:flex-none"
               size="sm"
               disabled={isSubmitting || isUserAlreadyARecipient}
               onClick={() => onAddSelfSigner()}
@@ -653,7 +655,7 @@ export const EnvelopeEditorRecipientForm = () => {
         </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
         {isOverRecipientLimit && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>
@@ -837,9 +839,12 @@ export const EnvelopeEditorRecipientForm = () => {
                               data-native-id={signer.id}
                               disabled={isSubmitting || !canRecipientBeModified(signer.id)}
                               className={cn('pb-2', {
-                                'border-b pb-4': showAdvancedSettings && index !== signers.length - 1,
+                                // Recipients that span several lines (stacked below `sm`, or with advanced
+                                // settings shown) are separated by a divider.
+                                'border-b pb-4': index !== signers.length - 1,
+                                'sm:border-b-0 sm:pb-2': !showAdvancedSettings && index !== signers.length - 1,
                                 'pt-2': showAdvancedSettings && index === 0,
-                                'pr-3': isSigningOrderSequential,
+                                'sm:pr-3': isSigningOrderSequential,
                               })}
                             >
                               <div className="flex flex-row flex-wrap items-center gap-2 sm:flex-nowrap">
@@ -853,11 +858,14 @@ export const EnvelopeEditorRecipientForm = () => {
                                     name={`signers.${index}.signingOrder`}
                                     render={({ field }) => (
                                       <FormItem
-                                        className={cn('mt-auto flex items-center gap-x-1 space-y-0', {
-                                          'mb-6':
-                                            form.formState.errors.signers?.[index] &&
-                                            !form.formState.errors.signers[index]?.signingOrder,
-                                        })}
+                                        className={cn(
+                                          'order-1 mt-auto flex items-center gap-x-1 space-y-0 sm:order-none',
+                                          {
+                                            'sm:mb-6':
+                                              form.formState.errors.signers?.[index] &&
+                                              !form.formState.errors.signers[index]?.signingOrder,
+                                          },
+                                        )}
                                       >
                                         <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
                                         <FormControl>
@@ -889,20 +897,28 @@ export const EnvelopeEditorRecipientForm = () => {
                                   />
                                 )}
 
+                                {/*
+                                 * Below `sm` the fields are stacked, so each recipient gets a header line
+                                 * (title, role and delete) with the inputs underneath. The `order` classes
+                                 * pull the role and delete controls up next to this title.
+                                 */}
+                                <span className="order-1 min-w-0 flex-1 truncate font-medium text-sm sm:hidden">
+                                  <Trans>Recipient {index + 1}</Trans>
+                                </span>
+
                                 <FormField
                                   control={form.control}
                                   name={`signers.${index}.email`}
                                   render={({ field }) => (
                                     <FormItem
-                                      className={cn('relative w-full', {
-                                        'mb-6':
+                                      className={cn('relative order-2 w-full sm:order-none', {
+                                        'sm:mb-6':
                                           form.formState.errors.signers?.[index] &&
                                           !form.formState.errors.signers[index]?.email,
                                       })}
                                     >
-                                      {/* Below `sm` the rows are stacked, so every row needs its own labels. */}
                                       {!showAdvancedSettings && (
-                                        <FormLabel className={cn(index !== 0 && 'sm:hidden')}>
+                                        <FormLabel className={cn(index !== 0 && 'sm:sr-only')}>
                                           <Trans>Email</Trans>
                                         </FormLabel>
                                       )}
@@ -942,14 +958,14 @@ export const EnvelopeEditorRecipientForm = () => {
                                   name={`signers.${index}.name`}
                                   render={({ field }) => (
                                     <FormItem
-                                      className={cn('w-full', {
-                                        'mb-6':
+                                      className={cn('order-3 w-full sm:order-none', {
+                                        'sm:mb-6':
                                           form.formState.errors.signers?.[index] &&
                                           !form.formState.errors.signers[index]?.name,
                                       })}
                                     >
                                       {!showAdvancedSettings && (
-                                        <FormLabel className={cn(index !== 0 && 'sm:hidden')}>
+                                        <FormLabel className={cn(index !== 0 && 'sm:sr-only')}>
                                           <Trans>Name</Trans>
                                         </FormLabel>
                                       )}
@@ -988,8 +1004,8 @@ export const EnvelopeEditorRecipientForm = () => {
                                   name={`signers.${index}.role`}
                                   render={({ field }) => (
                                     <FormItem
-                                      className={cn('mt-auto w-fit', {
-                                        'mb-6':
+                                      className={cn('order-1 mt-auto w-fit sm:order-none', {
+                                        'sm:mb-6':
                                           form.formState.errors.signers?.[index] &&
                                           !form.formState.errors.signers[index]?.role,
                                       })}
@@ -1019,8 +1035,8 @@ export const EnvelopeEditorRecipientForm = () => {
 
                                 <Button
                                   variant="ghost"
-                                  className={cn('mt-auto px-2', {
-                                    'mb-6': form.formState.errors.signers?.[index],
+                                  className={cn('order-1 mt-auto px-2 sm:order-none', {
+                                    'sm:mb-6': form.formState.errors.signers?.[index],
                                   })}
                                   data-testid="remove-signer-button"
                                   disabled={

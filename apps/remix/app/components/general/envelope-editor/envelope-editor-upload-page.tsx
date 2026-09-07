@@ -468,7 +468,7 @@ export const EnvelopeEditorUploadPage = () => {
       <EnvelopeEditorInvalidDirectTemplateAlert className="max-w-none" />
 
       <Card backdropBlur={false} className="border">
-        <CardHeader className="pb-3">
+        <CardHeader className="p-4 pb-3 sm:p-6 sm:pb-3">
           <CardTitle>
             <Trans>Documents</Trans>
           </CardTitle>
@@ -477,13 +477,13 @@ export const EnvelopeEditorUploadPage = () => {
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
           {uploadConfig?.allowUpload && (
             <DocumentDropzone
               data-testid="envelope-item-dropzone"
               onDrop={onFileDrop}
               allowMultiple
-              className="pt-6 pb-4"
+              className="sm:pt-6 sm:pb-4"
               disabled={dropzoneDisabledMessage !== null}
               disabledMessage={dropzoneDisabledMessage || undefined}
               disabledHeading={msg`Upload disabled`}
@@ -646,8 +646,9 @@ export const EnvelopeEditorUploadPage = () => {
       {/* Recipients Section */}
       <EnvelopeEditorRecipientForm />
 
+      {/* Below `md` the step bar already offers this, so the button only shows alongside the sidebar. */}
       {editorConfig.general.allowAddFieldsStep && (
-        <div className="flex justify-end">
+        <div className="hidden justify-end md:flex">
           <Button type="button" onClick={() => void navigateToStep('addFields')}>
             <Trans>Add Fields</Trans>
           </Button>
