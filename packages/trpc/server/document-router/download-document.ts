@@ -1,4 +1,5 @@
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   downloadDocumentMeta,
   ZDownloadDocumentRequestSchema,
@@ -9,6 +10,7 @@ export const downloadDocumentRoute = authenticatedProcedure
   .meta(downloadDocumentMeta)
   .input(ZDownloadDocumentRequestSchema)
   .output(ZDownloadDocumentResponseSchema)
+  .use(twoFactorScope((input) => ({ document: input.documentId })))
   .query(({ input, ctx }) => {
     const { documentId, version } = input;
 

@@ -2,6 +2,7 @@ import { resendDocument } from '@documenso/lib/server-only/document/resend-docum
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   redistributeEnvelopeMeta,
   ZRedistributeEnvelopeRequestSchema,
@@ -12,6 +13,7 @@ export const redistributeEnvelopeRoute = authenticatedProcedure
   .meta(redistributeEnvelopeMeta)
   .input(ZRedistributeEnvelopeRequestSchema)
   .output(ZRedistributeEnvelopeResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { envelopeId, recipients } = input;

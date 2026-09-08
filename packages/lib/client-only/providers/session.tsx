@@ -8,11 +8,19 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { useLocation } from 'react-router';
 
 import { SKIP_QUERY_BATCH_META } from '../../constants/trpc';
+import type { TTwoFactorEnforcementStatus } from '../../utils/two-factor';
 
 export type AppSession = {
   session: Session;
   user: SessionUser;
   organisations: TGetOrganisationSessionResponse;
+
+  /**
+   * Instance-wide 2FA enforcement status for the current user + session,
+   * computed server-side. Layout components read this to derive banners and
+   * the enforcement redirect client-side without extra queries.
+   */
+  twoFactorEnforcement: TTwoFactorEnforcementStatus;
 };
 
 interface SessionProviderProps {
@@ -94,6 +102,7 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
       session: newSession.session,
       user: newSession.user,
       organisations,
+      twoFactorEnforcement: newSession.twoFactorEnforcement,
     });
   }, []);
 

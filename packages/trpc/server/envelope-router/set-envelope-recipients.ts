@@ -4,6 +4,7 @@ import { EnvelopeType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZSetEnvelopeRecipientsRequestSchema,
   ZSetEnvelopeRecipientsResponseSchema,
@@ -12,6 +13,7 @@ import {
 export const setEnvelopeRecipientsRoute = authenticatedProcedure
   .input(ZSetEnvelopeRecipientsRequestSchema)
   .output(ZSetEnvelopeRecipientsResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { envelopeId, envelopeType, recipients } = input;

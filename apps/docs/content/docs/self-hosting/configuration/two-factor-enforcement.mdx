@@ -1,0 +1,54 @@
+---
+title: Two-Factor Enforcement
+description: Require two-factor authentication instance-wide or per organisation, with grace periods and important limitations.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## Overview
+
+Documenso can require users to enable two-factor authentication (2FA) at two levels:
+
+- **Instance-wide enforcement** — configured by an instance administrator under **Admin → Site Settings**. Requires a Documenso license that includes the feature. Once a user's grace period expires, they are redirected to a forced enrolment page before they can continue using the app.
+- **Per-organisation enforcement** — available to everyone, configured by organisation admins in the organisation settings. Once a member's grace period expires, only access to that organisation (and its teams) is blocked; the rest of the app stays usable.
+
+A user satisfies enforcement when they have 2FA enabled **and** their current session has passed a second factor (a TOTP/backup-code challenge, a user-verified passkey sign-in, or enabling 2FA during the session). Sessions created before the user enabled 2FA must sign out and back in to verify.
+
+## Grace Periods
+
+Both levels support a grace period of 0–365 days:
+
+- **Instance**: the window starts at the later of the user's grace start (typically account creation, restarted by an admin 2FA reset) and the moment enforcement was enabled.
+- **Organisation**: the window starts at the latest of joining the organisation, the moment the organisation enabled enforcement, and the user's grace start.
+
+A grace period of **0 days** enforces immediately: for the instance policy, users are forced to enrol right after signing up or signing in; for the organisation policy, members are blocked from the organisation until they enrol.
+
+**Joining is never blocked; access is.** Invitations and SSO sign-ins always succeed — the grace window starts at join. Members who never comply still occupy a seat and count towards member limits; organisation admins can see per-member 2FA compliance in the members list.
+
+Reducing an active grace period requires an explicit acknowledgement in the settings UI, since it can immediately block users who have not yet enrolled.
+
+Enabling enforcement requires the acting administrator to already satisfy the policy themselves (2FA enabled and verified on their current session). This prevents administrators from locking themselves out with a 0-day grace period.
+
+## Known Limitation: API Tokens Are Exempt
+
+<Callout type="warn">
+  Enforcement applies to interactive (session-based) access only. **API tokens minted before a
+  user's deadline keep working after it.** A blocked user cannot mint new tokens, but existing
+  tokens are not revoked by enforcement. If you need to cut off a non-compliant user's API access,
+  revoke their tokens explicitly.
+</Callout>
+
+## Licensing
+
+Instance-wide enforcement is license-gated:
+
+- Without the license, the instance-wide section in Admin → Site Settings is visible but disabled.
+- If enforcement was configured while licensed and the license later lapses, the stored configuration becomes **inactive** (nothing is enforced) and the only permitted change is disabling it.
+
+Per-organisation enforcement does not require a license. When instance-wide enforcement is active, it takes precedence over organisation policies.
+
+---
+
+## See Also
+
+- [License](/docs/self-hosting/configuration/license) - Configuring your Documenso license

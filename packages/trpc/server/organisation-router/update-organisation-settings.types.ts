@@ -13,6 +13,13 @@ import { z } from 'zod';
 
 export const ZUpdateOrganisationSettingsRequestSchema = z.object({
   organisationId: z.string(),
+
+  /**
+   * Required (as `true`) when the update reduces an active 2FA enforcement
+   * grace window, so the client explicitly acknowledges that members lose
+   * remaining grace time.
+   */
+  acknowledgeGracePeriodReduction: z.boolean().optional(),
   data: z.object({
     // Document related settings.
     documentVisibility: z.nativeEnum(DocumentVisibility).optional(),
@@ -45,6 +52,11 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
 
     // AI features settings.
     aiFeaturesEnabled: z.boolean().optional(),
+
+    // 2FA enforcement settings. Touching these requires the
+    // MANAGE_ORGANISATION_SECURITY permission (ADMIN only).
+    twoFactorRequired: z.boolean().optional(),
+    twoFactorGracePeriodDays: z.number().int().min(0).max(365).optional(),
   }),
 });
 

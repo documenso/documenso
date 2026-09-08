@@ -13,6 +13,12 @@ type LoginOptions = {
   password?: string;
 
   /**
+   * TOTP code for accounts with 2FA enabled. Sign-ins that pass a valid code
+   * create a session with `twoFactorVerified: true`.
+   */
+  totpCode?: string;
+
+  /**
    * Where to navigate after login.
    */
   redirectPath?: string;
@@ -22,6 +28,7 @@ export const apiSignin = async ({
   page,
   email = 'example@documenso.com',
   password = 'password',
+  totpCode,
   redirectPath = '/',
 }: LoginOptions) => {
   const { request } = page.context();
@@ -33,6 +40,7 @@ export const apiSignin = async ({
     data: {
       email,
       password,
+      totpCode,
       csrfToken,
     },
   });

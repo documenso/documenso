@@ -6,6 +6,7 @@ import { buildOrganisationWhereQuery, isOrganisationRoleWithinUserHierarchy } fr
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZResendOrganisationMemberInviteRequestSchema,
   ZResendOrganisationMemberInviteResponseSchema,
@@ -15,6 +16,7 @@ export const resendOrganisationMemberInviteRoute = authenticatedProcedure
   //   .meta(resendOrganisationMemberInviteMeta)
   .input(ZResendOrganisationMemberInviteRequestSchema)
   .output(ZResendOrganisationMemberInviteResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .mutation(async ({ ctx, input }) => {
     const { organisationId, invitationId } = input;
 

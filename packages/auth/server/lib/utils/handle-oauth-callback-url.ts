@@ -23,6 +23,7 @@ import { AuthenticationErrorCode } from '../errors/error-codes';
 import { failEmbedAuthFlow } from '../handoff/record-embed-auth-failure';
 import { onAuthorize } from './authorizer';
 import { getOpenIdConfiguration } from './open-id';
+import { createTwoFactorChallenge } from './two-factor-challenge';
 
 type HandleOAuthCallbackUrlOptions = {
   c: Context;
@@ -96,6 +97,7 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
       user: {
         select: {
           id: true,
+          twoFactorEnabled: true,
         },
       },
     },
@@ -103,7 +105,21 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
 
   // Directly log in user if account already exists.
   if (existingAccount) {
-    await onAuthorize({ userId: existingAccount.user.id }, c);
+    // A 2FA-enabled user must pass a TOTP/backup challenge before any session
+    // exists — primary (OAuth) auth alone only earns a pending challenge.
+    if (existingAccount.user.twoFactorEnabled) {
+      await createTwoFactorChallenge(c, {
+        userId: existingAccount.user.id,
+        metadata: {
+          redirectPath,
+          authMethod: 'oauth',
+        },
+      });
+
+      return c.redirect('/2fa-challenge', 302);
+    }
+
+    await onAuthorize({ userId: existingAccount.user.id, authMethod: 'oauth', twoFactorVerified: false }, c);
 
     return c.redirect(redirectPath, 302);
   }
@@ -115,11 +131,37 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
     select: {
       id: true,
       emailVerified: true,
+      twoFactorEnabled: true,
     },
   });
 
   // Handle existing user but no account.
   if (userWithSameEmail) {
+    // Deferred account linking: when the target user has 2FA enabled, NO
+    // account mutation may happen before the code verifies. The entire link
+    // transaction below is deferred into the challenge metadata `action` and
+    // executed atomically with token consumption after the code passes.
+    //
+    // Access/ID tokens are intentionally NOT stored in the metadata — the
+    // deferred account row is created without them.
+    if (userWithSameEmail.twoFactorEnabled) {
+      await createTwoFactorChallenge(c, {
+        userId: userWithSameEmail.id,
+        metadata: {
+          redirectPath,
+          authMethod: 'oauth',
+          action: {
+            type: 'link-oauth-account',
+            provider: clientOptions.id,
+            providerAccountId: sub,
+            email,
+          },
+        },
+      });
+
+      return c.redirect('/2fa-challenge', 302);
+    }
+
     await prisma.$transaction(async (tx) => {
       await tx.account.create({
         data: {
@@ -160,7 +202,7 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
       }
     });
 
-    await onAuthorize({ userId: userWithSameEmail.id }, c);
+    await onAuthorize({ userId: userWithSameEmail.id, authMethod: 'oauth', twoFactorVerified: false }, c);
 
     return c.redirect(redirectPath, 302);
   }
@@ -213,7 +255,7 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
     console.error(err);
   });
 
-  await onAuthorize({ userId: createdUser.id }, c);
+  await onAuthorize({ userId: createdUser.id, authMethod: 'oauth', twoFactorVerified: false }, c);
 
   return c.redirect(redirectPath, 302);
 };

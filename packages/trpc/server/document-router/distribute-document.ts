@@ -3,6 +3,7 @@ import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/ups
 import { mapEnvelopeToDocumentLite } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   distributeDocumentMeta,
   ZDistributeDocumentRequestSchema,
@@ -13,6 +14,7 @@ export const distributeDocumentRoute = authenticatedProcedure
   .meta(distributeDocumentMeta)
   .input(ZDistributeDocumentRequestSchema)
   .output(ZDistributeDocumentResponseSchema)
+  .use(twoFactorScope((input) => ({ document: input.documentId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { documentId, meta = {} } = input;

@@ -5,6 +5,7 @@ import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   updateEnvelopeItemsMeta,
   ZUpdateEnvelopeItemsRequestSchema,
@@ -15,6 +16,7 @@ export const updateEnvelopeItemsRoute = authenticatedProcedure
   .meta(updateEnvelopeItemsMeta)
   .input(ZUpdateEnvelopeItemsRequestSchema)
   .output(ZUpdateEnvelopeItemsResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
     const { envelopeId, data } = input;

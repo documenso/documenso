@@ -3,6 +3,7 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 
 import { maybeAuthenticatedProcedure } from '../trpc';
+import { twoFactorRemediation } from '../two-factor-enforcement/enforce';
 import {
   ZDeclineOrganisationMemberInviteRequestSchema,
   ZDeclineOrganisationMemberInviteResponseSchema,
@@ -11,6 +12,8 @@ import {
 export const declineOrganisationMemberInviteRoute = maybeAuthenticatedProcedure
   .input(ZDeclineOrganisationMemberInviteRequestSchema)
   .output(ZDeclineOrganisationMemberInviteResponseSchema)
+  // 2FA enforcement: REMEDIATION — a member must always be able to walk away; declining an invite must never be blocked. Instance assert still applies.
+  .use(twoFactorRemediation())
   .mutation(async ({ input }) => {
     const { token } = input;
 

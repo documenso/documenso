@@ -44,15 +44,27 @@ export const ZOrganisationLiteSchema = OrganisationSchema.pick({
  */
 export const ZOrganisationManySchema = ZOrganisationLiteSchema;
 
+/**
+ * Metadata stored on the SSO account-link verification token.
+ *
+ * Intentionally stores ONLY the provider subject and the email address the
+ * confirmation was sent to — never access/ID tokens. The linked account row
+ * is created without provider tokens; the organisation portal re-authenticates
+ * against the IdP on every sign-in, so persisting tokens in a verification
+ * token row would only widen the blast radius of a database leak.
+ */
 export const ZOrganisationAccountLinkMetadataSchema = z.object({
   type: z.enum(['link', 'create']),
   userId: z.number(),
   organisationId: z.string(),
+
+  /**
+   * The email address the confirmation email was sent to. Confirmation
+   * asserts the user's email still matches this value.
+   */
+  email: z.string().email(),
   oauthConfig: z.object({
     providerAccountId: z.string(),
-    accessToken: z.string(),
-    expiresAt: z.number(),
-    idToken: z.string(),
   }),
 });
 

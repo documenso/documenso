@@ -2,6 +2,7 @@ import { deleteEnvelopeRecipient } from '@documenso/lib/server-only/recipient/de
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import {
   deleteEnvelopeRecipientMeta,
   ZDeleteEnvelopeRecipientRequestSchema,
@@ -12,6 +13,7 @@ export const deleteEnvelopeRecipientRoute = authenticatedProcedure
   .meta(deleteEnvelopeRecipientMeta)
   .input(ZDeleteEnvelopeRecipientRequestSchema)
   .output(ZDeleteEnvelopeRecipientResponseSchema)
+  .use(twoFactorScope((input) => ({ recipient: input.recipientId })))
   .mutation(async ({ input, ctx }) => {
     const { user, teamId, metadata } = ctx;
     const { recipientId } = input;

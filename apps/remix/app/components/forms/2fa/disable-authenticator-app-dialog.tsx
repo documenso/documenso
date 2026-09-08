@@ -1,5 +1,6 @@
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -68,15 +69,23 @@ export const DisableAuthenticatorAppDialog = () => {
 
   const { isSubmitting: isDisable2FASubmitting } = disable2FAForm.formState;
 
+  // Todo: (2FA enforcement, step 5) Once org enforcement state is available
+  // client-side, warn BEFORE disabling that org/team access will block at the
+  // org 2FA deadline. Until then the warning is shown after the fact based on
+  // the server response.
   const onDisable2FAFormSubmit = async ({ totpCode, backupCode }: TDisable2FAForm) => {
     try {
-      await authClient.twoFactor.disable({ totpCode, backupCode });
+      const { orgEnforcementApplies } = await authClient.twoFactor.disable({ totpCode, backupCode });
 
       toast({
         title: _(msg`Two-factor authentication disabled`),
-        description: _(
-          msg`Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in.`,
-        ),
+        description: orgEnforcementApplies
+          ? _(
+              msg`Two-factor authentication has been disabled for your account. One of your organisations requires two-factor authentication: access to it will be blocked at its deadline until you re-enable 2FA.`,
+            )
+          : _(
+              msg`Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in.`,
+            ),
       });
 
       flushSync(() => {
@@ -84,7 +93,19 @@ export const DisableAuthenticatorAppDialog = () => {
       });
 
       await refreshSession();
-    } catch (_err) {
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      if (error.code === 'TWO_FACTOR_DISABLE_FORBIDDEN') {
+        toast({
+          title: _(msg`Unable to disable two-factor authentication`),
+          description: _(msg`Two-factor authentication is required by this instance and cannot be disabled.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
+
       toast({
         title: _(msg`Unable to disable two-factor authentication`),
         description: _(

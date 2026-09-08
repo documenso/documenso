@@ -7,6 +7,7 @@ import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations'
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZUpdateOrganisationAuthenticationPortalRequestSchema,
   ZUpdateOrganisationAuthenticationPortalResponseSchema,
@@ -15,6 +16,7 @@ import {
 export const updateOrganisationAuthenticationPortalRoute = authenticatedProcedure
   .input(ZUpdateOrganisationAuthenticationPortalRequestSchema)
   .output(ZUpdateOrganisationAuthenticationPortalResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .mutation(async ({ input, ctx }) => {
     const { organisationId, data } = input;
     const { user } = ctx;

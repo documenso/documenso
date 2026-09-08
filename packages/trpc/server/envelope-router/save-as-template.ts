@@ -1,11 +1,13 @@
 import { duplicateEnvelope } from '@documenso/lib/server-only/envelope/duplicate-envelope';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZSaveAsTemplateRequestSchema, ZSaveAsTemplateResponseSchema } from './save-as-template.types';
 
 export const saveAsTemplateRoute = authenticatedProcedure
   .input(ZSaveAsTemplateRequestSchema)
   .output(ZSaveAsTemplateResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { envelopeId, includeRecipients, includeFields } = input;
     const { teamId } = ctx;

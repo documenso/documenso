@@ -2,12 +2,14 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZGetOrganisationRequestSchema, ZGetOrganisationResponseSchema } from './get-organisation.types';
 
 export const getOrganisationRoute = authenticatedProcedure
   //   .meta(getOrganisationMeta)
   .input(ZGetOrganisationRequestSchema)
   .output(ZGetOrganisationResponseSchema)
+  .use(twoFactorScope((input) => ({ organisationReference: input.organisationReference })))
   .query(async ({ input, ctx }) => {
     const { organisationReference } = input;
 
