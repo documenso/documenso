@@ -4,6 +4,7 @@ import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations'
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZGetOrganisationAuthenticationPortalRequestSchema,
   ZGetOrganisationAuthenticationPortalResponseSchema,
@@ -12,6 +13,7 @@ import {
 export const getOrganisationAuthenticationPortalRoute = authenticatedProcedure
   .input(ZGetOrganisationAuthenticationPortalRequestSchema)
   .output(ZGetOrganisationAuthenticationPortalResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ input, ctx }) => {
     const { organisationId } = input;
 

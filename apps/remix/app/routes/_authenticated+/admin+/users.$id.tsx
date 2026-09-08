@@ -1,3 +1,4 @@
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
 import { ZUpdateUserRequestSchema } from '@documenso/trpc/server/admin-router/update-user.types';
@@ -74,6 +75,11 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
+
+  const { user: currentUser } = useSession();
+
+  // Self-reset is forbidden server-side; hide the affordance entirely.
+  const canResetTwoFactor = user.twoFactorEnabled && user.id !== currentUser.id;
 
   const roles = user.roles ?? [];
 
@@ -228,7 +234,7 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
       </Accordion>
 
       <div className="mt-16 flex flex-col gap-4">
-        {user && user.twoFactorEnabled && <AdminUserResetTwoFactorDialog user={user} />}
+        {canResetTwoFactor && <AdminUserResetTwoFactorDialog user={user} />}
         {user && user.disabled && <AdminUserEnableDialog userToEnable={user} />}
         {user && !user.disabled && <AdminUserDisableDialog userToDisable={user} />}
         {user && <AdminUserDeleteDialog user={user} />}

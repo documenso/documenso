@@ -7,12 +7,14 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@documenso/prisma/generated/types';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZCreateTeamGroupsRequestSchema, ZCreateTeamGroupsResponseSchema } from './create-team-groups.types';
 
 export const createTeamGroupsRoute = authenticatedProcedure
   // .meta(createTeamGroupsMeta)
   .input(ZCreateTeamGroupsRequestSchema)
   .output(ZCreateTeamGroupsResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId, groups } = input;
     const { user } = ctx;

@@ -4,6 +4,7 @@ import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations'
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZDeleteOrganisationEmailRequestSchema,
   ZDeleteOrganisationEmailResponseSchema,
@@ -12,6 +13,7 @@ import {
 export const deleteOrganisationEmailRoute = authenticatedProcedure
   .input(ZDeleteOrganisationEmailRequestSchema)
   .output(ZDeleteOrganisationEmailResponseSchema)
+  .use(twoFactorScope((input) => ({ organisationEmail: input.emailId })))
   .mutation(async ({ input, ctx }) => {
     const { emailId } = input;
     const { user } = ctx;

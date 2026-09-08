@@ -32,6 +32,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       organisation: {
         select: {
           name: true,
+          organisationGlobalSettings: {
+            select: {
+              twoFactorRequired: true,
+              twoFactorGracePeriodDays: true,
+            },
+          },
         },
       },
     },
@@ -71,6 +77,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     },
   });
 
+  // Non-blocking notice data: joining always succeeds, but the member's 2FA
+  // grace window starts at join when the organisation requires 2FA.
+  const twoFactorSettings = organisationMemberInvite.organisation.organisationGlobalSettings;
+
   return {
     state: 'Pending',
     token: organisationMemberInvite.token,
@@ -78,6 +88,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     organisationName,
     userExists: user !== null,
     isSessionUserTheInvitedUser: user !== null && user.id === session.user?.id,
+    organisationTwoFactorRequired: twoFactorSettings.twoFactorRequired,
+    organisationTwoFactorGracePeriodDays: twoFactorSettings.twoFactorGracePeriodDays,
   } as const;
 }
 
@@ -141,6 +153,8 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
       organisationName={data.organisationName}
       userExists={data.userExists}
       isSessionUserTheInvitedUser={data.isSessionUserTheInvitedUser}
+      organisationTwoFactorRequired={data.organisationTwoFactorRequired}
+      organisationTwoFactorGracePeriodDays={data.organisationTwoFactorGracePeriodDays}
     />
   );
 }
@@ -151,6 +165,8 @@ type PendingInvitationProps = {
   organisationName: string;
   userExists: boolean;
   isSessionUserTheInvitedUser: boolean;
+  organisationTwoFactorRequired: boolean;
+  organisationTwoFactorGracePeriodDays: number;
 };
 
 type InvitationResult = 'idle' | 'accepted' | 'declined';
@@ -163,6 +179,8 @@ const PendingInvitation = ({
   organisationName,
   userExists,
   isSessionUserTheInvitedUser,
+  organisationTwoFactorRequired,
+  organisationTwoFactorGracePeriodDays,
 }: PendingInvitationProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
@@ -288,6 +306,24 @@ const PendingInvitation = ({
             You have been invited to join <strong>{organisationName}</strong> on Documenso.
           </Trans>
         </p>
+
+        {/* Non-blocking notice: accepting always succeeds; access to the
+            organisation blocks only after the grace period expires. */}
+        {organisationTwoFactorRequired && !actionIsDecline && (
+          <p className="mt-2 mb-4 text-muted-foreground text-sm">
+            {organisationTwoFactorGracePeriodDays > 0 ? (
+              <Trans>
+                This organisation requires two-factor authentication. You will need to enable it within{' '}
+                {organisationTwoFactorGracePeriodDays} days of joining to keep access to the organisation.
+              </Trans>
+            ) : (
+              <Trans>
+                This organisation requires two-factor authentication. You will need to enable it immediately after
+                joining to access the organisation.
+              </Trans>
+            )}
+          </p>
+        )}
 
         {acceptFailureReason && (
           <p className="mt-2 mb-4 text-destructive text-sm">

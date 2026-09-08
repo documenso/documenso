@@ -10,9 +10,20 @@ import type { AnyZodObject } from 'zod';
 
 import { dataTransformer } from '../utils/data-transformer';
 import type { TrpcContext } from './context';
+import { twoFactorInstanceOnly } from './two-factor-enforcement/enforce';
+
+/**
+ * Marker set on the session-reachable base procedures so the 2FA enforcement
+ * drift guard can statically distinguish them from plain `procedure` routes.
+ */
+export type TrpcAuthType = 'authenticated' | 'maybeAuthenticated' | 'admin';
 
 // Can't import type from trpc-to-openapi because it breaks build, not sure why.
 export type TrpcRouteMeta = {
+  /**
+   * Set by the base procedures below — do not set this on individual routes.
+   */
+  trpcAuthType?: TrpcAuthType;
   openapi?: {
     enabled?: boolean;
     method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
@@ -150,6 +161,12 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path, me
   // authenticated TRPC call here.
   assertUserNotDisabled(ctx.user);
 
+  // 2FA enforcement is owned by the route-level inline middlewares
+  // (`twoFactorScope` and friends, see `./two-factor-enforcement/enforce.ts`)
+  // which run after `.input()` parsing. Nothing runs here — the drift guard
+  // (`./two-factor-enforcement/drift-guard.test.ts`) fails CI for any
+  // session-reachable procedure without an inline enforcement middleware.
+
   // Recreate the logger with a sub request ID to differentiate between batched
   // requests, as well as identifying attributes so every subsequent log line
   // (including errors) inherits them.
@@ -261,6 +278,11 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, pat
   const sessionUser = ctx.user && !ctx.user.disabled ? ctx.user : null;
   const sessionRecord = sessionUser ? ctx.session : null;
 
+  // 2FA enforcement for the session branch is owned by the route-level inline
+  // middlewares (`maybeAuthenticated` serves session users too, e.g.
+  // attachment reads — they are NOT exempt). Anonymous requests carry no
+  // session and pass through the inline middleware untouched.
+
   // Resolve `auth` once so it stays in sync between the logger bindings and
   // the outgoing metadata.
   const auth = sessionRecord ? 'session' : null;
@@ -320,6 +342,10 @@ export const adminMiddleware = t.middleware(async ({ ctx, next, path }) => {
       message: 'Not authorized to perform this action.',
     });
   }
+
+  // 2FA enforcement (instance admins are subject to it) is owned by the
+  // `twoFactorInstanceOnly` middleware attached to the `adminProcedure` base
+  // below.
 
   // Recreate the logger with a sub request ID to differentiate between batched
   // requests, as well as identifying attributes so every subsequent log line
@@ -390,7 +416,23 @@ export const procedureMiddleware = t.middleware(async ({ ctx, next, path }) => {
  */
 export const router = t.router;
 export const procedure = t.procedure.use(procedureMiddleware);
-export const authenticatedProcedure = t.procedure.use(authenticatedMiddleware);
+
+// The `trpcAuthType` markers below let the 2FA enforcement drift guard test
+// statically identify session-reachable procedures when walking the app
+// router. Route-level `.meta()` calls shallow-merge on top, so the marker
+// survives per-route metadata.
+export const authenticatedProcedure = t.procedure.meta({ trpcAuthType: 'authenticated' }).use(authenticatedMiddleware);
 // While this is functionally the same as `procedure`, it's useful for indicating purpose
-export const maybeAuthenticatedProcedure = t.procedure.use(maybeAuthenticatedMiddleware);
-export const adminProcedure = t.procedure.use(adminMiddleware);
+export const maybeAuthenticatedProcedure = t.procedure
+  .meta({ trpcAuthType: 'maybeAuthenticated' })
+  .use(maybeAuthenticatedMiddleware);
+export const adminProcedure = t.procedure
+  .meta({ trpcAuthType: 'admin' })
+  .use(adminMiddleware)
+  // 2FA enforcement: admin procedures operate in the instance-admin context,
+  // not as an organisation member — organisation enforcement targets member
+  // access to organisation/team resources, so the entire admin router is
+  // instance-assert-only. The INSTANCE assert applies to admins ("admins are
+  // subject to enforcement"). Attached at the base so every admin route
+  // inherits it; individual admin routes must not attach their own.
+  .use(twoFactorInstanceOnly());

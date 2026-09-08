@@ -5,12 +5,14 @@ import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations'
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZDeleteOrganisationRequestSchema, ZDeleteOrganisationResponseSchema } from './delete-organisation.types';
 
 export const deleteOrganisationRoute = authenticatedProcedure
   //   .meta(deleteOrganisationMeta)
   .input(ZDeleteOrganisationRequestSchema)
   .output(ZDeleteOrganisationResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .mutation(async ({ input, ctx }) => {
     const { organisationId } = input;
     const { user } = ctx;

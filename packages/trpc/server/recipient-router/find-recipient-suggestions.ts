@@ -1,6 +1,7 @@
 import { getRecipientSuggestions } from '@documenso/lib/server-only/recipient/get-recipient-suggestions';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import {
   ZGetRecipientSuggestionsRequestSchema,
   ZGetRecipientSuggestionsResponseSchema,
@@ -12,6 +13,7 @@ import {
 export const findRecipientSuggestionsRoute = authenticatedProcedure
   .input(ZGetRecipientSuggestionsRequestSchema)
   .output(ZGetRecipientSuggestionsResponseSchema)
+  .use(twoFactorScopeFromCtx())
   .query(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { query } = input;

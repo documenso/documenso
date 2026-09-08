@@ -4,6 +4,7 @@ import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   getDocumentsByIdsMeta,
   ZGetDocumentsByIdsRequestSchema,
@@ -14,6 +15,7 @@ export const getDocumentsByIdsRoute = authenticatedProcedure
   .meta(getDocumentsByIdsMeta)
   .input(ZGetDocumentsByIdsRequestSchema)
   .output(ZGetDocumentsByIdsResponseSchema)
+  .use(twoFactorScope((input) => ({ document: input.documentIds })))
   .mutation(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { documentIds } = input;

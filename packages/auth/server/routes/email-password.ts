@@ -7,12 +7,9 @@ import {
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
-import { disableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/disable-2fa';
-import { enableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/enable-2fa';
 import { isTwoFactorAuthenticationEnabled } from '@documenso/lib/server-only/2fa/is-2fa-availble';
-import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
+import { resetTwoFactorAfterBackupCodeUse } from '@documenso/lib/server-only/2fa/reset-2fa-after-backup-code-use';
 import { validateTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/validate-2fa';
-import { viewBackupCodes } from '@documenso/lib/server-only/2fa/view-backup-codes';
 import { verifyCaptchaToken } from '@documenso/lib/server-only/captcha/verify-captcha';
 import { rateLimitResponse } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
 import {
@@ -24,6 +21,7 @@ import {
   verifyEmailRateLimit,
 } from '@documenso/lib/server-only/rate-limit/rate-limits';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
+import { assertUserNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getMostRecentEmailVerificationToken } from '@documenso/lib/server-only/user/get-most-recent-email-verification-token';
@@ -40,7 +38,6 @@ import { UserSecurityAuditLogType } from '@prisma/client';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { DateTime } from 'luxon';
-import { z } from 'zod';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { invalidateSessions } from '../lib/session/session';
@@ -135,14 +132,16 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const is2faEnabled = isTwoFactorAuthenticationEnabled({ user });
 
+    let isBackupCodeRecovery = false;
+
     if (is2faEnabled) {
-      const isValid = await validateTwoFactorAuthentication({
+      const validationResult = await validateTwoFactorAuthentication({
         backupCode,
         totpCode,
         user,
       });
 
-      if (!isValid) {
+      if (!validationResult.isValid) {
         await prisma.userSecurityAuditLog.create({
           data: {
             userId: user.id,
@@ -154,6 +153,8 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
         throw new AppError(AuthenticationErrorCode.InvalidTwoFactorCode);
       }
+
+      isBackupCodeRecovery = validationResult.method === 'backup';
     }
 
     if (!user.emailVerified) {
@@ -179,11 +180,44 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
+    // A rejected sign-in must never strip 2FA, so every sign-in guard runs
+    // before the recovery reset below: the disabled check here (onAuthorize
+    // re-checks it as defence in depth) and the unverified-email guard above.
+    assertUserNotDisabled(user);
+
+    // Backup codes are recovery, not sign-in: a successful backup-code
+    // sign-in atomically resets the user's 2FA configuration (conditional
+    // update — concurrent uses cannot double-spend) and the client is told to
+    // land on the re-enrolment page.
+    if (isBackupCodeRecovery) {
+      await resetTwoFactorAfterBackupCodeUse({ user, requestMetadata });
+    }
+
     // The disabled check now lives inside `onAuthorize` so every sign-in path
     // (password, passkey, OAuth, OIDC) shares the same enforcement.
-    await onAuthorize({ userId: user.id }, c);
+    //
+    // If 2FA is enabled we only reach this point after the inline TOTP/backup
+    // validation above has passed, so the session counts as second-factor
+    // verified. A backup code IS a second factor, so recovery sign-ins are
+    // verified too.
+    await onAuthorize(
+      {
+        userId: user.id,
+        authMethod: 'email-password',
+        twoFactorVerified: is2faEnabled,
+      },
+      c,
+    );
 
-    return c.text('', 201);
+    return c.json(
+      {
+        // Non-null when the server needs the client to land somewhere
+        // specific instead of its own redirect path. Currently only the
+        // post-recovery re-enrolment page.
+        redirectPath: isBackupCodeRecovery ? '/onboarding/2fa' : null,
+      },
+      201,
+    );
   })
   /**
    * Signup endpoint.
@@ -316,7 +350,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     // If email is verified, automatically authenticate user.
     if (state === EMAIL_VERIFICATION_STATE.VERIFIED && userId !== null) {
-      await onAuthorize({ userId }, c);
+      await onAuthorize({ userId, authMethod: 'email-password', twoFactorVerified: false }, c);
     }
 
     return c.json({
@@ -454,156 +488,8 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     }
 
     return c.text('OK', 201);
-  })
-  /**
-   * Setup two factor authentication.
-   */
-  .post('/2fa/setup', async (c) => {
-    const { user } = await getSession(c);
+  });
 
-    const result = await setupTwoFactorAuthentication({
-      user,
-    });
-
-    return c.json({
-      success: true,
-      secret: result.secret,
-      uri: result.uri,
-    });
-  })
-  /**
-   * Enable two factor authentication.
-   */
-  .post(
-    '/2fa/enable',
-    sValidator(
-      'json',
-      z.object({
-        code: z.string(),
-      }),
-    ),
-    async (c) => {
-      const requestMetadata = c.get('requestMetadata');
-
-      const { user: sessionUser } = await getSession(c);
-
-      const user = await prisma.user.findFirst({
-        where: {
-          id: sessionUser.id,
-        },
-        select: {
-          id: true,
-          email: true,
-          twoFactorEnabled: true,
-          twoFactorSecret: true,
-        },
-      });
-
-      if (!user) {
-        throw new AppError(AuthenticationErrorCode.InvalidRequest);
-      }
-
-      const { code } = c.req.valid('json');
-
-      const result = await enableTwoFactorAuthentication({
-        user,
-        code,
-        requestMetadata,
-      });
-
-      return c.json({
-        success: true,
-        recoveryCodes: result.recoveryCodes,
-      });
-    },
-  )
-  /**
-   * Disable two factor authentication.
-   */
-  .post(
-    '/2fa/disable',
-    sValidator(
-      'json',
-      z.object({
-        totpCode: z.string().trim().optional(),
-        backupCode: z.string().trim().optional(),
-      }),
-    ),
-    async (c) => {
-      const requestMetadata = c.get('requestMetadata');
-
-      const { user: sessionUser } = await getSession(c);
-
-      const user = await prisma.user.findFirst({
-        where: {
-          id: sessionUser.id,
-        },
-        select: {
-          id: true,
-          email: true,
-          twoFactorEnabled: true,
-          twoFactorSecret: true,
-          twoFactorBackupCodes: true,
-        },
-      });
-
-      if (!user) {
-        throw new AppError(AuthenticationErrorCode.InvalidRequest);
-      }
-
-      const { totpCode, backupCode } = c.req.valid('json');
-
-      await disableTwoFactorAuthentication({
-        user,
-        totpCode,
-        backupCode,
-        requestMetadata,
-      });
-
-      return c.text('OK', 201);
-    },
-  )
-  /**
-   * View backup codes.
-   */
-  .post(
-    '/2fa/view-recovery-codes',
-    sValidator(
-      'json',
-      z.object({
-        token: z.string(),
-      }),
-    ),
-    async (c) => {
-      const { user: sessionUser } = await getSession(c);
-
-      const user = await prisma.user.findFirst({
-        where: {
-          id: sessionUser.id,
-        },
-        select: {
-          id: true,
-          email: true,
-          twoFactorEnabled: true,
-          twoFactorSecret: true,
-          twoFactorBackupCodes: true,
-        },
-      });
-
-      if (!user) {
-        throw new AppError(AuthenticationErrorCode.InvalidRequest);
-      }
-
-      const { token } = c.req.valid('json');
-
-      const backupCodes = await viewBackupCodes({
-        user,
-        token,
-      });
-
-      return c.json({
-        success: true,
-        backupCodes,
-      });
-    },
-  );
+// Note: The duplicated `/2fa/*` endpoints previously mounted here have been
+// consolidated into the `/two-factor` route (`./two-factor.ts`), which is the
+// only set of 2FA endpoints the auth client calls.

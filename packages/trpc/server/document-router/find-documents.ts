@@ -2,12 +2,14 @@ import { findDocuments } from '@documenso/lib/server-only/document/find-document
 import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import { ZFindDocumentsMeta, ZFindDocumentsRequestSchema, ZFindDocumentsResponseSchema } from './find-documents.types';
 
 export const findDocumentsRoute = authenticatedProcedure
   .meta(ZFindDocumentsMeta)
   .input(ZFindDocumentsRequestSchema)
   .output(ZFindDocumentsResponseSchema)
+  .use(twoFactorScopeFromCtx())
   .query(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
 

@@ -1,6 +1,7 @@
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { assertTwoFactorEnforcementForSession } from '@documenso/lib/server-only/2fa/org-enforcement';
 import { detectRecipientsFromEnvelope } from '@documenso/lib/server-only/ai/envelope/detect-recipients';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sValidator } from '@hono/standard-validator';
@@ -40,6 +41,14 @@ export const detectRecipientsRoute = new Hono<HonoEnv>().post(
           message: 'You do not have access to this team',
         });
       }
+
+      // 2FA enforcement: session-authenticated endpoint — instance assert +
+      // the owning organisation's policy for the envelope's team.
+      await assertTwoFactorEnforcementForSession({
+        user: session.user,
+        session: session.session,
+        organisationIds: [team.organisationId],
+      });
 
       // Check if AI features are enabled for the team
       const { aiFeaturesEnabled } = team.derivedSettings;

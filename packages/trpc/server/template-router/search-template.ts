@@ -1,11 +1,13 @@
 import { searchTemplatesWithKeyword } from '@documenso/lib/server-only/template/search-templates-with-keyword';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import { ZSearchTemplateRequestSchema, ZSearchTemplateResponseSchema } from './search-template.types';
 
 export const searchTemplateRoute = authenticatedProcedure
   .input(ZSearchTemplateRequestSchema)
   .output(ZSearchTemplateResponseSchema)
+  .use(twoFactorScopeFromCtx())
   .query(async ({ input, ctx }) => {
     const { query } = input;
 

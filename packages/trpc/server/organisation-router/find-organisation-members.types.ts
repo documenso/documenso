@@ -34,6 +34,13 @@ export const ZFindOrganisationMembersResponseSchema = ZFindResultResponse.extend
       email: z.string(),
       name: z.string(),
       avatarImageId: z.string().nullable(),
+
+      /**
+       * Per-member 2FA compliance indicator. Enrolment is genuine compliance
+       * under the satisfaction rule (`twoFactorEnabled && session verified` —
+       * the session half is per-login, enrolment is the durable part).
+       */
+      twoFactorEnabled: z.boolean(),
       currentOrganisationRole: OrganisationMemberRoleSchema,
       groups: z.array(
         OrganisationGroupSchema.pick({

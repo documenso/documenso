@@ -37,6 +37,10 @@ export const getApiTokenByToken = async ({ token, bypassRateLimit = false }: Get
                   name: true,
                   email: true,
                   disabled: true,
+                  // Kept in sync with the `user` select below — team tokens
+                  // substitute the organisation owner as the acting user.
+                  twoFactorEnabled: true,
+                  twoFactorGraceStartedAt: true,
                 },
               },
             },
@@ -49,6 +53,11 @@ export const getApiTokenByToken = async ({ token, bypassRateLimit = false }: Get
           name: true,
           email: true,
           disabled: true,
+          // Selected so `ctx.user` keeps a consistent shape between the
+          // session and API-token auth branches. API-token access itself is
+          // exempt from 2FA enforcement (machine access).
+          twoFactorEnabled: true,
+          twoFactorGraceStartedAt: true,
         },
       },
     },

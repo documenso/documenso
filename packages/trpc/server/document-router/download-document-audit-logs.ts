@@ -5,6 +5,7 @@ import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-aud
 import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZDownloadDocumentAuditLogsRequestSchema,
   ZDownloadDocumentAuditLogsResponseSchema,
@@ -13,6 +14,7 @@ import {
 export const downloadDocumentAuditLogsRoute = authenticatedProcedure
   .input(ZDownloadDocumentAuditLogsRequestSchema)
   .output(ZDownloadDocumentAuditLogsResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { envelopeId } = input;
