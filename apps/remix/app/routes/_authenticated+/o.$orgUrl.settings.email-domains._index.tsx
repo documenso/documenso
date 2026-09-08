@@ -1,5 +1,5 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { IS_BILLING_ENABLED, IS_DOCUMENSO_CLOUD } from '@documenso/lib/constants/app';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -9,6 +9,7 @@ import { Link } from 'react-router';
 
 import { OrganisationEmailDomainCreateDialog } from '~/components/dialogs/organisation-email-domain-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
+import { EmailDomainsUpsell } from '~/components/general/settings-upsell/email-domains-upsell';
 import { OrganisationEmailDomainsDataTable } from '~/components/tables/organisation-email-domains-table';
 import { appMetaTags } from '~/utils/meta';
 
@@ -41,6 +42,8 @@ export default function OrganisationSettingsEmailDomains() {
         <section>
           <OrganisationEmailDomainsDataTable />
         </section>
+      ) : IS_DOCUMENSO_CLOUD() ? (
+        <EmailDomainsUpsell />
       ) : (
         <Alert className="mt-8 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
           <div className="mb-4 sm:mb-0">

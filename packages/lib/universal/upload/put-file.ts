@@ -1,5 +1,6 @@
 import type { TUploadPdfResponse } from '@documenso/remix/server/api/files/files.types';
 
+import { formatPath } from '../../constants/app';
 import { AppError } from '../../errors/app-error';
 
 type File = {
@@ -38,7 +39,7 @@ export const putPdfFile = async (file: File, options?: PutFileOptions) => {
 
   formData.append('file', properFile);
 
-  const response = await fetch('/api/files/upload-pdf', {
+  const response = await fetch(formatPath('/api/files/upload-pdf'), {
     method: 'POST',
     headers: buildUploadAuthHeaders(options),
     body: formData,

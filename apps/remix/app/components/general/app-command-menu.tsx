@@ -1,5 +1,6 @@
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { formatPath } from '@documenso/lib/constants/app';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import {
   DOCUMENTS_PAGE_SHORTCUT,
@@ -16,9 +17,9 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import { keepPreviousData } from '@tanstack/react-query';
-import { commandScore } from 'cmdk/dist/command-score';
+import { defaultFilter as commandScore } from 'cmdk';
 import {
   ArrowLeftIcon,
   CheckIcon,
@@ -595,9 +596,21 @@ export const AppCommandMenu = ({ open, onOpenChange }: AppCommandMenuProps) => {
 
             <span className="ml-auto text-muted-foreground text-xs">
               {hasValidSearch ? (
-                <Trans>{formatChipCount(totalVisibleCount, isVisibleCountCapped)} results</Trans>
+                isVisibleCountCapped ? (
+                  <Trans>{formatChipCount(totalVisibleCount, isVisibleCountCapped)} results</Trans>
+                ) : (
+                  <Plural
+                    value={totalVisibleCount}
+                    one="# result"
+                    other="# results"
+                  />
+                )
               ) : (
-                <Trans>{totalVisibleCount} items</Trans>
+                <Plural
+                  value={totalVisibleCount}
+                  one="# item"
+                  other="# items"
+                />
               )}
             </span>
           </div>
@@ -862,7 +875,7 @@ const PromptLanguageCommands = ({
 
       formData.append('lang', lang);
 
-      const response = await fetch('/api/locale', {
+      const response = await fetch(formatPath('/api/locale'), {
         method: 'post',
         body: formData,
       });

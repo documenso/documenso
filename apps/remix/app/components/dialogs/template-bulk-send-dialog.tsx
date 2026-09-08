@@ -1,4 +1,7 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { TBulkSendCsvError } from '@documenso/lib/server-only/template/validate-bulk-send-csv';
 import { trpc } from '@documenso/trpc/react';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
@@ -17,7 +20,9 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { File as FileIcon, Upload, X } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { useCurrentTeam } from '~/providers/team';
@@ -28,6 +33,8 @@ const ZBulkSendFormSchema = z.object({
 });
 
 type TBulkSendFormSchema = z.infer<typeof ZBulkSendFormSchema>;
+
+type TBulkSendValidationError = TBulkSendCsvError | { type: 'UPLOAD_ERROR'; code: string };
 
 export type TemplateBulkSendDialogProps = {
   templateId: number;
@@ -42,6 +49,9 @@ export const TemplateBulkSendDialog = ({ templateId, recipients, trigger, onSucc
 
   const team = useCurrentTeam();
 
+  const [open, setOpen] = useState(false);
+  const [validationError, setValidationError] = useState<TBulkSendValidationError | null>(null);
+
   const form = useForm<TBulkSendFormSchema>({
     resolver: zodResolver(ZBulkSendFormSchema),
     defaultValues: {
@@ -50,6 +60,20 @@ export const TemplateBulkSendDialog = ({ templateId, recipients, trigger, onSucc
   });
 
   const { mutateAsync: uploadBulkSend } = trpc.template.uploadBulkSend.useMutation();
+
+  const onOpenChange = (value: boolean) => {
+    if (form.formState.isSubmitting) {
+      return;
+    }
+
+    setOpen(value);
+
+    if (!value) {
+      setValidationError(null);
+
+      form.reset();
+    }
+  };
 
   const onDownloadTemplate = () => {
     const headers = recipients.flatMap((_, index) => [`recipient_${index + 1}_email`, `recipient_${index + 1}_name`]);
@@ -71,36 +95,44 @@ export const TemplateBulkSendDialog = ({ templateId, recipients, trigger, onSucc
   };
 
   const onSubmit = async (values: TBulkSendFormSchema) => {
+    setValidationError(null);
+
     try {
       const csv = await values.file.text();
 
-      await uploadBulkSend({
+      const result = await uploadBulkSend({
         templateId,
         teamId: team?.id,
         csv: csv,
         sendImmediately: values.sendImmediately,
       });
 
+      if (!result.success) {
+        setValidationError(result.error);
+
+        return;
+      }
+
       toast({
         title: _(msg`Success`),
         description: _(msg`Your bulk send has been initiated. You will receive an email notification upon completion.`),
       });
 
+      setOpen(false);
       form.reset();
+
       onSuccess?.();
     } catch (err) {
       console.error(err);
 
-      toast({
-        title: _(msg`Error`),
-        description: _(msg`Failed to upload CSV. Please check the file format and try again.`),
-        variant: 'destructive',
-      });
+      const error = AppError.parseError(err);
+
+      setValidationError({ type: 'UPLOAD_ERROR', code: error.code });
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="outline" className="shrink-0" size="sm">
@@ -174,7 +206,10 @@ export const TemplateBulkSendDialog = ({ templateId, recipients, trigger, onSucc
                             className="hidden"
                             onChange={(e) => {
                               const file = e.target.files?.[0];
+
                               if (file) {
+                                setValidationError(null);
+
                                 onChange(file);
                               }
                             }}
@@ -195,7 +230,11 @@ export const TemplateBulkSendDialog = ({ templateId, recipients, trigger, onSucc
                           type="button"
                           variant="link"
                           className="p-0 text-destructive text-xs hover:text-destructive"
-                          onClick={() => onChange(null)}
+                          onClick={() => {
+                            setValidationError(null);
+
+                            form.resetField('file');
+                          }}
                           disabled={form.formState.isSubmitting}
                         >
                           <X className="h-4 w-4" />
@@ -217,6 +256,67 @@ export const TemplateBulkSendDialog = ({ templateId, recipients, trigger, onSucc
                 </FormItem>
               )}
             />
+
+            {validationError !== null && (
+              <Alert variant="destructive">
+                <AlertDescription className="max-h-32 overflow-y-auto">
+                  {match(validationError)
+                    .with({ type: 'PARSE_ERROR' }, () => (
+                      <Trans>The CSV could not be parsed. Please check the file format and try again.</Trans>
+                    ))
+                    .with({ type: 'EMPTY' }, () => (
+                      <Trans>
+                        The CSV does not contain any rows. Please add at least one row of recipient details.
+                      </Trans>
+                    ))
+                    .with({ type: 'ROW_LIMIT_EXCEEDED' }, ({ rowCount, maxRows }) => (
+                      <Trans>
+                        The CSV contains {rowCount} rows. A maximum of {maxRows} rows is allowed per upload.
+                      </Trans>
+                    ))
+                    .with({ type: 'MISSING_COLUMNS' }, ({ missingColumns }) => (
+                      <>
+                        <Trans>
+                          The CSV is missing the following required columns. Please download the template CSV for the
+                          correct format.
+                        </Trans>
+
+                        <ul className="mt-1 list-inside list-disc">
+                          {missingColumns.map((column) => (
+                            <li key={column} className="font-mono">
+                              {column}
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    ))
+                    .with({ type: 'INVALID_RECIPIENTS' }, ({ rowErrors }) => (
+                      <>
+                        <Trans>The CSV contains invalid recipient emails. Please fix the following rows:</Trans>
+
+                        <ul className="mt-1 list-inside list-disc">
+                          {rowErrors.map((rowError, index) => (
+                            <li key={index}>
+                              <Trans>
+                                Row {rowError.row}: <span className="font-mono">{rowError.column}</span> must be a valid
+                                email or empty
+                              </Trans>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    ))
+                    .with({ type: 'UPLOAD_ERROR' }, ({ code }) =>
+                      code === AppErrorCode.LIMIT_EXCEEDED ? (
+                        <Trans>The CSV exceeds the maximum file size.</Trans>
+                      ) : (
+                        <Trans>Failed to upload CSV. Please check the file format and try again.</Trans>
+                      ),
+                    )
+                    .exhaustive()}
+                </AlertDescription>
+              </Alert>
+            )}
 
             <FormField
               control={form.control}
@@ -240,7 +340,12 @@ export const TemplateBulkSendDialog = ({ templateId, recipients, trigger, onSucc
             />
 
             <DialogFooter className="mt-4">
-              <Button variant="secondary" onClick={() => form.reset()} type="button">
+              <Button
+                variant="secondary"
+                onClick={() => onOpenChange(false)}
+                disabled={form.formState.isSubmitting}
+                type="button"
+              >
                 <Trans>Cancel</Trans>
               </Button>
 
