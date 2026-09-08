@@ -153,7 +153,6 @@ export const DocumentDropzone = ({
             {_(heading[type])}
           </p>
 
-          {/* The drag & drop hint is irrelevant on touch devices, but the disabled reason must always show. */}
           <p className={cn('mt-1 text-center text-muted-foreground/80 text-sm', !disabled && 'hidden sm:block')}>
             {_(disabled ? disabledMessage : msg`Drag & drop your document here.`)}
           </p>

@@ -21,11 +21,6 @@ export type DocumentAttachmentsPopoverProps = {
   envelopeId: string;
   buttonClassName?: string;
   buttonSize?: 'sm' | 'default';
-
-  /**
-   * Visually hide the button label below the `sm` breakpoint while keeping it
-   * available to screen readers.
-   */
   collapseLabelOnMobile?: boolean;
 };
 

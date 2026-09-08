@@ -89,11 +89,6 @@ export const fieldButtonList = [
 type EnvelopeEditorFieldDragDropProps = {
   selectedRecipientId: number | null;
   selectedEnvelopeItemId: string | null;
-
-  /**
-   * Called when the user picks a field type from the palette, before the field
-   * is placed on the document.
-   */
   onFieldSelect?: (fieldType: FieldType) => void;
 };
 

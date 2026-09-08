@@ -89,8 +89,6 @@ export const EnvelopeEditorFieldsPage = () => {
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
   const { revalidate } = useRevalidator();
 
-  // Whether the fields panel overlay is open. Only relevant below the `md`
-  // breakpoint, where the panel is hidden behind a floating trigger button.
   const [isMobileFieldsPanelOpen, setIsMobileFieldsPanelOpen] = useState(false);
 
   const envelopeItemPermissions = useMemo(
@@ -191,8 +189,6 @@ export const EnvelopeEditorFieldsPage = () => {
   }, []);
 
   const onDetectClick = () => {
-    // Close the panel overlay on small viewports so the document stays
-    // visible while the AI dialogs are open.
     setIsMobileFieldsPanelOpen(false);
 
     if (!team.preferences.aiFeaturesEnabled) {
@@ -336,24 +332,19 @@ export const EnvelopeEditorFieldsPage = () => {
           )}
 
           {/*
-           * Below `md` the panel is a slide-in overlay, from `md` upwards it is a
-           * static sidebar.
-           *
-           * This is deliberately one always-mounted element toggled with CSS rather
-           * than a Sheet/Drawer: the field palette registers window-level mouse
-           * listeners that must survive the panel closing mid click-to-place, and
-           * unmounting would also double-mount the field settings forms and AI
-           * dialogs. `invisible` (with the transition covering visibility) keeps the
-           * closed overlay out of the tab order and accessibility tree.
+           * Always mounted and toggled with CSS rather than a Sheet/Drawer: the field
+           * palette registers window-level mouse listeners that must survive the panel
+           * closing mid click-to-place, and unmounting would also double-mount the field
+           * settings forms and AI dialogs. `invisible` keeps the closed overlay out of
+           * the tab order and accessibility tree.
            */}
           <div
             className={cn(
               'fixed inset-y-0 right-0 z-50 w-80 max-w-[85vw] overflow-y-auto border-border border-l bg-background py-4 transition-[transform,visibility] duration-200',
               isMobileFieldsPanelOpen ? 'translate-x-0 shadow-xl' : 'invisible translate-x-full',
-              'md:visible md:sticky md:top-0 md:z-auto md:h-full md:w-80 md:max-w-none md:flex-shrink-0 md:translate-x-0 md:shadow-none md:transition-none',
+              'md:visible md:sticky md:top-0 md:z-auto md:h-full md:w-80 md:max-w-none md:flex-shrink-0 md:transform-none md:shadow-none md:transition-none',
             )}
           >
-            {/* Panel header with close button, visible below the `md` breakpoint. */}
             <div className="mb-4 flex items-center justify-between px-4 md:hidden">
               <h3 className="font-semibold text-foreground text-sm">
                 <Trans>Fields</Trans>

@@ -157,7 +157,6 @@ export const EnvelopeEditor = () => {
     <div className="flex h-[100dvh] w-full flex-col bg-envelope-editor-background">
       <EnvelopeEditorHeader />
 
-      {/* Embedded hosts control their own frame size, so the notice only applies to the full app. */}
       {!editorConfig.embedded && <EnvelopeEditorMobileNotice />}
 
       {/* Main Content Area */}
@@ -404,7 +403,7 @@ export const EnvelopeEditor = () => {
       {/* Mobile quick actions, opened from the "More" item in the step bar. */}
       {hasMobileMenu && (
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-          <SheetContent className="flex w-full max-w-[350px] flex-col">
+          <SheetContent className="flex w-full max-w-[350px] flex-col overflow-y-auto">
             <SheetHeader className="text-left">
               <SheetTitle>
                 <Trans>Quick Actions</Trans>

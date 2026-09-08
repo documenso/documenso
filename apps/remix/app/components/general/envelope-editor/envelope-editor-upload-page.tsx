@@ -646,7 +646,6 @@ export const EnvelopeEditorUploadPage = () => {
       {/* Recipients Section */}
       <EnvelopeEditorRecipientForm />
 
-      {/* Below `md` the step bar already offers this, so the button only shows alongside the sidebar. */}
       {editorConfig.general.allowAddFieldsStep && (
         <div className="hidden justify-end md:flex">
           <Button type="button" onClick={() => void navigateToStep('addFields')}>

@@ -897,11 +897,6 @@ export const EnvelopeEditorRecipientForm = () => {
                                   />
                                 )}
 
-                                {/*
-                                 * Below `sm` the fields are stacked, so each recipient gets a header line
-                                 * (title, role and delete) with the inputs underneath. The `order` classes
-                                 * pull the role and delete controls up next to this title.
-                                 */}
                                 <span className="order-1 min-w-0 flex-1 truncate font-medium text-sm sm:hidden">
                                   <Trans>Recipient {index + 1}</Trans>
                                 </span>

@@ -314,7 +314,6 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
         )}
       </DialogTrigger>
 
-      {/* Below `md` the sidebar stacks above the content and the form body scrolls within the viewport. */}
       <DialogContent className="!max-w-5xl flex max-h-[100dvh] w-full flex-col gap-0 p-0 md:max-h-none md:flex-row">
         {/* Sidebar. */}
         <div className="flex shrink-0 flex-col border-b bg-accent/20 md:w-80 md:border-r md:border-b-0">

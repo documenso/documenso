@@ -71,7 +71,6 @@ export default function EnvelopeEditorHeader() {
     <nav className="w-full border-border border-b bg-background px-4 py-3 md:px-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
-          {/* The logo and separator are hidden on small viewports to leave room for the title. */}
           {editorConfig.embedded?.customBrandingLogo ? (
             <img src={`/api/branding/logo/team/${envelope.teamId}`} alt="Logo" className="hidden h-6 w-auto sm:block" />
           ) : (
