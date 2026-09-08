@@ -31,6 +31,12 @@ export const ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP = {
   MANAGE_BILLING: [OrganisationMemberRole.ADMIN],
   DELETE_ORGANISATION_TRANSFER_REQUEST: [OrganisationMemberRole.ADMIN],
   MANAGE_ORGANISATION: [OrganisationMemberRole.ADMIN, OrganisationMemberRole.MANAGER],
+  /**
+   * Security-sensitive organisation settings (2FA enforcement). ADMIN only —
+   * managers can manage day-to-day settings but must not be able to lock
+   * members out (or unlock them) via enforcement policy.
+   */
+  MANAGE_ORGANISATION_SECURITY: [OrganisationMemberRole.ADMIN],
 } satisfies Record<string, OrganisationMemberRole[]>;
 
 /**

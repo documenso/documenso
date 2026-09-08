@@ -6,6 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationGroupType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZDeleteOrganisationGroupRequestSchema,
   ZDeleteOrganisationGroupResponseSchema,
@@ -15,6 +16,7 @@ export const deleteOrganisationGroupRoute = authenticatedProcedure
   // .meta(deleteOrganisationGroupMeta)
   .input(ZDeleteOrganisationGroupRequestSchema)
   .output(ZDeleteOrganisationGroupResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .mutation(async ({ input, ctx }) => {
     const { groupId, organisationId } = input;
     const { user } = ctx;

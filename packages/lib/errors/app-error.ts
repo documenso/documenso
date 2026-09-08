@@ -23,6 +23,11 @@ export enum AppErrorCode {
   SCHEMA_FAILED = 'SCHEMA_FAILED',
   TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS',
   TWO_FACTOR_AUTH_FAILED = 'TWO_FACTOR_AUTH_FAILED',
+  /**
+   * The user is blocked by 2FA enforcement (instance-wide or per-organisation)
+   * and must enrol/verify a second factor before accessing the resource.
+   */
+  TWO_FACTOR_REQUIRED = 'TWO_FACTOR_REQUIRED',
   WEBHOOK_INVALID_REQUEST = 'WEBHOOK_INVALID_REQUEST',
   ENVELOPE_DRAFT = 'ENVELOPE_DRAFT',
   ENVELOPE_COMPLETED = 'ENVELOPE_COMPLETED',
@@ -106,6 +111,9 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.SCHEMA_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
   [AppErrorCode.TOO_MANY_REQUESTS]: { code: 'TOO_MANY_REQUESTS', status: 429 },
   [AppErrorCode.TWO_FACTOR_AUTH_FAILED]: { code: 'UNAUTHORIZED', status: 401 },
+  // 403, not 401: the session is valid — the account is forbidden from the
+  // resource until 2FA enforcement is satisfied.
+  [AppErrorCode.TWO_FACTOR_REQUIRED]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.ENVELOPE_DRAFT]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_COMPLETED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_REJECTED]: { code: 'BAD_REQUEST', status: 400 },
@@ -334,7 +342,7 @@ export class AppError extends Error {
         () => 400 as const,
       )
       .with(AppErrorCode.UNAUTHORIZED, () => 401 as const)
-      .with(AppErrorCode.FORBIDDEN, AppErrorCode.CSC_UNLICENSED, () => 403 as const)
+      .with(AppErrorCode.FORBIDDEN, AppErrorCode.CSC_UNLICENSED, AppErrorCode.TWO_FACTOR_REQUIRED, () => 403 as const)
       .with(AppErrorCode.NOT_FOUND, () => 404 as const)
       .with(AppErrorCode.NOT_IMPLEMENTED, () => 501 as const)
       .otherwise(() => 500 as const);

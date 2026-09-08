@@ -2,6 +2,7 @@ import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envel
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   updateDocumentMeta,
   ZUpdateDocumentRequestSchema,
@@ -15,6 +16,7 @@ export const updateDocumentRoute = authenticatedProcedure
   .meta(updateDocumentMeta)
   .input(ZUpdateDocumentRequestSchema)
   .output(ZUpdateDocumentResponseSchema)
+  .use(twoFactorScope((input) => ({ document: input.documentId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { documentId, data, meta = {} } = input;

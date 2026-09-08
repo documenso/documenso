@@ -59,6 +59,8 @@ export const getActiveSessions = async (c: Context | Request): Promise<ActiveSes
       createdAt: true,
       ipAddress: true,
       userAgent: true,
+      authMethod: true,
+      twoFactorVerified: true,
     },
   });
 };

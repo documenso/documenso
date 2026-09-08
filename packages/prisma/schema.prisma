@@ -63,6 +63,10 @@ model User {
   twoFactorEnabled     Boolean @default(false)
   twoFactorBackupCodes String?
 
+  // Anchor for 2FA enforcement grace periods. Backfilled from `createdAt` for
+  // existing users; reset by an admin 2FA reset to restart grace windows.
+  twoFactorGraceStartedAt DateTime @default(now())
+
   folders   Folder[]
   envelopes Envelope[]
 
@@ -94,6 +98,7 @@ enum UserSecurityAuditLogType {
   ORGANISATION_SSO_UNLINK
   AUTH_2FA_DISABLE
   AUTH_2FA_ENABLE
+  AUTH_2FA_ADMIN_RESET
   PASSKEY_CREATED
   PASSKEY_DELETED
   PASSKEY_UPDATED
@@ -160,8 +165,14 @@ model VerificationToken {
   expires     DateTime
   createdAt   DateTime @default(now())
   metadata    Json?
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Failed-attempt counter for tokens that accept guessable input (2FA
+  // challenge codes). Atomically incremented; the token is consumed once it
+  // reaches the cap.
+  attempts Int @default(0)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum WebhookTriggerEvents {
@@ -371,6 +382,15 @@ model Session {
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Plain string, not a PG enum. Validated by the zod enum in
+  // packages/lib/types/session-auth-method.ts.
+  authMethod String @default("unknown")
+
+  // Whether a second factor was passed at sign-in (TOTP/backup challenge or UV
+  // passkey) or 2FA was enabled mid-session. Rows predating this column
+  // backfill false — those sessions never qualify; users must re-login.
+  twoFactorVerified Boolean @default(false)
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -993,6 +1013,13 @@ model OrganisationGlobalSettings {
 
   // AI features settings.
   aiFeaturesEnabled Boolean @default(false)
+
+  // 2FA enforcement settings. Org-level only — deliberately NOT mirrored in
+  // TeamGlobalSettings. `extractDerivedTeamSettings` must skip these keys.
+  twoFactorRequired        Boolean   @default(false)
+  twoFactorGracePeriodDays Int       @default(7)
+  // Set server-side on each off→on transition of `twoFactorRequired`.
+  twoFactorEnforcedFrom    DateTime?
 }
 
 /// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';", "import { ZEnvelopeReminderSettings as ZEnvelopeReminderSettingsSchema } from '@documenso/lib/constants/envelope-reminder';", "import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';"])

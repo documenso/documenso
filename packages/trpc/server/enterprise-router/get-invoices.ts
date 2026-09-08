@@ -6,10 +6,12 @@ import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations'
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZGetInvoicesRequestSchema } from './get-invoices.types';
 
 export const getInvoicesRoute = authenticatedProcedure
   .input(ZGetInvoicesRequestSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ ctx, input }) => {
     const { organisationId } = input;
 

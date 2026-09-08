@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { createTOTPKeyURI } from 'oslo/otp';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
+import { AppError } from '../../errors/app-error';
 import { symmetricEncrypt } from '../../universal/crypto';
 
 type SetupTwoFactorAuthenticationOptions = {
@@ -31,9 +32,15 @@ export const setupTwoFactorAuthentication = async ({ user }: SetupTwoFactorAuthe
   const uri = createTOTPKeyURI(ISSUER, accountName, secret);
   const encodedSecret = base32.encode(new Uint8Array(secret));
 
-  await prisma.user.update({
+  // Conditional update rather than a read-then-write pre-check: the write
+  // itself asserts 2FA is not enabled, so a concurrent enable can never be
+  // silently clobbered by a secret/backup-code rotation. Users with 2FA
+  // enabled must disable it (which requires a valid code) before re-running
+  // setup.
+  const { count } = await prisma.user.updateMany({
     where: {
       id: user.id,
+      twoFactorEnabled: false,
     },
     data: {
       twoFactorEnabled: false,
@@ -47,6 +54,13 @@ export const setupTwoFactorAuthentication = async ({ user }: SetupTwoFactorAuthe
       }),
     },
   });
+
+  if (count === 0) {
+    throw new AppError('TWO_FACTOR_ALREADY_ENABLED', {
+      message: 'Two-factor authentication is already enabled. Disable it before running setup again.',
+      statusCode: 400,
+    });
+  }
 
   return {
     secret: encodedSecret,

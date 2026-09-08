@@ -59,6 +59,28 @@ export const passkeyRateLimit = createRateLimit({
   window: '15m',
 });
 
+/**
+ * IP-scoped limit for the unauthenticated 2FA challenge endpoint, checked
+ * BEFORE the challenge cookie is resolved so hammering without a valid cookie
+ * is bounded without any DB token lookups.
+ */
+export const twoFactorChallengeIpRateLimit = createRateLimit({
+  action: 'auth.2fa-challenge.ip',
+  max: 30,
+  window: '15m',
+});
+
+/**
+ * Per-user limit for the 2FA challenge endpoint, checked AFTER the challenge
+ * cookie resolves to a user. No `globalMax` — the IP bound is enforced by
+ * `twoFactorChallengeIpRateLimit` above.
+ */
+export const twoFactorChallengeUserRateLimit = createRateLimit({
+  action: 'auth.2fa-challenge.user',
+  max: 10,
+  window: '15m',
+});
+
 export const linkOrgAccountRateLimit = createRateLimit({
   action: 'auth.link-org-account',
   max: 5,

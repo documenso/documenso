@@ -6,11 +6,13 @@ import { prisma } from '@documenso/prisma';
 import type { Prisma, WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZFindWebhookCallsRequestSchema, ZFindWebhookCallsResponseSchema } from './find-webhook-calls.types';
 
 export const findWebhookCallsRoute = authenticatedProcedure
   .input(ZFindWebhookCallsRequestSchema)
   .output(ZFindWebhookCallsResponseSchema)
+  .use(twoFactorScope((input) => ({ webhook: input.webhookId })))
   .query(async ({ input, ctx }) => {
     const { webhookId, page, perPage, status, query, events } = input;
 

@@ -1,4 +1,5 @@
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   downloadEnvelopeItemMeta,
   ZDownloadEnvelopeItemRequestSchema,
@@ -9,6 +10,7 @@ export const downloadEnvelopeItemRoute = authenticatedProcedure
   .meta(downloadEnvelopeItemMeta)
   .input(ZDownloadEnvelopeItemRequestSchema)
   .output(ZDownloadEnvelopeItemResponseSchema)
+  .use(twoFactorScope((input) => ({ envelopeItem: input.envelopeItemId })))
   .query(({ input, ctx }) => {
     const { envelopeItemId, version } = input;
 

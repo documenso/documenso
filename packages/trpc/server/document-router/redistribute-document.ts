@@ -2,6 +2,7 @@ import { resendDocument } from '@documenso/lib/server-only/document/resend-docum
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   redistributeDocumentMeta,
   ZRedistributeDocumentRequestSchema,
@@ -12,6 +13,7 @@ export const redistributeDocumentRoute = authenticatedProcedure
   .meta(redistributeDocumentMeta)
   .input(ZRedistributeDocumentRequestSchema)
   .output(ZRedistributeDocumentResponseSchema)
+  .use(twoFactorScope((input) => ({ document: input.documentId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { documentId, recipients } = input;

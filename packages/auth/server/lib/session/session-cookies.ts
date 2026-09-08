@@ -11,7 +11,7 @@ import { generateSessionToken } from './session';
 export const sessionCookieName = formatSecureCookieName('sessionId');
 export const csrfCookieName = formatSecureCookieName('csrfToken');
 
-const getAuthSecret = () => {
+export const getAuthSecret = () => {
   const authSecret = env('NEXTAUTH_SECRET');
 
   if (!authSecret) {

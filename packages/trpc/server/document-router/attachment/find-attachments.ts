@@ -4,6 +4,7 @@ import { findAttachmentsByEnvelopeId } from '@documenso/lib/server-only/envelope
 import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import { ZFindAttachmentsRequestSchema, ZFindAttachmentsResponseSchema } from './find-attachments.types';
 
 export const findAttachmentsRoute = authenticatedProcedure
@@ -20,6 +21,7 @@ export const findAttachmentsRoute = authenticatedProcedure
   })
   .input(ZFindAttachmentsRequestSchema)
   .output(ZFindAttachmentsResponseSchema)
+  .use(twoFactorScope((input) => ({ document: input.documentId })))
   .query(async ({ input, ctx }) => {
     const { documentId } = input;
     const { teamId } = ctx;

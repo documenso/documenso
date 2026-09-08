@@ -11,10 +11,12 @@ import { prisma } from '@documenso/prisma';
 import type { Logger } from 'pino';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZGetSubscriptionRequestSchema } from './get-subscription.types';
 
 export const getSubscriptionRoute = authenticatedProcedure
   .input(ZGetSubscriptionRequestSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ ctx, input }) => {
     const { organisationId } = input;
 

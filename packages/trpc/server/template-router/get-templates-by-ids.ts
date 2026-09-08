@@ -6,6 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   getTemplatesByIdsMeta,
   ZGetTemplatesByIdsRequestSchema,
@@ -16,6 +17,7 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
   .meta(getTemplatesByIdsMeta)
   .input(ZGetTemplatesByIdsRequestSchema)
   .output(ZGetTemplatesByIdsResponseSchema)
+  .use(twoFactorScope((input) => ({ template: input.templateIds })))
   .mutation(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { templateIds } = input;

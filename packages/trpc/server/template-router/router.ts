@@ -35,6 +35,7 @@ import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
+import { TWO_FACTOR_SKIP, twoFactorScope, twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import { getTemplatesByIdsRoute } from './get-templates-by-ids';
 import {
   ZBulkSendTemplateMutationSchema,
@@ -83,6 +84,7 @@ export const templateRouter = router({
     })
     .input(ZFindTemplatesRequestSchema)
     .output(ZFindTemplatesResponseSchema)
+    .use(twoFactorScopeFromCtx())
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
 
@@ -136,6 +138,7 @@ export const templateRouter = router({
   findOrganisationTemplates: authenticatedProcedure
     .input(ZFindOrganisationTemplatesRequestSchema)
     .output(ZFindTemplatesResponseSchema)
+    .use(twoFactorScopeFromCtx())
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
 
@@ -183,6 +186,7 @@ export const templateRouter = router({
   getOrganisationTemplateById: authenticatedProcedure
     .input(ZGetOrganisationTemplateByIdRequestSchema)
     .output(ZGetOrganisationTemplateByIdResponseSchema)
+    .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { envelopeId } = input;
@@ -214,6 +218,7 @@ export const templateRouter = router({
     })
     .input(ZGetTemplateByIdRequestSchema)
     .output(ZGetTemplateByIdResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId } = input;
@@ -261,6 +266,7 @@ export const templateRouter = router({
     })
     .input(ZCreateTemplateMutationSchema)
     .output(ZCreateTemplateResponseSchema)
+    .use(twoFactorScopeFromCtx())
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
 
@@ -351,6 +357,7 @@ export const templateRouter = router({
     })
     .input(ZCreateTemplateV2RequestSchema)
     .output(ZCreateTemplateV2ResponseSchema)
+    .use(twoFactorScopeFromCtx())
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
 
@@ -437,6 +444,7 @@ export const templateRouter = router({
     })
     .input(ZUpdateTemplateRequestSchema)
     .output(ZUpdateTemplateResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, data, meta } = input;
@@ -483,6 +491,7 @@ export const templateRouter = router({
     })
     .input(ZDuplicateTemplateMutationSchema)
     .output(ZDuplicateTemplateResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId } = input;
@@ -522,6 +531,7 @@ export const templateRouter = router({
     })
     .input(ZDeleteTemplateMutationSchema)
     .output(ZSuccessResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId } = input;
@@ -562,6 +572,7 @@ export const templateRouter = router({
     })
     .input(ZCreateDocumentFromTemplateRequestSchema)
     .output(ZCreateDocumentFromTemplateResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ ctx, input }) => {
       const { teamId } = ctx;
       const {
@@ -664,6 +675,13 @@ export const templateRouter = router({
     // })
     .input(ZCreateDocumentFromDirectTemplateRequestSchema)
     .output(ZCreateDocumentFromDirectTemplateResponseSchema)
+    // Token-authorized: authorization derives from the direct-template token
+    // (the session is incidental — an instance-blocked signed-in user must
+    // still be able to use someone else's direct template), so both asserts
+    // are skipped when the token is present — mirroring the handler, which
+    // authorizes via the token alone. The schema requires a non-empty token,
+    // so the fallback (instance assert only) is unreachable in practice.
+    .use(twoFactorScope((input) => (input.directTemplateToken ? TWO_FACTOR_SKIP : {})))
     .mutation(async ({ input, ctx }) => {
       const {
         directRecipientName,
@@ -717,6 +735,7 @@ export const templateRouter = router({
     })
     .input(ZCreateTemplateDirectLinkRequestSchema)
     .output(ZCreateTemplateDirectLinkResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, directRecipientId } = input;
@@ -794,6 +813,7 @@ export const templateRouter = router({
     })
     .input(ZDeleteTemplateDirectLinkRequestSchema)
     .output(ZSuccessResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId } = input;
@@ -828,6 +848,7 @@ export const templateRouter = router({
     })
     .input(ZToggleTemplateDirectLinkRequestSchema)
     .output(ZToggleTemplateDirectLinkResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, enabled } = input;
@@ -846,51 +867,54 @@ export const templateRouter = router({
   /**
    * @private
    */
-  uploadBulkSend: authenticatedProcedure.input(ZBulkSendTemplateMutationSchema).mutation(async ({ ctx, input }) => {
-    const { templateId, teamId, csv, sendImmediately } = input;
-    const { user } = ctx;
+  uploadBulkSend: authenticatedProcedure
+    .input(ZBulkSendTemplateMutationSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
+    .mutation(async ({ ctx, input }) => {
+      const { templateId, teamId, csv, sendImmediately } = input;
+      const { user } = ctx;
 
-    ctx.logger.info({
-      input: {
-        templateId,
+      ctx.logger.info({
+        input: {
+          templateId,
+          teamId,
+        },
+      });
+
+      if (csv.length > 4 * 1024 * 1024) {
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
+          message: 'File size exceeds 4MB limit',
+          statusCode: 400,
+        });
+      }
+
+      const template = await getTemplateById({
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         teamId,
-      },
-    });
-
-    if (csv.length > 4 * 1024 * 1024) {
-      throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
-        message: 'File size exceeds 4MB limit',
-        statusCode: 400,
-      });
-    }
-
-    const template = await getTemplateById({
-      id: {
-        type: 'templateId',
-        id: templateId,
-      },
-      teamId,
-      userId: user.id,
-    });
-
-    if (!template) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Template not found',
-      });
-    }
-
-    await jobs.triggerJob({
-      name: 'internal.bulk-send-template',
-      payload: {
         userId: user.id,
-        teamId,
-        templateId,
-        csvContent: csv,
-        sendImmediately,
-        requestMetadata: ctx.metadata.requestMetadata,
-      },
-    });
+      });
 
-    return { success: true };
-  }),
+      if (!template) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Template not found',
+        });
+      }
+
+      await jobs.triggerJob({
+        name: 'internal.bulk-send-template',
+        payload: {
+          userId: user.id,
+          teamId,
+          templateId,
+          csvContent: csv,
+          sendImmediately,
+          requestMetadata: ctx.metadata.requestMetadata,
+        },
+      });
+
+      return { success: true };
+    }),
 });

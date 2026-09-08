@@ -1,6 +1,7 @@
 import { duplicateEnvelope } from '@documenso/lib/server-only/envelope/duplicate-envelope';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   duplicateEnvelopeMeta,
   ZDuplicateEnvelopeRequestSchema,
@@ -11,6 +12,7 @@ export const duplicateEnvelopeRoute = authenticatedProcedure
   .meta(duplicateEnvelopeMeta)
   .input(ZDuplicateEnvelopeRequestSchema)
   .output(ZDuplicateEnvelopeResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { envelopeId, includeRecipients, includeFields } = input;

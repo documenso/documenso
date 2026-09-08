@@ -3,8 +3,10 @@ import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { getBasePath } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
+import { getTwoFactorEnforcementStatus } from '@documenso/lib/server-only/2fa/get-two-factor-enforcement-status';
 import { createPublicEnv } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
+import type { TTwoFactorEnforcementStatus } from '@documenso/lib/utils/two-factor';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { getOrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session';
 import { Toaster } from '@documenso/ui/primitives/toaster';
@@ -60,9 +62,19 @@ export async function loader({ context, request }: Route.LoaderArgs) {
   const disableAnimations = cookieHeader.includes('__disable_animations=true');
 
   let organisations = null;
+  let twoFactorEnforcement: TTwoFactorEnforcementStatus = { required: false };
 
   if (session.isAuthenticated) {
-    organisations = await getOrganisationSession({ userId: session.user.id });
+    [organisations, twoFactorEnforcement] = await Promise.all([
+      getOrganisationSession({
+        userId: session.user.id,
+        user: session.user,
+        session: session.session,
+      }),
+      // Instance 2FA enforcement status is part of the session payload so
+      // layouts can derive banners/redirects client-side without new queries.
+      getTwoFactorEnforcementStatus({ user: session.user, session: session.session }),
+    ]);
   }
 
   return data(
@@ -80,6 +92,7 @@ export async function loader({ context, request }: Route.LoaderArgs) {
             user: session.user,
             session: session.session,
             organisations: organisations || [],
+            twoFactorEnforcement,
           }
         : null,
       publicEnv: createPublicEnv(),

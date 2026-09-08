@@ -7,6 +7,7 @@ import { submitSupportTicket } from '@documenso/lib/server-only/user/submit-supp
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
 import { authenticatedProcedure, router } from '../trpc';
+import { twoFactorInstanceOnly, twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZFindUserSecurityAuditLogsSchema,
   ZSetProfileImageMutationSchema,
@@ -17,6 +18,8 @@ import {
 export const profileRouter = router({
   findUserSecurityAuditLogs: authenticatedProcedure
     .input(ZFindUserSecurityAuditLogsSchema)
+    // 2FA enforcement: user-level security audit log; no organisation scope. Instance assert still applies.
+    .use(twoFactorInstanceOnly())
     .query(async ({ input, ctx }) => {
       return await findUserSecurityAuditLogs({
         userId: ctx.user.id,
@@ -24,67 +27,95 @@ export const profileRouter = router({
       });
     }),
 
-  updateProfile: authenticatedProcedure.input(ZUpdateProfileMutationSchema).mutation(async ({ input, ctx }) => {
-    const { name, signature } = input;
+  updateProfile: authenticatedProcedure
+    .input(ZUpdateProfileMutationSchema)
+    // 2FA enforcement: user-level profile update; no organisation scope. Instance assert still applies.
+    .use(twoFactorInstanceOnly())
+    .mutation(async ({ input, ctx }) => {
+      const { name, signature } = input;
 
-    await updateProfile({
-      userId: ctx.user.id,
-      name,
-      signature,
-      requestMetadata: ctx.metadata.requestMetadata,
-    });
-  }),
-
-  deleteAccount: authenticatedProcedure.mutation(async ({ ctx }) => {
-    ctx.logger.info({
-      input: {
+      await updateProfile({
         userId: ctx.user.id,
-      },
-    });
+        name,
+        signature,
+        requestMetadata: ctx.metadata.requestMetadata,
+      });
+    }),
 
-    await deleteUser({
-      id: ctx.user.id,
-    });
-  }),
+  deleteAccount: authenticatedProcedure
+    // 2FA enforcement: user-level account deletion; a blocked user must be able to delete their own account. Instance assert still applies.
+    .use(twoFactorInstanceOnly())
+    .mutation(async ({ ctx }) => {
+      ctx.logger.info({
+        input: {
+          userId: ctx.user.id,
+        },
+      });
 
-  setProfileImage: authenticatedProcedure.input(ZSetProfileImageMutationSchema).mutation(async ({ input, ctx }) => {
-    const { bytes, teamId, organisationId } = input;
+      await deleteUser({
+        id: ctx.user.id,
+      });
+    }),
 
-    ctx.logger.info({
-      input: {
-        teamId,
-        organisationId,
-      },
-    });
+  setProfileImage: authenticatedProcedure
+    .input(ZSetProfileImageMutationSchema)
+    .use(
+      twoFactorScope((input) => ({
+        organisation: input.organisationId ?? undefined,
+        team: input.teamId ?? undefined,
+      })),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { bytes, teamId, organisationId } = input;
 
-    let target: SetAvatarImageOptions['target'] = {
-      type: 'user',
-    };
+      ctx.logger.info({
+        input: {
+          teamId,
+          organisationId,
+        },
+      });
 
-    if (teamId) {
-      target = {
-        type: 'team',
-        teamId,
+      let target: SetAvatarImageOptions['target'] = {
+        type: 'user',
       };
-    }
 
-    if (organisationId) {
-      target = {
-        type: 'organisation',
-        organisationId,
-      };
-    }
+      if (teamId) {
+        target = {
+          type: 'team',
+          teamId,
+        };
+      }
 
-    return await setAvatarImage({
-      userId: ctx.user.id,
-      target,
-      bytes,
-      requestMetadata: ctx.metadata,
-    });
-  }),
+      if (organisationId) {
+        target = {
+          type: 'organisation',
+          organisationId,
+        };
+      }
+
+      return await setAvatarImage({
+        userId: ctx.user.id,
+        target,
+        bytes,
+        requestMetadata: ctx.metadata,
+      });
+    }),
 
   submitSupportTicket: authenticatedProcedure
     .input(ZSubmitSupportTicketMutationSchema)
+    .use(
+      twoFactorScope((input) => {
+        // The legacy string team ID is only in scope when it parses to a real
+        // ID — mirroring the handler's own validation branch; a malformed
+        // value is rejected by the handler, not resolved here.
+        const teamId = input.teamId ? Number(input.teamId) : null;
+
+        return {
+          organisation: input.organisationId,
+          team: teamId !== null && Number.isInteger(teamId) && teamId > 0 ? teamId : undefined,
+        };
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
       const { subject, message, organisationId, teamId } = input;
 

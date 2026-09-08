@@ -1,4 +1,6 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { AppError } from '@documenso/lib/errors/app-error';
+import { assertTwoFactorEnforcementForSession } from '@documenso/lib/server-only/2fa/org-enforcement';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import type { DocumentDataVersion } from '@documenso/lib/types/document';
 import { sha256 } from '@documenso/lib/universal/crypto';
@@ -41,6 +43,10 @@ route.get(
 
     let userId = session.user?.id;
 
+    // Presign-token access (embedding) is machine access and exempt from 2FA
+    // enforcement; the assert below only applies to session auth.
+    const isPresignTokenAccess = Boolean(presignToken);
+
     // Check presignToken if provided
     if (presignToken) {
       const verifiedToken = await verifyEmbeddingPresignToken({
@@ -69,6 +75,11 @@ route.get(
             type: true,
             teamId: true,
             templateType: true,
+            team: {
+              select: {
+                organisationId: true,
+              },
+            },
           },
         },
       },
@@ -76,6 +87,26 @@ route.get(
 
     if (!envelopeItem) {
       return c.json({ error: 'Not found' }, 404);
+    }
+
+    // 2FA enforcement (session auth only): instance assert + the owning
+    // organisation's policy for the envelope being accessed.
+    if (!isPresignTokenAccess && session.user && session.session) {
+      try {
+        await assertTwoFactorEnforcementForSession({
+          user: session.user,
+          session: session.session,
+          organisationIds: [envelopeItem.envelope.team.organisationId],
+        });
+      } catch (error) {
+        if (error instanceof AppError) {
+          const { status, body } = AppError.toRestAPIError(error);
+
+          return c.json({ error: body.message, code: error.code }, status);
+        }
+
+        throw error;
+      }
     }
 
     // Check whether the user has access to the document.

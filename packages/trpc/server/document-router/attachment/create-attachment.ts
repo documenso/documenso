@@ -4,6 +4,7 @@ import { createAttachment } from '@documenso/lib/server-only/envelope-attachment
 import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import { ZCreateAttachmentRequestSchema, ZCreateAttachmentResponseSchema } from './create-attachment.types';
 
 export const createAttachmentRoute = authenticatedProcedure
@@ -20,6 +21,7 @@ export const createAttachmentRoute = authenticatedProcedure
   })
   .input(ZCreateAttachmentRequestSchema)
   .output(ZCreateAttachmentResponseSchema)
+  .use(twoFactorScope((input) => ({ document: input.documentId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const userId = ctx.user.id;

@@ -1,6 +1,7 @@
 import { createAttachment } from '@documenso/lib/server-only/envelope-attachment/create-attachment';
 
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import {
   createAttachmentMeta,
   ZCreateAttachmentRequestSchema,
@@ -11,6 +12,7 @@ export const createAttachmentRoute = authenticatedProcedure
   .meta(createAttachmentMeta)
   .input(ZCreateAttachmentRequestSchema)
   .output(ZCreateAttachmentResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const userId = ctx.user.id;

@@ -6,6 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   findEnvelopeAuditLogsMeta,
   ZFindEnvelopeAuditLogsRequestSchema,
@@ -16,6 +17,7 @@ export const findEnvelopeAuditLogsRoute = authenticatedProcedure
   .meta(findEnvelopeAuditLogsMeta)
   .input(ZFindEnvelopeAuditLogsRequestSchema)
   .output(ZFindEnvelopeAuditLogsResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .query(async ({ input, ctx }) => {
     const { envelopeId, page = 1, perPage = 50, orderByColumn = 'createdAt', orderByDirection = 'desc' } = input;
 
