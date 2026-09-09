@@ -25,6 +25,7 @@ import {
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { assertRecipientNotExpired } from '../../utils/recipients';
+import { assertSignatureModeAllowed } from '../../utils/signature-mode';
 import { validateFieldAuth } from '../document/validate-field-auth';
 
 export type SignFieldWithTokenOptions = {
@@ -204,8 +205,12 @@ export const signFieldWithToken = async ({
     throw new Error('Signature field must have a signature');
   }
 
-  if (isSignatureField && documentMeta?.typedSignatureEnabled === false && typedSignature) {
-    throw new Error('Typed signatures are not allowed. Please draw your signature');
+  if (isSignatureField && documentMeta) {
+    if (typedSignature) {
+      assertSignatureModeAllowed('typed', documentMeta);
+    } else if (signatureImageAsBase64) {
+      assertSignatureModeAllowed('image', documentMeta);
+    }
   }
 
   if (field.fieldMeta?.readOnly && !AUTO_SIGNABLE_FIELD_TYPES.includes(field.type)) {
