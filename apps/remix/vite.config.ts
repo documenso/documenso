@@ -5,6 +5,7 @@ import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
 import autoprefixer from 'autoprefixer';
 import serverAdapter from 'hono-react-router-adapter/vite';
+import type { AppLoadContext } from 'react-router';
 import tailwindcss from 'tailwindcss';
 import { defineConfig, normalizePath } from 'vite';
 import macrosPlugin from 'vite-plugin-babel-macros';
@@ -49,7 +50,7 @@ export default defineConfig({
       entry: 'server/router.ts',
       getLoadContext: async () => {
         const { getLoadContext } = await import('./server/load-context');
-        return getLoadContext();
+        return getLoadContext() as unknown as AppLoadContext;
       },
       exclude: [
         // Spread the defaults but replace the /.css$/ rule so that Bull
