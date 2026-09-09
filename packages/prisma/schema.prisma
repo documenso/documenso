@@ -144,9 +144,18 @@ model Passkey {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+enum AnonymousVerificationTokenType {
+  PASSKEY
+  QR_SIGNATURE
+}
+
 model AnonymousVerificationToken {
-  id        String   @id @unique @default(cuid())
-  token     String   @unique
+  id       String                         @id @unique @default(cuid())
+  type     AnonymousVerificationTokenType
+  token    String                         @unique
+  value    String?
+  metadata Json?
+
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
@@ -571,6 +580,7 @@ model DocumentMeta {
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
   drawSignatureEnabled   Boolean @default(true)
+  qrSignatureEnabled     Boolean @default(true)
 
   language           String                     @default("en")
   distributionMethod DocumentDistributionMethod @default(EMAIL)
@@ -970,6 +980,7 @@ model OrganisationGlobalSettings {
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
   drawSignatureEnabled   Boolean @default(true)
+  qrSignatureEnabled     Boolean @default(true)
 
   defaultRecipients Json? /// [DefaultRecipient[]] @zod.custom.use(ZDefaultRecipientsSchema)
 
@@ -1013,6 +1024,7 @@ model TeamGlobalSettings {
   typedSignatureEnabled  Boolean?
   uploadSignatureEnabled Boolean?
   drawSignatureEnabled   Boolean?
+  qrSignatureEnabled     Boolean?
 
   defaultRecipients Json? /// [DefaultRecipient[]] @zod.custom.use(ZDefaultRecipientsSchema)
 

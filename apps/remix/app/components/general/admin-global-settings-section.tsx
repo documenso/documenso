@@ -156,6 +156,10 @@ export const AdminGlobalSettingsSection = ({
         </DetailsValue>
       </DetailsCard>
 
+      <DetailsCard label={<Trans>QR signature</Trans>}>
+        <DetailsValue>{booleanValue(settings.qrSignatureEnabled, inheritedSettings?.qrSignatureEnabled)}</DetailsValue>
+      </DetailsCard>
+
       <DetailsCard label={<Trans>Branding</Trans>}>
         <DetailsValue>{booleanValue(settings.brandingEnabled, inheritedSettings?.brandingEnabled)}</DetailsValue>
       </DetailsCard>

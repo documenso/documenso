@@ -68,6 +68,7 @@ All webhook events share a common structure:
 | `typedSignatureEnabled`    | boolean | Whether typed signatures are allowed    |
 | `uploadSignatureEnabled`   | boolean | Whether uploaded signatures are allowed |
 | `drawSignatureEnabled`     | boolean | Whether drawn signatures are allowed    |
+| `qrSignatureEnabled`       | boolean | Whether QR code handoff to a mobile device is allowed |
 | `language`                 | string  | Document language code                  |
 | `distributionMethod`       | string  | How document is distributed             |
 | `emailSettings`            | object? | Custom email settings for this document |
@@ -141,6 +142,7 @@ Triggered when a new document is created.
       "typedSignatureEnabled": true,
       "uploadSignatureEnabled": true,
       "drawSignatureEnabled": true,
+      "qrSignatureEnabled": true,
       "language": "en",
       "distributionMethod": "EMAIL",
       "emailSettings": null
@@ -235,6 +237,7 @@ The document status changes to `PENDING` and recipients have `sendStatus: "SENT"
       "typedSignatureEnabled": true,
       "uploadSignatureEnabled": true,
       "drawSignatureEnabled": true,
+      "qrSignatureEnabled": true,
       "language": "en",
       "distributionMethod": "EMAIL",
       "emailSettings": null
@@ -435,6 +438,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
       "typedSignatureEnabled": true,
       "uploadSignatureEnabled": true,
       "drawSignatureEnabled": true,
+      "qrSignatureEnabled": true,
       "language": "en",
       "distributionMethod": "EMAIL",
       "emailSettings": null
@@ -618,6 +622,7 @@ This event is **not** triggered when a recipient hides a document from their inb
       "typedSignatureEnabled": true,
       "uploadSignatureEnabled": true,
       "drawSignatureEnabled": true,
+      "qrSignatureEnabled": true,
       "language": "en",
       "distributionMethod": "EMAIL",
       "emailSettings": null

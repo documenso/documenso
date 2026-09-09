@@ -25,6 +25,7 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
     typedSignatureEnabled: z.boolean().optional(),
     uploadSignatureEnabled: z.boolean().optional(),
     drawSignatureEnabled: z.boolean().optional(),
+    qrSignatureEnabled: z.boolean().optional(),
     defaultRecipients: ZDefaultRecipientsSchema.nullish(),
     delegateDocumentOwnership: z.boolean().nullish(),
     envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.optional(),

@@ -438,6 +438,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           typedSignatureEnabled: body.meta.typedSignatureEnabled,
           uploadSignatureEnabled: body.meta.uploadSignatureEnabled,
           drawSignatureEnabled: body.meta.drawSignatureEnabled,
+          qrSignatureEnabled: body.meta.qrSignatureEnabled,
           distributionMethod: body.meta.distributionMethod,
           emailSettings: body.meta.emailSettings,
         },

@@ -35,6 +35,7 @@ export type DocumentSigningSignatureFieldProps = {
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
+  qrSignatureEnabled?: boolean;
 };
 
 export const DocumentSigningSignatureField = ({
@@ -44,6 +45,7 @@ export const DocumentSigningSignatureField = ({
   typedSignatureEnabled,
   uploadSignatureEnabled,
   drawSignatureEnabled,
+  qrSignatureEnabled,
 }: DocumentSigningSignatureFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -295,6 +297,8 @@ export const DocumentSigningSignatureField = ({
             typedSignatureEnabled={typedSignatureEnabled}
             uploadSignatureEnabled={uploadSignatureEnabled}
             drawSignatureEnabled={drawSignatureEnabled}
+            qrSignatureEnabled={qrSignatureEnabled}
+            qrSignatureContext={{ type: 'DOCUMENT_SIGNATURE', recipientToken: recipient.token }}
           />
 
           <DocumentSigningDisclosure />

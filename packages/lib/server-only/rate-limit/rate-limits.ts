@@ -72,6 +72,21 @@ export const reportSenderRateLimit = createRateLimit({
   window: '7d',
 });
 
+// ---- Signature (QR mobile handoff) ----
+
+export const qrSignatureCreateRateLimit = createRateLimit({
+  action: 'signature.qr-create',
+  max: 20,
+  window: '15m',
+});
+
+export const qrSignatureCompleteRateLimit = createRateLimit({
+  action: 'signature.qr-complete',
+  max: 20,
+  globalMax: 60,
+  window: '15m',
+});
+
 // ---- Billing ----
 
 export const syncSubscriptionRateLimit = createRateLimit({

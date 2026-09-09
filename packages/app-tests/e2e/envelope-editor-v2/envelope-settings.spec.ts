@@ -384,6 +384,7 @@ const assertEnvelopeSettingsPersistedInDatabase = async ({
   expect(envelope.documentMeta.drawSignatureEnabled).toBe(true);
   expect(envelope.documentMeta.typedSignatureEnabled).toBe(true);
   expect(envelope.documentMeta.uploadSignatureEnabled).toBe(false);
+  expect(envelope.documentMeta.qrSignatureEnabled).toBe(true);
   expect(envelope.documentMeta.emailSettings).toMatchObject(DB_EXPECTED_VALUES.emailSettings);
 
   const authOptions = parseAuthOptions(envelope.authOptions);

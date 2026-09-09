@@ -50,11 +50,13 @@ export default function TeamsSettingsPage() {
                 typedSignatureEnabled: null,
                 uploadSignatureEnabled: null,
                 drawSignatureEnabled: null,
+                qrSignatureEnabled: null,
               }
             : {
                 typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
                 uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
                 drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
+                qrSignatureEnabled: signatureTypes.includes(DocumentSignatureType.QR),
               }),
           delegateDocumentOwnership,
         },
