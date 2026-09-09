@@ -1,6 +1,4 @@
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { IS_TEAM_ANALYTICS_ENABLED } from '@documenso/lib/constants/app';
-import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
@@ -36,15 +34,15 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
   }, []);
 
   const menuNavigationLinks = useMemo(() => {
-    const navigationTeam =
-      currentTeam ??
-      (organisations.length === 1 && organisations[0].teams.length === 1 ? organisations[0].teams[0] : null);
+    let teamUrl = currentTeam?.url || null;
 
-    if (!navigationTeam) {
-      return [];
+    if (!teamUrl && organisations.length === 1 && organisations[0].teams.length === 1) {
+      teamUrl = organisations[0].teams[0].url;
     }
 
-    const teamUrl = navigationTeam.url;
+    if (!teamUrl) {
+      return [];
+    }
 
     return [
       {
@@ -55,9 +53,6 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
         href: `/t/${teamUrl}/templates`,
         label: msg`Templates`,
       },
-      ...(IS_TEAM_ANALYTICS_ENABLED() && canExecuteTeamAction('MANAGE_TEAM', navigationTeam.currentTeamRole)
-        ? [{ href: `/t/${teamUrl}/analytics`, label: msg`Analytics` }]
-        : []),
     ];
   }, [currentTeam, organisations]);
 

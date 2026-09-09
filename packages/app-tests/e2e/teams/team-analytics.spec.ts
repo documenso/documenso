@@ -13,7 +13,8 @@ import { apiSignin, apiSignout } from '../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const TIMEZONE = 'America/New_York';
-const APRIL_DATE = '2026-04-15';
+const APRIL_START = '2026-04-01';
+const MAY_START = '2026-05-01';
 const MAY_DATE = '2026-05-15';
 const SECOND_OWNER_NAME = 'Analytics Second Owner';
 const HIDDEN_OWNER_NAME = 'Hidden Analytics Owner';
@@ -99,8 +100,8 @@ test('[ANALYTICS]: owner and calendar filters keep activity and current counts o
   });
 
   await expect(page.getByRole('heading', { name: 'Analytics' })).toBeVisible();
-  await expect(page.getByLabel('Period', { exact: true })).toContainText('Month');
-  await expect(page.getByLabel('Date')).toHaveValue(MAY_DATE);
+  await expect(page.getByTestId('analytics-period')).toContainText('Month');
+  await expect(page.getByTestId('analytics-date')).toHaveText('May 2026');
   await expect(page.getByText(TIMEZONE, { exact: false }).first()).toBeVisible();
   await expectMetrics(page, { sent: 4, completed: 1, declined: 1, cancelled: 1, draft: 2, pending: 1 });
   await expect(page.getByTestId('analytics-coverage')).toContainText('Completed');
@@ -117,7 +118,7 @@ test('[ANALYTICS]: owner and calendar filters keep activity and current counts o
   await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 1 });
   await expect(page.getByTestId('analytics-coverage')).toHaveCount(0);
 
-  await page.getByLabel('Period', { exact: true }).click();
+  await page.getByTestId('analytics-period').click();
   await page.getByRole('option', { name: 'Day', exact: true }).click();
   await expectAnalyticsUrl(page, {
     period: 'day',
@@ -127,34 +128,36 @@ test('[ANALYTICS]: owner and calendar filters keep activity and current counts o
   });
   await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 1 });
 
-  await page.getByLabel('Date').fill('2026-05-18');
+  for (let step = 0; step < 3; step += 1) {
+    await page.getByRole('button', { name: 'Next period' }).click();
+  }
   await expectAnalyticsUrl(page, {
     period: 'day',
     date: '2026-05-18',
     timezone: TIMEZONE,
     senderIds: String(secondOwner.id),
   });
+  await expect(page.getByTestId('analytics-date')).toHaveText('May 18, 2026');
   await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 1 });
 
-  await page.getByLabel('Period', { exact: true }).click();
+  await page.getByTestId('analytics-period').click();
   await page.getByRole('option', { name: 'Month', exact: true }).click();
   await page.getByRole('button', { name: 'Previous period' }).click();
   await expect.poll(() => new URL(page.url()).searchParams.get('date')?.slice(0, 7)).toBe('2026-04');
-  await expect(page.getByLabel('Date')).toHaveValue('2026-04-01');
+  await expect(page.getByTestId('analytics-date')).toHaveText('Apr 2026');
   await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 1 });
 
   await page.getByRole('button', { name: 'Next period' }).click();
   await expect.poll(() => new URL(page.url()).searchParams.get('date')?.slice(0, 7)).toBe('2026-05');
-  await expect(page.getByLabel('Date')).toHaveValue('2026-05-01');
+  await expect(page.getByTestId('analytics-date')).toHaveText('May 2026');
   await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 1 });
-  await page.getByLabel('Date').fill('2026-05-18');
 
   await page.getByTestId('analytics-owner-filter').click();
-  await page.getByRole('option', { name: 'All', exact: true }).click();
+  await page.getByRole('option', { name: 'Clear', exact: true }).click();
   await page.keyboard.press('Escape');
   await expectAnalyticsUrl(page, {
     period: 'month',
-    date: '2026-05-18',
+    date: MAY_START,
     timezone: TIMEZONE,
     senderIds: null,
   });
@@ -163,8 +166,8 @@ test('[ANALYTICS]: owner and calendar filters keep activity and current counts o
   const savedUrl = page.url();
   await page.reload();
   await expect(page).toHaveURL(savedUrl);
-  await expect(page.getByLabel('Period', { exact: true })).toContainText('Month');
-  await expect(page.getByLabel('Date')).toHaveValue('2026-05-18');
+  await expect(page.getByTestId('analytics-period')).toContainText('Month');
+  await expect(page.getByTestId('analytics-date')).toHaveText('May 2026');
   await expectMetrics(page, { sent: 4, completed: 1, declined: 1, cancelled: 1, draft: 2, pending: 1 });
 
   const savedLocation = new URL(savedUrl);
@@ -173,7 +176,7 @@ test('[ANALYTICS]: owner and calendar filters keep activity and current counts o
   await apiSignin({ page, email: secondOwner.email, redirectPath: savedPath });
   await expectAnalyticsUrl(page, {
     period: 'month',
-    date: '2026-05-18',
+    date: MAY_START,
     timezone: TIMEZONE,
     senderIds: null,
   });
@@ -243,14 +246,14 @@ test('[ANALYTICS]: a late response cannot replace the active calendar result', a
     await expect(page.getByTestId(`analytics-${metric}`)).toHaveCount(0);
   }
 
-  await page.getByLabel('Date').fill(APRIL_DATE);
-  await expectAnalyticsUrl(page, { period: 'month', date: APRIL_DATE, timezone: TIMEZONE });
+  await page.getByRole('button', { name: 'Previous period' }).click();
+  await expectAnalyticsUrl(page, { period: 'month', date: APRIL_START, timezone: TIMEZONE });
   await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 3 });
 
   releaseMay();
   await mayReleased;
 
-  await expectAnalyticsUrl(page, { period: 'month', date: APRIL_DATE, timezone: TIMEZONE });
+  await expectAnalyticsUrl(page, { period: 'month', date: APRIL_START, timezone: TIMEZONE });
   await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 3 });
 });
 
@@ -407,7 +410,7 @@ test('[ANALYTICS]: empty states, invalid filters, and browser history remain rec
       await expect(page.getByTestId(`analytics-${metric}`)).toHaveCount(0);
     }
 
-    await page.getByRole('button', { name: 'Reset filters', exact: true }).click();
+    await page.getByRole('button', { name: 'Reset', exact: true }).click();
     await expect(page.getByTestId('analytics-error')).toHaveCount(0);
     await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 0 });
   }
@@ -448,7 +451,7 @@ test('[ANALYTICS]: request and access failures clear totals and recover only whe
   await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 1 });
 
   failNextRequest = true;
-  await page.getByLabel('Date').fill(APRIL_DATE);
+  await page.getByRole('button', { name: 'Previous period' }).click();
   await expect(page.getByTestId('analytics-error')).toBeVisible();
 
   for (const metric of METRICS) {
@@ -467,7 +470,7 @@ test('[ANALYTICS]: request and access failures clear totals and recover only whe
   });
   await prisma.organisationGroupMember.delete({ where: { id: managerMembership.id } });
 
-  await page.getByLabel('Date').fill(MAY_DATE);
+  await page.getByRole('button', { name: 'Next period' }).click();
   await expect(page.getByTestId('analytics-error')).toBeVisible();
 
   for (const metric of METRICS) {

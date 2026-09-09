@@ -67,13 +67,13 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         href: `/t/${teamUrl}/templates`,
         text: t`Templates`,
       },
-      ...(IS_TEAM_ANALYTICS_ENABLED() && canExecuteTeamAction('MANAGE_TEAM', navigationTeam.currentTeamRole)
-        ? [{ href: `/t/${teamUrl}/analytics`, text: t`Analytics` }]
-        : []),
       {
         href: '/inbox',
         text: t`Inbox`,
       },
+      ...(IS_TEAM_ANALYTICS_ENABLED() && canExecuteTeamAction('MANAGE_TEAM', navigationTeam.currentTeamRole)
+        ? [{ href: `/t/${teamUrl}/analytics`, text: t`Analytics` }]
+        : []),
       {
         href: '/settings/profile',
         text: t`Settings`,
