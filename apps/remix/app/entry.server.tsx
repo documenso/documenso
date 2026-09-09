@@ -7,10 +7,11 @@ import { createReadableStreamFromReadable } from '@react-router/node';
 import { isbot } from 'isbot';
 import type { RenderToPipeableStreamOptions } from 'react-dom/server';
 import { renderToPipeableStream } from 'react-dom/server';
-import type { AppLoadContext, EntryContext } from 'react-router';
+import type { EntryContext, RouterContextProvider } from 'react-router';
 import { ServerRouter } from 'react-router';
 
 import { langCookie } from './storage/lang-cookie.server';
+import { nonceContext } from './utils/nonce';
 
 export const streamTimeout = 5_000;
 
@@ -19,7 +20,7 @@ export default async function handleRequest(
   responseStatusCode: number,
   responseHeaders: Headers,
   routerContext: EntryContext,
-  loadContext: AppLoadContext,
+  loadContext: RouterContextProvider,
 ) {
   let language = await langCookie.parse(request.headers.get('cookie') ?? '');
 
@@ -33,7 +34,7 @@ export default async function handleRequest(
   // scripts it injects (route manifest, hydration data, module preloads).
   // The same nonce is also exposed to the React tree via the root loader so
   // our own inline scripts/styles can carry it.
-  const nonce = loadContext.nonce || undefined;
+  const nonce = loadContext.get(nonceContext) || undefined;
 
   return new Promise((resolve, reject) => {
     let shellRendered = false;
