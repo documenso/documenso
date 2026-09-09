@@ -1,4 +1,5 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { getBasePath } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
@@ -9,6 +10,7 @@ import { getOrganisationSession } from '@documenso/trpc/server/organisation-rout
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
+import { useEffect } from 'react';
 import {
   data,
   isRouteErrorResponse,
@@ -21,13 +23,16 @@ import {
   useMatches,
 } from 'react-router';
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
+import { nonceMiddleware } from '~/middleware/nonce';
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
 import { GenericErrorLayout } from './components/general/generic-error-layout';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
-import { nonce } from './utils/nonce';
+import { nonce, nonceContext } from './utils/nonce';
+
+export const middleware = [nonceMiddleware];
 
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
@@ -72,7 +77,7 @@ export async function loader({ context, request }: Route.LoaderArgs) {
       // Surface the per-request CSP nonce produced by `securityHeadersMiddleware` so all
       // SSR-rendered <script>/<style> elements in this layout (and child
       // routes that need it) can carry the matching nonce attribute.
-      nonce: context.nonce,
+      nonce: context.get(nonceContext),
       session: session.isAuthenticated
         ? {
             user: session.user,
@@ -200,11 +205,19 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  const analytics = useAnalytics();
+
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
 
   if (errorCode !== 404) {
     console.error('[RootErrorBoundary]', error);
   }
+
+  useEffect(() => {
+    if (errorCode !== 404) {
+      analytics.captureException(error, { source: 'app', location: 'root_boundary' });
+    }
+  }, [error]);
 
   return <GenericErrorLayout errorCode={errorCode} />;
 }

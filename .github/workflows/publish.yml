@@ -14,6 +14,7 @@ jobs:
   build_and_publish_platform_containers:
     name: Build and publish platform containers
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -78,6 +79,7 @@ jobs:
   create_and_publish_manifest:
     name: Create and publish manifest
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     needs: build_and_publish_platform_containers
     steps:
       - name: Checkout

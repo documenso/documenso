@@ -1,3 +1,39 @@
+import { SIGNATURE_MIN_COVERAGE_THRESHOLD } from '@documenso/lib/constants/signatures';
+import type { RefObject } from 'react';
+
+/**
+ * Checks whether the signature covers enough of the canvas to be considered
+ * valid, by measuring the percentage of non-transparent pixels against
+ * SIGNATURE_MIN_COVERAGE_THRESHOLD.
+ */
+export const checkSignatureValidity = (element: RefObject<HTMLCanvasElement | null>) => {
+  if (!element.current) {
+    return false;
+  }
+
+  const ctx = element.current.getContext('2d');
+
+  if (!ctx) {
+    return false;
+  }
+
+  const imageData = ctx.getImageData(0, 0, element.current.width, element.current.height);
+  const data = imageData.data;
+  let filledPixels = 0;
+  const totalPixels = data.length / 4;
+
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] > 0) {
+      filledPixels++;
+    }
+  }
+
+  const filledPercentage = filledPixels / totalPixels;
+  const isValid = filledPercentage > SIGNATURE_MIN_COVERAGE_THRESHOLD;
+
+  return isValid;
+};
+
 export const average = (a: number, b: number) => (a + b) / 2;
 
 export const getSvgPathFromStroke = (points: number[][], closed = true) => {

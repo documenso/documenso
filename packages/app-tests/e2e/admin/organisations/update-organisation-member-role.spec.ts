@@ -50,9 +50,9 @@ test('[ADMIN]: promote member to owner', async ({ page }) => {
   });
 
   // Verify we're on the admin organisation page
-  await expect(page.getByText(`Manage organisation`)).toBeVisible();
+  await expect(page.getByText(`Manage organization`)).toBeVisible();
 
-  await expect(page.getByLabel('Organisation Name')).toHaveValue(organisation.name);
+  await expect(page.getByLabel('Organization Name')).toHaveValue(organisation.name);
 
   // Check that the organisation members table shows the correct roles
   const ownerRow = page.getByRole('row', { name: ownerUser.email });
@@ -356,7 +356,7 @@ test('[ADMIN]: error handling for invalid organisation', async ({ page }) => {
   });
 
   // Should show 404 error
-  await expect(page.getByRole('heading', { name: 'Organisation not found' })).toBeVisible({
+  await expect(page.getByRole('heading', { name: 'Organization not found' })).toBeVisible({
     timeout: 10_000,
   });
 });
@@ -525,8 +525,8 @@ test('[ADMIN]: verify organisation access after ownership change', async ({ page
 
   // Should be able to access organisation settings
   await expect(page.getByTestId('unified-settings-sidebar')).toBeVisible();
-  await expect(page.getByLabel('Organisation Name*')).toBeVisible();
-  await expect(page.getByLabel('Organisation Name*')).toBeEnabled();
+  await expect(page.getByLabel('Organization Name*')).toBeVisible();
+  await expect(page.getByLabel('Organization Name*')).toBeEnabled();
 
   // Should have delete permissions
   await expect(page.getByRole('button', { name: 'Delete' })).toBeVisible();
