@@ -2,6 +2,7 @@ import { getRecipientType, RecipientStatusType } from '@documenso/lib/client-onl
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
+import { cn } from '@documenso/ui/lib/utils';
 import { PopoverHover } from '@documenso/ui/primitives/popover';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -58,94 +59,90 @@ export const StackAvatarsWithTooltip = ({
     ];
   }, [recipients]);
 
+  const sections = [
+    {
+      key: 'completed',
+      label: <Trans>Completed</Trans>,
+      dotClassName: 'bg-green-500',
+      labelClassName: 'text-green-600 dark:text-green-400',
+      recipients: completedRecipients,
+      isInteractive: false,
+    },
+    {
+      key: 'rejected',
+      label: <Trans>Rejected</Trans>,
+      dotClassName: 'bg-red-500',
+      labelClassName: 'text-red-600 dark:text-red-400',
+      recipients: rejectedRecipients,
+      isInteractive: false,
+    },
+    {
+      key: 'waiting',
+      label: <Trans>Waiting</Trans>,
+      dotClassName: 'bg-blue-500',
+      labelClassName: 'text-blue-600 dark:text-blue-400',
+      recipients: waitingRecipients,
+      isInteractive: true,
+    },
+    {
+      key: 'opened',
+      label: <Trans>Opened</Trans>,
+      dotClassName: 'bg-amber-400',
+      labelClassName: 'text-amber-600 dark:text-amber-400',
+      recipients: openedRecipients,
+      isInteractive: true,
+    },
+    {
+      key: 'uncompleted',
+      label: <Trans>Uncompleted</Trans>,
+      dotClassName: 'bg-gray-400',
+      labelClassName: 'text-muted-foreground',
+      recipients: uncompletedRecipients,
+      isInteractive: true,
+    },
+  ].filter((section) => section.recipients.length > 0);
+
   return (
     <PopoverHover
       trigger={children || <StackAvatars recipients={sortedRecipients} />}
       contentProps={{
-        className: 'flex flex-col gap-y-5 py-2',
+        className: 'w-64 divide-y divide-border/50 overflow-hidden p-0 text-sm',
         side: position,
       }}
     >
-      {completedRecipients.length > 0 && (
-        <div>
-          <h1 className="font-medium text-base">
-            <Trans>Completed</Trans>
-          </h1>
-          {completedRecipients.map((recipient) => (
-            <div key={recipient.id} className="my-1 flex items-center gap-2">
-              <StackAvatar
-                first={true}
-                key={recipient.id}
-                type={getRecipientType(recipient)}
-                fallbackText={recipientAbbreviation(recipient)}
-              />
-              <div>
-                <p className="text-muted-foreground text-sm">{recipient.email || recipient.name}</p>
-                <p className="text-muted-foreground/70 text-xs">
-                  {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {sections.map((section) => (
+        <div key={section.key} className="px-3 pt-2.5 pb-1">
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className={cn('h-1.5 w-1.5 rounded-full', section.dotClassName)} />
+            <span className={section.labelClassName}>{section.label}</span>
+            <span className="text-muted-foreground">{section.recipients.length}</span>
+          </div>
 
-      {rejectedRecipients.length > 0 && (
-        <div>
-          <h1 className="font-medium text-base">
-            <Trans>Rejected</Trans>
-          </h1>
-          {rejectedRecipients.map((recipient) => (
-            <div key={recipient.id} className="my-1 flex items-center gap-2">
-              <StackAvatar
-                first={true}
-                key={recipient.id}
-                type={getRecipientType(recipient)}
-                fallbackText={recipientAbbreviation(recipient)}
-              />
-              <div>
-                <p className="text-muted-foreground text-sm">{recipient.email || recipient.name}</p>
-                <p className="text-muted-foreground/70 text-xs">
-                  {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+          <div className="mt-1.5">
+            {section.isInteractive
+              ? section.recipients.map((recipient) => (
+                  <AvatarWithRecipient key={recipient.id} recipient={recipient} documentStatus={documentStatus} />
+                ))
+              : section.recipients.map((recipient) => (
+                  <div key={recipient.id} className="-mx-2 flex items-center gap-2.5 rounded-md px-2 py-1.5">
+                    <StackAvatar
+                      first={true}
+                      type={getRecipientType(recipient)}
+                      fallbackText={recipientAbbreviation(recipient)}
+                      className="h-8 w-8 shrink-0 border-0 text-xs"
+                    />
 
-      {waitingRecipients.length > 0 && (
-        <div>
-          <h1 className="font-medium text-base">
-            <Trans>Waiting</Trans>
-          </h1>
-          {waitingRecipients.map((recipient) => (
-            <AvatarWithRecipient key={recipient.id} recipient={recipient} documentStatus={documentStatus} />
-          ))}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-foreground">{recipient.email || recipient.name}</p>
+                      <p className="truncate text-muted-foreground text-xs">
+                        {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+          </div>
         </div>
-      )}
-
-      {openedRecipients.length > 0 && (
-        <div>
-          <h1 className="font-medium text-base">
-            <Trans>Opened</Trans>
-          </h1>
-          {openedRecipients.map((recipient) => (
-            <AvatarWithRecipient key={recipient.id} recipient={recipient} documentStatus={documentStatus} />
-          ))}
-        </div>
-      )}
-
-      {uncompletedRecipients.length > 0 && (
-        <div>
-          <h1 className="font-medium text-base">
-            <Trans>Uncompleted</Trans>
-          </h1>
-          {uncompletedRecipients.map((recipient) => (
-            <AvatarWithRecipient key={recipient.id} recipient={recipient} documentStatus={documentStatus} />
-          ))}
-        </div>
-      )}
+      ))}
     </PopoverHover>
   );
 };
