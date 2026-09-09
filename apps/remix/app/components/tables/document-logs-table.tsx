@@ -59,7 +59,8 @@ export const DocumentLogsTable = ({ documentId, userId }: DocumentLogsTableProps
       {
         header: _(msg`Time`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => i18n.date(row.original.createdAt, { dateStyle: 'medium', timeStyle: 'medium' }),
+        cell: ({ row }) =>
+          i18n.date(row.original.createdAt, { dateStyle: 'short', timeStyle: 'short', hourCycle: 'h12' }),
       },
       {
         header: _(msg`User`),
