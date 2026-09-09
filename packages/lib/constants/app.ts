@@ -53,9 +53,6 @@ export const NEXT_PRIVATE_INTERNAL_WEBAPP_URL = () =>
 
 export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED') === 'true';
 
-/** Team analytics is enabled unless its rollout kill switch is set to `false`. */
-export const IS_TEAM_ANALYTICS_ENABLED = () => env('NEXT_PUBLIC_FEATURE_TEAM_ANALYTICS_ENABLED') !== 'false';
-
 /**
  * Whether this instance is Documenso Cloud (managed SaaS).
  *

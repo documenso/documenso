@@ -1,5 +1,4 @@
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { IS_TEAM_ANALYTICS_ENABLED } from '@documenso/lib/constants/app';
 import { SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -50,7 +49,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request);
   const team = await getTeamByUrl({ userId: session.user.id, teamUrl: params.teamUrl });
 
-  if (!IS_TEAM_ANALYTICS_ENABLED() || !team || !canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole)) {
+  if (!team || !canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole)) {
     throw redirect(formatDocumentsPath(params.teamUrl));
   }
 

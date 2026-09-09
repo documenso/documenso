@@ -1,7 +1,6 @@
 import LogoImage from '@documenso/assets/logo.png';
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { IS_TEAM_ANALYTICS_ENABLED } from '@documenso/lib/constants/app';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
@@ -71,7 +70,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         href: '/inbox',
         text: t`Inbox`,
       },
-      ...(IS_TEAM_ANALYTICS_ENABLED() && canExecuteTeamAction('MANAGE_TEAM', navigationTeam.currentTeamRole)
+      ...(canExecuteTeamAction('MANAGE_TEAM', navigationTeam.currentTeamRole)
         ? [{ href: `/t/${teamUrl}/analytics`, text: t`Analytics` }]
         : []),
       {

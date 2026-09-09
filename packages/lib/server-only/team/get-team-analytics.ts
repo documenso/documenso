@@ -6,7 +6,6 @@ import type {
 import { DocumentStatus, EnvelopeType, Prisma, TeamMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
-import { IS_TEAM_ANALYTICS_ENABLED } from '../../constants/app';
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -46,12 +45,6 @@ export const getTeamAnalytics = async ({
   timezone,
   senderIds: requestedSenderIds,
 }: GetTeamAnalyticsOptions): Promise<TGetTeamAnalyticsResponse> => {
-  if (!IS_TEAM_ANALYTICS_ENABLED()) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'Team analytics is disabled',
-    });
-  }
-
   const resolvedPeriod = resolveAnalyticsPeriod({ period, date, timezone });
   const senderIds = [...new Set(requestedSenderIds ?? [])].sort((a, b) => a - b);
 
