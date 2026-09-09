@@ -1,4 +1,4 @@
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { cn } from '@documenso/ui/lib/utils';
@@ -20,16 +20,18 @@ import {
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 
 import { AdminLicenseStatusBanner } from '~/components/general/admin-license-status-banner';
+import { adminMiddleware } from '~/middleware/admin';
 import { appMetaTags } from '~/utils/meta';
-
 import type { Route } from './+types/_layout';
 
 export function meta() {
   return appMetaTags(msg`Admin`);
 }
 
+export const middleware = [adminMiddleware];
+
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user } = await getSession(request);
+  const { user } = await getOptionalSession(request);
 
   const license = await LicenseClient.getInstance()?.getCachedLicense();
 
