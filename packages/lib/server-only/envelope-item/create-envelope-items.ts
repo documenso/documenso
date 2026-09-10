@@ -57,7 +57,10 @@ export const UNSAFE_createEnvelopeItems = async ({
         flattenForm: envelope.type !== 'TEMPLATE',
       });
 
-      const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
+      const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized, {
+        envelopeId: envelope.id,
+        fileName: file.name,
+      });
 
       const { documentData } = await putPdfFileServerSide({
         name: file.name,

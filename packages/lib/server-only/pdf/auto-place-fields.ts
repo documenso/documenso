@@ -1,8 +1,15 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { type TFieldAndMeta, ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { logger } from '@documenso/lib/utils/logger';
 import { PDF, rgb } from '@libpdf/core';
 import type { FieldType, Recipient } from '@prisma/client';
 
-import { parseFieldMetaFromPlaceholder, parseFieldTypeFromPlaceholder } from './helpers';
+import {
+  parseFieldMetaFromPlaceholder,
+  parseFieldTypeFromPlaceholder,
+  parsePlaceholderData,
+  parseRawFieldMetaFromPlaceholder,
+} from './helpers';
 
 const PLACEHOLDER_REGEX = /\{\{([^}]+)\}\}/g;
 const DEFAULT_FIELD_HEIGHT_PERCENT = 2;
@@ -61,7 +68,15 @@ export type FieldToCreate = TFieldAndMeta & {
   height: number;
 };
 
-export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<PlaceholderInfo[]> => {
+type ExtractPlaceholdersLogContext = {
+  envelopeId?: string;
+  fileName?: string;
+};
+
+export const extractPlaceholdersFromPDF = async (
+  pdf: Buffer,
+  logContext?: ExtractPlaceholdersLogContext,
+): Promise<PlaceholderInfo[]> => {
   const pdfDoc = await PDF.load(new Uint8Array(pdf));
 
   const placeholders: PlaceholderInfo[] = [];
@@ -85,7 +100,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
         continue;
       }
 
-      const placeholderData = innerMatch[1].split(',').map((property) => property.trim());
+      const placeholderData = parsePlaceholderData(innerMatch[1]);
       const [fieldTypeString, recipientOrMeta, ...fieldMetaData] = placeholderData;
 
       let fieldType: FieldType;
@@ -109,14 +124,51 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
       const recipient = recipientOrMeta;
 
-      const rawFieldMeta = Object.fromEntries(fieldMetaData.map((property) => property.split('=')));
+      /*
+        Parse and validate the field metadata. A malformed selection placeholder
+        (e.g. an unknown validation rule or a default value that doesn't match an
+        option) is skipped like an invalid field type rather than aborting the whole
+        upload, which may contain other valid placeholders and files.
+      */
+      let fieldAndMeta: TFieldAndMeta;
 
-      const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
+      try {
+        const rawFieldMeta = parseRawFieldMetaFromPlaceholder(fieldMetaData);
+        const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
 
-      const fieldAndMeta: TFieldAndMeta = ZEnvelopeFieldAndMetaSchema.parse({
-        type: fieldType,
-        fieldMeta: parsedFieldMeta,
-      });
+        const parsedFieldAndMeta = ZEnvelopeFieldAndMetaSchema.safeParse({
+          type: fieldType,
+          fieldMeta: parsedFieldMeta,
+        });
+
+        /*
+          Surface schema failures as INVALID_BODY (400) instead of letting the raw
+          ZodError bubble up to the caller as an INTERNAL_SERVER_ERROR (500).
+        */
+        if (!parsedFieldAndMeta.success) {
+          throw new AppError(AppErrorCode.INVALID_BODY, {
+            message: `Invalid field metadata for placeholder "${placeholder}": ${parsedFieldAndMeta.error.message}`,
+          });
+        }
+
+        fieldAndMeta = parsedFieldAndMeta.data;
+      } catch (error) {
+        const appError = AppError.parseError(error);
+
+        logger.warn(
+          {
+            envelopeId: logContext?.envelopeId,
+            fileName: logContext?.fileName,
+            placeholder,
+            page: page.index + 1,
+            code: appError.code,
+            message: appError.message,
+          },
+          'Skipping placeholder with invalid field metadata',
+        );
+
+        continue;
+      }
 
       /*
         LibPDF returns bbox in points with bottom-left origin.
@@ -182,8 +234,9 @@ export const removePlaceholdersFromPDF = async (pdf: Buffer, placeholders?: Plac
  */
 export const extractPdfPlaceholders = async (
   pdf: Buffer,
+  logContext?: ExtractPlaceholdersLogContext,
 ): Promise<{ cleanedPdf: Buffer; placeholders: PlaceholderInfo[] }> => {
-  const placeholders = await extractPlaceholdersFromPDF(pdf);
+  const placeholders = await extractPlaceholdersFromPDF(pdf, logContext);
 
   if (placeholders.length === 0) {
     return { cleanedPdf: pdf, placeholders: [] };
