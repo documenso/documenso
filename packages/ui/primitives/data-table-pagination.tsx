@@ -22,7 +22,7 @@ export function DataTablePagination<TData>({
   additionalInformation = 'VisibleCount',
 }: DataTablePaginationProps<TData>) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-4 px-2">
+    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-4 px-2 tabular-nums">
       <div className="flex-1 text-muted-foreground text-sm">
         {match(additionalInformation)
           .with('SelectedCount', () => (
