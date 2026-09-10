@@ -29,7 +29,7 @@ export type TrpcRouteMeta = {
     successDescription?: string;
     errorResponses?: number[] | Record<number, string>;
   };
-} & Record<string, unknown>;
+};
 
 const t = initTRPC
   .meta<TrpcRouteMeta>()
@@ -37,32 +37,30 @@ const t = initTRPC
   .create({
     transformer: dataTransformer,
     errorFormatter(opts) {
-      const { shape, error, ctx } = opts;
+      const { shape: errorTemplate, error, ctx } = opts;
 
       const originalError = error.cause;
 
-      let data: Record<string, unknown> = shape.data;
+      if (!(originalError instanceof AppError)) {
+        return errorTemplate;
+      }
+
+      if (originalError.headers && ctx) {
+        for (const [headerKey, headerValue] of Object.entries(originalError.headers)) {
+          ctx.res.headers.append(headerKey, headerValue);
+        }
+      }
 
       // Default unknown errors to 400, since if you're throwing an AppError it is expected
       // that you already know what you're doing.
-      if (originalError instanceof AppError) {
-        if (originalError.headers && ctx) {
-          for (const [headerKey, headerValue] of Object.entries(originalError.headers)) {
-            ctx.res.headers.append(headerKey, headerValue);
-          }
-        }
-
-        data = {
-          ...data,
+      return {
+        ...errorTemplate,
+        data: {
+          ...errorTemplate.data,
           appError: AppError.toJSON(originalError),
           code: originalError.code,
           httpStatus: originalError.statusCode ?? genericErrorCodeToTrpcErrorCodeMap[originalError.code]?.status ?? 400,
-        };
-      }
-
-      return {
-        ...shape,
-        data,
+        },
       };
     },
   });
