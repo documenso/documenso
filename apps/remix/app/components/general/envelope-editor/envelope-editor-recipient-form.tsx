@@ -33,7 +33,6 @@ import { isDeepEqual } from 'remeda';
 import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
 import { AiRecipientDetectionDialog } from '~/components/dialogs/ai-recipient-detection-dialog';
 import { useCurrentTeam } from '~/providers/team';
-import { useCspNonce } from '~/utils/nonce';
 
 import { RecipientStepList } from './recipient-step-list';
 
@@ -43,7 +42,6 @@ export const EnvelopeEditorRecipientForm = () => {
 
   const organisation = useCurrentOrganisation();
   const team = useCurrentTeam();
-  const cspNonce = useCspNonce();
 
   const { toast } = useToast();
   const { remaining } = useLimits();

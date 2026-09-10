@@ -49,7 +49,6 @@ export const EnvelopeEditorUploadPage = () => {
   const { maximumEnvelopeItemCount, remaining } = useLimits();
   const { toast } = useToast();
   const analytics = useAnalytics();
-  const cspNonce = useCspNonce();
 
   const {
     envelope,
