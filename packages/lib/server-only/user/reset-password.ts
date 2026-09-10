@@ -47,7 +47,7 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
   const isSamePassword = await compare(password, foundToken.user.password || '');
 
   if (isSamePassword) {
-    throw new AppError('SAME_PASSWORD');
+    throw new AppError(AppErrorCode.SAME_PASSWORD);
   }
 
   const hashedPassword = await hash(password, SALT_ROUNDS);
