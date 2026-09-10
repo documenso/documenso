@@ -43,6 +43,7 @@ type LocalFile = {
 
 export const EnvelopeEditorUploadPage = () => {
   const organisation = useCurrentOrganisation();
+  const cspNonce = useCspNonce();
 
   const { t, i18n } = useLingui();
   const { maximumEnvelopeItemCount, remaining } = useLimits();
