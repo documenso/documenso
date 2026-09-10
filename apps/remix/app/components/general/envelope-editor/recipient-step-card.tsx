@@ -5,7 +5,7 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DraggableProvided, DraggableStateSnapshot } from '@hello-pangea/dnd';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import { GripVerticalIcon, Users2Icon } from 'lucide-react';
 
 import { RecipientRow, type RecipientRowProps } from './recipient-row';
@@ -189,8 +189,11 @@ export const RecipientStepCard = ({
                   <>
                     <span className="ml-1 flex items-center gap-x-1.5 text-green-700 text-xs dark:text-green-400">
                       <Users2Icon className="h-3.5 w-3.5" />
-                      {/* Does not need Plural tag because it's always "recipients" */}
-                      <Trans>{step.members.length} recipients · any order</Trans>
+                      <Plural
+                        value={step.members.length}
+                        one="# recipient · any order"
+                        other="# recipients · any order"
+                      />
                     </span>
 
                     <Button
