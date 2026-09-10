@@ -138,5 +138,7 @@ declare namespace NodeJS {
     GOOGLE_VERTEX_PROJECT_ID?: string;
     GOOGLE_VERTEX_LOCATION?: string;
     GOOGLE_VERTEX_API_KEY?: string;
+    GOOGLE_VERTEX_SERVICE_ACCOUNT_KEY?: string;
+    GOOGLE_VERTEX_USE_ADC?: string;
   }
 }
