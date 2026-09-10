@@ -72,7 +72,7 @@ export const SettingsPublicProfileTemplatesTable = () => {
 
   return (
     <div>
-      <div className="mt-6 divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 dark:divide-foreground/30 dark:border-foreground/30">
+      <div className="mt-6 divide-y divide-border overflow-hidden rounded-lg border border-border">
         {/* Loading and error handling states. */}
         {publicDirectTemplates.length === 0 && (
           <>
@@ -132,7 +132,7 @@ export const SettingsPublicProfileTemplatesTable = () => {
 
               <div>
                 <p className="break-all text-sm">{template.publicTitle}</p>
-                <p className="break-all text-neutral-400 text-xs">{template.publicDescription}</p>
+                <p className="break-all text-muted-foreground text-xs">{template.publicDescription}</p>
               </div>
             </div>
 
