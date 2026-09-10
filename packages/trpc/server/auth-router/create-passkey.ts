@@ -8,6 +8,8 @@ export const createPasskeyRoute = authenticatedProcedure
   .input(ZCreatePasskeyRequestSchema)
   .output(ZCreatePasskeyResponseSchema)
   .mutation(async ({ ctx, input }) => {
+    // SAFETY: ZRegistrationResponseJSONSchema validates the same fields RegistrationResponseJSON
+    // declares; the assertion only restores the library type that zod inference loses.
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const verificationResponse = input.verificationResponse as RegistrationResponseJSON;
 
