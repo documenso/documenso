@@ -51,6 +51,7 @@ async function createAndSendDocument(
   pdfBuffer: Buffer,
   filename: string,
   title: string,
+  externalId: string,
   recipients: Recipient[],
 ): Promise<CreateAndSendResult> {
   const recipientPayload = recipients.map((recipient, index) => ({
@@ -89,6 +90,7 @@ async function createAndSendDocument(
     JSON.stringify({
       type: 'DOCUMENT',
       title,
+      externalId,
       recipients: recipientPayload,
       meta: {
         subject: `Please sign: ${title}`,
@@ -145,6 +147,7 @@ const result = await createAndSendDocument(
   pdfBuffer,
   'contract.pdf',
   'Service Agreement',
+  'nda-contract-ndac214',
   [
     { email: 'client@example.com', name: 'John Smith', role: 'SIGNER' },
     { email: 'manager@company.com', name: 'Jane Doe', role: 'SIGNER' },
@@ -172,6 +175,7 @@ ENVELOPE_RESPONSE=$(curl -s -X POST "${BASE_URL}/envelope/create" \
   -F 'payload={
     "type": "DOCUMENT",
     "title": "Service Agreement",
+    "externalId": "nda-contract-ndac214",
     "recipients": [
       {
         "email": "client@example.com",
@@ -240,6 +244,8 @@ echo $DISTRIBUTE_RESPONSE | jq '.recipients[] | {email, signingUrl}'
 
 </Tab>
 </Tabs>
+
+`externalId` is your application's own reference for this document, such as an invoice number or a database key. Documenso stores it on the envelope and repeats it in every webhook as `payload.externalId`, so your handler can match the event to your record without keeping a lookup table of Documenso IDs. To react when everyone has signed, see [Workflow 4](#workflow-4-wait-for-completion-with-webhooks). To fetch the finished PDF, see [Workflow 5](#workflow-5-download-signed-documents).
 
 ---
 
