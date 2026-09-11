@@ -502,6 +502,10 @@ msgstr "Użytkownik {recipientReference} podpisał dokument „{documentName}”
 msgid "{remaningLength, plural, one {# character remaining} other {# characters remaining}}"
 msgstr "{remaningLength, plural, one {Pozostał # znak} few {Pozostały # znaki} many {Pozostało # znaków} other {Pozostało # znaków}}"
 
+#: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
+msgid "{rowCount, plural, one {The CSV contains # row.} other {The CSV contains # rows.}} {maxRows, plural, one {A maximum of # row is allowed per upload.} other {A maximum of # rows is allowed per upload.}}"
+msgstr ""
+
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
 msgid "{selectedCount} selected"
 msgstr "Zaznaczono {selectedCount}"
@@ -1007,6 +1011,10 @@ msgstr "6 miesięcy"
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 msgid "7 days"
 msgstr "7 dni"
+
+#: apps/remix/app/components/forms/password.tsx
+msgid "A code is required"
+msgstr ""
 
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
 msgid "A confirmation email has been sent, and it should arrive in your inbox shortly."
@@ -1776,6 +1784,8 @@ msgstr "Ten adres e-mail już istnieje."
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 #: apps/remix/app/components/forms/avatar-image.tsx
+#: apps/remix/app/components/forms/password-setup-request-button.tsx
+#: apps/remix/app/components/forms/password-setup-request.tsx
 #: apps/remix/app/components/forms/password.tsx
 #: apps/remix/app/components/forms/reset-password.tsx
 #: apps/remix/app/components/forms/signup.tsx
@@ -2391,6 +2401,7 @@ msgid "Backport email transport"
 msgstr "Użyj dostawcy poczty e-mail"
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
+#: apps/remix/app/components/forms/2fa/two-factor-code-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Backup Code"
 msgstr "Kod zapasowy"
@@ -2835,6 +2846,11 @@ msgstr "Limit znaków"
 msgid "Charts"
 msgstr "Wykresy"
 
+#: apps/remix/app/components/forms/password-setup-request-button.tsx
+#: apps/remix/app/components/forms/password-setup-request.tsx
+msgid "Check your email"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
 #: packages/lib/utils/fields.ts
@@ -2986,6 +3002,7 @@ msgstr "Sekret klienta jest wymagany"
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-set-password.tsx
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 #: apps/remix/app/components/general/organisations/organisation-quota-banner.tsx
 #: packages/ui/primitives/dialog.tsx
@@ -5494,9 +5511,17 @@ msgstr "Wpisz nazwę"
 msgid "Enter Number"
 msgstr "Wpisz liczbę"
 
+#: apps/remix/app/components/forms/2fa/two-factor-code-dialog.tsx
+msgid "Enter one of your backup codes to continue."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Enter Text"
 msgstr "Wpisz tekst"
+
+#: apps/remix/app/components/forms/2fa/two-factor-code-dialog.tsx
+msgid "Enter the code from your authenticator app to continue."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Enter the domain you want to use for sending emails (without http:// or www)"
@@ -5618,7 +5643,6 @@ msgstr "Koperta została zaktualizowana"
 #: apps/remix/app/components/dialogs/envelopes-bulk-download-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-download-dialog.tsx
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
-#: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
@@ -6533,6 +6557,10 @@ msgstr "Identyfikowanie odbiorców"
 msgid "If there is any issue with your subscription, please contact us at <0>{SUPPORT_EMAIL}</0>."
 msgstr "Jeśli masz problemy z subskrypcją, skontaktuj się z nami pod adresem <0>{SUPPORT_EMAIL}</0>."
 
+#: packages/email/templates/reset-password.tsx
+msgid "If this was you, no action is needed. If it wasn't, reset your password immediately and <0>contact us</0>."
+msgstr ""
+
 #: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
 msgid "If you are using staging, ensure that you have set the host prop on the embedding component to the staging domain (https://stg-app.documenso.com)"
 msgstr "Jeśli korzystasz ze środowiska „staging”, ustaw właściwość host na domenę https://stg-app.documenso.com"
@@ -7080,6 +7108,10 @@ msgstr "Link wygaśnie za 1 godzinę."
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "Link expires in 30 minutes."
 msgstr "Link wygaśnie za 30 minut."
+
+#: apps/remix/app/components/forms/password-setup-request-button.tsx
+msgid "Link sent"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgctxt "Action button to link template to public profile"
@@ -7783,6 +7815,10 @@ msgstr "Żadne szablony organizacyjne nie są udostępniane Twojemu zespołowi."
 msgid "No organisations found"
 msgstr "Nie znaleziono organizacji"
 
+#: apps/remix/app/components/general/document-signing/document-signing-auth-set-password.tsx
+msgid "No password set"
+msgstr ""
+
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "No public profile templates found"
 msgstr "Nie znaleziono szablonów profilu publicznego"
@@ -8408,6 +8444,10 @@ msgstr "Klucze dostępu nie są obsługiwane w tej przeglądarce"
 msgid "Password"
 msgstr "Hasło"
 
+#: apps/remix/app/components/general/document-signing/document-signing-auth-set-password.tsx
+msgid "Password authentication unavailable"
+msgstr ""
+
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/generate-certificate-pdf.ts
 msgid "Password Re-Authentication"
@@ -8417,6 +8457,10 @@ msgstr "Hasło"
 msgid "Password Reset Requested"
 msgstr "Prośba o zresetowanie hasła"
 
+#: packages/lib/server-only/auth/send-reset-password.ts
+msgid "Password Reset Success!"
+msgstr ""
+
 #: packages/email/templates/reset-password.tsx
 msgid "Password Reset Successful"
 msgstr "Hasło zostało zresetowane"
@@ -8425,6 +8469,14 @@ msgstr "Hasło zostało zresetowane"
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Password should not be common or based on personal information"
 msgstr "Hasło nie powinno być powszechne ani oparte na informacjach osobistych"
+
+#: apps/remix/app/components/forms/password-setup-request-button.tsx
+msgid "Password sign in is disabled for this instance."
+msgstr ""
+
+#: apps/remix/app/components/forms/password-setup-request.tsx
+msgid "Password sign in is disabled for this instance. Please contact support."
+msgstr ""
 
 #: apps/remix/app/components/forms/password.tsx
 #: apps/remix/app/components/forms/reset-password.tsx
@@ -9754,6 +9806,12 @@ msgstr "Rola"
 msgid "Roles"
 msgstr "Role"
 
+#. placeholder {0}: rowError.row
+#. placeholder {1}: rowError.column
+#: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
+msgid "Row {0}: <0>{1}</0> must be a valid email or empty"
+msgstr ""
+
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Rows per page"
 msgstr "Wiersze na stronę"
@@ -10212,6 +10270,11 @@ msgstr "Wyślij przypomnienie"
 msgid "Send reminders to the following recipients"
 msgstr "Wyślij przypomnienia do następujących odbiorców"
 
+#: apps/remix/app/components/forms/password-setup-request-button.tsx
+#: apps/remix/app/components/forms/password-setup-request.tsx
+msgid "Send setup link"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Send Status"
 msgstr "Status wysyłki"
@@ -10275,6 +10338,7 @@ msgid "Sessions have been revoked"
 msgstr "Sesje zostały unieważnione"
 
 #: apps/remix/app/components/general/claim-account.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Set a password"
 msgstr "Ustaw hasło"
 
@@ -10638,6 +10702,10 @@ msgstr "Przypomnienia o podpisaniu"
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Signing Status"
 msgstr "Status podpisu"
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-set-password.tsx
+msgid "Signing this field requires a password, but your account does not have one. We can email you a link to set one. Once done, sign in again and return to this document to continue."
+msgstr ""
 
 #: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Signing Window Expired"
@@ -11523,6 +11591,26 @@ msgstr "Wymagane metody uwierzytelniania odbiorców do wyświetlania dokumentu."
 msgid "The content to show in the banner, HTML is allowed"
 msgstr "Zawartość do wyświetlenia w banerze. Dozwolone są znaki HTML"
 
+#: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
+msgid "The CSV contains invalid recipient emails. Please fix the following rows:"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
+msgid "The CSV could not be parsed. Please check the file format and try again."
+msgstr ""
+
+#: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
+msgid "The CSV does not contain any rows. Please add at least one row of recipient details."
+msgstr ""
+
+#: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
+msgid "The CSV exceeds the maximum file size."
+msgstr ""
+
+#: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
+msgid "The CSV is missing the following required columns. Please download the template CSV for the correct format."
+msgstr ""
+
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "The default email to use when sending emails to recipients"
 msgstr "Domyślny adres e-mail do wysyłania wiadomości do odbiorców"
@@ -11899,6 +11987,10 @@ msgstr "Token został pomyślnie usunięty."
 #: apps/remix/app/routes/_unauthenticated+/reset-password._index.tsx
 msgid "The token you have used to reset your password is either expired or it never existed. If you have still forgotten your password, please request a new reset link."
 msgstr "Token użyty do zresetowania hasła wygasł lub nie istnieje. Jeśli nadal nie pamiętasz hasła, poproś o nowy link."
+
+#: apps/remix/app/components/forms/password.tsx
+msgid "The two factor code you provided is invalid. Please try again."
+msgstr ""
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "The two-factor authentication code provided is incorrect."
@@ -12653,6 +12745,7 @@ msgstr "Weryfikacja dwuetapowa"
 msgid "Two factor authentication recovery codes are used to access your account in the event that you lose access to your authenticator app."
 msgstr "Kody odzyskiwania są używane do odzyskania dostępu do konta, w przypadku utraty dostępu do aplikacji uwierzytelniającej."
 
+#: apps/remix/app/components/forms/2fa/two-factor-code-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/generate-certificate-pdf.ts
@@ -12952,6 +13045,7 @@ msgid "Update passkey"
 msgstr "Zaktualizuj klucz dostępu"
 
 #: apps/remix/app/components/forms/password.tsx
+#: apps/remix/app/components/forms/password.tsx
 msgid "Update password"
 msgstr "Zaktualizuj hasło"
 
@@ -13169,11 +13263,13 @@ msgid "Use API tokens to authenticate with the Documenso API."
 msgstr "Użyj tokenów API do uwierzytelniania połączenia z interfejsem Documenso."
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
+#: apps/remix/app/components/forms/2fa/two-factor-code-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Use Authenticator"
 msgstr "Użyj aplikacji uwierzytelniającej"
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
+#: apps/remix/app/components/forms/2fa/two-factor-code-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Use Backup Code"
 msgstr "Użyj kodu zapasowego"
@@ -13852,6 +13948,14 @@ msgstr "Nie mogliśmy Cię wylogować."
 msgid "We were unable to report this sender at this time. Please try again later."
 msgstr "Nie mogliśmy zgłosić nadawcę. Spróbuj ponownie później."
 
+#: apps/remix/app/components/forms/password-setup-request-button.tsx
+msgid "We were unable to send the email. Please try again later."
+msgstr ""
+
+#: apps/remix/app/components/forms/password-setup-request.tsx
+msgid "We were unable to send the email. Please try again or contact support."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "We were unable to set your public profile to public. Please try again."
 msgstr "Nie mogliśmy zmienić Twojego profilu publicznego na prywatny. Spróbuj ponownie."
@@ -13973,6 +14077,16 @@ msgstr "Wysłaliśmy Ci wiadomość z 6-cyfrowym kodem. Wpisz go poniżej, aby z
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "We've sent a confirmation email to <0>{email}</0>. Please check your inbox and click the link in the email to verify your account."
 msgstr "Wysłaliśmy wiadomość weryfikacyjną na adres <0>{email}</0>. Sprawdź skrzynkę odbiorczą i kliknij link w wiadomości, aby zweryfikować konto."
+
+#. placeholder {0}: user.email
+#: apps/remix/app/components/forms/password-setup-request.tsx
+msgid "We've sent a link to {0}. Follow it to set your password, then sign in again to continue."
+msgstr ""
+
+#. placeholder {0}: user.email
+#: apps/remix/app/components/forms/password-setup-request-button.tsx
+msgid "We've sent a link to {0}. Follow it to set your password."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
@@ -14933,9 +15047,17 @@ msgstr "Wysłano zbyt wiele żądań wykrywania. Poczekaj minutę przed ponowną
 msgid "Your Account"
 msgstr "Twoje konto"
 
+#: apps/remix/app/components/general/document-signing/document-signing-auth-set-password.tsx
+msgid "Your account does not have a password and password sign in is disabled for this instance. Please contact the document sender to use a different authentication method."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Your account has been deleted successfully."
 msgstr "Twoje konto zostało pomyślnie usunięte."
+
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+msgid "Your account has no password. Add one to sign in with your email and to sign documents that require it. We'll email you a link."
+msgstr ""
 
 #: apps/remix/app/components/forms/avatar-image.tsx
 msgid "Your avatar has been updated successfully."
@@ -15213,6 +15335,15 @@ msgstr "Twoje hasło zostało pomyślnie zaktualizowane."
 msgid "Your password has been updated."
 msgstr "Twoje hasło zostało zaktualizowane."
 
+#: packages/email/templates/reset-password.tsx
+#: packages/lib/server-only/auth/send-reset-password.ts
+msgid "Your password was changed"
+msgstr ""
+
+#: packages/email/templates/reset-password.tsx
+msgid "Your password was just changed from your account security settings."
+msgstr ""
+
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Your payment is overdue. Please settle the payment to avoid any service disruptions."
 msgstr "Masz zaległą płatność. Ureguluj płatność, aby uniknąć przerw w dostępie do usługi."
@@ -15358,4 +15489,3 @@ msgstr "Powiększ"
 #: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
 msgid "Zoom out"
 msgstr "Pomniejsz"
-
