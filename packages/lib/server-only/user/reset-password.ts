@@ -82,6 +82,7 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
     name: 'send.password.reset.success.email',
     payload: {
       userId: foundToken.userId,
+      source: 'RESET',
     },
   });
 

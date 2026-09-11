@@ -83,7 +83,7 @@ test('[DOCUMENT_AUTH]: passwordless user is sent a setup link and can sign after
   // A bare session must not be able to set a password inline; it gets emailed a link instead.
   await expect(page.getByLabel('New password')).not.toBeVisible();
 
-  await page.getByRole('button', { name: 'Email me a link to set a password' }).click();
+  await page.getByRole('button', { name: 'Send setup link' }).click();
   await expect(page.getByText('Check your email')).toBeVisible();
 
   const resetToken = await prisma.passwordResetToken.findFirstOrThrow({
@@ -181,8 +181,8 @@ test('[DOCUMENT_AUTH]: passwordless user can request a setup link from security 
 
   // Clicking before hydration is a no-op, so retry until the sent state appears.
   await expect(async () => {
-    await page.getByRole('button', { name: 'Email me a link to set a password' }).click();
-    await expect(page.getByText('Check your email')).toBeVisible({ timeout: 2_000 });
+    await page.getByRole('button', { name: 'Send setup link' }).click();
+    await expect(page.getByRole('button', { name: 'Link sent' })).toBeVisible({ timeout: 2_000 });
   }).toPass({ timeout: 15_000 });
 
   const resetToken = await prisma.passwordResetToken.findFirst({

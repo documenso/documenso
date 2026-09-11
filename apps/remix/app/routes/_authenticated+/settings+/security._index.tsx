@@ -14,7 +14,7 @@ import { DisableAuthenticatorAppDialog } from '~/components/forms/2fa/disable-au
 import { EnableAuthenticatorAppDialog } from '~/components/forms/2fa/enable-authenticator-app-dialog';
 import { ViewRecoveryCodesDialog } from '~/components/forms/2fa/view-recovery-codes-dialog';
 import { PasswordForm } from '~/components/forms/password';
-import { PasswordSetupRequest } from '~/components/forms/password-setup-request';
+import { PasswordSetupRequestButton } from '~/components/forms/password-setup-request-button';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
 
@@ -52,19 +52,21 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
       {hasEmailPasswordAccount && <PasswordForm user={user} />}
 
       {!hasEmailPasswordAccount && isEmailPasswordSigninEnabled && (
-        <Alert className="flex flex-col p-6" variant="neutral">
-          <AlertTitle>
-            <Trans>Set a password</Trans>
-          </AlertTitle>
+        <Alert className="flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
+          <div className="mb-4 sm:mb-0">
+            <AlertTitle>
+              <Trans>Set a password</Trans>
+            </AlertTitle>
 
-          <AlertDescription className="mb-4">
-            <Trans>
-              Your account does not have a password. Setting one will allow you to sign in with your email address and
-              authenticate document signatures that require a password. We'll email you a link to set it.
-            </Trans>
-          </AlertDescription>
+            <AlertDescription className="mr-4">
+              <Trans>
+                Your account has no password. Add one to sign in with your email and to sign documents that require it.
+                We'll email you a link.
+              </Trans>
+            </AlertDescription>
+          </div>
 
-          <PasswordSetupRequest />
+          <PasswordSetupRequestButton />
         </Alert>
       )}
 

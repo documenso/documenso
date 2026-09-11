@@ -11,29 +11,23 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { useMemo } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
-import { hasTwoFactorCode, TwoFactorCodeField, ZTwoFactorCodeFieldSchema } from './2fa/two-factor-code-field';
+import { hasTwoFactorCode, TwoFactorCodeDialog, ZTwoFactorCodeFieldSchema } from './2fa/two-factor-code-dialog';
 
-const createPasswordFormSchema = (isTwoFactorRequired: boolean) =>
-  ZTwoFactorCodeFieldSchema.extend({
-    currentPassword: ZCurrentPasswordSchema,
-    password: ZPasswordSchema,
-    repeatedPassword: ZPasswordSchema,
-  })
-    .refine((data) => data.password === data.repeatedPassword, {
-      message: 'Passwords do not match',
-      path: ['repeatedPassword'],
-    })
-    .refine((data) => !isTwoFactorRequired || hasTwoFactorCode(data), {
-      message: 'A two factor code is required',
-      path: ['totpCode'],
-    });
+export const ZPasswordFormSchema = ZTwoFactorCodeFieldSchema.extend({
+  currentPassword: ZCurrentPasswordSchema,
+  password: ZPasswordSchema,
+  repeatedPassword: ZPasswordSchema,
+}).refine((data) => data.password === data.repeatedPassword, {
+  message: 'Passwords do not match',
+  path: ['repeatedPassword'],
+});
 
-export type TPasswordFormSchema = z.infer<ReturnType<typeof createPasswordFormSchema>>;
+export type TPasswordFormSchema = z.infer<typeof ZPasswordFormSchema>;
 
 export type PasswordFormProps = {
   className?: string;
@@ -44,9 +38,7 @@ export const PasswordForm = ({ className, user }: PasswordFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const isTwoFactorRequired = user.twoFactorEnabled;
-
-  const schema = useMemo(() => createPasswordFormSchema(isTwoFactorRequired), [isTwoFactorRequired]);
+  const [isTwoFactorDialogOpen, setIsTwoFactorDialogOpen] = useState(false);
 
   const form = useForm<TPasswordFormSchema>({
     values: {
@@ -56,12 +48,27 @@ export const PasswordForm = ({ className, user }: PasswordFormProps) => {
       totpCode: '',
       backupCode: '',
     },
-    resolver: zodResolver(schema),
+    resolver: zodResolver(ZPasswordFormSchema),
   });
 
   const isSubmitting = form.formState.isSubmitting;
 
-  const onFormSubmit = async ({ currentPassword, password, totpCode, backupCode }: TPasswordFormSchema) => {
+  const onFormSubmit = async (values: TPasswordFormSchema) => {
+    const { currentPassword, password, totpCode, backupCode } = values;
+
+    // Collect the 2FA code in a dialog once the password fields are valid.
+    if (user.twoFactorEnabled && !hasTwoFactorCode(values)) {
+      if (isTwoFactorDialogOpen) {
+        const message = _(msg`A code is required`);
+
+        form.setError('totpCode', { message });
+        form.setError('backupCode', { message });
+      }
+
+      setIsTwoFactorDialogOpen(true);
+      return;
+    }
+
     try {
       await authClient.emailPassword.updatePassword({
         currentPassword,
@@ -71,6 +78,7 @@ export const PasswordForm = ({ className, user }: PasswordFormProps) => {
       });
 
       form.reset();
+      setIsTwoFactorDialogOpen(false);
 
       toast({
         title: _(msg`Password updated`),
@@ -157,8 +165,6 @@ export const PasswordForm = ({ className, user }: PasswordFormProps) => {
               </FormItem>
             )}
           />
-
-          {isTwoFactorRequired && <TwoFactorCodeField<TPasswordFormSchema> />}
         </fieldset>
 
         <div className="mt-4 ml-auto">
@@ -167,6 +173,14 @@ export const PasswordForm = ({ className, user }: PasswordFormProps) => {
           </Button>
         </div>
       </form>
+
+      <TwoFactorCodeDialog<TPasswordFormSchema>
+        open={isTwoFactorDialogOpen}
+        onOpenChange={setIsTwoFactorDialogOpen}
+        isSubmitting={isSubmitting}
+        submitLabel={<Trans>Update password</Trans>}
+        onSubmit={form.handleSubmit(onFormSubmit)}
+      />
     </Form>
   );
 };

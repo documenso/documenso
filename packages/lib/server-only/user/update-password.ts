@@ -105,6 +105,7 @@ export const updatePassword = async ({
     name: 'send.password.reset.success.email',
     payload: {
       userId,
+      source: 'UPDATE',
     },
   });
 

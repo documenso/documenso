@@ -1,12 +1,10 @@
-import { authClient } from '@documenso/auth/client';
+import { usePasswordSetupRequest } from '@documenso/lib/client-only/hooks/use-password-setup-request';
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { AppError } from '@documenso/lib/errors/app-error';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { useMutation } from '@tanstack/react-query';
 import { match } from 'ts-pattern';
 
 export type PasswordSetupRequestProps = {
@@ -14,22 +12,14 @@ export type PasswordSetupRequestProps = {
 };
 
 /**
- * For signed in users who do not have a password. Sends them the standard
- * password reset email so they can set one via a verified link, rather than
- * allowing a bare session to mint a credential.
+ * Inline "send me a setup link" control with its own sent/error states, for
+ * contexts like dialogs where a toast would be missed.
  */
 export const PasswordSetupRequest = ({ className }: PasswordSetupRequestProps) => {
   const { _ } = useLingui();
   const { user } = useSession();
 
-  const {
-    mutate: requestSetupLink,
-    isPending,
-    isSuccess,
-    error,
-  } = useMutation({
-    mutationFn: async () => authClient.emailPassword.forgotPassword({ email: user.email }),
-  });
+  const { requestSetupLink, isPending, isSuccess, errorCode } = usePasswordSetupRequest();
 
   if (isSuccess) {
     return (
@@ -48,13 +38,13 @@ export const PasswordSetupRequest = ({ className }: PasswordSetupRequestProps) =
 
   return (
     <div className={className}>
-      {error && (
+      {errorCode && (
         <Alert className="mb-4" variant="destructive">
           <AlertTitle>
             <Trans>An error occurred</Trans>
           </AlertTitle>
           <AlertDescription>
-            {match(AppError.parseError(error).code)
+            {match(errorCode)
               .with('SIGNIN_DISABLED', () =>
                 _(msg`Password sign in is disabled for this instance. Please contact support.`),
               )
@@ -63,8 +53,8 @@ export const PasswordSetupRequest = ({ className }: PasswordSetupRequestProps) =
         </Alert>
       )}
 
-      <Button type="button" loading={isPending} onClick={() => requestSetupLink()}>
-        <Trans>Email me a link to set a password</Trans>
+      <Button type="button" loading={isPending} onClick={requestSetupLink}>
+        <Trans>Send setup link</Trans>
       </Button>
     </div>
   );
