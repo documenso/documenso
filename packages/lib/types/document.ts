@@ -63,6 +63,7 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
     uploadSignatureEnabled: true,
     drawSignatureEnabled: true,
     allowDictateNextSigner: true,
+    allowDocumentRejection: true,
     language: true,
     emailSettings: true,
     emailId: true,
