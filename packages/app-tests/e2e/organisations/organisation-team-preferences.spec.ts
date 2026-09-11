@@ -37,6 +37,10 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   await page.getByRole('option', { name: 'Upload' }).click();
   await page.keyboard.press('Escape');
 
+  // Disable document rejection
+  await page.getByTestId('allow-document-rejection-trigger').click();
+  await page.getByRole('option', { name: 'No', exact: true }).click();
+
   await page.getByRole('button', { name: 'Save changes' }).first().click();
   await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
 
@@ -68,9 +72,13 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   expect(teamSettings.typedSignatureEnabled).toEqual(true);
   expect(teamSettings.uploadSignatureEnabled).toEqual(false);
   expect(teamSettings.drawSignatureEnabled).toEqual(false);
+  expect(teamSettings.allowDocumentRejection).toEqual(false);
 
   // Edit the team settings
   await page.goto(`/t/${team.url}/settings/document`);
+
+  // Document rejection is left untouched so it keeps inheriting from the organisation.
+  await expect(page.getByTestId('allow-document-rejection-status')).toHaveText('Inherited');
 
   await page.getByTestId('document-visibility-trigger').click();
   await page.getByRole('option', { name: 'Everyone can access and view' }).click();
@@ -102,6 +110,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   expect(updatedTeamSettings.typedSignatureEnabled).toEqual(true);
   expect(updatedTeamSettings.uploadSignatureEnabled).toEqual(false);
   expect(updatedTeamSettings.drawSignatureEnabled).toEqual(false);
+  expect(updatedTeamSettings.allowDocumentRejection).toEqual(false);
 
   const document = await seedTeamDocumentWithMeta(team);
 
@@ -120,6 +129,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   expect(documentMeta.language).toEqual('pl');
   expect(documentMeta.timezone).toEqual('Europe/London');
   expect(documentMeta.dateFormat).toEqual('MM/dd/yyyy');
+  expect(documentMeta.allowDocumentRejection).toEqual(false);
 });
 
 test('[ORGANISATIONS]: manage branding preferences', async ({ page }) => {
