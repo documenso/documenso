@@ -4,7 +4,7 @@ import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-e
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { prisma } from '@documenso/prisma';
-import { EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -17,18 +17,18 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
   .output(ZDownloadDocumentCertificateResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
-    const { documentId } = input;
+    const { envelopeId } = input;
 
     ctx.logger.info({
       input: {
-        documentId,
+        envelopeId,
       },
     });
 
     const { envelopeWhereInput } = await getEnvelopeWhereInput({
       id: {
-        type: 'documentId',
-        id: documentId,
+        type: 'envelopeId',
+        id: envelopeId,
       },
       type: EnvelopeType.DOCUMENT,
       userId: ctx.user.id,
@@ -60,7 +60,9 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
       });
     }
 
-    if (!isDocumentCompleted(envelope.status)) {
+    // A cancelled document was never sealed/completed, so a signing certificate
+    // must not be generated for it. REJECTED and COMPLETED keep their prior behavior.
+    if (!isDocumentCompleted(envelope.status) || envelope.status === DocumentStatus.CANCELLED) {
       throw new AppError('DOCUMENT_NOT_COMPLETE');
     }
 
@@ -79,10 +81,8 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
 
     const result = await certificatePdf.save();
 
-    const base64 = Buffer.from(result).toString('base64');
-
     return {
-      data: base64,
+      data: Buffer.from(result).toString('base64'),
       envelopeTitle: envelope.title,
     };
   });

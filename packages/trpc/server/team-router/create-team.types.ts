@@ -1,5 +1,6 @@
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { z } from 'zod';
-import { ZTeamNameSchema, ZTeamUrlSchema } from './schema';
+import { ZTeamUrlSchema } from './schema';
 
 // export const createTeamMeta: TrpcOpenApiMeta = {
 //   openapi: {
@@ -13,7 +14,7 @@ import { ZTeamNameSchema, ZTeamUrlSchema } from './schema';
 
 export const ZCreateTeamRequestSchema = z.object({
   organisationId: z.string(),
-  teamName: ZTeamNameSchema,
+  teamName: ZNameSchema,
   teamUrl: ZTeamUrlSchema,
   inheritMembers: z
     .boolean()

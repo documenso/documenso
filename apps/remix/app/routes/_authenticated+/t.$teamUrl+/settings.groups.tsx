@@ -56,7 +56,7 @@ export default function TeamsSettingsGroupsPage() {
 
   return (
     <div>
-      <SettingsHeader title={t`Team Groups`} subtitle={t`Manage the groups assigned to this team.`}>
+      <SettingsHeader hideDivider title={t`Team Groups`} subtitle={t`Manage the groups assigned to this team.`}>
         <TeamGroupCreateDialog />
       </SettingsHeader>
 

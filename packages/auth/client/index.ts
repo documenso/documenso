@@ -1,4 +1,4 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { formatPath, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import type { ClientResponse, InferRequestType } from 'hono/client';
 import { hc } from 'hono/client';
@@ -36,8 +36,6 @@ type TPasskeySignin = InferRequestType<AuthClientType['passkey']['authorize']['$
 export class AuthClient {
   public client: AuthClientType;
 
-  private signOutredirectPath: string = '/signin';
-
   constructor(options: { baseUrl: string }) {
     this.client = hc<AuthAppType>(options.baseUrl);
   }
@@ -45,7 +43,7 @@ export class AuthClient {
   public async signOut({ redirectPath }: { redirectPath?: string } = {}) {
     await this.client.signout.$post();
 
-    window.location.href = redirectPath ?? this.signOutredirectPath;
+    window.location.href = redirectPath ?? formatPath('/signin');
   }
 
   public async signOutAllSessions() {

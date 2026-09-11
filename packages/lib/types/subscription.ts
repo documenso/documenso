@@ -6,14 +6,39 @@ import { z } from 'zod';
  *
  * Example: "5m", "1h", "1d"
  */
-export const ZRateLimitWindowSchema = z.string().regex(/^\d+[smhd]$/);
+export const RATE_LIMIT_WINDOW_REGEX = /^\d+[smhd]$/;
 
-export const ZRateLimitArraySchema = z.array(
-  z.object({
-    window: ZRateLimitWindowSchema,
-    max: z.number().int().positive(),
-  }),
-);
+const RATE_LIMIT_WINDOW_ERROR_MESSAGE = 'Use a duration with a unit, e.g. 5m, 1h, or 24h';
+const RATE_LIMIT_DUPLICATE_WINDOW_ERROR_MESSAGE = 'Use a unique window for each rate limit';
+
+export const ZRateLimitWindowSchema = z.string().trim().regex(RATE_LIMIT_WINDOW_REGEX, {
+  message: RATE_LIMIT_WINDOW_ERROR_MESSAGE,
+});
+
+export const ZRateLimitArraySchema = z
+  .array(
+    z.object({
+      window: ZRateLimitWindowSchema,
+      max: z.number().int().positive(),
+    }),
+  )
+  .superRefine((entries, ctx) => {
+    const windows = new Set<string>();
+
+    entries.forEach((entry, index) => {
+      const window = entry.window.trim();
+
+      if (windows.has(window)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: RATE_LIMIT_DUPLICATE_WINDOW_ERROR_MESSAGE,
+          path: [index, 'window'],
+        });
+      }
+
+      windows.add(window);
+    });
+  });
 
 export type TRateLimitArray = z.infer<typeof ZRateLimitArraySchema>;
 
@@ -50,6 +75,8 @@ export const ZClaimFlagsSchema = z.object({
   allowLegacyEnvelopes: z.boolean().optional(),
 
   signingReminders: z.boolean().optional(),
+
+  cscQesSigning: z.boolean().optional(),
 
   /**
    * Controls whether an organisation is prevented from sending emails.
@@ -127,6 +154,11 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   signingReminders: {
     key: 'signingReminders',
     label: 'Signing reminders',
+  },
+  cscQesSigning: {
+    key: 'cscQesSigning',
+    label: 'QES signing',
+    isEnterprise: true,
   },
   disableEmails: {
     key: 'disableEmails',

@@ -31,18 +31,18 @@ export const TemplateDocumentReminder = ({
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
-        <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-lg text-primary">
+        <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-foreground text-lg">
           <Trans>
             Reminder: Please {_(actionVerb).toLowerCase()} your document
             <br />"{documentName}"
           </Trans>
         </Text>
 
-        <Text className="my-1 text-center text-base text-slate-400">
+        <Text className="my-1 text-center text-base text-muted-foreground">
           <Trans>Hi {recipientName},</Trans>
         </Text>
 
-        <Text className="my-1 text-center text-base text-slate-400">
+        <Text className="my-1 text-center text-base text-muted-foreground">
           {match(role)
             .with(RecipientRole.SIGNER, () => <Trans>Continue by signing the document.</Trans>)
             .with(RecipientRole.VIEWER, () => <Trans>Continue by viewing the document.</Trans>)
@@ -54,7 +54,7 @@ export const TemplateDocumentReminder = ({
 
         <Section className="mt-8 mb-6 text-center">
           <Button
-            className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center font-medium text-black text-sm no-underline"
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-center font-medium text-primary-foreground text-sm no-underline"
             href={signDocumentLink}
           >
             {match(role)

@@ -17,6 +17,7 @@ export default function SettingsBilling() {
       <SettingsHeader
         title={t`Billing`}
         subtitle={t`Manage billing and subscriptions for organisations where you have billing management permissions.`}
+        hideDivider
       />
 
       <UserBillingOrganisationsTable />

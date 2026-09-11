@@ -4,6 +4,7 @@ import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
+import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
@@ -38,8 +39,8 @@ export const signEnvelopeFieldRoute = procedure
     const field = await prisma.field.findFirst({
       where: {
         id: fieldId,
-        recipient: {
-          ...(recipient.role === RecipientRole.ASSISTANT
+        recipient:
+          recipient.role === RecipientRole.ASSISTANT
             ? {
                 signingStatus: {
                   not: SigningStatus.SIGNED,
@@ -51,8 +52,7 @@ export const signEnvelopeFieldRoute = procedure
               }
             : {
                 id: recipient.id,
-              }),
-        },
+              },
       },
       include: {
         envelope: {
@@ -107,6 +107,12 @@ export const signEnvelopeFieldRoute = procedure
         message: `Document ${envelope.id} must be pending for signing`,
       });
     }
+
+    // Both are checked because an assistant may insert values into a field belonging to
+    // another recipient, and neither signing window may have closed. For every other
+    // role these reference the same recipient.
+    assertRecipientNotExpired(recipient);
+    assertRecipientNotExpired(field.recipient);
 
     if (recipient.signingStatus === SigningStatus.SIGNED || field.recipient.signingStatus === SigningStatus.SIGNED) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {

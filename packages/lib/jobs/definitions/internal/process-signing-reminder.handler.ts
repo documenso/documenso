@@ -52,6 +52,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
     data: {
       lastReminderSentAt: now,
       nextReminderAt: null,
+      reminderCount: { increment: 1 },
     },
   });
 
@@ -243,13 +244,15 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
     });
   }
 
-  // Compute the next reminder time (repeat interval).
+  // reminderCount was incremented in the atomic claim above, so the value read
+  // here includes the reminder we just sent and gates the next one.
   if (recipient.sentAt) {
     await updateRecipientNextReminder({
       recipientId: recipient.id,
       envelopeId: envelope.id,
       sentAt: recipient.sentAt,
       lastReminderSentAt: now,
+      reminderCount: recipient.reminderCount,
     });
   }
 };

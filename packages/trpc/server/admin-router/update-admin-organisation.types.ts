@@ -1,13 +1,13 @@
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { z } from 'zod';
 
-import { ZOrganisationNameSchema } from '../organisation-router/create-organisation.types';
 import { ZTeamUrlSchema } from '../team-router/schema';
 import { ZCreateSubscriptionClaimRequestSchema } from './create-subscription-claim.types';
 
 export const ZUpdateAdminOrganisationRequestSchema = z.object({
   organisationId: z.string(),
   data: z.object({
-    name: ZOrganisationNameSchema.optional(),
+    name: ZNameSchema.optional(),
     url: ZTeamUrlSchema.optional(),
     claims: ZCreateSubscriptionClaimRequestSchema.pick({
       teamCount: true,

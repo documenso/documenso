@@ -1,5 +1,5 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { IS_BILLING_ENABLED, IS_DOCUMENSO_CLOUD } from '@documenso/lib/constants/app';
 import { generateEmailDomainRecords } from '@documenso/lib/utils/email-domains';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetOrganisationEmailDomainResponse } from '@documenso/trpc/server/enterprise-router/get-organisation-email-domain.types';
@@ -27,8 +27,9 @@ import { OrganisationEmailDomainRecordsDialog } from '~/components/dialogs/organ
 import { OrganisationEmailUpdateDialog } from '~/components/dialogs/organisation-email-update-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
+import { EmailDomainsUpsell } from '~/components/general/settings-upsell/email-domains-upsell';
 
-import type { Route } from './+types/o.$orgUrl.settings.groups.$id';
+import type { Route } from './+types/o.$orgUrl.settings.email-domains.$id';
 
 export default function OrganisationEmailDomainSettingsPage({ params }: Route.ComponentProps) {
   const { t } = useLingui();
@@ -96,8 +97,21 @@ export default function OrganisationEmailDomainSettingsPage({ params }: Route.Co
     ] satisfies DataTableColumnDef<TGetOrganisationEmailDomainResponse['emails'][number]>[];
   }, [organisation]);
 
+  const pageHeader = t`Email Domain Settings`;
+  const pageSubtitle = t`Manage your email domain settings.`;
+
   if (!IS_BILLING_ENABLED()) {
     return null;
+  }
+
+  if (!organisation.organisationClaim.flags.emailDomains && IS_DOCUMENSO_CLOUD()) {
+    return (
+      <div>
+        <SettingsHeader hideDivider title={pageHeader} subtitle={pageSubtitle} />
+
+        <EmailDomainsUpsell />
+      </div>
+    );
   }
 
   if (isLoadingEmailDomain) {
@@ -132,7 +146,7 @@ export default function OrganisationEmailDomainSettingsPage({ params }: Route.Co
 
   return (
     <div>
-      <SettingsHeader title={t`Email Domain Settings`} subtitle={t`Manage your email domain settings.`}>
+      <SettingsHeader hideDivider title={pageHeader} subtitle={pageSubtitle}>
         <OrganisationEmailCreateDialog emailDomain={emailDomain} />
       </SettingsHeader>
 

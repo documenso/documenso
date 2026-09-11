@@ -33,30 +33,30 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
   return (
     <Html>
       <Head />
-      <Preview>{_(previewText)}</Preview>
-
       <Body className="mx-auto my-auto font-sans">
-        <Section className="bg-white">
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-2 backdrop-blur-sm">
+        <Preview>{_(previewText)}</Preview>
+
+        <Section className="bg-background">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-2 backdrop-blur-sm">
             <Section className="p-2">
               <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
 
               <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
               <Section>
-                <Text className="mb-0 text-center font-semibold text-lg text-primary">
+                <Text className="mb-0 text-center font-semibold text-foreground text-lg">
                   <Trans>
                     {recipientName} {action} a document by using one of your direct links
                   </Trans>
                 </Text>
 
-                <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 text-slate-600 text-sm">
+                <div className="mx-auto my-2 w-fit rounded-lg bg-muted px-4 py-2 text-muted-foreground text-sm">
                   {documentName}
                 </div>
 
                 <Section className="my-6 text-center">
                   <Button
-                    className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center font-medium text-black text-sm no-underline"
+                    className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-center font-medium text-primary-foreground text-sm no-underline"
                     href={documentLink}
                   >
                     <Trans>View document</Trans>

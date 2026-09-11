@@ -148,6 +148,11 @@ export default function EnvelopeEditorHeader() {
                     <Trans>Rejected</Trans>
                   </Badge>
                 ))
+                .with(DocumentStatus.CANCELLED, () => (
+                  <Badge variant="destructive" className="shrink-0">
+                    <Trans>Cancelled</Trans>
+                  </Badge>
+                ))
                 .exhaustive()}
 
             {autosaveError && (

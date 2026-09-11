@@ -178,6 +178,24 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
 
 export type TCompleteDocumentWithTokenMutationSchema = z.infer<typeof ZCompleteDocumentWithTokenMutationSchema>;
 
+/**
+ * Discriminated response: SES envelopes return `{ status: 'SIGNED' }` after
+ * the in-place completion; TSP (AES/QES) envelopes return
+ * `{ status: 'REDIRECT', redirectUrl }` pointing at the credential-scope
+ * OAuth authorize endpoint. `{ status: 'ALREADY_SIGNED' }` is returned when
+ * the recipient had already signed prior to this request (retries, stale
+ * tabs, concurrent submissions) so callers can notify the user instead of
+ * erroring. Frontend callers can branch on `status` — existing callers
+ * ignored the response and remain compatible.
+ */
+export const ZCompleteDocumentWithTokenResponseSchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('REDIRECT'), redirectUrl: z.string() }),
+  z.object({ status: z.literal('SIGNED') }),
+  z.object({ status: z.literal('ALREADY_SIGNED') }),
+]);
+
+export type TCompleteDocumentWithTokenResponseSchema = z.infer<typeof ZCompleteDocumentWithTokenResponseSchema>;
+
 export const ZRejectDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
   documentId: z.number(),

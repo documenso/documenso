@@ -29,19 +29,19 @@ export const OrganisationInviteEmailTemplate = ({
   return (
     <Html>
       <Head />
-      <Preview>{_(previewText)}</Preview>
-
       <Body className="mx-auto my-auto font-sans">
-        <Section className="bg-white text-slate-500">
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-2 backdrop-blur-sm">
+        <Preview>{_(previewText)}</Preview>
+
+        <Section className="bg-background text-muted-foreground">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-2 backdrop-blur-sm">
             <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6 p-2" />
 
             <Section>
               <TemplateImage className="mx-auto" assetBaseUrl={assetBaseUrl} staticAsset="add-user.png" />
             </Section>
 
-            <Section className="p-2 text-slate-500">
-              <Text className="text-center font-medium text-black text-lg">
+            <Section className="p-2 text-muted-foreground">
+              <Text className="text-center font-medium text-foreground text-lg">
                 <Trans>Join {organisationName} on Documenso</Trans>
               </Text>
 
@@ -49,25 +49,25 @@ export const OrganisationInviteEmailTemplate = ({
                 <Trans>You have been invited to join the following organisation</Trans>
               </Text>
 
-              <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 font-medium text-base text-slate-600">
+              <div className="mx-auto my-2 w-fit rounded-lg bg-muted px-4 py-2 font-medium text-base text-muted-foreground">
                 {organisationName}
               </div>
 
               <Text className="my-1 text-center text-base">
                 <Trans>
-                  by <span className="text-slate-900">{senderName}</span>
+                  by <span className="text-foreground">{senderName}</span>
                 </Trans>
               </Text>
 
               <Section className="mt-6 mb-6 text-center">
                 <Button
-                  className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center font-medium text-black text-sm no-underline"
+                  className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-center font-medium text-primary-foreground text-sm no-underline"
                   href={`${baseUrl}/organisation/invite/${token}`}
                 >
                   <Trans>Accept</Trans>
                 </Button>
                 <Button
-                  className="ml-4 inline-flex items-center justify-center rounded-lg bg-gray-50 px-6 py-3 text-center font-medium text-slate-600 text-sm no-underline"
+                  className="ml-4 inline-flex items-center justify-center rounded-lg bg-muted px-6 py-3 text-center font-medium text-muted-foreground text-sm no-underline"
                   href={`${baseUrl}/organisation/decline/${token}`}
                 >
                   <Trans>Decline</Trans>

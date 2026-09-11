@@ -8,6 +8,8 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
+<EnvelopeWarning />
+
 ## Workflow 1: Send a Document for Signature
 
 The most common workflow: upload a PDF, add recipients with signature fields, and send for signing.
@@ -49,6 +51,7 @@ async function createAndSendDocument(
   pdfBuffer: Buffer,
   filename: string,
   title: string,
+  externalId: string,
   recipients: Recipient[],
 ): Promise<CreateAndSendResult> {
   const recipientPayload = recipients.map((recipient, index) => ({
@@ -87,6 +90,7 @@ async function createAndSendDocument(
     JSON.stringify({
       type: 'DOCUMENT',
       title,
+      externalId,
       recipients: recipientPayload,
       meta: {
         subject: `Please sign: ${title}`,
@@ -143,6 +147,7 @@ const result = await createAndSendDocument(
   pdfBuffer,
   'contract.pdf',
   'Service Agreement',
+  'nda-contract-ndac214',
   [
     { email: 'client@example.com', name: 'John Smith', role: 'SIGNER' },
     { email: 'manager@company.com', name: 'Jane Doe', role: 'SIGNER' },
@@ -170,6 +175,7 @@ ENVELOPE_RESPONSE=$(curl -s -X POST "${BASE_URL}/envelope/create" \
   -F 'payload={
     "type": "DOCUMENT",
     "title": "Service Agreement",
+    "externalId": "nda-contract-ndac214",
     "recipients": [
       {
         "email": "client@example.com",
@@ -238,6 +244,8 @@ echo $DISTRIBUTE_RESPONSE | jq '.recipients[] | {email, signingUrl}'
 
 </Tab>
 </Tabs>
+
+`externalId` is your application's own reference for this document, such as an invoice number or a database key. Documenso stores it on the envelope and repeats it in every webhook as `payload.externalId`, so your handler can match the event to your record without keeping a lookup table of Documenso IDs. To react when everyone has signed, see [Workflow 4](#workflow-4-wait-for-completion-with-webhooks). To fetch the finished PDF, see [Workflow 5](#workflow-5-download-signed-documents).
 
 ---
 
@@ -472,7 +480,7 @@ Send the same document to multiple recipients in parallel. Useful for policy ack
     <code>distributeDocument: true</code>
   </Step>
   <Step>
-    Process in batches with a short delay to respect rate limits (e.g. 100 requests/minute)
+    Process in batches with a short delay to respect rate limits (e.g. 1000 requests/minute)
   </Step>
 </Steps>
 
@@ -638,8 +646,8 @@ done
 </Tabs>
 
 <Callout type="info">
-  The API allows 100 requests per minute. For large batches, implement rate limiting with delays
-  between requests to avoid hitting limits.
+  The API allows 1000 requests per minute (your organisation may have its own lower limit). For large
+  batches, implement rate limiting with delays between requests to avoid hitting limits.
 </Callout>
 
 ---
@@ -998,9 +1006,12 @@ async function fetchWithRetry(
       // Retry on rate limit
       if (response.status === 429) {
         const retryAfter = response.headers.get('Retry-After');
-        const delay = retryAfter ? parseInt(retryAfter) * 1000 : baseDelayMs * Math.pow(2, attempt);
+        // Honor Retry-After exactly; the cap only applies to the exponential fallback.
+        const delay = retryAfter
+          ? parseInt(retryAfter) * 1000
+          : Math.min(baseDelayMs * Math.pow(2, attempt), maxDelayMs);
         console.log(`Rate limited, waiting ${delay}ms...`);
-        await new Promise((resolve) => setTimeout(resolve, Math.min(delay, maxDelayMs)));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         continue;
       }
 

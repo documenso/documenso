@@ -1,11 +1,10 @@
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { z } from 'zod';
-
-import { ZOrganisationNameSchema } from '../organisation-router/create-organisation.types';
 
 export const ZCreateAdminOrganisationRequestSchema = z.object({
   ownerUserId: z.number(),
   data: z.object({
-    name: ZOrganisationNameSchema,
+    name: ZNameSchema,
   }),
 });
 

@@ -1,4 +1,5 @@
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useEnvelopeAutosave } from '@documenso/lib/client-only/hooks/use-envelope-autosave';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -25,7 +26,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
 
 import { EnvelopeItemDeleteDialog } from '~/components/dialogs/envelope-item-delete-dialog';
+import { useCspNonce } from '~/utils/nonce';
 
+import { EnvelopeEditorInvalidDirectTemplateAlert } from './envelope-editor-invalid-direct-template-alert';
 import { EnvelopeEditorRecipientForm } from './envelope-editor-recipient-form';
 import { EnvelopeItemTitleInput } from './envelope-editor-title-input';
 
@@ -40,10 +43,12 @@ type LocalFile = {
 
 export const EnvelopeEditorUploadPage = () => {
   const organisation = useCurrentOrganisation();
+  const cspNonce = useCspNonce();
 
   const { t, i18n } = useLingui();
   const { maximumEnvelopeItemCount, remaining } = useLimits();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const {
     envelope,
@@ -212,6 +217,12 @@ export const EnvelopeEditorUploadPage = () => {
     const { data } = await createPromise.catch((error) => {
       console.error(error);
 
+      analytics.captureException(error, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'create_envelope_items',
+        envelopeId: envelope.id,
+      });
+
       // Set error state on files in batch upload.
       setLocalFiles((prev) =>
         prev.map((uploadingFile) =>
@@ -288,6 +299,12 @@ export const EnvelopeEditorUploadPage = () => {
       await replacePromise;
     } catch (error) {
       console.error(error);
+
+      analytics.captureException(error, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'replace_pdf',
+        envelopeId: envelope.id,
+      });
 
       toast({
         title: t`Replace failed`,
@@ -449,6 +466,9 @@ export const EnvelopeEditorUploadPage = () => {
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-8">
       <input {...getReplaceInputProps()} />
+
+      <EnvelopeEditorInvalidDirectTemplateAlert className="max-w-none" />
+
       <Card backdropBlur={false} className="border">
         <CardHeader className="pb-3">
           <CardTitle>
@@ -476,7 +496,7 @@ export const EnvelopeEditorUploadPage = () => {
 
           {/* Uploaded Files List */}
           <div className="mt-4">
-            <DragDropContext onDragEnd={onDragEnd}>
+            <DragDropContext nonce={cspNonce} onDragEnd={onDragEnd}>
               <Droppable droppableId="files">
                 {(provided) => (
                   <div

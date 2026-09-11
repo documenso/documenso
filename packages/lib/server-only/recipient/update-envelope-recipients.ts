@@ -12,7 +12,9 @@ import { extractLegacyIds } from '../../universal/id';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientBeModified } from '../../utils/recipients';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export interface UpdateEnvelopeRecipientsOptions {
   userId: number;
@@ -67,6 +69,8 @@ export const updateEnvelopeRecipients = async ({
     });
   }
 
+  assertEnvelopeMutable(envelope);
+
   if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Envelope already complete',
@@ -81,6 +85,17 @@ export const updateEnvelopeRecipients = async ({
   if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
+    });
+  }
+
+  for (const recipient of recipients) {
+    if (recipient.role === undefined) {
+      continue;
+    }
+
+    assertCompatibleRecipientRole({
+      signatureLevel: envelope.signatureLevel,
+      role: recipient.role,
     });
   }
 
@@ -106,6 +121,8 @@ export const updateEnvelopeRecipients = async ({
   });
 
   const updatedRecipients = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     return await Promise.all(
       recipientsToUpdate.map(async ({ originalRecipient, updateData }) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(originalRecipient.authOptions);

@@ -75,7 +75,7 @@ test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
       await item.click();
     }
 
-    await page.getByRole('button', { name: 'Update' }).first().click();
+    await page.getByRole('button', { name: 'Save changes' }).first().click();
 
     // Wait for the update to complete
     await expect(page.getByText('Document preferences updated', { exact: true })).toBeVisible();
@@ -140,7 +140,7 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
       await item.click();
     }
 
-    await page.getByRole('button', { name: 'Update' }).first().click();
+    await page.getByRole('button', { name: 'Save changes' }).first().click();
 
     // Wait for finish
     await expect(page.getByText('Document preferences updated', { exact: true })).toBeVisible();

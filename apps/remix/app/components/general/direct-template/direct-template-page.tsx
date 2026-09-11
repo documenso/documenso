@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { AppError } from '@documenso/lib/errors/app-error';
 import type { TTemplate } from '@documenso/lib/types/template';
@@ -13,7 +14,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import type { Field, Recipient } from '@prisma/client';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 
 import { useRequiredDocumentSigningAuthContext } from '~/components/general/document-signing/document-signing-auth-provider';
 import { useRequiredDocumentSigningContext } from '~/components/general/document-signing/document-signing-provider';
@@ -37,11 +38,11 @@ export const DirectTemplatePageView = ({
   directTemplateRecipient,
   directTemplateToken,
 }: DirectTemplatePageViewProps) => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const { _ } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const { email, fullName, setEmail } = useRequiredDocumentSigningContext();
   const { recipient, setRecipient } = useRequiredDocumentSigningAuthContext();
@@ -119,11 +120,18 @@ export const DirectTemplatePageView = ({
       if (redirectUrl) {
         window.location.href = redirectUrl;
       } else {
-        await navigate(`/sign/${token}/complete`);
+        window.location.href = `/sign/${token}/complete`;
       }
     } catch (err) {
       const error = AppError.parseError(err);
       const errorMessage = getDirectTemplateErrorMessage(error.code);
+
+      analytics.captureException(err, {
+        source: 'signing',
+        location: 'direct_template',
+        recipientId: directTemplateRecipient.id,
+        envelopeId: template.envelopeId,
+      });
 
       toast({
         title: _(errorMessage.title),

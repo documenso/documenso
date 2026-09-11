@@ -4,6 +4,7 @@ import { EnvelopeType } from '@prisma/client';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type GetRecipientByIdOptions = {
   recipientId: number;
@@ -36,6 +37,27 @@ export const getRecipientById = async ({ recipientId, userId, teamId, type }: Ge
   });
 
   if (!recipient) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Recipient not found',
+    });
+  }
+
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'envelopeId',
+      id: recipient.envelopeId,
+    },
+    type,
+    userId,
+    teamId,
+  });
+
+  // Additional validation to check visibility.
+  const envelope = await prisma.envelope.findUnique({
+    where: envelopeWhereInput,
+  });
+
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Recipient not found',
     });

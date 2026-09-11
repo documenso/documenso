@@ -8,7 +8,10 @@ import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentEmailSettings } from '../../types/document-email';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleDictateNextSigner } from '../signature-level/assert-compatible-dictate-next-signer';
+import { assertCompatibleSigningOrder } from '../signature-level/assert-compatible-signing-order';
 
 export type CreateDocumentMetaOptions = {
   userId: number;
@@ -73,6 +76,22 @@ export const updateDocumentMeta = async ({
     });
   }
 
+  await assertEnvelopeMutable(envelope);
+
+  if (signingOrder !== undefined) {
+    assertCompatibleSigningOrder({
+      signatureLevel: envelope.signatureLevel,
+      signingOrder,
+    });
+  }
+
+  if (allowDictateNextSigner !== undefined) {
+    assertCompatibleDictateNextSigner({
+      signatureLevel: envelope.signatureLevel,
+      allowDictateNextSigner,
+    });
+  }
+
   const { documentMeta: originalDocumentMeta } = envelope;
 
   // Validate the emailId belongs to the organisation.
@@ -92,6 +111,8 @@ export const updateDocumentMeta = async ({
   }
 
   return await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     const upsertedDocumentMeta = await tx.documentMeta.update({
       where: {
         id: envelope.documentMetaId,

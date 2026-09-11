@@ -3,13 +3,17 @@ import { createAttachmentRoute } from './attachment/create-attachment';
 import { deleteAttachmentRoute } from './attachment/delete-attachment';
 import { findAttachmentsRoute } from './attachment/find-attachments';
 import { updateAttachmentRoute } from './attachment/update-attachment';
+import { bulkCancelEnvelopesRoute } from './bulk-cancel-envelopes';
 import { bulkDeleteEnvelopesRoute } from './bulk-delete-envelopes';
 import { bulkMoveEnvelopesRoute } from './bulk-move-envelopes';
+import { cancelEnvelopeRoute } from './cancel-envelope';
 import { createEnvelopeRoute } from './create-envelope';
 import { createEnvelopeItemsRoute } from './create-envelope-items';
 import { deleteEnvelopeRoute } from './delete-envelope';
 import { deleteEnvelopeItemRoute } from './delete-envelope-item';
 import { distributeEnvelopeRoute } from './distribute-envelope';
+import { downloadEnvelopeAuditLogPdfRoute } from './download-envelope-audit-log-pdf';
+import { downloadEnvelopeCertificatePdfRoute } from './download-envelope-certificate-pdf';
 import { downloadEnvelopeItemRoute } from './download-envelope-item';
 import { duplicateEnvelopeRoute } from './duplicate-envelope';
 import { createEnvelopeFieldsRoute } from './envelope-fields/create-envelope-fields';
@@ -20,6 +24,7 @@ import { updateEnvelopeFieldsRoute } from './envelope-fields/update-envelope-fie
 import { createEnvelopeRecipientsRoute } from './envelope-recipients/create-envelope-recipients';
 import { deleteEnvelopeRecipientRoute } from './envelope-recipients/delete-envelope-recipient';
 import { getEnvelopeRecipientRoute } from './envelope-recipients/get-envelope-recipient';
+import { rejectEnvelopeRecipientOnBehalfOfRoute } from './envelope-recipients/reject-envelope-recipient-on-behalf-of';
 import { reportRecipientRoute } from './envelope-recipients/report-recipient';
 import { updateEnvelopeRecipientsRoute } from './envelope-recipients/update-envelope-recipients';
 import { findEnvelopeAuditLogsRoute } from './find-envelope-audit-logs';
@@ -68,6 +73,7 @@ export const envelopeRouter = router({
     delete: deleteEnvelopeRecipientRoute,
     set: setEnvelopeRecipientsRoute,
     report: reportRecipientRoute,
+    rejectOnBehalfOf: rejectEnvelopeRecipientOnBehalfOfRoute,
   },
   field: {
     get: getEnvelopeFieldRoute,
@@ -81,10 +87,15 @@ export const envelopeRouter = router({
   find: findEnvelopesRoute,
   auditLog: {
     find: findEnvelopeAuditLogsRoute,
+    downloadPdf: downloadEnvelopeAuditLogPdfRoute,
+  },
+  certificate: {
+    downloadPdf: downloadEnvelopeCertificatePdfRoute,
   },
   bulk: {
     move: bulkMoveEnvelopesRoute,
     delete: bulkDeleteEnvelopesRoute,
+    cancel: bulkCancelEnvelopesRoute,
   },
   editor: {
     get: getEditorEnvelopeRoute,
@@ -95,6 +106,7 @@ export const envelopeRouter = router({
   use: useEnvelopeRoute,
   update: updateEnvelopeRoute,
   delete: deleteEnvelopeRoute,
+  cancel: cancelEnvelopeRoute,
   duplicate: duplicateEnvelopeRoute,
   saveAsTemplate: saveAsTemplateRoute,
   distribute: distributeEnvelopeRoute,

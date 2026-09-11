@@ -5,6 +5,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { OrganisationGlobalSettings, TeamGlobalSettings } from '@prisma/client';
+import type { ReactNode } from 'react';
 
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 
@@ -25,38 +26,72 @@ const emailSettingsKeys = Object.keys(EMAIL_SETTINGS_LABELS) as (keyof TDocument
 type AdminGlobalSettingsSectionProps = {
   settings: TeamGlobalSettings | OrganisationGlobalSettings | null;
   isTeam?: boolean;
+  /** When viewing a team, the parent organisation settings the team inherits from. */
+  inheritedSettings?: OrganisationGlobalSettings | null;
 };
 
-export const AdminGlobalSettingsSection = ({ settings, isTeam = false }: AdminGlobalSettingsSectionProps) => {
+export const AdminGlobalSettingsSection = ({
+  settings,
+  isTeam = false,
+  inheritedSettings,
+}: AdminGlobalSettingsSectionProps) => {
   const { _ } = useLingui();
-  const notSetLabel = isTeam ? <Trans>Inherited</Trans> : <Trans>Not set</Trans>;
 
   if (!settings) {
     return null;
   }
 
-  const textValue = (value: string | null | undefined) => {
-    if (value === null || value === undefined) {
-      return notSetLabel;
+  const notSet = <Trans>Not set</Trans>;
+
+  const inheritedValue = (value: ReactNode) => {
+    if (!isTeam || value === null) {
+      return notSet;
     }
 
-    return value;
+    return (
+      <span className="flex items-center gap-1.5">
+        <span className="text-muted-foreground">
+          <Trans>Inherited</Trans>:
+        </span>
+        <span>{value}</span>
+      </span>
+    );
   };
 
-  const brandingTextValue = (value: string | null | undefined) => {
-    if (value === null || value === undefined || value.trim() === '') {
-      return notSetLabel;
+  const textValue = (value: string | null | undefined, inherited?: string | null) => {
+    if (value && value.trim() !== '') {
+      return value;
     }
 
-    return value;
+    if (inherited && inherited.trim() !== '') {
+      return inheritedValue(inherited);
+    }
+
+    return notSet;
   };
 
-  const booleanValue = (value: boolean | null | undefined) => {
-    if (value === null || value === undefined) {
-      return notSetLabel;
+  const booleanLabel = (value: boolean) => (value ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>);
+
+  const booleanValue = (value: boolean | null | undefined, inherited?: boolean | null) => {
+    if (value !== null && value !== undefined) {
+      return booleanLabel(value);
     }
 
-    return value ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>;
+    return inherited !== null && inherited !== undefined ? inheritedValue(booleanLabel(inherited)) : notSet;
+  };
+
+  const visibilityLabel = (value: string | null | undefined) => {
+    return value && DOCUMENT_VISIBILITY[value] ? _(DOCUMENT_VISIBILITY[value].value) : null;
+  };
+
+  const visibilityValue = (value: string | null | undefined, inherited?: string | null) => {
+    const label = visibilityLabel(value);
+
+    if (label !== null) {
+      return label;
+    }
+
+    return inheritedValue(visibilityLabel(inherited));
   };
 
   const parsedEmailSettings = ZDocumentEmailSettingsSchema.safeParse(settings.emailDocumentSettings);
@@ -65,70 +100,82 @@ export const AdminGlobalSettingsSection = ({ settings, isTeam = false }: AdminGl
     <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
       <DetailsCard label={<Trans>Document visibility</Trans>}>
         <DetailsValue>
-          {settings.documentVisibility != null
-            ? _(DOCUMENT_VISIBILITY[settings.documentVisibility].value)
-            : notSetLabel}
+          {visibilityValue(settings.documentVisibility, inheritedSettings?.documentVisibility)}
         </DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Document language</Trans>}>
-        <DetailsValue>{textValue(settings.documentLanguage)}</DetailsValue>
+        <DetailsValue>{textValue(settings.documentLanguage, inheritedSettings?.documentLanguage)}</DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Document timezone</Trans>}>
-        <DetailsValue>{textValue(settings.documentTimezone)}</DetailsValue>
+        <DetailsValue>{textValue(settings.documentTimezone, inheritedSettings?.documentTimezone)}</DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Date format</Trans>}>
-        <DetailsValue>{textValue(settings.documentDateFormat)}</DetailsValue>
+        <DetailsValue>{textValue(settings.documentDateFormat, inheritedSettings?.documentDateFormat)}</DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Include sender details</Trans>}>
-        <DetailsValue>{booleanValue(settings.includeSenderDetails)}</DetailsValue>
+        <DetailsValue>
+          {booleanValue(settings.includeSenderDetails, inheritedSettings?.includeSenderDetails)}
+        </DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Include signing certificate</Trans>}>
-        <DetailsValue>{booleanValue(settings.includeSigningCertificate)}</DetailsValue>
+        <DetailsValue>
+          {booleanValue(settings.includeSigningCertificate, inheritedSettings?.includeSigningCertificate)}
+        </DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Include audit log</Trans>}>
-        <DetailsValue>{booleanValue(settings.includeAuditLog)}</DetailsValue>
+        <DetailsValue>{booleanValue(settings.includeAuditLog, inheritedSettings?.includeAuditLog)}</DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Delegate document ownership</Trans>}>
-        <DetailsValue>{booleanValue(settings.delegateDocumentOwnership)}</DetailsValue>
+        <DetailsValue>
+          {booleanValue(settings.delegateDocumentOwnership, inheritedSettings?.delegateDocumentOwnership)}
+        </DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Typed signature</Trans>}>
-        <DetailsValue>{booleanValue(settings.typedSignatureEnabled)}</DetailsValue>
+        <DetailsValue>
+          {booleanValue(settings.typedSignatureEnabled, inheritedSettings?.typedSignatureEnabled)}
+        </DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Upload signature</Trans>}>
-        <DetailsValue>{booleanValue(settings.uploadSignatureEnabled)}</DetailsValue>
+        <DetailsValue>
+          {booleanValue(settings.uploadSignatureEnabled, inheritedSettings?.uploadSignatureEnabled)}
+        </DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Draw signature</Trans>}>
-        <DetailsValue>{booleanValue(settings.drawSignatureEnabled)}</DetailsValue>
+        <DetailsValue>
+          {booleanValue(settings.drawSignatureEnabled, inheritedSettings?.drawSignatureEnabled)}
+        </DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Branding</Trans>}>
-        <DetailsValue>{booleanValue(settings.brandingEnabled)}</DetailsValue>
+        <DetailsValue>{booleanValue(settings.brandingEnabled, inheritedSettings?.brandingEnabled)}</DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Branding logo</Trans>}>
-        <DetailsValue>{brandingTextValue(settings.brandingLogo)}</DetailsValue>
+        <DetailsValue>{textValue(settings.brandingLogo, inheritedSettings?.brandingLogo)}</DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Branding URL</Trans>}>
-        <DetailsValue>{brandingTextValue(settings.brandingUrl)}</DetailsValue>
+        <DetailsValue>{textValue(settings.brandingUrl, inheritedSettings?.brandingUrl)}</DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Branding company details</Trans>}>
-        <DetailsValue>{brandingTextValue(settings.brandingCompanyDetails)}</DetailsValue>
+        <DetailsValue>
+          {textValue(settings.brandingCompanyDetails, inheritedSettings?.brandingCompanyDetails)}
+        </DetailsValue>
       </DetailsCard>
 
       <DetailsCard label={<Trans>Email reply-to</Trans>}>
-        <DetailsValue>{textValue(settings.emailReplyTo)}</DetailsValue>
+        <DetailsValue>{textValue(settings.emailReplyTo, inheritedSettings?.emailReplyTo)}</DetailsValue>
       </DetailsCard>
 
       {isTeam && parsedEmailSettings.success && (
@@ -145,7 +192,7 @@ export const AdminGlobalSettingsSection = ({ settings, isTeam = false }: AdminGl
       )}
 
       <DetailsCard label={<Trans>AI features</Trans>}>
-        <DetailsValue>{booleanValue(settings.aiFeaturesEnabled)}</DetailsValue>
+        <DetailsValue>{booleanValue(settings.aiFeaturesEnabled, inheritedSettings?.aiFeaturesEnabled)}</DetailsValue>
       </DetailsCard>
     </div>
   );

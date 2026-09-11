@@ -34,7 +34,7 @@ body:
       label: Browser [e.g., Chrome, Firefox]
   - type: input
     attributes:
-      label: Version [e.g., 2.0.1]
+      label: Version [e.g., 2.13.0]
   - type: checkboxes
     attributes:
       label: Please check the boxes that apply to this issue report.
@@ -44,4 +44,3 @@ body:
         - label: I have included relevant environment information.
         - label: I have included any relevant screenshots.
         - label: I understand that this is a voluntary contribution and that there is no guarantee of resolution.
-        - label: I want to work on creating a PR for this issue if approved

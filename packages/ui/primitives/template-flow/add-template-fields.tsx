@@ -520,7 +520,7 @@ export const AddTemplateFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted-background',
+                    'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted',
                     selectedSignerStyles?.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
@@ -603,9 +603,7 @@ export const AddTemplateFieldsFormPartial = ({
                       <span className="flex-1 truncate text-left">{selectedSigner?.name}</span>
                     )}
 
-                    {!selectedSigner?.email && (
-                      <span className="gradie flex-1 truncate text-left">No recipient selected</span>
-                    )}
+                    {!selectedSigner?.email && <span className="flex-1 truncate text-left">No recipient selected</span>}
 
                     <ChevronsUpDown className="ml-2 h-4 w-4" />
                   </Button>

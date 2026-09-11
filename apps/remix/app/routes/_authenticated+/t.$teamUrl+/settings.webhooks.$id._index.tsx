@@ -216,6 +216,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
   return (
     <div>
       <SettingsHeader
+        hideDivider
         title={
           <div className="flex items-center gap-2">
             <p>

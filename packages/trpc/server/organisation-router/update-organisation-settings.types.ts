@@ -32,7 +32,6 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
 
     // Branding related settings.
     brandingEnabled: z.boolean().optional(),
-    brandingLogo: z.string().optional(),
     brandingUrl: z.string().optional(),
     brandingCompanyDetails: z.string().optional(),
     brandingColors: ZCssVarsSchema.nullish(),

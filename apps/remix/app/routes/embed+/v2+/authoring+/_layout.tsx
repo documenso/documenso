@@ -1,5 +1,6 @@
 import { PAID_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
@@ -12,7 +13,7 @@ import type { OrganisationSession } from '@documenso/trpc/server/organisation-ro
 import { Spinner } from '@documenso/ui/primitives/spinner';
 import { Trans } from '@lingui/react/macro';
 import { OrganisationMemberRole, OrganisationType, TeamMemberRole } from '@prisma/client';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { isRouteErrorResponse, Outlet, useLoaderData } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -166,7 +167,16 @@ export default function AuthoringLayout() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  const analytics = useAnalytics();
+
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
+
+  useEffect(() => {
+    analytics.captureException(error, {
+      source: 'embed',
+      location: 'embed_authoring_boundary',
+    });
+  }, [error]);
 
   return (
     <div>

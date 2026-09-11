@@ -503,7 +503,7 @@ export const ConfigureFieldsView = ({
             {selectedField && (
               <div
                 className={cn(
-                  'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white text-muted-foreground transition duration-200 [container-type:size] dark:text-muted-background',
+                  'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white text-muted-foreground transition duration-200 [container-type:size] dark:text-muted',
                   selectedRecipientStyles.base,
                   {
                     '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,

@@ -2,6 +2,7 @@ import { router } from '../trpc';
 import { createOrganisationEmailRoute } from './create-organisation-email';
 import { createOrganisationEmailDomainRoute } from './create-organisation-email-domain';
 import { createSubscriptionRoute } from './create-subscription';
+import { cscSignEnvelopeRoute } from './csc-sign-envelope';
 import { declineLinkOrganisationAccountRoute } from './decline-link-organisation-account';
 import { deleteOrganisationEmailRoute } from './delete-organisation-email';
 import { deleteOrganisationEmailDomainRoute } from './delete-organisation-email-domain';
@@ -54,5 +55,8 @@ export const enterpriseRouter = router({
     invoices: {
       get: getInvoicesRoute,
     },
+  },
+  csc: {
+    signEnvelope: cscSignEnvelopeRoute,
   },
 });

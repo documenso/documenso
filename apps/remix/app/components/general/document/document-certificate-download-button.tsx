@@ -13,13 +13,13 @@ import { DownloadIcon } from 'lucide-react';
 
 export type DocumentCertificateDownloadButtonProps = {
   className?: string;
-  documentId: number;
+  envelopeId: string;
   documentStatus: DocumentStatus;
 };
 
 export const DocumentCertificateDownloadButton = ({
   className,
-  documentId,
+  envelopeId,
   documentStatus,
 }: DocumentCertificateDownloadButtonProps) => {
   const { toast } = useToast();
@@ -29,7 +29,7 @@ export const DocumentCertificateDownloadButton = ({
 
   const onDownloadCertificatesClick = async () => {
     try {
-      const { data, envelopeTitle } = await downloadCertificate({ documentId });
+      const { data, envelopeTitle } = await downloadCertificate({ envelopeId });
 
       const buffer = new Uint8Array(base64.decode(data));
       const blob = new Blob([buffer], { type: 'application/pdf' });

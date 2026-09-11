@@ -9,6 +9,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface UpdateEnvelopeFieldsOptions {
@@ -59,6 +60,8 @@ export const updateEnvelopeFields = async ({
       message: 'Envelope not found',
     });
   }
+
+  assertEnvelopeMutable(envelope);
 
   if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -115,6 +118,8 @@ export const updateEnvelopeFields = async ({
   });
 
   const updatedFields = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     return await Promise.all(
       fieldsToUpdate.map(async ({ originalField, updateData, recipientEmail }) => {
         const updatedField = await tx.field.update({

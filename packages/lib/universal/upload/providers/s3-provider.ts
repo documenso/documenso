@@ -17,6 +17,14 @@ export class S3Provider implements StorageProvider {
       endpoint: env('NEXT_PRIVATE_UPLOAD_ENDPOINT') || undefined,
       forcePathStyle: env('NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE') === 'true',
       region: env('NEXT_PRIVATE_UPLOAD_REGION') || 'us-east-1',
+      // Since v3.729 the AWS SDK adds a CRC32 checksum to every request by default
+      // (`requestChecksumCalculation: 'WHEN_SUPPORTED'`). Many S3-compatible providers
+      // (GarageHQ, MinIO, Backblaze B2, etc.) reject those requests with an
+      // `InvalidDigest` error, which breaks uploads against third-party storage. Only
+      // send/validate checksums when the operation actually requires them so the default
+      // configuration keeps working with non-AWS backends.
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
       credentials: hasCredentials
         ? {
             accessKeyId: String(env('NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID')),

@@ -40,7 +40,7 @@ export default function TeamsSettingsMembersPage() {
 
   return (
     <div>
-      <SettingsHeader title={t`Team Members`} subtitle={t`Manage the members of your team.`}>
+      <SettingsHeader hideDivider title={t`Team Members`} subtitle={t`Manage the members of your team.`}>
         <TeamMemberCreateDialog />
       </SettingsHeader>
 

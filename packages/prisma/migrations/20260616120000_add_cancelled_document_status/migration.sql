@@ -1,0 +1,1 @@
+ALTER TYPE "DocumentStatus" ADD VALUE 'CANCELLED';

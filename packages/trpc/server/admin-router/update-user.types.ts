@@ -1,10 +1,11 @@
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { Role } from '@prisma/client';
 import { z } from 'zod';
 
 export const ZUpdateUserRequestSchema = z.object({
   id: z.number().min(1),
-  name: z.string().nullish(),
+  name: ZNameSchema.nullish(),
   email: zEmail().optional(),
   roles: z.array(z.nativeEnum(Role)).optional(),
 });

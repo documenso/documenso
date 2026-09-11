@@ -30,18 +30,19 @@ export const OrganisationAccountLinkConfirmationTemplate = ({
   return (
     <Html>
       <Head />
-      <Preview>{_(previewText)}</Preview>
       <Body className="mx-auto my-auto font-sans">
-        <Section className="bg-white">
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid px-2 pt-2 backdrop-blur-sm">
+        <Preview>{_(previewText)}</Preview>
+
+        <Section className="bg-background">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid px-2 pt-2 backdrop-blur-sm">
             <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6 p-2" />
 
             <Section>
               <TemplateImage className="mx-auto h-12 w-12" assetBaseUrl={assetBaseUrl} staticAsset="building-2.png" />
             </Section>
 
-            <Section className="p-2 text-slate-500">
-              <Text className="text-center font-medium text-black text-lg">
+            <Section className="p-2 text-muted-foreground">
+              <Text className="text-center font-medium text-foreground text-lg">
                 {type === 'create' ? (
                   <Trans>Account creation request</Trans>
                 ) : (
@@ -94,7 +95,7 @@ export const OrganisationAccountLinkConfirmationTemplate = ({
 
               <Section className="mt-8 mb-6 text-center">
                 <Button
-                  className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center font-medium text-black text-sm no-underline"
+                  className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-center font-medium text-primary-foreground text-sm no-underline"
                   href={confirmationLink}
                 >
                   <Trans>Review request</Trans>
@@ -102,7 +103,7 @@ export const OrganisationAccountLinkConfirmationTemplate = ({
               </Section>
             </Section>
 
-            <Text className="text-center text-slate-500 text-xs">
+            <Text className="text-center text-muted-foreground text-xs">
               <Trans>Link expires in 30 minutes.</Trans>
             </Text>
           </Container>

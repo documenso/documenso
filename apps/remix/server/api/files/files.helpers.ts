@@ -1,4 +1,6 @@
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { generatePartialSignedPdf } from '@documenso/lib/server-only/pdf/generate-partial-signed-pdf';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sha256 } from '@documenso/lib/universal/crypto';
@@ -24,6 +26,29 @@ type DocumentDataInput = {
   type: DocumentDataType;
   data: string;
   initialData: string;
+};
+
+export const resolveFileUploadUserId = async (c: Context<HonoEnv>): Promise<number | null> => {
+  const session = await getOptionalSession(c);
+
+  if (session.user?.id) {
+    return session.user.id;
+  }
+
+  const authorizationHeader = c.req.header('authorization');
+
+  const [bearerToken] = (authorizationHeader || '').split('Bearer ').filter((part) => part.length > 0);
+
+  const queryToken = c.req.query('token');
+  const presignToken = bearerToken || queryToken;
+
+  if (!presignToken) {
+    return null;
+  }
+
+  const verifiedToken = await verifyEmbeddingPresignToken({ token: presignToken }).catch(() => undefined);
+
+  return verifiedToken?.userId ?? null;
 };
 
 type EnvelopeForPendingDownload = {

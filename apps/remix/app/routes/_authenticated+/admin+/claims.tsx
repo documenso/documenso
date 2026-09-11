@@ -53,7 +53,7 @@ export default function Claims({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
-      <SettingsHeader title={t`Subscription Claims`} subtitle={t`Manage all subscription claims`} hideDivider>
+      <SettingsHeader hideDivider title={t`Subscription Claims`} subtitle={t`Manage all subscription claims`}>
         <ClaimCreateDialog licenseFlags={licenseFlags} />
       </SettingsHeader>
 

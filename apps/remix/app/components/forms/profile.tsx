@@ -1,5 +1,5 @@
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { ZNameSchema } from '@documenso/lib/constants/auth';
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';

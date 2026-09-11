@@ -1,6 +1,6 @@
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
-import type { Envelope } from '@prisma/client';
-import { type Field, RecipientRole, SigningStatus } from '@prisma/client';
+import type { Envelope, Field, Recipient } from '@prisma/client';
+import { RecipientRole, SigningStatus } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
@@ -14,6 +14,58 @@ import { zEmail } from './zod';
  * Currently only SIGNER requires a signature field.
  */
 export const RECIPIENT_ROLES_THAT_REQUIRE_FIELDS = [RecipientRole.SIGNER] as const;
+
+// signingOrder isn't required when submitting the recipient form (Zod: z.number().optional())
+type RecipientWithSigningOrder = Pick<Recipient, 'role'> & Partial<Pick<Recipient, 'signingOrder'>>;
+
+export const isCcRecipient = (recipient: Pick<Recipient, 'role'>) => {
+  return recipient.role === RecipientRole.CC;
+};
+
+export const isAssistantLastSigner = (recipients: Pick<Recipient, 'role'>[]) => {
+  const nonCcRecipients = recipients.filter((recipient) => !isCcRecipient(recipient));
+  const lastNonCcRecipient = nonCcRecipients[nonCcRecipients.length - 1];
+
+  return lastNonCcRecipient?.role === RecipientRole.ASSISTANT;
+};
+
+export const sortRecipientsForSigningOrder = <T extends RecipientWithSigningOrder>(recipients: T[]): T[] => {
+  return [...recipients].sort((r1, r2) => {
+    const r1IsCcRecipient = isCcRecipient(r1);
+    const r2IsCcRecipient = isCcRecipient(r2);
+
+    // CC recipients always sort after non-CC recipients.
+    if (r1IsCcRecipient !== r2IsCcRecipient) {
+      return r1IsCcRecipient ? 1 : -1;
+    }
+
+    // Order by signing order; missing orders sort last.
+    const r1SigningOrder = r1.signingOrder ?? Number.MAX_SAFE_INTEGER;
+    const r2SigningOrder = r2.signingOrder ?? Number.MAX_SAFE_INTEGER;
+
+    return r1SigningOrder - r2SigningOrder;
+  });
+};
+
+export const normalizeRecipientSigningOrders = <T extends RecipientWithSigningOrder>(
+  recipients: T[],
+  canUpdateRecipient: (recipient: T) => boolean = () => true,
+): Array<T & { signingOrder?: number }> => {
+  const nonCcRecipients = recipients.filter((recipient) => !isCcRecipient(recipient));
+  const ccRecipients = recipients.filter((recipient) => isCcRecipient(recipient));
+
+  const normalizedNonCcRecipients = nonCcRecipients.map((recipient, index) => ({
+    ...recipient,
+    signingOrder: canUpdateRecipient(recipient) ? index + 1 : (recipient.signingOrder ?? index + 1),
+  }));
+
+  const normalizedCcRecipients = ccRecipients.map((recipient) => ({
+    ...recipient,
+    signingOrder: undefined,
+  }));
+
+  return [...normalizedNonCcRecipients, ...normalizedCcRecipients];
+};
 
 /**
  * Returns recipients who are missing required fields for their role.

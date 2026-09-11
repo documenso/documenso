@@ -76,7 +76,7 @@ export const OrganisationTeamsTable = () => {
         cell: ({ row }) => (
           <div className="flex justify-end space-x-2">
             <Button variant="outline" asChild>
-              <Link to={`/t/${row.original.url}/settings`}>
+              <Link to={`/t/${row.original.url}/settings/general`}>
                 <Trans>Manage</Trans>
               </Link>
             </Button>

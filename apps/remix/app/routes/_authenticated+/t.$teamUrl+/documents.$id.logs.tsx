@@ -72,7 +72,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       updatedAt: envelope.updatedAt,
       documentMeta: envelope.documentMeta,
     },
-    recipients: envelope.recipients,
+    recipients: envelope.recipients.map((recipient) => ({
+      id: recipient.id,
+      email: recipient.email,
+      name: recipient.name,
+      role: recipient.role,
+    })),
     documentRootPath,
     userId: user.id,
   };
@@ -118,7 +123,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
     },
   ];
 
-  const formatRecipientText = (recipient: Recipient) => {
+  const formatRecipientText = (recipient: Pick<Recipient, 'email' | 'name' | 'role'>) => {
     let text = recipient.email;
 
     if (recipient.name) {
@@ -153,11 +158,11 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
           <div className="mt-4 flex w-full flex-row sm:mt-0 sm:w-auto sm:self-end">
             <DocumentCertificateDownloadButton
               className="mr-2"
-              documentId={document.id}
+              envelopeId={document.envelopeId}
               documentStatus={document.status}
             />
 
-            <DocumentAuditLogDownloadButton documentId={document.id} />
+            <DocumentAuditLogDownloadButton envelopeId={document.envelopeId} />
           </div>
         </div>
       </div>

@@ -17,7 +17,7 @@ export function TemplateDocumentRejected({
 }: TemplateDocumentRejectedProps) {
   return (
     <div className="mt-4">
-      <Heading className="mb-4 text-center font-semibold text-2xl text-slate-800">
+      <Heading className="mb-4 text-center font-semibold text-2xl text-foreground">
         <Trans>Document Rejected</Trans>
       </Heading>
 
@@ -28,7 +28,7 @@ export function TemplateDocumentRejected({
       </Text>
 
       {rejectionReason && (
-        <Text className="mb-4 text-base text-slate-400">
+        <Text className="mb-4 text-base text-muted-foreground">
           <Trans>Reason for rejection: {rejectionReason}</Trans>
         </Text>
       )}
@@ -39,7 +39,7 @@ export function TemplateDocumentRejected({
 
       <Button
         href={documentUrl}
-        className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center font-medium text-black text-sm no-underline"
+        className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-center font-medium text-primary-foreground text-sm no-underline"
       >
         <Trans>View Document</Trans>
       </Button>

@@ -355,6 +355,14 @@ export const formatDocumentAuditLogAction = (i18n: I18n, auditLog: TDocumentAudi
       you: msg`You deleted the document`,
       user: msg`${user} deleted the document`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CANCELLED }, () => ({
+      anonymous: msg({
+        message: `Document cancelled`,
+        context: `Audit log format`,
+      }),
+      you: msg`You cancelled the document`,
+      user: msg`${user} cancelled the document`,
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELDS_AUTO_INSERTED }, () => ({
       anonymous: msg({
         message: `System auto inserted fields`,
@@ -501,11 +509,31 @@ export const formatDocumentAuditLogAction = (i18n: I18n, auditLog: TDocumentAudi
           user: msg`${user} completed their task`,
         }));
     })
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED }, () => ({
-      anonymous: msg`Recipient rejected the document`,
-      you: msg`You rejected the document`,
-      user: msg`${user} rejected the document`,
-    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED }, ({ data }) => {
+      if (data.isExternal) {
+        const onBehalfOf = data.onBehalfOfUserName || data.onBehalfOfUserEmail;
+
+        if (onBehalfOf) {
+          return {
+            anonymous: msg`The document was rejected externally by ${onBehalfOf} on behalf of the recipient`,
+            you: msg`The document was rejected externally by ${onBehalfOf} on behalf of the recipient`,
+            user: msg`The document was rejected externally by ${onBehalfOf} on behalf of ${user}`,
+          };
+        }
+
+        return {
+          anonymous: msg`Recipient rejected the document externally`,
+          you: msg`The document was rejected externally on behalf of the recipient`,
+          user: msg`The document was rejected externally on behalf of ${user}`,
+        };
+      }
+
+      return {
+        anonymous: msg`Recipient rejected the document`,
+        you: msg`You rejected the document`,
+        user: msg`${user} rejected the document`,
+      };
+    })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED }, () => ({
       anonymous: msg`Recipient requested a 2FA token for the document`,
       you: msg`You requested a 2FA token for the document`,
@@ -597,6 +625,31 @@ export const formatDocumentAuditLogAction = (i18n: I18n, auditLog: TDocumentAudi
         user: message,
       };
     })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHENTICATED }, () => ({
+      anonymous: msg`Recipient authenticated with the signing provider`,
+      you: msg`You authenticated with the signing provider`,
+      user: msg`${user} authenticated with the signing provider`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHENTICATION_FAILED }, () => ({
+      anonymous: msg`Recipient's signing provider authentication failed`,
+      you: msg`Your signing provider authentication failed`,
+      user: msg`${user}'s signing provider authentication failed`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_SIGN_REQUESTED }, () => ({
+      anonymous: msg`Recipient requested a remote signature`,
+      you: msg`You requested a remote signature`,
+      user: msg`${user} requested a remote signature`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHORIZED }, () => ({
+      anonymous: msg`Recipient authorised the remote signature`,
+      you: msg`You authorised the remote signature`,
+      user: msg`${user} authorised the remote signature`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_SIGNED }, () => ({
+      anonymous: msg`Recipient's remote signature was applied`,
+      you: msg`Your remote signature was applied`,
+      user: msg`${user}'s remote signature was applied`,
+    }))
     .exhaustive();
 
   let selectedDescription = description.anonymous;
