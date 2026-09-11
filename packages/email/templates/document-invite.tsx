@@ -96,6 +96,14 @@ export const DocumentInviteEmailTemplate = ({
               <Text className="mt-2 text-base text-muted-foreground">
                 {customBody ? (
                   <TemplateCustomMessageBody text={customBody} />
+                ) : organisationType === OrganisationType.ORGANISATION && !includeSenderDetails ? (
+                  <Trans>
+                    {teamName} has invited you to {action} the document "{documentName}".
+                  </Trans>
+                ) : organisationType === OrganisationType.ORGANISATION ? (
+                  <Trans>
+                    {inviterName} on behalf of "{teamName}" has invited you to {action} the document "{documentName}".
+                  </Trans>
                 ) : (
                   <Trans>
                     {inviterName} has invited you to {action} the document "{documentName}".
