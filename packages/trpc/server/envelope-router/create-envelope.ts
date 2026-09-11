@@ -6,7 +6,6 @@ import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-plac
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
-import { EnvelopeType } from '@prisma/client';
 import type { Logger } from 'pino';
 import { match, P } from 'ts-pattern';
 
@@ -121,7 +120,7 @@ export const createEnvelopeRouteCaller = async ({
       }
 
       const normalized = await normalizePdf(pdf, {
-        flattenForm: type !== EnvelopeType.TEMPLATE,
+        flattenForm: false,
       });
 
       // Todo: Embeds - Might need to add this for client-side embeds in the future.

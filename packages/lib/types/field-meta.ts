@@ -72,6 +72,7 @@ export const ZBaseFieldMeta = z.object({
   readOnly: z.boolean().optional(),
   fontSize: z.number().min(8).max(96).default(DEFAULT_FIELD_FONT_SIZE).optional(),
   overflow: ZFieldOverflowMode.optional(),
+  source: z.enum(['acroform']).optional(),
 });
 
 export type TBaseFieldMeta = z.infer<typeof ZBaseFieldMeta>;
