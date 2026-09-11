@@ -2,6 +2,7 @@ import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-exp
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import {
+  ZDocumentMetaAllowDocumentRejectionSchema,
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
   ZDocumentMetaDrawSignatureEnabledSchema,
@@ -96,6 +97,7 @@ export const ZUseEnvelopePayloadSchema = z.object({
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       allowDictateNextSigner: z.boolean().optional(),
       envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
+      allowDocumentRejection: ZDocumentMetaAllowDocumentRejectionSchema.optional(),
     })
     .describe('Override values from the template for the created document.')
     .optional(),
