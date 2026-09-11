@@ -17,14 +17,18 @@ export const run = async ({ payload, io: _io }: { payload: TExecuteWebhookJobDef
 
   const { webhookUrl: url, secret } = webhook;
 
+  const deliveryId = payload.deliveryId ?? crypto.randomUUID();
+  const createdAt = payload.createdAt ?? new Date().toISOString();
+
   const payloadData = {
     event,
+    deliveryId,
     payload: data,
-    createdAt: new Date().toISOString(),
+    createdAt,
     webhookEndpoint: url,
   };
 
-  const result = await executeWebhookCall({ url, body: payloadData, secret });
+  const result = await executeWebhookCall({ url, body: payloadData, secret, deliveryId });
 
   await prisma.webhookCall.create({
     data: {
