@@ -102,8 +102,10 @@ export const DocumentSigningCompleteDialog = ({
 
   const { isNameLocked, isEmailLocked } = useEmbedSigningContext() || {};
 
+  const canDictateNextSigner = allowDictateNextSigner && Boolean(defaultNextSigner);
+
   const form = useForm<TNextSignerFormSchema>({
-    resolver: allowDictateNextSigner ? zodResolver(ZNextSignerFormSchema) : undefined,
+    resolver: canDictateNextSigner ? zodResolver(ZNextSignerFormSchema) : undefined,
     defaultValues: {
       name: defaultNextSigner?.name ?? '',
       email: defaultNextSigner?.email ?? '',
@@ -324,7 +326,7 @@ export const DocumentSigningCompleteDialog = ({
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onFormSubmit)}>
-                {allowDictateNextSigner && defaultNextSigner && (
+                {canDictateNextSigner && (
                   <div className="mb-4 flex flex-col gap-4">
                     <div className="flex flex-col gap-4 md:flex-row">
                       <FormField

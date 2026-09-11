@@ -40,6 +40,7 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import { getRecipientsWithMissingFields } from '../../utils/recipients';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
@@ -676,6 +677,7 @@ export const createDocumentFromDirectTemplate = async ({
         select: {
           id: true,
           signingOrder: true,
+          signingStatus: true,
           name: true,
           email: true,
           role: true,
@@ -694,9 +696,22 @@ export const createDocumentFromDirectTemplate = async ({
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       });
 
-      const nextRecipient = pendingRecipients[0];
+      const nextRecipients = getRecipientsInActiveSigningStep(pendingRecipients);
 
-      if (nextRecipient) {
+      const directRecipientOrder = createdDirectRecipient.signingOrder ?? Number.MAX_SAFE_INTEGER;
+
+      // The direct recipient can share a step with other recipients (a signing
+      // group). Those peers are still pending, so without this check they would
+      // look like the "next" step and be dictated over — dictation may only
+      // affect a strictly later step.
+      const hasCompletedCurrentStep = nextRecipients.every(
+        (pendingRecipient) => (pendingRecipient.signingOrder ?? Number.MAX_SAFE_INTEGER) > directRecipientOrder,
+      );
+
+      // Dictation can only apply when the next step is a single recipient.
+      const nextRecipient = hasCompletedCurrentStep && nextRecipients.length === 1 ? nextRecipients[0] : null;
+
+      if (nextRecipient && documentMeta.allowDictateNextSigner) {
         auditLogsToCreate.push(
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
@@ -730,12 +745,8 @@ export const createDocumentFromDirectTemplate = async ({
         await tx.recipient.update({
           where: { id: nextRecipient.id },
           data: {
-            ...(nextSigner && documentMeta?.allowDictateNextSigner
-              ? {
-                  name: nextSigner.name,
-                  email: nextSigner.email,
-                }
-              : {}),
+            name: nextSigner.name,
+            email: nextSigner.email,
           },
         });
       }

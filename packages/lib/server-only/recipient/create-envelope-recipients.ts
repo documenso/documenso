@@ -12,6 +12,7 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export interface CreateEnvelopeRecipientsOptions {
@@ -90,6 +91,13 @@ export const createEnvelopeRecipients = async ({
       role: recipient.role,
     });
   }
+
+  // Grouping is a property of the whole recipient set, so check the state the
+  // envelope will be left in rather than the incoming batch alone.
+  assertCompatibleRecipientGrouping({
+    signatureLevel: envelope.signatureLevel,
+    recipients: [...envelope.recipients, ...recipientsToCreate],
+  });
 
   const normalizedRecipients = recipientsToCreate.map((recipient) => ({
     ...recipient,

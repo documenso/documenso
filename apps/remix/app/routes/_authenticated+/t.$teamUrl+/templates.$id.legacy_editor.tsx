@@ -42,6 +42,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(templateRootPath);
   }
 
+  if (template.internalVersion !== 1) {
+    throw redirect(`${templateRootPath}/${template.envelopeId}/edit`);
+  }
+
   return superLoaderJson({
     template: {
       ...template,
