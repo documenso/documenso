@@ -1,11 +1,9 @@
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { Input } from '@documenso/ui/primitives/input';
 import { useLingui } from '@lingui/react/macro';
 import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { useEffect, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router';
+import { debounce, parseAsString, useQueryState } from 'nuqs';
 
 import { TeamGroupCreateDialog } from '~/components/dialogs/team-group-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
@@ -16,34 +14,12 @@ import { useCurrentTeam } from '~/providers/team';
 export default function TeamsSettingsGroupsPage() {
   const { t } = useLingui();
 
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const { pathname } = useLocation();
   const team = useCurrentTeam();
 
-  const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
-
-  const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
-
-  /**
-   * Handle debouncing the search query.
-   */
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams?.toString());
-
-    params.set('query', debouncedSearchQuery);
-
-    if (debouncedSearchQuery === '') {
-      params.delete('query');
-    }
-
-    // If nothing  to change then do nothing.
-    if (params.toString() === searchParams?.toString()) {
-      return;
-    }
-
-    setSearchParams(params);
-  }, [debouncedSearchQuery, pathname, searchParams]);
+  const [searchQuery, setSearchQuery] = useQueryState(
+    'query',
+    parseAsString.withDefault('').withOptions({ shallow: false, limitUrlUpdates: debounce(500) }),
+  );
 
   const everyoneGroupQuery = trpc.team.group.find.useQuery({
     teamId: team.id,
@@ -61,8 +37,8 @@ export default function TeamsSettingsGroupsPage() {
       </SettingsHeader>
 
       <Input
-        defaultValue={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        value={searchQuery}
+        onChange={(e) => void setSearchQuery(e.target.value || null)}
         placeholder={t`Search`}
         className="mb-4"
       />

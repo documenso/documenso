@@ -1,8 +1,6 @@
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { Input } from '@documenso/ui/primitives/input';
 import { useLingui } from '@lingui/react/macro';
-import { useEffect, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router';
+import { debounce, parseAsString, useQueryState } from 'nuqs';
 
 import { TeamCreateDialog } from '~/components/dialogs/team-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
@@ -11,29 +9,10 @@ import { OrganisationTeamsTable } from '~/components/tables/organisation-teams-t
 export default function OrganisationSettingsTeamsPage() {
   const { t } = useLingui();
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { pathname } = useLocation();
-
-  const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
-
-  const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
-
-  /**
-   * Handle debouncing the search query.
-   */
-  useEffect(() => {
-    setSearchParams((prev) => {
-      const params = new URLSearchParams(prev?.toString());
-
-      if (debouncedSearchQuery === '') {
-        params.delete('query');
-      } else {
-        params.set('query', debouncedSearchQuery);
-      }
-
-      return params;
-    });
-  }, [debouncedSearchQuery, pathname]);
+  const [searchQuery, setSearchQuery] = useQueryState(
+    'query',
+    parseAsString.withDefault('').withOptions({ shallow: false, limitUrlUpdates: debounce(500) }),
+  );
 
   return (
     <div>
@@ -42,8 +21,8 @@ export default function OrganisationSettingsTeamsPage() {
       </SettingsHeader>
 
       <Input
-        defaultValue={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        value={searchQuery}
+        onChange={(e) => void setSearchQuery(e.target.value || null)}
         placeholder={t`Search`}
         className="mb-4"
       />
