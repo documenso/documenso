@@ -171,43 +171,42 @@ export const buildTeamWhereQuery = ({
 /**
  * Majority of these are null which lets us inherit from the organisation settings.
  */
-export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | 'team'> => {
-  return {
-    documentVisibility: null,
-    documentLanguage: null,
-    documentTimezone: null,
-    documentDateFormat: null,
-    delegateDocumentOwnership: null,
+export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | 'team'> => ({
+  documentVisibility: null,
+  documentLanguage: null,
+  documentTimezone: null,
+  documentDateFormat: null,
+  delegateDocumentOwnership: null,
 
-    includeSenderDetails: null,
-    includeSigningCertificate: null,
-    includeAuditLog: null,
+  includeSenderDetails: null,
+  includeSigningCertificate: null,
+  includeAuditLog: null,
 
-    typedSignatureEnabled: null,
-    uploadSignatureEnabled: null,
-    drawSignatureEnabled: null,
+  typedSignatureEnabled: null,
+  uploadSignatureEnabled: null,
+  drawSignatureEnabled: null,
 
-    brandingEnabled: null,
-    brandingLogo: null,
-    brandingUrl: null,
-    brandingCompanyDetails: null,
-    brandingColors: null,
-    brandingCss: null,
+  brandingEnabled: null,
+  brandingLogo: null,
+  brandingLogoSize: null,
+  brandingUrl: null,
+  brandingCompanyDetails: null,
+  brandingColors: null,
+  brandingCss: null,
 
-    emailDocumentSettings: null,
-    emailId: null,
-    emailReplyTo: null,
-    // emailReplyToName: null,
+  emailDocumentSettings: null,
+  emailId: null,
+  emailReplyTo: null,
+  // emailReplyToName: null,
 
-    defaultRecipients: null,
+  defaultRecipients: null,
 
-    envelopeExpirationPeriod: null,
+  envelopeExpirationPeriod: null,
 
-    reminderSettings: null,
+  reminderSettings: null,
 
-    aiFeaturesEnabled: null,
-  };
-};
+  aiFeaturesEnabled: null,
+});
 
 /**
  * Derive the final settings for a team.
@@ -215,6 +214,14 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
  * @param organisationSettings The organisation settings to inherit values from
  * @param teamSettings The team settings which can override the organisation settings
  */
+const BRANDING_KEYS = new Set<string>([
+  'brandingEnabled',
+  'brandingLogo',
+  'brandingLogoSize',
+  'brandingUrl',
+  'brandingCompanyDetails',
+]);
+
 export const extractDerivedTeamSettings = (
   organisationSettings: Omit<OrganisationGlobalSettings, 'id'>,
   teamSettings: Omit<TeamGlobalSettings, 'id'>,
@@ -223,8 +230,17 @@ export const extractDerivedTeamSettings = (
     ...organisationSettings,
   };
 
+  // When brandingEnabled is null the team inherits all branding from the org.
+  // Treat branding as an atomic group: if any override is present the team must
+  // also have explicitly set brandingEnabled (non-null).
+  const teamOverridesBranding = teamSettings.brandingEnabled !== null;
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   for (const key of Object.keys(derivedSettings) as (keyof typeof derivedSettings)[]) {
+    if (BRANDING_KEYS.has(key) && !teamOverridesBranding) {
+      continue;
+    }
+
     const teamValue = teamSettings[key];
 
     if (teamValue !== null) {

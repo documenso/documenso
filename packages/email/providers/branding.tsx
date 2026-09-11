@@ -1,3 +1,5 @@
+import type { BrandingLogoSize } from '@documenso/lib/constants/organisations';
+import { DEFAULT_BRANDING_LOGO_SIZE } from '@documenso/lib/constants/organisations';
 import type { EmailBrandingColors } from '@documenso/lib/utils/email-branding-colors';
 import { createContext, useContext } from 'react';
 
@@ -5,6 +7,7 @@ type BrandingContextValue = {
   brandingEnabled: boolean;
   brandingUrl: string;
   brandingLogo: string;
+  brandingLogoSize?: BrandingLogoSize;
   brandingCompanyDetails: string;
   brandingHidePoweredBy: boolean;
   brandingColors?: EmailBrandingColors;
@@ -16,6 +19,7 @@ const defaultBrandingContextValue: BrandingContextValue = {
   brandingEnabled: false,
   brandingUrl: '',
   brandingLogo: '',
+  brandingLogoSize: DEFAULT_BRANDING_LOGO_SIZE,
   brandingCompanyDetails: '',
   brandingHidePoweredBy: false,
 };
@@ -35,7 +39,10 @@ export const useBranding = () => {
     throw new Error('Branding context not found');
   }
 
-  return ctx;
+  return {
+    ...ctx,
+    brandingLogoSize: ctx.brandingLogoSize || DEFAULT_BRANDING_LOGO_SIZE,
+  };
 };
 
 export type BrandingSettings = BrandingContextValue;
