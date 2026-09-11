@@ -25,9 +25,7 @@ export const DocumentPageViewInformation = ({ envelope, userId }: DocumentPageVi
       },
       {
         description: msg`Created`,
-        value: DateTime.fromJSDate(envelope.createdAt)
-          .setLocale(i18n.locales?.[0] || i18n.locale)
-          .toFormat('MMMM d, yyyy'),
+        value: i18n.date(envelope.createdAt, { dateStyle: 'long' }),
       },
       {
         description: msg`Last modified`,
