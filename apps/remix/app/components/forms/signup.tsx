@@ -1,6 +1,11 @@
 import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import {
+  NEXT_PUBLIC_IMPRINT_URL,
+  NEXT_PUBLIC_PRIVACY_POLICY_URL,
+  NEXT_PUBLIC_TERMS_OF_SERVICE_URL,
+} from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { ZNameSchema } from '@documenso/lib/types/name';
 import { env } from '@documenso/lib/utils/env';
@@ -410,20 +415,35 @@ export const SignUpForm = ({
           <Trans>
             By proceeding, you agree to our{' '}
             <Link
-              to="https://documen.so/terms"
+              to={NEXT_PUBLIC_TERMS_OF_SERVICE_URL()}
               target="_blank"
+              rel="noopener noreferrer"
               className="text-documenso-700 duration-200 hover:opacity-70"
             >
               Terms of Service
             </Link>{' '}
             and{' '}
             <Link
-              to="https://documen.so/privacy"
+              to={NEXT_PUBLIC_PRIVACY_POLICY_URL()}
               target="_blank"
+              rel="noopener noreferrer"
               className="text-documenso-700 duration-200 hover:opacity-70"
             >
               Privacy Policy
             </Link>
+            {NEXT_PUBLIC_IMPRINT_URL() ? (
+              <>
+                {' '}and{' '}
+                <Link
+                  to={NEXT_PUBLIC_IMPRINT_URL()!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-documenso-700 duration-200 hover:opacity-70"
+                >
+                  Imprint
+                </Link>
+              </>
+            ) : null}
             .
           </Trans>
         </p>

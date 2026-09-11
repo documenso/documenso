@@ -133,6 +133,13 @@ declare namespace NodeJS {
     NEXT_PRIVATE_TURNSTILE_SECRET_KEY?: string;
 
     /**
+     * Legal & Data Protection environment variables
+     */
+    NEXT_PUBLIC_TERMS_OF_SERVICE_URL?: string;
+    NEXT_PUBLIC_PRIVACY_POLICY_URL?: string;
+    NEXT_PUBLIC_IMPRINT_URL?: string;
+
+    /**
      * Google Vertex AI environment variables
      */
     GOOGLE_VERTEX_PROJECT_ID?: string;
