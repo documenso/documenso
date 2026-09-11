@@ -104,6 +104,19 @@ export const EnvelopeDownloadDialog = ({
 
   const envelopeItems = envelopeItemsPayload?.data || [];
 
+  // Item titles are captured when the item is created and are never updated
+  // afterwards: renaming a document only updates the envelope title, and a
+  // document generated from a template inherits the template's item title. For a
+  // single-item envelope the item *is* the document, so use the envelope's current
+  // title for both the download filename and the displayed name so they match the
+  // document title — consistent with the audit log / signing certificate / bulk
+  // document downloads. Multi-item envelopes keep their per-item titles so the
+  // downloaded files stay distinct.
+  const envelopeTitle = envelopeItemsPayload?.envelopeTitle;
+
+  const resolveItemTitle = (item: EnvelopeItemToDownload) =>
+    envelopeItems.length === 1 && envelopeTitle ? envelopeTitle : item.title;
+
   const onDownload = async (envelopeItem: EnvelopeItemToDownload, version: 'original' | 'signed' | 'pending') => {
     const { id: envelopeItemId } = envelopeItem;
 
@@ -120,7 +133,7 @@ export const EnvelopeDownloadDialog = ({
       await downloadPDF({
         envelopeItem,
         token,
-        fileName: envelopeItem.title,
+        fileName: resolveItemTitle(envelopeItem),
         version,
       });
 
@@ -186,8 +199,8 @@ export const EnvelopeDownloadDialog = ({
 
                   <div className="min-w-0 flex-1">
                     {/* Todo: Envelopes - Fix overflow */}
-                    <h4 className="truncate font-medium text-foreground text-sm" title={item.title}>
-                      {item.title}
+                    <h4 className="truncate font-medium text-foreground text-sm" title={resolveItemTitle(item)}>
+                      {resolveItemTitle(item)}
                     </h4>
                     <p className="mt-0.5 text-muted-foreground text-xs">
                       <Trans>PDF Document</Trans>
