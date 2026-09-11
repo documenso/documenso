@@ -1,5 +1,6 @@
 import { Img, Link } from '../components';
 import { useBranding } from '../providers/branding';
+import { getEmailAssetUrl } from '../utils/asset-url';
 import { getSafeBrandingUrl } from '../utils/branding-url';
 
 export type TemplateBrandingLogoProps = {
@@ -20,9 +21,7 @@ export const TemplateBrandingLogo = ({ assetBaseUrl, className = 'mb-4 h-6' }: T
   const hasCustomBrandingLogo = branding.brandingEnabled && Boolean(branding.brandingLogo);
 
   if (!hasCustomBrandingLogo) {
-    // Resolve against a trailing-slash base so a sub-path (e.g. "/ESign") in assetBaseUrl is preserved.
-    const base = assetBaseUrl.endsWith('/') ? assetBaseUrl : `${assetBaseUrl}/`;
-    const documensoLogoUrl = new URL('static/logo.png', base).toString();
+    const documensoLogoUrl = getEmailAssetUrl(assetBaseUrl, 'static/logo.png');
 
     return <Img src={documensoLogoUrl} alt="Documenso Logo" className={className} />;
   }

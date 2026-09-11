@@ -1,4 +1,5 @@
 import { Img } from '../components';
+import { getEmailAssetUrl } from '../utils/asset-url';
 
 export interface TemplateImageProps {
   assetBaseUrl: string;
@@ -7,13 +8,7 @@ export interface TemplateImageProps {
 }
 
 export const TemplateImage = ({ assetBaseUrl, className, staticAsset }: TemplateImageProps) => {
-  const getAssetUrl = (path: string) => {
-    // Resolve against a trailing-slash base so a sub-path (e.g. "/ESign") in assetBaseUrl is preserved.
-    const base = assetBaseUrl.endsWith('/') ? assetBaseUrl : `${assetBaseUrl}/`;
-    return new URL(path.replace(/^\//, ''), base).toString();
-  };
-
-  return <Img className={className} src={getAssetUrl(`/static/${staticAsset}`)} alt="" />;
+  return <Img className={className} src={getEmailAssetUrl(assetBaseUrl, `static/${staticAsset}`)} alt="" />;
 };
 
 export default TemplateImage;

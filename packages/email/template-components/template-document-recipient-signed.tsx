@@ -1,6 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 
 import { Column, Img, Section, Text } from '../components';
+import { getEmailAssetUrl } from '../utils/asset-url';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentRecipientSignedProps {
@@ -16,12 +17,6 @@ export const TemplateDocumentRecipientSigned = ({
   recipientEmail,
   assetBaseUrl,
 }: TemplateDocumentRecipientSignedProps) => {
-  const getAssetUrl = (path: string) => {
-    // Resolve against a trailing-slash base so a sub-path (e.g. "/ESign") in assetBaseUrl is preserved.
-    const base = assetBaseUrl.endsWith('/') ? assetBaseUrl : `${assetBaseUrl}/`;
-    return new URL(path.replace(/^\//, ''), base).toString();
-  };
-
   const recipientReference = recipientName || recipientEmail;
 
   return (
@@ -33,7 +28,7 @@ export const TemplateDocumentRecipientSigned = ({
           <Column align="center">
             <Text className="font-semibold text-base text-foreground">
               <Img
-                src={getAssetUrl('/static/completed.png')}
+                src={getEmailAssetUrl(assetBaseUrl, 'static/completed.png')}
                 className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
                 alt=""
               />
