@@ -38,9 +38,9 @@ export const handlerTriggerWebhooks = async (req: Request) => {
     return Response.json({ success: false, error: 'Invalid request body' }, { status: 400 });
   }
 
-  const { event, data, userId, teamId } = result.data;
+  const { event, data, teamId } = result.data;
 
-  const allWebhooks = await getAllWebhooksByEventTrigger({ event, userId, teamId });
+  const allWebhooks = await getAllWebhooksByEventTrigger({ event, teamId });
 
   await Promise.allSettled(
     allWebhooks.map(async (webhook) => {
