@@ -14,9 +14,43 @@ export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean
   });
 
   if (pdfDoc.isEncrypted) {
-    throw new AppError('INVALID_DOCUMENT_FILE', {
-      message: 'The document is encrypted',
-    });
+    // The file carries an encryption dictionary but could not be opened, so
+    // it genuinely requires a password we do not have.
+    if (!pdfDoc.isAuthenticated) {
+      throw new AppError('INVALID_DOCUMENT_FILE', {
+        message:
+          'This PDF is password protected. Re-save it without a password and try again.',
+      });
+    }
+
+    // Opened with an empty user password: owner-password encryption with only
+    // permission flags set (the common shape for government forms). Rebuilding
+    // the pages into a fresh document drops the encryption dictionary without
+    // needing owner access. The rebuild discards the AcroForm, so it is only
+    // safe where the form was going to be flattened anyway.
+    if (!shouldFlattenForm) {
+      throw new AppError('INVALID_DOCUMENT_FILE', {
+        message:
+          'This PDF is encrypted, and removing the encryption would discard its form fields.',
+      });
+    }
+
+    const rebuilt = await pdfDoc.extractPages(
+      [...Array(pdfDoc.getPageCount()).keys()],
+    );
+
+    rebuilt.flattenLayers();
+
+    const form = rebuilt.getForm();
+
+    if (form) {
+      form.flatten();
+      rebuilt.flattenAnnotations();
+    }
+
+    const normalizedPdfBytes = await rebuilt.save();
+
+    return Buffer.from(normalizedPdfBytes);
   }
 
   pdfDoc.flattenLayers();
