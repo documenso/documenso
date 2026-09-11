@@ -83,16 +83,7 @@ export const downloadRoute = new Hono<HonoEnv>()
             },
           },
           include: {
-            envelope: {
-              include: {
-                recipients: {
-                  select: {
-                    role: true,
-                    signingStatus: true,
-                  },
-                },
-              },
-            },
+            envelope: true,
             documentData: true,
           },
         });

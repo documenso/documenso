@@ -15,8 +15,7 @@ type DownloadPDFProps = {
    * 'signed': Downloads the signed version (default).
    * 'original': Downloads the original version.
    * 'pending': Downloads the original document with currently-inserted fields burned in.
-   *            Only valid while the envelope is in PENDING status. Not supported via
-   *            recipient token.
+   *            Only valid while the envelope is in PENDING status.
    */
   version?: DocumentVersion;
 };

@@ -4,8 +4,8 @@ import type { EnvelopeItem } from '@prisma/client';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 
 /**
- * `pending` is only supported when there is no recipient token (team/owner-side downloads
- * via the session-authed file route). The recipient-token route does not accept `pending`.
+ * `pending` downloads a PDF with the currently-inserted fields burned in. Supported
+ * for both session-authed and recipient-token downloads while the envelope is PENDING.
  */
 export type EnvelopeItemPdfUrlOptions =
   | {
