@@ -98,10 +98,10 @@ const trpcMutation = async (page: Page, procedure: string, input: Record<string,
   return { res, json: res.ok() ? await res.json() : null };
 };
 
-// ─── UI: Tab Visibility ──────────────────────────────────────────────────────
+// ─── UI: View Filter Visibility ──────────────────────────────────────────────
 
-test.describe('Organisation Templates - UI Tabs', () => {
-  test('should show Team/Organisation tabs for non-personal orgs', async ({ page }) => {
+test.describe('Organisation Templates - UI View Filter', () => {
+  test('should show the view filter for non-personal orgs', async ({ page }) => {
     const { ownerA, teamA } = await seedOrgTemplateScenario();
 
     await apiSignin({
@@ -110,11 +110,10 @@ test.describe('Organisation Templates - UI Tabs', () => {
       redirectPath: `/t/${teamA.url}/templates`,
     });
 
-    await expect(page.getByTestId('template-tab-team')).toBeVisible();
-    await expect(page.getByTestId('template-tab-organisation')).toBeVisible();
+    await expect(page.getByTestId('templates-table-view-filter')).toBeVisible();
   });
 
-  test('should not show tabs for personal organisations', async ({ page }) => {
+  test('should not show the view filter for personal organisations', async ({ page }) => {
     const { user, team } = await seedUser({ isPersonalOrganisation: true });
 
     await apiSignin({
@@ -123,15 +122,14 @@ test.describe('Organisation Templates - UI Tabs', () => {
       redirectPath: `/t/${team.url}/templates`,
     });
 
-    await expect(page.getByTestId('template-tab-team')).not.toBeVisible();
-    await expect(page.getByTestId('template-tab-organisation')).not.toBeVisible();
+    await expect(page.getByTestId('templates-table-view-filter')).not.toBeVisible();
   });
 });
 
 // ─── UI: Listing Organisation Templates ──────────────────────────────────────
 
 test.describe('Organisation Templates - Listing', () => {
-  test('should list org templates from other teams under the Organisation tab', async ({ page }) => {
+  test('should list org templates from other teams under the organisation view', async ({ page }) => {
     const { memberB, teamB, orgTemplate } = await seedOrgTemplateScenario();
 
     await apiSignin({
@@ -140,17 +138,30 @@ test.describe('Organisation Templates - Listing', () => {
       redirectPath: `/t/${teamB.url}/templates`,
     });
 
-    // Team tab should show 0 (memberB has no templates on teamB).
-    await expect(page.getByTestId('template-tab-team')).toBeVisible();
+    // Team view is active by default (memberB has no templates on teamB).
+    await expect(page.getByTestId('templates-table-view-filter')).toBeVisible();
 
-    // Switch to Organisation tab.
-    await page.getByTestId('template-tab-organisation').click();
+    // Switch to the organisation view.
+    await page.getByTestId('templates-table-view-filter').click();
+    await page.getByRole('option', { name: 'Organisation' }).click();
 
     // Should see the org template from teamA.
     await expect(page.getByText(orgTemplate.title)).toBeVisible();
   });
 
-  test('should not show private templates from other teams under Organisation tab', async ({ page }) => {
+  test('should use default pagination when URL values are zero', async ({ page }) => {
+    const { memberB, teamB, orgTemplate } = await seedOrgTemplateScenario();
+
+    await apiSignin({
+      page,
+      email: memberB.email,
+      redirectPath: `/t/${teamB.url}/templates?view=organisation&page=0&perPage=0`,
+    });
+
+    await expect(page.getByText(orgTemplate.title)).toBeVisible();
+  });
+
+  test('should not show private templates from other teams under the organisation view', async ({ page }) => {
     const { ownerA, teamA, memberB, teamB } = await seedOrgTemplateScenario();
 
     // Create a private template on teamA — should NOT appear in org tab.
