@@ -1,9 +1,21 @@
+import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
+import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
+import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
+import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
+import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+  type TFieldMetaSchema,
+} from '@documenso/lib/types/field-meta';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData, diffFieldChanges } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { EnvelopeType, type FieldType } from '@prisma/client';
+import { EnvelopeType, FieldType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
@@ -108,6 +120,64 @@ export const updateEnvelopeFields = async ({
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Envelope item not found',
       });
+    }
+
+    if (field.fieldMeta) {
+      if (fieldType === FieldType.TEXT) {
+        const parsed = ZTextFieldMeta.safeParse(field.fieldMeta);
+        if (parsed.success) {
+          const errors = validateTextField(parsed.data.text || '', parsed.data);
+          if (errors.length > 0) {
+            throw new AppError(AppErrorCode.INVALID_REQUEST, {
+              message: errors.join(', '),
+            });
+          }
+        }
+      } else if (fieldType === FieldType.NUMBER) {
+        const parsed = ZNumberFieldMeta.safeParse(field.fieldMeta);
+        if (parsed.success) {
+          const errors = validateNumberField(String(parsed.data.value || ''), parsed.data, false);
+          if (errors.length > 0) {
+            throw new AppError(AppErrorCode.INVALID_REQUEST, {
+              message: errors.join(', '),
+            });
+          }
+        }
+      } else if (fieldType === FieldType.CHECKBOX) {
+        const parsed = ZCheckboxFieldMeta.safeParse(field.fieldMeta);
+        if (parsed.success) {
+          const errors = validateCheckboxField(
+            parsed.data?.values?.map((item) => item.value) ?? [],
+            parsed.data,
+          );
+          if (errors.length > 0) {
+            throw new AppError(AppErrorCode.INVALID_REQUEST, {
+              message: errors.join(', '),
+            });
+          }
+        }
+      } else if (fieldType === FieldType.RADIO) {
+        const parsed = ZRadioFieldMeta.safeParse(field.fieldMeta);
+        if (parsed.success) {
+          const checkedValue = parsed.data.values?.find((option) => option.checked)?.value;
+          const errors = validateRadioField(checkedValue, parsed.data);
+          if (errors.length > 0) {
+            throw new AppError(AppErrorCode.INVALID_REQUEST, {
+              message: errors.join('. '),
+            });
+          }
+        }
+      } else if (fieldType === FieldType.DROPDOWN) {
+        const parsed = ZDropdownFieldMeta.safeParse(field.fieldMeta);
+        if (parsed.success) {
+          const errors = validateDropdownField(parsed.data.defaultValue, parsed.data);
+          if (errors.length > 0) {
+            throw new AppError(AppErrorCode.INVALID_REQUEST, {
+              message: errors.join(', '),
+            });
+          }
+        }
+      }
     }
 
     return {
