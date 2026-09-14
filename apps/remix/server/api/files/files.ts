@@ -1,6 +1,11 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import {
+  APP_CONTENT_IMAGE_MIME_TYPES,
+  APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT,
+  APP_DOCUMENT_UPLOAD_SIZE_LIMIT,
+} from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { createImageDataContent } from '@documenso/lib/server-only/data-content/create-image-data-content';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { prisma } from '@documenso/prisma';
@@ -11,15 +16,23 @@ import { Hono } from 'hono';
 import type { HonoEnv } from '../../router';
 import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest, resolveFileUploadUserId } from './files.helpers';
 import {
+  type TUploadImageResponse,
   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileRequestParamsSchema,
   ZGetEnvelopeItemFileRequestQuerySchema,
   ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileTokenRequestParamsSchema,
+  ZUploadImageRequestSchema,
+  ZUploadImageResponseSchema,
   ZUploadPdfRequestSchema,
 } from './files.types';
+import getDataContentImageRoute from './routes/get-data-content-image';
+import getDataContentImageByTokenRoute from './routes/get-data-content-image-by-token';
 import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
 import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
+
+const isAcceptedContentImageMimeType = (mimeType: string) =>
+  APP_CONTENT_IMAGE_MIME_TYPES.some((accepted) => accepted === mimeType);
 
 export const filesRoute = new Hono<HonoEnv>()
   /**
@@ -54,6 +67,54 @@ export const filesRoute = new Hono<HonoEnv>()
       return c.json(result);
     } catch (error) {
       console.error('Upload failed:', error);
+      return c.json({ error: 'Upload failed' }, 500);
+    }
+  })
+  /**
+   * Uploads an image for use as envelope content and creates an unlinked
+   * data content record for it. The record is attached to a content when the
+   * envelope contents are next saved.
+   */
+  .post('/upload-image', sValidator('form', ZUploadImageRequestSchema), async (c) => {
+    const logger = c.get('logger');
+
+    const userId = await resolveFileUploadUserId(c);
+
+    if (!userId) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const { file } = c.req.valid('form');
+
+    if (!file) {
+      return c.json({ error: 'No file provided' }, 400);
+    }
+
+    const MAX_FILE_SIZE = APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT * 1024 * 1024;
+
+    if (file.size > MAX_FILE_SIZE) {
+      return c.json({ error: 'File too large' }, 400);
+    }
+
+    // The declared type is client controlled so it is only an early rejection,
+    // the decoded bytes are verified while normalizing the image.
+    if (!isAcceptedContentImageMimeType(file.type)) {
+      return c.json({ error: 'Unsupported image type', code: 'INVALID_IMAGE_FILE' }, 400);
+    }
+
+    try {
+      const dataContent = await createImageDataContent({ file });
+
+      const response: TUploadImageResponse = ZUploadImageResponseSchema.parse(dataContent);
+
+      return c.json(response);
+    } catch (error) {
+      if (error instanceof AppError && error.code === 'INVALID_IMAGE_FILE') {
+        return c.json({ error: 'Invalid image file', code: error.code }, 400);
+      }
+
+      logger.error(error, 'Image upload failed');
+
       return c.json({ error: 'Upload failed' }, 500);
     }
   })
@@ -342,3 +403,7 @@ export const filesRoute = new Hono<HonoEnv>()
 // Is different to the other file endpoints since it uses documentDataId for hard caching.
 filesRoute.route('/', getEnvelopeItemPdfRoute);
 filesRoute.route('/', getEnvelopeItemPdfByTokenRoute);
+
+// Content image routes for both tokens and auth based, hard cached by dataContentId.
+filesRoute.route('/', getDataContentImageRoute);
+filesRoute.route('/', getDataContentImageByTokenRoute);

@@ -1,954 +1,265 @@
-import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
-import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import {
   type PageRenderData,
   useCurrentEnvelopeRender,
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
-import {
-  convertPixelToPercentage,
-  MIN_FIELD_HEIGHT_PX,
-  MIN_FIELD_WIDTH_PX,
-} from '@documenso/lib/universal/field-renderer/field-renderer';
-import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
-import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
-import { getOverlappingFieldPairs } from '@documenso/lib/utils/fields-overlap';
-import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@documenso/ui/primitives/command';
-import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { EnvelopeContentType } from '@documenso/lib/types/envelope-content-meta';
+import { getContentTransformerConfig } from '@documenso/lib/universal/content-renderer/content-geometry';
+import { DEFAULT_TRANSFORMER_SELECTION_CONFIG } from '@documenso/lib/universal/konva/transformer';
+import { canContentBeChanged } from '@documenso/lib/utils/envelope';
+import { resolveEnvelopeContentLimits } from '@documenso/lib/utils/envelope-content';
 import { useLingui } from '@lingui/react/macro';
-import type { FieldType } from '@prisma/client';
-import Konva from 'konva';
+import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import type { Transformer } from 'konva/lib/shapes/Transformer';
-import { CopyPlusIcon, ShapesIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { CopyPlusIcon, TrashIcon } from 'lucide-react';
+import { match } from 'ts-pattern';
+import {
+  EnvelopeCanvasActionBar,
+  EnvelopeCanvasActionButton,
+  EnvelopeCanvasActionButtonGroup,
+} from './canvas/envelope-canvas-action-bar';
+import { EnvelopeCanvasContentActions } from './canvas/envelope-canvas-content-actions';
+import { EnvelopeCanvasFieldActionButtons } from './canvas/envelope-canvas-field-action-buttons';
+import { EnvelopeCanvasPendingFieldMenu } from './canvas/envelope-canvas-pending-field-menu';
+import type {
+  EnvelopeCanvas,
+  EnvelopeCanvasSelection,
+  EnvelopeCanvasSelectionKind,
+} from './canvas/envelope-canvas-types';
+import { ENVELOPE_CANVAS_GROUP_NAMES } from './canvas/envelope-canvas-types';
+import { useEnvelopeCanvasContentsLayer } from './canvas/use-envelope-canvas-contents-layer';
+import { useEnvelopeCanvasFieldsLayer } from './canvas/use-envelope-canvas-fields-layer';
+import { useEnvelopeCanvasLineAnchors } from './canvas/use-envelope-canvas-line-anchors';
+import { useEnvelopeCanvasMarquee } from './canvas/use-envelope-canvas-marquee';
+import { useEnvelopeCanvasSelection } from './canvas/use-envelope-canvas-selection';
 
-import { fieldButtonList } from './envelope-editor-fields-drag-drop';
-import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
+/**
+ * Resolve the selectable kind of a Konva node, if any.
+ */
+const getNodeSelectionKind = (node: Konva.Node): EnvelopeCanvasSelectionKind | null => {
+  if (node.hasName(ENVELOPE_CANVAS_GROUP_NAMES.field)) {
+    return 'field';
+  }
 
-/** How far past a resize handle you can still grab it, in screen pixels. */
-const TRANSFORMER_ANCHOR_HIT_STROKE_PX = 24;
+  if (node.hasName(ENVELOPE_CANVAS_GROUP_NAMES.content)) {
+    return 'content';
+  }
+
+  return null;
+};
 
 export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
-  const { t, i18n } = useLingui();
-  const analytics = useAnalytics();
-  const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
-  const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
-
-  const interactiveTransformer = useRef<Transformer | null>(null);
-
-  const [selectedKonvaFieldGroups, setSelectedKonvaFieldGroups] = useState<Konva.Group[]>([]);
-
-  const [isFieldChanging, setIsFieldChanging] = useState(false);
-  const [pendingFieldCreation, setPendingFieldCreation] = useState<Konva.Rect | null>(null);
-
-  /**
-   * Whether the field was automatically selected on creation (drag-drop or marquee).
-   *
-   * We purposefully supress the floating toolbar for newly created fields.
-   */
-  const [isAutoSelectedField, setIsAutoSelectedField] = useState(false);
-
-  const { stage, pageLayer, konvaContainer, scaledViewport, unscaledViewport } = usePageRenderer(
-    ({ stage, pageLayer }) => createPageCanvas(stage, pageLayer),
-    pageData,
-  );
+  const { t } = useLingui();
+  const { envelope, editorFields, editorContents, selectedEditorTab } = useCurrentEnvelopeEditor();
+  const { currentEnvelopeItem } = useCurrentEnvelopeRender();
+  const organisation = useCurrentOrganisation();
 
   const { scale, pageNumber } = pageData;
 
-  const localPageFields = useMemo(
-    () =>
-      editorFields.localFields.filter(
-        (field) => field.page === pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
-      ),
-    [editorFields.localFields, pageNumber, currentEnvelopeItem?.id],
+  const { isContentLimitReached, isImageLimitReached } = resolveEnvelopeContentLimits(
+    editorContents.localContents.map((content) => content.contentMeta.type),
+    organisation.organisationClaim,
   );
 
-  /**
-   * Debounce the fields used for overlap highlighting so we don't recompute on every
-   * small drag/resize tick. Overlaps only occur within the same page and envelope
-   * item, so computing from this page's fields alone is sufficient.
-   */
-  const debouncedPageFields = useDebouncedValue(localPageFields, 300);
+  const {
+    stage,
+    pageLayer,
+    konvaContainer,
+    scaledViewport,
+    unscaledViewport,
+    fieldsVisibility,
+    contentsVisibility,
+    applyPageItemsVisibility,
+  } = usePageRenderer(({ stage, pageLayer }) => createPageCanvas(stage, pageLayer), pageData, {
+    // Mute the fields while contents are being edited.
+    fieldsVisibility: selectedEditorTab === 'contents' ? 'muted' : 'visible',
+  });
 
-  const overlappingFieldFormIds = useMemo(() => {
-    const formIds = new Set<string>();
-
-    const pairs = getOverlappingFieldPairs(
-      debouncedPageFields.map((field) => ({
-        id: field.formId,
-        envelopeItemId: field.envelopeItemId,
-        page: field.page,
-        positionX: field.positionX,
-        positionY: field.positionY,
-        width: field.width,
-        height: field.height,
-      })),
-    );
-
-    for (const pair of pairs) {
-      formIds.add(pair.fieldA.id);
-      formIds.add(pair.fieldB.id);
-    }
-
-    return formIds;
-  }, [debouncedPageFields]);
-
-  const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
-    const isDragEvent = event.type === 'dragend';
-
-    const fieldGroup = event.target as Konva.Group;
-    const fieldFormId = fieldGroup.id();
-
-    // Note: This values are scaled.
-    const {
-      width: fieldPixelWidth,
-      height: fieldPixelHeight,
-      x: fieldX,
-      y: fieldY,
-    } = fieldGroup.getClientRect({
-      skipStroke: true,
-      skipShadow: true,
-    });
-
-    const pageHeight = scaledViewport.height;
-    const pageWidth = scaledViewport.width;
-
-    // Calculate x and y as a percentage of the page width and height
-    const positionPercentX = (fieldX / pageWidth) * 100;
-    const positionPercentY = (fieldY / pageHeight) * 100;
-
-    // Get the bounds as a percentage of the page width and height
-    const fieldPageWidth = (fieldPixelWidth / pageWidth) * 100;
-    const fieldPageHeight = (fieldPixelHeight / pageHeight) * 100;
-
-    const fieldUpdates: Partial<TLocalField> = {
-      positionX: positionPercentX,
-      positionY: positionPercentY,
-    };
-
-    // Do not update the width/height unless the field has actually been resized.
-    // This is because our calculations will shift the width/height slightly
-    // due to the way we convert between pixel and percentage.
-    if (!isDragEvent) {
-      fieldUpdates.width = fieldPageWidth;
-      fieldUpdates.height = fieldPageHeight;
-    }
-
-    editorFields.updateFieldByFormId(fieldFormId, fieldUpdates);
-
-    // Select the field if it is not already selected.
-    if (isDragEvent && interactiveTransformer.current?.nodes().length === 0) {
-      setSelectedFields([fieldGroup]);
-    }
-
-    pageLayer.current?.batchDraw();
-  };
+  const canvas: EnvelopeCanvas = { stage, pageLayer, scale, pageNumber, unscaledViewport, scaledViewport };
 
   /**
-   * Draws (or removes) a dashed warning outline over a field that significantly
-   * overlaps another field. The highlight is a child of the field group so it moves
-   * and resizes with the field, and sits on top of the field's own rect (which is
-   * re-styled on every render and would otherwise clobber a direct stroke change).
+   * Whether contents can currently be edited on the canvas.
    */
-  const syncOverlapHighlight = (fieldGroup: Konva.Group, isOverlapping: boolean) => {
-    const existingHighlight = fieldGroup.findOne('.field-overlap-highlight');
+  const isContentsEditable =
+    selectedEditorTab === 'contents' && canContentBeChanged(envelope) && contentsVisibility === 'visible';
 
-    // Skip while a field is actively being dragged/resized. The highlight is driven
-    // by debounced field data, so it would lag behind and distort during the gesture.
-    // It is repainted once the gesture settles (the effect re-runs on isFieldChanging).
-    if (isFieldChanging) {
-      existingHighlight?.destroy();
-      return;
-    }
+  /**
+   * Keep the editor's selected field/content in sync with the canvas selection.
+   */
+  const syncEditorSelection = (selection: EnvelopeCanvasSelection) => {
+    const singleFormId = selection?.groups.length === 1 ? selection.groups[0].id() : null;
 
-    if (!isOverlapping) {
-      existingHighlight?.destroy();
-      return;
-    }
-
-    const fieldRect = fieldGroup.findOne('.field-rect');
-
-    if (!fieldRect) {
-      return;
-    }
-
-    const highlightAttrs = {
-      x: 0,
-      y: 0,
-      width: fieldRect.width(),
-      height: fieldRect.height(),
-      stroke: '#f59e0b',
-      strokeWidth: 2,
-      dash: [6, 4],
-      cornerRadius: 2,
-      strokeScaleEnabled: false,
-      listening: false,
-    } satisfies Partial<Konva.RectConfig>;
-
-    if (existingHighlight instanceof Konva.Rect) {
-      existingHighlight.setAttrs(highlightAttrs);
-      existingHighlight.moveToTop();
-      return;
-    }
-
-    const highlight = new Konva.Rect({
-      name: 'field-overlap-highlight',
-      ...highlightAttrs,
-    });
-
-    fieldGroup.add(highlight);
-    highlight.moveToTop();
+    editorFields.setSelectedField(selection?.kind === 'field' ? singleFormId : null);
+    editorContents.setSelectedContent(selection?.kind === 'content' ? singleFormId : null);
   };
 
-  const unsafeRenderFieldOnLayer = (field: TLocalField) => {
-    if (!pageLayer.current) {
-      return;
-    }
-
-    const recipient = envelope.recipients.find((r) => r.id === field.recipientId);
-    const isFieldEditable = recipient !== undefined && canRecipientFieldsBeModified(recipient, envelope.fields);
-
-    const { fieldGroup } = renderField({
-      scale,
-      pageLayer: pageLayer.current,
-      field: {
-        renderId: field.formId,
-        ...field,
-        customText: '',
-        inserted: false,
-        fieldMeta: field.fieldMeta,
-      },
-      translations: getClientSideFieldTranslations(i18n),
-      pageWidth: unscaledViewport.width,
-      pageHeight: unscaledViewport.height,
-      color: getRecipientColorKey(field.recipientId),
-      editable: isFieldEditable,
-      mode: 'edit',
-    });
-
-    syncOverlapHighlight(fieldGroup, overlappingFieldFormIds.has(field.formId));
-
-    if (!isFieldEditable) {
-      return;
-    }
-
-    fieldGroup.off('click');
-    fieldGroup.off('transformend');
-    fieldGroup.off('dragend');
-
-    // Set up field selection. Shift + click toggles this field in/out of the current
-    // multi-selection, so fields can be added to a group by clicking them --
-    // complementing marquee drag-selection. A plain click (no modifier) selects just
-    // this field.
-    fieldGroup.on('click', (event) => {
-      removePendingField();
-
-      const isMultiSelectModifier = event.evt.shiftKey;
-
-      if (isMultiSelectModifier) {
-        const currentNodes = interactiveTransformer.current?.nodes() ?? [];
-        const isAlreadySelected = currentNodes.includes(fieldGroup);
-
-        setSelectedFields(
-          isAlreadySelected ? currentNodes.filter((node) => node !== fieldGroup) : [...currentNodes, fieldGroup],
-        );
-      } else {
-        setSelectedFields([fieldGroup]);
+  const selection = useEnvelopeCanvasSelection({
+    getTransformerConfig: (kind, groups) => {
+      if (kind === 'field') {
+        return DEFAULT_TRANSFORMER_SELECTION_CONFIG;
       }
 
-      pageLayer.current?.batchDraw();
-    });
+      const selectedContents = groups.map((group) => editorContents.getContentByFormId(group.id()));
 
-    fieldGroup.on('transformend', handleResizeOrMove);
-    fieldGroup.on('dragend', handleResizeOrMove);
-  };
+      return getContentTransformerConfig(
+        selectedContents.map((content) => content?.contentMeta.type),
+        { hasImage: selectedContents.length === 1 && Boolean(selectedContents[0]?.dataContentId) },
+      );
+    },
+    onChange: syncEditorSelection,
+  });
 
-  const renderFieldOnLayer = (field: TLocalField) => {
-    try {
-      unsafeRenderFieldOnLayer(field);
-    } catch (err) {
-      console.error(err);
+  const fields = useEnvelopeCanvasFieldsLayer({ canvas, selection, fieldsVisibility, applyPageItemsVisibility });
 
-      analytics.captureException(err, {
-        source: 'editor',
-        location: 'envelope_page_render',
-        envelopeId: envelope.id,
-      });
+  const contents = useEnvelopeCanvasContentsLayer({
+    canvas,
+    selection,
+    isEditable: isContentsEditable,
+    applyPageItemsVisibility,
+  });
 
-      setRenderError(true);
-    }
-  };
+  const lineAnchors = useEnvelopeCanvasLineAnchors({
+    canvas,
+    selection,
+    isEditable: isContentsEditable,
+    localPageContents: contents.localPageContents,
+  });
+
+  const marquee = useEnvelopeCanvasMarquee({
+    // While editing contents the marquee selects contents instead of fields.
+    onSelect: (box) => (isContentsEditable ? contents.selectInBox(box) : fields.selectInBox(box)),
+    onEmptyClick: selection.clear,
+  });
 
   /**
-   * Initialize the Konva page canvas and all fields and interactions.
+   * Initialize the Konva page canvas and all fields, contents and interactions.
    */
   const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
-    // Initialize snap guides layer
-    // snapGuideLayer.current = initializeSnapGuides(stage.current);
+    selection.attach(currentPageLayer);
 
-    // Add transformer for resizing and rotating.
-    interactiveTransformer.current = createInteractiveTransformer(currentStage, currentPageLayer);
+    // Render the contents first so they sit beneath the fields.
+    contents.renderAll();
+    fields.renderAll();
 
-    // Render the fields.
-    for (const field of localPageFields) {
-      renderFieldOnLayer(field);
-    }
+    // The stage is rebuilt on zoom, so anything selected beforehand is now
+    // pointing at the nodes which were just thrown away.
+    selection.reattachSelection(currentPageLayer);
 
-    // Handle stage click to deselect.
+    marquee.bind(currentStage, currentPageLayer);
+
+    // Clicking an empty area of the stage deselects.
     currentStage.on('mousedown', (e) => {
-      removePendingField();
+      fields.clearPending();
 
-      if (e.target === stage.current) {
-        setSelectedFields([]);
+      if (e.target === currentStage) {
+        selection.clear();
         currentPageLayer.batchDraw();
       }
     });
 
     // When an item is dragged, select it automatically.
     const onDragStartOrEnd = (e: KonvaEventObject<Event>) => {
-      removePendingField();
+      fields.clearPending();
 
-      if (!e.target.hasName('field-group')) {
+      const kind = getNodeSelectionKind(e.target);
+
+      if (!kind) {
         return;
       }
 
-      setIsFieldChanging(e.type === 'dragstart');
-
-      const itemAlreadySelected = (interactiveTransformer.current?.nodes() || []).includes(e.target);
+      selection.setIsTransforming(e.type === 'dragstart');
 
       // Do nothing and allow the transformer to handle it.
       // Required so when multiple items are selected, this won't deselect them.
-      if (itemAlreadySelected) {
+      if (selection.isSelected(e.target)) {
         return;
       }
 
-      setSelectedFields([e.target]);
+      selection.select(kind, [e.target]);
     };
 
     currentStage.on('dragstart', onDragStartOrEnd);
     currentStage.on('dragend', onDragStartOrEnd);
-    currentStage.on('transformstart', () => setIsFieldChanging(true));
-    currentStage.on('transformend', () => setIsFieldChanging(false));
 
     currentPageLayer.batchDraw();
-  };
-
-  /**
-   * Creates an interactive transformer for the fields.
-   *
-   * Allows:
-   * - Resizing
-   * - Moving
-   * - Selecting multiple fields
-   * - Selecting empty area to create fields
-   */
-  const createInteractiveTransformer = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
-    const transformer = new Konva.Transformer({
-      rotateEnabled: false,
-      keepRatio: false,
-      shouldOverdrawWholeArea: true,
-      ignoreStroke: true,
-      flipEnabled: false,
-      anchorStyleFunc: (anchor) => {
-        anchor.hitStrokeWidth(TRANSFORMER_ANCHOR_HIT_STROKE_PX / scale);
-      },
-      boundBoxFunc: (oldBox, newBox) => {
-        // Enforce minimum size
-        if (newBox.width < 30 || newBox.height < 20) {
-          return oldBox;
-        }
-
-        return newBox;
-      },
-    });
-
-    currentPageLayer.add(transformer);
-
-    // Add selection rectangle.
-    const selectionRectangle = new Konva.Rect({
-      fill: 'rgba(24, 160, 251, 0.3)',
-      visible: false,
-    });
-    currentPageLayer.add(selectionRectangle);
-
-    let x1: number;
-    let y1: number;
-    let x2: number;
-    let y2: number;
-
-    currentStage.on('mousedown touchstart', (e) => {
-      // do nothing if we mousedown on any shape
-      if (e.target !== currentStage) {
-        return;
-      }
-
-      const pointerPosition = currentStage.getPointerPosition();
-
-      if (!pointerPosition) {
-        return;
-      }
-
-      x1 = pointerPosition.x / scale;
-      y1 = pointerPosition.y / scale;
-      x2 = pointerPosition.x / scale;
-      y2 = pointerPosition.y / scale;
-
-      selectionRectangle.setAttrs({
-        x: x1,
-        y: y1,
-        width: 0,
-        height: 0,
-        visible: true,
-      });
-    });
-
-    currentStage.on('mousemove touchmove', () => {
-      // do nothing if we didn't start selection
-      if (!selectionRectangle.visible()) {
-        return;
-      }
-
-      selectionRectangle.moveToTop();
-
-      const pointerPosition = currentStage.getPointerPosition();
-
-      if (!pointerPosition) {
-        return;
-      }
-
-      x2 = pointerPosition.x / scale;
-      y2 = pointerPosition.y / scale;
-
-      selectionRectangle.setAttrs({
-        x: Math.min(x1, x2),
-        y: Math.min(y1, y2),
-        width: Math.abs(x2 - x1),
-        height: Math.abs(y2 - y1),
-      });
-    });
-
-    currentStage.on('mouseup touchend', () => {
-      // do nothing if we didn't start selection
-      if (!selectionRectangle.visible()) {
-        return;
-      }
-
-      // Update visibility in timeout, so we can check it in click event
-      setTimeout(() => {
-        selectionRectangle.visible(false);
-      });
-
-      const stageFieldGroups = currentStage.find('.field-group') || [];
-      const box = selectionRectangle.getClientRect();
-      const selectedFieldGroups = stageFieldGroups.filter(
-        (shape) => Konva.Util.haveIntersection(box, shape.getClientRect()) && shape.draggable(),
-      );
-      setSelectedFields(selectedFieldGroups);
-
-      const unscaledBoxWidth = box.width / scale;
-      const unscaledBoxHeight = box.height / scale;
-
-      // Create a field if no items are selected or the size is too small.
-      if (
-        selectedFieldGroups.length === 0 &&
-        unscaledBoxWidth > MIN_FIELD_WIDTH_PX &&
-        unscaledBoxHeight > MIN_FIELD_HEIGHT_PX &&
-        editorFields.selectedRecipient &&
-        canRecipientFieldsBeModified(editorFields.selectedRecipient, envelope.fields)
-      ) {
-        const pendingFieldCreation = new Konva.Rect({
-          name: 'pending-field-creation',
-          x: box.x / scale,
-          y: box.y / scale,
-          width: unscaledBoxWidth,
-          height: unscaledBoxHeight,
-          fill: 'rgba(24, 160, 251, 0.3)',
-        });
-
-        currentPageLayer.add(pendingFieldCreation);
-        setPendingFieldCreation(pendingFieldCreation);
-      }
-    });
-
-    // Clicking empty stage area clears the selection. Field clicks -- including
-    // Shift+click multi-select -- are handled by each field group's own click
-    // handler in `unsafeRenderFieldOnLayer`.
-    currentStage.on('click tap', (e) => {
-      // If we are selecting with the marquee rectangle, do nothing.
-      if (selectionRectangle.visible() && selectionRectangle.width() > 0 && selectionRectangle.height() > 0) {
-        return;
-      }
-
-      // If empty area clicked, remove all selections.
-      if (e.target === stage.current) {
-        setSelectedFields([]);
-      }
-    });
-
-    return transformer;
-  };
-
-  /**
-   * Render fields when they are added or removed from the localFields.
-   */
-  useEffect(() => {
-    if (!pageLayer.current || !stage.current) {
-      return;
-    }
-
-    // If doesn't exist in localFields, destroy it since it's been deleted.
-    pageLayer.current.find('Group').forEach((group) => {
-      if (group.name() === 'field-group' && !localPageFields.some((field) => field.formId === group.id())) {
-        group.destroy();
-      }
-    });
-
-    // If it exists, rerender.
-    localPageFields.forEach((field) => {
-      renderFieldOnLayer(field);
-    });
-
-    // Reconcile selection state with live field nodes after flush/sync updates.
-    const liveSelectedFieldGroups = selectedKonvaFieldGroups.filter((fieldGroup) => {
-      if (!fieldGroup.getStage() || !fieldGroup.getParent()) {
-        return false;
-      }
-
-      return localPageFields.some((field) => field.formId === fieldGroup.id());
-    });
-
-    if (liveSelectedFieldGroups.length !== selectedKonvaFieldGroups.length) {
-      setSelectedFields(liveSelectedFieldGroups);
-    }
-
-    // Mirror the editor's single selected field onto the canvas (Konva) selection.
-    //
-    // `addField` already marks a newly created field as the selected field, so this
-    // makes a field placed via the palette (drag-drop) or marquee creation show its
-    // resize handles immediately -- no second click needed. It also clears the canvas
-    // selection when the selected field is cleared (e.g. when the author starts
-    // placing another field), so the floating action toolbar can't intercept the next
-    // placement click. Runs after the render loop above so the field's group exists.
-    const selectedFormId = editorFields.selectedField?.formId ?? null;
-    const isSingleCanvasSelection = selectedKonvaFieldGroups.length === 1;
-
-    if (selectedFormId && localPageFields.some((field) => field.formId === selectedFormId)) {
-      const isAlreadySelected = isSingleCanvasSelection && selectedKonvaFieldGroups[0].id() === selectedFormId;
-
-      if (!isAlreadySelected) {
-        const fieldGroupToSelect = pageLayer.current.findOne(`#${selectedFormId}`);
-
-        if (fieldGroupToSelect instanceof Konva.Group) {
-          setSelectedFields([fieldGroupToSelect], { isAutoSelect: true });
-        }
-      }
-    } else if (selectedFormId === null && isSingleCanvasSelection) {
-      setSelectedFields([]);
-    }
-
-    // Rerender the transformer
-    interactiveTransformer.current?.forceUpdate();
-
-    pageLayer.current.batchDraw();
-  }, [
-    localPageFields,
-    selectedKonvaFieldGroups,
-    overlappingFieldFormIds,
-    isFieldChanging,
-    editorFields.selectedField?.formId,
-  ]);
-
-  const setSelectedFields = (nodes: Konva.Node[], options?: { isAutoSelect?: boolean }) => {
-    // Any explicit (user-driven) selection shows the action toolbar; only auto-selection
-    // on field creation suppresses it.
-    setIsAutoSelectedField(Boolean(options?.isAutoSelect));
-
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const fieldGroups = nodes.filter(
-      (node) => node.hasName('field-group') && Boolean(node.getStage()) && Boolean(node.getParent()),
-    ) as Konva.Group[];
-
-    interactiveTransformer.current?.nodes(fieldGroups);
-    setSelectedKonvaFieldGroups(fieldGroups);
-
-    if (fieldGroups.length === 0 || fieldGroups.length > 1) {
-      editorFields.setSelectedField(null);
-    }
-
-    // Handle single field selection.
-    if (fieldGroups.length === 1) {
-      const fieldGroup = fieldGroups[0];
-
-      editorFields.setSelectedField(fieldGroup.id());
-      fieldGroup.moveToTop();
-    }
-  };
-
-  const deletedSelectedFields = () => {
-    const fieldFormids = selectedKonvaFieldGroups.map((field) => field.id()).filter((field) => field !== undefined);
-
-    editorFields.removeFieldsByFormId(fieldFormids);
-
-    setSelectedFields([]);
-  };
-
-  const changeSelectedFieldsRecipients = (recipientId: number) => {
-    const fields = selectedKonvaFieldGroups
-      .map((field) => editorFields.getFieldByFormId(field.id()))
-      .filter((field) => field !== undefined);
-
-    for (const field of fields) {
-      if (field.recipientId !== recipientId) {
-        editorFields.updateFieldByFormId(field.formId, { recipientId, id: undefined });
-      }
-    }
-  };
-
-  const changeSelectedFieldsType = (type: FieldType) => {
-    const fields = selectedKonvaFieldGroups
-      .map((field) => editorFields.getFieldByFormId(field.id()))
-      .filter((field) => field !== undefined);
-
-    for (const field of fields) {
-      if (field.type !== type) {
-        editorFields.updateFieldByFormId(field.formId, {
-          type,
-          fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[type]),
-          id: undefined,
-        });
-      }
-    }
-  };
-
-  const duplicatedSelectedFields = () => {
-    const fields = selectedKonvaFieldGroups
-      .map((field) => editorFields.getFieldByFormId(field.id()))
-      .filter((field) => field !== undefined);
-
-    for (const field of fields) {
-      editorFields.duplicateField(field);
-    }
-  };
-
-  const duplicatedSelectedFieldsOnAllPages = () => {
-    const fields = selectedKonvaFieldGroups
-      .map((field) => editorFields.getFieldByFormId(field.id()))
-      .filter((field) => field !== undefined);
-
-    for (const field of fields) {
-      editorFields.duplicateFieldToAllPages(field);
-    }
-
-    setSelectedFields([]);
-  };
-
-  /**
-   * Create a field from a pending field.
-   */
-  const createFieldFromPendingTemplate = (pendingFieldCreation: Konva.Rect, type: FieldType) => {
-    const pixelWidth = pendingFieldCreation.width();
-    const pixelHeight = pendingFieldCreation.height();
-    const pixelX = pendingFieldCreation.x();
-    const pixelY = pendingFieldCreation.y();
-
-    removePendingField();
-
-    if (!currentEnvelopeItem || !editorFields.selectedRecipient) {
-      return;
-    }
-
-    const { fieldX, fieldY, fieldWidth, fieldHeight } = convertPixelToPercentage({
-      width: pixelWidth,
-      height: pixelHeight,
-      positionX: pixelX,
-      positionY: pixelY,
-      pageWidth: unscaledViewport.width,
-      pageHeight: unscaledViewport.height,
-    });
-
-    editorFields.addField({
-      envelopeItemId: currentEnvelopeItem.id,
-      page: pageNumber,
-      type,
-      positionX: fieldX,
-      positionY: fieldY,
-      width: fieldWidth,
-      height: fieldHeight,
-      recipientId: editorFields.selectedRecipient.id,
-      fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[type]),
-    });
-  };
-
-  /**
-   * Remove any pending fields or rectangle on the canvas.
-   */
-  const removePendingField = () => {
-    setPendingFieldCreation(null);
-
-    const pendingFieldCreation = pageLayer.current?.find('.pending-field-creation') || [];
-
-    for (const field of pendingFieldCreation) {
-      field.destroy();
-    }
   };
 
   if (!currentEnvelopeItem) {
     return null;
   }
 
+  const { selection: currentSelection, isTransforming } = selection;
+
+  /**
+   * The selected content when exactly one is selected. Type specific quick
+   * actions (styles, image upload) are only offered for single selections.
+   */
+  const selectedSingleContent = match(currentSelection)
+    .with({ kind: 'content' }, ({ groups }) =>
+      groups.length === 1 ? (editorContents.getContentByFormId(groups[0].id()) ?? null) : null,
+    )
+    .otherwise(() => null);
+
+  const selectedContents = match(currentSelection)
+    .with({ kind: 'content' }, ({ groups }) =>
+      groups.flatMap((group) => editorContents.getContentByFormId(group.id()) ?? []),
+    )
+    .otherwise(() => []);
+
+  /**
+   * Duplicating adds a copy of every selected content, so it is offered only
+   * while the organisation's allowance has room for them.
+   */
+  const canSelectionBeDuplicated =
+    !isContentLimitReached &&
+    !(
+      isImageLimitReached && selectedContents.some((content) => content.contentMeta.type === EnvelopeContentType.IMAGE)
+    );
+
   return (
     <>
-      {selectedKonvaFieldGroups.length > 0 &&
-        interactiveTransformer.current &&
-        !isFieldChanging &&
-        !isAutoSelectedField && (
-          <FieldActionButtons
-            handleDuplicateSelectedFields={duplicatedSelectedFields}
-            handleDuplicateSelectedFieldsOnAllPages={duplicatedSelectedFieldsOnAllPages}
-            handleDeleteSelectedFields={deletedSelectedFields}
-            handleChangeRecipient={changeSelectedFieldsRecipients}
-            handleChangeFieldType={changeSelectedFieldsType}
-            selectedFieldFormId={selectedKonvaFieldGroups.map((field) => field.id())}
-            style={{
-              position: 'absolute',
-              top:
-                interactiveTransformer.current.y() + interactiveTransformer.current.getClientRect().height + 5 + 'px',
-              left:
-                interactiveTransformer.current.x() + interactiveTransformer.current.getClientRect().width / 2 + 'px',
-              transform: 'translateX(-50%)',
-              gap: '8px',
-              pointerEvents: 'auto',
-              zIndex: 50,
-            }}
+      {currentSelection?.kind === 'field' && (
+        <EnvelopeCanvasActionBar nodes={currentSelection.groups} hidden={isTransforming || currentSelection.isAuto}>
+          <EnvelopeCanvasFieldActionButtons
+            selectedFieldFormIds={currentSelection.groups.map((group) => group.id())}
+            onDuplicate={fields.duplicateSelected}
+            onDuplicateOnAllPages={fields.duplicateSelectedOnAllPages}
+            onDelete={fields.deleteSelected}
+            onChangeRecipient={fields.changeSelectedRecipient}
+            onChangeFieldType={fields.changeSelectedType}
           />
-        )}
+        </EnvelopeCanvasActionBar>
+      )}
 
-      {pendingFieldCreation && (
-        <div
-          style={{
-            position: 'absolute',
-            top: pendingFieldCreation.y() * scale + pendingFieldCreation.getClientRect().height + 5 + 'px',
-            left: pendingFieldCreation.x() * scale + pendingFieldCreation.getClientRect().width / 2 + 'px',
-            transform: 'translateX(-50%)',
-            zIndex: 50,
-          }}
-          // Don't use darkmode for this component, it should look the same for both light/dark modes.
-          className="grid w-max grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border border-gray-300 bg-white p-1 text-gray-500 shadow-sm"
-        >
-          {fieldButtonList.map((field) => (
-            <button
-              key={field.type}
-              onClick={() => createFieldFromPendingTemplate(pendingFieldCreation, field.type)}
-              className="col-span-1 w-full flex-shrink-0 rounded-sm px-2 py-1 text-xs hover:bg-gray-100 hover:text-gray-600"
-            >
-              {t(field.name)}
-            </button>
-          ))}
-        </div>
+      {currentSelection?.kind === 'content' && (
+        <EnvelopeCanvasActionBar nodes={currentSelection.groups} hidden={isTransforming || lineAnchors.isDragging}>
+          <EnvelopeCanvasActionButtonGroup>
+            {selectedSingleContent && <EnvelopeCanvasContentActions content={selectedSingleContent} />}
+
+            {/* Duplicating adds a content, so it is hidden once the organisation's allowance is used up. */}
+            {canSelectionBeDuplicated && (
+              <EnvelopeCanvasActionButton
+                title={t`Duplicate`}
+                icon={CopyPlusIcon}
+                onClick={contents.duplicateSelected}
+              />
+            )}
+
+            <EnvelopeCanvasActionButton title={t`Remove`} icon={TrashIcon} onClick={contents.deleteSelected} />
+          </EnvelopeCanvasActionButtonGroup>
+        </EnvelopeCanvasActionBar>
+      )}
+
+      {fields.pendingCreation && (
+        <EnvelopeCanvasActionBar nodes={[fields.pendingCreation]}>
+          <EnvelopeCanvasPendingFieldMenu onSelectType={fields.createFromPending} />
+        </EnvelopeCanvasActionBar>
       )}
 
       {/* The element Konva will inject it's canvas into. */}
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
     </>
-  );
-};
-
-type FieldActionButtonsProps = React.HTMLAttributes<HTMLDivElement> & {
-  handleDuplicateSelectedFields: () => void;
-  handleDuplicateSelectedFieldsOnAllPages: () => void;
-  handleDeleteSelectedFields: () => void;
-  handleChangeRecipient: (recipientId: number) => void;
-  handleChangeFieldType: (type: FieldType) => void;
-  selectedFieldFormId: string[];
-};
-
-const FieldActionButtons = ({
-  handleDuplicateSelectedFields,
-  handleDuplicateSelectedFieldsOnAllPages,
-  handleDeleteSelectedFields,
-  handleChangeRecipient,
-  handleChangeFieldType,
-  selectedFieldFormId,
-  ...props
-}: FieldActionButtonsProps) => {
-  const { t } = useLingui();
-
-  const [showRecipientSelector, setShowRecipientSelector] = useState(false);
-  const [showFieldTypeSelector, setShowFieldTypeSelector] = useState(false);
-
-  const { editorFields, envelope } = useCurrentEnvelopeEditor();
-
-  /**
-   * Decide the preselected field type in the command input.
-   *
-   * If all fields share the same type, use that as the default selection.
-   * Otherwise show no preselection.
-   */
-  const preselectedFieldType = useMemo(() => {
-    if (selectedFieldFormId.length === 0) {
-      return null;
-    }
-
-    const fields = editorFields.localFields.filter((field) => selectedFieldFormId.includes(field.formId));
-
-    if (fields.length === 0) {
-      return null;
-    }
-
-    const firstType = fields[0].type;
-    const isTypesSame = fields.every((field) => field.type === firstType);
-
-    return isTypesSame ? firstType : null;
-  }, [editorFields.localFields, selectedFieldFormId]);
-
-  /**
-   * Decide the preselected recipient in the command input.
-   *
-   * If all fields belong to the same recipient then use that recipient as the default.
-   *
-   * Otherwise show the placeholder.
-   */
-  const preselectedRecipient = useMemo(() => {
-    if (selectedFieldFormId.length === 0) {
-      return null;
-    }
-
-    const fields = editorFields.localFields.filter((field) => selectedFieldFormId.includes(field.formId));
-
-    if (fields.length === 0) {
-      return null;
-    }
-
-    const recipient = envelope.recipients.find((recipient) => recipient.id === fields[0].recipientId);
-
-    if (!recipient) {
-      return null;
-    }
-
-    const isRecipientsSame = fields.every((field) => field.recipientId === recipient.id);
-
-    if (isRecipientsSame) {
-      return recipient;
-    }
-
-    return null;
-  }, [editorFields.localFields, envelope.recipients, selectedFieldFormId]);
-
-  return (
-    <div className="flex flex-col items-center" {...props}>
-      <div className="group flex w-fit items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5">
-        <button
-          type="button"
-          title={t`Change Recipient`}
-          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-          onClick={() => setShowRecipientSelector(true)}
-          onTouchEnd={() => setShowRecipientSelector(true)}
-        >
-          <UserCircleIcon className="h-3 w-3" />
-        </button>
-
-        <button
-          type="button"
-          title={t`Change Field Type`}
-          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-          onClick={() => setShowFieldTypeSelector(true)}
-          onTouchEnd={() => setShowFieldTypeSelector(true)}
-        >
-          <ShapesIcon className="h-3 w-3" />
-        </button>
-
-        <button
-          type="button"
-          title={t`Duplicate`}
-          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-          onClick={handleDuplicateSelectedFields}
-          onTouchEnd={handleDuplicateSelectedFields}
-        >
-          <CopyPlusIcon className="h-3 w-3" />
-        </button>
-
-        <button
-          type="button"
-          title={t`Duplicate on all pages`}
-          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-          onClick={handleDuplicateSelectedFieldsOnAllPages}
-          onTouchEnd={handleDuplicateSelectedFieldsOnAllPages}
-        >
-          <SquareStackIcon className="h-3 w-3" />
-        </button>
-
-        <button
-          type="button"
-          title={t`Remove`}
-          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-          onClick={handleDeleteSelectedFields}
-          onTouchEnd={handleDeleteSelectedFields}
-        >
-          <TrashIcon className="h-3 w-3" />
-        </button>
-      </div>
-
-      <CommandDialog position="start" open={showRecipientSelector} onOpenChange={setShowRecipientSelector}>
-        <EnvelopeRecipientSelectorCommand
-          placeholder={t`Select a recipient`}
-          selectedRecipient={preselectedRecipient}
-          onSelectedRecipientChange={(recipient) => {
-            editorFields.setSelectedRecipient(recipient.id);
-            handleChangeRecipient(recipient.id);
-            setShowRecipientSelector(false);
-          }}
-          recipients={envelope.recipients}
-          fields={envelope.fields}
-        />
-      </CommandDialog>
-
-      <CommandDialog position="start" open={showFieldTypeSelector} onOpenChange={setShowFieldTypeSelector}>
-        <Command defaultValue={preselectedFieldType ? t(FRIENDLY_FIELD_TYPE[preselectedFieldType]) : undefined}>
-          <CommandInput placeholder={t`Select a field type`} />
-
-          <CommandList>
-            <CommandEmpty>
-              <span className="inline-block px-4 text-muted-foreground">
-                {t`No field type matching this description was found.`}
-              </span>
-            </CommandEmpty>
-
-            <CommandGroup>
-              {fieldButtonList.map((field) => {
-                const FieldIcon = field.icon;
-                const label = t(FRIENDLY_FIELD_TYPE[field.type]);
-
-                return (
-                  <CommandItem
-                    key={field.type}
-                    className="px-2"
-                    onSelect={() => {
-                      handleChangeFieldType(field.type);
-                      setShowFieldTypeSelector(false);
-                    }}
-                  >
-                    <FieldIcon className="mr-2 h-4 w-4" />
-                    <span className="truncate">{label}</span>
-                  </CommandItem>
-                );
-              })}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </CommandDialog>
-    </div>
   );
 };

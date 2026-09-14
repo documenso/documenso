@@ -9,6 +9,7 @@ import {
   apiTrpcRateLimit,
   apiV1RateLimit,
   apiV2RateLimit,
+  envelopeContentRateLimit,
   fileUploadRateLimit,
 } from '@documenso/lib/server-only/rate-limit/rate-limits';
 import { TelemetryClient } from '@documenso/lib/server-only/telemetry/telemetry-client';
@@ -58,6 +59,7 @@ const apiV2RateLimitMiddleware = createRateLimitMiddleware(apiV2RateLimit);
 const aiRateLimitMiddleware = createRateLimitMiddleware(aiRateLimit);
 const trpcRateLimitMiddleware = createRateLimitMiddleware(apiTrpcRateLimit);
 const fileRateLimitMiddleware = createRateLimitMiddleware(fileUploadRateLimit);
+const envelopeContentRateLimitMiddleware = createRateLimitMiddleware(envelopeContentRateLimit);
 
 /**
  * Attach session and context to requests.
@@ -107,6 +109,7 @@ app.route('/api/auth', auth);
 
 // Files route.
 app.use('/api/files/upload-pdf', fileRateLimitMiddleware);
+app.use('/api/files/upload-image', envelopeContentRateLimitMiddleware);
 app.route('/api/files', filesRoute);
 
 // AI route.

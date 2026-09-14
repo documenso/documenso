@@ -4,6 +4,7 @@ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/org
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { getContentsMissingImages, resolveEnvelopeContentLimits } from '@documenso/lib/utils/envelope-content';
 import { hasOverlappingFields } from '@documenso/lib/utils/fields-overlap';
 import { getRecipientsWithMissingFields } from '@documenso/lib/utils/recipients';
 import { zEmail } from '@documenso/lib/utils/zod';
@@ -31,7 +32,7 @@ import { Textarea } from '@documenso/ui/primitives/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { DocumentDistributionMethod, DocumentStatus, EnvelopeType } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangleIcon, InfoIcon } from 'lucide-react';
@@ -162,6 +163,25 @@ export const EnvelopeDistributeDialog = ({
     [envelope.fields],
   );
 
+  /**
+   * Image related contents without an image render nothing once sent.
+   */
+  const contentsMissingImages = useMemo(() => getContentsMissingImages(envelope.contents), [envelope.contents]);
+
+  /**
+   * An envelope can hold more contents than the organisation's plan allows,
+   * e.g. after the plan was lowered or a template was copied, so this is
+   * reported here rather than letting the send fail.
+   */
+  const contentLimits = useMemo(
+    () =>
+      resolveEnvelopeContentLimits(
+        envelope.contents.map((content) => content.metadata.type),
+        organisation.organisationClaim,
+      ),
+    [envelope.contents, organisation.organisationClaim],
+  );
+
   const invalidEnvelopeCode = useMemo(() => {
     if (recipientsMissingSignatureFields.length > 0) {
       return 'MISSING_SIGNATURES';
@@ -175,8 +195,26 @@ export const EnvelopeDistributeDialog = ({
       return 'MISSING_REQUIRED_EMAIL';
     }
 
+    if (contentsMissingImages.length > 0) {
+      return 'MISSING_CONTENT_IMAGES';
+    }
+
+    if (contentLimits.isContentLimitExceeded) {
+      return 'ENVELOPE_CONTENT_LIMIT_EXCEEDED';
+    }
+
+    if (contentLimits.isImageLimitExceeded) {
+      return 'ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED';
+    }
+
     return null;
-  }, [envelope.recipients, recipientsMissingRequiredEmail, recipientsMissingSignatureFields]);
+  }, [
+    envelope.recipients,
+    recipientsMissingRequiredEmail,
+    recipientsMissingSignatureFields,
+    contentsMissingImages,
+    contentLimits,
+  ]);
 
   const onFormSubmit = async ({ meta }: TEnvelopeDistributeFormSchema) => {
     try {
@@ -518,6 +556,33 @@ export const EnvelopeDistributeDialog = ({
                         </li>
                       ))}
                     </ul>
+                  </AlertDescription>
+                ))
+                .with('MISSING_CONTENT_IMAGES', () => (
+                  <AlertDescription>
+                    <Plural
+                      value={contentsMissingImages.length}
+                      one="An image content has no image. Upload an image for it, or remove it."
+                      other="# image contents have no image. Upload an image for each, or remove them."
+                    />
+                  </AlertDescription>
+                ))
+                .with('ENVELOPE_CONTENT_LIMIT_EXCEEDED', () => (
+                  <AlertDescription>
+                    <Plural
+                      value={contentLimits.contentLimit}
+                      one="This envelope cannot have more than # content item. Remove some, or contact support if you need more."
+                      other="This envelope cannot have more than # content items. Remove some, or contact support if you need more."
+                    />
+                  </AlertDescription>
+                ))
+                .with('ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED', () => (
+                  <AlertDescription>
+                    <Plural
+                      value={contentLimits.imageLimit}
+                      one="This envelope cannot have more than # image content item. Remove some, or contact support if you need more."
+                      other="This envelope cannot have more than # image content items. Remove some, or contact support if you need more."
+                    />
                   </AlertDescription>
                 ))
                 .exhaustive()}

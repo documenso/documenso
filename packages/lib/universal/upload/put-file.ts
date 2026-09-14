@@ -1,4 +1,4 @@
-import type { TUploadPdfResponse } from '@documenso/remix/server/api/files/files.types';
+import type { TUploadImageResponse, TUploadPdfResponse } from '@documenso/remix/server/api/files/files.types';
 
 import { formatPath } from '../../constants/app';
 import { AppError } from '../../errors/app-error';
@@ -51,6 +51,44 @@ export const putPdfFile = async (file: File, options?: PutFileOptions) => {
   }
 
   const result: TUploadPdfResponse = await response.json();
+
+  return result;
+};
+
+/**
+ * Upload an image for use as envelope content.
+ *
+ * Throws an `INVALID_IMAGE_FILE` error when the server rejects the image
+ * itself (unsupported format, corrupt bytes), otherwise `UPLOAD_FAILED`.
+ */
+export const putImageFile = async (file: File, options?: PutFileOptions) => {
+  const formData = new FormData();
+
+  // Create a proper File object from the data
+  const buffer = await file.arrayBuffer();
+  const blob = new Blob([buffer], { type: file.type });
+  const properFile = new File([blob], file.name, { type: file.type });
+
+  formData.append('file', properFile);
+
+  const response = await fetch(formatPath('/api/files/upload-image'), {
+    method: 'POST',
+    headers: buildUploadAuthHeaders(options),
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const body: { error?: string; code?: string } | null = await response.json().catch(() => null);
+
+    if (body?.code === 'INVALID_IMAGE_FILE') {
+      throw new AppError('INVALID_IMAGE_FILE', { message: body.error });
+    }
+
+    console.error('Upload failed:', response.statusText);
+    throw new AppError('UPLOAD_FAILED');
+  }
+
+  const result: TUploadImageResponse = await response.json();
 
   return result;
 };

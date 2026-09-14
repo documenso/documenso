@@ -442,6 +442,7 @@ const EmbedSignDocumentPageV2 = ({ data }: { data: Awaited<ReturnType<typeof han
           version="current"
           envelope={envelope}
           envelopeItems={envelope.envelopeItems}
+          contents={envelope.contents}
           token={token}
         >
           <EmbedSignDocumentV2ClientPage

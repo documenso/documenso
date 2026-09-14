@@ -595,6 +595,8 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
         memberCount: organisation.organisationClaim.memberCount,
         envelopeItemCount: organisation.organisationClaim.envelopeItemCount,
         recipientCount: organisation.organisationClaim.recipientCount,
+        envelopeContentCount: organisation.organisationClaim.envelopeContentCount,
+        envelopeContentImageCount: organisation.organisationClaim.envelopeContentImageCount,
         flags: organisation.organisationClaim.flags,
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         documentRateLimits: organisation.organisationClaim.documentRateLimits as NonNullable<
@@ -815,6 +817,54 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                 </FormControl>
                 <FormDescription>
                   <Trans>Maximum number of recipients per document allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="claims.envelopeContentCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Envelope Content Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Maximum number of contents per envelope allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="claims.envelopeContentImageCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Envelope Content Image Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Maximum number of image contents per envelope allowed. 0 = Unlimited</Trans>
                 </FormDescription>
                 <FormMessage />
               </FormItem>

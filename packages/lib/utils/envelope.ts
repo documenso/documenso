@@ -238,6 +238,28 @@ export type EnvelopeItemPermissions = {
   canOrderBeChanged: boolean;
 };
 
+/**
+ * Whether the envelope's current document data has been sealed, meaning the
+ * inserted fields and authored contents are already imprinted onto the PDF.
+ *
+ * The seal job runs for both completed and rejected envelopes.
+ */
+export const isEnvelopeSealed = (status: DocumentStatus) => {
+  return status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED;
+};
+
+/**
+ * Whether authored contents (text, shapes, images, ...) can be added or
+ * changed.
+ *
+ * Contents are imprinted onto the document when it is sealed, so they are
+ * frozen once the envelope has been sent. Templates are never sent and stay
+ * drafts, so they remain editable.
+ */
+export const canContentBeChanged = (envelope: Pick<Envelope, 'status'>) => {
+  return envelope.status === DocumentStatus.DRAFT;
+};
+
 export const getEnvelopeItemPermissions = (
   envelope: Pick<Envelope, 'completedAt' | 'deletedAt' | 'type' | 'status'>,
   recipients: Pick<Recipient, 'role' | 'signingStatus' | 'sendStatus'>[],

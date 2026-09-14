@@ -1,4 +1,6 @@
 import {
+  DEFAULT_ENVELOPE_CONTENT_COUNT,
+  DEFAULT_ENVELOPE_CONTENT_IMAGE_COUNT,
   DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
   DEFAULT_RECIPIENT_COUNT,
 } from '@documenso/ee/server-only/limits/constants';
@@ -14,6 +16,8 @@ export const generateDefaultSubscriptionClaim = (): Omit<
     memberCount: 1,
     envelopeItemCount: DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
     recipientCount: DEFAULT_RECIPIENT_COUNT,
+    envelopeContentCount: DEFAULT_ENVELOPE_CONTENT_COUNT,
+    envelopeContentImageCount: DEFAULT_ENVELOPE_CONTENT_IMAGE_COUNT,
     locked: false,
     flags: {},
 

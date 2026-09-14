@@ -37,6 +37,7 @@ import { getEnvelopesByIdsRoute } from './get-envelopes-by-ids';
 import { redistributeEnvelopeRoute } from './redistribute-envelope';
 import { replaceEnvelopeItemPdfRoute } from './replace-envelope-item-pdf';
 import { saveAsTemplateRoute } from './save-as-template';
+import { setEnvelopeContentsRoute } from './set-envelope-contents';
 import { setEnvelopeFieldsRoute } from './set-envelope-fields';
 import { setEnvelopeRecipientsRoute } from './set-envelope-recipients';
 import { signEnvelopeFieldRoute } from './sign-envelope-field';
@@ -83,6 +84,9 @@ export const envelopeRouter = router({
     delete: deleteEnvelopeFieldRoute,
     set: setEnvelopeFieldsRoute,
     sign: signEnvelopeFieldRoute,
+  },
+  content: {
+    set: setEnvelopeContentsRoute,
   },
   find: findEnvelopesRoute,
   auditLog: {

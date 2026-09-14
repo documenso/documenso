@@ -35,3 +35,17 @@ export const DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT = 5;
  * 0 = Unlimited recipients.
  */
 export const DEFAULT_RECIPIENT_COUNT = 20;
+
+/**
+ * The number of contents allowed on a single envelope.
+ *
+ * 0 = Unlimited contents.
+ */
+export const DEFAULT_ENVELOPE_CONTENT_COUNT = 0;
+
+/**
+ * The number of image contents allowed on a single envelope.
+ *
+ * 0 = Unlimited image contents.
+ */
+export const DEFAULT_ENVELOPE_CONTENT_IMAGE_COUNT = 0;

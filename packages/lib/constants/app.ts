@@ -4,6 +4,19 @@ import { SignatureLevel, type TSignatureLevel } from '../types/signature-level';
 
 export const APP_DOCUMENT_UPLOAD_SIZE_LIMIT = Number(env('NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT')) || 50;
 
+/**
+ * The maximum size of an image uploaded as envelope content, in MB.
+ */
+export const APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT = 10;
+
+/**
+ * The MIME types accepted for envelope content image uploads.
+ *
+ * SVG is deliberately excluded, since it can embed scripts and external
+ * references and is not rasterized consistently across renderers.
+ */
+export const APP_CONTENT_IMAGE_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const;
+
 export const NEXT_PUBLIC_WEBAPP_URL = () => env('NEXT_PUBLIC_WEBAPP_URL') ?? 'http://localhost:3000';
 
 /**
@@ -147,3 +160,5 @@ export const CSC_INSTANCE_SIGNATURE_LEVEL = (): TSignatureLevel => {
 };
 
 export const DOCUMENSO_CLOUD_ENTERPRISE_CTA_URL = 'https://documen.so/enterprise-cta';
+
+export const MAX_POSTGRES_INT = 2147483647;

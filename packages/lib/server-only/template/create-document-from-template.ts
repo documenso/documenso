@@ -50,6 +50,7 @@ import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { copyEnvelopeContents } from '../envelope-content/copy-envelope-contents';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
@@ -760,6 +761,13 @@ export const createDocumentFromTemplate = async ({
         data: attachmentsToCreate,
       });
     }
+
+    await copyEnvelopeContents({
+      tx,
+      fromEnvelopeId: template.id,
+      toEnvelopeId: envelope.id,
+      envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
+    });
 
     const createdEnvelope = await tx.envelope.findFirst({
       where: {

@@ -117,7 +117,10 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
       return;
     }
 
-    const foundField = localFields.find((field) => field.formId === formId);
+    // Read the live form values rather than the render captured `localFields`
+    // since this can be called from long-lived callbacks (e.g. Konva stage
+    // handlers) whose closures may hold a stale field list.
+    const foundField = form.getValues().fields.find((field) => field.formId === formId);
     const recipient = envelope.recipients.find((recipient) => recipient.id === foundField?.recipientId);
 
     if (recipient) {

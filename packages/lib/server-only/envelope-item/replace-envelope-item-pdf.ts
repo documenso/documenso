@@ -114,7 +114,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
     // Todo: Audit log if we're updating the title or order.
 
     // Delete fields that reference pages beyond the new PDF's page count.
-    const outOfBoundsFields = await tx.field.findMany({
+    const { count: deletedFieldCount } = await tx.field.deleteMany({
       where: {
         envelopeId: envelope.id,
         envelopeItemId,
@@ -122,23 +122,36 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
           gt: filePageCount,
         },
       },
+    });
+
+    if (deletedFieldCount > 0) {
+      didFieldsChange = true;
+    }
+
+    const itemContents = await tx.envelopeContent.findMany({
+      where: {
+        envelopeId: envelope.id,
+        envelopeItemId,
+      },
       select: {
         id: true,
+        metadata: true,
       },
     });
 
-    const deletedFieldIds = outOfBoundsFields.map((f) => f.id);
+    const outOfBoundsContentIds = itemContents
+      .filter((content) => (content.metadata.page ?? 1) > filePageCount)
+      .map((content) => content.id);
 
-    if (deletedFieldIds.length > 0) {
-      await tx.field.deleteMany({
+    // Delete contents that reference pages beyond the new PDF's page count.
+    if (outOfBoundsContentIds.length > 0) {
+      await tx.envelopeContent.deleteMany({
         where: {
           id: {
-            in: deletedFieldIds,
+            in: outOfBoundsContentIds,
           },
         },
       });
-
-      didFieldsChange = true;
     }
 
     if (recipients.length > 0 && placeholders.length > 0) {

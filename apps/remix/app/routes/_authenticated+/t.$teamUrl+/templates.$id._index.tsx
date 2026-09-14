@@ -176,6 +176,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               envelopeItems={envelope.envelopeItems}
               token={undefined}
               fields={envelope.fields}
+              contents={envelope.contents}
               recipients={envelope.recipients}
               overrideSettings={{
                 showRecipientTooltip: true,

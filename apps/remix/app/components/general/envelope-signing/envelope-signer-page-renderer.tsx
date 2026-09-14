@@ -10,6 +10,7 @@ import { isBase64Image } from '@documenso/lib/constants/signatures';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { ZFullFieldSchema } from '@documenso/lib/types/field';
+import { renderStaticContents } from '@documenso/lib/universal/content-renderer/render-static-contents';
 import {
   createFieldCanvasStyleCache,
   type FieldCanvasStyleCache,
@@ -17,6 +18,7 @@ import {
 import { createSpinner } from '@documenso/lib/universal/field-renderer/field-generic-items';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import { isEnvelopeSealed } from '@documenso/lib/utils/envelope';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
@@ -47,9 +49,13 @@ type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
 };
 
+/**
+ * The signing page renderer purposefully does not support "EnvelopePageItemsVisibility"
+ * since it's probably not needed at this time.
+ */
 export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
-  const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
+  const { currentEnvelopeItem, contentImages, setRenderError } = useCurrentEnvelopeRender();
   const { sessionData } = useOptionalSession();
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
@@ -90,7 +96,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
 
   const { onFieldSigned, onFieldUnsigned } = useEmbedSigningContext() || {};
 
-  const { stage, pageLayer, konvaContainer, unscaledViewport } = usePageRenderer(
+  const { stage, pageLayer, konvaContainer, unscaledViewport, hasFailedImage } = usePageRenderer(
     ({ stage, pageLayer }) => createPageCanvas(stage, pageLayer),
     pageData,
   );
@@ -98,6 +104,17 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
   const { scale, pageNumber } = pageData;
 
   const { envelope } = envelopeData;
+
+  /**
+   * A signer must not see a document which differs from what was authored,
+   * so a content image which failed to load is treated like any other render
+   * failure.
+   */
+  useEffect(() => {
+    if (hasFailedImage && !isEnvelopeSealed(envelope.status)) {
+      setRenderError(true);
+    }
+  }, [hasFailedImage, envelope.status]);
 
   const localPageFields = useMemo(() => {
     let fieldsToRender = recipientFields;
@@ -536,9 +553,42 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
   };
 
   /**
+   * Render the authored contents of the page beneath the fields.
+   *
+   * Contents never change during signing, so this only runs when the layer is
+   * created or fully rebuilt.
+   */
+  const renderContents = () => {
+    // Once an envelope is sealed the contents are imprinted onto the current
+    // PDF, so rendering them again would double them up.
+    if (!pageLayer.current || isEnvelopeSealed(envelope.status)) {
+      return;
+    }
+
+    try {
+      renderStaticContents({
+        contents: envelope.contents.filter(
+          (content) =>
+            (content.metadata.page ?? 1) === pageNumber && content.envelopeItemId === currentEnvelopeItem?.id,
+        ),
+        pageLayer: pageLayer.current,
+        pageWidth: unscaledViewport.width,
+        pageHeight: unscaledViewport.height,
+        scale,
+        mode: 'sign',
+        images: contentImages.images,
+      });
+    } catch (err) {
+      console.error(err);
+      setRenderError(true);
+    }
+  };
+
+  /**
    * Initialize the Konva page canvas and all fields and interactions.
    */
   const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
+    renderContents();
     renderFields();
     currentPageLayer.batchDraw();
   };
@@ -577,6 +627,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
     pageLayer.current.destroyChildren();
     cachedRenderFields.current.clear();
 
+    renderContents();
     renderFields();
 
     pageLayer.current.batchDraw();

@@ -5,7 +5,9 @@ import {
   useCurrentEnvelopeRender,
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
+import { renderStaticContents } from '@documenso/lib/universal/content-renderer/render-static-contents';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
+import { isEnvelopeSealed } from '@documenso/lib/utils/envelope';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { EnvelopeRecipientFieldTooltip } from '@documenso/ui/components/document/envelope-recipient-field-tooltip';
 import { useLingui } from '@lingui/react/macro';
@@ -22,9 +24,12 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
   const analytics = useAnalytics();
 
   const {
+    version,
     envelopeStatus,
     currentEnvelopeItem,
     fields,
+    contents,
+    contentImages,
     signatures,
     recipients,
     getRecipientColorKey,
@@ -32,15 +37,39 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
     overrideSettings,
   } = useCurrentEnvelopeRender();
 
+  /**
+   * Once an envelope is sealed the contents are imprinted onto the current
+   * PDF, so rendering them again would double them up.
+   */
+  const shouldRenderContents = !(version === 'current' && isEnvelopeSealed(envelopeStatus));
+
   const signaturesByFieldId = useMemo(() => {
     return new Map(signatures.map((signature) => [signature.fieldId, signature]));
   }, [signatures]);
 
-  const { stage, pageLayer, konvaContainer, unscaledViewport } = usePageRenderer(({ stage, pageLayer }) => {
+  const {
+    stage,
+    pageLayer,
+    konvaContainer,
+    unscaledViewport,
+    fieldsVisibility,
+    applyPageItemsVisibility,
+    hasFailedImage,
+  } = usePageRenderer(({ stage, pageLayer }) => {
     createPageCanvas(stage, pageLayer);
   }, pageData);
 
   const { scale, pageNumber } = pageData;
+
+  /**
+   * A content image which failed to load would render the page differently
+   * to how it was authored, so it is treated like any other render failure.
+   */
+  useEffect(() => {
+    if (shouldRenderContents && hasFailedImage) {
+      setRenderError(true);
+    }
+  }, [shouldRenderContents, hasFailedImage]);
 
   const localPageFields = useMemo((): GenericLocalField[] => {
     if (envelopeStatus === DocumentStatus.COMPLETED) {
@@ -105,7 +134,8 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
       translations: fieldTranslations,
       pageWidth: unscaledViewport.width,
       pageHeight: unscaledViewport.height,
-      color: getRecipientColorKey(field.recipientId),
+      // Muted fields are rendered with the read-only styling.
+      color: fieldsVisibility === 'muted' ? 'readOnly' : getRecipientColorKey(field.recipientId),
       editable: false,
       mode: overrideSettings?.mode ?? 'edit',
     });
@@ -131,12 +161,41 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
    * Initialize the Konva page canvas and all fields and interactions.
    */
   const createPageCanvas = (_currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
+    // Render the contents beneath the fields. Contents are static, so they
+    // only need to be rendered when the canvas is created.
+    if (shouldRenderContents) {
+      renderContents(currentPageLayer);
+    }
+
     // Render the fields.
     for (const field of localPageFields) {
       renderFieldOnLayer(field);
     }
 
     currentPageLayer.batchDraw();
+  };
+
+  /**
+   * Render the authored contents of the page beneath the fields.
+   */
+  const renderContents = (currentPageLayer: Konva.Layer) => {
+    try {
+      renderStaticContents({
+        contents: contents.filter(
+          (content) =>
+            (content.metadata.page ?? 1) === pageNumber && content.envelopeItemId === currentEnvelopeItem?.id,
+        ),
+        pageLayer: currentPageLayer,
+        pageWidth: unscaledViewport.width,
+        pageHeight: unscaledViewport.height,
+        scale,
+        mode: overrideSettings?.mode ?? 'edit',
+        images: contentImages.images,
+      });
+    } catch (err) {
+      console.error(err);
+      setRenderError(true);
+    }
   };
 
   /**
@@ -159,8 +218,10 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
       renderFieldOnLayer(field);
     });
 
+    applyPageItemsVisibility();
+
     pageLayer.current.batchDraw();
-  }, [localPageFields, signaturesByFieldId]);
+  }, [localPageFields, signaturesByFieldId, fieldsVisibility]);
 
   if (!currentEnvelopeItem) {
     return null;
@@ -170,6 +231,7 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
     <>
       {overrideSettings?.showRecipientTooltip &&
         pageData.imageLoadingState === 'loaded' &&
+        fieldsVisibility === 'visible' &&
         localPageFields.map((field) => (
           <EnvelopeRecipientFieldTooltip
             key={field.id}

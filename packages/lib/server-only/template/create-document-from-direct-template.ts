@@ -40,10 +40,12 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { assertEnvelopeContentLimits, getContentsMissingImages } from '../../utils/envelope-content';
 import { getRecipientsWithMissingFields } from '../../utils/recipients';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { copyEnvelopeContents } from '../envelope-content/copy-envelope-contents';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -111,6 +113,13 @@ export const createDocumentFromDirectTemplate = async ({
           documentData: true,
         },
       },
+      contents: {
+        select: {
+          id: true,
+          dataContentId: true,
+          metadata: true,
+        },
+      },
       documentMeta: true,
       user: {
         select: {
@@ -127,6 +136,8 @@ export const createDocumentFromDirectTemplate = async ({
               organisationClaim: {
                 select: {
                   recipientCount: true,
+                  envelopeContentCount: true,
+                  envelopeContentImageCount: true,
                 },
               },
             },
@@ -183,6 +194,22 @@ export const createDocumentFromDirectTemplate = async ({
       message: 'One or more signers on this direct template are missing a signature field',
     });
   }
+
+  // A direct template is never explicitly sent, so this is where an image
+  // content without an image would otherwise slip into a document.
+  if (getContentsMissingImages(directTemplateEnvelope.contents).length > 0) {
+    throw new AppError('MISSING_CONTENT_IMAGE', {
+      message: 'One or more image contents on this direct template have no image attached',
+      statusCode: 400,
+    });
+  }
+
+  // Mirrors the check in `sendDocument`, which this flow never reaches since it
+  // creates the document directly in PENDING.
+  assertEnvelopeContentLimits(
+    directTemplateEnvelope.contents.map((content) => content.metadata.type),
+    directTemplateEnvelope.team.organisation.organisationClaim,
+  );
 
   if (directTemplateEnvelope.updatedAt.getTime() !== templateUpdatedAt.getTime()) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Template no longer matches' });
@@ -761,6 +788,13 @@ export const createDocumentFromDirectTemplate = async ({
         })),
       });
     }
+
+    await copyEnvelopeContents({
+      tx,
+      fromEnvelopeId: directTemplateEnvelope.id,
+      toEnvelopeId: createdEnvelope.id,
+      envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
+    });
 
     return {
       createdEnvelope,

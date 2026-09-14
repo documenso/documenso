@@ -37,6 +37,7 @@ import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.
 import { isDocumentCompleted } from '../../utils/document';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { assertEnvelopeContentLimits, getContentsMissingImages } from '../../utils/envelope-content';
 import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
@@ -73,6 +74,13 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
       },
       fields: true,
       documentMeta: true,
+      contents: {
+        select: {
+          id: true,
+          dataContentId: true,
+          metadata: true,
+        },
+      },
       envelopeItems: {
         select: {
           id: true,
@@ -93,6 +101,8 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
               organisationClaim: {
                 select: {
                   recipientCount: true,
+                  envelopeContentCount: true,
+                  envelopeContentImageCount: true,
                 },
               },
             },
@@ -185,6 +195,26 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
       });
     }
   });
+
+  // Validate that every image content has an image, since they
+  // render nothing otherwise and the document would silently ship without them.
+  const contentsMissingImages = getContentsMissingImages(envelope.contents);
+
+  if (contentsMissingImages.length > 0) {
+    throw new AppError('MISSING_CONTENT_IMAGE', {
+      message: `The following contents have no image attached: ${contentsMissingImages.map((content) => content.id).join(', ')}.`,
+      statusCode: 400,
+    });
+  }
+
+  // Validate the envelope sits within the organisation's content allowances.
+  // A count of 0 means unlimited. This is checked when sending rather than
+  // when the contents are saved so an envelope which went over the limit
+  // (e.g. the organisation's plan was lowered) can still be edited back down.
+  assertEnvelopeContentLimits(
+    envelope.contents.map((content) => content.metadata.type),
+    envelope.team.organisation.organisationClaim,
+  );
 
   // Validate that recipients who require fields (e.g., signers need signature fields) have them.
   const recipientsWithMissingFields = getRecipientsWithMissingFields(envelope.recipients, envelope.fields);

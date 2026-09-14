@@ -1,3 +1,4 @@
+import { ZDataContentImageMeta } from '@documenso/lib/types/data-content-meta';
 import DocumentDataSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import { z } from 'zod';
 
@@ -12,6 +13,18 @@ export const ZUploadPdfResponseSchema = DocumentDataSchema.pick({
 
 export type TUploadPdfRequest = z.infer<typeof ZUploadPdfRequestSchema>;
 export type TUploadPdfResponse = z.infer<typeof ZUploadPdfResponseSchema>;
+
+export const ZUploadImageRequestSchema = z.object({
+  file: z.instanceof(File),
+});
+
+export const ZUploadImageResponseSchema = z.object({
+  id: z.string(),
+  metadata: ZDataContentImageMeta,
+});
+
+export type TUploadImageRequest = z.infer<typeof ZUploadImageRequestSchema>;
+export type TUploadImageResponse = z.infer<typeof ZUploadImageResponseSchema>;
 
 export const ZGetEnvelopeItemFileRequestParamsSchema = z.object({
   envelopeId: z.string().min(1),
