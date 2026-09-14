@@ -108,7 +108,9 @@ export const ZDocumentMetaUploadSignatureEnabledSchema = z
 
 export const ZDocumentMetaAllowDocumentRejectionSchema = z
   .boolean()
-  .describe('Whether to allow recipients to reject the document from the signing page.');
+  .describe(
+    'Whether recipients can reject the document from the signing page. Defaults to the organisation or team document preference. In embedded signing the embed must also enable its own allowDocumentRejection option.',
+  );
 
 /**
  * Note: Any updates to this will cause public API changes. You will need to update

@@ -63,6 +63,10 @@ export const DocumentSigningPageViewV2 = () => {
     onDocumentRejected,
   } = useEmbedSigningContext() || {};
 
+  // Both the document settings and the embed host (if any) must allow rejection.
+  const isDocumentRejectionAllowed =
+    envelope.type === EnvelopeType.DOCUMENT && envelope.documentMeta.allowDocumentRejection && allowDocumentRejection;
+
   const { t } = useLingui();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
@@ -193,7 +197,7 @@ export const DocumentSigningPageViewV2 = () => {
                   }
                 />
 
-                {envelope.type === EnvelopeType.DOCUMENT && allowDocumentRejection && (
+                {isDocumentRejectionAllowed && (
                   <DocumentSigningRejectDialog
                     documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
                     token={recipient.token}
