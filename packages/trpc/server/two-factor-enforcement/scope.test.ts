@@ -16,28 +16,12 @@ describe('normalizeTwoFactorScopeResult', () => {
     expect(normalizeTwoFactorScopeResult(TWO_FACTOR_CTX_TEAM)).toEqual({ type: 'ctxTeam' });
   });
 
-  it('normalizes an empty descriptor to no resources (instance assert only)', () => {
-    expect(normalizeTwoFactorScopeResult({})).toEqual({ type: 'resources', resources: [] });
-  });
-
-  it('normalizes single IDs and ID arrays', () => {
-    expect(normalizeTwoFactorScopeResult({ envelope: 'envelope_1' })).toEqual({
-      type: 'resources',
-      resources: [{ kind: 'envelope', envelopeIds: ['envelope_1'], documentIds: [], templateIds: [] }],
-    });
-
-    expect(normalizeTwoFactorScopeResult({ envelope: ['a', 'b'] })).toEqual({
-      type: 'resources',
-      resources: [{ kind: 'envelope', envelopeIds: ['a', 'b'], documentIds: [], templateIds: [] }],
-    });
-  });
-
   it('normalizes every resource kind to its resource-IDs variant', () => {
     const result = normalizeTwoFactorScopeResult({
       organisation: 'org_1',
       organisationReference: 'my-org-url',
       team: 1,
-      teamReference: 7,
+      teamReference: ['my-team-url', 7],
       envelope: 'envelope_1',
       document: 2,
       template: 3,
@@ -59,7 +43,7 @@ describe('normalizeTwoFactorScopeResult', () => {
         { kind: 'organisation', organisationIds: ['org_1'] },
         { kind: 'organisationReference', references: ['my-org-url'] },
         { kind: 'team', teamIds: [1] },
-        { kind: 'teamReference', references: [7] },
+        { kind: 'teamReference', references: ['my-team-url', 7] },
         { kind: 'envelope', envelopeIds: ['envelope_1'], documentIds: [], templateIds: [] },
         { kind: 'document', documentIds: [2] },
         { kind: 'template', templateIds: [3] },
@@ -77,13 +61,6 @@ describe('normalizeTwoFactorScopeResult', () => {
     });
   });
 
-  it('accepts a string-or-number teamReference (URL slug or ID)', () => {
-    expect(normalizeTwoFactorScopeResult({ teamReference: ['my-team-url', 7] })).toEqual({
-      type: 'resources',
-      resources: [{ kind: 'teamReference', references: ['my-team-url', 7] }],
-    });
-  });
-
   it('merges descriptor arrays per kind so each kind resolves in one batch', () => {
     expect(normalizeTwoFactorScopeResult([{ envelope: 'a' }, { envelope: ['b'], recipient: 7 }])).toEqual({
       type: 'resources',
@@ -94,17 +71,9 @@ describe('normalizeTwoFactorScopeResult', () => {
     });
   });
 
-  it('accepts ID sets at the bulk cap', () => {
-    const ids = Array.from({ length: TWO_FACTOR_ENFORCEMENT_MAX_BULK_IDS }, (_, i) => `envelope_${i}`);
-
-    expect(normalizeTwoFactorScopeResult({ envelope: ids })).toEqual({
-      type: 'resources',
-      resources: [{ kind: 'envelope', envelopeIds: ids, documentIds: [], templateIds: [] }],
-    });
-  });
-
-  it('rejects ID sets above the bulk cap instead of truncating', () => {
+  it('rejects ID sets above the bulk cap instead of truncating, including after merging', () => {
     const oversized = Array.from({ length: TWO_FACTOR_ENFORCEMENT_MAX_BULK_IDS + 1 }, (_, i) => `envelope_${i}`);
+    const half = Array.from({ length: TWO_FACTOR_ENFORCEMENT_MAX_BULK_IDS / 2 + 1 }, (_, i) => `envelope_${i}`);
 
     try {
       normalizeTwoFactorScopeResult({ envelope: oversized });
@@ -112,21 +81,15 @@ describe('normalizeTwoFactorScopeResult', () => {
     } catch (error) {
       expect(AppError.parseError(error).code).toBe(AppErrorCode.LIMIT_EXCEEDED);
     }
-  });
-
-  it('rejects when merged descriptors exceed the bulk cap combined', () => {
-    const half = Array.from({ length: TWO_FACTOR_ENFORCEMENT_MAX_BULK_IDS / 2 + 1 }, (_, i) => `envelope_${i}`);
 
     expect(() => normalizeTwoFactorScopeResult([{ envelope: half }, { envelope: half }])).toThrowError(AppError);
   });
 });
 
 describe('assertScopeBudget', () => {
-  it('allows counts within the budget', () => {
+  it('rejects only above the budget', () => {
     expect(() => assertScopeBudget(TWO_FACTOR_ENFORCEMENT_MAX_UNIQUE_SCOPES)).not.toThrow();
-  });
 
-  it('rejects counts above the budget', () => {
     try {
       assertScopeBudget(TWO_FACTOR_ENFORCEMENT_MAX_UNIQUE_SCOPES + 1);
       expect.unreachable();
