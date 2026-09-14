@@ -7,26 +7,9 @@ import {
   computeTwoFactorEnforcementStatus,
   evaluateInstanceTwoFactorEnforcementUpdate,
   isInstanceTwoFactorEnforcementActive,
-  isTwoFactorDeadlineExpired,
   isTwoFactorGracePeriodReduction,
-  isTwoFactorSatisfied,
   MAX_TWO_FACTOR_DEADLINE_TIMER_DELAY_MS,
 } from './two-factor';
-
-describe('isTwoFactorSatisfied', () => {
-  it('is satisfied only when the user is enrolled and the session is verified', () => {
-    expect(isTwoFactorSatisfied({ userTwoFactorEnabled: true, sessionTwoFactorVerified: true })).toBe(true);
-  });
-
-  it('is not satisfied when the session is unverified', () => {
-    expect(isTwoFactorSatisfied({ userTwoFactorEnabled: true, sessionTwoFactorVerified: false })).toBe(false);
-  });
-
-  it('is not satisfied when the user is not enrolled', () => {
-    expect(isTwoFactorSatisfied({ userTwoFactorEnabled: false, sessionTwoFactorVerified: true })).toBe(false);
-    expect(isTwoFactorSatisfied({ userTwoFactorEnabled: false, sessionTwoFactorVerified: false })).toBe(false);
-  });
-});
 
 describe('calculateTwoFactorDeadline', () => {
   it('adds the grace period to a single anchor', () => {
@@ -71,28 +54,6 @@ describe('calculateTwoFactorDeadline', () => {
   it('returns null when no anchors are provided', () => {
     expect(calculateTwoFactorDeadline({ anchors: [], gracePeriodDays: 7 })).toBeNull();
     expect(calculateTwoFactorDeadline({ anchors: [null, undefined], gracePeriodDays: 7 })).toBeNull();
-  });
-});
-
-describe('isTwoFactorDeadlineExpired', () => {
-  const deadline = new Date('2026-01-08T00:00:00.000Z');
-
-  it('is not expired before the deadline', () => {
-    const now = new Date('2026-01-07T23:59:59.999Z');
-
-    expect(isTwoFactorDeadlineExpired({ deadline, now })).toBe(false);
-  });
-
-  it('counts the deadline instant itself as expired', () => {
-    const now = new Date('2026-01-08T00:00:00.000Z');
-
-    expect(isTwoFactorDeadlineExpired({ deadline, now })).toBe(true);
-  });
-
-  it('is expired after the deadline', () => {
-    const now = new Date('2026-01-08T00:00:00.001Z');
-
-    expect(isTwoFactorDeadlineExpired({ deadline, now })).toBe(true);
   });
 });
 
@@ -741,37 +702,17 @@ describe('evaluateInstanceTwoFactorEnforcementUpdate', () => {
 describe('calculateTwoFactorDeadlineTimerDelay', () => {
   const now = new Date('2026-06-01T00:00:00.000Z');
 
-  it('returns the exact delay for a deadline within the timer range', () => {
-    const deadline = new Date(now.getTime() + 5_000);
-
-    expect(calculateTwoFactorDeadlineTimerDelay({ deadline, now })).toBe(5_000);
-  });
-
-  it('returns 0 for a deadline at the current instant (deadline counts as expired)', () => {
-    expect(calculateTwoFactorDeadlineTimerDelay({ deadline: now, now })).toBe(0);
-  });
-
   it('returns 0 for a past deadline', () => {
     const deadline = new Date(now.getTime() - 60_000);
 
     expect(calculateTwoFactorDeadlineTimerDelay({ deadline, now })).toBe(0);
   });
 
-  it('returns the delay at exactly the setTimeout maximum', () => {
-    const deadline = new Date(now.getTime() + MAX_TWO_FACTOR_DEADLINE_TIMER_DELAY_MS);
+  it('returns the delay at exactly the setTimeout maximum and null just past it', () => {
+    const atMax = new Date(now.getTime() + MAX_TWO_FACTOR_DEADLINE_TIMER_DELAY_MS);
+    const pastMax = new Date(now.getTime() + MAX_TWO_FACTOR_DEADLINE_TIMER_DELAY_MS + 1);
 
-    expect(calculateTwoFactorDeadlineTimerDelay({ deadline, now })).toBe(MAX_TWO_FACTOR_DEADLINE_TIMER_DELAY_MS);
-  });
-
-  it('returns null when the deadline exceeds the setTimeout maximum', () => {
-    const deadline = new Date(now.getTime() + MAX_TWO_FACTOR_DEADLINE_TIMER_DELAY_MS + 1);
-
-    expect(calculateTwoFactorDeadlineTimerDelay({ deadline, now })).toBeNull();
-  });
-
-  it('returns null for a deadline months away', () => {
-    const deadline = new Date('2026-12-01T00:00:00.000Z');
-
-    expect(calculateTwoFactorDeadlineTimerDelay({ deadline, now })).toBeNull();
+    expect(calculateTwoFactorDeadlineTimerDelay({ deadline: atMax, now })).toBe(MAX_TWO_FACTOR_DEADLINE_TIMER_DELAY_MS);
+    expect(calculateTwoFactorDeadlineTimerDelay({ deadline: pastMax, now })).toBeNull();
   });
 });

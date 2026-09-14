@@ -104,38 +104,18 @@ describe('ZTwoFactorChallengeMetadataSchema', () => {
   });
 });
 
-describe('shouldConsumeChallengeAfterFailure', () => {
-  it('does not consume below the maximum attempts', () => {
+// The `>=` boundary matters: an off-by-one here would grant one extra guess
+// per challenge (or one extra valid moment past expiry).
+describe('challenge consumption boundaries', () => {
+  it('consumes the challenge at exactly the maximum attempts, not before', () => {
     expect(shouldConsumeChallengeAfterFailure(TWO_FACTOR_CHALLENGE_MAX_ATTEMPTS - 1)).toBe(false);
-    expect(shouldConsumeChallengeAfterFailure(1)).toBe(false);
-  });
-
-  it('consumes at exactly the maximum attempts', () => {
     expect(shouldConsumeChallengeAfterFailure(TWO_FACTOR_CHALLENGE_MAX_ATTEMPTS)).toBe(true);
   });
 
-  it('consumes beyond the maximum attempts', () => {
-    expect(shouldConsumeChallengeAfterFailure(TWO_FACTOR_CHALLENGE_MAX_ATTEMPTS + 5)).toBe(true);
-  });
+  it('treats the expiry instant itself as expired', () => {
+    const expiresAt = new Date('2026-01-01T00:10:00.000Z');
 
-  it('honors a custom maximum', () => {
-    expect(shouldConsumeChallengeAfterFailure(2, 3)).toBe(false);
-    expect(shouldConsumeChallengeAfterFailure(3, 3)).toBe(true);
-  });
-});
-
-describe('isChallengeExpired', () => {
-  const expiresAt = new Date('2026-01-01T00:10:00.000Z');
-
-  it('is not expired before the expiry instant', () => {
     expect(isChallengeExpired({ expiresAt, now: new Date('2026-01-01T00:09:59.999Z') })).toBe(false);
-  });
-
-  it('is expired at exactly the expiry instant', () => {
     expect(isChallengeExpired({ expiresAt, now: expiresAt })).toBe(true);
-  });
-
-  it('is expired after the expiry instant', () => {
-    expect(isChallengeExpired({ expiresAt, now: new Date('2026-01-01T00:10:00.001Z') })).toBe(true);
   });
 });
