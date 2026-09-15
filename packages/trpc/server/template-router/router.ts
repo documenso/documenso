@@ -22,6 +22,7 @@ import { findTemplates } from '@documenso/lib/server-only/template/find-template
 import { getOrganisationTemplateById } from '@documenso/lib/server-only/template/get-organisation-template-by-id';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
+import { validateBulkSendCsv } from '@documenso/lib/server-only/template/validate-bulk-send-csv';
 import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
@@ -897,10 +898,13 @@ export const templateRouter = router({
         userId: user.id,
       });
 
-      if (!template) {
-        throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'Template not found',
-        });
+      const csvValidationResult = validateBulkSendCsv({
+        csvContent: csv,
+        recipientCount: template.recipients.length,
+      });
+
+      if (!csvValidationResult.success) {
+        return { success: false as const, error: csvValidationResult.error };
       }
 
       await jobs.triggerJob({
@@ -915,6 +919,6 @@ export const templateRouter = router({
         },
       });
 
-      return { success: true };
+      return { success: true as const };
     }),
 });

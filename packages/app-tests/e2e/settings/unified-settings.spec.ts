@@ -248,7 +248,7 @@ test.describe('Unified Settings', () => {
 
     // Wait for the organisation page to actually render — asserting straight after
     // `waitForURL` can read the previous scope's still-mounted sidebar and pass falsely.
-    await expect(page.getByTestId('settings-scope-breadcrumb-chip')).toContainText('Organisation Settings');
+    await expect(page.getByTestId('settings-scope-breadcrumb-chip')).toContainText('Organization Settings');
 
     await expect(trigger).toContainText(selected.name);
 
@@ -283,7 +283,7 @@ test.describe('Unified Settings', () => {
 
     // Selecting the inherit option stages the field back to inherited.
     await page.getByTestId('document-language-trigger').click();
-    await page.getByRole('option', { name: /inherit from organisation/i }).click();
+    await page.getByRole('option', { name: /inherit from organization/i }).click();
 
     await expect(langStatus).toHaveText(/inherited/i);
   });
@@ -450,7 +450,7 @@ test.describe('Unified Settings', () => {
     // An empty group would just look broken, so it explains itself directly under the switcher.
     const emptyState = sidebar.getByTestId('unified-settings-organisation-empty-state');
     await expect(emptyState).toBeVisible();
-    await expect(emptyState).toContainText(/permission to manage this organisation/i);
+    await expect(emptyState).toContainText(/permission to manage this organization/i);
 
     // Team and account pages remain navigable.
     await expect(sidebar.getByTestId('unified-settings-nav-team-general')).toBeVisible();

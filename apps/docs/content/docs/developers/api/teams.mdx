@@ -95,7 +95,7 @@ Documents created with a team token belong to that team:
 <Tab value="curl">
 ```bash
 curl -X POST "https://app.documenso.com/api/v2/envelope/create" \
-  -H "Authorization: api_team_xxxxxxxxxxxxxxxx" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: multipart/form-data" \
   -F 'payload={
     "type": "DOCUMENT",
@@ -157,11 +157,11 @@ Retrieve all documents belonging to the team:
 ```bash
 # List all team documents
 curl -X GET "https://app.documenso.com/api/v2/envelope" \
-  -H "Authorization: api_team_xxxxxxxxxxxxxxxx"
+  -H "Authorization: api_xxxxxxxxxxxxxxxx"
 
 # Filter by status
 curl -X GET "https://app.documenso.com/api/v2/envelope?status=PENDING" \
-  -H "Authorization: api_team_xxxxxxxxxxxxxxxx"
+  -H "Authorization: api_xxxxxxxxxxxxxxxx"
 ````
 
 </Tab>
@@ -191,7 +191,7 @@ Templates created with a team token are shared across the team.
 <Tab value="curl">
 ```bash
 curl -X POST "https://app.documenso.com/api/v2/template/create" \
-  -H "Authorization: api_team_xxxxxxxxxxxxxxxx" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: multipart/form-data" \
   -F 'payload={
     "title": "NDA Template",
@@ -269,7 +269,7 @@ console.log('Created team template:', template.id);
 <Tab value="curl">
 ```bash
 curl -X GET "https://app.documenso.com/api/v2/template" \
-  -H "Authorization: api_team_xxxxxxxxxxxxxxxx"
+  -H "Authorization: api_xxxxxxxxxxxxxxxx"
 ````
 
 </Tab>

@@ -1,6 +1,6 @@
 import type { User } from '@prisma/client';
 
-import { AppError } from '../../errors/app-error';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { verifyTwoFactorAuthenticationToken } from './verify-2fa-token';
 import { verifyBackupCode } from './verify-backup-code';
 
@@ -26,11 +26,11 @@ export const validateTwoFactorAuthentication = async ({
   user,
 }: ValidateTwoFactorAuthenticationOptions): Promise<TValidateTwoFactorAuthenticationResult> => {
   if (!user.twoFactorEnabled) {
-    throw new AppError('TWO_FACTOR_SETUP_REQUIRED');
+    throw new AppError(AppErrorCode.TWO_FACTOR_SETUP_REQUIRED);
   }
 
   if (!user.twoFactorSecret) {
-    throw new AppError('TWO_FACTOR_MISSING_SECRET');
+    throw new AppError(AppErrorCode.TWO_FACTOR_MISSING_SECRET);
   }
 
   if (totpCode) {
@@ -45,5 +45,5 @@ export const validateTwoFactorAuthentication = async ({
     return isValid ? { isValid: true, method: 'backup' } : { isValid: false, method: null };
   }
 
-  throw new AppError('TWO_FACTOR_MISSING_CREDENTIALS');
+  throw new AppError(AppErrorCode.TWO_FACTOR_MISSING_CREDENTIALS);
 };

@@ -39,7 +39,7 @@ export const disableTwoFactorAuthentication = async ({
   const { isValid } = await validateTwoFactorAuthentication({ totpCode, backupCode, user });
 
   if (!isValid) {
-    throw new AppError('INCORRECT_TWO_FACTOR_CODE');
+    throw new AppError(AppErrorCode.INCORRECT_TWO_FACTOR_CODE);
   }
 
   // Org-only enforcement allows the disable (the rest of the app stays
