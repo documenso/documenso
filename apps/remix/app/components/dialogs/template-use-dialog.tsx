@@ -34,10 +34,9 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 import { FileTextIcon, InfoIcon, Plus, UploadCloudIcon, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
 import * as z from 'zod';
 import { getTemplateUseErrorMessage } from '~/utils/toast-error-messages';
 
@@ -47,49 +46,22 @@ const DOCUMENT_NAME_SOURCE = {
   CUSTOM: 'custom',
 } as const;
 
-type TDocumentNameSource = (typeof DOCUMENT_NAME_SOURCE)[keyof typeof DOCUMENT_NAME_SOURCE];
-
-type TCustomDocumentData = {
-  data?: File;
-  uploadSequence?: number;
-};
-
 const getUploadedDocumentTitle = (file: File) => {
   return file.name.replace(/\.[^/.]+$/, '').trim();
 };
 
-const getLastUploadedFile = (customDocumentData?: TCustomDocumentData[]) => {
-  const uploadedFiles = customDocumentData?.filter(
-    (item): item is Required<TCustomDocumentData> => item.data !== undefined && item.uploadSequence !== undefined,
-  );
-
-  if (!uploadedFiles || uploadedFiles.length === 0) {
-    return undefined;
+/**
+ * Whether the file name can be used as a document title.
+ */
+const isUploadedFileNameUsable = (file?: File): file is File => {
+  if (!file) {
+    return false;
   }
 
-  return uploadedFiles.reduce((lastUploadedFile, uploadedFile) =>
-    uploadedFile.uploadSequence > lastUploadedFile.uploadSequence ? uploadedFile : lastUploadedFile,
-  ).data;
+  const title = getUploadedDocumentTitle(file);
+
+  return title.length > 0 && title.length <= DOCUMENT_TITLE_MAX_LENGTH;
 };
-
-const getTemplateUseDocumentTitle = ({
-  documentNameSource,
-  customDocumentName,
-  customDocumentData,
-}: {
-  documentNameSource: TDocumentNameSource;
-  customDocumentName: string;
-  customDocumentData?: TCustomDocumentData[];
-}) =>
-  match(documentNameSource)
-    .with(DOCUMENT_NAME_SOURCE.UPLOAD, () => {
-      const uploadedFile = getLastUploadedFile(customDocumentData);
-
-      return uploadedFile ? getUploadedDocumentTitle(uploadedFile) : undefined;
-    })
-    .with(DOCUMENT_NAME_SOURCE.CUSTOM, () => customDocumentName.trim())
-    .with(DOCUMENT_NAME_SOURCE.TEMPLATE, () => undefined)
-    .exhaustive();
 
 const ZAddRecipientsForNewDocumentSchema = z
   .object({
@@ -100,13 +72,15 @@ const ZAddRecipientsForNewDocumentSchema = z
       DOCUMENT_NAME_SOURCE.UPLOAD,
       DOCUMENT_NAME_SOURCE.CUSTOM,
     ]),
-    customDocumentName: z.string(),
+    customDocumentName: z
+      .string()
+      .trim()
+      .max(DOCUMENT_TITLE_MAX_LENGTH, { message: msg`Document name is too long`.id }),
     customDocumentData: z
       .array(
         z.object({
           title: z.string(),
           data: z.instanceof(File).optional(),
-          uploadSequence: z.number().optional(),
           envelopeItemId: z.string(),
         }),
       )
@@ -120,31 +94,9 @@ const ZAddRecipientsForNewDocumentSchema = z
       }),
     ),
   })
-  .superRefine((data, ctx) => {
-    if (data.documentNameSource === DOCUMENT_NAME_SOURCE.TEMPLATE) {
-      return;
-    }
-
-    const title = getTemplateUseDocumentTitle(data);
-    const path = data.documentNameSource === DOCUMENT_NAME_SOURCE.CUSTOM ? 'customDocumentName' : 'documentNameSource';
-
-    if (!title) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: msg`Document name is required`.id,
-        path: [path],
-      });
-
-      return;
-    }
-
-    if (title.length > DOCUMENT_TITLE_MAX_LENGTH) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: msg`Document name is too long`.id,
-        path: [path],
-      });
-    }
+  .refine((data) => data.documentNameSource !== DOCUMENT_NAME_SOURCE.CUSTOM || data.customDocumentName.length > 0, {
+    message: msg`Document name is required`.id,
+    path: ['customDocumentName'],
   });
 
 type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDocumentSchema>;
@@ -174,7 +126,7 @@ export function TemplateUseDialog({
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
-  const uploadSequenceRef = useRef(0);
+  const [lastUploadedFile, setLastUploadedFile] = useState<File>();
 
   const { data: response, isLoading: isLoadingEnvelopeItems } = trpc.envelope.item.getMany.useQuery(
     {
@@ -230,9 +182,36 @@ export function TemplateUseDialog({
 
   const { mutateAsync: createDocumentFromTemplate } = trpc.template.createDocumentFromTemplate.useMutation();
 
+  /**
+   * Track the most recently uploaded file so its name can be used as the document name.
+   * Files with an unusable name are ignored, and the document name source is reset if
+   * no usable file remains.
+   */
+  const updateLastUploadedFile = (file?: File) => {
+    const usableFile = isUploadedFileNameUsable(file) ? file : undefined;
+
+    setLastUploadedFile(usableFile);
+
+    if (!usableFile && form.getValues('documentNameSource') === DOCUMENT_NAME_SOURCE.UPLOAD) {
+      form.setValue('documentNameSource', DOCUMENT_NAME_SOURCE.TEMPLATE);
+    }
+  };
+
+  const getDocumentTitle = (data: TAddRecipientsForNewDocumentSchema) => {
+    if (data.documentNameSource === DOCUMENT_NAME_SOURCE.CUSTOM) {
+      return data.customDocumentName;
+    }
+
+    if (data.documentNameSource === DOCUMENT_NAME_SOURCE.UPLOAD && lastUploadedFile) {
+      return getUploadedDocumentTitle(lastUploadedFile);
+    }
+
+    return undefined;
+  };
+
   const onSubmit = async (data: TAddRecipientsForNewDocumentSchema) => {
     try {
-      const documentTitle = getTemplateUseDocumentTitle(data);
+      const documentTitle = getDocumentTitle(data);
 
       const customFilesToUpload = (data.customDocumentData ?? []).filter(
         (item): item is typeof item & { data: File } => item.data !== undefined,
@@ -289,13 +268,12 @@ export function TemplateUseDialog({
 
   const useCustomDocument = form.watch('useCustomDocument');
   const documentNameSource = form.watch('documentNameSource');
-  const customDocumentData = form.watch('customDocumentData');
-  const lastUploadedFile = useCustomDocument ? getLastUploadedFile(customDocumentData) : undefined;
   const canUseUploadedDocumentName = Boolean(lastUploadedFile);
 
   useEffect(() => {
     if (open) {
       form.reset(generateDefaultFormValues());
+      setLastUploadedFile(undefined);
     }
   }, [open, form]);
 
@@ -310,15 +288,6 @@ export function TemplateUseDialog({
       );
     }
   }, [envelopeItems, form, open]);
-
-  useEffect(() => {
-    if (documentNameSource !== DOCUMENT_NAME_SOURCE.UPLOAD || canUseUploadedDocumentName) {
-      return;
-    }
-
-    form.setValue('documentNameSource', DOCUMENT_NAME_SOURCE.TEMPLATE);
-    form.clearErrors('documentNameSource');
-  }, [canUseUploadedDocumentName, documentNameSource, form]);
 
   return (
     <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
@@ -518,6 +487,7 @@ export function TemplateUseDialog({
                                 })),
                               );
                               form.clearErrors('customDocumentData');
+                              updateLastUploadedFile(undefined);
                             }
                           }}
                         />
@@ -593,6 +563,18 @@ export function TemplateUseDialog({
                                           onClick={(e) => {
                                             e.preventDefault();
                                             field.onChange(undefined);
+
+                                            if (field.value === lastUploadedFile) {
+                                              // Fall back to any other uploaded file so the option stays available.
+                                              const remainingUploadedFile = form
+                                                .getValues('customDocumentData')
+                                                ?.find(
+                                                  (item) =>
+                                                    item.data !== field.value && isUploadedFileNameUsable(item.data),
+                                                )?.data;
+
+                                              updateLastUploadedFile(remainingUploadedFile);
+                                            }
                                           }}
                                         >
                                           <X className="mr-2 h-4 w-4" />
@@ -655,11 +637,8 @@ export function TemplateUseDialog({
                                         }
 
                                         field.onChange(file);
-                                        form.setValue(
-                                          `customDocumentData.${i}.uploadSequence`,
-                                          ++uploadSequenceRef.current,
-                                        );
                                         form.clearErrors(`customDocumentData.${i}.data`);
+                                        updateLastUploadedFile(file);
                                       }}
                                     />
                                   </div>
