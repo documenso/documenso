@@ -24,12 +24,11 @@ export const appContext = async (c: Context, next: Next) => {
 
   // These are non page paths like API.
   if (!isPageRequest(request) || noSessionCookie || blacklistedPathsRegex.test(url.pathname)) {
-    return next();
+    return await next();
   }
 
   // Add context to any pages you want here.
-
-  return next();
+  return await next();
 };
 
 const setAppContext = (c: Context, context: AppContext) => {
