@@ -143,7 +143,7 @@ test.describe('Organisation Templates - Listing', () => {
 
     // Switch to the organisation view.
     await page.getByTestId('templates-table-view-filter').click();
-    await page.getByRole('option', { name: 'Organisation' }).click();
+    await page.getByRole('option', { name: 'Organization' }).click();
 
     // Should see the org template from teamA.
     await expect(page.getByText(orgTemplate.title)).toBeVisible();
