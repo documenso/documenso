@@ -5,12 +5,12 @@ import { seedBlankFolder } from '@documenso/prisma/seed/folders';
 import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
-import type { Page } from '@playwright/test';
+import type { APIResponse, Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { DocumentVisibility, FolderType, TeamMemberRole, TemplateType } from '@prisma/client';
 import { customAlphabet } from 'nanoid';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, apiSignout } from '../fixtures/authentication';
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
 
@@ -25,48 +25,66 @@ type FindTemplatesResult = {
   count: number;
 };
 
-/**
- * Calls a tRPC query directly, bypassing the UI, optionally spoofing the
- * `x-team-id` header.
- */
-const trpcQuery = async (page: Page, procedure: string, input: Record<string, unknown>, teamId?: number) => {
-  const inputParam = encodeURIComponent(JSON.stringify({ json: input }));
+type TrpcResponse = {
+  response: APIResponse;
+  result: FindTemplatesResult | null;
+};
+
+const trpcQuery = async (
+  page: Page,
+  procedure: string,
+  input: Record<string, unknown>,
+  teamId?: number,
+): Promise<TrpcResponse> => {
+  const inputParam = encodeURIComponent(JSON.stringify({ json: { page: 1, perPage: 50, ...input } }));
   const url = `${WEBAPP_BASE_URL}/api/trpc/${procedure}?input=${inputParam}`;
 
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = teamId ? { 'x-team-id': teamId.toString() } : {};
 
-  if (teamId) {
-    headers['x-team-id'] = teamId.toString();
-  }
+  const response = await page.context().request.get(url, { headers });
 
-  const res = await page.context().request.get(url, { headers });
-
-  const json = res.ok() ? await res.json() : null;
+  const json = response.ok() ? await response.json() : null;
   const result: FindTemplatesResult | null = json ? json.result.data.json : null;
 
-  return { res, result };
+  return { response, result };
 };
 
 const FIND_TEMPLATE_PROCEDURES = ['template.findTemplates', 'template.findTemplatesInternal'] as const;
 
+const titlesOf = (res: TrpcResponse) => (res.result?.data ?? []).map((row) => row.title);
+
+const expectRejected = (res: TrpcResponse, status: number) => {
+  expect(res.response.status()).toBe(status);
+  expect(res.result).toBeNull();
+};
+
+// Check both count and data so one cannot be wrong while the other looks fine.
+const expectNoResults = (res: TrpcResponse) => {
+  expect(res.response.ok()).toBeTruthy();
+  expect(res.result?.count).toBe(0);
+  expect(res.result?.data).toEqual([]);
+};
+
+const expectExactTitles = (res: TrpcResponse, titles: string[], teamId: number) => {
+  expect(res.response.ok()).toBeTruthy();
+  expect(res.result?.count).toBe(titles.length);
+  expect(titlesOf(res).sort()).toEqual([...titles].sort());
+  expect(res.result?.data.every((row) => row.teamId === teamId)).toBe(true);
+};
+
 /**
- * Two organisations:
+ * Org A has two teams. teamA is the default team, so every org member is in it.
+ * teamB was created with inheritMembers: false, so only people added directly are in it.
+ *  - ownerA: org owner and teamA admin. Owns all the templates below.
+ *  - memberA, managerA: member and manager of teamA. Not in teamB.
+ *  - memberB: member of teamB, and also a member of teamA because teamA inherits.
+ *  - teamA has four templates with the same suffix in the title, one per visibility:
+ *    everyone, manager, admin (with a unique externalId and recipient email), and org.
  *
- * Org A
- *  - ownerA: org owner, ADMIN on teamA.
- *  - teamA: the default team, inherits organisation members.
- *  - teamB: sibling team created with `inheritMembers: false`.
- *  - memberA: MEMBER on teamA. Not a member of teamB.
- *  - memberB: MEMBER on teamB, and (via inheritance) also a MEMBER of teamA.
- *  - teamA has an EVERYONE template, an ADMIN-only template with a unique
- *    recipient email, and an ORGANISATION template.
+ * Org B is a separate org owned by "outsider". No overlap with Org A.
  *
- * Because memberB legitimately belongs to both teams, the "sibling team"
- * cases below exercise `x-team-id` scoping (a teamB request must never
- * return teamA rows), while memberA -> teamB exercises non-membership.
- *
- * Org B
- *  - outsider: owner of an unrelated organisation and team.
+ * So: memberB with a teamB header checks that teamA rows never come back.
+ * memberA with a teamB header checks that non-members are rejected.
  */
 const seedScenario = async () => {
   const { user: ownerA, organisation, team: teamA } = await seedUser();
@@ -81,30 +99,28 @@ const seedScenario = async () => {
     inheritMembers: false,
   });
 
-  const teamB = await prisma.team.findFirstOrThrow({
-    where: { url: teamBUrl },
-  });
+  const teamB = await prisma.team.findFirstOrThrow({ where: { url: teamBUrl } });
 
-  const memberA = await seedTeamMember({
-    teamId: teamA.id,
-    role: TeamMemberRole.MEMBER,
-  });
-
-  const memberB = await seedTeamMember({
-    teamId: teamB.id,
-    role: TeamMemberRole.MEMBER,
-  });
+  const memberA = await seedTeamMember({ teamId: teamA.id, role: TeamMemberRole.MEMBER });
+  const managerA = await seedTeamMember({ teamId: teamA.id, role: TeamMemberRole.MANAGER });
+  const memberB = await seedTeamMember({ teamId: teamB.id, role: TeamMemberRole.MEMBER });
 
   const { user: outsider, team: outsiderTeam } = await seedUser();
 
   const suffix = nanoid();
-
   const hiddenRecipientEmail = `hidden-recipient-${suffix}@example.com`;
 
   const everyoneTemplate = await seedBlankTemplate(ownerA, teamA.id, {
     createTemplateOptions: {
       title: `Everyone Template ${suffix}`,
       visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  const managerTemplate = await seedBlankTemplate(ownerA, teamA.id, {
+    createTemplateOptions: {
+      title: `Manager Template ${suffix}`,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
     },
   });
 
@@ -131,260 +147,199 @@ const seedScenario = async () => {
     },
   });
 
+  const allTitles = [everyoneTemplate.title, orgTemplate.title, managerTemplate.title, adminTemplate.title];
+
+  // Which templates each role on teamA should see.
+  const visibilityMatrix = [
+    { caller: memberA, visible: [everyoneTemplate.title, orgTemplate.title] },
+    { caller: managerA, visible: [everyoneTemplate.title, orgTemplate.title, managerTemplate.title] },
+    { caller: ownerA, visible: allTitles },
+  ];
+
   return {
     ownerA,
     memberA,
+    managerA,
     memberB,
     teamA,
     teamB,
     outsider,
     outsiderTeam,
+    suffix,
     everyoneTemplate,
+    managerTemplate,
     adminTemplate,
     orgTemplate,
     hiddenRecipientEmail,
+    allTitles,
+    visibilityMatrix,
   };
 };
 
-const titlesOf = (result: FindTemplatesResult | null) => (result?.data ?? []).map((row) => row.title);
+// ─── Not logged in, or using a team header for a team you are not in ─────────
 
-// ─── Unauthenticated and spoofed x-team-id requests ──────────────────────────
-
-test.describe('Find Templates API - Adversarial: Authentication and x-team-id Header Spoofing', () => {
+test.describe('Find Templates API - Adversarial: Auth and Team Header', () => {
   for (const procedure of FIND_TEMPLATE_PROCEDURES) {
     test(`${procedure}: should reject unauthenticated requests`, async ({ page }) => {
       const { teamA } = await seedScenario();
 
-      const { res } = await trpcQuery(page, procedure, { page: 1, perPage: 50 }, teamA.id);
+      const res = await trpcQuery(page, procedure, {}, teamA.id);
 
-      expect(res.ok()).toBeFalsy();
-      expect(res.status()).toBe(401);
+      expectRejected(res, 401);
     });
 
-    test(`${procedure}: should reject a spoofed x-team-id for a sibling team the user is not in`, async ({ page }) => {
-      const { memberA, teamB } = await seedScenario();
+    test(`${procedure}: should reject a team header for a team the user is not in`, async ({ page }) => {
+      const { memberA, teamA, teamB, outsider } = await seedScenario();
 
-      await apiSignin({ page, email: memberA.email });
+      const adminA = await seedTeamMember({ teamId: teamA.id, role: TeamMemberRole.ADMIN });
 
-      // teamB does not inherit organisation members, so memberA (teamA only)
-      // has no membership there and must be rejected despite being in the org.
-      const { res, result } = await trpcQuery(page, procedure, { page: 1, perPage: 50 }, teamB.id);
+      const cases = [
+        { name: 'org member, not in team', caller: memberA, teamId: teamB.id },
+        { name: 'admin of another team', caller: adminA, teamId: teamB.id },
+        { name: 'other organisation', caller: outsider, teamId: teamA.id },
+        { name: 'no team header', caller: memberA, teamId: undefined },
+      ];
 
-      expect(res.ok()).toBeFalsy();
-      expect(res.status()).toBe(404);
-      expect(result).toBeNull();
-    });
+      for (const { caller, teamId } of cases) {
+        await apiSignin({ page, email: caller.email });
 
-    test(`${procedure}: should reject an ADMIN of another team spoofing x-team-id`, async ({ page }) => {
-      const { teamA, teamB } = await seedScenario();
+        const res = await trpcQuery(page, procedure, {}, teamId);
 
-      // A team ADMIN role must not carry over to a team the user is not in.
-      const adminA = await seedTeamMember({
-        teamId: teamA.id,
-        role: TeamMemberRole.ADMIN,
-      });
+        expectRejected(res, 404);
 
-      await apiSignin({ page, email: adminA.email });
-
-      const { res, result } = await trpcQuery(page, procedure, { page: 1, perPage: 50 }, teamB.id);
-
-      expect(res.ok()).toBeFalsy();
-      expect(res.status()).toBe(404);
-      expect(result).toBeNull();
-    });
-
-    test(`${procedure}: should reject a spoofed x-team-id for a team in another organisation`, async ({ page }) => {
-      const { outsider, teamA } = await seedScenario();
-
-      await apiSignin({ page, email: outsider.email });
-
-      const { res, result } = await trpcQuery(page, procedure, { page: 1, perPage: 50 }, teamA.id);
-
-      expect(res.ok()).toBeFalsy();
-      expect(res.status()).toBe(404);
-      expect(result).toBeNull();
-    });
-
-    test(`${procedure}: should reject a request with no team header`, async ({ page }) => {
-      const { memberA } = await seedScenario();
-
-      await apiSignin({ page, email: memberA.email });
-
-      const { res, result } = await trpcQuery(page, procedure, { page: 1, perPage: 50 });
-
-      expect(res.ok()).toBeFalsy();
-      expect(res.status()).toBe(404);
-      expect(result).toBeNull();
+        await apiSignout({ page });
+      }
     });
   }
 
-  test('findOrganisationTemplates: should reject a spoofed x-team-id for a team in another organisation', async ({
-    page,
-  }) => {
+  test('findOrganisationTemplates: should reject a team header for a team in another org', async ({ page }) => {
     const { outsider, teamA } = await seedScenario();
 
     await apiSignin({ page, email: outsider.email });
 
-    const { res, result } = await trpcQuery(
-      page,
-      'template.findOrganisationTemplates',
-      { page: 1, perPage: 50 },
-      teamA.id,
-    );
+    const res = await trpcQuery(page, 'template.findOrganisationTemplates', {}, teamA.id);
 
-    expect(res.ok()).toBeFalsy();
-    expect(res.status()).toBe(404);
-    expect(result).toBeNull();
+    expectRejected(res, 404);
   });
 });
 
-// ─── Search query: must not reveal hidden templates (even via count) ─────────
+// ─── Search must not find templates you cannot see ──────────────────────────
 
-test.describe('Find Templates API - Adversarial: Search Query Leakage', () => {
+test.describe('Find Templates API - Adversarial: Search', () => {
   for (const procedure of FIND_TEMPLATE_PROCEDURES) {
-    test(`${procedure}: query must not reveal templates hidden by role visibility`, async ({ page }) => {
+    test(`${procedure}: search must not find templates hidden by role`, async ({ page }) => {
       const { memberA, teamA, adminTemplate, hiddenRecipientEmail } = await seedScenario();
 
       await apiSignin({ page, email: memberA.email });
 
-      // Exact title.
-      const byTitle = await trpcQuery(page, procedure, { query: adminTemplate.title, page: 1, perPage: 50 }, teamA.id);
+      for (const query of [adminTemplate.title, adminTemplate.externalId, hiddenRecipientEmail]) {
+        const res = await trpcQuery(page, procedure, { query }, teamA.id);
 
-      expect(byTitle.res.ok()).toBeTruthy();
-      expect(byTitle.result?.count).toBe(0);
-      expect(titlesOf(byTitle.result)).not.toContain(adminTemplate.title);
-
-      // External ID.
-      const byExternalId = await trpcQuery(
-        page,
-        procedure,
-        { query: adminTemplate.externalId, page: 1, perPage: 50 },
-        teamA.id,
-      );
-
-      expect(byExternalId.result?.count).toBe(0);
-
-      // Recipient email.
-      const byRecipient = await trpcQuery(
-        page,
-        procedure,
-        { query: hiddenRecipientEmail, page: 1, perPage: 50 },
-        teamA.id,
-      );
-
-      expect(byRecipient.result?.count).toBe(0);
+        expectNoResults(res);
+      }
     });
 
-    test(`${procedure}: query must not reveal templates from a sibling team`, async ({ page }) => {
+    test(`${procedure}: search must not find templates from another team`, async ({ page }) => {
       const { memberB, teamB, everyoneTemplate } = await seedScenario();
 
       await apiSignin({ page, email: memberB.email });
 
-      const { res, result } = await trpcQuery(
-        page,
-        procedure,
-        { query: everyoneTemplate.title, page: 1, perPage: 50 },
-        teamB.id,
-      );
+      const res = await trpcQuery(page, procedure, { query: everyoneTemplate.title }, teamB.id);
 
-      expect(res.ok()).toBeTruthy();
-      expect(result?.count).toBe(0);
-      expect(titlesOf(result)).not.toContain(everyoneTemplate.title);
+      expectNoResults(res);
     });
 
-    test(`${procedure}: query must not reveal templates from another organisation`, async ({ page }) => {
+    test(`${procedure}: search must not find templates from another org`, async ({ page }) => {
       const { outsider, outsiderTeam, everyoneTemplate } = await seedScenario();
 
       await apiSignin({ page, email: outsider.email });
 
-      const { res, result } = await trpcQuery(
-        page,
-        procedure,
-        { query: everyoneTemplate.title, page: 1, perPage: 50 },
-        outsiderTeam.id,
-      );
+      const res = await trpcQuery(page, procedure, { query: everyoneTemplate.title }, outsiderTeam.id);
 
-      expect(res.ok()).toBeTruthy();
-      expect(result?.count).toBe(0);
+      expectNoResults(res);
     });
 
-    test(`${procedure}: query still returns templates the user is allowed to see`, async ({ page }) => {
-      const { memberA, teamA, everyoneTemplate, adminTemplate, orgTemplate } = await seedScenario();
+    test(`${procedure}: list and search show only what each role is allowed to see`, async ({ page }) => {
+      const { teamA, suffix, allTitles, visibilityMatrix } = await seedScenario();
+
+      for (const { caller, visible } of visibilityMatrix) {
+        await apiSignin({ page, email: caller.email });
+
+        const listRes = await trpcQuery(page, procedure, {}, teamA.id);
+
+        expectExactTitles(listRes, visible, teamA.id);
+
+        const searchRes = await trpcQuery(page, procedure, { query: suffix }, teamA.id);
+
+        expectExactTitles(searchRes, visible, teamA.id);
+
+        for (const hidden of allTitles.filter((title) => !visible.includes(title))) {
+          const res = await trpcQuery(page, procedure, { query: hidden }, teamA.id);
+
+          expectNoResults(res);
+        }
+
+        await apiSignout({ page });
+      }
+    });
+
+    test(`${procedure}: wildcard search must not show more than allowed`, async ({ page }) => {
+      const { memberA, teamA, everyoneTemplate, orgTemplate } = await seedScenario();
 
       await apiSignin({ page, email: memberA.email });
 
-      // All three teamA templates share this suffix; only the two visible to a
-      // MEMBER should match, and the count must not leak the hidden one.
-      const suffix = everyoneTemplate.title.split(' ').pop();
-
-      const { res, result } = await trpcQuery(page, procedure, { query: suffix, page: 1, perPage: 50 }, teamA.id);
-
-      expect(res.ok()).toBeTruthy();
-      expect(result?.count).toBe(2);
-      expect(titlesOf(result)).toContain(everyoneTemplate.title);
-      expect(titlesOf(result)).toContain(orgTemplate.title);
-      expect(titlesOf(result)).not.toContain(adminTemplate.title);
-    });
-
-    test(`${procedure}: LIKE wildcard queries must not widen visibility`, async ({ page }) => {
-      const { memberA, teamA, adminTemplate } = await seedScenario();
-
-      await apiSignin({ page, email: memberA.email });
-
-      // `%` and `_` are passed through to ILIKE, so these are the widest
-      // possible queries. They may match everything visible, but never more.
+      // % and _ are not escaped, so these match everything you are allowed to see.
       for (const query of ['%', '_', '%%%']) {
-        const { res, result } = await trpcQuery(page, procedure, { query, page: 1, perPage: 50 }, teamA.id);
+        const res = await trpcQuery(page, procedure, { query }, teamA.id);
 
-        expect(res.ok()).toBeTruthy();
-        expect(result?.count).toBe(2);
-        expect(titlesOf(result)).not.toContain(adminTemplate.title);
-        expect(result?.data.every((row) => row.teamId === teamA.id)).toBe(true);
+        expectExactTitles(res, [everyoneTemplate.title, orgTemplate.title], teamA.id);
       }
 
-      // A wildcard-wrapped fragment of the hidden title must still find nothing.
-      const { result } = await trpcQuery(page, procedure, { query: '%Admin Only%', page: 1, perPage: 50 }, teamA.id);
+      for (const query of ['%Admin Only%', '%Manager%']) {
+        const res = await trpcQuery(page, procedure, { query }, teamA.id);
 
-      expect(result?.count).toBe(0);
+        expectNoResults(res);
+      }
     });
   }
 
-  test('findOrganisationTemplates: query must not reveal org templates from another organisation', async ({ page }) => {
+  test('findOrganisationTemplates: search must not find templates from another org', async ({ page }) => {
     const { outsider, outsiderTeam, orgTemplate } = await seedScenario();
 
     await apiSignin({ page, email: outsider.email });
 
-    const { res, result } = await trpcQuery(
+    const res = await trpcQuery(
       page,
       'template.findOrganisationTemplates',
-      { query: orgTemplate.title, page: 1, perPage: 50 },
+      { query: orgTemplate.title },
       outsiderTeam.id,
     );
 
-    expect(res.ok()).toBeTruthy();
-    expect(result?.count).toBe(0);
+    expectNoResults(res);
   });
 
-  test('findOrganisationTemplates: query must not reveal non-org templates from a sibling team', async ({ page }) => {
-    const { memberB, teamB, everyoneTemplate, adminTemplate } = await seedScenario();
+  test('findOrganisationTemplates: search must not find team templates from another team', async ({ page }) => {
+    const { memberB, teamB, everyoneTemplate, managerTemplate, adminTemplate } = await seedScenario();
 
     await apiSignin({ page, email: memberB.email });
 
-    for (const template of [everyoneTemplate, adminTemplate]) {
-      const { res, result } = await trpcQuery(
-        page,
-        'template.findOrganisationTemplates',
-        { query: template.title, page: 1, perPage: 50 },
-        teamB.id,
-      );
+    for (const { title } of [everyoneTemplate, managerTemplate, adminTemplate]) {
+      const res = await trpcQuery(page, 'template.findOrganisationTemplates', { query: title }, teamB.id);
 
-      expect(res.ok()).toBeTruthy();
-      expect(result?.count).toBe(0);
+      expectNoResults(res);
     }
   });
 
-  test('findOrganisationTemplates: query must not reveal admin-only org templates to a member', async ({ page }) => {
-    const { ownerA, teamA, memberB, teamB } = await seedScenario();
+  test('findOrganisationTemplates: shows only what the user role on the requesting team allows', async ({ page }) => {
+    const { ownerA, teamA, teamB, memberB, orgTemplate } = await seedScenario();
+
+    const managerOrgTemplate = await seedBlankTemplate(ownerA, teamA.id, {
+      createTemplateOptions: {
+        title: `Manager Org Template ${nanoid()}`,
+        templateType: TemplateType.ORGANISATION,
+        visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+      },
+    });
 
     const adminOrgTemplate = await seedBlankTemplate(ownerA, teamA.id, {
       createTemplateOptions: {
@@ -394,140 +349,154 @@ test.describe('Find Templates API - Adversarial: Search Query Leakage', () => {
       },
     });
 
-    await apiSignin({ page, email: memberB.email });
+    const managerB = await seedTeamMember({ teamId: teamB.id, role: TeamMemberRole.MANAGER });
 
-    const { res, result } = await trpcQuery(
-      page,
-      'template.findOrganisationTemplates',
-      { query: adminOrgTemplate.title, page: 1, perPage: 50 },
-      teamB.id,
-    );
+    const allOrgTitles = [orgTemplate.title, managerOrgTemplate.title, adminOrgTemplate.title];
 
-    expect(res.ok()).toBeTruthy();
-    expect(result?.count).toBe(0);
+    const matrix = [
+      { caller: memberB, visible: [orgTemplate.title] },
+      { caller: managerB, visible: [orgTemplate.title, managerOrgTemplate.title] },
+    ];
+
+    for (const { caller, visible } of matrix) {
+      await apiSignin({ page, email: caller.email });
+
+      const listRes = await trpcQuery(page, 'template.findOrganisationTemplates', {}, teamB.id);
+
+      expectExactTitles(listRes, visible, teamA.id);
+
+      for (const hidden of allOrgTitles.filter((title) => !visible.includes(title))) {
+        const res = await trpcQuery(page, 'template.findOrganisationTemplates', { query: hidden }, teamB.id);
+
+        expectNoResults(res);
+      }
+
+      await apiSignout({ page });
+    }
   });
 });
 
-// ─── ownerIds: must not reach other teams or bypass visibility ───────────────
+// ─── Owner filter must not reach other teams or skip visibility checks ───────
 
-test.describe('Find Templates API - Adversarial: Cross-Team ownerIds', () => {
-  test('ownerIds must not reveal templates owned by a user in a sibling team', async ({ page }) => {
-    const { ownerA, memberB, teamB, everyoneTemplate } = await seedScenario();
+test.describe('Find Templates API - Adversarial: Owner Filter', () => {
+  const procedure = 'template.findTemplatesInternal';
+
+  test('owner filter must not find templates from another team', async ({ page }) => {
+    const { ownerA, memberB, teamB } = await seedScenario();
 
     await apiSignin({ page, email: memberB.email });
 
-    // memberB (teamB) asks for everything owned by ownerA, whose templates live on teamA.
-    const { res, result } = await trpcQuery(
-      page,
-      'template.findTemplatesInternal',
-      { ownerIds: [ownerA.id], page: 1, perPage: 50 },
-      teamB.id,
-    );
+    const res = await trpcQuery(page, procedure, { ownerIds: [ownerA.id] }, teamB.id);
 
-    expect(res.ok()).toBeTruthy();
-    expect(result?.count).toBe(0);
-    expect(titlesOf(result)).not.toContain(everyoneTemplate.title);
+    expectNoResults(res);
   });
 
-  test('ownerIds must not reveal templates owned by a user in another organisation', async ({ page }) => {
-    const { ownerA, outsider, outsiderTeam, everyoneTemplate } = await seedScenario();
+  test('owner filter must not find templates from another org', async ({ page }) => {
+    const { ownerA, outsider, outsiderTeam } = await seedScenario();
 
     await apiSignin({ page, email: outsider.email });
 
-    const { res, result } = await trpcQuery(
-      page,
-      'template.findTemplatesInternal',
-      { ownerIds: [ownerA.id], page: 1, perPage: 50 },
-      outsiderTeam.id,
-    );
+    const res = await trpcQuery(page, procedure, { ownerIds: [ownerA.id] }, outsiderTeam.id);
 
-    expect(res.ok()).toBeTruthy();
-    expect(result?.count).toBe(0);
-    expect(titlesOf(result)).not.toContain(everyoneTemplate.title);
+    expectNoResults(res);
   });
 
-  test('ownerIds must not bypass role visibility within the team', async ({ page }) => {
-    const { ownerA, memberA, teamA, everyoneTemplate, adminTemplate } = await seedScenario();
+  test('owning a template only makes it visible in its own team', async ({ page }) => {
+    const { memberB, teamA, teamB } = await seedScenario();
 
-    await apiSignin({ page, email: memberA.email });
+    // memberB is in both teams and owns an admin-only template in each.
+    // They can only see these because they own them. That must not cross teams.
+    const ownedOnA = await seedBlankTemplate(memberB, teamA.id, {
+      createTemplateOptions: { title: `Owned On A ${nanoid()}`, visibility: DocumentVisibility.ADMIN },
+    });
 
-    // memberA is a MEMBER; filtering by the admin owner must still hide ADMIN-only templates.
-    const { res, result } = await trpcQuery(
-      page,
-      'template.findTemplatesInternal',
-      { ownerIds: [ownerA.id], page: 1, perPage: 50 },
-      teamA.id,
-    );
+    const ownedOnB = await seedBlankTemplate(memberB, teamB.id, {
+      createTemplateOptions: { title: `Owned On B ${nanoid()}`, visibility: DocumentVisibility.ADMIN },
+    });
 
-    expect(res.ok()).toBeTruthy();
-    expect(titlesOf(result)).toContain(everyoneTemplate.title);
-    expect(titlesOf(result)).not.toContain(adminTemplate.title);
-    expect(result?.data.every((row) => row.teamId === teamA.id)).toBe(true);
+    await apiSignin({ page, email: memberB.email });
+
+    const inputs = [
+      {},
+      { ownerIds: [memberB.id] },
+      { query: 'Owned On' },
+      { ownerIds: [memberB.id], query: 'Owned On' },
+    ];
+
+    for (const input of inputs) {
+      // teamB has no other templates, so this is the only row.
+      const fromB = await trpcQuery(page, procedure, input, teamB.id);
+
+      expectExactTitles(fromB, [ownedOnB.title], teamB.id);
+
+      const fromA = await trpcQuery(page, procedure, input, teamA.id);
+
+      expect(fromA.response.ok()).toBeTruthy();
+      expect(titlesOf(fromA)).toContain(ownedOnA.title);
+      expect(titlesOf(fromA)).not.toContain(ownedOnB.title);
+    }
   });
 
-  test('ownerIds combined with query must not bypass role visibility', async ({ page }) => {
-    const { ownerA, memberA, teamA, adminTemplate } = await seedScenario();
+  test('owner filter shows only what each role is allowed to see', async ({ page }) => {
+    const { ownerA, teamA, suffix, allTitles, visibilityMatrix } = await seedScenario();
 
-    await apiSignin({ page, email: memberA.email });
+    const ownerIds = [ownerA.id];
 
-    const { res, result } = await trpcQuery(
-      page,
-      'template.findTemplatesInternal',
-      { ownerIds: [ownerA.id], query: adminTemplate.title, page: 1, perPage: 50 },
-      teamA.id,
-    );
+    for (const { caller, visible } of visibilityMatrix) {
+      await apiSignin({ page, email: caller.email });
 
-    expect(res.ok()).toBeTruthy();
-    expect(result?.count).toBe(0);
+      const listRes = await trpcQuery(page, procedure, { ownerIds }, teamA.id);
+
+      expectExactTitles(listRes, visible, teamA.id);
+
+      const searchRes = await trpcQuery(page, procedure, { ownerIds, query: suffix }, teamA.id);
+
+      expectExactTitles(searchRes, visible, teamA.id);
+
+      for (const hidden of allTitles.filter((title) => !visible.includes(title))) {
+        const res = await trpcQuery(page, procedure, { ownerIds, query: hidden }, teamA.id);
+
+        expectNoResults(res);
+      }
+
+      await apiSignout({ page });
+    }
   });
 
-  test('ownerIds with unknown user IDs returns nothing rather than everything', async ({ page }) => {
+  test('owner filter with unknown user ids returns nothing', async ({ page }) => {
     const { ownerA, teamA } = await seedScenario();
 
     await apiSignin({ page, email: ownerA.email });
 
-    const { res, result } = await trpcQuery(
-      page,
-      'template.findTemplatesInternal',
-      { ownerIds: [-1, 999999999], page: 1, perPage: 50 },
-      teamA.id,
-    );
+    const res = await trpcQuery(page, procedure, { ownerIds: [-1, 999999999] }, teamA.id);
 
-    expect(res.ok()).toBeTruthy();
-    expect(result?.count).toBe(0);
+    expectNoResults(res);
   });
 
-  test('ownerIds is ignored by the public findTemplates route', async ({ page }) => {
-    const { ownerA, memberA, teamA, everyoneTemplate } = await seedScenario();
+  test('owner filter is ignored by the public findTemplates route', async ({ page }) => {
+    const { ownerA, memberA, teamA, everyoneTemplate, orgTemplate } = await seedScenario();
 
     await apiSignin({ page, email: memberA.email });
 
-    // Passing ownerIds to the public route must not error or filter, since
-    // the field is not part of its contract.
-    const { res, result } = await trpcQuery(
-      page,
-      'template.findTemplates',
-      { ownerIds: [ownerA.id], page: 1, perPage: 50 },
-      teamA.id,
-    );
+    // The public route does not accept ownerIds. It should be dropped, not error.
+    const res = await trpcQuery(page, 'template.findTemplates', { ownerIds: [ownerA.id] }, teamA.id);
 
-    expect(res.ok()).toBeTruthy();
-    expect(titlesOf(result)).toContain(everyoneTemplate.title);
+    expectExactTitles(res, [everyoneTemplate.title, orgTemplate.title], teamA.id);
   });
 });
 
-// ─── folderId: must not reach other teams ────────────────────────────────────
+// ─── Folder filter must not reach other teams ────────────────────────────────
 
-test.describe('Find Templates API - Adversarial: Cross-Team folderId', () => {
+test.describe('Find Templates API - Adversarial: Folder Filter', () => {
   for (const procedure of FIND_TEMPLATE_PROCEDURES) {
-    test(`${procedure}: folderId from a sibling team must not reveal that folder's templates`, async ({ page }) => {
+    test(`${procedure}: folder filter must not find folders from another team`, async ({ page }) => {
       const { ownerA, teamA, memberB, teamB } = await seedScenario();
 
       const folderA = await seedBlankFolder(ownerA, teamA.id, {
         createFolderOptions: { type: FolderType.TEMPLATE },
       });
 
-      const folderedTemplate = await seedBlankTemplate(ownerA, teamA.id, {
+      await seedBlankTemplate(ownerA, teamA.id, {
         createTemplateOptions: {
           title: `Foldered Template ${nanoid()}`,
           visibility: DocumentVisibility.EVERYONE,
@@ -537,16 +506,9 @@ test.describe('Find Templates API - Adversarial: Cross-Team folderId', () => {
 
       await apiSignin({ page, email: memberB.email });
 
-      const { res, result } = await trpcQuery(
-        page,
-        procedure,
-        { folderId: folderA.id, page: 1, perPage: 50 },
-        teamB.id,
-      );
+      const res = await trpcQuery(page, procedure, { folderId: folderA.id }, teamB.id);
 
-      expect(res.ok()).toBeTruthy();
-      expect(result?.count).toBe(0);
-      expect(titlesOf(result)).not.toContain(folderedTemplate.title);
+      expectNoResults(res);
     });
   }
 });
