@@ -69,11 +69,25 @@ export const isPrivateUrl = (url: string): boolean => {
       }
     }
 
-    // IPv4-mapped IPv6 (e.g. ::ffff:127.0.0.1)
-    const v4Mapped = normalizedHost.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+    // IPv4-mapped IPv6, dotted form (e.g. ::ffff:127.0.0.1)
+    const v4MappedDotted = normalizedHost.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
 
-    if (v4Mapped) {
-      return isPrivateUrl(`http://${v4Mapped[1]}`);
+    if (v4MappedDotted) {
+      return isPrivateUrl(`http://${v4MappedDotted[1]}`);
+    }
+
+    // IPv4-mapped IPv6, hex form (e.g. ::ffff:7f00:1). `new URL()` normalizes the
+    // dotted form above to this, so it must be decoded to the embedded IPv4 as
+    // well - otherwise a literal host such as `http://[::ffff:127.0.0.1]` slips
+    // through every dotted-decimal check above (SSRF, see #2901).
+    const v4MappedHex = normalizedHost.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i);
+
+    if (v4MappedHex) {
+      const high = parseInt(v4MappedHex[1], 16);
+      const low = parseInt(v4MappedHex[2], 16);
+      const ipv4 = [high >> 8, high & 0xff, low >> 8, low & 0xff].join('.');
+
+      return isPrivateUrl(`http://${ipv4}`);
     }
 
     return false;
