@@ -431,6 +431,7 @@ const MultiSelect = ({
               >
                 {option.label}
                 <button
+                  type="button"
                   className="absolute -inset-y-px -end-px flex size-7 items-center justify-center rounded-e-md border border-transparent p-0 text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {

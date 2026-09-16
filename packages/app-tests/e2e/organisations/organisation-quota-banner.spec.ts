@@ -7,8 +7,8 @@ import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
-const BANNER_EXCEEDED_TEXT = 'Your organisation has exceeded a fair use limit';
-const BANNER_NEARING_TEXT = 'Your organisation is approaching a fair use limit';
+const BANNER_EXCEEDED_TEXT = 'Your organization has exceeded a fair use limit';
+const BANNER_NEARING_TEXT = 'Your organization is approaching a fair use limit';
 
 type SeedQuotaStateOptions = {
   organisationId: string;
@@ -162,7 +162,7 @@ test('[QUOTA BANNER]: is hidden for free-claim organisations', async ({ page }) 
   });
 
   // Anchor on a stable element so banner-absence is meaningful (page fully loaded).
-  await expect(page.getByLabel('Organisation Name*')).toBeVisible();
+  await expect(page.getByLabel('Organization Name*')).toBeVisible();
 
   await expect(page.getByText(BANNER_EXCEEDED_TEXT)).toBeHidden();
   await expect(page.getByRole('button', { name: 'Learn more' })).toBeHidden();

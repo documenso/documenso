@@ -290,10 +290,11 @@ export const EnvelopesBulkDownloadDialog = ({
         {isOverDownloadLimit && (
           <Alert variant="warning">
             <AlertDescription>
-              <Trans>
-                You can download up to {MAX_BULK_DOWNLOAD_ENVELOPES} documents at a time. Deselect some documents to
-                continue.
-              </Trans>
+              <Plural
+                value={MAX_BULK_DOWNLOAD_ENVELOPES}
+                one="You can download up to # document at a time. Deselect some documents to continue."
+                other="You can download up to # documents at a time. Deselect some documents to continue."
+              />
             </AlertDescription>
           </Alert>
         )}
