@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -71,6 +72,7 @@ export const EnvelopeDistributeDialog = ({
   const { toast } = useToast();
   const { t, i18n } = useLingui();
   const navigate = useNavigate();
+  const analytics = useAnalytics();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -199,6 +201,12 @@ export const EnvelopeDistributeDialog = ({
       setIsOpen(false);
     } catch (err) {
       const error = AppError.parseError(err);
+
+      analytics.captureException(err, {
+        source: 'editor',
+        location: 'distribute_document',
+        envelopeId: envelope.id,
+      });
 
       const errorMessage = getDistributeErrorMessage(error.code);
 

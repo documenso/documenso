@@ -8,4 +8,7 @@ export default {
   // kept without a trailing slash so they match exactly, and so the bare
   // sub-path URL (e.g. "/ESign") still matches the basename at runtime.
   basename: process.env.NEXT_PUBLIC_BASE_PATH ? process.env.NEXT_PUBLIC_BASE_PATH.replace(/\/$/, '') : '/',
+  future: {
+    v8_middleware: true,
+  },
 } satisfies Config;
