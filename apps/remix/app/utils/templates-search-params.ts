@@ -1,4 +1,4 @@
-import { parseAsInteger, parseAsStringLiteral } from 'nuqs';
+import { parseAsArrayOf, parseAsInteger, parseAsString, parseAsStringLiteral } from 'nuqs';
 
 export const TEMPLATES_VIEW_VALUES = ['team', 'organisation'] as const;
 
@@ -10,6 +10,8 @@ export const TEMPLATES_VIEW_VALUES = ['team', 'organisation'] as const;
  */
 export const templatesSearchParams = {
   view: parseAsStringLiteral(TEMPLATES_VIEW_VALUES),
+  ownerIds: parseAsArrayOf(parseAsInteger),
   page: parseAsInteger,
   perPage: parseAsInteger,
+  query: parseAsString,
 };

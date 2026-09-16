@@ -14,14 +14,17 @@ export const TemplatesTableViewFilter = () => {
   const [{ view }, setSearchParams] = useQueryStates(
     {
       view: templatesSearchParams.view,
+      ownerIds: templatesSearchParams.ownerIds,
       page: templatesSearchParams.page,
     },
     { history: 'push' },
   );
 
   const onChange = (newView: string | null) => {
+    // The owner filter only applies to the team view, so drop it on any view change.
     void setSearchParams({
       view: TEMPLATES_VIEW_VALUES.find((value) => value === newView) ?? null,
+      ownerIds: null,
       page: null,
     });
   };
