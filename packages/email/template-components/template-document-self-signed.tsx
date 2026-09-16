@@ -2,6 +2,7 @@ import { env } from '@documenso/lib/utils/env';
 import { Trans } from '@lingui/react/macro';
 
 import { Button, Column, Img, Link, Section, Text } from '../components';
+import { getEmailAssetUrl } from '../utils/asset-url';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentSelfSignedProps {
@@ -14,10 +15,6 @@ export const TemplateDocumentSelfSigned = ({ documentName, assetBaseUrl }: Templ
 
   const signUpUrl = `${NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signup`;
 
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
-
   return (
     <>
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
@@ -27,7 +24,7 @@ export const TemplateDocumentSelfSigned = ({ documentName, assetBaseUrl }: Templ
           <Column align="center">
             <Text className="font-semibold text-base text-foreground">
               <Img
-                src={getAssetUrl('/static/completed.png')}
+                src={getEmailAssetUrl(assetBaseUrl, 'static/completed.png')}
                 className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
                 alt=""
               />
@@ -56,7 +53,7 @@ export const TemplateDocumentSelfSigned = ({ documentName, assetBaseUrl }: Templ
             className="mr-4 rounded-lg border border-border border-solid px-4 py-2 text-center font-medium text-foreground text-sm no-underline"
           >
             <Img
-              src={getAssetUrl('/static/user-plus.png')}
+              src={getEmailAssetUrl(assetBaseUrl, 'static/user-plus.png')}
               className="mr-2 mb-0.5 inline h-5 w-5 align-middle"
               alt=""
             />
@@ -67,7 +64,11 @@ export const TemplateDocumentSelfSigned = ({ documentName, assetBaseUrl }: Templ
             className="rounded-lg border border-border border-solid px-4 py-2 text-center font-medium text-foreground text-sm no-underline"
             href="https://documenso.com/pricing"
           >
-            <Img src={getAssetUrl('/static/review.png')} className="mr-2 mb-0.5 inline h-5 w-5 align-middle" alt="" />
+            <Img
+              src={getEmailAssetUrl(assetBaseUrl, 'static/review.png')}
+              className="mr-2 mb-0.5 inline h-5 w-5 align-middle"
+              alt=""
+            />
             <Trans>View plans</Trans>
           </Button>
         </Section>

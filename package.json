@@ -5,7 +5,7 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "2.16.0",
+  "version": "2.18.0",
   "scripts": {
     "postinstall": "patch-package",
     "build": "turbo run build",
@@ -41,10 +41,25 @@
     "translate:extract": "lingui extract --clean",
     "translate:compile": "lingui compile"
   },
-  "packageManager": "npm@11.11.0",
+  "packageManager": "npm@11.19.1",
   "engines": {
-    "npm": ">=11.11.0",
-    "node": ">=22.0.0"
+    "npm": ">=11.17.0",
+    "node": ">=24.0.0"
+  },
+  "allowScripts": {
+    "@documenso/skia-canvas": true,
+    "@playwright/browser-chromium": true,
+    "@prisma/client": true,
+    "@prisma/engines": true,
+    "aws-crt": true,
+    "esbuild": true,
+    "fsevents": true,
+    "inngest-cli": true,
+    "prisma": true,
+    "@datadog/pprof": false,
+    "core-js": false,
+    "msgpackr-extract": false,
+    "protobufjs": false
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.8",
@@ -67,7 +82,7 @@
     "esbuild": "^0.28.1",
     "husky": "^9.1.7",
     "inngest": "^3.54.0",
-    "inngest-cli": "^1.17.9",
+    "inngest-cli": "^1.44.0",
     "lint-staged": "^16.2.7",
     "nanoid": "^5.1.6",
     "nodemailer": "^9.0.0",
@@ -91,7 +106,7 @@
   "dependencies": {
     "@ai-sdk/google-vertex": "5.0.48",
     "@documenso/prisma": "*",
-    "@libpdf/core": "^0.4.1",
+    "@libpdf/core": "^0.4.2",
     "@lingui/conf": "^5.6.0",
     "@lingui/core": "^5.6.0",
     "@prisma/extension-read-replicas": "^0.4.1",
@@ -130,7 +145,7 @@
     "posthog-node": "4.18.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "sharp": "0.35.3",
+    "sharp": "0.35.4",
     "typescript": "5.6.2",
     "@marsidev/react-turnstile": "^1.5.0",
     "zod": "^3.25.76"
