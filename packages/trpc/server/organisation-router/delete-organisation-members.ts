@@ -13,6 +13,7 @@ import {
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZDeleteOrganisationMembersRequestSchema,
   ZDeleteOrganisationMembersResponseSchema,
@@ -22,6 +23,7 @@ export const deleteOrganisationMembersRoute = authenticatedProcedure
   //   .meta(deleteOrganisationMembersMeta)
   .input(ZDeleteOrganisationMembersRequestSchema)
   .output(ZDeleteOrganisationMembersResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .mutation(async ({ ctx, input }) => {
     const { organisationId, organisationMemberIds } = input;
     const userId = ctx.user.id;

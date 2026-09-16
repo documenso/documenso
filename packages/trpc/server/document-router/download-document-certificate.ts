@@ -7,6 +7,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZDownloadDocumentCertificateRequestSchema,
   ZDownloadDocumentCertificateResponseSchema,
@@ -15,6 +16,7 @@ import {
 export const downloadDocumentCertificateRoute = authenticatedProcedure
   .input(ZDownloadDocumentCertificateRequestSchema)
   .output(ZDownloadDocumentCertificateResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { envelopeId } = input;

@@ -9,6 +9,7 @@
     "background-jobs",
     "signing-certificate",
     "telemetry",
+    "two-factor-enforcement",
     "organisation-limits",
     "advanced"
   ]

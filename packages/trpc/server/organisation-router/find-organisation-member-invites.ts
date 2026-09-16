@@ -7,6 +7,7 @@ import type { OrganisationMemberInviteStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZFindOrganisationMemberInvitesRequestSchema,
   ZFindOrganisationMemberInvitesResponseSchema,
@@ -16,6 +17,7 @@ export const findOrganisationMemberInvitesRoute = authenticatedProcedure
   //   .meta(getOrganisationMemberInvitesMeta)
   .input(ZFindOrganisationMemberInvitesRequestSchema)
   .output(ZFindOrganisationMemberInvitesResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ input, ctx }) => {
     const { organisationId, query, page, perPage, status } = input;
     const { user } = ctx;

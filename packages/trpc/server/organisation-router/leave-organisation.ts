@@ -4,11 +4,14 @@ import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations'
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorRemediation } from '../two-factor-enforcement/enforce';
 import { ZLeaveOrganisationRequestSchema, ZLeaveOrganisationResponseSchema } from './leave-organisation.types';
 
 export const leaveOrganisationRoute = authenticatedProcedure
   .input(ZLeaveOrganisationRequestSchema)
   .output(ZLeaveOrganisationResponseSchema)
+  // 2FA enforcement: REMEDIATION — a blocked member must always be able to leave the organisation. Instance assert still applies.
+  .use(twoFactorRemediation())
   .mutation(async ({ ctx, input }) => {
     const { organisationId } = input;
     const userId = ctx.user.id;

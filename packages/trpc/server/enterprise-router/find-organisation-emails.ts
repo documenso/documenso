@@ -5,6 +5,7 @@ import { prisma } from '@documenso/prisma';
 import { Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZFindOrganisationEmailsRequestSchema,
   ZFindOrganisationEmailsResponseSchema,
@@ -13,6 +14,7 @@ import {
 export const findOrganisationEmailsRoute = authenticatedProcedure
   .input(ZFindOrganisationEmailsRequestSchema)
   .output(ZFindOrganisationEmailsResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ input, ctx }) => {
     const { organisationId, emailDomainId, query, page, perPage } = input;
     const { user } = ctx;

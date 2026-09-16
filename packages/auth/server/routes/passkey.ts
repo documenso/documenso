@@ -6,6 +6,7 @@ import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/servi
 import type { TAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 import { ZAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 import { getAuthenticatorOptions } from '@documenso/lib/utils/authenticator';
+import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { prisma } from '@documenso/prisma';
 import { sValidator } from '@hono/standard-validator';
 import { UserSecurityAuditLogType } from '@prisma/client';
@@ -37,7 +38,7 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    const { csrfToken, credential } = c.req.valid('json');
+    const { csrfToken, credential, redirectPath } = c.req.valid('json');
 
     if (typeof csrfToken !== 'string' || csrfToken.length === 0) {
       throw new AppError(AppErrorCode.INVALID_REQUEST);
@@ -104,6 +105,12 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
       expectedChallenge: challengeToken.token,
       expectedOrigin: origin,
       expectedRPID: rpId,
+      // The library defaults this to true — stated explicitly because the
+      // resulting session counts as second-factor verified, which is only
+      // sound if the authenticator performed user verification (PIN or
+      // biometric). See the matching `userVerification: 'required'` in
+      // `create-passkey-signin-options.ts`.
+      requireUserVerification: true,
       credential: {
         id: isoBase64URL.fromBuffer(passkey.credentialId),
         publicKey: new Uint8Array(passkey.credentialPublicKey),
@@ -134,11 +141,17 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
       },
     });
 
-    await onAuthorize({ userId: user.id }, c);
+    // A passkey is a trusted second factor (user verification enforced
+    // above), so the session counts as second-factor verified.
+    await onAuthorize({ userId: user.id, authMethod: 'passkey', twoFactorVerified: true }, c);
+
+    // Honor the client's redirect path only when it is a valid same-origin
+    // path.
+    const url = isValidReturnTo(redirectPath) ? (normalizeReturnTo(redirectPath) ?? '/') : '/';
 
     return c.json(
       {
-        url: '/',
+        url,
       },
       200,
     );

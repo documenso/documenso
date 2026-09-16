@@ -5,11 +5,14 @@ import type { Envelope, Prisma } from '@prisma/client';
 import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorInstanceOnly } from '../two-factor-enforcement/enforce';
 import { ZFindInboxRequestSchema, ZFindInboxResponseSchema } from './find-inbox.types';
 
 export const findInboxRoute = authenticatedProcedure
   .input(ZFindInboxRequestSchema)
   .output(ZFindInboxResponseSchema)
+  // 2FA enforcement: recipient-perspective inbox (documents where the user is a signer); signing access is token-authorized by design, not organisation-member access. Instance assert still applies.
+  .use(twoFactorInstanceOnly())
   .query(async ({ input, ctx }) => {
     const { page, perPage } = input;
 

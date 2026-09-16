@@ -9,12 +9,14 @@ import { EnvelopeType } from '@prisma/client';
 import { match, P } from 'ts-pattern';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { useEnvelopeMeta, ZUseEnvelopeRequestSchema, ZUseEnvelopeResponseSchema } from './use-envelope.types';
 
 export const useEnvelopeRoute = authenticatedProcedure
   .meta(useEnvelopeMeta)
   .input(ZUseEnvelopeRequestSchema)
   .output(ZUseEnvelopeResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.payload.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
 

@@ -8,6 +8,7 @@ import { OrganisationGroupType } from '@documenso/prisma/generated/types';
 import { unique } from 'remeda';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZUpdateOrganisationGroupRequestSchema,
   ZUpdateOrganisationGroupResponseSchema,
@@ -17,6 +18,7 @@ export const updateOrganisationGroupRoute = authenticatedProcedure
   // .meta(updateOrganisationGroupMeta)
   .input(ZUpdateOrganisationGroupRequestSchema)
   .output(ZUpdateOrganisationGroupResponseSchema)
+  .use(twoFactorScope((input) => ({ organisationGroup: input.id })))
   .mutation(async ({ input, ctx }) => {
     const { id, ...data } = input;
     const { user } = ctx;

@@ -2,6 +2,7 @@ import { deleteAttachment } from '@documenso/lib/server-only/envelope-attachment
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import {
   deleteAttachmentMeta,
   ZDeleteAttachmentRequestSchema,
@@ -12,6 +13,7 @@ export const deleteAttachmentRoute = authenticatedProcedure
   .meta(deleteAttachmentMeta)
   .input(ZDeleteAttachmentRequestSchema)
   .output(ZDeleteAttachmentResponseSchema)
+  .use(twoFactorScope((input) => ({ attachment: input.id })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const userId = ctx.user.id;

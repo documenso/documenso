@@ -6,6 +6,7 @@ import { prisma } from '@documenso/prisma';
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   deleteEnvelopeItemMeta,
   ZDeleteEnvelopeItemRequestSchema,
@@ -16,6 +17,7 @@ export const deleteEnvelopeItemRoute = authenticatedProcedure
   .meta(deleteEnvelopeItemMeta)
   .input(ZDeleteEnvelopeItemRequestSchema)
   .output(ZDeleteEnvelopeItemResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { user, teamId, metadata } = ctx;
     const { envelopeId, envelopeItemId } = input;

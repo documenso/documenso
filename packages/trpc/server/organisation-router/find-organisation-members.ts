@@ -5,6 +5,7 @@ import { prisma } from '@documenso/prisma';
 import { Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZFindOrganisationMembersRequestSchema,
   ZFindOrganisationMembersResponseSchema,
@@ -14,6 +15,7 @@ export const findOrganisationMembersRoute = authenticatedProcedure
   //   .meta(getOrganisationMembersMeta)
   .input(ZFindOrganisationMembersRequestSchema)
   .output(ZFindOrganisationMembersResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ input, ctx }) => {
     const { organisationId } = input;
     const { id } = ctx.user;
@@ -40,6 +42,7 @@ export const findOrganisationMembersRoute = authenticatedProcedure
           createdAt: organisationMember.createdAt,
           currentOrganisationRole: getHighestOrganisationRoleInGroup(groups),
           avatarImageId: organisationMember.user.avatarImageId,
+          twoFactorEnabled: organisationMember.user.twoFactorEnabled,
           groups,
         };
       }),
@@ -126,6 +129,7 @@ export const findOrganisationMembers = async ({
             email: true,
             name: true,
             avatarImageId: true,
+            twoFactorEnabled: true,
           },
         },
         organisationGroupMembers: {

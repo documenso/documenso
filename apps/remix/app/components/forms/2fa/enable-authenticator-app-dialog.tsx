@@ -1,6 +1,7 @@
 import { authClient } from '@documenso/auth/client';
 import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -69,11 +70,18 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
 
       setSetup2FAData(data);
     } catch (err) {
+      const error = AppError.parseError(err);
+
       toast({
         title: _(msg`Unable to setup two-factor authentication`),
-        description: _(
-          msg`We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.`,
-        ),
+        description:
+          error.code === 'TWO_FACTOR_ALREADY_ENABLED'
+            ? _(
+                msg`Two-factor authentication is already enabled for your account. Disable it before setting it up again.`,
+              )
+            : _(
+                msg`We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.`,
+              ),
         variant: 'destructive',
       });
     }

@@ -10,6 +10,7 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationGroupType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZUpdateOrganisationMemberRequestSchema,
   ZUpdateOrganisationMemberResponseSchema,
@@ -19,6 +20,7 @@ export const updateOrganisationMemberRoute = authenticatedProcedure
   //   .meta(updateOrganisationMemberMeta)
   .input(ZUpdateOrganisationMemberRequestSchema)
   .output(ZUpdateOrganisationMemberResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .mutation(async ({ ctx, input }) => {
     const { organisationId, organisationMemberId, data } = input;
     const userId = ctx.user.id;

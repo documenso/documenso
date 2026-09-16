@@ -6,6 +6,7 @@ import { isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/orga
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
+import { Badge } from '@documenso/ui/primitives/badge';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -99,6 +100,23 @@ export const OrganisationMembersDataTable = () => {
       {
         header: _(msg`Groups`),
         cell: ({ row }) => row.original.groups.filter((group) => group.type === OrganisationGroupType.CUSTOM).length,
+      },
+      {
+        // Per-member 2FA compliance indicator: enrolment is the durable half
+        // of the satisfaction rule, so org admins can see who has and hasn't
+        // enrolled (non-compliant members still consume seats).
+        header: _(msg`2FA`),
+        accessorKey: 'twoFactorEnabled',
+        cell: ({ row }) =>
+          row.original.twoFactorEnabled ? (
+            <Badge variant="default">
+              <Trans>Enrolled</Trans>
+            </Badge>
+          ) : (
+            <Badge variant="neutral">
+              <Trans>Not enrolled</Trans>
+            </Badge>
+          ),
       },
       {
         header: _(msg`Actions`),

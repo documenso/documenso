@@ -10,10 +10,10 @@ type ViewBackupCodesOptions = {
 };
 
 export const viewBackupCodes = async ({ token, user }: ViewBackupCodesOptions) => {
-  let isValid = await validateTwoFactorAuthentication({ totpCode: token, user });
+  let { isValid } = await validateTwoFactorAuthentication({ totpCode: token, user });
 
   if (!isValid) {
-    isValid = await validateTwoFactorAuthentication({ backupCode: token, user });
+    ({ isValid } = await validateTwoFactorAuthentication({ backupCode: token, user }));
   }
 
   if (!isValid) {

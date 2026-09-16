@@ -8,6 +8,7 @@ import { EnvelopeType } from '@prisma/client';
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import {
   deleteEnvelopeFieldMeta,
   ZDeleteEnvelopeFieldRequestSchema,
@@ -18,6 +19,7 @@ export const deleteEnvelopeFieldRoute = authenticatedProcedure
   .meta(deleteEnvelopeFieldMeta)
   .input(ZDeleteEnvelopeFieldRequestSchema)
   .output(ZDeleteEnvelopeFieldResponseSchema)
+  .use(twoFactorScope((input) => ({ field: input.fieldId })))
   .mutation(async ({ input, ctx }) => {
     const { user, teamId, metadata } = ctx;
     const { fieldId } = input;

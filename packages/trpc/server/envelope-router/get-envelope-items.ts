@@ -3,12 +3,14 @@ import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-e
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZGetEnvelopeItemsRequestSchema, ZGetEnvelopeItemsResponseSchema } from './get-envelope-items.types';
 
 // Not intended for V2 API usage.
 export const getEnvelopeItemsRoute = authenticatedProcedure
   .input(ZGetEnvelopeItemsRequestSchema)
   .output(ZGetEnvelopeItemsResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .query(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { envelopeId } = input;

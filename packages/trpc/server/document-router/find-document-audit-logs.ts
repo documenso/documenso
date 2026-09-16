@@ -1,6 +1,7 @@
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZFindDocumentAuditLogsRequestSchema,
   ZFindDocumentAuditLogsResponseSchema,
@@ -9,6 +10,7 @@ import {
 export const findDocumentAuditLogsRoute = authenticatedProcedure
   .input(ZFindDocumentAuditLogsRequestSchema)
   .output(ZFindDocumentAuditLogsResponseSchema)
+  .use(twoFactorScope((input) => ({ document: input.documentId })))
   .query(async ({ input, ctx }) => {
     const { teamId } = ctx;
 

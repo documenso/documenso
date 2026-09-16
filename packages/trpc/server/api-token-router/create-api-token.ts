@@ -4,11 +4,13 @@ import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZCreateApiTokenRequestSchema, ZCreateApiTokenResponseSchema } from './create-api-token.types';
 
 export const createApiTokenRoute = authenticatedProcedure
   .input(ZCreateApiTokenRequestSchema)
   .output(ZCreateApiTokenResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .mutation(async ({ input, ctx }) => {
     const { tokenName, teamId, expirationDate } = input;
 

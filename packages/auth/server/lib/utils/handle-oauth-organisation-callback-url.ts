@@ -12,6 +12,7 @@ import { AuthenticationErrorCode } from '../errors/error-codes';
 import { onAuthorize } from './authorizer';
 import { validateOauth } from './handle-oauth-callback-url';
 import { getOrganisationAuthenticationPortalOptions } from './organisation-portal';
+import { createTwoFactorChallenge } from './two-factor-challenge';
 
 type HandleOAuthOrganisationCallbackUrlOptions = {
   c: Context;
@@ -26,7 +27,7 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
     organisationUrl: orgUrl,
   });
 
-  const { email, name, sub, accessToken, accessTokenExpiresAt, idToken } = await validateOauth({
+  const { email, name, sub } = await validateOauth({
     c,
     clientOptions: {
       ...clientOptions,
@@ -55,7 +56,21 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
 
   // Directly log in user if account already exists.
   if (existingAccount) {
-    await onAuthorize({ userId: existingAccount.user.id }, c);
+    // A 2FA-enabled user must pass a TOTP/backup challenge before any session
+    // exists — primary (org OIDC) auth alone only earns a pending challenge.
+    if (existingAccount.user.twoFactorEnabled) {
+      await createTwoFactorChallenge(c, {
+        userId: existingAccount.user.id,
+        metadata: {
+          redirectPath: `/o/${orgUrl}`,
+          authMethod: 'oauth',
+        },
+      });
+
+      return c.redirect('/2fa-challenge', 302);
+    }
+
+    await onAuthorize({ userId: existingAccount.user.id, authMethod: 'oauth', twoFactorVerified: false }, c);
 
     return c.redirect(formatPath(`/o/${orgUrl}`), 302);
   }
@@ -103,16 +118,16 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
     });
   }
 
+  // Note: only the provider subject crosses into the verification token
+  // metadata — access/ID tokens are deliberately not persisted (see
+  // ZOrganisationAccountLinkMetadataSchema).
   await sendOrganisationAccountLinkConfirmationEmail({
     type: userToLink.emailVerified ? 'link' : 'create',
     userId: userToLink.id,
     organisationId: organisation.id,
     organisationName: organisation.name,
     oauthConfig: {
-      accessToken,
-      idToken,
       providerAccountId: sub,
-      expiresAt: Math.floor(accessTokenExpiresAt.getTime() / 1000),
     },
   });
 

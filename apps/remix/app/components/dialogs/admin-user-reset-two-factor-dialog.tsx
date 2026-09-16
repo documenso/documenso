@@ -56,7 +56,7 @@ export const AdminUserResetTwoFactorDialog = ({ className, user }: AdminUserRese
         .with(AppErrorCode.NOT_FOUND, () => msg`User not found.`)
         .with(
           AppErrorCode.UNAUTHORIZED,
-          () => msg`You are not authorized to reset two factor authentcation for this user.`,
+          () => msg`You are not authorized to reset two factor authentication for this user.`,
         )
         .otherwise(() => msg`An error occurred while resetting two factor authentication for the user.`);
 
@@ -85,7 +85,8 @@ export const AdminUserResetTwoFactorDialog = ({ className, user }: AdminUserRese
           <AlertDescription className="mr-2">
             <Trans>
               Reset the users two factor authentication. This action is irreversible and will disable two factor
-              authentication for the user.
+              authentication for the user. Their two-factor enforcement grace period will restart from the moment of the
+              reset.
             </Trans>
           </AlertDescription>
         </div>
@@ -108,7 +109,8 @@ export const AdminUserResetTwoFactorDialog = ({ className, user }: AdminUserRese
               <Alert variant="destructive">
                 <AlertDescription className="selection:bg-red-100">
                   <Trans>
-                    This action is irreversible. Please ensure you have informed the user before proceeding.
+                    This action is irreversible. Please ensure you have informed the user before proceeding. Any
+                    two-factor enforcement grace period for this user will restart from the moment of the reset.
                   </Trans>
                 </AlertDescription>
               </Alert>

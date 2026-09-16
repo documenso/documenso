@@ -2,6 +2,7 @@ import { deleteDocument } from '@documenso/lib/server-only/document/delete-docum
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   deleteDocumentMeta,
   ZDeleteDocumentRequestSchema,
@@ -12,6 +13,7 @@ export const deleteDocumentRoute = authenticatedProcedure
   .meta(deleteDocumentMeta)
   .input(ZDeleteDocumentRequestSchema)
   .output(ZDeleteDocumentResponseSchema)
+  .use(twoFactorScope((input) => ({ document: input.documentId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { documentId } = input;

@@ -86,6 +86,12 @@ export async function loader({ params }: Route.LoaderArgs) {
       name: true,
       url: true,
       avatarImageId: true,
+      organisationGlobalSettings: {
+        select: {
+          twoFactorRequired: true,
+          twoFactorGracePeriodDays: true,
+        },
+      },
     },
   });
 
@@ -107,6 +113,10 @@ export async function loader({ params }: Route.LoaderArgs) {
       name: organisation.name,
       url: organisation.url,
       avatar: organisation.avatarImageId,
+      // Non-blocking notice data: SSO membership creation always succeeds;
+      // the 2FA grace window starts at join.
+      twoFactorRequired: organisation.organisationGlobalSettings.twoFactorRequired,
+      twoFactorGracePeriodDays: organisation.organisationGlobalSettings.twoFactorGracePeriodDays,
     },
   } as const;
 }
@@ -265,6 +275,26 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
               </Alert>
             </div>
           </div>
+
+          {/* Non-blocking notice: confirming always succeeds; organisation
+              access blocks only after the grace period expires. */}
+          {organisation.twoFactorRequired && (
+            <Alert variant="neutral">
+              <AlertDescription>
+                {organisation.twoFactorGracePeriodDays > 0 ? (
+                  <Trans>
+                    This organisation requires two-factor authentication. You will need to enable it within{' '}
+                    {organisation.twoFactorGracePeriodDays} days of joining to keep access to the organisation.
+                  </Trans>
+                ) : (
+                  <Trans>
+                    This organisation requires two-factor authentication. You will need to enable it immediately after
+                    joining to access the organisation.
+                  </Trans>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
 
           <div className="mb-4 flex items-center gap-x-2">
             <Checkbox

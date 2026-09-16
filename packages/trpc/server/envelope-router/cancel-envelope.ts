@@ -2,6 +2,7 @@ import { cancelDocument } from '@documenso/lib/server-only/document/cancel-docum
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   cancelEnvelopeMeta,
   ZCancelEnvelopeRequestSchema,
@@ -12,6 +13,7 @@ export const cancelEnvelopeRoute = authenticatedProcedure
   .meta(cancelEnvelopeMeta)
   .input(ZCancelEnvelopeRequestSchema)
   .output(ZCancelEnvelopeResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { envelopeId, reason } = input;

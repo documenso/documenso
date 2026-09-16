@@ -14,6 +14,7 @@ import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { findRecipientSuggestionsRoute } from './find-recipient-suggestions';
 import {
   ZCompleteDocumentWithTokenMutationSchema,
@@ -67,6 +68,7 @@ export const recipientRouter = router({
     })
     .input(ZGetRecipientRequestSchema)
     .output(ZGetRecipientResponseSchema)
+    .use(twoFactorScope((input) => ({ recipient: input.recipientId })))
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { recipientId } = input;
@@ -102,6 +104,7 @@ export const recipientRouter = router({
     })
     .input(ZCreateDocumentRecipientRequestSchema)
     .output(ZCreateDocumentRecipientResponseSchema)
+    .use(twoFactorScope((input) => ({ document: input.documentId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, recipient } = input;
@@ -143,6 +146,7 @@ export const recipientRouter = router({
     })
     .input(ZCreateDocumentRecipientsRequestSchema)
     .output(ZCreateDocumentRecipientsResponseSchema)
+    .use(twoFactorScope((input) => ({ document: input.documentId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, recipients } = input;
@@ -182,6 +186,7 @@ export const recipientRouter = router({
     })
     .input(ZUpdateDocumentRecipientRequestSchema)
     .output(ZUpdateDocumentRecipientResponseSchema)
+    .use(twoFactorScope((input) => ({ document: input.documentId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, recipient } = input;
@@ -223,6 +228,7 @@ export const recipientRouter = router({
     })
     .input(ZUpdateDocumentRecipientsRequestSchema)
     .output(ZUpdateDocumentRecipientsResponseSchema)
+    .use(twoFactorScope((input) => ({ document: input.documentId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, recipients } = input;
@@ -262,6 +268,7 @@ export const recipientRouter = router({
     })
     .input(ZDeleteDocumentRecipientRequestSchema)
     .output(ZSuccessResponseSchema)
+    .use(twoFactorScope((input) => ({ recipient: input.recipientId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { recipientId } = input;
@@ -288,6 +295,7 @@ export const recipientRouter = router({
   setDocumentRecipients: authenticatedProcedure
     .input(ZSetDocumentRecipientsRequestSchema)
     .output(ZSetDocumentRecipientsResponseSchema)
+    .use(twoFactorScope((input) => ({ document: input.documentId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, recipients } = input;
@@ -334,6 +342,7 @@ export const recipientRouter = router({
     })
     .input(ZGetRecipientRequestSchema)
     .output(ZGetRecipientResponseSchema)
+    .use(twoFactorScope((input) => ({ recipient: input.recipientId })))
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { recipientId } = input;
@@ -369,6 +378,7 @@ export const recipientRouter = router({
     })
     .input(ZCreateTemplateRecipientRequestSchema)
     .output(ZCreateTemplateRecipientResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, recipient } = input;
@@ -410,6 +420,7 @@ export const recipientRouter = router({
     })
     .input(ZCreateTemplateRecipientsRequestSchema)
     .output(ZCreateTemplateRecipientsResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, recipients } = input;
@@ -449,6 +460,7 @@ export const recipientRouter = router({
     })
     .input(ZUpdateTemplateRecipientRequestSchema)
     .output(ZUpdateTemplateRecipientResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, recipient } = input;
@@ -490,6 +502,7 @@ export const recipientRouter = router({
     })
     .input(ZUpdateTemplateRecipientsRequestSchema)
     .output(ZUpdateTemplateRecipientsResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, recipients } = input;
@@ -529,6 +542,7 @@ export const recipientRouter = router({
     })
     .input(ZDeleteTemplateRecipientRequestSchema)
     .output(ZSuccessResponseSchema)
+    .use(twoFactorScope((input) => ({ recipient: input.recipientId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { recipientId } = input;
@@ -555,6 +569,7 @@ export const recipientRouter = router({
   setTemplateRecipients: authenticatedProcedure
     .input(ZSetTemplateRecipientsRequestSchema)
     .output(ZSetTemplateRecipientsResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, recipients } = input;

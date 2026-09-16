@@ -5,12 +5,14 @@ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZBulkMoveEnvelopesRequestSchema, ZBulkMoveEnvelopesResponseSchema } from './bulk-move-envelopes.types';
 
 export const bulkMoveEnvelopesRoute = authenticatedProcedure
   // .meta(bulkMoveEnvelopesMeta)
   .input(ZBulkMoveEnvelopesRequestSchema)
   .output(ZBulkMoveEnvelopesResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeIds })))
   .mutation(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { envelopeIds, envelopeType, folderId } = input;

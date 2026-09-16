@@ -5,11 +5,13 @@ import { EnvelopeType } from '@prisma/client';
 import pMap from 'p-map';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZBulkCancelEnvelopesRequestSchema, ZBulkCancelEnvelopesResponseSchema } from './bulk-cancel-envelopes.types';
 
 export const bulkCancelEnvelopesRoute = authenticatedProcedure
   .input(ZBulkCancelEnvelopesRequestSchema)
   .output(ZBulkCancelEnvelopesResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeIds })))
   .mutation(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { envelopeIds, reason } = input;

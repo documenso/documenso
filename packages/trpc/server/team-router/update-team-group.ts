@@ -6,12 +6,14 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationGroupType } from '@documenso/prisma/generated/types';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZUpdateTeamGroupRequestSchema, ZUpdateTeamGroupResponseSchema } from './update-team-group.types';
 
 export const updateTeamGroupRoute = authenticatedProcedure
   // .meta(updateTeamGroupMeta)
   .input(ZUpdateTeamGroupRequestSchema)
   .output(ZUpdateTeamGroupResponseSchema)
+  .use(twoFactorScope((input) => ({ teamGroup: input.id })))
   .mutation(async ({ input, ctx }) => {
     const { id, data } = input;
     const { user } = ctx;

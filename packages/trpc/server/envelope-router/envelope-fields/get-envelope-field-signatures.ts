@@ -4,6 +4,7 @@ import { prisma } from '@documenso/prisma';
 import { FieldType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import {
   ZGetEnvelopeFieldSignaturesRequestSchema,
   ZGetEnvelopeFieldSignaturesResponseSchema,
@@ -12,6 +13,7 @@ import {
 export const getEnvelopeFieldSignaturesRoute = authenticatedProcedure
   .input(ZGetEnvelopeFieldSignaturesRequestSchema)
   .output(ZGetEnvelopeFieldSignaturesResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .query(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { envelopeId } = input;

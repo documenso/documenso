@@ -5,6 +5,7 @@ import { resendTeamEmailVerification } from '@documenso/lib/server-only/team/res
 import { updateTeamEmail } from '@documenso/lib/server-only/team/update-team-email';
 import { prisma } from '@documenso/prisma';
 import { authenticatedProcedure, router } from '../trpc';
+import { twoFactorInstanceOnly, twoFactorScope } from '../two-factor-enforcement/enforce';
 import { completeTeamEmailVerificationRoute } from './complete-team-email-verification';
 import { createTeamRoute } from './create-team';
 import { createTeamGroupsRoute } from './create-team-groups';
@@ -57,54 +58,66 @@ export const teamRouter = router({
   // Old routes (to be migrated)
   // Todo: Refactor into routes.
   email: {
-    get: authenticatedProcedure.query(async ({ ctx }) => {
-      const teamEmail = await prisma.teamEmail.findUnique({
-        where: {
-          email: ctx.user.email,
-        },
-        include: {
-          team: {
-            select: {
-              id: true,
-              name: true,
-              url: true,
+    get: authenticatedProcedure
+      // 2FA enforcement: 'none' — looks up the team email record keyed by the
+      // caller's own email address; no organisation resource identifier is
+      // present. The instance assert still applies.
+      .use(twoFactorInstanceOnly())
+      .query(async ({ ctx }) => {
+        const teamEmail = await prisma.teamEmail.findUnique({
+          where: {
+            email: ctx.user.email,
+          },
+          include: {
+            team: {
+              select: {
+                id: true,
+                name: true,
+                url: true,
+              },
             },
           },
-        },
-      });
+        });
 
-      return teamEmail || null;
-    }),
-    update: authenticatedProcedure.input(ZUpdateTeamEmailMutationSchema).mutation(async ({ input, ctx }) => {
-      ctx.logger.info({
-        input: {
-          teamId: input.teamId,
-        },
-      });
+        return teamEmail || null;
+      }),
+    update: authenticatedProcedure
+      .input(ZUpdateTeamEmailMutationSchema)
+      .use(twoFactorScope((input) => ({ team: input.teamId })))
+      .mutation(async ({ input, ctx }) => {
+        ctx.logger.info({
+          input: {
+            teamId: input.teamId,
+          },
+        });
 
-      await updateTeamEmail({
-        userId: ctx.user.id,
-        ...input,
-      });
-    }),
-    delete: authenticatedProcedure.input(ZDeleteTeamEmailMutationSchema).mutation(async ({ input, ctx }) => {
-      const { teamId } = input;
+        await updateTeamEmail({
+          userId: ctx.user.id,
+          ...input,
+        });
+      }),
+    delete: authenticatedProcedure
+      .input(ZDeleteTeamEmailMutationSchema)
+      .use(twoFactorScope((input) => ({ team: input.teamId })))
+      .mutation(async ({ input, ctx }) => {
+        const { teamId } = input;
 
-      ctx.logger.info({
-        input: {
+        ctx.logger.info({
+          input: {
+            teamId,
+          },
+        });
+
+        await deleteTeamEmail({
+          userId: ctx.user.id,
+          userEmail: ctx.user.email,
           teamId,
-        },
-      });
-
-      await deleteTeamEmail({
-        userId: ctx.user.id,
-        userEmail: ctx.user.email,
-        teamId,
-      });
-    }),
+        });
+      }),
     verification: {
       send: authenticatedProcedure
         .input(ZCreateTeamEmailVerificationMutationSchema)
+        .use(twoFactorScope((input) => ({ team: input.teamId })))
         .mutation(async ({ input, ctx }) => {
           const { teamId, email, name } = input;
 
@@ -126,6 +139,7 @@ export const teamRouter = router({
       complete: completeTeamEmailVerificationRoute,
       resend: authenticatedProcedure
         .input(ZResendTeamEmailVerificationMutationSchema)
+        .use(twoFactorScope((input) => ({ team: input.teamId })))
         .mutation(async ({ input, ctx }) => {
           const { teamId } = input;
 
@@ -142,6 +156,7 @@ export const teamRouter = router({
         }),
       delete: authenticatedProcedure
         .input(ZDeleteTeamEmailVerificationMutationSchema)
+        .use(twoFactorScope((input) => ({ team: input.teamId })))
         .mutation(async ({ input, ctx }) => {
           const { teamId } = input;
 

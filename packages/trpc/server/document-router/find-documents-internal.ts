@@ -3,6 +3,7 @@ import { getStats } from '@documenso/lib/server-only/document/get-stats';
 import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import {
   ZFindDocumentsInternalRequestSchema,
   ZFindDocumentsInternalResponseSchema,
@@ -11,6 +12,7 @@ import {
 export const findDocumentsInternalRoute = authenticatedProcedure
   .input(ZFindDocumentsInternalRequestSchema)
   .output(ZFindDocumentsInternalResponseSchema)
+  .use(twoFactorScopeFromCtx())
   .query(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
 
