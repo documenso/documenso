@@ -9,16 +9,9 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import type { DateTimeFormatOptions } from 'luxon';
-import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import { UAParser } from 'ua-parser-js';
-
-const dateFormat: DateTimeFormatOptions = {
-  ...DateTime.DATETIME_SHORT,
-  hourCycle: 'h12',
-};
 
 export const SettingsSecurityActivityTable = () => {
   const { _, i18n } = useLingui();
@@ -61,7 +54,7 @@ export const SettingsSecurityActivityTable = () => {
       {
         header: _(msg`Date`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => i18n.date(row.original.createdAt, dateFormat),
+        cell: ({ row }) => i18n.date(row.original.createdAt, { dateStyle: 'medium', timeStyle: 'short' }),
       },
       {
         header: _(msg`Device`),
