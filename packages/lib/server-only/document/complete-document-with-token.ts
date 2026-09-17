@@ -59,7 +59,7 @@ export const completeDocumentWithToken = async ({
   nextSigner,
   recipientOverride,
 }: CompleteDocumentWithTokenOptions) => {
-  const envelope = await prisma.envelope.findFirstOrThrow({
+  const envelope = await prisma.envelope.findFirst({
     where: {
       ...unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
       recipients: {
@@ -78,23 +78,55 @@ export const completeDocumentWithToken = async ({
     },
   });
 
-  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
-
-  if (envelope.status !== DocumentStatus.PENDING) {
-    throw new Error(`Document ${envelope.id} must be pending`);
+  // The most common cause is a stale signing page: the document was deleted,
+  // or the recipient was removed, after the link was opened. Surface a
+  // NOT_FOUND instead of leaking a Prisma P2025 as a 500.
+  if (!envelope) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found for the provided signing token',
+      statusCode: 404,
+    });
   }
 
+  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
   if (envelope.recipients.length === 0) {
-    throw new Error(`Document ${envelope.id} has no recipient with token ${token}`);
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `Document ${envelope.id} has no recipient with the provided token`,
+      statusCode: 404,
+    });
   }
 
   const [recipient] = envelope.recipients;
 
-  assertRecipientNotExpired(recipient);
-
+  // A retried or duplicate completion request for an already signed
+  // recipient throws a code the router resolves idempotently. This must be
+  // checked before the envelope status guard since the envelope may have
+  // been completed and sealed by the recipient's original request.
   if (recipient.signingStatus === SigningStatus.SIGNED) {
-    throw new Error(`Recipient ${recipient.id} has already signed`);
+    throw new AppError(AppErrorCode.RECIPIENT_ALREADY_SIGNED, {
+      message: `Recipient ${recipient.id} has already signed`,
+      statusCode: 400,
+    });
   }
+
+  if (envelope.status !== DocumentStatus.PENDING) {
+    const envelopeStatusErrorCode: Record<DocumentStatus, AppErrorCode> = {
+      [DocumentStatus.DRAFT]: AppErrorCode.ENVELOPE_DRAFT,
+      [DocumentStatus.COMPLETED]: AppErrorCode.ENVELOPE_COMPLETED,
+      [DocumentStatus.REJECTED]: AppErrorCode.ENVELOPE_REJECTED,
+      [DocumentStatus.CANCELLED]: AppErrorCode.ENVELOPE_CANCELLED,
+      // Unreachable: guarded by the status check above.
+      [DocumentStatus.PENDING]: AppErrorCode.INVALID_REQUEST,
+    };
+
+    throw new AppError(envelopeStatusErrorCode[envelope.status], {
+      message: `Document ${envelope.id} must be pending to be completed, found ${envelope.status}`,
+      statusCode: 400,
+    });
+  }
+
+  assertRecipientNotExpired(recipient);
 
   if (recipient.signingStatus === SigningStatus.REJECTED) {
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
@@ -109,7 +141,10 @@ export const completeDocumentWithToken = async ({
     });
 
     if (!isRecipientsTurn) {
-      throw new Error(`Recipient ${recipient.id} attempted to complete the document before it was their turn`);
+      throw new AppError(AppErrorCode.RECIPIENT_OUT_OF_TURN, {
+        message: `Recipient ${recipient.id} attempted to complete the document before it was their turn`,
+        statusCode: 400,
+      });
     }
   }
 
@@ -272,13 +307,22 @@ export const completeDocumentWithToken = async ({
   }
 
   if (fieldsContainUnsignedRequiredField(fields)) {
-    throw new Error(`Recipient ${recipient.id} has unsigned fields`);
+    throw new AppError(AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS, {
+      message: `Recipient ${recipient.id} has unsigned fields`,
+      statusCode: 400,
+    });
   }
 
   await prisma.$transaction(async (tx) => {
-    await tx.recipient.update({
+    // Conditional update so two concurrent completion requests can't both
+    // proceed: only the request that transitions the recipient to SIGNED
+    // continues, the loser sees a count of 0 and aborts.
+    const { count: updatedRecipientCount } = await tx.recipient.updateMany({
       where: {
         id: recipient.id,
+        signingStatus: {
+          not: SigningStatus.SIGNED,
+        },
       },
       data: {
         signingStatus: SigningStatus.SIGNED,
@@ -287,6 +331,16 @@ export const completeDocumentWithToken = async ({
         email: recipientEmail,
       },
     });
+
+    // A concurrent request completed the recipient between our initial read
+    // and this transaction. Abort so the winning request handles all side
+    // effects, the router resolves this code idempotently.
+    if (updatedRecipientCount === 0) {
+      throw new AppError(AppErrorCode.RECIPIENT_ALREADY_SIGNED, {
+        message: `Recipient ${recipient.id} has already signed`,
+        statusCode: 400,
+      });
+    }
 
     if (recipientEmail !== recipient.email || recipientName !== recipient.name) {
       await tx.documentAuditLog.create({

@@ -1,7 +1,3 @@
-import {
-  assertMemberCountWithinCap,
-  syncMemberCountWithStripeSeatPlan,
-} from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
@@ -17,7 +13,6 @@ import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { generateDatabaseId } from '../../universal/id';
-import { validateIfSubscriptionIsRequired } from '../../utils/billing';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
@@ -62,18 +57,12 @@ export const createOrganisationMemberInvites = async ({
         },
       },
       organisationGlobalSettings: true,
-      organisationClaim: true,
-      subscription: true,
     },
   });
 
   if (!organisation) {
     throw new AppError(AppErrorCode.NOT_FOUND);
   }
-
-  const { organisationClaim } = organisation;
-
-  const subscription = validateIfSubscriptionIsRequired(organisation.subscription);
 
   const currentOrganisationMemberRole = await getMemberOrganisationRole({
     organisationId: organisation.id,
@@ -119,19 +108,6 @@ export const createOrganisationMemberInvites = async ({
       token: nanoid(32),
     }),
   );
-
-  const numberOfCurrentMembers = organisation.members.length;
-  const numberOfCurrentInvites = organisation.invites.length;
-  const numberOfNewInvites = organisationMemberInvites.length;
-
-  const totalMemberCountWithInvites = numberOfCurrentMembers + numberOfCurrentInvites + numberOfNewInvites;
-
-  // Enforce the seat cap and sync billing for seat based plans.
-  if (subscription) {
-    await assertMemberCountWithinCap(subscription, organisationClaim, totalMemberCountWithInvites);
-
-    await syncMemberCountWithStripeSeatPlan(subscription, organisationClaim, totalMemberCountWithInvites);
-  }
 
   await prisma.organisationMemberInvite.createMany({
     data: organisationMemberInvites,

@@ -40,6 +40,7 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { getRecipientsWithMissingFields } from '../../utils/recipients';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -169,6 +170,17 @@ export const createDocumentFromDirectTemplate = async ({
   if (!directTemplateRecipient || directTemplateRecipient.role === RecipientRole.CC) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Invalid or missing direct recipient',
+    });
+  }
+
+  const recipientsWithMissingFields = getRecipientsWithMissingFields(
+    recipients,
+    recipients.flatMap((recipient) => recipient.fields),
+  );
+
+  if (recipientsWithMissingFields.length > 0) {
+    throw new AppError(AppErrorCode.MISSING_SIGNATURE_FIELD, {
+      message: 'One or more signers on this direct template are missing a signature field',
     });
   }
 

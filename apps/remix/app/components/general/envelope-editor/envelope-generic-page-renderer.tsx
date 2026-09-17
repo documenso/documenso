@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import {
   type PageRenderData,
@@ -18,6 +19,7 @@ type GenericLocalField = TEnvelope['fields'][number] & {
 
 export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { i18n } = useLingui();
+  const analytics = useAnalytics();
 
   const {
     envelopeStatus,
@@ -114,6 +116,13 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
       unsafeRenderFieldOnLayer(field);
     } catch (err) {
       console.error(err);
+
+      analytics.captureException(err, {
+        source: 'editor',
+        location: 'envelope_page_render',
+        envelopeId: currentEnvelopeItem?.envelopeId,
+      });
+
       setRenderError(true);
     }
   };

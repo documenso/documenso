@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 
 import { EMAIL_VERIFICATION_STATE, USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER } from '../../constants/email';
 import { jobsClient } from '../../jobs/client';
+import { getMostRecentEmailVerificationToken } from './get-most-recent-email-verification-token';
 
 export type VerifyEmailProps = {
   token: string;
@@ -36,13 +37,8 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   const valid = verificationToken.expires > new Date();
 
   if (!valid) {
-    const mostRecentToken = await prisma.verificationToken.findFirst({
-      where: {
-        userId: verificationToken.userId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+    const mostRecentToken = await getMostRecentEmailVerificationToken({
+      userId: verificationToken.userId,
     });
 
     // If there isn't a recent token or it's older than 1 hour, send a new token
@@ -80,6 +76,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
     prisma.verificationToken.updateMany({
       where: {
         userId: verificationToken.userId,
+        identifier: USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER,
       },
       data: {
         completed: true,
@@ -89,6 +86,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
     prisma.verificationToken.deleteMany({
       where: {
         userId: verificationToken.userId,
+        identifier: USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER,
         expires: {
           lt: new Date(),
         },

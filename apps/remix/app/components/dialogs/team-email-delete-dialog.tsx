@@ -17,28 +17,25 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Prisma } from '@prisma/client';
+import type { Team, TeamEmail, TeamEmailVerification } from '@prisma/client';
 import { useState } from 'react';
 import { useRevalidator } from 'react-router';
 
 export type TeamEmailDeleteDialogProps = {
   trigger?: React.ReactNode;
   teamName: string;
-  team: Prisma.TeamGetPayload<{
-    include: {
-      teamEmail: true;
-      emailVerification: {
-        select: {
-          expiresAt: true;
-          name: true;
-          email: true;
-        };
-      };
-    };
-  }>;
+  team: Pick<Team, 'id' | 'avatarImageId' | 'name'>;
+  teamEmail: Pick<TeamEmail, 'email' | 'name'> | null;
+  emailVerification: Pick<TeamEmailVerification, 'email' | 'name' | 'expiresAt'> | null;
 };
 
-export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDeleteDialogProps) => {
+export const TeamEmailDeleteDialog = ({
+  trigger,
+  teamName,
+  team,
+  teamEmail,
+  emailVerification,
+}: TeamEmailDeleteDialogProps) => {
   const [open, setOpen] = useState(false);
 
   const { _ } = useLingui();
@@ -83,11 +80,11 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
     });
 
   const onRemove = async () => {
-    if (team.teamEmail) {
+    if (teamEmail) {
       await deleteTeamEmail({ teamId: team.id });
     }
 
-    if (team.emailVerification) {
+    if (emailVerification) {
       await deleteTeamEmailVerification({ teamId: team.id });
     }
 
@@ -121,13 +118,13 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
           <AvatarWithText
             avatarClass="h-12 w-12"
             avatarSrc={formatAvatarUrl(team.avatarImageId)}
-            avatarFallback={extractInitials((team.teamEmail?.name || team.emailVerification?.name) ?? '')}
+            avatarFallback={extractInitials((teamEmail?.name || emailVerification?.name) ?? '')}
             primaryText={
               <span className="font-semibold text-foreground/80 text-sm">
-                {team.teamEmail?.name || team.emailVerification?.name}
+                {teamEmail?.name || emailVerification?.name}
               </span>
             }
-            secondaryText={<span className="text-sm">{team.teamEmail?.email || team.emailVerification?.email}</span>}
+            secondaryText={<span className="text-sm">{teamEmail?.email || emailVerification?.email}</span>}
           />
         </Alert>
 

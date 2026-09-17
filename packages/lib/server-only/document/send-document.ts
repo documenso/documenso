@@ -194,7 +194,7 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
       .map((r) => (r.name ? `${r.name} (${r.email}, id: ${r.id})` : `${r.email} (id: ${r.id})`))
       .join(', ');
 
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+    throw new AppError(AppErrorCode.MISSING_SIGNATURE_FIELD, {
       message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
     });
   }

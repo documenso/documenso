@@ -94,7 +94,11 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
 
   return (
     <div>
-      <SettingsHeader title={t`Organisation Group Settings`} subtitle={t`Manage your organisation group settings.`}>
+      <SettingsHeader
+        hideDivider
+        title={t`Organisation Group Settings`}
+        subtitle={t`Manage your organisation group settings.`}
+      >
         <OrganisationGroupDeleteDialog
           organisationGroupId={groupId}
           organisationGroupName={group.name || ''}

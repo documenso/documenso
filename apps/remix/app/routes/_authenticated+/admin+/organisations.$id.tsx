@@ -258,7 +258,11 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
   return (
     <div>
-      <SettingsHeader title={t`Manage organisation`} subtitle={t`Manage the ${organisation.name} organisation`}>
+      <SettingsHeader
+        hideDivider
+        title={t`Manage organisation`}
+        subtitle={t`Manage the ${organisation.name} organisation`}
+      >
         <Button variant="outline" asChild>
           <Link to={`/admin/organisation-insights/${organisationId}`}>
             <Trans>View insights</Trans>
@@ -269,10 +273,10 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       <GenericOrganisationAdminForm organisation={organisation} />
 
       <SettingsHeader
+        hideDivider
         title={t`Organisation usage`}
         subtitle={t`Current usage against organisation limits.`}
         className="mt-6"
-        hideDivider
       />
 
       <OrganisationUsagePanel
@@ -308,6 +312,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       </div>
 
       <SettingsHeader
+        hideDivider
         title={t`Manage subscription`}
         subtitle={t`Manage the ${organisation.name} organisation subscription`}
         className="mt-16"
@@ -425,6 +430,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       </div>
 
       <SettingsHeader
+        hideDivider
         title={t`Danger Zone`}
         subtitle={t`Irreversible actions for this organisation`}
         className="mt-16"

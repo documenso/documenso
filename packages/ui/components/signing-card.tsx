@@ -35,7 +35,7 @@ export const SigningCard3D = ({ className, name, signature, signingCelebrationIm
 
   const [trackMouse, setTrackMouse] = useState(false);
 
-  const timeoutRef = useRef<number | undefined>();
+  const timeoutRef = useRef<number | undefined>(undefined);
 
   const cardX = useMotionValue(0);
   const cardY = useMotionValue(0);
