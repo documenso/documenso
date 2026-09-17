@@ -10,7 +10,7 @@ import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import { RecipientRole, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, RecipientRole, TeamMemberRole } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -33,10 +33,21 @@ const searchInbox = async (page: Page, query: string) => {
   await page.waitForURL((url) => (url.searchParams.get('query') ?? '') === query);
 };
 
-const selectInboxStatus = async (page: Page, statusName: 'Pending' | 'Completed' | 'Rejected' | 'Cancelled') => {
+// Rendered labels come from the compiled English catalog, which uses the US
+// spelling "Canceled" for the `Cancelled` source string.
+const INBOX_STATUS_LABELS = {
+  [DocumentStatus.PENDING]: 'Pending',
+  [DocumentStatus.COMPLETED]: 'Completed',
+  [DocumentStatus.REJECTED]: 'Rejected',
+  [DocumentStatus.CANCELLED]: 'Canceled',
+} as const;
+
+type InboxStatus = keyof typeof INBOX_STATUS_LABELS;
+
+const selectInboxStatus = async (page: Page, status: InboxStatus) => {
   await page.getByTestId('documents-table-status-filter').click();
-  await page.getByRole('option', { name: statusName }).click();
-  await page.waitForURL((url) => url.searchParams.get('status') === statusName.toUpperCase());
+  await page.getByRole('option', { name: INBOX_STATUS_LABELS[status], exact: true }).click();
+  await page.waitForURL((url) => url.searchParams.get('status') === status);
 };
 
 // ─── Behaviour ───────────────────────────────────────────────────────────────
@@ -73,14 +84,14 @@ test.describe('Inbox - Search & Status Filter', () => {
     await expect(inboxRow(page, 'Inbox Cancelled Document')).toBeVisible();
     await expect(inboxRow(page, 'Inbox Draft Document')).not.toBeVisible();
 
-    await selectInboxStatus(page, 'Completed');
+    await selectInboxStatus(page, DocumentStatus.COMPLETED);
 
     await expect(page.getByTestId('documents-table-status-filter')).toContainText('Completed');
     await expect(inboxRow(page, 'Inbox Completed Document')).toBeVisible();
     await expect(inboxRow(page, 'Inbox Pending Document')).not.toBeVisible();
     await expect(inboxRow(page, 'Inbox Cancelled Document')).not.toBeVisible();
 
-    await selectInboxStatus(page, 'Cancelled');
+    await selectInboxStatus(page, DocumentStatus.CANCELLED);
 
     await expect(inboxRow(page, 'Inbox Cancelled Document')).toBeVisible();
     await expect(inboxRow(page, 'Inbox Pending Document')).not.toBeVisible();
@@ -105,7 +116,7 @@ test.describe('Inbox - Search & Status Filter', () => {
 
     await page.getByTestId('documents-table-status-filter').click();
 
-    for (const visibleStatus of ['Pending', 'Completed', 'Rejected', 'Cancelled']) {
+    for (const visibleStatus of Object.values(INBOX_STATUS_LABELS)) {
       await expect(page.getByRole('option', { name: visibleStatus, exact: true })).toBeVisible();
     }
 
@@ -141,7 +152,7 @@ test.describe('Inbox - Search & Status Filter', () => {
     await expect(page.getByText(SEARCH_EMPTY_STATE)).toBeVisible();
 
     // Search is combined with the status filter.
-    await selectInboxStatus(page, 'Completed');
+    await selectInboxStatus(page, DocumentStatus.COMPLETED);
     await searchInbox(page, 'Agreement');
 
     await expect(page.getByText(SEARCH_EMPTY_STATE)).toBeVisible();
@@ -236,7 +247,9 @@ test.describe('Inbox - Adversarial Access', () => {
     // Supported non-pending statuses are scoped to exactly that status.
     await page.goto(`${WEBAPP_BASE_URL}/inbox?status=CANCELLED`);
 
-    await expect(page.getByTestId('documents-table-status-filter')).toContainText('Cancelled');
+    await expect(page.getByTestId('documents-table-status-filter')).toContainText(
+      INBOX_STATUS_LABELS[DocumentStatus.CANCELLED],
+    );
     await expect(inboxRow(page, 'Cancelled Document')).toBeVisible();
     await expect(inboxRow(page, 'Legit Pending Document')).not.toBeVisible();
     await expect(inboxRow(page, 'Unsent Draft Document')).not.toBeVisible();
