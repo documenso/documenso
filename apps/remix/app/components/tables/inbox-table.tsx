@@ -45,8 +45,8 @@ export const InboxTable = () => {
   const query = findInboxSearchParams.query ?? '';
 
   const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery({
-    page: findInboxSearchParams.page ?? 1,
-    perPage: findInboxSearchParams.perPage ?? 10,
+    page: Math.max(findInboxSearchParams.page ?? 1, 1),
+    perPage: Math.min(Math.max(findInboxSearchParams.perPage ?? 10, 1), 100),
     query: query || undefined,
     status,
   });
