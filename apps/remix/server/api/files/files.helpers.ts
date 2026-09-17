@@ -1,18 +1,21 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { generatePartialSignedPdf } from '@documenso/lib/server-only/pdf/generate-partial-signed-pdf';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+import { canAccessTeamDocument } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 import {
   type DocumentDataType,
   DocumentStatus,
+  type DocumentVisibility,
   type EnvelopeType,
   EnvelopeType as EnvelopeTypeEnum,
   type RecipientRole,
   type SigningStatus,
+  TeamMemberRole,
   type TemplateType,
   TemplateType as TemplateTypeEnum,
 } from '@prisma/client';
@@ -262,30 +265,51 @@ const handlePendingFileRequest = async ({
 type CheckEnvelopeFileAccessOptions = {
   userId: number;
   teamId: number;
+  envelopeId: string;
   envelopeType: EnvelopeType;
   templateType: TemplateType;
+  visibility: DocumentVisibility;
 };
 
 /**
  * Check whether a user has access to an envelope's file.
  *
- * First checks team membership. If that fails and the envelope is an
- * ORGANISATION template (not a document), falls back to checking whether
- * the user belongs to any team in the same organisation.
+ * Mirrors the tRPC read paths (owner / team role permitting `visibility` / team
+ * email). If that fails and the envelope is an ORGANISATION template (not a
+ * document), falls back to checking whether the user belongs to any team in the
+ * same organisation with a role that permits the template's `visibility`.
  */
 export const checkEnvelopeFileAccess = async ({
   userId,
   teamId,
+  envelopeId,
   envelopeType,
   templateType,
+  visibility,
 }: CheckEnvelopeFileAccessOptions): Promise<boolean> => {
-  const team = await getTeamById({ userId, teamId }).catch(() => null);
+  try {
+    const { envelopeWhereInput } = await getEnvelopeWhereInput({
+      id: { type: 'envelopeId', id: envelopeId },
+      type: envelopeType,
+      userId,
+      teamId,
+    });
 
-  if (team) {
-    return true;
+    const envelope = await prisma.envelope.findFirst({ where: envelopeWhereInput, select: { id: true } });
+
+    if (envelope) {
+      return true;
+    }
+  } catch (error) {
+    // NOT_FOUND means the user is not a member of the envelope's team. Anything else is a real failure.
+    if (!(error instanceof AppError && error.code === AppErrorCode.NOT_FOUND)) {
+      throw error;
+    }
   }
 
   if (envelopeType === EnvelopeTypeEnum.TEMPLATE && templateType === TemplateTypeEnum.ORGANISATION) {
+    const rolesWithAccess = Object.values(TeamMemberRole).filter((role) => canAccessTeamDocument(role, visibility));
+
     const orgAccess = await prisma.team.findFirst({
       where: {
         id: teamId,
@@ -301,6 +325,7 @@ export const checkEnvelopeFileAccess = async ({
                       },
                     },
                   },
+                  teamRole: { in: rolesWithAccess },
                 },
               },
             },
