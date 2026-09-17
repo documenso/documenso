@@ -226,7 +226,6 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
 
       if (organisationType === OrganisationType.ORGANISATION) {
         emailSubject = i18n._(msg`Reminder: ${envelope.team.name} invited you to ${recipientActionVerb} a document`);
-        emailMessage = envelope.documentMeta.message || '';
 
         if (!emailMessage) {
           const inviterName = user.name || user.email;
