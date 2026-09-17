@@ -12,7 +12,10 @@ export type GetLimitsOptions = {
 export const getLimits = async ({ headers, teamId }: GetLimitsOptions) => {
   const requestHeaders = headers ?? {};
 
-  const url = new URL('/api/limits', NEXT_PUBLIC_WEBAPP_URL());
+  // Note: the path must be appended rather than passed as the `new URL()` path
+  // argument, since a leading-slash path replaces the sub-path that
+  // NEXT_PUBLIC_WEBAPP_URL may carry (e.g. https://host/ESign).
+  const url = new URL(`${NEXT_PUBLIC_WEBAPP_URL()}/api/limits`);
 
   if (teamId) {
     requestHeaders['team-id'] = teamId.toString();

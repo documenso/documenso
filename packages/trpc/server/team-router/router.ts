@@ -1,11 +1,11 @@
 import { createTeamEmailVerification } from '@documenso/lib/server-only/team/create-team-email-verification';
 import { deleteTeamEmail } from '@documenso/lib/server-only/team/delete-team-email';
 import { deleteTeamEmailVerification } from '@documenso/lib/server-only/team/delete-team-email-verification';
-import { getTeamEmailByEmail } from '@documenso/lib/server-only/team/get-team-email-by-email';
 import { resendTeamEmailVerification } from '@documenso/lib/server-only/team/resend-team-email-verification';
 import { updateTeamEmail } from '@documenso/lib/server-only/team/update-team-email';
-
+import { prisma } from '@documenso/prisma';
 import { authenticatedProcedure, router } from '../trpc';
+import { completeTeamEmailVerificationRoute } from './complete-team-email-verification';
 import { createTeamRoute } from './create-team';
 import { createTeamGroupsRoute } from './create-team-groups';
 import { createTeamMembersRoute } from './create-team-members';
@@ -58,7 +58,22 @@ export const teamRouter = router({
   // Todo: Refactor into routes.
   email: {
     get: authenticatedProcedure.query(async ({ ctx }) => {
-      return await getTeamEmailByEmail({ email: ctx.user.email });
+      const teamEmail = await prisma.teamEmail.findUnique({
+        where: {
+          email: ctx.user.email,
+        },
+        include: {
+          team: {
+            select: {
+              id: true,
+              name: true,
+              url: true,
+            },
+          },
+        },
+      });
+
+      return teamEmail || null;
     }),
     update: authenticatedProcedure.input(ZUpdateTeamEmailMutationSchema).mutation(async ({ input, ctx }) => {
       ctx.logger.info({
@@ -67,7 +82,7 @@ export const teamRouter = router({
         },
       });
 
-      return await updateTeamEmail({
+      await updateTeamEmail({
         userId: ctx.user.id,
         ...input,
       });
@@ -81,7 +96,7 @@ export const teamRouter = router({
         },
       });
 
-      return await deleteTeamEmail({
+      await deleteTeamEmail({
         userId: ctx.user.id,
         userEmail: ctx.user.email,
         teamId,
@@ -99,7 +114,7 @@ export const teamRouter = router({
             },
           });
 
-          return await createTeamEmailVerification({
+          await createTeamEmailVerification({
             teamId,
             userId: ctx.user.id,
             data: {
@@ -108,6 +123,7 @@ export const teamRouter = router({
             },
           });
         }),
+      complete: completeTeamEmailVerificationRoute,
       resend: authenticatedProcedure
         .input(ZResendTeamEmailVerificationMutationSchema)
         .mutation(async ({ input, ctx }) => {
@@ -135,7 +151,7 @@ export const teamRouter = router({
             },
           });
 
-          return await deleteTeamEmailVerification({
+          await deleteTeamEmailVerification({
             userId: ctx.user.id,
             teamId,
           });

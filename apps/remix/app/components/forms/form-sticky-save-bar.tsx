@@ -3,12 +3,33 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangleIcon } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
+
+const getScrollParent = (node: HTMLElement): HTMLElement | null => {
+  let current = node.parentElement;
+
+  while (current) {
+    const { overflowY } = getComputedStyle(current);
+
+    if (overflowY === 'auto' || overflowY === 'scroll') {
+      return current;
+    }
+
+    current = current.parentElement;
+  }
+
+  return null;
+};
 
 export type FormStickySaveBarProps = {
   isDirty: boolean;
   isSubmitting: boolean;
   onReset: () => void;
+  /**
+   * Slot for a "reset to defaults" action, rendered before the Undo button. Hidden while
+   * the bar is floating so it never appears in the unsaved-changes island.
+   */
+  resetToDefaults?: ReactNode;
 };
 
 /**
@@ -24,7 +45,7 @@ export type FormStickySaveBarProps = {
  * shared-layout morph). A 1px sentinel below it detects the stuck state so we can toggle
  * the pill chrome.
  */
-export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset }: FormStickySaveBarProps) => {
+export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset, resetToDefaults }: FormStickySaveBarProps) => {
   const { t } = useLingui();
 
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -38,14 +59,18 @@ export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset }: FormSticky
     }
 
     // The sentinel sits at the bar's resting position (the end of the form). While the
-    // bar is stuck to the bottom of the viewport the sentinel is scrolled past (out of
-    // view); once you reach the form's end it comes into view and the bar settles.
+    // bar is stuck to the bottom of the scroll container the sentinel is scrolled past
+    // (out of view); once you reach the form's end it comes into view and the bar settles.
+    //
+    // Observe relative to the actual scroll container (not always the viewport) so a
+    // banner shifting the page can't desync the detection from the sticky bar — both
+    // then share the same reference box.
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsStuck(!entry.isIntersecting);
       },
       {
-        root: null,
+        root: getScrollParent(sentinel),
         rootMargin: '0px 0px -24px 0px',
         threshold: 0,
       },
@@ -100,6 +125,8 @@ export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset }: FormSticky
         </AnimatePresence>
 
         <div className="ml-auto flex flex-shrink-0 items-center gap-x-2">
+          {!isFloating && resetToDefaults}
+
           {isDirty && (
             <Button type="button" variant="secondary" size="sm" onClick={onReset} disabled={isSubmitting}>
               <Trans>Undo</Trans>

@@ -143,7 +143,7 @@ export default function DashboardPage() {
 
                   {canExecuteOrganisationAction('MANAGE_ORGANISATION', org.currentOrganisationRole) && (
                     <div className="absolute top-4 right-4 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                      <Link to={`/o/${org.url}/settings`}>
+                      <Link to={`/o/${org.url}/settings/general`}>
                         <SettingsIcon className="h-4 w-4" />
                       </Link>
                     </div>
@@ -212,7 +212,7 @@ export default function DashboardPage() {
 
                     {canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole) && (
                       <div className="absolute top-4 right-4 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                        <Link to={`/t/${team.url}/settings`}>
+                        <Link to={`/t/${team.url}/settings/general`}>
                           <SettingsIcon className="h-4 w-4" />
                         </Link>
                       </div>

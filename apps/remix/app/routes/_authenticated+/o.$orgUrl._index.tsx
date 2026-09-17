@@ -115,7 +115,7 @@ export default function OrganisationSettingsTeamsPage() {
         </div>
 
         <Button asChild>
-          <Link to={`/o/${organisation.url}/settings`}>
+          <Link to={`/o/${organisation.url}/settings/general`}>
             <Trans>Manage Organisation</Trans>
           </Link>
         </Button>
@@ -184,7 +184,7 @@ const TeamDropdownMenu = ({ team }: { team: TGetOrganisationSessionResponse[0]['
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link to={`/t/${team.url}/settings`}>
+          <Link to={`/t/${team.url}/settings/general`}>
             <SettingsIcon className="mr-2 h-4 w-4" />
             <Trans>Settings</Trans>
           </Link>

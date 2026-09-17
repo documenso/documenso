@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import { type User, UserSecurityAuditLogType } from '@prisma/client';
 
-import { AppError } from '../../errors/app-error';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getBackupCodes } from './get-backup-code';
 import { verifyTwoFactorAuthenticationToken } from './verify-2fa-token';
@@ -22,13 +22,13 @@ export const enableTwoFactorAuthentication = async ({
   }
 
   if (!user.twoFactorSecret) {
-    throw new AppError('TWO_FACTOR_SETUP_REQUIRED');
+    throw new AppError(AppErrorCode.TWO_FACTOR_SETUP_REQUIRED);
   }
 
   const isValidToken = await verifyTwoFactorAuthenticationToken({ user, totpCode: code });
 
   if (!isValidToken) {
-    throw new AppError('INCORRECT_TWO_FACTOR_CODE');
+    throw new AppError(AppErrorCode.INCORRECT_TWO_FACTOR_CODE);
   }
 
   let recoveryCodes: string[] = [];
