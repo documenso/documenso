@@ -1,50 +1,38 @@
 import type { EnvelopeEditorStep } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@documenso/ui/primitives/sheet';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
 import { motion } from 'framer-motion';
 import {
   ArrowLeftIcon,
-  CopyPlusIcon,
-  DownloadCloudIcon,
   EyeIcon,
-  FileOutputIcon,
-  LinkIcon,
   type LucideIcon,
+  MoreHorizontalIcon,
   MousePointerIcon,
-  SendIcon,
-  SettingsIcon,
-  Trash2Icon,
   UploadIcon,
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
-
-import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
-import { EnvelopeDistributeDialog } from '~/components/dialogs/envelope-distribute-dialog';
-import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
-import { EnvelopeDuplicateDialog } from '~/components/dialogs/envelope-duplicate-dialog';
-import { EnvelopeRedistributeDialog } from '~/components/dialogs/envelope-redistribute-dialog';
-import { EnvelopeSaveAsTemplateDialog } from '~/components/dialogs/envelope-save-as-template-dialog';
-import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
-import { EnvelopeEditorSettingsDialog } from '~/components/general/envelope-editor/envelope-editor-settings-dialog';
 
 import { EnvelopeEditorFieldsPage } from './envelope-editor-fields-page';
 import EnvelopeEditorHeader from './envelope-editor-header';
+import { EnvelopeEditorMobileNotice } from './envelope-editor-mobile-notice';
 import { EnvelopeEditorPreviewPage } from './envelope-editor-preview-page';
+import { EnvelopeEditorQuickActions, useHasEnvelopeEditorQuickActions } from './envelope-editor-quick-actions';
 import { EnvelopeEditorUploadPage } from './envelope-editor-upload-page';
 
 type EnvelopeEditorStepData = {
   id: string;
   title: MessageDescriptor;
+  /** Short label used where space is limited, such as the mobile step bar. */
+  shortTitle: MessageDescriptor;
   icon: LucideIcon;
   description: MessageDescriptor;
 };
@@ -52,6 +40,7 @@ type EnvelopeEditorStepData = {
 const UPLOAD_STEP = {
   id: 'upload',
   title: msg`Document & Recipients`,
+  shortTitle: msg`Documents`,
   icon: UploadIcon,
   description: msg`Upload documents and add recipients`,
 };
@@ -59,6 +48,7 @@ const UPLOAD_STEP = {
 const ADD_FIELDS_STEP = {
   id: 'addFields',
   title: msg`Add Fields`,
+  shortTitle: msg`Fields`,
   icon: MousePointerIcon,
   description: msg`Place and configure form fields in the document`,
 };
@@ -66,6 +56,7 @@ const ADD_FIELDS_STEP = {
 const PREVIEW_STEP = {
   id: 'preview',
   title: msg`Preview`,
+  shortTitle: msg`Preview`,
   icon: EyeIcon,
   description: msg`Preview the document before sending`,
 };
@@ -73,32 +64,20 @@ const PREVIEW_STEP = {
 export const EnvelopeEditor = () => {
   const { t } = useLingui();
 
-  const navigate = useNavigate();
+  const { editorConfig, isDocument, relativePath, navigateToStep, flushAutosave, resetForms } =
+    useCurrentEnvelopeEditor();
 
-  const {
-    envelope,
-    editorConfig,
-    isDocument,
-    isTemplate,
-    relativePath,
-    navigateToStep,
-    syncEnvelope,
-    flushAutosave,
-    resetForms,
-  } = useCurrentEnvelopeEditor();
+  const [searchParams] = useSearchParams();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // The mobile "More" sheet holds the quick actions and the return link, so it
+  // is only offered when at least one of them applies.
+  const hasQuickActions = useHasEnvelopeEditorQuickActions();
+  const hasMobileMenu = hasQuickActions || !editorConfig.embedded;
 
   const {
     general: { minimizeLeftSidebar, allowUploadAndRecipientStep, allowAddFieldsStep, allowPreviewStep },
-    actions: {
-      allowDistributing,
-      allowDirectLink,
-      allowDuplication,
-      allowSaveAsTemplate,
-      allowDownloadPDF,
-      allowDeletion,
-    },
   } = editorConfig;
 
   const envelopeEditorSteps = useMemo(() => {
@@ -175,16 +154,21 @@ export const EnvelopeEditor = () => {
   const currentStepData = envelopeEditorSteps.find((step) => step.id === searchParamsStep) || envelopeEditorSteps[0];
 
   return (
-    <div className="h-screen w-screen bg-envelope-editor-background">
+    <div className="flex h-[100dvh] w-full flex-col bg-envelope-editor-background">
       <EnvelopeEditorHeader />
 
+      {!editorConfig.embedded && <EnvelopeEditorMobileNotice />}
+
       {/* Main Content Area */}
-      <div className="flex h-[calc(100vh-4rem)] w-screen">
-        {/* Left Section - Step Navigation */}
+      <div className="flex min-h-0 w-full flex-1">
+        {/* Left Section - Step Navigation. Hidden below `md`, where the bottom bar takes over. */}
         <div
-          className={cn('flex w-80 flex-shrink-0 flex-col overflow-y-auto border-border border-r bg-background py-4', {
-            'w-14': minimizeLeftSidebar,
-          })}
+          className={cn(
+            'hidden w-80 flex-shrink-0 flex-col overflow-y-auto border-border border-r bg-background py-4 md:flex',
+            {
+              'w-14': minimizeLeftSidebar,
+            },
+          )}
         >
           {/* Left section step selector. */}
           {minimizeLeftSidebar ? (
@@ -318,7 +302,7 @@ export const EnvelopeEditor = () => {
 
           {/* Quick Actions. */}
           <div
-            className={cn('space-y-3 px-4 [&_.lucide]:text-muted-foreground', {
+            className={cn('space-y-3 px-4', {
               'px-2': minimizeLeftSidebar,
             })}
           >
@@ -328,166 +312,7 @@ export const EnvelopeEditor = () => {
               </h4>
             )}
 
-            {editorConfig.settings && (
-              <EnvelopeEditorSettingsDialog
-                trigger={
-                  <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Settings`)}>
-                    <SettingsIcon className="h-4 w-4" />
-
-                    {!minimizeLeftSidebar && (
-                      <span className="ml-2">
-                        {isDocument ? <Trans>Document Settings</Trans> : <Trans>Template Settings</Trans>}
-                      </span>
-                    )}
-                  </Button>
-                }
-              />
-            )}
-
-            {isDocument && allowDistributing && (
-              <>
-                <EnvelopeDistributeDialog
-                  documentRootPath={relativePath.documentRootPath}
-                  trigger={
-                    <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Send Envelope`)}>
-                      <SendIcon className="h-4 w-4" />
-
-                      {!minimizeLeftSidebar && (
-                        <span className="ml-2">
-                          <Trans>Send Document</Trans>
-                        </span>
-                      )}
-                    </Button>
-                  }
-                />
-
-                <EnvelopeRedistributeDialog
-                  envelope={envelope}
-                  trigger={
-                    <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Resend Envelope`)}>
-                      <SendIcon className="h-4 w-4" />
-
-                      {!minimizeLeftSidebar && (
-                        <span className="ml-2">
-                          <Trans>Resend Document</Trans>
-                        </span>
-                      )}
-                    </Button>
-                  }
-                />
-              </>
-            )}
-
-            {isTemplate && allowDirectLink && (
-              <TemplateDirectLinkDialog
-                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-                directLink={envelope.directLink}
-                recipients={envelope.recipients}
-                onCreateSuccess={async () => await syncEnvelope()}
-                onDeleteSuccess={async () => await syncEnvelope()}
-                trigger={
-                  <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Direct Link`)}>
-                    <LinkIcon className="h-4 w-4" />
-
-                    {!minimizeLeftSidebar && (
-                      <span className="ml-2">
-                        <Trans>Direct Link</Trans>
-                      </span>
-                    )}
-                  </Button>
-                }
-              />
-            )}
-
-            {allowDuplication && (
-              <EnvelopeDuplicateDialog
-                envelopeId={envelope.id}
-                envelopeType={envelope.type}
-                trigger={
-                  <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Duplicate Envelope`)}>
-                    <CopyPlusIcon className="h-4 w-4" />
-
-                    {!minimizeLeftSidebar && (
-                      <span className="ml-2">
-                        {isDocument ? <Trans>Duplicate Document</Trans> : <Trans>Duplicate Template</Trans>}
-                      </span>
-                    )}
-                  </Button>
-                }
-              />
-            )}
-
-            {allowSaveAsTemplate && isDocument && (
-              <EnvelopeSaveAsTemplateDialog
-                envelopeId={envelope.id}
-                trigger={
-                  <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Save as Template`)}>
-                    <FileOutputIcon className="h-4 w-4" />
-
-                    {!minimizeLeftSidebar && (
-                      <span className="ml-2">
-                        <Trans>Save as Template</Trans>
-                      </span>
-                    )}
-                  </Button>
-                }
-              />
-            )}
-
-            {allowDownloadPDF && (
-              <EnvelopeDownloadDialog
-                envelopeId={envelope.id}
-                envelopeStatus={envelope.status}
-                isLegacy={envelope.internalVersion === 1}
-                envelopeItems={envelope.envelopeItems}
-                trigger={
-                  <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Download PDF`)}>
-                    <DownloadCloudIcon className="h-4 w-4" />
-
-                    {!minimizeLeftSidebar && (
-                      <span className="ml-2">
-                        <Trans>Download PDF</Trans>
-                      </span>
-                    )}
-                  </Button>
-                }
-              />
-            )}
-
-            {/* Check envelope ID since it can be in embedded create mode. */}
-            {allowDeletion && envelope.id && (
-              <EnvelopeDeleteDialog
-                id={envelope.id}
-                type={envelope.type}
-                status={envelope.status}
-                title={envelope.title}
-                canManageDocument={true}
-                trigger={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start"
-                    title={t(msg`Delete Envelope`)}
-                  >
-                    <Trash2Icon className="h-4 w-4" />
-
-                    {!minimizeLeftSidebar && (
-                      <span className="ml-2">
-                        {isDocument ? <Trans>Delete Document</Trans> : <Trans>Delete Template</Trans>}
-                      </span>
-                    )}
-                  </Button>
-                }
-                onDelete={async () => {
-                  await navigate(
-                    envelope.type === EnvelopeType.DOCUMENT
-                      ? relativePath.documentRootPath
-                      : relativePath.templateRootPath,
-                  );
-                }}
-              />
-            )}
+            <EnvelopeEditorQuickActions showLabels={!minimizeLeftSidebar} />
           </div>
 
           {/* Footer of left sidebar. */}
@@ -518,21 +343,89 @@ export const EnvelopeEditor = () => {
           )}
         </div>
 
-        {/* Main Content - Changes based on current step */}
-        <div className="flex-1 overflow-y-auto">
-          {match({
-            pageToRender,
-            allowUploadAndRecipientStep,
-            allowAddFieldsStep,
-            allowPreviewStep,
-          })
-            .with({ pageToRender: 'loading' }, () => <SpinnerBox className="py-32" />)
-            .with({ pageToRender: 'upload', allowUploadAndRecipientStep: true }, () => <EnvelopeEditorUploadPage />)
-            .with({ pageToRender: 'addFields', allowAddFieldsStep: true }, () => <EnvelopeEditorFieldsPage />)
-            .with({ pageToRender: 'preview', allowPreviewStep: true }, () => <EnvelopeEditorPreviewPage />)
-            .otherwise(() => null)}
+        <div className="flex min-w-0 flex-1 flex-col">
+          {/* Main Content - Changes based on current step */}
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            {match({
+              pageToRender,
+              allowUploadAndRecipientStep,
+              allowAddFieldsStep,
+              allowPreviewStep,
+            })
+              .with({ pageToRender: 'loading' }, () => <SpinnerBox className="py-32" />)
+              .with({ pageToRender: 'upload', allowUploadAndRecipientStep: true }, () => <EnvelopeEditorUploadPage />)
+              .with({ pageToRender: 'addFields', allowAddFieldsStep: true }, () => <EnvelopeEditorFieldsPage />)
+              .with({ pageToRender: 'preview', allowPreviewStep: true }, () => <EnvelopeEditorPreviewPage />)
+              .otherwise(() => null)}
+          </div>
+
+          {/* Mobile step bar. Replaces the sidebar below `md`. */}
+          <nav
+            className="flex h-14 shrink-0 items-stretch border-border border-t bg-background md:hidden"
+            aria-label={t`Editor steps`}
+          >
+            {envelopeEditorSteps.map((step) => {
+              const Icon = step.icon;
+              const isActive = searchParamsStep === step.id;
+
+              return (
+                <button
+                  key={step.id}
+                  data-testid={`envelope-editor-mobile-step-${step.id}`}
+                  type="button"
+                  aria-current={isActive ? 'step' : undefined}
+                  className={cn(
+                    'flex flex-1 flex-col items-center justify-center gap-1 font-medium text-[11px] transition-colors',
+                    isActive ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground hover:text-foreground',
+                  )}
+                  onClick={() => void navigateToStep(step.id as EnvelopeEditorStep)}
+                >
+                  <Icon className="h-5 w-5" />
+                  {t(step.shortTitle)}
+                </button>
+              );
+            })}
+
+            {hasMobileMenu && (
+              <button
+                type="button"
+                className="flex flex-1 flex-col items-center justify-center gap-1 font-medium text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+                onClick={() => setIsMobileMenuOpen(true)}
+              >
+                <MoreHorizontalIcon className="h-5 w-5" />
+                <Trans>More</Trans>
+              </button>
+            )}
+          </nav>
         </div>
       </div>
+
+      {/* Mobile quick actions, opened from the "More" item in the step bar. */}
+      {hasMobileMenu && (
+        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+          <SheetContent className="flex w-full max-w-[350px] flex-col overflow-y-auto">
+            <SheetHeader className="text-left">
+              <SheetTitle>
+                <Trans>Quick Actions</Trans>
+              </SheetTitle>
+            </SheetHeader>
+
+            <EnvelopeEditorQuickActions showLabels />
+
+            {!editorConfig.embedded && (
+              <Button variant="ghost" className="mt-auto w-full justify-start" asChild>
+                <Link to={relativePath.basePath}>
+                  <ArrowLeftIcon className="h-4 w-4 flex-shrink-0" />
+
+                  <span className="ml-2">
+                    {isDocument ? <Trans>Return to documents</Trans> : <Trans>Return to templates</Trans>}
+                  </span>
+                </Link>
+              </Button>
+            )}
+          </SheetContent>
+        </Sheet>
+      )}
     </div>
   );
 };
