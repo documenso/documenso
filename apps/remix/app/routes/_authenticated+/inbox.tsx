@@ -2,8 +2,11 @@ import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { InboxIcon } from 'lucide-react';
 
+import { DocumentSearch } from '~/components/general/document/document-search';
 import { OrganisationInvitations } from '~/components/general/organisations/organisation-invitations';
+import { DocumentsTableStatusFilter } from '~/components/tables/documents-table-status-filter';
 import { InboxTable } from '~/components/tables/inbox-table';
+import { INBOX_SELECTABLE_STATUSES } from '~/utils/inbox-search-params';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
@@ -24,6 +27,14 @@ export default function InboxPage() {
         </p>
 
         <OrganisationInvitations className="mt-4" />
+      </div>
+
+      <div className="mb-8 flex flex-wrap items-center gap-x-2 gap-y-4">
+        <div className="w-56">
+          <DocumentSearch />
+        </div>
+
+        <DocumentsTableStatusFilter statuses={INBOX_SELECTABLE_STATUSES} />
       </div>
 
       <InboxTable />
