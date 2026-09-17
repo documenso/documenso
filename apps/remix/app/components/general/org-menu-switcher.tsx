@@ -271,6 +271,14 @@ export const OrgMenuSwitcher = () => {
                 </Link>
               </DropdownMenuItem>
 
+              {canAccessTeamSettings && (
+                <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
+                  <Link to={`/t/${currentTeam.url}/analytics`}>
+                    <Trans>Analytics</Trans>
+                  </Link>
+                </DropdownMenuItem>
+              )}
+
               <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
                 <Link
                   to={

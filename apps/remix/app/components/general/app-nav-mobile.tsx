@@ -1,6 +1,7 @@
 import LogoImage from '@documenso/assets/logo.png';
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
@@ -37,13 +38,11 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
   };
 
   const menuNavigationLinks = useMemo(() => {
-    let teamUrl = currentTeam?.url || null;
+    const navigationTeam =
+      currentTeam ??
+      (organisations.length === 1 && organisations[0].teams.length === 1 ? organisations[0].teams[0] : null);
 
-    if (!teamUrl && organisations.length === 1 && organisations[0].teams.length === 1) {
-      teamUrl = organisations[0].teams[0].url;
-    }
-
-    if (!teamUrl) {
+    if (!navigationTeam) {
       return [
         {
           href: '/inbox',
@@ -55,6 +54,8 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         },
       ];
     }
+
+    const teamUrl = navigationTeam.url;
 
     return [
       {
@@ -69,12 +70,15 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         href: '/inbox',
         text: t`Inbox`,
       },
+      ...(canExecuteTeamAction('MANAGE_TEAM', navigationTeam.currentTeamRole)
+        ? [{ href: `/t/${teamUrl}/analytics`, text: t`Analytics` }]
+        : []),
       {
         href: '/settings/profile',
         text: t`Settings`,
       },
     ];
-  }, [currentTeam, organisations]);
+  }, [currentTeam, organisations, t]);
 
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
