@@ -5,15 +5,15 @@ import { useLingui } from '@lingui/react';
 import { useQueryStates } from 'nuqs';
 import { useEffect, useState } from 'react';
 
-import { documentsSearchParams } from '~/utils/documents-search-params';
+import { templatesSearchParams } from '~/utils/templates-search-params';
 
-export const DocumentSearch = () => {
+export const TemplateSearch = () => {
   const { _ } = useLingui();
 
   const [{ query }, setSearchParams] = useQueryStates(
     {
-      query: documentsSearchParams.query,
-      page: documentsSearchParams.page,
+      query: templatesSearchParams.query,
+      page: templatesSearchParams.page,
     },
     { history: 'push' },
   );
@@ -23,7 +23,6 @@ export const DocumentSearch = () => {
 
   useEffect(() => {
     if (debouncedSearchTerm !== (query ?? '')) {
-      // Reset pagination so a new search never lands on an empty page.
       void setSearchParams({
         query: debouncedSearchTerm || null,
         page: null,
@@ -34,9 +33,10 @@ export const DocumentSearch = () => {
   return (
     <Input
       type="search"
-      placeholder={_(msg`Search documents...`)}
+      placeholder={_(msg`Search templates...`)}
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
+      data-testid="templates-search-input"
     />
   );
 };
