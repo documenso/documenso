@@ -111,6 +111,7 @@ export const generateDefaultOrganisationSettings = (): Omit<OrganisationGlobalSe
     documentTimezone: null, // Null means local timezone.
     documentDateFormat: DEFAULT_DOCUMENT_DATE_FORMAT,
     delegateDocumentOwnership: false,
+    allowDocumentRejection: true,
 
     includeSenderDetails: true,
     includeSigningCertificate: true,

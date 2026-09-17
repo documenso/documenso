@@ -30,6 +30,7 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     uploadSignatureEnabled: z.boolean().nullish(),
     drawSignatureEnabled: z.boolean().nullish(),
     delegateDocumentOwnership: z.boolean().nullish(),
+    allowDocumentRejection: z.boolean().nullish(),
     envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
     reminderSettings: ZEnvelopeReminderSettings.nullish(),
 

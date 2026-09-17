@@ -261,7 +261,9 @@ export const DocumentSigningPageViewV1 = ({
 
           <div className="flex items-center gap-x-4">
             <DocumentSigningAttachmentsPopover envelopeId={document.envelopeId} token={recipient.token} />
-            <DocumentSigningRejectDialog documentId={document.id} token={recipient.token} />
+            {documentMeta.allowDocumentRejection && (
+              <DocumentSigningRejectDialog documentId={document.id} token={recipient.token} />
+            )}
           </div>
         </div>
 

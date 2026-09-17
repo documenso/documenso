@@ -96,6 +96,9 @@ export const EmbedSignDocumentV1ClientPage = ({
 
   const [allowDocumentRejection, setAllowDocumentRejection] = useState(false);
 
+  // Both the embed host and the document settings must allow rejection.
+  const isDocumentRejectionAllowed = allowDocumentRejection && (metadata?.allowDocumentRejection ?? true);
+
   const selectedSigner = allRecipients.find((r) => r.id === selectedSignerId);
   const isAssistantMode = recipient.role === RecipientRole.ASSISTANT;
 
@@ -303,7 +306,7 @@ export const EmbedSignDocumentV1ClientPage = ({
         <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
           <DocumentSigningAttachmentsPopover envelopeId={envelopeId} token={token} />
 
-          {allowDocumentRejection && (
+          {isDocumentRejectionAllowed && (
             <DocumentSigningRejectDialog documentId={documentId} token={token} onRejected={onDocumentRejected} />
           )}
         </div>
@@ -502,7 +505,7 @@ export const EmbedSignDocumentV1ClientPage = ({
                   </Button>
                 ) : (
                   <Button
-                    className={allowDocumentRejection ? 'col-start-2' : 'col-span-2'}
+                    className={isDocumentRejectionAllowed ? 'col-start-2' : 'col-span-2'}
                     disabled={isThrottled}
                     loading={isSubmitting}
                     onClick={() => throttledOnCompleteClick()}

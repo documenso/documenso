@@ -87,7 +87,11 @@ export const EnvelopeSignerHeader = () => {
 const MobileDropdownMenu = () => {
   const { envelope, recipient } = useRequiredEnvelopeSigningContext();
 
-  const { allowDocumentRejection } = useEmbedSigningContext() || {};
+  const { allowDocumentRejection = true } = useEmbedSigningContext() || {};
+
+  // Both the document settings and the embed host (if any) must allow rejection.
+  const isDocumentRejectionAllowed =
+    envelope.type === EnvelopeType.DOCUMENT && envelope.documentMeta.allowDocumentRejection && allowDocumentRejection;
 
   return (
     <DropdownMenu>
@@ -113,7 +117,7 @@ const MobileDropdownMenu = () => {
           }
         />
 
-        {envelope.type === EnvelopeType.DOCUMENT && allowDocumentRejection !== false && (
+        {isDocumentRejectionAllowed && (
           <DocumentSigningRejectDialog
             documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
             token={recipient.token}

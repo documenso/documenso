@@ -39,6 +39,7 @@ export default function OrganisationSettingsDocumentPage() {
         signatureTypes,
         defaultRecipients,
         delegateDocumentOwnership,
+        allowDocumentRejection,
         aiFeaturesEnabled,
       } = data;
 
@@ -46,6 +47,7 @@ export default function OrganisationSettingsDocumentPage() {
         documentVisibility === null ||
         documentLanguage === null ||
         documentDateFormat === null ||
+        allowDocumentRejection === null ||
         aiFeaturesEnabled === null
       ) {
         throw new Error('Should not be possible.');
@@ -63,6 +65,7 @@ export default function OrganisationSettingsDocumentPage() {
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           delegateDocumentOwnership,
+          allowDocumentRejection,
           aiFeaturesEnabled,
         },
       });
