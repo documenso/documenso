@@ -190,50 +190,74 @@ test.describe('Inbox Find - Recipient Scoping', () => {
 // ─── Search hardening ────────────────────────────────────────────────────────
 
 test.describe('Inbox Find - Search Hardening', () => {
-  test('should treat SQL wildcard characters in the query literally', async ({ page }) => {
+  test('should keep wildcard searches scoped to the recipient inbox', async ({ page }) => {
+    // SQL LIKE wildcards ("%" and "_") are intentionally passed through so
+    // users can do advanced searches. That must only ever widen the title
+    // match, never the recipient scoping.
     const { user: sender, team: senderTeam } = await seedUser();
-    const { user: recipient } = await seedUser();
+    const { user: victim } = await seedUser();
+    const { user: attacker } = await seedUser();
 
-    await seedPendingDocument(sender, senderTeam.id, [recipient], {
-      createDocumentOptions: { title: 'Alpha Report' },
+    await seedPendingDocument(sender, senderTeam.id, [victim], {
+      createDocumentOptions: { title: 'Victim Alpha Report' },
     });
 
-    await seedPendingDocument(sender, senderTeam.id, [recipient], {
-      createDocumentOptions: { title: 'Beta Report' },
+    await seedCompletedDocument(sender, senderTeam.id, [victim], {
+      createDocumentOptions: { title: 'Victim Beta Report' },
     });
 
-    await seedPendingDocument(sender, senderTeam.id, [recipient], {
-      createDocumentOptions: { title: '100% Signed Report' },
+    // The attacker has one document of their own so we can prove wildcards
+    // return their inbox and nothing more.
+    await seedPendingDocument(sender, senderTeam.id, [attacker], {
+      createDocumentOptions: { title: 'Attacker Own Report' },
     });
 
-    await apiSignin({ page, email: recipient.email });
+    const wildcardQueries = ['%', '_', '%%%', '%Report%', 'Victim%', 'Victim _lpha%', '\\', '%victim%'];
 
-    // Positive control.
-    const plain = await trpcInboxFind(page, { query: 'Report' });
-    expect(titlesOf(plain.data).sort()).toEqual(['100% Signed Report', 'Alpha Report', 'Beta Report']);
+    // Positive control: wildcards work for the actual recipient.
+    await apiSignin({ page, email: victim.email });
 
-    // A literal "%" only matches the title that actually contains one.
-    const literalPercent = await trpcInboxFind(page, { query: '%' });
-    expect(titlesOf(literalPercent.data)).toEqual(['100% Signed Report']);
+    const victimAll = await trpcInboxFind(page, { query: '%' });
+    expect(titlesOf(victimAll.data).sort()).toEqual(['Victim Alpha Report', 'Victim Beta Report']);
 
-    const literalPhrase = await trpcInboxFind(page, { query: '100% signed' });
-    expect(titlesOf(literalPhrase.data)).toEqual(['100% Signed Report']);
+    const victimPattern = await trpcInboxFind(page, { query: 'Victim _lpha%' });
+    expect(titlesOf(victimPattern.data)).toEqual(['Victim Alpha Report']);
 
-    // None of the titles contain these literally, so a correctly escaped
-    // query must match nothing rather than acting as a wildcard.
-    for (const query of ['_', '%Report%', 'Alph_ Report', '%%%', '\\']) {
+    await apiSignout({ page });
+
+    // The attacker gets exactly their own inbox for every wildcard, never the victim's.
+    await apiSignin({ page, email: attacker.email });
+
+    for (const query of wildcardQueries) {
       const { res, data } = await trpcInboxFind(page, { query });
 
-      expect(res.ok()).toBeTruthy();
-      expect(titlesOf(data), `query "${query}"`).toEqual([]);
+      expect(res.ok(), `query "${query}"`).toBeTruthy();
+
+      const titles = titlesOf(data);
+
+      expect(titles, `query "${query}"`).not.toContain('Victim Alpha Report');
+      expect(titles, `query "${query}"`).not.toContain('Victim Beta Report');
+      expect(
+        titles.every((title) => title === 'Attacker Own Report'),
+        `query "${query}"`,
+      ).toBe(true);
+    }
+
+    // Wildcards combined with the status filter still cannot escape the scope.
+    for (const status of ['PENDING', 'COMPLETED', 'REJECTED', 'CANCELLED']) {
+      const { data } = await trpcInboxFind(page, { query: '%', status });
+
+      expect(titlesOf(data), `status "${status}"`).not.toContain('Victim Alpha Report');
+      expect(titlesOf(data), `status "${status}"`).not.toContain('Victim Beta Report');
     }
 
     await apiSignout({ page });
   });
 
   test('should only match against the document title', async ({ page }) => {
-    const { user: sender, team: senderTeam } = await seedUser();
-    const { user: recipient } = await seedUser();
+    // Explicit names so the negative queries below are deterministic.
+    const { user: sender, team: senderTeam } = await seedUser({ name: 'Sender Person' });
+    const { user: recipient } = await seedUser({ name: 'Recipient Person' });
 
     await seedPendingDocument(sender, senderTeam.id, ['zebra-person@test.documenso.com', recipient], {
       createDocumentOptions: {
@@ -250,13 +274,10 @@ test.describe('Inbox Find - Search Hardening', () => {
 
     // External IDs, sender details and other recipients must not be probeable
     // through the inbox search.
-    for (const query of ['ext-hidden', sender.email, sender.name ?? '', 'zebra-person']) {
-      if (!query) {
-        continue;
-      }
-
+    for (const query of ['ext-hidden', sender.email, 'Sender Person', 'zebra-person']) {
       const { data } = await trpcInboxFind(page, { query });
-      expect(titlesOf(data)).toEqual([]);
+
+      expect(titlesOf(data), `query "${query}"`).toEqual([]);
     }
 
     await apiSignout({ page });
