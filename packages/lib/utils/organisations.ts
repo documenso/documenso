@@ -6,6 +6,7 @@ import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../constants/date-formats';
 import { DEFAULT_ENVELOPE_EXPIRATION_PERIOD } from '../constants/envelope-expiration';
 import { DEFAULT_ENVELOPE_REMINDER_SETTINGS } from '../constants/envelope-reminder';
 import {
+  DEFAULT_BRANDING_LOGO_SIZE,
   LOWEST_ORGANISATION_ROLE,
   ORGANISATION_MEMBER_ROLE_HIERARCHY,
   ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
@@ -126,6 +127,7 @@ export const generateDefaultOrganisationSettings = (): Omit<OrganisationGlobalSe
     brandingCompanyDetails: '',
     brandingColors: null,
     brandingCss: '',
+    brandingLogoSize: DEFAULT_BRANDING_LOGO_SIZE,
 
     emailId: null,
     emailReplyTo: null,
