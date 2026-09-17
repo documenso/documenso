@@ -16,21 +16,16 @@ import { Trans } from '@lingui/react/macro';
 import { DocumentStatus as DocumentStatusEnum, RecipientRole, SigningStatus } from '@prisma/client';
 import { CheckCircleIcon, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
+import { useQueryStates } from 'nuqs';
 import { useMemo, useTransition } from 'react';
-import { useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { useOptionalCurrentTeam } from '~/providers/team';
+import { inboxSearchParams, resolveInboxStatus } from '~/utils/inbox-search-params';
 
 import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
-
-export type DocumentsTableProps = {
-  data?: TFindInboxResponse;
-  isLoading?: boolean;
-  isLoadingError?: boolean;
-};
 
 type DocumentsTableRow = TFindInboxResponse['data'][number];
 
@@ -40,16 +35,23 @@ export const InboxTable = () => {
   const team = useOptionalCurrentTeam();
   const [isPending, startTransition] = useTransition();
 
-  const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
-  const page = searchParams?.get?.('page') ? Number(searchParams.get('page')) : undefined;
-  const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
+  const [findInboxSearchParams] = useQueryStates(inboxSearchParams, {
+    history: 'push',
+  });
+
+  const status = resolveInboxStatus(findInboxSearchParams.status);
+  const query = findInboxSearchParams.query ?? '';
 
   const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery({
-    page: page || 1,
-    perPage: perPage || 10,
+    page: Math.max(findInboxSearchParams.page ?? 1, 1),
+    perPage: Math.min(Math.max(findInboxSearchParams.perPage ?? 10, 1), 100),
+    query: query || undefined,
+    status,
   });
+
+  const hasSearchQuery = query.trim().length > 0;
 
   const columns = useMemo(() => {
     return [
@@ -123,7 +125,20 @@ export const InboxTable = () => {
         emptyState={
           <div className="flex h-60 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
             <p>
-              <Trans>Documents that require your attention will appear here</Trans>
+              {match({ hasSearchQuery, status })
+                .with({ hasSearchQuery: true }, () => <Trans>No documents match your search</Trans>)
+                .with({ status: DocumentStatusEnum.COMPLETED }, () => (
+                  <Trans>Documents that you have completed will appear here</Trans>
+                ))
+                .with({ status: DocumentStatusEnum.REJECTED }, () => (
+                  <Trans>Documents that have been rejected will appear here</Trans>
+                ))
+                .with({ status: DocumentStatusEnum.CANCELLED }, () => (
+                  <Trans>Documents that have been cancelled will appear here</Trans>
+                ))
+                .otherwise(() => (
+                  <Trans>Documents that require your attention will appear here</Trans>
+                ))}
             </p>
           </div>
         }
