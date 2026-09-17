@@ -5,7 +5,7 @@ import {
   ZRecipientActionAuthSchema,
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
-import { ZRecipientLiteSchema, ZRecipientSchema } from '@documenso/lib/types/recipient';
+import { ZRecipientLiteSchema, ZRecipientSchema, ZRecipientSigningOrderSchema } from '@documenso/lib/types/recipient';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { RecipientRole } from '@prisma/client';
 import { z } from 'zod';
@@ -27,7 +27,7 @@ export const ZCreateRecipientSchema = z.object({
   email: zEmail().toLowerCase().min(1).max(254),
   name: z.string().max(255),
   role: z.nativeEnum(RecipientRole),
-  signingOrder: z.number().optional(),
+  signingOrder: ZRecipientSigningOrderSchema.optional(),
   accessAuth: z.array(ZRecipientAccessAuthTypesSchema).default([]).optional(),
   actionAuth: z.array(ZRecipientActionAuthTypesSchema).default([]).optional(),
 });
@@ -37,7 +37,7 @@ export const ZUpdateRecipientSchema = z.object({
   email: zEmail().toLowerCase().min(1).max(254).optional(),
   name: z.string().max(255).optional(),
   role: z.nativeEnum(RecipientRole).optional(),
-  signingOrder: z.number().optional(),
+  signingOrder: ZRecipientSigningOrderSchema.optional(),
   accessAuth: z.array(ZRecipientAccessAuthTypesSchema).default([]).optional(),
   actionAuth: z.array(ZRecipientActionAuthTypesSchema).default([]).optional(),
 });
@@ -86,7 +86,7 @@ export const ZSetDocumentRecipientsRequestSchema = z.object({
       email: zEmail().toLowerCase().min(1).max(254),
       name: z.string().max(255),
       role: z.nativeEnum(RecipientRole),
-      signingOrder: z.number().optional(),
+      signingOrder: ZRecipientSigningOrderSchema.optional(),
       actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
     }),
   ),
@@ -148,7 +148,7 @@ export const ZSetTemplateRecipientsRequestSchema = z.object({
         ),
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
-      signingOrder: z.number().optional(),
+      signingOrder: ZRecipientSigningOrderSchema.optional(),
       actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
     }),
   ),

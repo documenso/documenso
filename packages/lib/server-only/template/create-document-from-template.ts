@@ -52,6 +52,9 @@ import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
+import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
+import { assignDefaultRecipientSigningOrders } from '../signature-level/assign-default-recipient-signing-orders';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -430,8 +433,6 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
-  const allFinalRecipients = [...finalRecipients, ...defaultRecipientsFinal];
-
   // Key = original envelope item ID
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
@@ -523,6 +524,22 @@ export const createDocumentFromTemplate = async ({
     requested: ZSignatureLevelSchema.parse(template.signatureLevel),
     strict: false,
   });
+
+  // Assign default recipients signing orders if TSP is enabled since
+  // TSP envelopes require sequential signing.
+  const orderedDefaultRecipients = assignDefaultRecipientSigningOrders({
+    signatureLevel,
+    payloadRecipients: finalRecipients,
+    defaultRecipients: defaultRecipientsFinal,
+  });
+
+  const allFinalRecipients = [...finalRecipients, ...orderedDefaultRecipients];
+
+  for (const recipient of allFinalRecipients) {
+    assertCompatibleRecipientRole({ signatureLevel, role: recipient.role });
+  }
+
+  assertCompatibleRecipientGrouping({ signatureLevel, recipients: allFinalRecipients });
 
   const documentMeta = await prisma.documentMeta.create({
     data: extractDerivedDocumentMeta(

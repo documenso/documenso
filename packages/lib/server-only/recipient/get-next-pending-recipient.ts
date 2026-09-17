@@ -1,7 +1,8 @@
 import { prisma } from '@documenso/prisma';
-import { EnvelopeType, RecipientRole } from '@prisma/client';
+import { EnvelopeType } from '@prisma/client';
 
 import { mapDocumentIdToSecondaryId } from '../../utils/envelope';
+import { getNextDictatableRecipient } from '../../utils/recipient-groups';
 
 export const getNextPendingRecipient = async ({
   documentId,
@@ -16,33 +17,17 @@ export const getNextPendingRecipient = async ({
         type: EnvelopeType.DOCUMENT,
         secondaryId: mapDocumentIdToSecondaryId(documentId),
       },
-      // CC recipients are informational only and never take part in signing,
-      // so they must never be offered as the next pending recipient.
-      role: {
-        not: RecipientRole.CC,
-      },
     },
-    orderBy: [
-      {
-        signingOrder: {
-          sort: 'asc',
-          nulls: 'last',
-        },
-      },
-      {
-        id: 'asc',
-      },
-    ],
   });
 
-  const currentIndex = recipients.findIndex((r) => r.id === currentRecipientId);
+  const nextRecipient = getNextDictatableRecipient({ recipients, currentRecipientId });
 
-  if (currentIndex === -1 || currentIndex === recipients.length - 1) {
+  if (!nextRecipient) {
     return null;
   }
 
   return {
-    ...recipients[currentIndex + 1],
+    ...nextRecipient,
     token: '',
   };
 };

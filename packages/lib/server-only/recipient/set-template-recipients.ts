@@ -12,6 +12,7 @@ import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export type SetTemplateRecipientsOptions = {
@@ -67,6 +68,11 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }: 
       role: recipient.role,
     });
   }
+
+  assertCompatibleRecipientGrouping({
+    signatureLevel: envelope.signatureLevel,
+    recipients,
+  });
 
   const normalizedRecipients = recipients.map((recipient) => {
     // Force replace any changes to the name or email of the direct recipient.
