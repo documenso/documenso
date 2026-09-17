@@ -40,11 +40,10 @@ export const DocumentInviteEmailTemplate = ({
   const { _ } = useLingui();
 
   const action = _(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase();
-  const isOrganisationInvite = organisationType === OrganisationType.ORGANISATION;
 
   let previewText = msg`${inviterName} has invited you to ${action} ${documentName}`;
 
-  if (isOrganisationInvite) {
+  if (organisationType === OrganisationType.ORGANISATION) {
     previewText = includeSenderDetails
       ? msg`${inviterName} on behalf of "${teamName}" has invited you to ${action} ${documentName}`
       : msg`${teamName} has invited you to ${action} ${documentName}`;
@@ -97,14 +96,6 @@ export const DocumentInviteEmailTemplate = ({
               <Text className="mt-2 text-base text-muted-foreground">
                 {customBody ? (
                   <TemplateCustomMessageBody text={customBody} />
-                ) : isOrganisationInvite && !includeSenderDetails ? (
-                  <Trans>
-                    {teamName} has invited you to {action} the document "{documentName}".
-                  </Trans>
-                ) : isOrganisationInvite ? (
-                  <Trans>
-                    {inviterName} on behalf of "{teamName}" has invited you to {action} the document "{documentName}".
-                  </Trans>
                 ) : (
                   <Trans>
                     {inviterName} has invited you to {action} the document "{documentName}".
