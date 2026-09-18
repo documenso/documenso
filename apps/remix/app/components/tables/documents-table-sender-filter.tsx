@@ -23,7 +23,7 @@ export const DocumentsTableSenderFilter = ({ teamId }: DocumentsTableSenderFilte
       senderIds: documentsSearchParams.senderIds,
       page: documentsSearchParams.page,
     },
-    { history: 'push' },
+    { history: 'push', shallow: false },
   );
 
   const selectedSenderIds = (senderIds ?? []).map((senderId) => senderId.toString());
