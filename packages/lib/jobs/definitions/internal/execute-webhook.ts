@@ -10,6 +10,8 @@ const EXECUTE_WEBHOOK_JOB_DEFINITION_SCHEMA = z.object({
   event: z.nativeEnum(WebhookTriggerEvents),
   webhookId: z.string(),
   data: z.unknown(),
+  deliveryId: z.string().optional(),
+  createdAt: z.string().optional(),
   requestMetadata: ZRequestMetadataSchema.optional(),
 });
 
