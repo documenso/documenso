@@ -185,18 +185,28 @@ export const ZSignatureFieldMeta = ZBaseFieldMeta.extend({
 
 export type TSignatureFieldMeta = z.infer<typeof ZSignatureFieldMeta>;
 
-export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
-  ZSignatureFieldMeta,
-  ZInitialsFieldMeta,
-  ZNameFieldMeta,
-  ZEmailFieldMeta,
-  ZDateFieldMeta,
-  ZTextFieldMeta,
-  ZNumberFieldMeta,
-  ZRadioFieldMeta,
-  ZCheckboxFieldMeta,
-  ZDropdownFieldMeta,
-]);
+export const ZFieldMetaNotOptionalSchema = z
+  .discriminatedUnion('type', [
+    ZSignatureFieldMeta,
+    ZInitialsFieldMeta,
+    ZNameFieldMeta,
+    ZEmailFieldMeta,
+    ZDateFieldMeta,
+    ZTextFieldMeta,
+    ZNumberFieldMeta,
+    ZRadioFieldMeta,
+    ZCheckboxFieldMeta,
+    ZDropdownFieldMeta,
+  ])
+  .superRefine((data, ctx) => {
+    if (data.required && data.readOnly) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'A field cannot be both read-only and required',
+        path: ['required'],
+      });
+    }
+  });
 
 export type TFieldMetaNotOptionalSchema = z.infer<typeof ZFieldMetaNotOptionalSchema>;
 
@@ -255,52 +265,62 @@ export const ZFieldMetaSchema = z
 
 export type TFieldMetaSchema = z.infer<typeof ZFieldMetaSchema>;
 
-export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal(FieldType.SIGNATURE),
-    fieldMeta: ZSignatureFieldMeta.optional(),
-  }),
-  z.object({
-    type: z.literal(FieldType.FREE_SIGNATURE),
-    fieldMeta: z.undefined(),
-  }),
-  z.object({
-    type: z.literal(FieldType.INITIALS),
-    fieldMeta: ZInitialsFieldMeta.optional(),
-  }),
-  z.object({
-    type: z.literal(FieldType.NAME),
-    fieldMeta: ZNameFieldMeta.optional(),
-  }),
-  z.object({
-    type: z.literal(FieldType.EMAIL),
-    fieldMeta: ZEmailFieldMeta.optional(),
-  }),
-  z.object({
-    type: z.literal(FieldType.DATE),
-    fieldMeta: ZDateFieldMeta.optional(),
-  }),
-  z.object({
-    type: z.literal(FieldType.TEXT),
-    fieldMeta: ZTextFieldMeta.optional(),
-  }),
-  z.object({
-    type: z.literal(FieldType.NUMBER),
-    fieldMeta: ZNumberFieldMeta.optional(),
-  }),
-  z.object({
-    type: z.literal(FieldType.RADIO),
-    fieldMeta: ZRadioFieldMeta.optional(),
-  }),
-  z.object({
-    type: z.literal(FieldType.CHECKBOX),
-    fieldMeta: ZCheckboxFieldMeta.optional(),
-  }),
-  z.object({
-    type: z.literal(FieldType.DROPDOWN),
-    fieldMeta: ZDropdownFieldMeta.optional(),
-  }),
-]);
+export const ZFieldAndMetaSchema = z
+  .discriminatedUnion('type', [
+    z.object({
+      type: z.literal(FieldType.SIGNATURE),
+      fieldMeta: ZSignatureFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.FREE_SIGNATURE),
+      fieldMeta: z.undefined(),
+    }),
+    z.object({
+      type: z.literal(FieldType.INITIALS),
+      fieldMeta: ZInitialsFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.NAME),
+      fieldMeta: ZNameFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.EMAIL),
+      fieldMeta: ZEmailFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.DATE),
+      fieldMeta: ZDateFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.TEXT),
+      fieldMeta: ZTextFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.NUMBER),
+      fieldMeta: ZNumberFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.RADIO),
+      fieldMeta: ZRadioFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.CHECKBOX),
+      fieldMeta: ZCheckboxFieldMeta.optional(),
+    }),
+    z.object({
+      type: z.literal(FieldType.DROPDOWN),
+      fieldMeta: ZDropdownFieldMeta.optional(),
+    }),
+  ])
+  .superRefine((data, ctx) => {
+    if (data.fieldMeta?.required && data.fieldMeta?.readOnly) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'A field cannot be both read-only and required',
+        path: ['fieldMeta', 'required'],
+      });
+    }
+  });
 
 export type TFieldAndMeta = z.infer<typeof ZFieldAndMetaSchema>;
 
@@ -400,51 +420,61 @@ export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
   [FieldType.DROPDOWN]: FIELD_DROPDOWN_META_DEFAULT_VALUES,
 } as const;
 
-export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal(FieldType.SIGNATURE),
-    fieldMeta: ZSignatureFieldMeta.optional().default(FIELD_SIGNATURE_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.FREE_SIGNATURE),
-    fieldMeta: z.undefined(),
-  }),
-  z.object({
-    type: z.literal(FieldType.INITIALS),
-    fieldMeta: ZInitialsFieldMeta.optional().default(FIELD_INITIALS_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.NAME),
-    fieldMeta: ZNameFieldMeta.optional().default(FIELD_NAME_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.EMAIL),
-    fieldMeta: ZEmailFieldMeta.optional().default(FIELD_EMAIL_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.DATE),
-    fieldMeta: ZDateFieldMeta.optional().default(FIELD_DATE_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.TEXT),
-    fieldMeta: ZTextFieldMeta.optional().default(FIELD_TEXT_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.NUMBER),
-    fieldMeta: ZNumberFieldMeta.optional().default(FIELD_NUMBER_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.RADIO),
-    fieldMeta: ZRadioFieldMeta.optional().default(FIELD_RADIO_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.CHECKBOX),
-    fieldMeta: ZCheckboxFieldMeta.optional().default(FIELD_CHECKBOX_META_DEFAULT_VALUES),
-  }),
-  z.object({
-    type: z.literal(FieldType.DROPDOWN),
-    fieldMeta: ZDropdownFieldMeta.optional().default(FIELD_DROPDOWN_META_DEFAULT_VALUES),
-  }),
-]);
+export const ZEnvelopeFieldAndMetaSchema = z
+  .discriminatedUnion('type', [
+    z.object({
+      type: z.literal(FieldType.SIGNATURE),
+      fieldMeta: ZSignatureFieldMeta.optional().default(FIELD_SIGNATURE_META_DEFAULT_VALUES),
+    }),
+    z.object({
+      type: z.literal(FieldType.FREE_SIGNATURE),
+      fieldMeta: z.undefined(),
+    }),
+    z.object({
+      type: z.literal(FieldType.INITIALS),
+      fieldMeta: ZInitialsFieldMeta.optional().default(FIELD_INITIALS_META_DEFAULT_VALUES),
+    }),
+    z.object({
+      type: z.literal(FieldType.NAME),
+      fieldMeta: ZNameFieldMeta.optional().default(FIELD_NAME_META_DEFAULT_VALUES),
+    }),
+    z.object({
+      type: z.literal(FieldType.EMAIL),
+      fieldMeta: ZEmailFieldMeta.optional().default(FIELD_EMAIL_META_DEFAULT_VALUES),
+    }),
+    z.object({
+      type: z.literal(FieldType.DATE),
+      fieldMeta: ZDateFieldMeta.optional().default(FIELD_DATE_META_DEFAULT_VALUES),
+    }),
+    z.object({
+      type: z.literal(FieldType.TEXT),
+      fieldMeta: ZTextFieldMeta.optional().default(FIELD_TEXT_META_DEFAULT_VALUES),
+    }),
+    z.object({
+      type: z.literal(FieldType.NUMBER),
+      fieldMeta: ZNumberFieldMeta.optional().default(FIELD_NUMBER_META_DEFAULT_VALUES),
+    }),
+    z.object({
+      type: z.literal(FieldType.RADIO),
+      fieldMeta: ZRadioFieldMeta.optional().default(FIELD_RADIO_META_DEFAULT_VALUES),
+    }),
+    z.object({
+      type: z.literal(FieldType.CHECKBOX),
+      fieldMeta: ZCheckboxFieldMeta.optional().default(FIELD_CHECKBOX_META_DEFAULT_VALUES),
+    }),
+    z.object({
+      type: z.literal(FieldType.DROPDOWN),
+      fieldMeta: ZDropdownFieldMeta.optional().default(FIELD_DROPDOWN_META_DEFAULT_VALUES),
+    }),
+  ])
+  .superRefine((data, ctx) => {
+    if (data.fieldMeta?.required && data.fieldMeta?.readOnly) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'A field cannot be both read-only and required',
+        path: ['fieldMeta', 'required'],
+      });
+    }
+  });
 
 export type TEnvelopeFieldAndMeta = z.infer<typeof ZEnvelopeFieldAndMetaSchema>;
