@@ -1,3 +1,4 @@
+import type { TQrSignatureContext } from '@documenso/lib/types/qr-signature';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import { Dialog, DialogClose, DialogContent, DialogFooter } from '@documenso/ui/primitives/dialog';
 
@@ -22,6 +23,8 @@ export type SignaturePadDialogProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'o
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
+  qrSignatureEnabled?: boolean;
+  qrSignatureContext?: TQrSignatureContext;
 };
 
 export const SignaturePadDialog = ({
@@ -34,6 +37,8 @@ export const SignaturePadDialog = ({
   typedSignatureEnabled,
   uploadSignatureEnabled,
   drawSignatureEnabled,
+  qrSignatureEnabled,
+  qrSignatureContext,
   dialogConfirmText,
 }: SignaturePadDialogProps) => {
   const { i18n } = useLingui();
@@ -121,6 +126,8 @@ export const SignaturePadDialog = ({
             typedSignatureEnabled={typedSignatureEnabled}
             uploadSignatureEnabled={uploadSignatureEnabled}
             drawSignatureEnabled={drawSignatureEnabled}
+            qrSignatureEnabled={qrSignatureEnabled}
+            qrSignatureContext={qrSignatureContext}
           />
 
           <DialogFooter>
