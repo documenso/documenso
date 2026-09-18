@@ -4657,7 +4657,7 @@ msgstr "ドキュメントのタイムゾーン"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Document title"
-msgstr "文書タイトル"
+msgstr "ドキュメントタイトル"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
