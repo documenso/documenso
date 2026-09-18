@@ -77,7 +77,14 @@ export const USE_INTERNAL_URL_BROWSERLESS = () => env('NEXT_PUBLIC_USE_INTERNAL_
  */
 export const IS_AI_FEATURES_CONFIGURED = (): boolean => {
   if (typeof window === 'undefined') {
-    return !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
+    const hasProject = !!env('GOOGLE_VERTEX_PROJECT_ID') || !!env('GOOGLE_VERTEX_SERVICE_ACCOUNT_KEY');
+    const hasAuth =
+      !!env('GOOGLE_VERTEX_API_KEY') ||
+      !!env('GOOGLE_VERTEX_SERVICE_ACCOUNT_KEY') ||
+      !!env('GOOGLE_APPLICATION_CREDENTIALS') ||
+      env('GOOGLE_VERTEX_USE_ADC') === 'true';
+
+    return hasProject && hasAuth;
   }
 
   return env('NEXT_PUBLIC_AI_FEATURES_ENABLED') === 'true';
