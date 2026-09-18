@@ -4,7 +4,7 @@ import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/do
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, FolderType, WebhookTriggerEvents } from '@prisma/client';
+import { RecipientRole, DocumentStatus, EnvelopeType, FolderType, WebhookTriggerEvents } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
@@ -16,6 +16,7 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
 import { recomputeNextReminderForEnvelope } from '../recipient/update-recipient-next-reminder';
 import { assertCompatibleDictateNextSigner } from '../signature-level/assert-compatible-dictate-next-signer';
+import { assertAssistantCompatibleSigningOrder } from '../signature-level/assert-assistant-compatible-signing-order';
 import { assertCompatibleSigningOrder } from '../signature-level/assert-compatible-signing-order';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { assertEnvelopeMutable } from './assert-envelope-mutable';
@@ -60,6 +61,7 @@ export const updateEnvelope = async ({
     where: envelopeWhereInput,
     include: {
       documentMeta: true,
+      recipients: true,
       team: {
         select: {
           organisationId: true,
@@ -86,6 +88,15 @@ export const updateEnvelope = async ({
       signatureLevel: envelope.signatureLevel,
       signingOrder: meta.signingOrder,
     });
+
+    // Flipping an envelope that already carries an assistant to parallel
+    // signing reaches the same illegal state from the other side.
+    if (envelope.recipients.some((recipient) => recipient.role === RecipientRole.ASSISTANT)) {
+      assertAssistantCompatibleSigningOrder({
+        role: RecipientRole.ASSISTANT,
+        signingOrder: meta.signingOrder,
+      });
+    }
   }
 
   if (meta.allowDictateNextSigner !== undefined) {
