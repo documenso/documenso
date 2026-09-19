@@ -2,7 +2,7 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -29,8 +29,6 @@ export const UserOrganisationsTable = () => {
     })),
   });
 
-  const isPersonalLayoutMode = isPersonalLayout(data);
-
   const results = {
     data: data || [],
     perPage: 10,
@@ -44,31 +42,13 @@ export const UserOrganisationsTable = () => {
         header: _(msg`Organisation`),
         accessorKey: 'name',
         cell: ({ row }) => (
-          <Link
-            to={isPersonalLayoutMode ? `/settings/organisations` : `/o/${row.original.url}`}
-            preventScrollReset={true}
-          >
+          <Link to={`/o/${row.original.url}`} preventScrollReset={true}>
             <AvatarWithText
               avatarSrc={formatAvatarUrl(row.original.avatarImageId)}
               avatarClass="h-12 w-12"
               avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
-              primaryText={
-                <span className="font-semibold text-foreground/80">
-                  {isPersonalLayoutMode
-                    ? _(
-                        msg({
-                          message: `Personal`,
-                          context: `Personal organisation (adjective)`,
-                        }),
-                      )
-                    : row.original.name}
-                </span>
-              }
-              secondaryText={
-                isPersonalLayoutMode
-                  ? _(msg`Your personal organisation`)
-                  : `${NEXT_PUBLIC_WEBAPP_URL()}/o/${row.original.url}`
-              }
+              primaryText={<span className="font-semibold text-foreground/80">{row.original.name}</span>}
+              secondaryText={`${NEXT_PUBLIC_WEBAPP_URL()}/o/${row.original.url}`}
             />
           </Link>
         ),
@@ -92,7 +72,7 @@ export const UserOrganisationsTable = () => {
           <div className="flex justify-end space-x-2">
             {canExecuteOrganisationAction('MANAGE_ORGANISATION', row.original.currentOrganisationRole) && (
               <Button variant="outline" asChild>
-                <Link to={`/o/${row.original.url}/settings`}>
+                <Link to={`/o/${row.original.url}/settings/general`}>
                   <Trans>Manage</Trans>
                 </Link>
               </Button>
@@ -117,7 +97,7 @@ export const UserOrganisationsTable = () => {
         ),
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, [isPersonalLayoutMode]);
+  }, []);
 
   return (
     <div>
@@ -129,9 +109,6 @@ export const UserOrganisationsTable = () => {
         totalPages={results.totalPages}
         error={{
           enable: isLoadingError,
-        }}
-        columnVisibility={{
-          actions: !isPersonalLayoutMode,
         }}
         skeleton={{
           enable: isLoading,
@@ -154,14 +131,12 @@ export const UserOrganisationsTable = () => {
               <TableCell>
                 <Skeleton className="h-4 w-20 rounded-full" />
               </TableCell>
-              {!isPersonalLayoutMode && (
-                <TableCell>
-                  <div className="flex flex-row justify-end space-x-2">
-                    <Skeleton className="h-10 w-20 rounded" />
-                    <Skeleton className="h-10 w-16 rounded" />
-                  </div>
-                </TableCell>
-              )}
+              <TableCell>
+                <div className="flex flex-row justify-end space-x-2">
+                  <Skeleton className="h-10 w-20 rounded" />
+                  <Skeleton className="h-10 w-16 rounded" />
+                </div>
+              </TableCell>
             </>
           ),
         }}

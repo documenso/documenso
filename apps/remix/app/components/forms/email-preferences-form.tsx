@@ -1,10 +1,11 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { FROM_ADDRESS } from '@documenso/lib/constants/email';
 import { DEFAULT_DOCUMENT_EMAIL_SETTINGS, ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentEmailCheckboxes } from '@documenso/ui/components/document/document-email-checkboxes';
-import { Button } from '@documenso/ui/primitives/button';
+import { Alert } from '@documenso/ui/primitives/alert';
 import {
   Form,
   FormControl,
@@ -18,20 +19,27 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
-import type { TeamGlobalSettings } from '@prisma/client';
+import { OrganisationType, type TeamGlobalSettings } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import { FormStickySaveBar } from './form-sticky-save-bar';
+import { InheritableField } from './inheritable-field';
 
 const ZEmailPreferencesFormSchema = z.object({
   emailId: z.string().nullable(),
   emailReplyTo: zEmail().nullable(),
   // emailReplyToName: z.string(),
   emailDocumentSettings: ZDocumentEmailSettingsSchema.nullable(),
+  includeSenderDetails: z.boolean().nullable(),
 });
 
 export type TEmailPreferencesFormSchema = z.infer<typeof ZEmailPreferencesFormSchema>;
 
-type SettingsSubset = Pick<TeamGlobalSettings, 'emailId' | 'emailReplyTo' | 'emailDocumentSettings'>;
+type SettingsSubset = Pick<
+  TeamGlobalSettings,
+  'emailId' | 'emailReplyTo' | 'emailDocumentSettings' | 'includeSenderDetails'
+>;
 
 export type EmailPreferencesFormProps = {
   settings: SettingsSubset;
@@ -40,7 +48,12 @@ export type EmailPreferencesFormProps = {
 };
 
 export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: EmailPreferencesFormProps) => {
+  const { user } = useSession();
   const organisation = useCurrentOrganisation();
+
+  const isPersonalOrganisation = organisation.type === OrganisationType.PERSONAL;
+
+  const placeholderEmail = user.email ?? 'user@example.com';
 
   const form = useForm<TEmailPreferencesFormSchema>({
     defaultValues: {
@@ -48,6 +61,7 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
       emailReplyTo: settings.emailReplyTo,
       // emailReplyToName: settings.emailReplyToName,
       emailDocumentSettings: settings.emailDocumentSettings,
+      includeSenderDetails: settings.includeSenderDetails,
     },
     resolver: zodResolver(ZEmailPreferencesFormSchema),
   });
@@ -59,10 +73,22 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
 
   const emails = emailData?.data || [];
 
+  const handleFormSubmit = form.handleSubmit(async (data) => {
+    try {
+      await onFormSubmit(data);
+    } catch {
+      // The page handler surfaces its own error toast. Keep the form dirty so
+      // the save bar stays visible and the user can retry.
+      return;
+    }
+
+    form.reset(data);
+  });
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onFormSubmit)}>
-        <fieldset className="flex h-full max-w-2xl flex-col gap-y-6" disabled={form.formState.isSubmitting}>
+      <form onSubmit={handleFormSubmit}>
+        <fieldset className="flex h-full flex-col gap-y-6" disabled={form.formState.isSubmitting}>
           {organisation.organisationClaim.flags.emailDomains && (
             <FormField
               control={form.control}
@@ -109,10 +135,12 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
             control={form.control}
             name="emailReplyTo"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  <Trans>Reply to email</Trans>
-                </FormLabel>
+              <InheritableField
+                canInherit={canInherit}
+                isInherited={field.value === null}
+                label={<Trans>Reply to email</Trans>}
+                testId="email-reply-to"
+              >
                 <FormControl>
                   <Input
                     {...field}
@@ -133,7 +161,7 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
                     </span>
                   )}
                 </FormDescription>
-              </FormItem>
+              </InheritableField>
             )}
           />
 
@@ -157,10 +185,13 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
             control={form.control}
             name="emailDocumentSettings"
             render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>
-                  <Trans>Default Email Settings</Trans>
-                </FormLabel>
+              <InheritableField
+                className="flex-1"
+                canInherit={canInherit}
+                isInherited={field.value === null}
+                label={<Trans>Default Email Settings</Trans>}
+                testId="email-document-settings"
+              >
                 {canInherit && (
                   <Select
                     value={field.value === null ? 'INHERIT' : 'CONTROLLED'}
@@ -199,15 +230,88 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
                     settings will not affect existing documents or templates.
                   </Trans>
                 </FormDescription>
-              </FormItem>
+              </InheritableField>
             )}
           />
 
-          <div className="flex flex-row justify-end space-x-4">
-            <Button type="submit" loading={form.formState.isSubmitting}>
-              <Trans>Update</Trans>
-            </Button>
-          </div>
+          {!isPersonalOrganisation && (
+            <FormField
+              control={form.control}
+              name="includeSenderDetails"
+              render={({ field }) => (
+                <InheritableField
+                  className="flex-1"
+                  canInherit={canInherit}
+                  isInherited={field.value === null}
+                  label={<Trans>Send on Behalf of Team</Trans>}
+                  testId="include-sender-details"
+                >
+                  <FormControl>
+                    <Select
+                      {...field}
+                      value={field.value === null ? '-1' : field.value.toString()}
+                      onValueChange={(value) =>
+                        field.onChange(value === 'true' ? true : value === 'false' ? false : null)
+                      }
+                    >
+                      <SelectTrigger
+                        className="bg-background text-muted-foreground"
+                        data-testid="include-sender-details-trigger"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value="true">
+                          <Trans>Yes</Trans>
+                        </SelectItem>
+
+                        <SelectItem value="false">
+                          <Trans>No</Trans>
+                        </SelectItem>
+
+                        {canInherit && (
+                          <SelectItem value={'-1'}>
+                            <Trans>Inherit from organisation</Trans>
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+
+                  <div className="pt-2">
+                    <div className="font-medium text-muted-foreground text-xs">
+                      <Trans>Preview</Trans>
+                    </div>
+
+                    <Alert variant="neutral" className="mt-1 px-2.5 py-1.5 text-sm">
+                      {field.value ? (
+                        <Trans>
+                          "{placeholderEmail}" on behalf of "Team Name" has invited you to sign "example document".
+                        </Trans>
+                      ) : (
+                        <Trans>"Team Name" has invited you to sign "example document".</Trans>
+                      )}
+                    </Alert>
+                  </div>
+
+                  <FormDescription>
+                    <Trans>
+                      Controls the formatting of the message that will be sent when inviting a recipient to sign a
+                      document. If a custom message has been provided while configuring the document, it will be used
+                      instead.
+                    </Trans>
+                  </FormDescription>
+                </InheritableField>
+              )}
+            />
+          )}
+
+          <FormStickySaveBar
+            isDirty={form.formState.isDirty}
+            isSubmitting={form.formState.isSubmitting}
+            onReset={() => form.reset()}
+          />
         </fieldset>
       </form>
     </Form>

@@ -1,4 +1,4 @@
-import { ZNameSchema } from '@documenso/lib/constants/auth';
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { z } from 'zod';
 
@@ -70,6 +70,8 @@ export type TResendVerifyEmailSchema = z.infer<typeof ZResendVerifyEmailSchema>;
 export const ZUpdatePasswordSchema = z.object({
   currentPassword: ZCurrentPasswordSchema,
   password: ZPasswordSchema,
+  totpCode: z.string().trim().optional(),
+  backupCode: z.string().trim().optional(),
 });
 
 export type TUpdatePasswordSchema = z.infer<typeof ZUpdatePasswordSchema>;

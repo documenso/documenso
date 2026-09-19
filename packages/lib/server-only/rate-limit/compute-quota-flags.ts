@@ -1,4 +1,4 @@
-import { QUOTA_WARNING_THRESHOLD } from './get-quota-alert-kind';
+import { isQuotaExceeded, isQuotaNearing } from '../../universal/quota-usage';
 
 export type QuotaFlags = {
   isDocumentQuotaExceeded: boolean;
@@ -20,39 +20,6 @@ type ComputeQuotaFlagsOptions = {
     emailCount?: number;
     apiCount?: number;
   };
-};
-
-/**
- * A quota of `null` means unlimited (never exceeded). A quota of `0` means
- * blocked (always exceeded). Otherwise usage `>=` quota is exceeded.
- */
-const isQuotaExceeded = (quota: number | null, usage: number): boolean => {
-  if (quota === null) {
-    return false;
-  }
-
-  if (quota === 0) {
-    return true;
-  }
-
-  return usage >= quota;
-};
-
-/**
- * A counter is "nearing" its quota once usage reaches the warning threshold
- * (80% of the quota, rounded up) but has not yet been exceeded. Nearing and
- * exceeded are mutually exclusive per counter.
- */
-const isQuotaNearing = (quota: number | null, usage: number): boolean => {
-  if (quota === null || quota === 0) {
-    return false;
-  }
-
-  if (isQuotaExceeded(quota, usage)) {
-    return false;
-  }
-
-  return usage >= Math.ceil(quota * QUOTA_WARNING_THRESHOLD);
 };
 
 export const computeQuotaFlags = ({ quotas, usage }: ComputeQuotaFlagsOptions): QuotaFlags => {

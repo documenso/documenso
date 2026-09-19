@@ -1,12 +1,21 @@
+import { isSigninEnabledForProvider } from '@documenso/lib/constants/auth';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
-import { Link } from 'react-router';
+import { Link, redirect } from 'react-router';
 
 import { ForgotPasswordForm } from '~/components/forms/forgot-password';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
   return appMetaTags(msg`Forgot Password`);
+}
+
+export async function loader() {
+  if (!isSigninEnabledForProvider('email')) {
+    throw redirect('/signin');
+  }
+
+  return null;
 }
 
 export default function ForgotPasswordPage() {

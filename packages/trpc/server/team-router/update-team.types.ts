@@ -1,6 +1,7 @@
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { z } from 'zod';
 
-import { ZTeamNameSchema, ZTeamUrlSchema } from './schema';
+import { ZTeamUrlSchema } from './schema';
 
 export const MAX_PROFILE_BIO_LENGTH = 256;
 
@@ -19,7 +20,7 @@ export const MAX_PROFILE_BIO_LENGTH = 256;
 export const ZUpdateTeamRequestSchema = z.object({
   teamId: z.number(),
   data: z.object({
-    name: ZTeamNameSchema.optional(),
+    name: ZNameSchema.optional(),
     url: ZTeamUrlSchema.optional(),
     profileBio: z
       .string()

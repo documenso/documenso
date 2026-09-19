@@ -2,38 +2,34 @@ import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounce
 import { Input } from '@documenso/ui/primitives/input';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { useCallback, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router';
+import { useQueryStates } from 'nuqs';
+import { useEffect, useState } from 'react';
 
-export const DocumentSearch = ({ initialValue = '' }: { initialValue?: string }) => {
+import { documentsSearchParams } from '~/utils/documents-search-params';
+
+export const DocumentSearch = () => {
   const { _ } = useLingui();
 
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const [searchTerm, setSearchTerm] = useState(initialValue);
-  const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
-
-  const handleSearch = useCallback(
-    (term: string) => {
-      const params = new URLSearchParams(searchParams?.toString() ?? '');
-      if (term) {
-        params.set('query', term);
-      } else {
-        params.delete('query');
-      }
-
-      setSearchParams(params);
+  const [{ query }, setSearchParams] = useQueryStates(
+    {
+      query: documentsSearchParams.query,
+      page: documentsSearchParams.page,
     },
-    [searchParams],
+    { history: 'push' },
   );
 
-  useEffect(() => {
-    const currentQueryParam = searchParams.get('query') || '';
+  const [searchTerm, setSearchTerm] = useState(query ?? '');
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
-    if (debouncedSearchTerm !== currentQueryParam) {
-      handleSearch(debouncedSearchTerm);
+  useEffect(() => {
+    if (debouncedSearchTerm !== (query ?? '')) {
+      // Reset pagination so a new search never lands on an empty page.
+      void setSearchParams({
+        query: debouncedSearchTerm || null,
+        page: null,
+      });
     }
-  }, [debouncedSearchTerm, searchParams]);
+  }, [debouncedSearchTerm, query, setSearchParams]);
 
   return (
     <Input

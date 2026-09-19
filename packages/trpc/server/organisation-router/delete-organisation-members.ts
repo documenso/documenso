@@ -1,8 +1,8 @@
-import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import {
   ORGANISATION_MEMBER_ROLE_HIERARCHY,
   ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
 } from '@documenso/lib/constants/organisations';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
 import {
@@ -11,7 +11,6 @@ import {
   isOrganisationRoleWithinUserHierarchy,
 } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
-import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -59,8 +58,6 @@ export const deleteOrganisationMembers = async ({
       roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
     }),
     include: {
-      subscription: true,
-      organisationClaim: true,
       teams: {
         select: {
           id: true,
@@ -75,22 +72,12 @@ export const deleteOrganisationMembers = async ({
           },
         },
       },
-      invites: {
-        where: {
-          status: OrganisationMemberInviteStatus.PENDING,
-        },
-        select: {
-          id: true,
-        },
-      },
     },
   });
 
   if (!organisation) {
     throw new AppError(AppErrorCode.UNAUTHORIZED);
   }
-
-  const { organisationClaim } = organisation;
 
   const membersToDelete = organisation.members.filter((member) => organisationMemberIds.includes(member.id));
 
@@ -127,15 +114,6 @@ export const deleteOrganisationMembers = async ({
         message: 'Cannot remove a member with a higher role',
       });
     }
-  }
-
-  const inviteCount = organisation.invites.length;
-  const newMemberCount = organisation.members.length + inviteCount - membersToDelete.length;
-
-  // Removing members is a reducing operation, so we don't gate it on the
-  // subscription being present. Sync Stripe only when one exists.
-  if (organisation.subscription) {
-    await syncMemberCountWithStripeSeatPlan(organisation.subscription, organisationClaim, newMemberCount);
   }
 
   const removedUserIds = membersToDelete.map((member) => member.userId);
@@ -182,6 +160,13 @@ export const deleteOrganisationMembers = async ({
         },
       },
     });
+  });
+
+  // Members were removed — queue a seat sync to true the Stripe quantity down to
+  // the new count (no proration, no credit).
+  await jobs.triggerJob({
+    name: 'internal.sync-organisation-seats',
+    payload: { organisationId },
   });
 
   for (const member of membersToDelete) {

@@ -66,8 +66,9 @@ test('[TEAMS]: update team', async ({ page }) => {
   await page.getByLabel('Team URL*').clear();
   await page.getByLabel('Team URL*').fill(updatedTeamId);
 
-  await page.getByRole('button', { name: 'Update team' }).click();
+  await page.getByRole('button', { name: 'Save changes' }).click();
 
   // Check we have been redirected to the new team URL and the name is updated.
-  await page.waitForURL(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${updatedTeamId}/settings`);
+  // The team settings index redirects to the explicit General route.
+  await page.waitForURL(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${updatedTeamId}/settings/general`);
 });

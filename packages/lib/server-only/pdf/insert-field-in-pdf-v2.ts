@@ -2,8 +2,8 @@
 import '../konva/skia-backend';
 
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { Canvas } from '@documenso/skia-canvas';
 import Konva from 'konva';
-import type { Canvas } from 'skia-canvas';
 
 import { renderField } from '../../universal/field-renderer/render-field';
 import { ensureFontLibrary } from './helpers';

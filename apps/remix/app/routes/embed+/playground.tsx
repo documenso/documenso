@@ -5,8 +5,9 @@
  *
  * No translations required.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { formatPath } from '@documenso/lib/constants/app';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 
 export const loader = () => {
@@ -147,7 +148,7 @@ export default function EmbedPlaygroundPage() {
       return inputToken;
     }
 
-    const response = await fetch('/api/v2/embedding/create-presign-token', {
+    const response = await fetch(formatPath('/api/v2/embedding/create-presign-token'), {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${inputToken}`,

@@ -1,8 +1,8 @@
 import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
@@ -96,7 +96,7 @@ export const SignUpForm = ({
       password: '',
       signature: '',
     },
-    mode: 'onBlur',
+    mode: 'onChange',
     resolver: zodResolver(ZSignUpFormSchema),
   });
 

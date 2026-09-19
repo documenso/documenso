@@ -50,7 +50,7 @@ import type { Organisation, Team, User } from '@prisma/client';
  *
  * --- GLOBAL LIMIT AWARENESS ---
  * apps/remix/server/router.ts applies a GLOBAL per-IP limiter to /api/v1/*:
- *   apiV1RateLimit = 100 requests / 1 minute (action `api.v1`, see rate-limits.ts).
+ *   apiV1RateLimit = 1000 requests / 1 minute (action `api.v1`, see rate-limits.ts).
  * Every per-org limit/quota configured here is kept FAR below that ceiling (single
  * digits) and the suite runs serially so the shared-IP global bucket is never the
  * thing that trips. A global-limit 429 is shaped `{ error }` whereas an org-limit
@@ -62,7 +62,7 @@ const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const baseUrl = `${WEBAPP_BASE_URL}/api/v1`;
 
 // Run serially: all workers share one IP, and the global /api/v1 limiter is
-// per-IP. Serial execution keeps the shared global bucket well under 100/min.
+// per-IP. Serial execution keeps the shared global bucket well under 1000/min.
 test.describe.configure({ mode: 'serial' });
 
 // This suite is only meaningful with real rate limiting enabled. CI sets the
@@ -125,7 +125,7 @@ const setClaimLimits = async (team: Team, limits: ClaimLimits) => {
  * GLOBAL /api/v1 IP bucket so a fresh scenario starts from zero.
  *
  * - The org windowed limiter keys its rows `ip:org:<id>`.
- * - The GLOBAL limiter (apps/remix/server/router.ts -> apiV1RateLimit, 100/min
+ * - The GLOBAL limiter (apps/remix/server/router.ts -> apiV1RateLimit, 1000/min
  *   per IP, action `api.v1`) is shared by EVERY v1 request from this test client.
  *   Across the suite (and especially across repeated local runs within the same
  *   minute) that shared bucket would otherwise fill up and trip BEFORE the org

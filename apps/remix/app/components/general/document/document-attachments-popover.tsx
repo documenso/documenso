@@ -1,5 +1,6 @@
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { isHttpUrl, toSafeHref } from '@documenso/lib/utils/is-http-url';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -24,7 +25,7 @@ export type DocumentAttachmentsPopoverProps = {
 
 const ZAttachmentFormSchema = z.object({
   label: z.string().min(1, 'Label is required'),
-  url: z.string().url('Must be a valid URL'),
+  url: z.string().url('Must be a valid URL').refine(isHttpUrl, 'URL must use the http or https protocol'),
 });
 
 type TAttachmentFormSchema = z.infer<typeof ZAttachmentFormSchema>;
@@ -156,7 +157,7 @@ export const DocumentAttachmentsPopover = ({
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-sm">{attachment.label}</p>
                     <a
-                      href={attachment.data}
+                      href={toSafeHref(attachment.data)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="truncate text-muted-foreground text-xs underline hover:text-foreground"

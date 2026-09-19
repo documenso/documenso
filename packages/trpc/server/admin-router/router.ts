@@ -1,4 +1,5 @@
 import { router } from '../trpc';
+import { adminSearchRoute } from './admin-search';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
@@ -118,5 +119,6 @@ export const adminRouter = router({
   teamMember: {
     delete: deleteAdminTeamMemberRoute,
   },
+  search: adminSearchRoute,
   updateSiteSetting: updateSiteSettingRoute,
 });

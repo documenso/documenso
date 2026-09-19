@@ -1,0 +1,107 @@
+---
+title: Apply Your License Key
+description: Activate your Enterprise license key to unlock enterprise features on your self-hosted instance.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+A license key activates the Enterprise features available to your self-hosted instance, such as CSC signing, SSO, embed white-labelling, and 21 CFR Part 11 compliance.
+
+<Callout type="info">
+  The license key applies to your **whole instance**, not an individual user account. There's one
+  key per deployment.
+</Callout>
+
+## Prerequisites
+
+- An active Enterprise license key — contact [sales](https://documen.so/enterprise) to set up an
+  Enterprise subscription, then copy your key from [license.documenso.com](https://license.documenso.com).
+  See [Enterprise Edition](/docs/policies/enterprise-edition) for details.
+- A running self-hosted Documenso instance that you're able to restart
+
+## Step 1: Set the environment variable
+
+Set `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` to your license key.
+
+<Tabs items={['Docker Compose', 'docker run', '.env']}>
+<Tab value="Docker Compose">
+
+Add the variable to your `.env` file (or directly under `environment:` in `compose.yml`):
+
+```bash
+NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY=your-license-key-here
+```
+
+Then apply it:
+
+```bash
+docker compose up -d
+```
+
+</Tab>
+<Tab value="docker run">
+
+```bash
+docker run -d \
+  --name documenso \
+  -e NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY=your-license-key-here \
+  documenso/documenso:latest
+```
+
+</Tab>
+<Tab value=".env">
+
+If you're running Documenso directly (not in a container), add the variable to your `.env` file:
+
+```bash
+NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY=your-license-key-here
+```
+
+</Tab>
+</Tabs>
+
+## Step 2: Restart the instance
+
+The license key is only read once, at process startup. Setting the variable in a running container or shell has no effect until the process restarts.
+
+```bash
+# Docker Compose
+docker compose restart documenso
+
+# Docker
+docker restart documenso
+```
+
+On startup, Documenso validates the key against the Documenso license server and caches the result locally for future startups, so a brief license-server outage won't lock you out.
+
+## What the license enables
+
+A valid license doesn't turn every enterprise feature on everywhere — activation depends on the feature:
+
+- **CSC signing** activates instance-wide automatically once the license is active and CSC transport is configured. See [CSC / QES Signing](/docs/self-hosting/configuration/signing-certificate/csc-qes) for the full setup.
+- **SSO, embed white-labelling, 21 CFR Part 11, and similar** are provisioned per organisation. Follow each feature's own guide to configure it once the license is active.
+
+## Troubleshooting
+
+<Accordions type="multiple">
+  <Accordion title="Enterprise features are still unavailable after applying the key">
+    - Confirm the key is present in the environment the running process actually reads — `docker
+      exec` into the container and check `env | grep LICENSE` if unsure.
+    - Confirm the instance was fully restarted after the variable was set, not just reloaded.
+    - Re-copy the key to rule out truncation or accidental whitespace.
+  </Accordion>
+  <Accordion title="A specific feature still isn't working">
+    Instance-wide features (like CSC signing) also need their own configuration — an active license
+    alone isn't enough. Check that feature's guide to confirm the required settings are in place.
+    Per-organisation features additionally need to be provisioned for the organisation that's using
+    them.
+  </Accordion>
+</Accordions>
+
+## See Also
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
+- [Enterprise Edition](/docs/policies/enterprise-edition) - What's included and how to purchase a license
+- [CSC / QES Signing](/docs/self-hosting/configuration/signing-certificate/csc-qes) - Enable CSC-based signing

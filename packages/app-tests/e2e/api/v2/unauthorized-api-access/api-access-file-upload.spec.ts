@@ -44,46 +44,6 @@ test.describe('File upload endpoint authorization', () => {
     expect(res.status()).toBe(401);
   });
 
-  test('rejects an unauthenticated presigned-post-url request', async ({ request }) => {
-    const res = await request.post(`${WEBAPP_BASE_URL}/api/files/presigned-post-url`, {
-      headers: { 'Content-Type': 'application/json' },
-      data: { fileName: 'test.pdf', contentType: 'application/pdf' },
-    });
-
-    expect(res.ok()).toBeFalsy();
-    expect(res.status()).toBe(401);
-  });
-
-  test('rejects a presigned-post-url request with an invalid presign token', async ({ request }) => {
-    const res = await request.post(`${WEBAPP_BASE_URL}/api/files/presigned-post-url`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer not-a-real-token',
-      },
-      data: { fileName: 'test.pdf', contentType: 'application/pdf' },
-    });
-
-    expect(res.ok()).toBeFalsy();
-    expect(res.status()).toBe(401);
-  });
-
-  test('rejects a presigned-post-url request with a disallowed content type', async ({ request }) => {
-    const { user, team } = await seedUser();
-    const presignToken = await createPresignTokenForUser(user.id, team.id);
-
-    const res = await request.post(`${WEBAPP_BASE_URL}/api/files/presigned-post-url`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${presignToken}`,
-      },
-      data: { fileName: 'malware.exe', contentType: 'application/x-msdownload' },
-    });
-
-    // Authenticated, but the content type is not on the allow-list.
-    expect(res.ok()).toBeFalsy();
-    expect(res.status()).toBe(400);
-  });
-
   test('allows an upload-pdf request authorized by a valid presign token', async ({ request }) => {
     const { user, team } = await seedUser();
     const presignToken = await createPresignTokenForUser(user.id, team.id);

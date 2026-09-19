@@ -1,3 +1,4 @@
+import { toSafeHref } from '@documenso/lib/utils/is-http-url';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
@@ -53,7 +54,7 @@ export const DocumentSigningAttachmentsPopover = ({
             {attachments?.data.map((attachment) => (
               <a
                 key={attachment.id}
-                href={attachment.data}
+                href={toSafeHref(attachment.data)}
                 title={attachment.data}
                 target="_blank"
                 rel="noopener noreferrer"

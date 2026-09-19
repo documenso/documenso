@@ -1,0 +1,61 @@
+name: 'One-Click Deploy Provider Request'
+description: Request a new one-click deployment provider (Railway, Render, etc.) to be added to our README
+title: 'One-Click Deploy Provider Request: [Provider Name]'
+labels: ['deploy-provider-request']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in adding a one-click deploy option for Documenso!
+
+        Each provider we list requires us to create, test, and maintain a deployment template, which is ongoing work on top of everything else. To keep this manageable, we ask that providers (or users) **open an issue instead of a PR** so the community can signal interest.
+
+        **How this works:**
+
+        - 👍 this issue if you'd like to see Documenso deployable on this provider.
+        - If community interest is high enough, we'll consider adding it to the README.
+        - Opening an issue is not a guarantee of inclusion. PRs adding badges without a prior issue and demonstrated interest will be closed.
+  - type: input
+    attributes:
+      label: Provider Name
+      placeholder: e.g. Railway
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Provider Website
+      placeholder: e.g. https://railway.com
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Deploy/Template URL
+      description: A link to an existing deployment template or deploy button URL, if one exists.
+  - type: dropdown
+    attributes:
+      label: Who creates and maintains the deployment template?
+      options:
+        - The provider
+        - Me / the community
+        - Nobody yet
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Testing & Maintenance
+      description: Has the template been tested against the current Documenso release? How are updates handled when Documenso ships breaking changes (env vars, migrations, Docker changes)?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Why this provider?
+      description: Tell us why Documenso users would benefit — existing user base, region coverage, free tier, etc.
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Please check the boxes that apply to this request.
+      options:
+        - label: I have searched existing issues to make sure this provider has not already been requested.
+        - label: I understand that inclusion depends on community interest and is not guaranteed.
+        - label: I understand that PRs adding deploy badges without a prior issue will be closed.
