@@ -3,7 +3,7 @@ import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { debounce, parseAsString, useQueryState } from 'nuqs';
+import { debounce, parseAsInteger, parseAsString, useQueryState } from 'nuqs';
 import { Link, useLocation, useSearchParams } from 'react-router';
 
 import { OrganisationMemberInviteDialog } from '~/components/dialogs/organisation-member-invite-dialog';
@@ -21,6 +21,7 @@ export default function TeamsSettingsMembersPage() {
     'query',
     parseAsString.withDefault('').withOptions({ shallow: false, limitUrlUpdates: debounce(500) }),
   );
+  const [, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
 
   const currentTab = searchParams?.get('tab') === 'invites' ? 'invites' : 'members';
 
@@ -38,7 +39,10 @@ export default function TeamsSettingsMembersPage() {
         <div className="my-4 flex flex-row items-center justify-between space-x-4">
           <Input
             value={searchQuery}
-            onChange={(e) => void setSearchQuery(e.target.value || null)}
+            onChange={(e) => {
+          void setSearchQuery(e.target.value || null);
+          void setPage(null);
+        }}
             placeholder={_(msg`Search`)}
           />
 
