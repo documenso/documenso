@@ -1,4 +1,4 @@
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { STATS_COUNT_CAP } from '@documenso/lib/constants/document';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/find-documents-internal.types';
@@ -14,13 +14,26 @@ import { FilterPill } from '~/components/general/filter-pill';
 import { documentsSearchParams } from '~/utils/documents-search-params';
 
 type DocumentsTableStatusFilterProps = {
-  stats: TFindDocumentsInternalResponse['stats'];
+  /**
+   * Per-status document counts, shown next to each option. When omitted no
+   * counts are rendered.
+   */
+  stats?: TFindDocumentsInternalResponse['stats'];
+
+  /**
+   * The statuses available for selection. Defaults to every status that
+   * makes sense for the documents page.
+   */
+  statuses?: ExtendedDocumentStatus[];
 };
 
-export const DocumentsTableStatusFilter = ({ stats }: DocumentsTableStatusFilterProps) => {
+export const DocumentsTableStatusFilter = ({
+  stats,
+  statuses = SELECTABLE_STATUSES,
+}: DocumentsTableStatusFilterProps) => {
   const { _ } = useLingui();
 
-  const organisation = useCurrentOrganisation();
+  const organisation = useOptionalCurrentOrganisation();
 
   const [{ status }, setSearchParams] = useQueryStates(
     {
@@ -32,14 +45,14 @@ export const DocumentsTableStatusFilter = ({ stats }: DocumentsTableStatusFilter
 
   const selectableStatuses = useMemo(
     () =>
-      SELECTABLE_STATUSES.filter((value) => {
-        if (organisation.type === OrganisationType.PERSONAL) {
+      statuses.filter((value) => {
+        if (organisation?.type === OrganisationType.PERSONAL) {
           return value !== ExtendedDocumentStatus.INBOX;
         }
 
         return true;
       }),
-    [organisation.type],
+    [organisation?.type, statuses],
   );
 
   const selectedStatus = useMemo(
@@ -65,20 +78,22 @@ export const DocumentsTableStatusFilter = ({ stats }: DocumentsTableStatusFilter
         options={selectableStatuses.map((value) => ({
           value,
           label: <DocumentStatus status={value} />,
-          trailing: formatStatsCount(stats[value]),
+          trailing: stats ? formatStatsCount(stats[value]) : undefined,
         }))}
         testId="documents-table-status-filter"
       />
 
       {/* Visually hidden document counts, for screen readers and tests. */}
-      <span className="sr-only" data-testid="documents-status-counts">
-        {[...selectableStatuses, ExtendedDocumentStatus.ALL].map((value) => (
-          <span key={value}>
-            {_(FRIENDLY_STATUS_MAP[value].label)}:{' '}
-            <span data-testid={`documents-status-count-${value}`}>{stats[value]}</span>
-          </span>
-        ))}
-      </span>
+      {stats && (
+        <span className="sr-only" data-testid="documents-status-counts">
+          {[...selectableStatuses, ExtendedDocumentStatus.ALL].map((value) => (
+            <span key={value}>
+              {_(FRIENDLY_STATUS_MAP[value].label)}:{' '}
+              <span data-testid={`documents-status-count-${value}`}>{stats[value]}</span>
+            </span>
+          ))}
+        </span>
+      )}
     </>
   );
 };
