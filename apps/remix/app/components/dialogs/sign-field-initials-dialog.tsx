@@ -59,7 +59,7 @@ export const SignFieldInitialsDialog = createCallable<SignFieldInitialsDialogPro
                       <Trans>Initials</Trans>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input autoFocus {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

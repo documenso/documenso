@@ -56,7 +56,7 @@ export const SignFieldNameDialog = createCallable<SignFieldNameDialogProps, stri
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input {...field} />
+                      <Input autoFocus {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -58,7 +58,7 @@ export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, st
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input {...field} />
+                        <Input autoFocus {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
