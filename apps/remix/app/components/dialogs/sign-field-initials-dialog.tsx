@@ -36,7 +36,12 @@ export const SignFieldInitialsDialog = createCallable<SignFieldInitialsDialogPro
 
   return (
     <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-      <DialogContent>
+      <DialogContent
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          form.setFocus('initials');
+        }}
+      >
         <DialogHeader>
           <DialogTitle>
             <Trans>Enter Initials</Trans>
@@ -59,7 +64,7 @@ export const SignFieldInitialsDialog = createCallable<SignFieldInitialsDialogPro
                       <Trans>Initials</Trans>
                     </FormLabel>
                     <FormControl>
-                      <Input autoFocus {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -36,7 +36,12 @@ export const SignFieldNameDialog = createCallable<SignFieldNameDialogProps, stri
 
   return (
     <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-      <DialogContent>
+      <DialogContent
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          form.setFocus('name');
+        }}
+      >
         <DialogHeader>
           <DialogTitle>
             <Trans>Enter Name</Trans>
@@ -56,7 +61,7 @@ export const SignFieldNameDialog = createCallable<SignFieldNameDialogProps, stri
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input autoFocus {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

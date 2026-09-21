@@ -40,7 +40,12 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
 
   return (
     <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-      <DialogContent>
+      <DialogContent
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          form.setFocus('text');
+        }}
+      >
         <DialogHeader>
           <DialogTitle>{fieldMeta?.label || <Trans>Enter Text</Trans>}</DialogTitle>
 
@@ -60,7 +65,6 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
                     <FormControl>
                       <Textarea
                         id="custom-text"
-                        autoFocus
                         placeholder={fieldMeta?.placeholder ?? t`Enter your text here`}
                         className={cn('w-full rounded-md', {
                           'border-2 border-red-300 text-left ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':

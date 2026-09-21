@@ -96,7 +96,12 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
 
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent>
+        <DialogContent
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            form.setFocus('number');
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{fieldMeta.label || <Trans>Enter Number</Trans>}</DialogTitle>
 
@@ -115,7 +120,6 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
                     <FormItem>
                       <FormControl>
                         <Input
-                          autoFocus
                           placeholder={fieldMeta.placeholder ?? t`Enter your number here`}
                           className={cn('w-full rounded-md', {
                             'border-2 border-red-300 text-left ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':

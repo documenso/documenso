@@ -38,7 +38,12 @@ export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, st
 
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent>
+        <DialogContent
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            form.setFocus('email');
+          }}
+        >
           <DialogHeader>
             <DialogTitle>
               <Trans>Enter Email</Trans>
@@ -58,7 +63,7 @@ export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, st
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input autoFocus {...field} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
