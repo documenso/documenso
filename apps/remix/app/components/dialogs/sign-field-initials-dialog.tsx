@@ -39,10 +39,12 @@ export const SignFieldInitialsDialog = createCallable<SignFieldInitialsDialogPro
       <DialogContent
         onOpenAutoFocus={(event) => {
           event.preventDefault();
-          // Radix mounts the dialog into a portal on the frame after this
-          // callback runs, which steals focus back before a synchronous
-          // setFocus() call can stick. Deferring past that frame fixes it.
-          requestAnimationFrame(() => form.setFocus('initials'));
+          // Something in the dialog's mount/portal sequence steals focus
+          // back within ~1ms of a synchronous setFocus() call (confirmed via
+          // runtime instrumentation). Deferring with setTimeout survives it;
+          // requestAnimationFrame does NOT -- rAF never fires in some
+          // embedded/background render contexts, silently breaking focus.
+          setTimeout(() => form.setFocus('initials'), 0);
         }}
       >
         <DialogHeader>
