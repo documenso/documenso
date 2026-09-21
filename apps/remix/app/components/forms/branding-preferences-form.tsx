@@ -25,6 +25,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { TeamGlobalSettings } from '@prisma/client';
 import { Loader } from 'lucide-react';
@@ -45,14 +46,17 @@ const ZBrandingPreferencesFormSchema = z.object({
     .instanceof(File)
     .refine(
       (file) => file.size <= BRANDING_LOGO_MAX_SIZE_BYTES,
-      `File size must be less than ${BRANDING_LOGO_MAX_SIZE_MB}MB`,
+      msg`File size must be less than ${BRANDING_LOGO_MAX_SIZE_MB}MB`,
     )
-    .refine((file) => BRANDING_LOGO_ALLOWED_TYPES.includes(file.type), 'Only .jpg, .png, and .webp files are accepted')
+    .refine(
+      (file) => BRANDING_LOGO_ALLOWED_TYPES.includes(file.type),
+      msg`Only .jpg, .png, and .webp files are accepted`,
+    )
     .nullish(),
-  brandingUrl: z.string().url().optional().or(z.literal('')),
-  brandingCompanyDetails: z.string().max(500).optional(),
+  brandingUrl: z.string().url(msg`Please enter a valid URL`).optional().or(z.literal('')),
+  brandingCompanyDetails: z.string().max(500, msg`Brand details must be less than 500 characters`).optional(),
   brandingColors: ZCssVarsSchema.default({}),
-  brandingCss: z.string().max(10_000).default(''),
+  brandingCss: z.string().max(10_000, msg`Custom CSS must be less than 10,000 characters`).default(''),
 });
 
 export type TBrandingPreferencesFormSchema = z.infer<typeof ZBrandingPreferencesFormSchema>;
