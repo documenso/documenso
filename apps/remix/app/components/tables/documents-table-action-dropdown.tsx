@@ -154,6 +154,7 @@ export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsT
         <EnvelopeDownloadDialog
           envelopeId={row.envelopeId}
           envelopeStatus={row.status}
+          envelopeTitle={row.title}
           isLegacy={row.internalVersion === 1}
           token={canManageDocument ? undefined : recipient?.token}
           trigger={

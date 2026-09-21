@@ -248,6 +248,7 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
       <EnvelopeDownloadDialog
         envelopeId={row.envelopeId}
         envelopeStatus={row.status}
+        envelopeTitle={row.title}
         token={recipient?.token}
         trigger={
           <Button className="w-32">

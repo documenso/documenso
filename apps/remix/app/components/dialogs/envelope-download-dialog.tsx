@@ -38,9 +38,9 @@ type EnvelopeDownloadDialogProps = {
 
   /**
    * Used as the display/download name for single-item envelopes, since item titles
-   * are never updated on rename. Pass it alongside `envelopeItems`.
+   * are never updated when the envelope is renamed.
    */
-  envelopeTitle?: string;
+  envelopeTitle: string;
 
   /**
    * The recipient token to download the document.
@@ -56,7 +56,7 @@ export const EnvelopeDownloadDialog = ({
   envelopeStatus,
   isLegacy,
   envelopeItems: initialEnvelopeItems,
-  envelopeTitle: initialEnvelopeTitle,
+  envelopeTitle,
   token,
   trigger,
 }: EnvelopeDownloadDialogProps) => {
@@ -104,18 +104,14 @@ export const EnvelopeDownloadDialog = ({
       access: token ? { type: 'recipient', token } : { type: 'user' },
     },
     {
-      initialData: initialEnvelopeItems
-        ? { data: initialEnvelopeItems, envelopeTitle: initialEnvelopeTitle ?? '' }
-        : undefined,
+      initialData: initialEnvelopeItems ? { data: initialEnvelopeItems } : undefined,
       enabled: open,
     },
   );
 
   const envelopeItems = envelopeItemsPayload?.data || [];
-  const envelopeTitle = envelopeItemsPayload?.envelopeTitle;
 
-  const getItemTitle = (item: EnvelopeItemToDownload) =>
-    envelopeItems.length === 1 && envelopeTitle ? envelopeTitle : item.title;
+  const getItemTitle = (item: EnvelopeItemToDownload) => (envelopeItems.length === 1 ? envelopeTitle : item.title);
 
   const onDownload = async (envelopeItem: EnvelopeItemToDownload, version: 'original' | 'signed' | 'pending') => {
     const { id: envelopeItemId } = envelopeItem;

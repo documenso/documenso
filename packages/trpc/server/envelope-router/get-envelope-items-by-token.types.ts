@@ -21,5 +21,4 @@ export const ZGetEnvelopeItemsByTokenResponseSchema = z.object({
     title: true,
     order: true,
   }).array(),
-  envelopeTitle: z.string(),
 });

@@ -150,7 +150,7 @@ export const EnvelopesBulkDownloadDialog = ({
         try {
           const downloadVersion = getDownloadVersion(envelope);
 
-          const { data: envelopeItems, envelopeTitle } = await trpcUtils.envelope.item.getManyByToken.fetch({
+          const { data: envelopeItems } = await trpcUtils.envelope.item.getManyByToken.fetch({
             envelopeId: envelope.id,
             access: {
               type: 'user',
@@ -171,7 +171,7 @@ export const EnvelopesBulkDownloadDialog = ({
             const { filename, blob } = await fetchPDF({
               envelopeItem,
               token: undefined,
-              fileName: envelopeItems.length === 1 ? envelopeTitle : envelopeItem.title,
+              fileName: envelopeItems.length === 1 ? envelope.title : envelopeItem.title,
               version: downloadVersion,
             });
 
