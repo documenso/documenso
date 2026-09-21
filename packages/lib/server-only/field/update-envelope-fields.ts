@@ -122,20 +122,37 @@ export const updateEnvelopeFields = async ({
 
     return await Promise.all(
       fieldsToUpdate.map(async ({ originalField, updateData, recipientEmail }) => {
+        // Only update fieldMeta when explicitly provided.
+        // This is a partial update, so an omitted fieldMeta must leave the
+        // stored configuration untouched.
+        const fieldUpdateData: {
+          type?: FieldType;
+          page?: number;
+          positionX?: number;
+          positionY?: number;
+          width?: number;
+          height?: number;
+          envelopeItemId?: string;
+          fieldMeta?: TFieldMetaSchema;
+        } = {
+          type: updateData.type,
+          page: updateData.pageNumber,
+          positionX: updateData.pageX,
+          positionY: updateData.pageY,
+          width: updateData.width,
+          height: updateData.height,
+          envelopeItemId: updateData.envelopeItemId,
+        };
+
+        if (updateData.fieldMeta !== undefined) {
+          fieldUpdateData.fieldMeta = updateData.fieldMeta;
+        }
+
         const updatedField = await tx.field.update({
           where: {
             id: updateData.id,
           },
-          data: {
-            type: updateData.type,
-            page: updateData.pageNumber,
-            positionX: updateData.pageX,
-            positionY: updateData.pageY,
-            width: updateData.width,
-            height: updateData.height,
-            fieldMeta: updateData.fieldMeta,
-            envelopeItemId: updateData.envelopeItemId,
-          },
+          data: fieldUpdateData,
         });
 
         // Handle field updated audit log.
