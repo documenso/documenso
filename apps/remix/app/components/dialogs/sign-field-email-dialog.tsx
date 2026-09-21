@@ -41,7 +41,10 @@ export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, st
         <DialogContent
           onOpenAutoFocus={(event) => {
             event.preventDefault();
-            form.setFocus('email');
+            // Radix mounts the dialog into a portal on the frame after this
+            // callback runs, which steals focus back before a synchronous
+            // setFocus() call can stick. Deferring past that frame fixes it.
+            requestAnimationFrame(() => form.setFocus('email'));
           }}
         >
           <DialogHeader>

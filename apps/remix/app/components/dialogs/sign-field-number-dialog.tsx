@@ -99,7 +99,10 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
         <DialogContent
           onOpenAutoFocus={(event) => {
             event.preventDefault();
-            form.setFocus('number');
+            // Radix mounts the dialog into a portal on the frame after this
+            // callback runs, which steals focus back before a synchronous
+            // setFocus() call can stick. Deferring past that frame fixes it.
+            requestAnimationFrame(() => form.setFocus('number'));
           }}
         >
           <DialogHeader>
