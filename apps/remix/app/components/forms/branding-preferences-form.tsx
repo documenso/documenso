@@ -12,7 +12,15 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
 import { Button } from '@documenso/ui/primitives/button';
 import { ColorPicker } from '@documenso/ui/primitives/color-picker';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@documenso/ui/primitives/form/form';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
@@ -349,6 +357,8 @@ export function BrandingPreferencesForm({
                         </span>
                       )}
                     </FormDescription>
+
+                    <FormMessage />
                   </div>
                 </InheritableField>
               )}
@@ -379,6 +389,8 @@ export function BrandingPreferencesForm({
                       </span>
                     )}
                   </FormDescription>
+
+                  <FormMessage />
                 </InheritableField>
               )}
             />
@@ -413,6 +425,8 @@ export function BrandingPreferencesForm({
                       </span>
                     )}
                   </FormDescription>
+
+                  <FormMessage />
                 </InheritableField>
               )}
             />
@@ -597,6 +611,8 @@ export function BrandingPreferencesForm({
                         <FormDescription>
                           <Trans>Border radius size in REM units (e.g. 0.5rem).</Trans>
                         </FormDescription>
+
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -634,6 +650,8 @@ export function BrandingPreferencesForm({
                               shown after you save.
                             </Trans>
                           </FormDescription>
+
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
