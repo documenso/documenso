@@ -474,6 +474,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
       typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
       uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
       drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
+      qrSignatureEnabled={document.documentMeta?.qrSignatureEnabled}
     >
       <DocumentSigningAuthProvider documentAuthOptions={document.authOptions} recipient={recipient} user={user}>
         {sessionData?.user && <AuthenticatedHeader />}

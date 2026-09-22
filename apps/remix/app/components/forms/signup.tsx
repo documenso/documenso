@@ -314,6 +314,7 @@ export const SignUpForm = ({
                         <FormControl>
                           <SignaturePadDialog
                             disabled={isSubmitting}
+                            qrSignatureContext={{ type: 'PROFILE_SIGNATURE' }}
                             value={value}
                             onChange={(v) => onChange(v ?? '')}
                           />

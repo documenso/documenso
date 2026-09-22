@@ -9,6 +9,7 @@ import {
   ZDocumentMetaDrawSignatureEnabledSchema,
   ZDocumentMetaLanguageSchema,
   ZDocumentMetaMessageSchema,
+  ZDocumentMetaQrSignatureEnabledSchema,
   ZDocumentMetaRedirectUrlSchema,
   ZDocumentMetaSubjectSchema,
   ZDocumentMetaTimezoneSchema,
@@ -66,6 +67,7 @@ export const ZTemplateMetaUpsertSchema = z.object({
   typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
   uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
   drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+  qrSignatureEnabled: ZDocumentMetaQrSignatureEnabledSchema.optional(),
   signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
   allowDictateNextSigner: z.boolean().optional(),
 });
@@ -147,6 +149,7 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+      qrSignatureEnabled: ZDocumentMetaQrSignatureEnabledSchema.optional(),
       allowDictateNextSigner: z.boolean().optional(),
       envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
     })

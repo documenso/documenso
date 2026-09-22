@@ -278,6 +278,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+          qrSignatureEnabled: signatureTypes.includes(DocumentSignatureType.QR),
           envelopeExpirationPeriod,
           reminderSettings,
         },
