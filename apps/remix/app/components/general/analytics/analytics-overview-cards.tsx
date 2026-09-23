@@ -36,24 +36,20 @@ export const AnalyticsOverviewCards = <TData extends AnalyticsOverviewData>({
 }: AnalyticsOverviewCardsProps<TData>) => {
   const { i18n } = useLingui();
 
-  const { data, isPending, isError, isRefetching, isPlaceholderData, refetch } = query;
+  const { data, isLoading, isError, refetch } = query;
 
   const entityCounts = data ? entity.select(data) : null;
 
   const formatNumber = (value: number) => value.toLocaleString(i18n.locale);
 
   const sharedProps = {
-    isPending,
+    isLoading: isLoading || !data,
     isError,
-    isRefetching,
-    onRetry: () => void refetch(),
+    onRetry: refetch,
   };
 
   return (
-    <div
-      className={cn('grid grid-cols-1 gap-4 transition-opacity md:grid-cols-3', isPlaceholderData && 'opacity-60')}
-      aria-busy={isPlaceholderData ? 'true' : undefined}
-    >
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       <AnalyticsStatCard
         {...sharedProps}
         icon={SendIcon}

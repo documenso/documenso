@@ -19,16 +19,12 @@ export type AnalyticsStatusBreakdownCardProps = {
 export const AnalyticsStatusBreakdownCard = ({ query, className }: AnalyticsStatusBreakdownCardProps) => {
   const { _, i18n } = useLingui();
 
-  const { data, isPending, isError, isRefetching, isPlaceholderData, refetch } = query;
+  const { data, isLoading, isError, refetch } = query;
 
   const rows = data ? allocatePercentages(STATUS_ROWS.map((row) => ({ ...row, count: data[row.key] }))) : [];
 
   return (
-    <Card
-      className={cn('flex flex-col transition-opacity', isPlaceholderData && 'opacity-60', className)}
-      aria-busy={isPlaceholderData ? 'true' : undefined}
-      data-testid="analytics-status-breakdown"
-    >
+    <Card className={cn('flex flex-col', className)} data-testid="analytics-status-breakdown">
       <CardHeader className="flex flex-row items-start justify-between gap-x-4 space-y-0">
         <div className="space-y-1.5">
           <CardTitle>
@@ -54,8 +50,8 @@ export const AnalyticsStatusBreakdownCard = ({ query, className }: AnalyticsStat
 
       <CardContent className="flex flex-1 flex-col">
         {isError ? (
-          <AnalyticsQueryError onRetry={() => void refetch()} isRetrying={isRefetching} />
-        ) : isPending || !data ? (
+          <AnalyticsQueryError onRetry={refetch} />
+        ) : isLoading || !data ? (
           <div className="flex flex-col gap-y-4">
             <Skeleton className="h-2.5 w-full rounded-full" />
 

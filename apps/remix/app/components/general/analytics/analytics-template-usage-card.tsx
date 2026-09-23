@@ -1,5 +1,4 @@
 import type { TGetTeamAnalyticsTemplateUsageResponse } from '@documenso/trpc/server/team-router/get-team-analytics.types';
-import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
@@ -37,14 +36,10 @@ export const AnalyticsTemplateUsageCard = <TTemplate extends AnalyticsTemplate>(
 }: AnalyticsTemplateUsageCardProps<TTemplate>) => {
   const { i18n } = useLingui();
 
-  const { data, isPending, isError, isRefetching, isPlaceholderData, refetch } = query;
+  const { data, isLoading, isError, refetch } = query;
 
   return (
-    <Card
-      className={cn('transition-opacity', isPlaceholderData && 'opacity-60', className)}
-      aria-busy={isPlaceholderData ? 'true' : undefined}
-      data-testid="analytics-template-usage"
-    >
+    <Card className={className} data-testid="analytics-template-usage">
       <CardHeader>
         <CardTitle>
           <Trans>Template usage</Trans>
@@ -57,8 +52,8 @@ export const AnalyticsTemplateUsageCard = <TTemplate extends AnalyticsTemplate>(
 
       <CardContent>
         {isError ? (
-          <AnalyticsQueryError onRetry={() => void refetch()} isRetrying={isRefetching} />
-        ) : isPending || !data ? (
+          <AnalyticsQueryError onRetry={refetch} />
+        ) : isLoading || !data ? (
           <ul className="flex flex-col gap-y-3">
             {Array.from({ length: 3 }, (_, index) => (
               <li key={index} className="flex items-center gap-x-3">

@@ -8,7 +8,6 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
 import { OrganisationMemberRole } from '@prisma/client';
-import { keepPreviousData } from '@tanstack/react-query';
 import { UsersIcon } from 'lucide-react';
 import { redirect } from 'react-router';
 
@@ -81,22 +80,19 @@ export default function OrganisationAnalyticsPage({ loaderData }: Route.Componen
 
   // `from`/`to` are only present for custom ranges.
   const queryInput = { organisationId: organisation.id, timezone, ...range };
-  const queryOptions = { placeholderData: keepPreviousData };
 
-  const overviewQuery = trpc.organisation.analytics.getOverview.useQuery(queryInput, queryOptions);
-  const documentsOverTimeQuery = trpc.organisation.analytics.getDocumentsOverTime.useQuery(queryInput, queryOptions);
-  const statusBreakdownQuery = trpc.organisation.analytics.getStatusBreakdown.useQuery(queryInput, queryOptions);
-  const templateUsageQuery = trpc.organisation.analytics.getTemplateUsage.useQuery(
-    { ...queryInput, limit: TEMPLATE_LIMIT },
-    queryOptions,
-  );
-  const teamActivityQuery = trpc.organisation.analytics.getTeamActivity.useQuery(queryInput, queryOptions);
+  const overviewQuery = trpc.organisation.analytics.getOverview.useQuery(queryInput);
+  const documentsOverTimeQuery = trpc.organisation.analytics.getDocumentsOverTime.useQuery(queryInput);
+  const statusBreakdownQuery = trpc.organisation.analytics.getStatusBreakdown.useQuery(queryInput);
+  const templateUsageQuery = trpc.organisation.analytics.getTemplateUsage.useQuery({
+    ...queryInput,
+    limit: TEMPLATE_LIMIT,
+  });
+  const teamActivityQuery = trpc.organisation.analytics.getTeamActivity.useQuery(queryInput);
 
   const hasNoActivity =
     overviewQuery.isSuccess &&
-    !overviewQuery.isPlaceholderData &&
     documentsOverTimeQuery.isSuccess &&
-    !documentsOverTimeQuery.isPlaceholderData &&
     overviewQuery.data.sent.current === 0 &&
     overviewQuery.data.sent.previous === 0 &&
     documentsOverTimeQuery.data.total === 0;

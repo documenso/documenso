@@ -88,7 +88,7 @@ export const AnalyticsActivityTableCard = ({
 
   const isExpanded = expandedRangeKey === rangeKey;
 
-  const { data, isPending, isError, isRefetching, isPlaceholderData, refetch } = query;
+  const { data, isLoading, isError, refetch } = query;
 
   const activeCount = rows.filter((row) => row.sent > 0).length;
 
@@ -103,11 +103,7 @@ export const AnalyticsActivityTableCard = ({
   const testId = (suffix: string) => `analytics-${testIdPrefix}-${suffix}`;
 
   return (
-    <Card
-      className={cn('transition-opacity', isPlaceholderData && 'opacity-60', className)}
-      aria-busy={isPlaceholderData ? 'true' : undefined}
-      data-testid={testId('activity')}
-    >
+    <Card className={className} data-testid={testId('activity')}>
       <CardHeader className="gap-4 space-y-0 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-col space-y-1.5">
           <CardTitle>{title}</CardTitle>
@@ -124,8 +120,8 @@ export const AnalyticsActivityTableCard = ({
 
       <CardContent>
         {isError ? (
-          <AnalyticsQueryError onRetry={() => void refetch()} isRetrying={isRefetching} />
-        ) : isPending || data === undefined ? (
+          <AnalyticsQueryError onRetry={refetch} />
+        ) : isLoading || data === undefined ? (
           <ul className="flex flex-col gap-y-3">
             {Array.from({ length: 4 }, (_, index) => (
               <li key={index} className="flex items-center gap-x-3">

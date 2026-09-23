@@ -11,10 +11,9 @@ export type AnalyticsStatCardProps = {
   value: ReactNode;
   description: ReactNode;
   badge?: ReactNode;
-  isPending: boolean;
+  isLoading: boolean;
   isError: boolean;
-  isRefetching?: boolean;
-  onRetry: () => void;
+  onRetry: () => Promise<unknown>;
   testId: string;
 };
 
@@ -24,9 +23,8 @@ export const AnalyticsStatCard = ({
   value,
   description,
   badge,
-  isPending,
+  isLoading,
   isError,
-  isRefetching = false,
   onRetry,
   testId,
 }: AnalyticsStatCardProps) => {
@@ -40,8 +38,8 @@ export const AnalyticsStatCard = ({
         </div>
 
         {isError ? (
-          <AnalyticsQueryError onRetry={onRetry} isRetrying={isRefetching} className="mt-3" />
-        ) : isPending ? (
+          <AnalyticsQueryError onRetry={onRetry} className="mt-3" />
+        ) : isLoading ? (
           <div className="mt-3 flex flex-col gap-y-2">
             <Skeleton className="h-9 w-24" />
             <Skeleton className="h-3.5 w-32" />

@@ -24,21 +24,17 @@ type Bucket = TGetTeamAnalyticsDocumentsOverTimeResponse['range']['bucket'];
 export const AnalyticsDocumentsOverTimeCard = ({ range, query, className }: AnalyticsDocumentsOverTimeCardProps) => {
   const { i18n } = useLingui();
 
-  const { data, isPending, isError, isRefetching, isPlaceholderData, refetch } = query;
+  const { data, isLoading, isError, refetch } = query;
 
-  // The backend decides the bucket, and it must match the points being rendered
-  // (including stale placeholder data) so the tick and tooltip formatting line up.
-  // Before any data arrives it is guessed from the requested range.
+  // The backend decides the bucket, and it must match the points being rendered so
+  // the tick and tooltip formatting line up. Before data arrives it is guessed from
+  // the requested range.
   const bucket: Bucket = data ? data.range.bucket : guessBucket(range);
 
   const tickInterval = data ? getTickInterval(data.points.length, bucket) : 0;
 
   return (
-    <Card
-      className={cn('flex flex-col transition-opacity', isPlaceholderData && 'opacity-60', className)}
-      aria-busy={isPlaceholderData ? 'true' : undefined}
-      data-testid="analytics-documents-over-time"
-    >
+    <Card className={cn('flex flex-col', className)} data-testid="analytics-documents-over-time">
       <CardHeader className="flex flex-row items-start justify-between gap-x-4 space-y-0">
         <div className="space-y-1.5">
           <CardTitle>
@@ -63,8 +59,8 @@ export const AnalyticsDocumentsOverTimeCard = ({ range, query, className }: Anal
       {/* flex-1 + justify-center keeps the fixed-height chart vertically level with the status breakdown card. */}
       <CardContent className="flex flex-1 flex-col justify-center">
         {isError ? (
-          <AnalyticsQueryError onRetry={() => void refetch()} isRetrying={isRefetching} />
-        ) : isPending || !data ? (
+          <AnalyticsQueryError onRetry={refetch} />
+        ) : isLoading || !data ? (
           <Skeleton className="w-full" style={{ height: CHART_HEIGHT }} />
         ) : data.total === 0 ? (
           <div

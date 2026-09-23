@@ -16,11 +16,9 @@ import { useEffect, useMemo } from 'react';
  */
 export type AnalyticsQueryResult<TData> = {
   data: TData | undefined;
-  isPending: boolean;
+  isLoading: boolean;
   isError: boolean;
-  isRefetching: boolean;
-  isPlaceholderData: boolean;
-  refetch: () => unknown;
+  refetch: () => Promise<unknown>;
 };
 
 export type TAnalyticsPresetRange = Exclude<TTeamAnalyticsRange, 'custom'>;
