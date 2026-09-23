@@ -10,7 +10,7 @@ const CONTENT_TYPE_MULTIPART = 'multipart/form-data';
 const getUrlEncodedBody = async (req: Request) => {
   const params = new URLSearchParams(await req.text());
 
-  const data: Record<string, unknown> = {};
+  const data: Record<string, string[]> = {};
 
   for (const key of params.keys()) {
     data[key] = params.getAll(key);
@@ -22,18 +22,20 @@ const getUrlEncodedBody = async (req: Request) => {
 const getMultipartBody = async (req: Request) => {
   const formData = await req.formData();
 
-  const data: Record<string, unknown> = {};
+  const data: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {};
 
   for (const [key, value] of formData.entries()) {
     // !: Handles cases where our generated SDKs send key[] syntax for arrays.
     const normalizedKey = key.endsWith('[]') ? key.slice(0, -2) : key;
 
-    if (data[normalizedKey] === undefined) {
+    const existing = data[normalizedKey];
+
+    if (existing === undefined) {
       data[normalizedKey] = value;
-    } else if (Array.isArray(data[normalizedKey])) {
-      data[normalizedKey].push(value);
+    } else if (Array.isArray(existing)) {
+      existing.push(value);
     } else {
-      data[normalizedKey] = [data[normalizedKey], value];
+      data[normalizedKey] = [existing, value];
     }
   }
 
@@ -138,8 +140,10 @@ const createRequestProxy = async (req: Request, url?: string) => {
         }
 
         default:
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any
-          return (target as unknown as Record<string | number | symbol, unknown>)[prop];
+          // SAFETY: Every property this trap does not special-case is forwarded from the
+          // original Request, so `prop` can only be a key the caller reads off a Request.
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          return target[prop as keyof Request];
       }
     },
   });
@@ -160,23 +164,25 @@ export const createOpenApiFetchHandler = async <TRouter extends OpenApiRouter>(
   const url = new URL(opts.req.url.replace(opts.endpoint, ''));
   const req: Request = await createRequestProxy(opts.req, url.toString());
 
+  // The handler is typed against Node HTTP req/res, but only reads properties our request
+  // proxy and mock response provide, so we declare it against the fetch-based types we pass.
   // @ts-expect-error Inherited from original fetch handler in `trpc-to-openapi`
-  const openApiHttpHandler = createOpenApiNodeHttpHandler(opts);
+  const openApiHttpHandler: (req: Request, res: ServerResponse) => void = createOpenApiNodeHttpHandler(opts);
 
   return new Promise<Response>((resolve) => {
     let statusCode: number;
 
-    // Create a mock ServerResponse object that bridges Node HTTP APIs with Fetch API Response.
-    // This allows the Node HTTP handler to work with Fetch API Request objects.
+    // SAFETY: The Node HTTP handler only calls setHeader/statusCode/end on the response,
+    // which this mock implements to bridge Node HTTP APIs with a Fetch API Response.
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const res = {
-      setHeader: (key: string, value: string | readonly string[]) => {
-        if (typeof value === 'string') {
-          resHeaders.set(key, value);
-        } else {
+      setHeader: (key: string, value: string | string[]) => {
+        if (Array.isArray(value)) {
           for (const v of value) {
             resHeaders.append(key, v);
           }
+        } else {
+          resHeaders.set(key, value);
         }
       },
       get statusCode() {
@@ -195,14 +201,6 @@ export const createOpenApiFetchHandler = async <TRouter extends OpenApiRouter>(
       },
     } as ServerResponse;
 
-    // Type assertions are necessary here for interop between Fetch API Request/Response
-    // and Node HTTP IncomingMessage/ServerResponse types.
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const nodeReq = req as unknown as Parameters<typeof openApiHttpHandler>[0];
-
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const nodeRes = res as unknown as Parameters<typeof openApiHttpHandler>[1];
-
-    void openApiHttpHandler(nodeReq, nodeRes);
+    void openApiHttpHandler(req, res);
   });
 };
