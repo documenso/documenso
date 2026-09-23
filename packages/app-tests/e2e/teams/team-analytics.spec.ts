@@ -1,611 +1,690 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
-import type { Prisma, User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 import { DocumentStatus, DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
+import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
-import type { Page } from '@playwright/test';
+import type { TGetTeamAnalyticsDocumentsOverTimeResponse } from '@documenso/trpc/server/team-router/get-team-analytics.types';
+import type { Locator, Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { DateTime } from 'luxon';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
-const TIMEZONE = 'America/New_York';
-const APRIL_START = '2026-04-01';
-const MAY_START = '2026-05-01';
-const MAY_DATE = '2026-05-15';
-const SECOND_OWNER_NAME = 'Analytics Second Owner';
-const HIDDEN_OWNER_NAME = 'Hidden Analytics Owner';
 
-const APRIL_SENT_AT = new Date('2026-04-10T12:00:00.000Z');
-const MAY_COMPLETED_AT = new Date('2026-05-10T12:00:00.000Z');
-const MAY_DECLINED_AT = new Date('2026-05-12T12:00:00.000Z');
-const MAY_CANCELLED_AT = new Date('2026-05-14T12:00:00.000Z');
-const MAY_GAP_SENT_AT = new Date('2026-05-16T12:00:00.000Z');
-const MAY_OTHER_OWNER_SENT_AT = new Date('2026-05-18T12:00:00.000Z');
-const JUNE_RETRY_AT = new Date('2026-06-10T12:00:00.000Z');
+type AnalyticsRange = '7d' | '30d' | '90d' | '12m';
 
-const METRICS = ['sent', 'completed', 'declined', 'cancelled', 'draft', 'pending'] as const;
+/**
+ * Timestamps are relative to now and kept at least a day away from every window
+ * boundary (7, 30, 60 and 90 days) so the assertions hold regardless of timezone.
+ */
+const daysAgo = (days: number) => DateTime.now().minus({ days }).toJSDate();
 
-type Metric = (typeof METRICS)[number];
-type MetricCounts = Record<Metric, number>;
-type AuditType = (typeof DOCUMENT_AUDIT_LOG_TYPE)[keyof typeof DOCUMENT_AUDIT_LOG_TYPE];
-type AuditEvent = {
-  type: AuditType;
-  createdAt: Date;
-  data?: Prisma.InputJsonValue;
-};
+/**
+ * The same day as `daysAgo` as a yyyy-MM-dd calendar date in the host timezone,
+ * which is also the browser timezone the page sends with custom ranges.
+ */
+const daysAgoDate = (days: number) => DateTime.now().minus({ days }).toFormat('yyyy-MM-dd');
 
 test.describe.configure({ mode: 'parallel' });
 
-test('[ANALYTICS]: owner and calendar filters keep activity and current counts on their own time axes', async ({
-  page,
-}) => {
+test('[ANALYTICS]: admin sees overview numbers for the last 30 days', async ({ page }) => {
   const { team, owner } = await seedTeam();
-  const secondOwner = await seedTeamMember({
+
+  // Current window: 5 sent, 3 completed.
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.COMPLETED, sentAt: daysAgo(2) });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.PENDING, sentAt: daysAgo(3) });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.COMPLETED, sentAt: daysAgo(4) });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.COMPLETED, sentAt: daysAgo(12) });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.PENDING, sentAt: daysAgo(15) });
+
+  // Previous window: 2 sent, 1 completed.
+  const resentDocument = await seedAnalyticsDocument({
+    owner,
     teamId: team.id,
-    name: SECOND_OWNER_NAME,
-    role: TeamMemberRole.ADMIN,
+    status: DocumentStatus.COMPLETED,
+    sentAt: daysAgo(40),
+  });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.PENDING, sentAt: daysAgo(45) });
+
+  // First send: a re-send inside the current window leaves the document counted once, in the previous window.
+  await prisma.documentAuditLog.create({
+    data: {
+      envelopeId: resentDocument.id,
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
+      createdAt: daysAgo(20),
+      data: {},
+    },
   });
 
+  // Soft delete: a deleted document sent in the window is excluded, so none of the numbers below change.
   await seedAnalyticsDocument({
     owner,
     teamId: team.id,
     status: DocumentStatus.COMPLETED,
-    completedAt: MAY_COMPLETED_AT,
-    events: [sent(APRIL_SENT_AT), sent(MAY_COMPLETED_AT), completed(MAY_COMPLETED_AT), completed(JUNE_RETRY_AT)],
+    sentAt: daysAgo(6),
+    deletedAt: new Date(),
   });
-  await seedAnalyticsDocument({
-    owner,
-    teamId: team.id,
-    status: DocumentStatus.REJECTED,
-    events: [sent(MAY_DECLINED_AT), declined(MAY_DECLINED_AT), declined(new Date('2026-05-13T12:00:00.000Z'))],
-  });
-  await seedAnalyticsDocument({
-    owner,
-    teamId: team.id,
-    status: DocumentStatus.CANCELLED,
-    completedAt: MAY_CANCELLED_AT,
-    events: [sent(MAY_CANCELLED_AT), cancelled(MAY_CANCELLED_AT), cancelled(new Date('2026-05-15T12:00:00.000Z'))],
-  });
-  await seedAnalyticsDocument({
-    owner,
-    teamId: team.id,
-    status: DocumentStatus.COMPLETED,
-    completedAt: MAY_GAP_SENT_AT,
-    events: [
-      sent(MAY_GAP_SENT_AT),
-      {
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-        createdAt: MAY_GAP_SENT_AT,
-        data: { transactionId: 'rejected-completion', isRejected: true },
-      },
-    ],
-  });
+
+  // Never sent. Every document above without `createdAt` was created today.
   await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.DRAFT });
-  await seedAnalyticsDocument({
-    owner: secondOwner,
-    teamId: team.id,
-    status: DocumentStatus.PENDING,
-    events: [sent(MAY_OTHER_OWNER_SENT_AT)],
-  });
-  await seedAnalyticsDocument({ owner: secondOwner, teamId: team.id, status: DocumentStatus.DRAFT });
 
-  await apiSignin({
-    page,
-    email: owner.email,
-    redirectPath: analyticsPath({ teamUrl: team.url, date: MAY_DATE }),
-  });
+  // Never sent, created just after local midnight so bucketing in the wrong timezone would shift their day.
+  const createdDaysAgo = [3, 3, 5];
 
-  await expect(page.getByRole('heading', { name: 'Analytics' })).toBeVisible();
-  await expect(page.getByTestId('analytics-period')).toContainText('Month');
-  await expect(page.getByTestId('analytics-date')).toHaveText('May 2026');
-  await expect(page.getByText(TIMEZONE, { exact: false }).first()).toBeVisible();
-  await expectMetrics(page, { sent: 4, completed: 1, declined: 1, cancelled: 1, draft: 2, pending: 1 });
-  await expect(page.getByTestId('analytics-coverage')).toContainText('Completed');
-
-  await page.getByTestId('analytics-owner-filter').click();
-  await page.getByRole('option', { name: SECOND_OWNER_NAME, exact: true }).click();
-  await page.keyboard.press('Escape');
-  await expectAnalyticsUrl(page, {
-    period: 'month',
-    date: MAY_DATE,
-    timezone: TIMEZONE,
-    senderIds: String(secondOwner.id),
-  });
-  await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 1 });
-  await expect(page.getByTestId('analytics-coverage')).toHaveCount(0);
-
-  await page.getByTestId('analytics-period').click();
-  await page.getByRole('option', { name: 'Day', exact: true }).click();
-  await expectAnalyticsUrl(page, {
-    period: 'day',
-    date: MAY_DATE,
-    timezone: TIMEZONE,
-    senderIds: String(secondOwner.id),
-  });
-  await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 1 });
-
-  for (let step = 0; step < 3; step += 1) {
-    await page.getByRole('button', { name: 'Next period' }).click();
+  for (const days of createdDaysAgo) {
+    await seedAnalyticsDocument({
+      owner,
+      teamId: team.id,
+      status: DocumentStatus.DRAFT,
+      createdAt: DateTime.now().minus({ days }).startOf('day').plus({ minutes: 30 }).toJSDate(),
+    });
   }
-  await expectAnalyticsUrl(page, {
-    period: 'day',
-    date: '2026-05-18',
-    timezone: TIMEZONE,
-    senderIds: String(secondOwner.id),
-  });
-  await expect(page.getByTestId('analytics-date')).toHaveText('May 18, 2026');
-  await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 1 });
 
-  await page.getByTestId('analytics-period').click();
-  await page.getByRole('option', { name: 'Month', exact: true }).click();
-  await page.getByRole('button', { name: 'Previous period' }).click();
-  await expect.poll(() => new URL(page.url()).searchParams.get('date')?.slice(0, 7)).toBe('2026-04');
-  await expect(page.getByTestId('analytics-date')).toHaveText('Apr 2026');
-  await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 1 });
+  await apiSignin({ page, email: owner.email, redirectPath: analyticsPath(team.url) });
+  await waitForAnalytics(page);
 
-  await page.getByRole('button', { name: 'Next period' }).click();
-  await expect.poll(() => new URL(page.url()).searchParams.get('date')?.slice(0, 7)).toBe('2026-05');
-  await expect(page.getByTestId('analytics-date')).toHaveText('May 2026');
-  await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 1 });
+  await expect(page.getByTestId('analytics-range')).toContainText('Last 30 days');
 
-  await page.getByTestId('analytics-owner-filter').click();
-  await page.getByRole('option', { name: 'Clear', exact: true }).click();
-  await page.keyboard.press('Escape');
-  await expectAnalyticsUrl(page, {
-    period: 'month',
-    date: MAY_START,
-    timezone: TIMEZONE,
-    senderIds: null,
-  });
-  await expectMetrics(page, { sent: 4, completed: 1, declined: 1, cancelled: 1, draft: 2, pending: 1 });
+  await expect(page.getByTestId('analytics-sent')).toHaveText('5');
+  await expect(page.getByTestId('analytics-sent-delta')).toHaveText('+150%');
+  await expect(page.getByTestId('analytics-completion-rate')).toHaveText('60%');
+  await expect(page.getByTestId('analytics-completion-rate-delta')).toHaveText('+10%');
+  await expect(page.getByTestId('analytics-members')).toHaveText('1/1');
 
-  const savedUrl = page.url();
-  await page.reload();
-  await expect(page).toHaveURL(savedUrl);
-  await expect(page.getByTestId('analytics-period')).toContainText('Month');
-  await expect(page.getByTestId('analytics-date')).toHaveText('May 2026');
-  await expectMetrics(page, { sent: 4, completed: 1, declined: 1, cancelled: 1, draft: 2, pending: 1 });
+  // Day buckets: documents land on their creation day in the request timezone and empty days are zero-filled.
+  const daily = await requestDocumentsOverTime(page, team.id, { range: '30d' });
 
-  const savedLocation = new URL(savedUrl);
-  const savedPath = `${savedLocation.pathname}${savedLocation.search}`;
-  await apiSignout({ page });
-  await apiSignin({ page, email: secondOwner.email, redirectPath: savedPath });
-  await expectAnalyticsUrl(page, {
-    period: 'month',
-    date: MAY_START,
-    timezone: TIMEZONE,
-    senderIds: null,
-  });
-  await expectMetrics(page, { sent: 4, completed: 1, declined: 1, cancelled: 1, draft: 2, pending: 1 });
+  expect(daily.points).toHaveLength(30);
+  expect(daily.points).toContainEqual({ date: daysAgoDate(3), count: 2 });
+  expect(daily.points).toContainEqual({ date: daysAgoDate(4), count: 0 });
+  expect(daily.points).toContainEqual({ date: daysAgoDate(5), count: 1 });
+
+  // Month buckets: keyed by month start, the last one sums this month's documents (8 created today, deleted excluded).
+  const monthStart = DateTime.now().startOf('month');
+  const createdThisMonth = 8 + createdDaysAgo.filter((days) => DateTime.now().minus({ days }) >= monthStart).length;
+  const monthly = await requestDocumentsOverTime(page, team.id, { range: '12m' });
+
+  expect(monthly.points).toHaveLength(12);
+  expect(monthly.points.at(-1)).toEqual({ date: monthStart.toFormat('yyyy-MM-dd'), count: createdThisMonth });
+
+  // Switching to 90 days pulls the previous window into the current one.
+  await selectRange(page, 'Last 90 days');
+  await expectRangeParam(page, '90d');
+  await expect(page.getByTestId('analytics-sent')).toHaveText('7');
+
+  // Loading a range directly from the URL works too. The 7 day previous window
+  // (7-14 days ago) only contains the document sent 12 days ago.
+  await page.goto(analyticsPath(team.url, '7d'));
+  await waitForAnalytics(page);
+  await expect(page.getByTestId('analytics-sent')).toHaveText('3');
+  await expect(page.getByTestId('analytics-sent-delta')).toHaveText('+200%');
 });
 
-test('[ANALYTICS]: a late response cannot replace the active calendar result', async ({ page }) => {
+test('[ANALYTICS]: a custom date range scopes activity to the selected days', async ({ page }) => {
   const { team, owner } = await seedTeam();
 
-  await seedAnalyticsDocument({
-    owner,
-    teamId: team.id,
-    status: DocumentStatus.PENDING,
-    events: [sent(APRIL_SENT_AT)],
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.COMPLETED, sentAt: daysAgo(3) });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.PENDING, sentAt: daysAgo(5) });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.COMPLETED, sentAt: daysAgo(20) });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.COMPLETED, sentAt: daysAgo(40) });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.PENDING, sentAt: daysAgo(50) });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.COMPLETED, sentAt: daysAgo(200) });
+
+  // A 16 day window loaded from the URL only contains the document sent 20 days
+  // ago. The equally sized previous window (41-26 days ago) contains the one sent
+  // 40 days ago, so the delta is flat.
+  const windowFrom = daysAgoDate(25);
+  const windowTo = daysAgoDate(10);
+
+  await apiSignin({ page, email: owner.email, redirectPath: customAnalyticsPath(team.url, windowFrom, windowTo) });
+  await waitForAnalytics(page);
+
+  await expect(page.getByTestId('analytics-sent')).toHaveText('1');
+  await expect(page.getByTestId('analytics-sent-delta')).toHaveText('0%');
+  await expect(page.getByTestId('analytics-documents-over-time')).toContainText('Daily');
+
+  // The trigger shows the formatted window, e.g. "Aug 29 – Sep 13, 2026".
+  const rangeTrigger = page.getByTestId('analytics-range');
+
+  await expect(rangeTrigger).toContainText(String(DateTime.fromISO(windowTo).year));
+
+  // Picking a new window in the calendar replaces the current one on apply.
+  const pickedFrom = daysAgoDate(6);
+  const pickedTo = daysAgoDate(2);
+
+  await rangeTrigger.click();
+  await page.getByTestId('analytics-range-custom').click();
+
+  await clickCalendarDay(page, pickedFrom);
+  await clickCalendarDay(page, pickedTo);
+  await page.getByTestId('analytics-range-apply').click();
+
+  await expectCustomRangeParams(page, pickedFrom, pickedTo);
+  await expect(page.getByTestId('analytics-range-calendar')).toHaveCount(0);
+  await expect(page.getByTestId('analytics-sent')).toHaveText('2');
+  await expect(page.getByTestId('analytics-sent-delta')).toHaveText('New');
+
+  // Windows longer than 92 days are bucketed by month.
+  await page.goto(customAnalyticsPath(team.url, daysAgoDate(120), daysAgoDate(1)));
+  await waitForAnalytics(page);
+
+  await expect(page.getByTestId('analytics-documents-over-time')).toContainText('Monthly');
+  await expect(page.getByTestId('analytics-sent')).toHaveText('5');
+
+  // An invalid window (from after to) falls back to the default preset and the
+  // stray params are cleared from the URL.
+  await page.goto(customAnalyticsPath(team.url, daysAgoDate(5), daysAgoDate(10)));
+  await waitForAnalytics(page);
+
+  await expect.poll(() => page.url()).not.toContain('range=custom');
+  await expect.poll(() => new URL(page.url()).searchParams.has('from')).toBe(false);
+  await expect(page.getByTestId('analytics-sent')).toHaveText('3');
+
+  // A window starting more than 12 months ago is rejected the same way.
+  await page.goto(customAnalyticsPath(team.url, daysAgoDate(400), daysAgoDate(380)));
+  await waitForAnalytics(page);
+
+  await expect.poll(() => page.url()).not.toContain('range=custom');
+
+  // The API rejects an invalid custom window outright (the resolver rules
+  // themselves are unit tested).
+  const invalidResponse = await requestOverview(page, team.id, {
+    range: 'custom',
+    from: daysAgoDate(5),
+    to: daysAgoDate(10),
   });
-  await seedAnalyticsDocument({
-    owner,
-    teamId: team.id,
-    status: DocumentStatus.PENDING,
-    events: [sent(MAY_COMPLETED_AT)],
-  });
-  await seedAnalyticsDocument({
-    owner,
-    teamId: team.id,
-    status: DocumentStatus.PENDING,
-    events: [sent(MAY_DECLINED_AT)],
-  });
 
-  let releaseMay: () => void = () => undefined;
-  let markMayReceived: () => void = () => undefined;
-  let markMayReleased: () => void = () => undefined;
-  const mayRelease = new Promise<void>((resolve) => {
-    releaseMay = () => resolve();
-  });
-  const mayReceived = new Promise<void>((resolve) => {
-    markMayReceived = () => resolve();
-  });
-  const mayReleased = new Promise<void>((resolve) => {
-    markMayReleased = () => resolve();
-  });
-  let heldMay = false;
-
-  await page.route('**/api/trpc/team.getAnalytics?**', async (route) => {
-    const input = new URL(route.request().url()).searchParams.get('input');
-
-    if (!heldMay && input?.includes(`"date":"${MAY_DATE}"`)) {
-      heldMay = true;
-      const response = await route.fetch();
-      markMayReceived();
-      await mayRelease;
-      await route.fulfill({ response });
-      markMayReleased();
-      return;
-    }
-
-    await route.continue();
-  });
-
-  await apiSignin({
-    page,
-    email: owner.email,
-    redirectPath: analyticsPath({ teamUrl: team.url, date: MAY_DATE }),
-  });
-  await mayReceived;
-
-  for (const metric of METRICS) {
-    await expect(page.getByTestId(`analytics-${metric}`)).toHaveCount(0);
-  }
-
-  await page.getByRole('button', { name: 'Previous period' }).click();
-  await expectAnalyticsUrl(page, { period: 'month', date: APRIL_START, timezone: TIMEZONE });
-  await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 3 });
-
-  releaseMay();
-  await mayReleased;
-
-  await expectAnalyticsUrl(page, { period: 'month', date: APRIL_START, timezone: TIMEZONE });
-  await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 3 });
+  expect(invalidResponse.status()).toBe(400);
 });
 
-test('[ANALYTICS]: a manager sees only permitted documents and cannot query another team', async ({ page }) => {
+test('[ANALYTICS]: a manager only sees documents within their visibility scope', async ({ page }) => {
   const { team, owner } = await seedTeam();
   const manager = await seedTeamMember({
     teamId: team.id,
     name: 'Analytics Manager',
     role: TeamMemberRole.MANAGER,
   });
-  const { user: hiddenOwner, team: foreignTeam } = await seedUser({ name: HIDDEN_OWNER_NAME });
 
-  await seedAnalyticsDocument({
-    owner,
-    teamId: team.id,
-    status: DocumentStatus.PENDING,
-    visibility: DocumentVisibility.EVERYONE,
-    events: [sent(MAY_COMPLETED_AT)],
-  });
+  for (const status of [DocumentStatus.COMPLETED, DocumentStatus.COMPLETED, DocumentStatus.PENDING]) {
+    await seedAnalyticsDocument({
+      owner,
+      teamId: team.id,
+      status,
+      visibility: DocumentVisibility.EVERYONE,
+      sentAt: daysAgo(3),
+    });
+  }
+
+  for (const status of [DocumentStatus.COMPLETED, DocumentStatus.COMPLETED]) {
+    await seedAnalyticsDocument({
+      owner,
+      teamId: team.id,
+      status,
+      visibility: DocumentVisibility.ADMIN,
+      sentAt: daysAgo(4),
+    });
+  }
+
+  // Owner clause: an ADMIN-only document the manager owns is in their scope, unlike the owner's ADMIN-only ones.
   await seedAnalyticsDocument({
     owner: manager,
     teamId: team.id,
-    status: DocumentStatus.PENDING,
-    visibility: DocumentVisibility.ADMIN,
-    events: [sent(MAY_DECLINED_AT)],
-  });
-  await seedAnalyticsDocument({
-    owner: hiddenOwner,
-    teamId: team.id,
     status: DocumentStatus.COMPLETED,
     visibility: DocumentVisibility.ADMIN,
-    completedAt: MAY_CANCELLED_AT,
-    events: [sent(MAY_CANCELLED_AT)],
+    sentAt: daysAgo(3),
   });
 
-  await apiSignin({
-    page,
-    email: manager.email,
-    redirectPath: analyticsPath({ teamUrl: team.url, date: MAY_DATE }),
-  });
+  await apiSignin({ page, email: manager.email, redirectPath: analyticsPath(team.url) });
+  await waitForAnalytics(page);
 
-  await expectMetrics(page, { sent: 2, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 2 });
-  await expect(page.getByTestId('analytics-coverage')).toHaveCount(0);
+  await expect(page.getByTestId('analytics-sent')).toHaveText('4');
+  await expect(page.getByTestId('analytics-status-completed')).toHaveText('3');
+  await expect(page.getByTestId('analytics-status-pending')).toHaveText('1');
+  await expect(page.getByTestId('analytics-documents-over-time-total')).toHaveText('4 total');
+  await expect(page.getByTestId('analytics-members')).toHaveText('2/2');
 
-  await page.getByTestId('analytics-owner-filter').click();
-  await expect(page.getByRole('option', { name: HIDDEN_OWNER_NAME, exact: true })).toHaveCount(0);
-  await page.keyboard.press('Escape');
-
-  const ownTeamResponse = await requestAnalytics(page, { teamId: team.id, date: MAY_DATE });
-  expect(ownTeamResponse.ok()).toBe(true);
-
-  const foreignTeamResponse = await requestAnalytics(page, { teamId: foreignTeam.id, date: MAY_DATE });
-  expect(foreignTeamResponse.status()).toBe(401);
-  expect(await foreignTeamResponse.text()).not.toContain('"activity"');
-});
-
-test('[ANALYTICS]: an unauthenticated caller and a team member cannot access analytics', async ({ page }) => {
-  const { team } = await seedTeam();
-  const member = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.MEMBER });
-
-  const unauthenticatedResponse = await requestAnalytics(page, { teamId: team.id, date: MAY_DATE });
-  expect(unauthenticatedResponse.status()).toBe(401);
-  expect(await unauthenticatedResponse.text()).not.toContain('"activity"');
-
-  await apiSignin({ page, email: member.email });
-
-  const memberResponse = await requestAnalytics(page, { teamId: team.id, date: MAY_DATE });
-  expect(memberResponse.status()).toBe(401);
-  expect(await memberResponse.text()).not.toContain('"activity"');
-
-  await page.goto(analyticsPath({ teamUrl: team.url, date: MAY_DATE }));
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents(?:\\?.*)?$`));
-  expect(page.url()).not.toContain('/analytics');
-
-  await apiSignout({ page });
-});
-
-test('[ANALYTICS]: a personal team uses the same dashboard', async ({ page }) => {
-  const { user, team } = await seedUser({ isPersonalOrganisation: true });
-
-  await seedAnalyticsDocument({
-    owner: user,
-    teamId: team.id,
-    status: DocumentStatus.PENDING,
-    events: [sent(MAY_COMPLETED_AT)],
-  });
-
-  await apiSignin({
-    page,
-    email: user.email,
-    redirectPath: analyticsPath({ teamUrl: team.url, date: MAY_DATE }),
-  });
-
-  await expect(page.getByRole('heading', { name: 'Analytics' })).toBeVisible();
-  await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 1 });
-});
-
-test('[ANALYTICS]: empty states, invalid filters, and browser history remain recoverable', async ({ page }) => {
-  const { team, owner } = await seedTeam();
-  const emptyOwner = await seedTeamMember({
-    teamId: team.id,
-    name: 'Analytics Empty Owner',
-    role: TeamMemberRole.ADMIN,
-  });
-
-  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.DRAFT });
-  await apiSignin({
-    page,
-    email: owner.email,
-    redirectPath: analyticsPath({ teamUrl: team.url, date: MAY_DATE }),
-  });
-
-  await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 0 });
-  await expect(page.getByTestId('analytics-empty')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Send a document', exact: true })).toHaveCount(0);
-
-  await page.getByTestId('analytics-owner-filter').click();
-  await page.getByRole('option', { name: 'Analytics Empty Owner', exact: true }).click();
-  await page.keyboard.press('Escape');
-  await expectAnalyticsUrl(page, {
-    period: 'month',
-    date: MAY_DATE,
-    timezone: TIMEZONE,
-    senderIds: String(emptyOwner.id),
-  });
-  await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 0 });
-  await expect(page.getByTestId('analytics-empty')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Send a document', exact: true })).toHaveCount(0);
-
-  await page.goBack();
-  await expectAnalyticsUrl(page, { period: 'month', date: MAY_DATE, timezone: TIMEZONE });
-  await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 0 });
-  await expect(page.getByTestId('analytics-empty')).toBeVisible();
-
-  await page.goForward();
-  await expectAnalyticsUrl(page, {
-    period: 'month',
-    date: MAY_DATE,
-    timezone: TIMEZONE,
-    senderIds: String(emptyOwner.id),
-  });
-  await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 0 });
-  await expect(page.getByTestId('analytics-empty')).toBeVisible();
-
-  for (const path of [
-    analyticsPath({ teamUrl: team.url, date: MAY_DATE, senderIds: [2_147_483_647] }),
-    analyticsPath({ teamUrl: team.url, date: 'not-a-date' }),
-    analyticsPath({ teamUrl: team.url, date: MAY_DATE, timezone: 'Not/A_Timezone' }),
-  ]) {
-    await page.goto(path);
-    await expect(page.getByTestId('analytics-error')).toBeVisible();
-
-    for (const metric of METRICS) {
-      await expect(page.getByTestId(`analytics-${metric}`)).toHaveCount(0);
-    }
-
-    await page.getByRole('button', { name: 'Reset', exact: true }).click();
-    await expect(page.getByTestId('analytics-error')).toHaveCount(0);
-    await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 1, pending: 0 });
-  }
-});
-
-test('[ANALYTICS]: request and access failures clear totals and recover only when allowed', async ({ page }) => {
-  const { team, owner } = await seedTeam();
-  const manager = await seedTeamMember({
-    teamId: team.id,
-    name: 'Analytics Revoked Manager',
-    role: TeamMemberRole.MANAGER,
-  });
-
+  // An ADMIN-only document still counts for the manager when they are a recipient.
   await seedAnalyticsDocument({
     owner,
     teamId: team.id,
     status: DocumentStatus.PENDING,
-    events: [sent(MAY_COMPLETED_AT)],
+    visibility: DocumentVisibility.ADMIN,
+    sentAt: daysAgo(5),
+    recipientEmail: manager.email,
   });
 
-  let failNextRequest = false;
+  await page.reload();
+  await waitForAnalytics(page);
 
-  await page.route('**/api/trpc/team.getAnalytics?**', async (route) => {
-    if (failNextRequest) {
-      failNextRequest = false;
-      await route.abort('failed');
-      return;
-    }
+  await expect(page.getByTestId('analytics-sent')).toHaveText('5');
+  await expect(page.getByTestId('analytics-status-completed')).toHaveText('3');
+  await expect(page.getByTestId('analytics-status-pending')).toHaveText('2');
+  await expect(page.getByTestId('analytics-documents-over-time-total')).toHaveText('5 total');
 
-    await route.continue();
-  });
+  await apiSignout({ page });
+  await apiSignin({ page, email: owner.email, redirectPath: analyticsPath(team.url) });
+  await waitForAnalytics(page);
 
-  await apiSignin({
-    page,
-    email: manager.email,
-    redirectPath: analyticsPath({ teamUrl: team.url, date: MAY_DATE }),
-  });
-  await expectMetrics(page, { sent: 1, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 1 });
-
-  failNextRequest = true;
-  await page.getByRole('button', { name: 'Previous period' }).click();
-  await expect(page.getByTestId('analytics-error')).toBeVisible();
-
-  for (const metric of METRICS) {
-    await expect(page.getByTestId(`analytics-${metric}`)).toHaveCount(0);
-  }
-
-  await page.getByRole('button', { name: 'Retry', exact: true }).click();
-  await expectMetrics(page, { sent: 0, completed: 0, declined: 0, cancelled: 0, draft: 0, pending: 1 });
-  await expect(page.getByTestId('analytics-empty')).toBeVisible();
-
-  const managerMembership = await prisma.organisationGroupMember.findFirstOrThrow({
-    where: {
-      organisationMember: { userId: manager.id, organisationId: team.organisationId },
-      group: { teamGroups: { some: { teamId: team.id, teamRole: TeamMemberRole.MANAGER } } },
-    },
-  });
-  await prisma.organisationGroupMember.delete({ where: { id: managerMembership.id } });
-
-  await page.getByRole('button', { name: 'Next period' }).click();
-  await expect(page.getByTestId('analytics-error')).toBeVisible();
-
-  for (const metric of METRICS) {
-    await expect(page.getByTestId(`analytics-${metric}`)).toHaveCount(0);
-  }
-
-  await expect(page.getByRole('button', { name: 'Retry', exact: true })).toHaveCount(0);
-  await expect(page.getByRole('link', { name: 'Back to documents', exact: true })).toBeVisible();
+  await expect(page.getByTestId('analytics-sent')).toHaveText('7');
+  await expect(page.getByTestId('analytics-status-completed')).toHaveText('5');
+  await expect(page.getByTestId('analytics-status-pending')).toHaveText('2');
+  await expect(page.getByTestId('analytics-documents-over-time-total')).toHaveText('7 total');
 });
 
+test('[ANALYTICS]: template usage ranks templates by documents created from them', async ({ page }) => {
+  const { team, owner } = await seedTeam();
+
+  const popularTemplate = await seedBlankTemplate(owner, team.id, {
+    createTemplateOptions: { title: 'Analytics Popular Template' },
+  });
+  const otherTemplate = await seedBlankTemplate(owner, team.id, {
+    createTemplateOptions: { title: 'Analytics Other Template' },
+  });
+  const deletedTemplate = await seedBlankTemplate(owner, team.id, {
+    createTemplateOptions: { title: 'Analytics Deleted Template', deletedAt: new Date() },
+  });
+
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.PENDING, sentAt: daysAgo(2) });
+  await seedAnalyticsDocument({ owner, teamId: team.id, status: DocumentStatus.COMPLETED, sentAt: daysAgo(3) });
+
+  // Distinct counts so the order does not depend on the tie-breaker.
+  for (const [template, count] of [
+    [popularTemplate, 3],
+    [otherTemplate, 2],
+    [deletedTemplate, 1],
+  ] as const) {
+    for (let index = 0; index < count; index += 1) {
+      await seedAnalyticsDocument({
+        owner,
+        teamId: team.id,
+        status: DocumentStatus.PENDING,
+        sentAt: daysAgo(2),
+        templateSecondaryId: template.secondaryId,
+      });
+    }
+  }
+
+  await apiSignin({ page, email: owner.email, redirectPath: analyticsPath(team.url) });
+  await waitForAnalytics(page);
+
+  const rows = page.getByTestId('analytics-template-row');
+
+  await expect(rows).toHaveCount(3);
+
+  await expect(rows.nth(0)).toContainText('Analytics Popular Template');
+  await expect(rows.nth(0)).toContainText('3 uses');
+  await expect(rows.nth(0).getByRole('link', { name: 'Analytics Popular Template' })).toHaveAttribute(
+    'href',
+    `/t/${team.url}/templates/${popularTemplate.id}`,
+  );
+
+  await expect(rows.nth(1)).toContainText('Analytics Other Template');
+  await expect(rows.nth(1)).toContainText('2 uses');
+
+  await expect(rows.nth(2)).toContainText('Unavailable template');
+  await expect(rows.nth(2)).toContainText('1 use');
+  await expect(rows.nth(2)).not.toContainText('Analytics Deleted Template');
+  await expect(rows.nth(2).getByRole('link')).toHaveCount(0);
+});
+
+test('[ANALYTICS]: member activity respects visibility per member', async ({ page }) => {
+  // `seedTeam` hardcodes the owner name, so seed the owner directly to control it.
+  const { user: jane, team } = await seedUser({ name: 'Jane Analytics' });
+
+  const manager = await seedTeamMember({
+    teamId: team.id,
+    name: 'Analytics Manager',
+    role: TeamMemberRole.MANAGER,
+  });
+
+  await seedTeamMember({
+    teamId: team.id,
+    name: 'Analytics Member',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  // Jane: 3 EVERYONE (2 completed, 1 pending) + 2 ADMIN-only (both completed).
+  for (const status of [DocumentStatus.COMPLETED, DocumentStatus.COMPLETED, DocumentStatus.PENDING]) {
+    await seedAnalyticsDocument({
+      owner: jane,
+      teamId: team.id,
+      status,
+      visibility: DocumentVisibility.EVERYONE,
+      sentAt: daysAgo(3),
+    });
+  }
+
+  for (const status of [DocumentStatus.COMPLETED, DocumentStatus.COMPLETED]) {
+    await seedAnalyticsDocument({
+      owner: jane,
+      teamId: team.id,
+      status,
+      visibility: DocumentVisibility.ADMIN,
+      sentAt: daysAgo(4),
+    });
+  }
+
+  // Manager: 2 EVERYONE (1 completed, 1 pending).
+  for (const status of [DocumentStatus.COMPLETED, DocumentStatus.PENDING]) {
+    await seedAnalyticsDocument({
+      owner: manager,
+      teamId: team.id,
+      status,
+      visibility: DocumentVisibility.EVERYONE,
+      sentAt: daysAgo(5),
+    });
+  }
+
+  const rows = page.getByTestId('analytics-member-row');
+
+  // Admin sees everything.
+  await apiSignin({ page, email: jane.email, redirectPath: analyticsPath(team.url) });
+  await waitForAnalytics(page);
+
+  await expect(page.getByTestId('analytics-member-summary')).toContainText('3 members');
+  await expect(page.getByTestId('analytics-member-summary')).toContainText('2 active');
+  await expect(rows).toHaveCount(3);
+
+  await expect(rows.nth(0)).toContainText('Jane Analytics');
+  await expectMemberRow(rows.nth(0), { sent: '5', completed: '4', pending: '1', completionRate: '80%' });
+
+  await expect(rows.nth(1)).toContainText('Analytics Manager');
+  await expectMemberRow(rows.nth(1), { sent: '2', completed: '1', pending: '1', completionRate: '50%' });
+
+  await expect(rows.nth(2)).toContainText('Analytics Member');
+  await expectMemberRow(rows.nth(2), { sent: '0', completed: '0', pending: '0', completionRate: '—' });
+
+  // Search filters the table case-insensitively.
+  const search = page.getByTestId('analytics-member-search');
+
+  await search.fill('MANAGER');
+  await expect(rows).toHaveCount(1);
+  await expect(rows.nth(0)).toContainText('Analytics Manager');
+
+  await search.fill('');
+  await expect(rows).toHaveCount(3);
+
+  // Manager: Jane's two ADMIN-only documents are excluded from her row.
+  await apiSignout({ page });
+  await apiSignin({ page, email: manager.email, redirectPath: analyticsPath(team.url) });
+  await waitForAnalytics(page);
+
+  await expect(rows).toHaveCount(3);
+
+  await expect(rows.nth(0)).toContainText('Jane Analytics');
+  await expectMemberRow(rows.nth(0), { sent: '3', completed: '2', pending: '1', completionRate: '67%' });
+});
+
+test('[ANALYTICS]: member activity previews 8 members and can show all', async ({ page }) => {
+  // 8 organisation members inherited into the team + the owner = 9 team members.
+  const { team, owner } = await seedTeam({ createTeamMembers: 8 });
+
+  const rows = page.getByTestId('analytics-member-row');
+
+  await apiSignin({ page, email: owner.email, redirectPath: analyticsPath(team.url) });
+  await waitForAnalytics(page);
+
+  await expect(page.getByTestId('analytics-member-summary')).toContainText('9 members');
+  await expect(rows).toHaveCount(8);
+
+  await page.getByTestId('analytics-member-show-all').click();
+
+  await expect(rows).toHaveCount(9);
+  await expect(page.getByTestId('analytics-member-show-all')).toHaveCount(0);
+});
+
+test('[ANALYTICS]: members and unauthenticated users cannot access analytics', async ({ page }) => {
+  const { team, owner } = await seedTeam();
+  const member = await seedTeamMember({
+    teamId: team.id,
+    name: 'Analytics Member',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  const documentsPathPattern = new RegExp(`/t/${team.url}/documents(?:\\?.*)?$`);
+
+  // Unauthenticated: the page redirects to sign in and the API rejects the call.
+  await page.goto(analyticsPath(team.url));
+  await page.waitForURL(/\/signin(?:\?.*)?$/);
+
+  const unauthenticatedResponse = await requestOverview(page, team.id);
+  expect(unauthenticatedResponse.status()).toBe(401);
+
+  // Member: no nav link, redirected away from the page, API rejects the calls.
+  await apiSignin({ page, email: member.email, redirectPath: `/t/${team.url}/documents` });
+  await page.waitForURL(documentsPathPattern);
+
+  await page.getByTestId('menu-switcher').click();
+
+  // Anchor on an item every user sees, so the absence check can't pass on an unopened menu.
+  await expect(page.getByRole('menuitem', { name: 'Inbox', exact: true })).toBeVisible();
+  await expect(page.getByRole('menuitem', { name: 'Analytics', exact: true })).toHaveCount(0);
+  await page.keyboard.press('Escape');
+
+  await page.goto(analyticsPath(team.url));
+  await page.waitForURL(documentsPathPattern);
+
+  const memberOverviewResponse = await requestOverview(page, team.id);
+  expect(memberOverviewResponse.status()).toBe(401);
+
+  const memberActivityResponse = await requestMemberActivity(page, team.id);
+  expect(memberActivityResponse.status()).toBe(401);
+
+  await apiSignout({ page });
+
+  // Non-member denial: a user outside the team's organisation gets "Team not found", not a crash,
+  // and is rejected by the API.
+  const { user: nonMember } = await seedUser();
+
+  await apiSignin({ page, email: nonMember.email });
+
+  await page.goto(analyticsPath(team.url));
+  await page.waitForURL(documentsPathPattern);
+  await expect(page.getByRole('heading', { name: 'Team not found' })).toBeVisible();
+
+  const nonMemberResponse = await requestOverview(page, team.id);
+  expect(nonMemberResponse.status()).toBe(401);
+
+  await apiSignout({ page });
+
+  // Admin: the menu switcher item leads to the analytics page.
+  await apiSignin({ page, email: owner.email, redirectPath: `/t/${team.url}/documents` });
+
+  await page.getByTestId('menu-switcher').click();
+  await page.getByRole('menuitem', { name: 'Analytics', exact: true }).click();
+  await page.waitForURL(new RegExp(`/t/${team.url}/analytics(?:\\?.*)?$`));
+  await waitForAnalytics(page);
+
+  const adminResponse = await requestOverview(page, team.id);
+  expect(adminResponse.ok()).toBe(true);
+});
+
+test('[ANALYTICS]: an empty team renders empty states without errors', async ({ page }) => {
+  const { team, owner } = await seedTeam();
+
+  await apiSignin({ page, email: owner.email, redirectPath: analyticsPath(team.url) });
+  await waitForAnalytics(page);
+
+  await expect(page.getByTestId('analytics-sent')).toHaveText('0');
+  await expect(page.getByTestId('analytics-sent-delta')).toHaveCount(0);
+  await expect(page.getByTestId('analytics-completion-rate')).toHaveText('—');
+  await expect(page.getByTestId('analytics-completion-rate-delta')).toHaveCount(0);
+  await expect(page.getByTestId('analytics-members')).toHaveText('0/1');
+
+  await expect(page.getByTestId('analytics-documents-over-time-total')).toHaveText('0 total');
+  await expect(page.getByTestId('analytics-status-completed')).toHaveCount(0);
+  await expect(page.getByTestId('analytics-template-row')).toHaveCount(0);
+
+  // The zero-row checks above would also pass if a card errored, so assert that none did.
+  await expect(page.getByTestId('analytics-error')).toHaveCount(0);
+});
+
+/**
+ * Seed a team document with an optional DOCUMENT_SENT audit log, recipient and
+ * source template.
+ */
 const seedAnalyticsDocument = async ({
   owner,
   teamId,
   status,
   visibility = DocumentVisibility.EVERYONE,
-  completedAt,
-  events = [],
+  sentAt,
+  recipientEmail,
+  templateSecondaryId,
+  createdAt,
+  deletedAt,
 }: {
   owner: User;
   teamId: number;
   status: DocumentStatus;
   visibility?: DocumentVisibility;
-  completedAt?: Date;
-  events?: AuditEvent[];
+  sentAt?: Date;
+  recipientEmail?: string;
+  templateSecondaryId?: string;
+  createdAt?: Date;
+  deletedAt?: Date;
 }) => {
   const envelope = await seedBlankDocument(owner, teamId, {
-    createDocumentOptions: { status, visibility, ...(completedAt ? { completedAt } : {}) },
+    createDocumentOptions: {
+      status,
+      visibility,
+      createdAt,
+      deletedAt,
+      ...(status === DocumentStatus.COMPLETED && sentAt ? { completedAt: sentAt } : {}),
+      ...(templateSecondaryId ? { templateId: mapSecondaryIdToTemplateId(templateSecondaryId) } : {}),
+    },
   });
 
-  if (events.length > 0) {
+  if (sentAt) {
     await prisma.documentAuditLog.createMany({
-      data: events.map(({ type, createdAt, data = {} }) => ({
-        envelopeId: envelope.id,
-        type,
-        createdAt,
-        data,
-      })),
+      data: [
+        {
+          envelopeId: envelope.id,
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
+          createdAt: sentAt,
+          data: {},
+        },
+      ],
     });
   }
-};
 
-const sent = (createdAt: Date): AuditEvent => ({
-  type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
-  createdAt,
-  data: {},
-});
-
-const completed = (createdAt: Date): AuditEvent => ({
-  type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-  createdAt,
-  data: { transactionId: `completed-${createdAt.toISOString()}` },
-});
-
-const declined = (createdAt: Date): AuditEvent => ({
-  type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED,
-  createdAt,
-  data: {
-    recipientEmail: 'recipient@example.com',
-    recipientName: 'Recipient',
-    recipientId: 1,
-    recipientRole: 'SIGNER',
-    reason: 'No',
-  },
-});
-
-const cancelled = (createdAt: Date): AuditEvent => ({
-  type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CANCELLED,
-  createdAt,
-  data: { reason: 'No longer needed' },
-});
-
-const analyticsPath = ({
-  teamUrl,
-  date,
-  period = 'month',
-  timezone = TIMEZONE,
-  senderIds,
-}: {
-  teamUrl: string;
-  date: string;
-  period?: 'day' | 'week' | 'month' | 'year';
-  timezone?: string;
-  senderIds?: number[];
-}) => {
-  const searchParams = new URLSearchParams({ period, date, timezone });
-
-  if (senderIds && senderIds.length > 0) {
-    searchParams.set('senderIds', senderIds.join(','));
+  if (recipientEmail) {
+    await prisma.recipient.create({
+      data: {
+        envelopeId: envelope.id,
+        email: recipientEmail,
+        name: 'Analytics Recipient',
+        token: Math.random().toString().slice(2, 12),
+      },
+    });
   }
 
-  return `/t/${teamUrl}/analytics?${searchParams.toString()}`;
+  return envelope;
 };
 
-const expectMetrics = async (page: Page, counts: MetricCounts) => {
-  for (const metric of METRICS) {
-    await expect(page.getByTestId(`analytics-${metric}`)).toHaveText(String(counts[metric]));
-  }
+const analyticsPath = (teamUrl: string, range?: AnalyticsRange) => {
+  const path = `/t/${teamUrl}/analytics`;
+
+  return range ? `${path}?range=${range}` : path;
 };
 
-const expectAnalyticsUrl = async (
-  page: Page,
-  expected: {
-    period: string;
-    date: string;
-    timezone: string;
-    senderIds?: string | null;
-  },
-) => {
+const customAnalyticsPath = (teamUrl: string, from: string, to: string) => {
+  return `${analyticsPath(teamUrl)}?range=custom&from=${from}&to=${to}`;
+};
+
+/**
+ * The analytics queries only run after hydration, which can be slow on a cold dev
+ * server, so wait for the hydrate fallback to be replaced before asserting values.
+ */
+const waitForAnalytics = async (page: Page) => {
+  await expect(page.getByRole('heading', { name: 'Analytics' })).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('analytics-loading')).toHaveCount(0, { timeout: 30_000 });
+};
+
+const selectRange = async (page: Page, label: string) => {
+  await page.getByTestId('analytics-range').click();
+  await page.getByRole('option', { name: label, exact: true }).click();
+};
+
+const expectRangeParam = async (page: Page, range: AnalyticsRange) => {
+  await expect.poll(() => new URL(page.url()).searchParams.get('range')).toBe(range);
+};
+
+const expectCustomRangeParams = async (page: Page, from: string, to: string) => {
   await expect
     .poll(() => {
-      const searchParams = new URL(page.url()).searchParams;
+      const { searchParams } = new URL(page.url());
 
-      return {
-        period: searchParams.get('period'),
-        date: searchParams.get('date'),
-        timezone: searchParams.get('timezone'),
-        senderIds: searchParams.get('senderIds'),
-      };
+      return { range: searchParams.get('range'), from: searchParams.get('from'), to: searchParams.get('to') };
     })
-    .toEqual({ senderIds: null, ...expected });
+    .toEqual({ range: 'custom', from, to });
 };
 
-const requestAnalytics = async (page: Page, { teamId, date }: { teamId: number; date: string }) => {
-  const input = encodeURIComponent(
-    JSON.stringify({
-      json: {
-        teamId,
-        period: 'month',
-        date,
-        timezone: TIMEZONE,
-      },
-    }),
-  );
+/**
+ * Click a yyyy-MM-dd day in the open range calendar. Each visible month renders a
+ * grid labelled by its caption (e.g. "September 2026"), so the day button is
+ * scoped to the matching grid to avoid hitting the same day number in the other month.
+ */
+const clickCalendarDay = async (page: Page, date: string) => {
+  const day = DateTime.fromISO(date).setLocale('en');
 
-  return await page.context().request.get(`${WEBAPP_BASE_URL}/api/trpc/team.getAnalytics?input=${input}`, {
-    headers: { 'x-team-id': String(teamId) },
-  });
+  const monthGrid = page
+    .getByTestId('analytics-range-calendar')
+    .getByRole('grid', { name: day.toFormat('LLLL yyyy'), exact: true });
+
+  await monthGrid.getByRole('gridcell', { name: String(day.day), exact: true }).click();
+};
+
+const expectMemberRow = async (
+  row: Locator,
+  expected: { sent: string; completed: string; pending: string; completionRate: string },
+) => {
+  await expect(row.getByTestId('analytics-member-sent')).toHaveText(expected.sent);
+  await expect(row.getByTestId('analytics-member-completed')).toHaveText(expected.completed);
+  await expect(row.getByTestId('analytics-member-pending')).toHaveText(expected.pending);
+  await expect(row.getByTestId('analytics-member-completion-rate')).toHaveText(expected.completionRate);
+};
+
+type AnalyticsRequestRange = { range: AnalyticsRange } | { range: 'custom'; from: string; to: string };
+
+const requestAnalytics = async (
+  page: Page,
+  procedure: 'getOverview' | 'getMemberActivity' | 'getDocumentsOverTime',
+  teamId: number,
+  range: AnalyticsRequestRange = { range: '30d' },
+  timezone = 'UTC',
+) => {
+  const input = encodeURIComponent(JSON.stringify({ json: { teamId, timezone, ...range } }));
+
+  return await page.context().request.get(`${WEBAPP_BASE_URL}/api/trpc/team.analytics.${procedure}?input=${input}`);
+};
+
+const requestOverview = async (page: Page, teamId: number, range?: AnalyticsRequestRange) => {
+  return await requestAnalytics(page, 'getOverview', teamId, range);
+};
+
+const requestMemberActivity = async (page: Page, teamId: number) => {
+  return await requestAnalytics(page, 'getMemberActivity', teamId);
+};
+
+/**
+ * Fetch documents over time in the host timezone, so bucket dates line up with
+ * `daysAgoDate` and the `createdAt` of documents seeded with `daysAgo`.
+ */
+const requestDocumentsOverTime = async (page: Page, teamId: number, range: AnalyticsRequestRange) => {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const response = await requestAnalytics(page, 'getDocumentsOverTime', teamId, range, timezone);
+
+  expect(response.ok()).toBe(true);
+
+  const body: { result: { data: { json: Pick<TGetTeamAnalyticsDocumentsOverTimeResponse, 'points'> } } } =
+    await response.json();
+
+  return body.result.data.json;
 };

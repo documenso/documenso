@@ -1,7 +1,9 @@
 import LogoImage from '@documenso/assets/logo.png';
 import { authClient } from '@documenso/auth/client';
+import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
+import { canAccessOrganisationAnalytics, formatOrganisationAnalyticsPath } from '@documenso/lib/utils/organisations';
+import { canExecuteTeamAction, formatAnalyticsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
@@ -23,6 +25,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
   const { organisations } = useSession();
 
   const currentTeam = useOptionalCurrentTeam();
+  const currentOrganisation = useOptionalCurrentOrganisation();
 
   const { data: unreadCountData } = trpc.document.inbox.getCount.useQuery(
     {
@@ -48,6 +51,9 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
           href: '/inbox',
           text: t`Inbox`,
         },
+        ...(currentOrganisation && canAccessOrganisationAnalytics(currentOrganisation.currentOrganisationRole)
+          ? [{ href: formatOrganisationAnalyticsPath(currentOrganisation.url), text: t`Analytics` }]
+          : []),
         {
           href: '/settings/profile',
           text: t`Settings`,
@@ -71,14 +77,14 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         text: t`Inbox`,
       },
       ...(canExecuteTeamAction('MANAGE_TEAM', navigationTeam.currentTeamRole)
-        ? [{ href: `/t/${teamUrl}/analytics`, text: t`Analytics` }]
+        ? [{ href: formatAnalyticsPath(teamUrl), text: t`Analytics` }]
         : []),
       {
         href: '/settings/profile',
         text: t`Settings`,
       },
     ];
-  }, [currentTeam, organisations, t]);
+  }, [currentTeam, currentOrganisation, organisations, t]);
 
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
