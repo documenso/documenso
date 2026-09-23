@@ -6,9 +6,13 @@ import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/
 import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
+import {
+  canAccessOrganisationAnalytics,
+  canExecuteOrganisationAction,
+  formatOrganisationAnalyticsPath,
+} from '@documenso/lib/utils/organisations';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
+import { canExecuteTeamAction, formatAnalyticsPath } from '@documenso/lib/utils/teams';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { LanguageSwitcherDialog } from '@documenso/ui/components/common/language-switcher-dialog';
 import { cn } from '@documenso/ui/lib/utils';
@@ -61,6 +65,13 @@ export const OrgMenuSwitcher = () => {
     canExecuteOrganisationAction('MANAGE_ORGANISATION', currentOrganisation.currentOrganisationRole);
 
   const canAccessTeamSettings = currentTeam && canExecuteTeamAction('MANAGE_TEAM', currentTeam.currentTeamRole);
+
+  // Team analytics take precedence when in a team context, the team page links to organisation analytics.
+  const analyticsPath = canAccessTeamSettings
+    ? formatAnalyticsPath(currentTeam.url)
+    : currentOrganisation && canAccessOrganisationAnalytics(currentOrganisation.currentOrganisationRole)
+      ? formatOrganisationAnalyticsPath(currentOrganisation.url)
+      : null;
 
   // Use hovered org for teams display if available,
   // otherwise use current team's org if in a team,
@@ -270,6 +281,14 @@ export const OrgMenuSwitcher = () => {
                   <Trans>Inbox</Trans>
                 </Link>
               </DropdownMenuItem>
+
+              {analyticsPath && (
+                <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
+                  <Link to={analyticsPath}>
+                    <Trans>Analytics</Trans>
+                  </Link>
+                </DropdownMenuItem>
+              )}
 
               <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
                 <Link
