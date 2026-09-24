@@ -74,7 +74,7 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, query = '', st
 
   const unsignedUserRecipient = {
     ...userRecipient,
-    signingStatus: SigningStatus.NOT_SIGNED,
+    signingStatus: { not: SigningStatus.SIGNED },
   } satisfies Prisma.RecipientWhereInput;
 
   const statusWhere = match(status)

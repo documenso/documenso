@@ -272,7 +272,7 @@ const getInboxStatus = (row: DocumentsTableRow, email: string) => {
       (recipient) =>
         recipient.email !== email ||
         recipient.role === RecipientRole.CC ||
-        recipient.signingStatus !== SigningStatus.NOT_SIGNED,
+        recipient.signingStatus === SigningStatus.SIGNED,
     );
 
   return isWaitingOnOthers ? ExtendedDocumentStatus.PARTIALLY_APPROVED : row.status;

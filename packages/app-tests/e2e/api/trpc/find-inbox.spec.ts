@@ -385,10 +385,20 @@ test.describe('Inbox Find - Status Filter Hardening', () => {
       data: { signingStatus: SigningStatus.SIGNED },
     });
 
+    // The recipient has rejected, but the seal job has not yet moved the document to REJECTED.
+    const rejecting = await seedPendingDocument(sender, senderTeam.id, [recipient, otherRecipient], {
+      createDocumentOptions: { title: 'Scoped Rejecting Document' },
+    });
+
+    await prisma.recipient.updateMany({
+      where: { envelopeId: rejecting.id, email: recipient.email },
+      data: { signingStatus: SigningStatus.REJECTED },
+    });
+
     await apiSignin({ page, email: recipient.email });
 
     const expectations = [
-      { status: 'PENDING', expected: ['Scoped Pending Document'] },
+      { status: 'PENDING', expected: ['Scoped Rejecting Document', 'Scoped Pending Document'] },
       { status: 'PARTIALLY_APPROVED', expected: ['Scoped Partially Approved Document'] },
       { status: 'COMPLETED', expected: ['Scoped Completed Document'] },
       { status: 'CANCELLED', expected: ['Scoped Cancelled Document'] },
