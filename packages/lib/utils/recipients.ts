@@ -1,9 +1,10 @@
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { Envelope, Field, Recipient } from '@prisma/client';
-import { RecipientRole, SigningStatus } from '@prisma/client';
+import { EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
+import type { TEditorEnvelope } from '../types/envelope-editor';
 import type { TRecipientLite } from '../types/recipient';
 import { extractLegacyIds } from '../universal/id';
 import { zEmail } from './zod';
@@ -22,11 +23,32 @@ export const isCcRecipient = (recipient: Pick<Recipient, 'role'>) => {
   return recipient.role === RecipientRole.CC;
 };
 
-export const isAssistantLastSigner = (recipients: Pick<Recipient, 'role'>[]) => {
+/**
+ * Whether an assistant sits in the last signing step (nobody after them to assist).
+ *
+ * Falls back to a positional check when no recipient carries a signing order.
+ */
+export const isAssistantLastSigner = (
+  recipients: Array<Pick<Recipient, 'role'> & { signingOrder?: number | null }>,
+) => {
   const nonCcRecipients = recipients.filter((recipient) => !isCcRecipient(recipient));
-  const lastNonCcRecipient = nonCcRecipients[nonCcRecipients.length - 1];
 
-  return lastNonCcRecipient?.role === RecipientRole.ASSISTANT;
+  if (nonCcRecipients.length === 0) {
+    return false;
+  }
+
+  const hasAnySigningOrder = nonCcRecipients.some((recipient) => typeof recipient.signingOrder === 'number');
+
+  if (!hasAnySigningOrder) {
+    return nonCcRecipients[nonCcRecipients.length - 1]?.role === RecipientRole.ASSISTANT;
+  }
+
+  const maxOrder = Math.max(...nonCcRecipients.map((recipient) => recipient.signingOrder ?? Number.MAX_SAFE_INTEGER));
+
+  return nonCcRecipients.some(
+    (recipient) =>
+      (recipient.signingOrder ?? Number.MAX_SAFE_INTEGER) === maxOrder && recipient.role === RecipientRole.ASSISTANT,
+  );
 };
 
 export const sortRecipientsForSigningOrder = <T extends RecipientWithSigningOrder>(recipients: T[]): T[] => {
@@ -118,6 +140,36 @@ export const canRecipientBeModified = (
   }
 
   return true;
+};
+
+/**
+ * Editor-level wrapper around `canRecipientBeModified`.
+ *
+ * Template recipients and unsaved (id-less) recipients can always be modified.
+ */
+export const canEditorRecipientBeModified = (
+  envelope: Pick<TEditorEnvelope, 'type' | 'recipients' | 'fields'>,
+  recipientId?: number,
+) => {
+  if (envelope.type === EnvelopeType.TEMPLATE) {
+    return true;
+  }
+
+  if (recipientId === undefined) {
+    return true;
+  }
+
+  const recipient = envelope.recipients.find((r) => r.id === recipientId);
+
+  // The envelope lags behind the form: a recipient the editor has just created
+  // is not in it yet. Such a recipient cannot have acted on the document, so
+  // treat an unknown id as modifiable — reporting it as locked would freeze
+  // reordering for a document nobody has signed.
+  if (!recipient) {
+    return true;
+  }
+
+  return canRecipientBeModified(recipient, envelope.fields);
 };
 
 /**
