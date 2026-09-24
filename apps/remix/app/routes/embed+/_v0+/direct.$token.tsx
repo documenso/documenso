@@ -358,6 +358,7 @@ const EmbedDirectTemplatePageV2 = ({ data }: { data: Awaited<ReturnType<typeof h
           version="current"
           envelope={envelope}
           envelopeItems={envelope.envelopeItems}
+          contents={envelope.contents}
           token={recipient.token}
         >
           <EmbedSignDocumentV2ClientPage

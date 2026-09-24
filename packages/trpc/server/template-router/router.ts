@@ -523,6 +523,7 @@ export const templateRouter = router({
         templateId,
         recipients,
         distributeDocument,
+        includeContents,
         customDocumentDataId,
         folderId,
         prefillFields,
@@ -569,6 +570,7 @@ export const templateRouter = router({
         externalId,
         override,
         attachments,
+        includeContents,
         formValues,
       });
 

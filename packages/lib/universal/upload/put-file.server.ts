@@ -12,7 +12,13 @@ import { uploadS3File } from './server-actions';
 type File = {
   name: string;
   type: string;
-  arrayBuffer: () => Promise<ArrayBuffer>;
+
+  /**
+   * The bytes to store. A `Uint8Array` (including a Node `Buffer`) is
+   * accepted as-is since the consumers below only ever read the view's
+   * bytes, so callers don't need to copy into a standalone `ArrayBuffer`.
+   */
+  arrayBuffer: () => Promise<ArrayBuffer | Uint8Array>;
 };
 
 /**
@@ -48,13 +54,26 @@ export const putPdfFileServerSide = async (file: File, initialData?: string) => 
   };
 };
 
+type PutNormalizedPdfFileOptions = {
+  flattenForm?: boolean;
+
+  /**
+   * The initial data of the created document data, e.g. the source file when
+   * copying one. Defaults to the uploaded file.
+   */
+  initialData?: string;
+};
+
 /**
  * Uploads a pdf file and normalizes it.
  */
-export const putNormalizedPdfFileServerSide = async (file: File, options: { flattenForm?: boolean } = {}) => {
+export const putNormalizedPdfFileServerSide = async (
+  file: File,
+  { initialData, ...normalizePdfOptions }: PutNormalizedPdfFileOptions = {},
+) => {
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const normalized = await normalizePdf(buffer, options);
+  const normalized = await normalizePdf(buffer, normalizePdfOptions);
 
   const fileName = file.name.endsWith('.pdf') ? file.name : `${file.name}.pdf`;
 
@@ -67,6 +86,7 @@ export const putNormalizedPdfFileServerSide = async (file: File, options: { flat
   return await createDocumentData({
     type: documentData.type,
     data: documentData.data,
+    initialData,
   });
 };
 

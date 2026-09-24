@@ -238,6 +238,29 @@ export type EnvelopeItemPermissions = {
   canOrderBeChanged: boolean;
 };
 
+/**
+ * Whether the envelope's contents have been rendered into its PDF.
+ *
+ * Contents are inserted into the document when it is sent, so from PENDING
+ * onwards the PDF bytes already contain them and the client must not draw
+ * them again.
+ */
+export const areContentsImprinted = (status: DocumentStatus) => {
+  return status !== DocumentStatus.DRAFT;
+};
+
+/**
+ * Whether authored contents (text, shapes, images, ...) can be added or
+ * changed.
+ *
+ * Contents are imprinted onto the document when it is sealed, so they are
+ * frozen once the envelope has been sent. Templates are never sent and stay
+ * drafts, so they remain editable.
+ */
+export const canContentBeChanged = (envelope: Pick<Envelope, 'status'>) => {
+  return envelope.status === DocumentStatus.DRAFT;
+};
+
 export const getEnvelopeItemPermissions = (
   envelope: Pick<Envelope, 'completedAt' | 'deletedAt' | 'type' | 'status'>,
   recipients: Pick<Recipient, 'role' | 'signingStatus' | 'sendStatus'>[],

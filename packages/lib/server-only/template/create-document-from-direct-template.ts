@@ -40,10 +40,16 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import {
+  assertEnvelopeContentLimits,
+  buildEnvelopeContentCopyData,
+  getContentsMissingImages,
+} from '../../utils/envelope-content';
 import { getRecipientsWithMissingFields } from '../../utils/recipients';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { renderContentsOntoPdf } from '../envelope-content/insert-contents-into-envelope-item';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -111,6 +117,7 @@ export const createDocumentFromDirectTemplate = async ({
           documentData: true,
         },
       },
+      contents: true,
       documentMeta: true,
       user: {
         select: {
@@ -127,6 +134,8 @@ export const createDocumentFromDirectTemplate = async ({
               organisationClaim: {
                 select: {
                   recipientCount: true,
+                  envelopeContentCount: true,
+                  envelopeContentImageCount: true,
                 },
               },
             },
@@ -183,6 +192,22 @@ export const createDocumentFromDirectTemplate = async ({
       message: 'One or more signers on this direct template are missing a signature field',
     });
   }
+
+  // A direct template is never explicitly sent, so this is where an image
+  // content without an image would otherwise slip into a document.
+  if (getContentsMissingImages(directTemplateEnvelope.contents).length > 0) {
+    throw new AppError('MISSING_CONTENT_IMAGE', {
+      message: 'One or more image contents on this direct template have no image attached',
+      statusCode: 400,
+    });
+  }
+
+  // Mirrors the check in `sendDocument`, which this flow never reaches since it
+  // creates the document directly in PENDING.
+  assertEnvelopeContentLimits(
+    directTemplateEnvelope.contents.map((content) => content.contentMeta.type),
+    directTemplateEnvelope.team.organisation.organisationClaim,
+  );
 
   if (directTemplateEnvelope.updatedAt.getTime() !== templateUpdatedAt.getTime()) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Template no longer matches' });
@@ -335,18 +360,36 @@ export const createDocumentFromDirectTemplate = async ({
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
 
-  // Duplicate the envelope item data.
+  // Duplicate the envelope item data and rendering the template's contents into
+  // the copy.
+  //
+  // The document is created directly in PENDING, so `sendDocument` below will
+  // not insert the contents (it only does so from DRAFT).
   const envelopeItemsToCreate = await Promise.all(
     directTemplateEnvelope.envelopeItems.map(async (item, i) => {
       const buffer = await getFileServerSide(item.documentData);
 
       const titleToUse = item.title || directTemplateEnvelope.title;
 
-      const { documentData: newDocumentData } = await putPdfFileServerSide({
-        name: titleToUse,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(buffer),
+      const itemContents = directTemplateEnvelope.contents.filter((content) => content.envelopeItemId === item.id);
+
+      // Render the contents onto the PDF.
+      const envelopeItemWithContents = await renderContentsOntoPdf({
+        pdfData: buffer,
+        contents: itemContents,
       });
+
+      const { documentData: newDocumentData } = await putPdfFileServerSide(
+        {
+          name: titleToUse,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(envelopeItemWithContents),
+        },
+        // The template's file is never modified, so the copy keeps it as its
+        // initial data rather than re-uploading the same bytes. This is what
+        // preserves the original PDF once the contents are rendered in.
+        item.documentData.data,
+      );
 
       const newEnvelopeItemId = prefixedId('envelope_item');
 
@@ -367,11 +410,21 @@ export const createDocumentFromDirectTemplate = async ({
 
   const incrementedDocumentId = await incrementDocumentId();
 
+  const envelopeId = prefixedId('envelope');
+
+  // The template's contents are remapped onto the new envelope items up front
+  // so they can be inserted as soon as the envelope exists.
+  const contentsToCreate = buildEnvelopeContentCopyData({
+    contents: directTemplateEnvelope.contents,
+    envelopeId,
+    envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
+  });
+
   const { createdEnvelope, recipientId, token } = await prisma.$transaction(async (tx) => {
     // Create the envelope and non direct template recipients.
     const createdEnvelope = await tx.envelope.create({
       data: {
-        id: prefixedId('envelope'),
+        id: envelopeId,
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
         internalVersion: directTemplateEnvelope.internalVersion,
@@ -425,13 +478,14 @@ export const createDocumentFromDirectTemplate = async ({
             url: true,
           },
         },
-        envelopeItems: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
+
+    if (contentsToCreate.length > 0) {
+      await tx.envelopeContent.createMany({
+        data: contentsToCreate,
+      });
+    }
 
     let nonDirectRecipientFieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 

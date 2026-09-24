@@ -160,6 +160,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
               envelopeItems={envelope.envelopeItems}
               token={undefined}
               fields={envelope.fields}
+              contents={envelope.contents}
               signatures={fieldSignatures}
               recipients={envelope.recipients}
               overrideSettings={{

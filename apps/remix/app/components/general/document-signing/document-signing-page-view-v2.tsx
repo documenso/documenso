@@ -235,7 +235,10 @@ export const DocumentSigningPageViewV2 = () => {
           </div>
         </div>
 
-        <div className="embed--DocumentContainer min-w-0 flex-1 overflow-y-auto" ref={scrollableContainerRef}>
+        <div
+          className="embed--DocumentContainer min-w-0 flex-1 overflow-x-auto overflow-y-auto"
+          ref={scrollableContainerRef}
+        >
           <div className="flex flex-col">
             {/* Horizontal envelope item selector */}
             {envelopeItems.length > 1 && (
@@ -267,6 +270,9 @@ export const DocumentSigningPageViewV2 = () => {
                   customPageRenderer={EnvelopeSignerPageRenderer}
                   scrollParentRef={scrollableContainerRef}
                   errorMessage={PDF_VIEWER_ERROR_MESSAGES.signing}
+                  toolbar={['zoom']}
+                  // Todo: Content - Decide how to manage zooming on mobile.
+                  toolbarClassName="hidden lg:flex"
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">

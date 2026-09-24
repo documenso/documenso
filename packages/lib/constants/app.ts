@@ -148,3 +148,5 @@ export const CSC_INSTANCE_SIGNATURE_LEVEL = (): TSignatureLevel => {
 };
 
 export const DOCUMENSO_CLOUD_ENTERPRISE_CTA_URL = 'https://documen.so/enterprise-cta';
+
+export const MAX_POSTGRES_INT = 2147483647;

@@ -25,6 +25,7 @@ export const useEnvelopeRoute = authenticatedProcedure
       externalId,
       recipients = [],
       distributeDocument,
+      includeContents,
       customDocumentData = [],
       folderId,
       prefillFields,
@@ -131,6 +132,7 @@ export const useEnvelopeRoute = authenticatedProcedure
       prefillFields,
       override,
       attachments,
+      includeContents,
       formValues,
     });
 
@@ -146,6 +148,12 @@ export const useEnvelopeRoute = authenticatedProcedure
         requestMetadata: ctx.metadata,
       }).catch((err) => {
         console.error(err);
+
+        // Keep specific errors (e.g. a missing signature field) so callers
+        // can act on them, only generic failures become a send failure.
+        if (err instanceof AppError) {
+          throw err;
+        }
 
         throw new AppError('DOCUMENT_SEND_FAILED');
       });

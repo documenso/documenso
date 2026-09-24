@@ -8,6 +8,7 @@ import { ZSignatureLevelSchema } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { nanoid, prefixedId } from '../../universal/id';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { buildEnvelopeContentCopyData } from '../../utils/envelope-content';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
@@ -22,11 +23,17 @@ export interface DuplicateEnvelopeOptions {
     duplicateAsTemplate?: boolean;
     includeRecipients?: boolean;
     includeFields?: boolean;
+    includeContents?: boolean;
   };
 }
 
 export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: DuplicateEnvelopeOptions) => {
-  const { duplicateAsTemplate = false, includeRecipients = true, includeFields = true } = overrides ?? {};
+  const {
+    duplicateAsTemplate = false,
+    includeRecipients = true,
+    includeFields = true,
+    includeContents = true,
+  } = overrides ?? {};
 
   const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
     id,
@@ -38,6 +45,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
   const envelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
     select: {
+      id: true,
       type: true,
       title: true,
       userId: true,
@@ -60,6 +68,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
       authOptions: true,
       visibility: true,
       documentMeta: true,
+      contents: true,
       recipients: {
         select: {
           email: true,
@@ -136,7 +145,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
       signatureLevel: duplicatedSignatureLevel,
       userId,
       teamId,
-      title: envelope.title + ' (copy)',
+      title: `${envelope.title} (copy)`,
       documentMetaId: createdDocumentMeta.id,
       authOptions: envelope.authOptions || undefined,
       visibility: envelope.visibility,
@@ -215,6 +224,20 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
         }),
       { concurrency: 5 },
     );
+  }
+
+  if (includeContents) {
+    const contentsToCreate = buildEnvelopeContentCopyData({
+      contents: envelope.contents,
+      envelopeId: duplicatedEnvelope.id,
+      envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
+    });
+
+    if (contentsToCreate.length > 0) {
+      await prisma.envelopeContent.createMany({
+        data: contentsToCreate,
+      });
+    }
   }
 
   if (duplicatedEnvelope.type === EnvelopeType.DOCUMENT) {

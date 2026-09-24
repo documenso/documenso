@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  getFieldCanvasStyleCacheKey,
-  getOpacityValue,
-  getPixelValue,
-  getRenderableColor,
-  TRANSPARENT_COLOR,
-} from './field-canvas-style';
+import { KONVA_TRANSPARENT_FILL } from '../konva/constants';
+import { getFieldCanvasStyleCacheKey, getOpacityValue, getPixelValue, getRenderableColor } from './field-canvas-style';
 import type { FieldToRender } from './field-renderer';
 
 const createField = (overrides: Partial<FieldToRender> = {}) =>
@@ -73,21 +68,21 @@ describe('getRenderableColor', () => {
   });
 
   it('normalizes the `transparent` keyword to a renderable transparent color, regardless of case or whitespace', () => {
-    expect(getRenderableColor('transparent')).toBe(TRANSPARENT_COLOR);
-    expect(getRenderableColor('TRANSPARENT')).toBe(TRANSPARENT_COLOR);
-    expect(getRenderableColor('  Transparent  ')).toBe(TRANSPARENT_COLOR);
+    expect(getRenderableColor('transparent')).toBe(KONVA_TRANSPARENT_FILL);
+    expect(getRenderableColor('TRANSPARENT')).toBe(KONVA_TRANSPARENT_FILL);
+    expect(getRenderableColor('  Transparent  ')).toBe(KONVA_TRANSPARENT_FILL);
   });
 
   it('normalizes fully transparent rgba() colors to a renderable transparent color', () => {
-    expect(getRenderableColor('rgba(0, 0, 0, 0)')).toBe(TRANSPARENT_COLOR);
-    expect(getRenderableColor('rgba(255, 0, 0, 0)')).toBe(TRANSPARENT_COLOR);
-    expect(getRenderableColor('rgba(255, 0, 0, 0.0)')).toBe(TRANSPARENT_COLOR);
-    expect(getRenderableColor('rgba(255, 0, 0, 0.00)')).toBe(TRANSPARENT_COLOR);
+    expect(getRenderableColor('rgba(0, 0, 0, 0)')).toBe(KONVA_TRANSPARENT_FILL);
+    expect(getRenderableColor('rgba(255, 0, 0, 0)')).toBe(KONVA_TRANSPARENT_FILL);
+    expect(getRenderableColor('rgba(255, 0, 0, 0.0)')).toBe(KONVA_TRANSPARENT_FILL);
+    expect(getRenderableColor('rgba(255, 0, 0, 0.00)')).toBe(KONVA_TRANSPARENT_FILL);
   });
 
   it('normalizes space-separated (CSS Color 4) fully transparent colors to a renderable transparent color', () => {
-    expect(getRenderableColor('rgb(0 128 0 / 0)')).toBe(TRANSPARENT_COLOR);
-    expect(getRenderableColor('rgba(255 0 0 / 0)')).toBe(TRANSPARENT_COLOR);
+    expect(getRenderableColor('rgb(0 128 0 / 0)')).toBe(KONVA_TRANSPARENT_FILL);
+    expect(getRenderableColor('rgba(255 0 0 / 0)')).toBe(KONVA_TRANSPARENT_FILL);
   });
 
   it('passes space-separated (CSS Color 4) colors through unchanged', () => {
