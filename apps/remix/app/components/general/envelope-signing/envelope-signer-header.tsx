@@ -102,6 +102,7 @@ const MobileDropdownMenu = () => {
           envelopeId={envelope.id}
           envelopeStatus={envelope.status}
           envelopeItems={envelope.envelopeItems}
+          envelopeTitle={envelope.title}
           token={recipient.token}
           trigger={
             <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>

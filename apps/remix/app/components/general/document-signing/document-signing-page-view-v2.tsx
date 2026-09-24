@@ -184,6 +184,7 @@ export const DocumentSigningPageViewV2 = () => {
                   envelopeId={envelope.id}
                   envelopeStatus={envelope.status}
                   envelopeItems={envelope.envelopeItems}
+                  envelopeTitle={envelope.title}
                   token={recipient.token}
                   trigger={
                     <Button variant="ghost" size="sm" className="w-full justify-start">
