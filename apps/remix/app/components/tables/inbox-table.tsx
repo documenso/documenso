@@ -22,7 +22,7 @@ import { match } from 'ts-pattern';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { useOptionalCurrentTeam } from '~/providers/team';
-import { inboxSearchParams, resolveInboxStatus } from '~/utils/inbox-search-params';
+import { inboxSearchParams } from '~/utils/inbox-search-params';
 
 import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
@@ -32,6 +32,7 @@ type DocumentsTableRow = TFindInboxResponse['data'][number];
 export const InboxTable = () => {
   const { _, i18n } = useLingui();
 
+  const { user } = useSession();
   const team = useOptionalCurrentTeam();
   const [isPending, startTransition] = useTransition();
 
@@ -41,7 +42,7 @@ export const InboxTable = () => {
     history: 'push',
   });
 
-  const status = resolveInboxStatus(findInboxSearchParams.status);
+  const status = findInboxSearchParams.status ?? undefined;
   const query = findInboxSearchParams.query ?? '';
 
   const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery({
@@ -81,7 +82,7 @@ export const InboxTable = () => {
       {
         header: _(msg`Status`),
         accessorKey: 'status',
-        cell: ({ row }) => <DocumentStatus status={row.original.status} />,
+        cell: ({ row }) => <DocumentStatus status={getInboxStatus(row.original, user.email)} />,
         size: 140,
       },
       {
@@ -89,7 +90,7 @@ export const InboxTable = () => {
         cell: ({ row }) => <InboxTableActionButton row={row.original} />,
       },
     ] satisfies DataTableColumnDef<DocumentsTableRow>[];
-  }, [team]);
+  }, [team, user.email]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
@@ -129,6 +130,9 @@ export const InboxTable = () => {
                 .with({ hasSearchQuery: true }, () => <Trans>No documents match your search</Trans>)
                 .with({ status: DocumentStatusEnum.COMPLETED }, () => (
                   <Trans>Documents that you have completed will appear here</Trans>
+                ))
+                .with({ status: 'PARTIALLY_APPROVED' }, () => (
+                  <Trans>Documents that are waiting on other recipients will appear here</Trans>
                 ))
                 .with({ status: DocumentStatusEnum.REJECTED }, () => (
                   <Trans>Documents that have been rejected will appear here</Trans>
@@ -258,4 +262,21 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
       />
     ))
     .otherwise(() => <div></div>);
+};
+
+/**
+ * Shows a pending document as partially approved once the user has completed
+ * their part, which matches the inbox status filter.
+ */
+const getInboxStatus = (row: DocumentsTableRow, email: string) => {
+  const isWaitingOnOthers =
+    row.status === DocumentStatusEnum.PENDING &&
+    row.recipients.every(
+      (recipient) =>
+        recipient.email !== email ||
+        recipient.role === RecipientRole.CC ||
+        recipient.signingStatus !== SigningStatus.NOT_SIGNED,
+    );
+
+  return isWaitingOnOthers ? 'PARTIALLY_APPROVED' : row.status;
 };

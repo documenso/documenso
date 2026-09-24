@@ -1,10 +1,11 @@
 import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { TInboxStatus } from '@documenso/trpc/server/document-router/find-inbox.types';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { cn } from '@documenso/ui/lib/utils';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { CheckCircle2, Clock, File, TimerOff, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock, ClockCheck, File, TimerOff, XCircle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 import type { HTMLAttributes } from 'react';
 
@@ -15,11 +16,17 @@ type FriendlyStatus = {
   color: string;
 };
 
-export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
+export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus | TInboxStatus, FriendlyStatus> = {
   PENDING: {
     label: msg`Pending`,
     labelExtended: msg`Document pending`,
     icon: Clock,
+    color: 'text-blue-600 dark:text-blue-300',
+  },
+  PARTIALLY_APPROVED: {
+    label: msg`Partially Approved`,
+    labelExtended: msg`Document partially approved`,
+    icon: ClockCheck,
     color: 'text-blue-600 dark:text-blue-300',
   },
   COMPLETED: {
@@ -66,7 +73,7 @@ export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus>
 };
 
 export type DocumentStatusProps = HTMLAttributes<HTMLSpanElement> & {
-  status: ExtendedDocumentStatus;
+  status: ExtendedDocumentStatus | TInboxStatus;
   inheritColor?: boolean;
 };
 

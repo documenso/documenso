@@ -10,9 +10,14 @@ import { z } from 'zod';
  *
  * Every document status except DRAFT, since drafts have not been sent to
  * recipients yet and must never be visible in the inbox.
+ *
+ * PENDING only covers documents that still need the user to act.
+ * PARTIALLY_APPROVED covers pending documents that the user has completed and
+ * that wait on other recipients.
  */
 export const INBOX_STATUSES = [
   DocumentStatus.PENDING,
+  'PARTIALLY_APPROVED',
   DocumentStatus.COMPLETED,
   DocumentStatus.REJECTED,
   DocumentStatus.CANCELLED,

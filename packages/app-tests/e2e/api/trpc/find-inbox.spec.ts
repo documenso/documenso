@@ -10,7 +10,7 @@ import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import { DocumentStatus, EnvelopeType, RecipientRole, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus, TeamMemberRole } from '@prisma/client';
 
 import { apiSignin, apiSignout } from '../../fixtures/authentication';
 
@@ -345,7 +345,7 @@ test.describe('Inbox Find - Status Filter Hardening', () => {
     }
 
     // Sanity check that the valid filters, and the unfiltered view, never include the draft.
-    for (const status of ['PENDING', 'COMPLETED', 'REJECTED', 'CANCELLED', undefined]) {
+    for (const status of ['PENDING', 'PARTIALLY_APPROVED', 'COMPLETED', 'REJECTED', 'CANCELLED', undefined]) {
       const { res, data } = await trpcInboxFind(page, { status });
 
       expect(res.ok(), `status "${status}" should be accepted`).toBeTruthy();
@@ -358,6 +358,7 @@ test.describe('Inbox Find - Status Filter Hardening', () => {
   test('should scope each status filter to exactly that status', async ({ page }) => {
     const { user: sender, team: senderTeam } = await seedUser();
     const { user: recipient } = await seedUser();
+    const { user: otherRecipient } = await seedUser();
 
     await seedPendingDocument(sender, senderTeam.id, [recipient], {
       createDocumentOptions: { title: 'Scoped Pending Document' },
@@ -375,10 +376,21 @@ test.describe('Inbox Find - Status Filter Hardening', () => {
       createDocumentOptions: { title: 'Scoped Rejected Document', status: DocumentStatus.REJECTED },
     });
 
+    // The recipient has signed, but the other recipient has not.
+    const partiallyApproved = await seedPendingDocument(sender, senderTeam.id, [recipient, otherRecipient], {
+      createDocumentOptions: { title: 'Scoped Partially Approved Document' },
+    });
+
+    await prisma.recipient.updateMany({
+      where: { envelopeId: partiallyApproved.id, email: recipient.email },
+      data: { signingStatus: SigningStatus.SIGNED },
+    });
+
     await apiSignin({ page, email: recipient.email });
 
     const expectations = [
       { status: 'PENDING', expected: ['Scoped Pending Document'] },
+      { status: 'PARTIALLY_APPROVED', expected: ['Scoped Partially Approved Document'] },
       { status: 'COMPLETED', expected: ['Scoped Completed Document'] },
       { status: 'CANCELLED', expected: ['Scoped Cancelled Document'] },
       { status: 'REJECTED', expected: ['Scoped Rejected Document'] },
