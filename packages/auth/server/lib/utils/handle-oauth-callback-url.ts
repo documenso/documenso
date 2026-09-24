@@ -6,7 +6,9 @@ import {
 } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
+import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
+import { OrganisationMemberRole } from '@prisma/client';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
@@ -174,7 +176,40 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     return user;
   });
 
-  await onCreateUserHook(createdUser).catch((err) => {
+  let skipPersonalOrganisation = false;
+
+  if (clientOptions.defaultOrganisationId) {
+    const targetOrganisation = await prisma.organisation.findUnique({
+      where: {
+        id: clientOptions.defaultOrganisationId,
+      },
+      include: {
+        groups: true,
+      },
+    });
+
+    if (targetOrganisation) {
+      await addUserToOrganisation({
+        userId: createdUser.id,
+        organisationId: targetOrganisation.id,
+        organisationGroups: targetOrganisation.groups,
+        organisationMemberRole: OrganisationMemberRole.MEMBER,
+        bypassEmail: true,
+      }).catch((err) => {
+        console.error('Failed to assign user to default organisation:', err);
+      });
+
+      skipPersonalOrganisation = true;
+    } else {
+      console.warn(
+        `Default organisation with id "${clientOptions.defaultOrganisationId}" not found. Falling back to personal organisation creation.`,
+      );
+    }
+  }
+
+  await onCreateUserHook(createdUser, {
+    skipPersonalOrganisation,
+  }).catch((err) => {
     // Todo: (RR7) Add logging.
     console.error(err);
   });
