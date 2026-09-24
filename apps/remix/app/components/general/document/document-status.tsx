@@ -1,5 +1,4 @@
 import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
-import type { TInboxStatus } from '@documenso/trpc/server/document-router/find-inbox.types';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { cn } from '@documenso/ui/lib/utils';
 import type { MessageDescriptor } from '@lingui/core';
@@ -16,7 +15,7 @@ type FriendlyStatus = {
   color: string;
 };
 
-export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus | TInboxStatus, FriendlyStatus> = {
+export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
   PENDING: {
     label: msg`Pending`,
     labelExtended: msg`Document pending`,
@@ -73,7 +72,7 @@ export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus | TInboxStatus, 
 };
 
 export type DocumentStatusProps = HTMLAttributes<HTMLSpanElement> & {
-  status: ExtendedDocumentStatus | TInboxStatus;
+  status: ExtendedDocumentStatus;
   inheritColor?: boolean;
 };
 

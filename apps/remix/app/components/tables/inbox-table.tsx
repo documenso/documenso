@@ -1,6 +1,7 @@
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
 import type { TFindInboxResponse } from '@documenso/trpc/server/document-router/find-inbox.types';
 import { Button } from '@documenso/ui/primitives/button';
@@ -131,7 +132,7 @@ export const InboxTable = () => {
                 .with({ status: DocumentStatusEnum.COMPLETED }, () => (
                   <Trans>Documents that you have completed will appear here</Trans>
                 ))
-                .with({ status: 'PARTIALLY_APPROVED' }, () => (
+                .with({ status: ExtendedDocumentStatus.PARTIALLY_APPROVED }, () => (
                   <Trans>Documents that are waiting on other recipients will appear here</Trans>
                 ))
                 .with({ status: DocumentStatusEnum.REJECTED }, () => (
@@ -278,5 +279,5 @@ const getInboxStatus = (row: DocumentsTableRow, email: string) => {
         recipient.signingStatus !== SigningStatus.NOT_SIGNED,
     );
 
-  return isWaitingOnOthers ? 'PARTIALLY_APPROVED' : row.status;
+  return isWaitingOnOthers ? ExtendedDocumentStatus.PARTIALLY_APPROVED : row.status;
 };

@@ -1,32 +1,29 @@
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { STATS_COUNT_CAP } from '@documenso/lib/constants/document';
-import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
-import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/find-documents-internal.types';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { OrganisationType } from '@prisma/client';
 import { ListFilterIcon } from 'lucide-react';
-import { parseAsString, useQueryStates } from 'nuqs';
+import { useQueryStates } from 'nuqs';
 import { useMemo } from 'react';
 
-import type { DocumentStatusProps } from '~/components/general/document/document-status';
 import { DocumentStatus, FRIENDLY_STATUS_MAP } from '~/components/general/document/document-status';
 import { FilterPill } from '~/components/general/filter-pill';
 import { documentsSearchParams } from '~/utils/documents-search-params';
 
 type DocumentsTableStatusFilterProps = {
   /**
-   * Per-status document counts, shown next to each option. When omitted no
-   * counts are rendered.
+   * Per-status document counts, shown next to each option. When omitted, or
+   * when a status has no count, no count is rendered.
    */
-  stats?: TFindDocumentsInternalResponse['stats'];
+  stats?: Partial<Record<ExtendedDocumentStatus, number>>;
 
   /**
    * The statuses available for selection. Defaults to every status that
    * makes sense for the documents page.
    */
-  statuses?: readonly DocumentStatusProps['status'][];
+  statuses?: readonly ExtendedDocumentStatus[];
 };
 
 export const DocumentsTableStatusFilter = ({
@@ -37,11 +34,9 @@ export const DocumentsTableStatusFilter = ({
 
   const organisation = useOptionalCurrentOrganisation();
 
-  // Any string is read here since each page offers its own statuses, which
-  // are matched against the selectable statuses below.
   const [{ status }, setSearchParams] = useQueryStates(
     {
-      status: parseAsString,
+      status: documentsSearchParams.status,
       page: documentsSearchParams.page,
     },
     { history: 'push' },
@@ -82,7 +77,7 @@ export const DocumentsTableStatusFilter = ({
         options={selectableStatuses.map((value) => ({
           value,
           label: <DocumentStatus status={value} />,
-          trailing: stats && isExtendedDocumentStatus(value) ? formatStatsCount(stats[value]) : undefined,
+          trailing: formatStatsCount(stats?.[value]),
         }))}
         testId="documents-table-status-filter"
       />
@@ -90,7 +85,7 @@ export const DocumentsTableStatusFilter = ({
       {/* Visually hidden document counts, for screen readers and tests. */}
       {stats && (
         <span className="sr-only" data-testid="documents-status-counts">
-          {[...selectableStatuses, ExtendedDocumentStatus.ALL].filter(isExtendedDocumentStatus).map((value) => (
+          {[...selectableStatuses, ExtendedDocumentStatus.ALL].map((value) => (
             <span key={value}>
               {_(FRIENDLY_STATUS_MAP[value].label)}:{' '}
               <span data-testid={`documents-status-count-${value}`}>{stats[value]}</span>
@@ -112,6 +107,10 @@ const SELECTABLE_STATUSES: ExtendedDocumentStatus[] = [
   ExtendedDocumentStatus.EXPIRED,
 ];
 
-const formatStatsCount = (count: number) => {
+const formatStatsCount = (count: number | undefined) => {
+  if (count === undefined) {
+    return undefined;
+  }
+
   return count >= STATS_COUNT_CAP ? `${STATS_COUNT_CAP.toLocaleString()}+` : count.toString();
 };

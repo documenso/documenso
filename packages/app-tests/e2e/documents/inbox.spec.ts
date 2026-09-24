@@ -8,6 +8,7 @@ import {
 } from '@documenso/prisma/seed/documents';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, RecipientRole, SigningStatus, TeamMemberRole } from '@prisma/client';
@@ -37,7 +38,7 @@ const searchInbox = async (page: Page, query: string) => {
 // spelling "Canceled" for the `Cancelled` source string.
 const INBOX_STATUS_LABELS = {
   [DocumentStatus.PENDING]: 'Pending',
-  PARTIALLY_APPROVED: 'Partially Approved',
+  [ExtendedDocumentStatus.PARTIALLY_APPROVED]: 'Partially Approved',
   [DocumentStatus.COMPLETED]: 'Completed',
   [DocumentStatus.REJECTED]: 'Rejected',
   [DocumentStatus.CANCELLED]: 'Canceled',
@@ -154,7 +155,7 @@ test.describe('Inbox - Search & Status Filter', () => {
     await expect(inboxRow(page, 'Inbox Unsigned Document')).toBeVisible();
     await expect(inboxRow(page, 'Inbox Signed Document')).not.toBeVisible();
 
-    await selectInboxStatus(page, 'PARTIALLY_APPROVED');
+    await selectInboxStatus(page, ExtendedDocumentStatus.PARTIALLY_APPROVED);
 
     await expect(page.getByTestId('documents-table-status-filter')).toContainText('Partially Approved');
     await expect(inboxRow(page, 'Inbox Signed Document')).toBeVisible();

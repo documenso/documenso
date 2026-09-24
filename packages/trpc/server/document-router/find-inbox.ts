@@ -1,6 +1,7 @@
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
 import { prisma } from '@documenso/prisma';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import type { Envelope, Prisma } from '@prisma/client';
 import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 import { match, P } from 'ts-pattern';
@@ -85,7 +86,7 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, query = '', st
       status: DocumentStatus.PENDING,
       recipients: { some: unsignedUserRecipient },
     }))
-    .with('PARTIALLY_APPROVED', () => ({
+    .with(ExtendedDocumentStatus.PARTIALLY_APPROVED, () => ({
       status: DocumentStatus.PENDING,
       recipients: { some: userRecipient, none: unsignedUserRecipient },
     }))

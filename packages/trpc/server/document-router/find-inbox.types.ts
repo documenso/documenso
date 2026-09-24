@@ -2,7 +2,7 @@
 
 import { ZDocumentManySchema } from '@documenso/lib/types/document';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { DocumentStatus } from '@prisma/client';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { z } from 'zod';
 
 /**
@@ -16,11 +16,11 @@ import { z } from 'zod';
  * that wait on other recipients.
  */
 export const INBOX_STATUSES = [
-  DocumentStatus.PENDING,
-  'PARTIALLY_APPROVED',
-  DocumentStatus.COMPLETED,
-  DocumentStatus.REJECTED,
-  DocumentStatus.CANCELLED,
+  ExtendedDocumentStatus.PENDING,
+  ExtendedDocumentStatus.PARTIALLY_APPROVED,
+  ExtendedDocumentStatus.COMPLETED,
+  ExtendedDocumentStatus.REJECTED,
+  ExtendedDocumentStatus.CANCELLED,
 ] as const;
 
 export const ZInboxStatusSchema = z.enum(INBOX_STATUSES);
