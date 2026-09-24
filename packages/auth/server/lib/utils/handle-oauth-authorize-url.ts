@@ -38,7 +38,7 @@ const oauthCookieMaxAge = 60 * 10; // 10 minutes.
 export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOptions) => {
   const { c, clientOptions, redirectPath } = options;
 
-  let prompt = options.prompt ?? 'login';
+  let prompt: HandleOAuthAuthorizeUrlOptions['prompt'] | undefined = options.prompt;
 
   if (!clientOptions.clientId || !clientOptions.clientSecret) {
     throw new AppError(AppErrorCode.NOT_SETUP);
@@ -63,12 +63,21 @@ export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOp
     scopes,
   );
 
-  // Pass the prompt to the authorization endpoint.
-  if (process.env.NEXT_PRIVATE_OIDC_PROMPT && isOidcPrompt(process.env.NEXT_PRIVATE_OIDC_PROMPT)) {
-    prompt = process.env.NEXT_PRIVATE_OIDC_PROMPT;
+  // Pass the prompt to the authorization endpoint if configured.
+  // Setting NEXT_PRIVATE_OIDC_PROMPT to an empty string explicitly omits the prompt parameter.
+  if (prompt === undefined) {
+    if (process.env.NEXT_PRIVATE_OIDC_PROMPT === '') {
+      prompt = undefined;
+    } else if (process.env.NEXT_PRIVATE_OIDC_PROMPT && isOidcPrompt(process.env.NEXT_PRIVATE_OIDC_PROMPT)) {
+      prompt = process.env.NEXT_PRIVATE_OIDC_PROMPT;
+    } else {
+      prompt = 'login';
+    }
   }
 
-  url.searchParams.set('prompt', prompt);
+  if (prompt) {
+    url.searchParams.set('prompt', prompt);
+  }
 
   setCookie(c, `${clientOptions.id}_oauth_state`, state, {
     ...sessionCookieOptions,
