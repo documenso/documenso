@@ -63,6 +63,10 @@ export const SUPPORTED_LANGUAGES: Record<string, SupportedLanguage> = {
     short: 'ko',
     full: msg`Korean`,
   },
+  sk: {
+    short: 'sk',
+    full: msg`Slovak`,
+  },
   zh: {
     short: 'zh',
     full: msg`Chinese`,
