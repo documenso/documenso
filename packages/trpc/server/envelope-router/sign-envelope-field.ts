@@ -39,8 +39,8 @@ export const signEnvelopeFieldRoute = procedure
     const field = await prisma.field.findFirst({
       where: {
         id: fieldId,
-        recipient: {
-          ...(recipient.role === RecipientRole.ASSISTANT
+        recipient:
+          recipient.role === RecipientRole.ASSISTANT
             ? {
                 signingStatus: {
                   not: SigningStatus.SIGNED,
@@ -52,8 +52,7 @@ export const signEnvelopeFieldRoute = procedure
               }
             : {
                 id: recipient.id,
-              }),
-        },
+              },
       },
       include: {
         envelope: {

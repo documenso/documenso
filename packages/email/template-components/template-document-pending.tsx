@@ -1,6 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 
 import { Column, Img, Section, Text } from '../components';
+import { getEmailAssetUrl } from '../utils/asset-url';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentPendingProps {
@@ -9,10 +10,6 @@ export interface TemplateDocumentPendingProps {
 }
 
 export const TemplateDocumentPending = ({ documentName, assetBaseUrl }: TemplateDocumentPendingProps) => {
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
-
   return (
     <>
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
@@ -21,7 +18,11 @@ export const TemplateDocumentPending = ({ documentName, assetBaseUrl }: Template
         <Section className="mb-4">
           <Column align="center">
             <Text className="font-semibold text-base text-foreground">
-              <Img src={getAssetUrl('/static/clock.png')} className="-mt-0.5 mr-2 inline h-7 w-7 align-middle" alt="" />
+              <Img
+                src={getEmailAssetUrl(assetBaseUrl, 'static/clock.png')}
+                className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
+                alt=""
+              />
               <Trans>Waiting for others</Trans>
             </Text>
           </Column>

@@ -1,6 +1,7 @@
 import { Plural, Trans } from '@lingui/react/macro';
 
 import { Heading, Img, Section, Text } from '../components';
+import { getEmailAssetUrl } from '../utils/asset-url';
 
 export type TemplateAccessAuth2FAProps = {
   documentTitle: string;
@@ -18,13 +19,9 @@ export const TemplateAccessAuth2FA = ({
   expiresInMinutes,
   assetBaseUrl = 'http://localhost:3002',
 }: TemplateAccessAuth2FAProps) => {
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
-
   return (
     <div>
-      <Img src={getAssetUrl('/static/document.png')} alt="Document" className="mx-auto h-12 w-12" />
+      <Img src={getEmailAssetUrl(assetBaseUrl, 'static/document.png')} alt="Document" className="mx-auto h-12 w-12" />
 
       <Section className="mt-8">
         <Heading className="text-center font-semibold text-foreground text-lg">

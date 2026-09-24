@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
@@ -37,8 +38,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
 
+/** How far past a resize handle you can still grab it, in screen pixels. */
+const TRANSFORMER_ANCHOR_HIT_STROKE_PX = 24;
+
 export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
+  const analytics = useAnalytics();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
 
@@ -276,6 +281,13 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       unsafeRenderFieldOnLayer(field);
     } catch (err) {
       console.error(err);
+
+      analytics.captureException(err, {
+        source: 'editor',
+        location: 'envelope_page_render',
+        envelopeId: envelope.id,
+      });
+
       setRenderError(true);
     }
   };
@@ -350,6 +362,9 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       shouldOverdrawWholeArea: true,
       ignoreStroke: true,
       flipEnabled: false,
+      anchorStyleFunc: (anchor) => {
+        anchor.hitStrokeWidth(TRANSFORMER_ANCHOR_HIT_STROKE_PX / scale);
+      },
       boundBoxFunc: (oldBox, newBox) => {
         // Enforce minimum size
         if (newBox.width < 30 || newBox.height < 20) {
