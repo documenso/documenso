@@ -28,7 +28,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
@@ -100,32 +100,38 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const selectedField = useMemo(() => structuredClone(editorFields.selectedField), [editorFields.selectedField]);
 
-  const [copiedField, setCopiedField] = useState<TLocalField | null>(null);
+  const [copiedFields, setCopiedFields] = useState<TLocalField[]>([]);
 
   useHotkeys(['ctrl+c', 'meta+c'], (event) => {
     // Keep the native copy when the user has selected text.
-    if (!selectedField || window.getSelection()?.toString()) {
+    if (editorFields.selectedFields.length === 0 || window.getSelection()?.toString()) {
       return;
     }
 
     event.preventDefault();
-    setCopiedField(selectedField);
+    setCopiedFields(structuredClone(editorFields.selectedFields));
 
     toast({
-      title: _(msg`Copied field`),
-      description: _(msg`Copied field to clipboard`),
+      title: _(
+        msg({
+          message: plural(editorFields.selectedFields.length, {
+            one: 'Copied field',
+            other: 'Copied # fields',
+          }),
+        }),
+      ),
     });
   });
 
   useHotkeys(['ctrl+v', 'meta+v'], (event) => {
-    if (!copiedField) {
+    if (copiedFields.length === 0) {
       return;
     }
 
     event.preventDefault();
 
-    // Paste the next copy offset from the last one, so repeated pastes do not stack.
-    setCopiedField(editorFields.duplicateField(copiedField));
+    // Paste the next copies offset from the last ones, so repeated pastes do not stack.
+    setCopiedFields(copiedFields.map((field) => editorFields.duplicateField(field)));
   });
 
   /**

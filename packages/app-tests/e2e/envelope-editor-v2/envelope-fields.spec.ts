@@ -692,6 +692,56 @@ const assertCopyPasteFieldPersistedInDatabase = async ({
   expect(positions.size).toBe(3);
 };
 
+const runMultiCopyPasteFieldFlow = async (surface: TEnvelopeEditorSurface): Promise<TCopyPasteFlowResult> => {
+  const externalId = `e2e-multi-copy-paste-${nanoid()}`;
+  const root = surface.root;
+
+  await updateExternalId(surface, externalId);
+  await setupRecipientsForFieldPlacement(surface);
+
+  await clickEnvelopeEditorStep(root, 'addFields');
+  await expect(root.locator('.konva-container canvas').first()).toBeVisible();
+
+  await placeFieldOnPdf(root, 'Signature', FIELD_A_POSITION);
+  await placeFieldOnPdf(root, 'Name', FIELD_B_POSITION);
+  await marqueeSelectFieldsOnCanvas(root, { x: 50, y: 100 }, { x: 260, y: 290 });
+  await expect.poll(async () => getKonvaTransformerNodeCountForPage(root, 1)).toBe(2);
+
+  await root.keyboard.press('ControlOrMeta+c');
+  await root.keyboard.press('ControlOrMeta+v');
+
+  await expect.poll(async () => getKonvaElementCountForPage(root, 1, '.field-group')).toBe(4);
+
+  // Navigate away and back to persist changes.
+  await clickEnvelopeEditorStep(root, 'upload');
+  await clickEnvelopeEditorStep(root, 'addFields');
+  await expect.poll(async () => getKonvaElementCountForPage(root, 1, '.field-group')).toBe(4);
+
+  return { externalId };
+};
+
+const assertMultiCopyPasteFieldPersistedInDatabase = async ({
+  surface,
+  externalId,
+}: {
+  surface: TEnvelopeEditorSurface;
+  externalId: string;
+}) => {
+  const envelope = await prisma.envelope.findFirstOrThrow({
+    where: {
+      externalId,
+      userId: surface.userId,
+      teamId: surface.teamId,
+      type: surface.envelopeType,
+    },
+    orderBy: { createdAt: 'desc' },
+    include: { fields: true },
+  });
+
+  const types = envelope.fields.map((field) => field.type).sort();
+  expect(types).toEqual([FieldType.NAME, FieldType.NAME, FieldType.SIGNATURE, FieldType.SIGNATURE]);
+};
+
 // --- Change field type flow ---
 
 type TChangeFieldTypeFlowResult = {
@@ -971,6 +1021,16 @@ test.describe('document editor', () => {
     });
   });
 
+  test('copy and paste multiple selected fields with keyboard shortcuts', async ({ page }) => {
+    const surface = await openDocumentEnvelopeEditor(page);
+    const result = await runMultiCopyPasteFieldFlow(surface);
+
+    await assertMultiCopyPasteFieldPersistedInDatabase({
+      surface,
+      ...result,
+    });
+  });
+
   test('place and configure all 10 field types', async ({ page }) => {
     const surface = await openDocumentEnvelopeEditor(page);
     const result = await runAllFieldTypesFlow(surface);
@@ -1038,6 +1098,16 @@ test.describe('template editor', () => {
     const result = await runCopyPasteFieldFlow(surface);
 
     await assertCopyPasteFieldPersistedInDatabase({
+      surface,
+      ...result,
+    });
+  });
+
+  test('copy and paste multiple selected fields with keyboard shortcuts', async ({ page }) => {
+    const surface = await openTemplateEnvelopeEditor(page);
+    const result = await runMultiCopyPasteFieldFlow(surface);
+
+    await assertMultiCopyPasteFieldPersistedInDatabase({
       surface,
       ...result,
     });
