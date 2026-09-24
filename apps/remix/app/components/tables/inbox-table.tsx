@@ -265,10 +265,6 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
     .otherwise(() => <div></div>);
 };
 
-/**
- * Shows a pending document as partially approved once the user has completed
- * their part, which matches the inbox status filter.
- */
 const getInboxStatus = (row: DocumentsTableRow, email: string) => {
   const isWaitingOnOthers =
     row.status === DocumentStatusEnum.PENDING &&

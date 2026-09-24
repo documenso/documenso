@@ -376,7 +376,6 @@ test.describe('Inbox Find - Status Filter Hardening', () => {
       createDocumentOptions: { title: 'Scoped Rejected Document', status: DocumentStatus.REJECTED },
     });
 
-    // The recipient has signed, but the other recipient has not.
     const partiallyApproved = await seedPendingDocument(sender, senderTeam.id, [recipient, otherRecipient], {
       createDocumentOptions: { title: 'Scoped Partially Approved Document' },
     });
