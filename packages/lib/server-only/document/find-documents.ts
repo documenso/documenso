@@ -326,6 +326,7 @@ export const findDocuments = async ({
           ]),
         ),
       )
+      .with(ExtendedDocumentStatus.PARTIALLY_APPROVED, () => null) // Only the inbox offers this status.
       .exhaustive();
   };
 
@@ -488,6 +489,7 @@ export const findDocuments = async ({
           return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), hasExpiredRecipient(eb), eb.or(accessBranches)]);
         }),
       )
+      .with(ExtendedDocumentStatus.PARTIALLY_APPROVED, () => null) // Only the inbox offers this status.
       .exhaustive();
   };
 

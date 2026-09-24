@@ -301,7 +301,7 @@ export const getStats = async ({ userId, teamId, period, search = '', folderId, 
   // `expired` is intentionally excluded from `all` — it overlaps PENDING.
   const all = Math.min(draft + pending + completed + rejected + cancelled + inbox, STATS_COUNT_CAP);
 
-  const stats: Record<ExtendedDocumentStatus, number> = {
+  const stats: Record<Exclude<ExtendedDocumentStatus, 'PARTIALLY_APPROVED'>, number> = {
     [ExtendedDocumentStatus.DRAFT]: draft,
     [ExtendedDocumentStatus.PENDING]: pending,
     [ExtendedDocumentStatus.COMPLETED]: completed,

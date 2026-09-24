@@ -2,7 +2,7 @@
 
 import { ZDocumentManySchema } from '@documenso/lib/types/document';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { DocumentStatus } from '@prisma/client';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { z } from 'zod';
 
 /**
@@ -10,12 +10,17 @@ import { z } from 'zod';
  *
  * Every document status except DRAFT, since drafts have not been sent to
  * recipients yet and must never be visible in the inbox.
+ *
+ * PENDING only covers documents that still need the user to act.
+ * PARTIALLY_APPROVED covers pending documents that the user has completed and
+ * that wait on other recipients.
  */
 export const INBOX_STATUSES = [
-  DocumentStatus.PENDING,
-  DocumentStatus.COMPLETED,
-  DocumentStatus.REJECTED,
-  DocumentStatus.CANCELLED,
+  ExtendedDocumentStatus.PENDING,
+  ExtendedDocumentStatus.PARTIALLY_APPROVED,
+  ExtendedDocumentStatus.COMPLETED,
+  ExtendedDocumentStatus.REJECTED,
+  ExtendedDocumentStatus.CANCELLED,
 ] as const;
 
 export const ZInboxStatusSchema = z.enum(INBOX_STATUSES);
