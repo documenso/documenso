@@ -138,7 +138,7 @@ export const OrganisationTeamsTable = () => {
         ),
       }}
     >
-      {(table) => results.totalPages > 1 && <DataTablePagination additionalInformation="VisibleCount" table={table} />}
+      {(table) => (results.totalPages > 1 || results.currentPage > 1) && <DataTablePagination additionalInformation="VisibleCount" table={table} />}
     </DataTable>
   );
 };
