@@ -7,7 +7,6 @@ import { MAX_PROFILE_BIO_LENGTH, ZUpdateTeamRequestSchema } from '@documenso/trp
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,7 +15,7 @@ import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
 import type { TeamProfile } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckSquareIcon, CopyIcon } from 'lucide-react';
+import { CheckIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
@@ -121,7 +120,7 @@ export const PublicProfileForm = ({ className, profile, onProfileUpdate }: Publi
   return (
     <Form {...form}>
       <form className={cn('flex w-full flex-col gap-y-4', className)} onSubmit={form.handleSubmit(onFormSubmit)}>
-        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
+        <fieldset className="flex w-full min-w-0 flex-col gap-y-4" disabled={isSubmitting}>
           <FormField
             control={form.control}
             name="url"
@@ -130,61 +129,63 @@ export const PublicProfileForm = ({ className, profile, onProfileUpdate }: Publi
                 <FormLabel>
                   <Trans>Public profile URL</Trans>
                 </FormLabel>
-                <FormControl>
-                  <Input {...field} disabled={field.disabled || !isPersonalLayoutMode} />
-                </FormControl>
+                <div
+                  className={cn(
+                    'flex h-10 w-full items-center overflow-hidden rounded-md border border-input bg-background pr-1.5 text-base ring-offset-background has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-ring has-[input:focus-visible]:ring-offset-2 md:text-sm',
+                    form.formState.errors.url && 'ring-2 ring-destructive',
+                  )}
+                >
+                  <span className="flex h-full select-none items-center whitespace-nowrap border-input border-r bg-muted/50 pr-2.5 pl-3 text-muted-foreground">
+                    {formatUserProfilePath('').replace(/https?:\/\//, '')}
+                  </span>
 
-                {!isPersonalLayoutMode && (
+                  <FormControl>
+                    <input
+                      {...field}
+                      className="h-full min-w-0 flex-1 bg-transparent px-2.5 placeholder:text-muted-foreground/40 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                      disabled={field.disabled || !isPersonalLayoutMode}
+                    />
+                  </FormControl>
+
+                  {field.value && (
+                    <Button
+                      type="button"
+                      variant="none"
+                      aria-label={_(msg`Copy profile URL`)}
+                      className="h-7 w-7 shrink-0 rounded p-0 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      onClick={async () => onCopy()}
+                    >
+                      <AnimatePresence mode="wait" initial={false}>
+                        <motion.div
+                          key={copiedTimeout ? 'copied' : 'copy'}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0, transition: { duration: 0.1 } }}
+                        >
+                          {copiedTimeout ? (
+                            <CheckIcon className="h-4 w-4 shrink-0" />
+                          ) : (
+                            <CopyIcon className="h-4 w-4 shrink-0" />
+                          )}
+                        </motion.div>
+                      </AnimatePresence>
+                    </Button>
+                  )}
+                </div>
+
+                {!isPersonalLayoutMode ? (
                   <p className="text-muted-foreground text-xs">
                     <Trans>You can update the profile URL by updating the team URL in the general settings page.</Trans>
                   </p>
+                ) : (
+                  !form.formState.errors.url && (
+                    <p className="text-muted-foreground text-xs">
+                      <Trans>A unique URL to access your profile</Trans>
+                    </p>
+                  )
                 )}
 
-                <div className="h-8">
-                  {!form.formState.errors.url && (
-                    <div className="h-8 text-muted-foreground text-sm">
-                      {field.value ? (
-                        <div>
-                          <Button
-                            type="button"
-                            variant="none"
-                            className="h-7 rounded bg-neutral-50 pr-0.5 pl-2 font-normal dark:border dark:border-neutral-500 dark:bg-neutral-600"
-                            onClick={async () => onCopy()}
-                          >
-                            <p>
-                              {formatUserProfilePath('').replace(/https?:\/\//, '')}
-                              <span className="font-semibold">{field.value}</span>
-                            </p>
-
-                            <div className="ml-1 flex h-6 w-6 items-center justify-center rounded transition-all hover:bg-neutral-200 hover:active:bg-neutral-300 dark:hover:bg-neutral-500 dark:hover:active:bg-neutral-400">
-                              <AnimatePresence mode="wait" initial={false}>
-                                <motion.div
-                                  key={copiedTimeout ? 'copied' : 'copy'}
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  exit={{ opacity: 0, transition: { duration: 0.1 } }}
-                                  className="absolute"
-                                >
-                                  {copiedTimeout ? (
-                                    <CheckSquareIcon className="h-3.5 w-3.5" />
-                                  ) : (
-                                    <CopyIcon className="h-3.5 w-3.5" />
-                                  )}
-                                </motion.div>
-                              </AnimatePresence>
-                            </div>
-                          </Button>
-                        </div>
-                      ) : (
-                        <p>
-                          <Trans>A unique URL to access your profile</Trans>
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  <FormMessage />
-                </div>
+                <FormMessage />
               </FormItem>
             )}
           />
