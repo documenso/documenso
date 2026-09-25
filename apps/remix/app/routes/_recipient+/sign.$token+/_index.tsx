@@ -8,7 +8,7 @@ import { readCscSadSessionFromRequest } from '@documenso/ee/server-only/signing/
 import { readCscServiceSessionFromRequest } from '@documenso/ee/server-only/signing/csc/cookies/service-session-cookie';
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
-import { IS_INSTANCE_CSC_MODE } from '@documenso/lib/constants/app';
+import { IS_INSTANCE_CSC_MODE, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { loadRecipientBrandingByTeamId } from '@documenso/lib/server-only/branding/load-recipient-branding';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
@@ -30,6 +30,8 @@ import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
+import { i18n } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { DocumentSigningOrder, DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 import { Clock8 } from 'lucide-react';
@@ -384,6 +386,33 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
     branding,
   } as const);
 }
+
+export const meta = ({ params }: Route.MetaArgs) => {
+  const { token } = params;
+  const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
+  const ogImageUrl = `${baseUrl}/sign/${token}/opengraph`;
+
+  const title = i18n._(msg`A document is waiting for your signature`);
+  const description = i18n._(
+    msg`Review and sign this document securely from your browser with Documenso, the open source signing platform.`,
+  );
+
+  return [
+    { title: i18n._(msg`Sign Document - Documenso`) },
+    // A leaf `meta` export replaces the parent's, so the recipient layout's
+    // robots tag has to be re-emitted here.
+    { name: 'robots', content: 'noindex, nofollow, noarchive, nosnippet, noimageindex' },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: ogImageUrl },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: ogImageUrl },
+  ];
+};
 
 export default function SigningPage() {
   const data = useSuperLoaderData<typeof loader>();
