@@ -92,7 +92,7 @@ export const getUploadErrorMessage = (code: string): ToastMessageDescriptor => {
     .with(AppErrorCode.TOO_MANY_REQUESTS, () => FAIR_USE_LIMIT_EXCEEDED_ERROR_MESSAGE)
     .with('INVALID_DOCUMENT_FILE', () => ({
       title: msg`Error`,
-      description: msg`You cannot upload encrypted PDFs.`,
+      description: msg`The file is not a valid PDF or is password protected.`,
     }))
     .with(AppErrorCode.LIMIT_EXCEEDED, () => ({
       title: msg`Error`,
