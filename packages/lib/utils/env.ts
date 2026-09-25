@@ -59,5 +59,11 @@ export const createPublicEnv = () => ({
   // Derived from the private Vertex credentials so the client can gate AI
   // feature UI on a boolean.
   NEXT_PUBLIC_AI_FEATURES_ENABLED:
-    process.env.GOOGLE_VERTEX_PROJECT_ID && process.env.GOOGLE_VERTEX_API_KEY ? 'true' : 'false',
+    (process.env.GOOGLE_VERTEX_PROJECT_ID || process.env.GOOGLE_VERTEX_SERVICE_ACCOUNT_KEY) &&
+    (process.env.GOOGLE_VERTEX_API_KEY ||
+      process.env.GOOGLE_VERTEX_SERVICE_ACCOUNT_KEY ||
+      process.env.GOOGLE_APPLICATION_CREDENTIALS ||
+      process.env.GOOGLE_VERTEX_USE_ADC === 'true')
+      ? 'true'
+      : 'false',
 });

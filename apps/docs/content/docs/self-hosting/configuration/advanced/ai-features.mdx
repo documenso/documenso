@@ -19,17 +19,40 @@ This guide covers how to enable the AI recipient and field detection features wh
 
 ## Prerequisites
 
-- A Google Cloud project with the **Vertex AI API** enabled and billing active.
-- A **Vertex AI Express API key** with access to Gemini models (create via the [Vertex AI Express flow](https://cloud.google.com/vertex-ai/generative-ai/docs/start/express-mode/overview) and manage keys in [API keys](https://cloud.google.com/vertex-ai/generative-ai/docs/start/api-keys)).
+- A Google Cloud project with the **Vertex AI API** (Agent Platform API) enabled and billing active.
+- Authentication credentials (one of the following):
+  - **Google Cloud Service Account (Recommended for Production)**: A Service Account with the `roles/aiplatform.user` (Vertex AI User / Agent Platform User) role. You can pass the JSON key (or base64-encoded JSON) via `GOOGLE_VERTEX_SERVICE_ACCOUNT_KEY`.
+  - **Application Default Credentials (ADC)**: When running on GCP (GCE/GKE/Cloud Run), set `GOOGLE_VERTEX_USE_ADC="true"` to authenticate via the environment's service account.
+  - **Vertex AI Express API key**: Generated via the [Vertex AI Express flow](https://cloud.google.com/vertex-ai/generative-ai/docs/start/express-mode/overview) and passed via `GOOGLE_VERTEX_API_KEY`.
 - Documenso version that includes the AI detection feature and the corresponding database migration.
 
 ## Configure Environment Variables
 
-Add these variables to your deployment `.env` (or secret manager):
+Add the variables to your deployment `.env` (or secret manager):
 
+### Option A: Service Account Key (Recommended)
+
+```env
+GOOGLE_VERTEX_PROJECT_ID="<your-gcp-project-id>"
+GOOGLE_VERTEX_SERVICE_ACCOUNT_KEY="<raw-json-or-base64-encoded-key>"
+# Optional, defaults to "global"
+GOOGLE_VERTEX_LOCATION="global"
 ```
+
+### Option B: Express API Key
+
+```env
 GOOGLE_VERTEX_PROJECT_ID="<your-gcp-project-id>"
 GOOGLE_VERTEX_API_KEY="<your-vertex-api-key>"
+# Optional, defaults to "global"
+GOOGLE_VERTEX_LOCATION="global"
+```
+
+### Option C: Application Default Credentials (ADC)
+
+```env
+GOOGLE_VERTEX_PROJECT_ID="<your-gcp-project-id>"
+GOOGLE_VERTEX_USE_ADC="true"
 # Optional, defaults to "global"
 GOOGLE_VERTEX_LOCATION="global"
 ```
