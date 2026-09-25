@@ -62,7 +62,10 @@ export const SignaturePadDialog = ({
         type="button"
         disabled={disabled}
         className="absolute inset-0 flex items-center justify-center bg-transparent"
-        onClick={() => setShowSignatureModal(true)}
+        onClick={() => {
+          setSignature(value ?? '');
+          setShowSignatureModal(true);
+        }}
         whileHover="onHover"
       >
         {!value && !disableAnimation && (
@@ -109,7 +112,19 @@ export const SignaturePadDialog = ({
         )}
       </motion.button>
 
-      <Dialog open={showSignatureModal} onOpenChange={disabled ? undefined : setShowSignatureModal}>
+      <Dialog
+        open={showSignatureModal}
+        onOpenChange={
+          disabled
+            ? undefined
+            : (open) => {
+                if (!open) {
+                  setSignature(value ?? '');
+                }
+                setShowSignatureModal(open);
+              }
+        }
+      >
         <DialogContent hideClose={true} className="p-6 pt-4">
           <SignaturePad
             id="signature"
