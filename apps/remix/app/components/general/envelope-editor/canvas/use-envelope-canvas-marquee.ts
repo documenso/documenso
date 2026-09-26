@@ -98,6 +98,14 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
       });
     };
 
+    /**
+     * Whether the pointer was actually dragged, as opposed to a plain click
+     * which leaves the rectangle without an area.
+     */
+    const isMarqueeDrawn = () => {
+      return selectionRectangle.visible() && selectionRectangle.width() > 0 && selectionRectangle.height() > 0;
+    };
+
     const onWindowPointerUp = () => {
       stopTrackingWindow();
 
@@ -110,6 +118,14 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
       setTimeout(() => {
         selectionRectangle.visible(false);
       });
+
+      // A plain click is not a selection, the click handler below deals with
+      // it. Selecting here would also match anything whose bounding box merely
+      // contains the point (e.g. a diagonal line), and since this runs after
+      // other window listeners it would override e.g. a content being placed.
+      if (!isMarqueeDrawn()) {
+        return;
+      }
 
       onSelectRef.current(selectionRectangle.getClientRect());
     };
@@ -158,7 +174,7 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
 
     stage.on('click.marquee tap.marquee', (e) => {
       // A marquee drag just finished, the selection was handled on mouse up.
-      if (selectionRectangle.visible() && selectionRectangle.width() > 0 && selectionRectangle.height() > 0) {
+      if (isMarqueeDrawn()) {
         return;
       }
 
