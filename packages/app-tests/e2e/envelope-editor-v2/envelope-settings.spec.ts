@@ -24,6 +24,7 @@ const TEST_SETTINGS_VALUES = {
   subject: 'E2E settings subject',
   message: 'E2E settings message',
   language: 'French',
+  allowDocumentRejection: 'No',
   dateFormat: 'DD/MM/YYYY',
   timezone: 'Europe/London',
   distributionMethod: 'None',
@@ -102,6 +103,10 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
 
   await signatureTypesCombobox.click();
   await root.getByRole('option', { name: 'Upload' }).click();
+  await clickSettingsDialogHeader(root);
+
+  await getComboboxByLabel(root, 'Allow Document Rejection').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.allowDocumentRejection, exact: true }).click();
   await clickSettingsDialogHeader(root);
 
   await getComboboxByLabel(root, 'Date Format').click();
@@ -265,6 +270,9 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
   await expect(root.locator('input[name="meta.redirectUrl"]')).toHaveValue(TEST_SETTINGS_VALUES.redirectUrl);
   await expect(getComboboxByLabel(root, 'Language')).toContainText(TEST_SETTINGS_VALUES.language);
   await expect(getComboboxByLabel(root, 'Allowed Signature Types')).not.toContainText('Upload');
+  await expect(getComboboxByLabel(root, 'Allow Document Rejection')).toContainText(
+    TEST_SETTINGS_VALUES.allowDocumentRejection,
+  );
   await expect(getComboboxByLabel(root, 'Date Format')).toContainText(TEST_SETTINGS_VALUES.dateFormat);
   await expect(getComboboxByLabel(root, 'Time Zone')).toContainText(TEST_SETTINGS_VALUES.timezone);
   await expect(root.locator('[data-testid="documentDistributionMethodSelectValue"]')).toContainText(
@@ -384,6 +392,7 @@ const assertEnvelopeSettingsPersistedInDatabase = async ({
   expect(envelope.documentMeta.drawSignatureEnabled).toBe(true);
   expect(envelope.documentMeta.typedSignatureEnabled).toBe(true);
   expect(envelope.documentMeta.uploadSignatureEnabled).toBe(false);
+  expect(envelope.documentMeta.allowDocumentRejection).toBe(false);
   expect(envelope.documentMeta.emailSettings).toMatchObject(DB_EXPECTED_VALUES.emailSettings);
 
   const authOptions = parseAuthOptions(envelope.authOptions);

@@ -33,6 +33,7 @@ export default function TeamsSettingsPage() {
         signatureTypes,
         defaultRecipients,
         delegateDocumentOwnership,
+        allowDocumentRejection,
         aiFeaturesEnabled,
       } = data;
 
@@ -57,6 +58,7 @@ export default function TeamsSettingsPage() {
                 drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
               }),
           delegateDocumentOwnership,
+          allowDocumentRejection,
         },
       });
 

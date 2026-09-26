@@ -583,6 +583,8 @@ model DocumentMeta {
 
   reminderSettings Json? /// [EnvelopeReminderSettings] @zod.custom.use(ZEnvelopeReminderSettingsSchema)
 
+  allowDocumentRejection Boolean @default(true)
+
   envelope Envelope?
 }
 
@@ -966,6 +968,7 @@ model OrganisationGlobalSettings {
   documentTimezone          String? // Nullable to allow using local timezones if not set.
   documentDateFormat        String             @default("yyyy-MM-dd hh:mm a")
   delegateDocumentOwnership Boolean            @default(false)
+  allowDocumentRejection    Boolean            @default(true)
 
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
@@ -1005,6 +1008,7 @@ model TeamGlobalSettings {
   documentTimezone          String?
   documentDateFormat        String?
   delegateDocumentOwnership Boolean?
+  allowDocumentRejection    Boolean?
 
   includeSenderDetails      Boolean?
   includeSigningCertificate Boolean?

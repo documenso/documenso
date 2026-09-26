@@ -48,6 +48,7 @@ export const ZEnvelopeForSigningResponse = z.object({
       uploadSignatureEnabled: true,
       drawSignatureEnabled: true,
       allowDictateNextSigner: true,
+      allowDocumentRejection: true,
       language: true,
     }),
     recipients: ZRecipientLiteSchema.pick({
