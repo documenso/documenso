@@ -65,13 +65,8 @@ type SyncEditorSelectionToCanvasOptions = {
    */
   selectedGroups: Konva.Group[];
 
-  select: (kind: EnvelopeCanvasSelectionKind, nodes: Konva.Node[], options?: { isAuto?: boolean }) => void;
+  select: (kind: EnvelopeCanvasSelectionKind, nodes: Konva.Node[]) => void;
   clear: () => void;
-
-  /**
-   * Whether a selection made by this sync counts as automatic.
-   */
-  isAuto: boolean;
 };
 
 /**
@@ -92,7 +87,6 @@ export const syncEditorSelectionToCanvas = ({
   selectedGroups,
   select,
   clear,
-  isAuto,
 }: SyncEditorSelectionToCanvasOptions) => {
   const isSingleSelection = selectedGroups.length === 1;
 
@@ -106,7 +100,7 @@ export const syncEditorSelectionToCanvas = ({
     const groupToSelect = layer.findOne(`#${editorFormId}`);
 
     if (groupToSelect instanceof Konva.Group) {
-      select(kind, [groupToSelect], { isAuto });
+      select(kind, [groupToSelect]);
     }
 
     return;

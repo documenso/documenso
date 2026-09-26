@@ -345,7 +345,6 @@ export const useEnvelopeCanvasContentsLayer = ({
         selectedGroups,
         select: selection.select,
         clear: selection.clear,
-        isAuto: false,
       });
     }
 

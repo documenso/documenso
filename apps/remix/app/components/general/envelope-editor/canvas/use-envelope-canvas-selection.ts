@@ -21,10 +21,6 @@ const EMPTY_GROUPS: Konva.Group[] = [];
 /** How far past a resize handle you can still grab it, in screen pixels. */
 const TRANSFORMER_ANCHOR_HIT_STROKE_PX = 24;
 
-type SelectOptions = {
-  isAuto?: boolean;
-};
-
 type UseEnvelopeCanvasSelectionOptions = {
   /**
    * Resolve the transformer configuration for a selection.
@@ -106,7 +102,7 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
   }, []);
 
   const select = useCallback(
-    (kind: EnvelopeCanvasSelectionKind, nodes: Konva.Node[], options?: SelectOptions) => {
+    (kind: EnvelopeCanvasSelectionKind, nodes: Konva.Node[]) => {
       const groupName = ENVELOPE_CANVAS_GROUP_NAMES[kind];
 
       const groups = nodes.filter(
@@ -117,7 +113,7 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
           Boolean(node.getParent()),
       );
 
-      applySelection(groups.length > 0 ? { kind, groups, isAuto: Boolean(options?.isAuto) } : null);
+      applySelection(groups.length > 0 ? { kind, groups } : null);
     },
     [applySelection],
   );
@@ -169,7 +165,7 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
         .find(`.${ENVELOPE_CANVAS_GROUP_NAMES[currentSelection.kind]}`)
         .filter((group) => selectedIds.has(group.id()));
 
-      select(currentSelection.kind, groups, { isAuto: currentSelection.isAuto });
+      select(currentSelection.kind, groups);
     },
     [select],
   );

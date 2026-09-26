@@ -376,8 +376,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
       selection.select('field', liveSelectedGroups);
     }
 
-    // Newly created fields are auto selected, which suppresses the action bar
-    // so it can't intercept the next placement click.
     syncEditorSelectionToCanvas({
       layer,
       kind: 'field',
@@ -386,7 +384,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
       selectedGroups,
       select: selection.select,
       clear: selection.clear,
-      isAuto: true,
     });
 
     applyPageItemsVisibility();

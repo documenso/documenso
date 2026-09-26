@@ -49,10 +49,7 @@ test('a selected field survives zooming', async ({ page }) => {
   await root.getByRole('button', { name: 'Signature', exact: true }).click();
   await getPageCanvas(root).click({ position: { x: 160, y: 160 } });
 
-  // A freshly placed field is auto selected, which deliberately suppresses
-  // the action bar, so click it to make it a real selection.
-  await selectContentOnCanvas(root, { x: 160, y: 160 });
-
+  // A freshly placed field is selected, with its action bar showing.
   await expect.poll(() => getKonvaTransformerNodeCountForPage(root, 1)).toBe(1);
   await expect(root.getByTestId('envelope-canvas-action-bar')).toBeVisible();
 

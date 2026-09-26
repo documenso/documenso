@@ -83,7 +83,7 @@ type EnvelopeEditorContentDragDropProps = {
 };
 
 export const EnvelopeEditorContentDragDrop = ({ selectedEnvelopeItemId }: EnvelopeEditorContentDragDropProps) => {
-  const { envelope, editorContents } = useCurrentEnvelopeEditor();
+  const { envelope, editorContents, setIsPlacingItem } = useCurrentEnvelopeEditor();
 
   const organisation = useCurrentOrganisation();
 
@@ -95,6 +95,16 @@ export const EnvelopeEditorContentDragDrop = ({ selectedEnvelopeItemId }: Envelo
   );
 
   const [selectedContent, setSelectedContent] = useState<ContentDragDropItem | null>(null);
+
+  // Let the canvas know a content is being placed, so it can get its selection
+  // out of the way of the placement click.
+  useEffect(() => {
+    setIsPlacingItem(selectedContent !== null);
+
+    return () => {
+      setIsPlacingItem(false);
+    };
+  }, [selectedContent, setIsPlacingItem]);
 
   const { isWithinPageBounds, getPage } = useDocumentElement();
 

@@ -14,6 +14,7 @@ import { useLingui } from '@lingui/react/macro';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { CopyPlusIcon, TrashIcon } from 'lucide-react';
+import { useEffect } from 'react';
 import { match } from 'ts-pattern';
 import {
   EnvelopeCanvasActionBar,
@@ -54,7 +55,7 @@ const getNodeSelectionKind = (node: Konva.Node): EnvelopeCanvasSelectionKind | n
 
 export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t } = useLingui();
-  const { envelope, editorFields, editorContents, selectedEditorTab } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, editorContents, selectedEditorTab, isPlacingItem } = useCurrentEnvelopeEditor();
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
   const organisation = useCurrentOrganisation();
 
@@ -135,6 +136,28 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     onSelect: (box) => (isContentsEditable ? contents.selectInBox(box) : fields.selectInBox(box)),
     onEmptyClick: selection.clear,
   });
+
+  /**
+   * Picking a field or content from the palette drops the selection and any
+   * pending creation, so nothing floating over the page sits under the
+   * placement click.
+   *
+   * The action bar and pending menus are DOM elements above the canvas, so a
+   * placement click landing on one would press its button as well as placing
+   * the item, and by then the button acts on the item which was just placed
+   * (e.g. removing it).
+   */
+  useEffect(() => {
+    if (!isPlacingItem) {
+      return;
+    }
+
+    fields.clearPending();
+    contents.clearPending();
+    selection.clear();
+
+    pageLayer.current?.batchDraw();
+  }, [isPlacingItem]);
 
   /**
    * Initialize the Konva page canvas and all fields, contents and interactions.
@@ -234,7 +257,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   return (
     <>
       {currentSelection?.kind === 'field' && (
-        <EnvelopeCanvasActionBar nodes={currentSelection.groups} hidden={isTransforming || currentSelection.isAuto}>
+        <EnvelopeCanvasActionBar nodes={currentSelection.groups} hidden={isTransforming}>
           <EnvelopeCanvasFieldActionButtons
             selectedFieldFormIds={currentSelection.groups.map((group) => group.id())}
             onDuplicate={fields.duplicateSelected}

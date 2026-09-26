@@ -37,12 +37,6 @@ export type EnvelopeCanvasSelectionKind = 'field' | 'content';
 export type EnvelopeCanvasSelection = {
   kind: EnvelopeCanvasSelectionKind;
   groups: Konva.Group[];
-
-  /**
-   * Whether the selection was made programmatically (e.g. on creation) rather
-   * than by the user.
-   */
-  isAuto: boolean;
 } | null;
 
 /**

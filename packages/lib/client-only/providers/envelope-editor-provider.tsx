@@ -69,6 +69,17 @@ type EnvelopeEditorProviderValue = {
   selectedEditorTab: EnvelopeEditorTab;
   setSelectedEditorTab: (tab: EnvelopeEditorTab) => void;
 
+  /**
+   * Whether a field or content has been picked from the palette and is
+   * waiting to be placed on the page.
+   *
+   * The canvas drops its selection while this is set, so nothing floating
+   * over the page (the transformer, the action bar) sits under the
+   * placement click.
+   */
+  isPlacingItem: boolean;
+  setIsPlacingItem: (isPlacingItem: boolean) => void;
+
   isAutosaving: boolean;
   flushAutosave: () => Promise<TEditorEnvelope>;
   autosaveError: boolean;
@@ -158,6 +169,8 @@ export const EnvelopeEditorProvider = ({
   const [autosaveError, setAutosaveError] = useState<boolean>(false);
 
   const [selectedEditorTab, setSelectedEditorTab] = useState<EnvelopeEditorTab>('fields');
+
+  const [isPlacingItem, setIsPlacingItem] = useState(false);
 
   const isCscMode = IS_INSTANCE_CSC_MODE();
 
@@ -655,6 +668,8 @@ export const EnvelopeEditorProvider = ({
         editorRecipients,
         selectedEditorTab,
         setSelectedEditorTab,
+        isPlacingItem,
+        setIsPlacingItem,
         autosaveError,
         flushAutosave,
         isAutosaving,
