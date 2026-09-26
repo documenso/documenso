@@ -122,7 +122,7 @@ export const EnvelopeItemEditDialog = ({
 
       toast({
         title: t`Failed to read file`,
-        description: t`The file is not a valid PDF.`,
+        description: t`The file is not a valid PDF or is password protected.`,
         variant: 'destructive',
       });
     }

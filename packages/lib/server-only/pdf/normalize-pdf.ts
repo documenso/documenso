@@ -9,14 +9,18 @@ export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean
     console.error(`PDF normalization error: ${e.message}`);
 
     throw new AppError('INVALID_DOCUMENT_FILE', {
-      message: 'The document is not a valid PDF',
+      message: 'The document is not a valid PDF or is password protected',
     });
   });
 
   if (pdfDoc.isEncrypted) {
-    throw new AppError('INVALID_DOCUMENT_FILE', {
-      message: 'The document is encrypted',
-    });
+    if (!pdfDoc.isAuthenticated) {
+      throw new AppError('INVALID_DOCUMENT_FILE', {
+        message: 'The document is password protected',
+      });
+    }
+
+    pdfDoc.removeProtection({ ignorePermissions: true });
   }
 
   pdfDoc.flattenLayers();
