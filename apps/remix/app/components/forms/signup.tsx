@@ -64,6 +64,8 @@ export type SignUpFormProps = {
   isMicrosoftSignupEnabled?: boolean;
   isOidcSignupEnabled?: boolean;
   returnTo?: string;
+  termsUrl: string;
+  privacyUrl: string;
 };
 
 export const SignUpForm = ({
@@ -74,6 +76,8 @@ export const SignUpForm = ({
   isMicrosoftSignupEnabled,
   isOidcSignupEnabled,
   returnTo,
+  termsUrl,
+  privacyUrl,
 }: SignUpFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -410,7 +414,7 @@ export const SignUpForm = ({
           <Trans>
             By proceeding, you agree to our{' '}
             <Link
-              to="https://documen.so/terms"
+              to={termsUrl}
               target="_blank"
               className="text-documenso-700 duration-200 hover:opacity-70"
             >
@@ -418,7 +422,7 @@ export const SignUpForm = ({
             </Link>{' '}
             and{' '}
             <Link
-              to="https://documen.so/privacy"
+              to={privacyUrl}
               target="_blank"
               className="text-documenso-700 duration-200 hover:opacity-70"
             >
