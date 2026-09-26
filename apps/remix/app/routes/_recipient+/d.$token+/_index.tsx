@@ -15,7 +15,10 @@ import { redirect } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
-import { DirectTemplateInvalidPageView } from '~/components/general/direct-template/direct-template-invalid-page';
+import {
+  DirectTemplateInvalidPageView,
+  type DirectTemplateInvalidReason,
+} from '~/components/general/direct-template/direct-template-invalid-page';
 import { DirectTemplatePageView } from '~/components/general/direct-template/direct-template-page';
 import { DirectTemplateAuthPageView } from '~/components/general/direct-template/direct-template-signing-auth-page';
 import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
@@ -77,13 +80,13 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
   if (recipientsWithMissingFields.length > 0) {
     return {
       isAccessAuthValid: true,
-      isTemplateMissingSignatures: true,
+      invalidReason: 'MISSING_SIGNATURE_FIELD',
     } as const;
   }
 
   return {
     isAccessAuthValid: true,
-    isTemplateMissingSignatures: false,
+    invalidReason: null,
     template: {
       ...template,
       folder: null,
@@ -108,7 +111,7 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
     .then((envelopeForSigning) => {
       return {
         isDocumentAccessValid: true,
-        isTemplateMissingSignatures: false,
+        invalidReason: null,
         envelopeForSigning,
       } as const;
     })
@@ -121,10 +124,18 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
         } as const;
       }
 
-      if (error.code === AppErrorCode.MISSING_SIGNATURE_FIELD) {
+      // Reasons the template renders but cannot be submitted, reported up
+      // front rather than once the signer has filled everything in.
+      const invalidReason = match(error.code)
+        .returnType<DirectTemplateInvalidReason | null>()
+        .with(AppErrorCode.MISSING_SIGNATURE_FIELD, () => 'MISSING_SIGNATURE_FIELD')
+        .with('MISSING_CONTENT_IMAGE', () => 'MISSING_CONTENT_IMAGE')
+        .otherwise(() => null);
+
+      if (invalidReason) {
         return {
           isDocumentAccessValid: true,
-          isTemplateMissingSignatures: true,
+          invalidReason,
         } as const;
       }
 
@@ -201,8 +212,8 @@ const DirectSigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV
     return <DirectTemplateAuthPageView />;
   }
 
-  if (data.isTemplateMissingSignatures) {
-    return <DirectTemplateInvalidPageView />;
+  if (data.invalidReason) {
+    return <DirectTemplateInvalidPageView reason={data.invalidReason} />;
   }
 
   const { template, directTemplateRecipient } = data;
@@ -259,8 +270,8 @@ const DirectSigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV
     return <DocumentSigningAuthPageView email={''} emailHasAccount={true} />;
   }
 
-  if (data.isTemplateMissingSignatures) {
-    return <DirectTemplateInvalidPageView />;
+  if (data.invalidReason) {
+    return <DirectTemplateInvalidPageView reason={data.invalidReason} />;
   }
 
   const { envelope, recipient } = data.envelopeForSigning;
@@ -283,6 +294,7 @@ const DirectSigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV
           version="current"
           envelope={envelope}
           envelopeItems={envelope.envelopeItems}
+          contents={envelope.contents}
           token={recipient.token}
         >
           <DocumentSigningPageViewV2 />

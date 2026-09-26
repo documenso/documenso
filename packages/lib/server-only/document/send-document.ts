@@ -37,9 +37,11 @@ import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.
 import { isDocumentCompleted } from '../../utils/document';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { assertEnvelopeContentLimits, getContentsMissingImages } from '../../utils/envelope-content';
 import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { insertContentsIntoEnvelopeItem } from '../envelope-content/insert-contents-into-envelope-item';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -73,6 +75,13 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
       },
       fields: true,
       documentMeta: true,
+      contents: {
+        select: {
+          id: true,
+          dataContentId: true,
+          contentMeta: true,
+        },
+      },
       envelopeItems: {
         select: {
           id: true,
@@ -93,6 +102,8 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
               organisationClaim: {
                 select: {
                   recipientCount: true,
+                  envelopeContentCount: true,
+                  envelopeContentImageCount: true,
                 },
               },
             },
@@ -186,6 +197,22 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     }
   });
 
+  // Validate that every image content has an image, since they
+  // render nothing otherwise and the document would silently ship without them.
+  const contentsMissingImages = getContentsMissingImages(envelope.contents);
+
+  if (contentsMissingImages.length > 0) {
+    throw new AppError('MISSING_CONTENT_IMAGE', {
+      message: `The following contents have no image attached: ${contentsMissingImages.map((content) => content.id).join(', ')}.`,
+      statusCode: 400,
+    });
+  }
+
+  assertEnvelopeContentLimits(
+    envelope.contents.map((content) => content.contentMeta.type),
+    envelope.team.organisation.organisationClaim,
+  );
+
   // Validate that recipients who require fields (e.g., signers need signature fields) have them.
   const recipientsWithMissingFields = getRecipientsWithMissingFields(envelope.recipients, envelope.fields);
 
@@ -197,6 +224,14 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     throw new AppError(AppErrorCode.MISSING_SIGNATURE_FIELD, {
       message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
     });
+  }
+
+  if (envelope.status === DocumentStatus.DRAFT) {
+    await Promise.all(
+      envelope.envelopeItems.map(async (envelopeItem) => {
+        await insertContentsIntoEnvelopeItem({ envelopeItemId: envelopeItem.id });
+      }),
+    );
   }
 
   const allRecipientsHaveNoActionToTake = envelope.recipients.every(

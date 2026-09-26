@@ -18,6 +18,8 @@ import {
   ZGetEnvelopeItemFileTokenRequestParamsSchema,
   ZUploadPdfRequestSchema,
 } from './files.types';
+import getDataContentImageRoute from './routes/get-data-content-image';
+import getDataContentImageByTokenRoute from './routes/get-data-content-image-by-token';
 import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
 import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
 
@@ -342,3 +344,7 @@ export const filesRoute = new Hono<HonoEnv>()
 // Is different to the other file endpoints since it uses documentDataId for hard caching.
 filesRoute.route('/', getEnvelopeItemPdfRoute);
 filesRoute.route('/', getEnvelopeItemPdfByTokenRoute);
+
+// Content image routes for both tokens and auth based, hard cached by dataContentId.
+filesRoute.route('/', getDataContentImageRoute);
+filesRoute.route('/', getDataContentImageByTokenRoute);

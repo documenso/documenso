@@ -209,7 +209,6 @@ export const TemplatesTable = ({
             <div className="flex items-center gap-x-4">
               <TemplateUseDialog
                 envelopeId={row.original.envelopeId}
-                templateId={row.original.id}
                 templateSigningOrder={row.original.templateMeta?.signingOrder}
                 documentDistributionMethod={row.original.templateMeta?.distributionMethod}
                 recipients={row.original.recipients}

@@ -577,6 +577,7 @@ const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loade
           version="current"
           envelope={envelope}
           envelopeItems={envelope.envelopeItems}
+          contents={envelope.contents}
           token={recipient.token}
         >
           <DocumentSigningPageViewV2 />

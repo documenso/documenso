@@ -2,12 +2,46 @@ import type { DocumentDataVersion } from '@documenso/lib/types/document';
 import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { getRecipientColor } from '@documenso/ui/lib/recipient-colors';
-import type { Field, Recipient } from '@prisma/client';
+import type { EnvelopeContent, Field, Recipient } from '@prisma/client';
 import type React from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { clamp } from 'remeda';
 
 import type { TEnvelope } from '../../types/envelope';
+import { areContentsImprinted } from '../../utils/envelope';
+
+/**
+ * The minimum content data required to render a content.
+ */
+export type EnvelopeRenderContent = Pick<EnvelopeContent, 'id' | 'envelopeItemId' | 'contentMeta' | 'dataContentId'>;
+
+import type { EnvelopePageItemsVisibility } from '../../types/envelope-page-items-visibility';
 import type { FieldRenderMode } from '../../universal/field-renderer/field-renderer';
+import { type ContentImages, useContentImages } from '../hooks/use-content-images';
+
+export const ENVELOPE_VIEWER_MIN_ZOOM = 0.5;
+export const ENVELOPE_VIEWER_MAX_ZOOM = 2;
+export const ENVELOPE_VIEWER_ZOOM_STEP = 0.25;
+
+/**
+ * User controls for the envelope PDF viewer, shared across the editor, signing
+ * and preview surfaces.
+ *
+ * Written by the viewer toolbar and consumed by the PDF viewer (zoom) and
+ * `usePageRenderer` (fields/contents visibility).
+ */
+export type EnvelopeViewerControls = {
+  zoom: number;
+  setZoom: (zoom: number) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+
+  fieldsVisibility: EnvelopePageItemsVisibility;
+  setFieldsVisibility: (visibility: EnvelopePageItemsVisibility) => void;
+
+  contentsVisibility: EnvelopePageItemsVisibility;
+  setContentsVisibility: (visibility: EnvelopePageItemsVisibility) => void;
+};
 
 /**
  * The signature data for an inserted signature field.
@@ -28,9 +62,33 @@ export type PageRenderData = {
   pageWidth: number;
   pageHeight: number;
   imageLoadingState: ImageLoadingState;
+
+  /**
+   * Report whether everything drawn on the page is ready.
+   *
+   * A page renderer may have to load things of its own (e.g. the images of
+   * the page's contents), which it can only start once the page image is
+   * ready. The page waits for this so it is never shown half drawn.
+   */
+  onReadyChange?: (isReady: boolean) => void;
 };
 
 export type ImageLoadingState = 'loading' | 'loaded' | 'error';
+
+export type PageSize = {
+  width: number;
+  height: number;
+};
+
+/**
+ * The unscaled sizes of the pages rendered so far, registered by the page
+ * renderers so page relative geometry can be computed outside of them, e.g.
+ * by the settings panel.
+ */
+export type PageSizeRegistry = {
+  register: (envelopeItemId: string, pageNumber: number, size: PageSize) => void;
+  get: (envelopeItemId: string, pageNumber: number) => PageSize | null;
+};
 
 type EnvelopeRenderOverrideSettings = {
   mode?: FieldRenderMode;
@@ -60,6 +118,15 @@ type EnvelopeRenderProviderValue = {
   currentEnvelopeItem: EnvelopeRenderItem | null;
   setCurrentEnvelopeItem: (envelopeItemId: string) => void;
   fields: Field[];
+  contents: EnvelopeRenderContent[];
+
+  /**
+   * The images of the image contents, loaded ahead of rendering.
+   */
+  contentImages: ContentImages;
+
+  pageSizes: PageSizeRegistry;
+
   signatures: EnvelopeRenderFieldSignature[];
   recipients: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>[];
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
@@ -67,6 +134,8 @@ type EnvelopeRenderProviderValue = {
   renderError: boolean;
   setRenderError: (renderError: boolean) => void;
   overrideSettings?: EnvelopeRenderOverrideSettings;
+
+  viewerControls: EnvelopeViewerControls;
 };
 
 interface EnvelopeRenderProviderProps {
@@ -99,6 +168,13 @@ interface EnvelopeRenderProviderProps {
    * Only pass if the CustomRenderer you are passing in wants fields.
    */
   fields?: Field[];
+
+  /**
+   * Optional contents which are passed down to renderers for custom rendering needs.
+   *
+   * Only pass if the CustomRenderer you are passing in wants contents.
+   */
+  contents?: EnvelopeRenderContent[];
 
   /**
    * Optional inserted signature data for signature fields.
@@ -157,6 +233,7 @@ export const EnvelopeRenderProvider = ({
   envelope,
   envelopeItems: envelopeItemsFromProps,
   fields,
+  contents,
   signatures,
   token,
   presignToken,
@@ -165,6 +242,36 @@ export const EnvelopeRenderProvider = ({
   overrideSettings,
 }: EnvelopeRenderProviderProps) => {
   const [renderError, setRenderError] = useState<boolean>(false);
+
+  const [zoom, setZoomInternal] = useState<number>(1);
+  const [fieldsVisibility, setFieldsVisibility] = useState<EnvelopePageItemsVisibility>('visible');
+  const [contentsVisibility, setContentsVisibility] = useState<EnvelopePageItemsVisibility>('visible');
+
+  const setZoom = useCallback((value: number) => {
+    setZoomInternal(clamp(value, { min: ENVELOPE_VIEWER_MIN_ZOOM, max: ENVELOPE_VIEWER_MAX_ZOOM }));
+  }, []);
+
+  const zoomIn = useCallback(() => {
+    setZoomInternal((prev) => Math.min(ENVELOPE_VIEWER_MAX_ZOOM, prev + ENVELOPE_VIEWER_ZOOM_STEP));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setZoomInternal((prev) => Math.max(ENVELOPE_VIEWER_MIN_ZOOM, prev - ENVELOPE_VIEWER_ZOOM_STEP));
+  }, []);
+
+  const viewerControls = useMemo(
+    (): EnvelopeViewerControls => ({
+      zoom,
+      setZoom,
+      zoomIn,
+      zoomOut,
+      fieldsVisibility,
+      setFieldsVisibility,
+      contentsVisibility,
+      setContentsVisibility,
+    }),
+    [zoom, setZoom, zoomIn, zoomOut, fieldsVisibility, contentsVisibility],
+  );
 
   const envelopeItems = useMemo(
     () =>
@@ -213,6 +320,34 @@ export const EnvelopeRenderProvider = ({
     }
   }, [currentItem, envelopeItems]);
 
+  // Once an envelope is sealed the contents are imprinted onto the current
+  // PDF and are not rendered, so their images are not loaded either.
+  const isContentsImprinted = version === 'current' && areContentsImprinted(envelope.status);
+
+  const contentImages = useContentImages({
+    envelopeId: envelope.id,
+    envelopeItemId: currentItem?.id ?? null,
+    contents: isContentsImprinted ? [] : (contents ?? []),
+    token,
+    presignToken,
+  });
+
+  // Sizes do not drive rendering, so a ref avoids re-rendering the tree as
+  // pages register themselves.
+  const pageSizesRef = useRef(new Map<string, PageSize>());
+
+  const pageSizes = useMemo(
+    (): PageSizeRegistry => ({
+      register: (envelopeItemId, pageNumber, size) => {
+        pageSizesRef.current.set(`${envelopeItemId}:${pageNumber}`, size);
+      },
+      get: (envelopeItemId, pageNumber) => {
+        return pageSizesRef.current.get(`${envelopeItemId}:${pageNumber}`) ?? null;
+      },
+    }),
+    [],
+  );
+
   const recipientIds = useMemo(() => recipients.map((recipient) => recipient.id).sort(), [recipients]);
 
   const getRecipientColorKey = useCallback(
@@ -230,12 +365,16 @@ export const EnvelopeRenderProvider = ({
         currentEnvelopeItem: currentItem,
         setCurrentEnvelopeItem,
         fields: fields ?? [],
+        contents: contents ?? [],
+        contentImages,
+        pageSizes,
         signatures: signatures ?? [],
         recipients,
         getRecipientColorKey,
         renderError,
         setRenderError,
         overrideSettings,
+        viewerControls,
       }}
     >
       {children}

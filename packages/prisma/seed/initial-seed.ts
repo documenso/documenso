@@ -1,11 +1,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import {
+  CONTENT_ALIGNMENT_LOGO_PNG,
+  CONTENT_ALIGNMENT_TEST_CONTENTS,
+} from '@documenso/app-tests/constants/content-alignment-pdf';
 import { ALIGNMENT_TEST_FIELDS } from '@documenso/app-tests/constants/field-alignment-pdf';
 import { FIELD_META_TEST_FIELDS } from '@documenso/app-tests/constants/field-meta-pdf';
 import { OVERFLOW_TEST_FIELDS } from '@documenso/app-tests/constants/field-overflow-pdf';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
+import { createDataContentImage } from '@documenso/lib/server-only/data-content/create-data-content-image';
 import { incrementDocumentId, incrementTemplateId } from '@documenso/lib/server-only/envelope/increment-id';
+import { ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';
 import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL, DIRECT_TEMPLATE_RECIPIENT_NAME } from '../../lib/constants/direct-templates';
@@ -230,6 +236,21 @@ export const seedDatabase = async () => {
       insertFields: true,
       status: DocumentStatus.PENDING,
     }),
+    seedContentAlignmentTestDocument({
+      userId: exampleUser.user.id,
+      teamId: exampleUser.team.id,
+      recipientName: exampleUser.user.name || '',
+      recipientEmail: exampleUser.user.email,
+      status: DocumentStatus.DRAFT,
+    }),
+    seedContentAlignmentTestDocument({
+      userId: exampleUser.user.id,
+      teamId: exampleUser.team.id,
+      recipientName: exampleUser.user.name || '',
+      recipientEmail: exampleUser.user.email,
+      status: DocumentStatus.DRAFT,
+      type: EnvelopeType.TEMPLATE,
+    }),
     seedAlignmentTestDocument({
       userId: adminUser.user.id,
       teamId: adminUser.team.id,
@@ -440,6 +461,154 @@ export const seedAlignmentTestDocument = async ({
   return await prisma.envelope.findFirstOrThrow({
     where: {
       id: createdEnvelope.id,
+    },
+    include: {
+      recipients: true,
+      envelopeItems: true,
+    },
+  });
+};
+
+/**
+ * Seed a document with the content alignment PDF and one of every content
+ * variant placed on its labelled grid, used for the content visual regression
+ * test and for eyeballing content rendering in the editor.
+ *
+ * A single signature field sits in a spare cell so the document can be
+ * signed and sealed.
+ */
+export const seedContentAlignmentTestDocument = async ({
+  userId,
+  teamId,
+  title = 'Envelope Content Alignment Test',
+  recipientName,
+  recipientEmail,
+  status,
+  type = EnvelopeType.DOCUMENT,
+}: {
+  userId: number;
+  teamId: number;
+  title?: string;
+  recipientName: string;
+  recipientEmail: string;
+  status: DocumentStatus;
+  type?: EnvelopeType;
+}) => {
+  const contentAlignmentPdf = fs
+    .readFileSync(path.join(__dirname, '../../../assets/content-alignment.pdf'))
+    .toString('base64');
+
+  const documentData = await createDocumentData({ documentData: contentAlignmentPdf });
+
+  const secondaryId =
+    type === EnvelopeType.DOCUMENT
+      ? await incrementDocumentId().then((v) => v.formattedDocumentId)
+      : await incrementTemplateId().then((v) => v.formattedTemplateId);
+
+  const documentMeta = await prisma.documentMeta.create({
+    data: {},
+  });
+
+  const createdEnvelope = await prisma.envelope.create({
+    data: {
+      id: prefixedId('envelope'),
+      secondaryId,
+      internalVersion: 2,
+      signatureLevel: SignatureLevel.SES,
+      type,
+      documentMetaId: documentMeta.id,
+      source: DocumentSource.DOCUMENT,
+      title,
+      status,
+      envelopeItems: {
+        create: {
+          id: prefixedId('envelope_item'),
+          title: 'content-alignment-pdf',
+          documentDataId: documentData.id,
+          order: 1,
+        },
+      },
+      userId,
+      teamId,
+      recipients: {
+        create: {
+          name: recipientName,
+          email: recipientEmail,
+          token: nanoid(),
+          sendStatus: status === 'DRAFT' ? SendStatus.NOT_SENT : SendStatus.SENT,
+          signingStatus: status === 'COMPLETED' ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+          readStatus: status !== 'DRAFT' ? ReadStatus.OPENED : ReadStatus.NOT_OPENED,
+        },
+      },
+    },
+    include: {
+      recipients: true,
+      envelopeItems: true,
+    },
+  });
+
+  const { id, recipients, envelopeItems } = createdEnvelope;
+  const recipientId = recipients[0].id;
+  const envelopeItemId = envelopeItems[0].id;
+
+  // The one field, in the spare cell of the text page's rotation row.
+  await prisma.field.create({
+    data: {
+      type: 'SIGNATURE',
+      fieldMeta: { type: 'signature', overflow: 'auto' },
+      page: 1,
+      positionX: 66,
+      positionY: 60,
+      width: 28,
+      height: 7,
+      recipientId,
+      envelopeItemId,
+      envelopeId: id,
+      customText: '',
+      inserted: false,
+    },
+  });
+
+  // Contents sharing a zIndex are stacked by id, and ids are random. Hand the
+  // ids out in sorted order so the listed order of the fixture is also the
+  // stacking order, which keeps the equal zIndex case deterministic.
+  const contentIds = CONTENT_ALIGNMENT_TEST_CONTENTS.map(() => prefixedId('envelope_content')).sort();
+
+  // Images go through the real upload normalization so the stored bytes and
+  // content meta match what the editor would produce. One data content per
+  // content, since each content owns its data.
+  for (const [index, content] of CONTENT_ALIGNMENT_TEST_CONTENTS.entries()) {
+    let dataContentId: string | null = null;
+
+    if (content.image === 'logo') {
+      const dataContent = await createDataContentImage({
+        file: {
+          name: 'logo.png',
+          arrayBuffer: async () =>
+            CONTENT_ALIGNMENT_LOGO_PNG.buffer.slice(
+              CONTENT_ALIGNMENT_LOGO_PNG.byteOffset,
+              CONTENT_ALIGNMENT_LOGO_PNG.byteOffset + CONTENT_ALIGNMENT_LOGO_PNG.byteLength,
+            ) as ArrayBuffer,
+        },
+      });
+
+      dataContentId = dataContent.id;
+    }
+
+    await prisma.envelopeContent.create({
+      data: {
+        id: contentIds[index],
+        envelopeId: id,
+        envelopeItemId,
+        contentMeta: ZEnvelopeContentMetaSchema.parse(content.contentMeta),
+        dataContentId,
+      },
+    });
+  }
+
+  return await prisma.envelope.findFirstOrThrow({
+    where: {
+      id,
     },
     include: {
       recipients: true,
