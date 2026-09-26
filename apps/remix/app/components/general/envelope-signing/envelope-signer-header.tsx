@@ -17,6 +17,7 @@ import { match } from 'ts-pattern';
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { BrandingLogo } from '~/components/general/branding-logo';
+import { PublicLegalLinks } from '~/components/general/public-legal-links';
 
 import { BrandingLogoIcon } from '../branding-logo-icon';
 import { DocumentSigningRejectDialog } from '../document-signing/document-signing-reject-dialog';
@@ -68,8 +69,10 @@ export const EnvelopeSignerHeader = () => {
       </div>
 
       {/* Right side - Desktop content */}
-      <div className="hidden items-center space-x-2 lg:flex">
-        <p className="mr-2 flex-shrink-0 text-muted-foreground text-sm">
+      <div className="hidden items-center space-x-4 lg:flex">
+        <PublicLegalLinks />
+
+        <p className="flex-shrink-0 text-muted-foreground text-sm">
           <Plural one="1 Field Remaining" other="# Fields Remaining" value={recipientFieldsRemaining.length} />
         </p>
 
