@@ -246,6 +246,21 @@ export const EnvelopeEditorFieldsPage = () => {
     editorFields.setSelectedRecipient(firstSelectableRecipient?.id ?? null);
   }, []);
 
+  /**
+   * Deselect a field or content which is not on the current envelope item
+   * when the item changes, otherwise its settings stay open in the sidebar for
+   * something which is no longer on screen.
+   */
+  useEffect(() => {
+    if (editorFields.selectedField && editorFields.selectedField.envelopeItemId !== currentEnvelopeItem?.id) {
+      editorFields.setSelectedField(null);
+    }
+
+    if (editorContents.selectedContent && editorContents.selectedContent.envelopeItemId !== currentEnvelopeItem?.id) {
+      editorContents.setSelectedContent(null);
+    }
+  }, [currentEnvelopeItem?.id]);
+
   const onDetectClick = () => {
     if (!team.preferences.aiFeaturesEnabled) {
       setIsAiEnableDialogOpen(true);
