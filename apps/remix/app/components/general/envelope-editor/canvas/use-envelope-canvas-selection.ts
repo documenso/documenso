@@ -68,11 +68,16 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
   const selectionRef = useLatestRef(selection);
 
   /**
-   * Re-resolve the transformer configuration for the current selection, for
-   * when the selected items change in a way which affects it (e.g. an image
-   * being attached to a selected content) without the selection changing.
+   * Re-sync the transformer after the items change without the selection
+   * changing: re-resolve its configuration (e.g. an image attached to the
+   * selected content locks its ratio) and raise it back above the items.
+   *
+   * The handles straddle the selected item's edges, so any item stacked above
+   * the transformer hides part of them and takes their clicks. Rendering
+   * appends new items on top and the contents stacking raises every content,
+   * so each reconcile calls this afterwards.
    */
-  const refreshTransformerConfig = useCallback(() => {
+  const refreshTransformer = useCallback(() => {
     const transformer = transformerRef.current;
 
     if (!transformer) {
@@ -80,6 +85,7 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
     }
 
     applyTransformerConfig(transformer, selectionRef.current);
+    transformer.moveToTop();
     transformer.forceUpdate();
   }, [applyTransformerConfig]);
 
@@ -96,6 +102,9 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
     if (nextSelection?.groups.length === 1) {
       nextSelection.groups[0].moveToTop();
     }
+
+    // Above the item just raised, so its handles stay visible and clickable.
+    transformer?.moveToTop();
 
     setSelectionState(nextSelection);
     onChangeRef.current(nextSelection);
@@ -186,7 +195,6 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
       keepRatio: false,
       borderStroke: selectionColor,
       anchorStroke: selectionColor,
-      shouldOverdrawWholeArea: true,
       ignoreStroke: true,
       flipEnabled: false,
       anchorStyleFunc: (anchor) => {
@@ -243,7 +251,7 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
     toggle,
     clear,
     isSelected,
-    refreshTransformerConfig,
+    refreshTransformer,
   };
 };
 

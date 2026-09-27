@@ -27,6 +27,10 @@ type ContentGroupPosition = {
  * Draws a box content type's own nodes inside the group, after the shared
  * frame (group, position, hover outline) has been set up.
  *
+ * Called on every render, and again on every tick of a resize with the box
+ * at its current size, so it must lay everything out from `geometry` rather
+ * than assume the size is settled.
+ *
  * `meta` is any box content; the renderer narrows it to its own type via
  * `assertContentMetaType`.
  */
@@ -67,11 +71,59 @@ export const renderBoxContent = (
     rotation: getContentRotation(meta),
   });
 
-  renderChildren({ contentGroup, meta, geometry });
+  /**
+   * Lay the content out at a box: the type's own nodes, then the shared hover
+   * outline around them.
+   */
+  const layoutBox = (box: Rect) => {
+    renderChildren({ contentGroup, meta, geometry: box });
 
-  createContentHoverInteraction(contentGroup, content, options, geometry.width, geometry.height);
+    createContentHoverInteraction(contentGroup, content, options, box.width, box.height);
+  };
+
+  layoutBox(geometry);
+
+  bindBoxContentResize(contentGroup, layoutBox);
 
   return contentGroup;
+};
+
+/**
+ * Keep a box content's strokes and text unscaled while it is being resized.
+ *
+ * The transformer resizes by scaling the group, which scales everything in
+ * it: strokes thicken unevenly and dash patterns stretch until the gesture
+ * ends and the box is re-rendered from its written back size. So on every
+ * transform tick the group scale is folded into the box size, the content is
+ * laid out again at that size and the scale is reset, as the multi item
+ * fields do.
+ *
+ * The write back reads the bounds size multiplied by the group scale, which
+ * folding the scale in early leaves unchanged.
+ */
+const bindBoxContentResize = (contentGroup: Konva.Group, layoutBox: (box: Rect) => void) => {
+  contentGroup.off('transform.contentBox');
+
+  contentGroup.on('transform.contentBox', () => {
+    const boundsNode = contentGroup.findOne(`.${CONTENT_BOUNDS_NODE_NAME}`);
+
+    if (!boundsNode) {
+      return;
+    }
+
+    const box: Rect = {
+      x: contentGroup.x(),
+      y: contentGroup.y(),
+      width: boundsNode.width() * contentGroup.scaleX(),
+      height: boundsNode.height() * contentGroup.scaleY(),
+    };
+
+    contentGroup.scale({ x: 1, y: 1 });
+
+    layoutBox(box);
+
+    contentGroup.getLayer()?.batchDraw();
+  });
 };
 
 /**

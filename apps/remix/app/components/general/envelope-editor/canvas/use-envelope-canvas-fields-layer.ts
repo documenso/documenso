@@ -388,7 +388,7 @@ export const useEnvelopeCanvasFieldsLayer = ({
 
     applyPageItemsVisibility();
 
-    selection.refreshTransformerConfig();
+    selection.refreshTransformer();
 
     layer.batchDraw();
   }, [

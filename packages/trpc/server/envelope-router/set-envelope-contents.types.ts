@@ -17,7 +17,9 @@ export const ZSetEnvelopeContentsRequestSchema = z.object({
       dataContentId: z
         .string()
         .nullable()
-        .describe('The id of an uploaded data content (e.g. an image) to attach, or null for none.'),
+        .describe(
+          'The id of a data content (e.g. an image) already attached to a content on this envelope, or null for none. New images are attached via the upload image route.',
+        ),
     }),
   ),
 });

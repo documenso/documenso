@@ -10,7 +10,7 @@ import { generateDatabaseId } from '../../universal/id';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData, diffContentChanges } from '../../utils/document-audit-logs';
 import { canContentBeChanged, type EnvelopeIdOptions } from '../../utils/envelope';
-import { assertEnvelopeContentSaveWithinLimits, getDataContentIds } from '../../utils/envelope-content';
+import { assertEnvelopeContentSaveWithinLimits } from '../../utils/envelope-content';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type SetEnvelopeContentsOptions = {
@@ -38,8 +38,15 @@ export type SetEnvelopeContentsOptions = {
     contentMeta: TEnvelopeContentMetaInput;
 
     /**
-     * The ID of an uploaded data content (e.g. an image) to attach to the
-     * content, or null for none.
+     * The ID of a data content (e.g. an image) to attach to the content, or
+     * null for none.
+     *
+     * This ID must already be attached to the content, or be null to remove an image.
+     *
+     * This ID parameter is only here to allow users to duplicate data content without
+     * reuploading it.
+     *
+     * To attach a new image you must go through trpc.envelope.content.uploadImage
      */
     dataContentId: string | null;
   }[];
@@ -51,9 +58,6 @@ export type SetEnvelopeContentsOptions = {
  *
  * Existing contents not present in the list are deleted, contents with a
  * matching ID are updated, and the rest are created.
- *
- * Data contents referenced by the list are attached. They are shared rather
- * than copied, and never deleted once no longer referenced.
  */
 export const setEnvelopeContents = async ({
   userId,
@@ -77,7 +81,16 @@ export const setEnvelopeContents = async ({
           id: true,
         },
       },
-      contents: true,
+      contents: {
+        include: {
+          dataContent: {
+            select: {
+              id: true,
+              metadata: true,
+            },
+          },
+        },
+      },
       team: {
         select: {
           organisation: {
@@ -109,7 +122,14 @@ export const setEnvelopeContents = async ({
     });
   }
 
-  const existingContents = envelope.contents;
+  const existingContents = envelope.contents.map(({ dataContent: _dataContent, ...content }) => content);
+
+  // Create a map of all the existing data contents on this envelope.
+  const attachedDataContents = new Map(
+    envelope.contents.flatMap((content) =>
+      content.dataContent ? [[content.dataContent.id, content.dataContent]] : [],
+    ),
+  );
 
   // The organisation's plan caps how much content an envelope may hold.
   assertEnvelopeContentSaveWithinLimits({
@@ -121,25 +141,6 @@ export const setEnvelopeContents = async ({
   const removedContents = existingContents.filter(
     (existingContent) => !contents.some((content) => content.id === existingContent.id),
   );
-
-  const requestedDataContentIds = getDataContentIds(contents);
-
-  // A data content is an immutable blob which any number of contents may point
-  // at, so it is shared rather than copied. Knowing its ID is all that is
-  // needed to attach it: the IDs are random and unguessable, and attaching one
-  // only lets its bytes be displayed, so there is no ownership check.
-  let requestedDataContents: DataContent[] = [];
-
-  // Verify that the data contents exist.
-  if (requestedDataContentIds.length > 0) {
-    requestedDataContents = await prisma.dataContent.findMany({
-      where: {
-        id: {
-          in: requestedDataContentIds,
-        },
-      },
-    });
-  }
 
   const linkedContents = contents.map((content) => {
     const foundEnvelopeItem = envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === content.envelopeItemId);
@@ -169,7 +170,7 @@ export const setEnvelopeContents = async ({
     return {
       ...content,
       contentMeta,
-      dataContentId: resolveDataContentId(content.dataContentId, contentMeta.type, requestedDataContents),
+      dataContentId: resolveDataContentId(content.dataContentId, contentMeta.type, attachedDataContents),
       _persisted: persisted,
     };
   });
@@ -331,18 +332,22 @@ export const setEnvelopeContents = async ({
 
 /**
  * The data content to attach to a content, or null for none. Throws if the
- * data content does not exist or is not the type the content type can hold.
+ * data content is not already attached to the envelope or is not the type the
+ * content type can hold.
+ *
+ * Deliberately reports an unattached data content as not found rather than
+ * forbidden, so the response does not reveal whether the ID exists.
  */
 const resolveDataContentId = (
   dataContentId: string | null | undefined,
   contentType: EnvelopeContentType,
-  dataContents: Pick<DataContent, 'id' | 'metadata'>[],
+  attachedDataContents: Map<string, Pick<DataContent, 'id' | 'metadata'>>,
 ) => {
   if (!dataContentId) {
     return null;
   }
 
-  const dataContent = dataContents.find((item) => item.id === dataContentId);
+  const dataContent = attachedDataContents.get(dataContentId);
 
   if (!dataContent) {
     throw new AppError(AppErrorCode.NOT_FOUND, {

@@ -350,9 +350,7 @@ export const useEnvelopeCanvasContentsLayer = ({
 
     applyPageItemsVisibility();
 
-    // Contents may have changed in a way which affects the transformer, e.g.
-    // an image attached to the selected content locks its ratio.
-    selection.refreshTransformerConfig();
+    selection.refreshTransformer();
 
     layer.batchDraw();
   }, [

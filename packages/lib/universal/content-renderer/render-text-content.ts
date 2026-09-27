@@ -79,7 +79,7 @@ export const renderTextContentElement = (content: ContentToRender, options: Rend
       fill: color,
     } satisfies Partial<Konva.TextConfig>);
 
-    const hitRect = upsertContentHitRect(contentGroup, content, geometry.width, geometry.height);
+    upsertContentHitRect(contentGroup, content, geometry.width, geometry.height);
 
     // A persistent dashed outline marks the text box bounds while editing,
     // matching the image placeholder treatment, since the text itself
@@ -109,74 +109,5 @@ export const renderTextContentElement = (content: ContentToRender, options: Rend
 
     // Keep the text above the outline so the dashes never cross the glyphs.
     contentText.moveToTop();
-
-    contentGroup.off('transform.contentText');
-    contentGroup.off('transformend.contentText');
-
-    // The transformer resizes by scaling the group. Counter-scale the text so it
-    // keeps its real size while the box visibly resizes, laying it out against
-    // the scaled bounds in unscaled units. Mirrors the generic text field.
-    contentGroup.on('transform.contentText', () => {
-      const groupScaleX = contentGroup.scaleX();
-      const groupScaleY = contentGroup.scaleY();
-
-      contentText.scaleX(1 / groupScaleX);
-      contentText.scaleY(1 / groupScaleY);
-
-      const scaledWidth = hitRect.width() * groupScaleX;
-      const scaledHeight = hitRect.height() * groupScaleY;
-
-      // During the active transform use the crop bounds (content box only).
-      contentText.x(0);
-      contentText.y(0);
-      contentText.width(scaledWidth);
-      contentText.height(scaledHeight);
-      contentText.wrap('word');
-
-      contentGroup.getLayer()?.batchDraw();
-    });
-
-    // Once the gesture settles, recalculate the overflow layout against the new
-    // box dimensions. The page renderer subsequently re-renders from the
-    // persisted geometry, which resets the group scale.
-    contentGroup.on('transformend.contentText', () => {
-      const groupScaleX = contentGroup.scaleX();
-      const groupScaleY = contentGroup.scaleY();
-
-      contentText.scaleX(1);
-      contentText.scaleY(1);
-
-      const newWidth = hitRect.width() * groupScaleX;
-      const newHeight = hitRect.height() * groupScaleY;
-
-      const newOverflowLayout = calculateOverflowLayout({
-        overflowMode: CONTENT_TEXT_OVERFLOW_MODE,
-        isLabel: false,
-        textToRender,
-        fontSize,
-        fontFamily: konvaTextFontFamily,
-        lineHeight,
-        letterSpacing,
-        textAlign,
-        verticalAlign,
-        baseX: 0,
-        baseY: 0,
-        baseWidth: newWidth,
-        baseHeight: newHeight,
-        groupX: contentGroup.x(),
-        groupY: contentGroup.y(),
-        pageWidth,
-        pageHeight,
-      });
-
-      contentText.x(newOverflowLayout.x);
-      contentText.y(newOverflowLayout.y);
-      contentText.width(newOverflowLayout.width);
-      contentText.height(newOverflowLayout.height);
-      contentText.wrap(newOverflowLayout.wrap);
-      contentText.verticalAlign(newOverflowLayout.verticalAlign);
-
-      contentGroup.getLayer()?.batchDraw();
-    });
   });
 };
