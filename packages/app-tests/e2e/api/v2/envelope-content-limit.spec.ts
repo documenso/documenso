@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { createDataContentImage } from '@documenso/lib/server-only/data-content/create-data-content-image';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
-import { DataContentType } from '@documenso/lib/types/data-content-meta';
 import { EnvelopeContentType, ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
@@ -25,6 +25,7 @@ test.describe.configure({
 });
 
 const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf'));
+const logoPngBuffer = fs.readFileSync(path.join(__dirname, '../../../../../packages/assets/logo.png'));
 
 /**
  * Set the content allowances on the organisation that owns the seeded team.
@@ -76,8 +77,8 @@ const createEnvelope = async (request: APIRequestContext, authToken: string) => 
  * `imageCount` are image contents, then attempt to distribute it.
  *
  * Contents are inserted directly since they are not part of the public API.
- * Image contents are given an image so the send is not rejected for the
- * unrelated reason of an image content having no image.
+ * Image contents are given a real image, since sending rejects an image
+ * content without one and decodes it to draw it into the PDF.
  */
 const buildAndDistributeEnvelopeWithContents = async ({
   request,
@@ -144,20 +145,8 @@ const buildAndDistributeEnvelopeWithContents = async ({
 
   const dataContentIds = await Promise.all(
     Array.from({ length: imageCount }).map(async () => {
-      const dataContent = await prisma.dataContent.create({
-        data: {
-          id: generateDatabaseId('data'),
-          type: 'BYTES_64',
-          data: 'aW1hZ2U=',
-          metadata: {
-            type: DataContentType.IMAGE,
-            width: 10,
-            height: 10,
-            mimeType: 'image/png',
-            fileName: 'image.png',
-            fileSize: 5,
-          },
-        },
+      const dataContent = await createDataContentImage({
+        file: { name: 'logo.png', arrayBuffer: async () => new Uint8Array(logoPngBuffer).buffer as ArrayBuffer },
       });
 
       return dataContent.id;
