@@ -9,7 +9,7 @@ export const ZFindOrganisationStatsRequestSchema = ZFindSearchParamsSchema.exten
     .optional(),
   claimId: z.string().describe('Filter stats by the original subscription claim ID.').optional(),
   orderByColumn: z
-    .enum(['documentCount', 'emailCount', 'apiCount', 'emailReports', 'totalCount'])
+    .enum(['documentCount', 'emailCount', 'apiCount', 'emailReports', 'teamCount', 'totalCount'])
     .describe('The column to sort by.')
     .optional(),
   orderByDirection: z.enum(['asc', 'desc']).describe('Sort direction.').default('desc'),
@@ -27,6 +27,7 @@ export const ZFindOrganisationStatsResponseSchema = ZFindResultResponse.extend({
       emailCount: z.number(),
       apiCount: z.number(),
       emailReports: z.number(),
+      teamCount: z.number(),
       documentQuota: z.number().nullable(),
       emailQuota: z.number().nullable(),
       apiQuota: z.number().nullable(),
