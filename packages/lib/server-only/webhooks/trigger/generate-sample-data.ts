@@ -46,6 +46,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
       typedSignatureEnabled: true,
       uploadSignatureEnabled: true,
       drawSignatureEnabled: true,
+      qrSignatureEnabled: true,
       language: 'en',
       distributionMethod: DocumentDistributionMethod.EMAIL,
       emailSettings: null,

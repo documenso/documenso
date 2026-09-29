@@ -111,6 +111,7 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
                 <FormControl>
                   <SignaturePadDialog
                     disabled={isSubmitting}
+                    qrSignatureContext={{ type: 'PROFILE_SIGNATURE' }}
                     fullName={user.name ?? ''}
                     value={value}
                     onChange={(v) => onChange(v ?? '')}

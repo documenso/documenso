@@ -37,6 +37,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       typedSignatureEnabled,
       uploadSignatureEnabled,
       drawSignatureEnabled,
+      qrSignatureEnabled,
       defaultRecipients,
       delegateDocumentOwnership,
       envelopeExpirationPeriod,
@@ -104,6 +105,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       uploadSignatureEnabled ?? organisation.organisationGlobalSettings.uploadSignatureEnabled;
     const derivedDrawSignatureEnabled =
       drawSignatureEnabled ?? organisation.organisationGlobalSettings.drawSignatureEnabled;
+    const derivedQrSignatureEnabled = qrSignatureEnabled ?? organisation.organisationGlobalSettings.qrSignatureEnabled;
 
     const derivedDelegateDocumentOwnership =
       delegateDocumentOwnership ?? organisation.organisationGlobalSettings.delegateDocumentOwnership;
@@ -111,7 +113,8 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
     if (
       derivedTypedSignatureEnabled === false &&
       derivedUploadSignatureEnabled === false &&
-      derivedDrawSignatureEnabled === false
+      derivedDrawSignatureEnabled === false &&
+      derivedQrSignatureEnabled === false
     ) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
         message: 'At least one signature type must be enabled',
@@ -165,6 +168,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             typedSignatureEnabled,
             uploadSignatureEnabled,
             drawSignatureEnabled,
+            qrSignatureEnabled,
             defaultRecipients: defaultRecipients === null ? Prisma.DbNull : defaultRecipients,
             delegateDocumentOwnership: derivedDelegateDocumentOwnership,
             envelopeExpirationPeriod: envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,

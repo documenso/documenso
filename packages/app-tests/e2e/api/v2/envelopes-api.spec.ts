@@ -196,6 +196,7 @@ test.describe('API V2 Envelopes', () => {
           typedSignatureEnabled: true,
           uploadSignatureEnabled: false,
           drawSignatureEnabled: false,
+          qrSignatureEnabled: false,
           emailReplyTo: userA.email,
           emailSettings: {
             recipientSigningRequest: false,
@@ -295,6 +296,7 @@ test.describe('API V2 Envelopes', () => {
       expect(envelope.documentMeta.typedSignatureEnabled).toBe(payload.meta.typedSignatureEnabled);
       expect(envelope.documentMeta.uploadSignatureEnabled).toBe(payload.meta.uploadSignatureEnabled);
       expect(envelope.documentMeta.drawSignatureEnabled).toBe(payload.meta.drawSignatureEnabled);
+      expect(envelope.documentMeta.qrSignatureEnabled).toBe(payload.meta.qrSignatureEnabled);
       expect(envelope.documentMeta.emailReplyTo).toBe(payload.meta.emailReplyTo);
       expect(envelope.documentMeta.emailSettings).toEqual(payload.meta.emailSettings);
 

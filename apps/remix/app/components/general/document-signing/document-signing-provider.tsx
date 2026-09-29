@@ -33,6 +33,7 @@ export interface DocumentSigningProviderProps {
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
+  qrSignatureEnabled?: boolean;
   children: React.ReactNode;
 }
 
@@ -43,6 +44,7 @@ export const DocumentSigningProvider = ({
   typedSignatureEnabled = true,
   uploadSignatureEnabled = true,
   drawSignatureEnabled = true,
+  qrSignatureEnabled = true,
   children,
 }: DocumentSigningProviderProps) => {
   const [fullName, setFullName] = useState(initialFullName || '');
@@ -54,7 +56,7 @@ export const DocumentSigningProvider = ({
       const sig = initialSignature || '';
       const isBase64 = isBase64Image(sig);
 
-      if (isBase64 && (uploadSignatureEnabled || drawSignatureEnabled)) {
+      if (isBase64 && (uploadSignatureEnabled || drawSignatureEnabled || qrSignatureEnabled)) {
         return sig;
       }
 

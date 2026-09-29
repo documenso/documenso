@@ -1,3 +1,4 @@
+import type { TQrSignatureContext } from '@documenso/lib/types/qr-signature';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
@@ -13,10 +14,21 @@ export type SignFieldSignatureDialogProps = {
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
+  qrSignatureEnabled?: boolean;
+  qrSignatureContext?: TQrSignatureContext;
 };
 
 export const SignFieldSignatureDialog = createCallable<SignFieldSignatureDialogProps, string | null>(
-  ({ call, fullName, typedSignatureEnabled, uploadSignatureEnabled, drawSignatureEnabled, initialSignature }) => {
+  ({
+    call,
+    fullName,
+    typedSignatureEnabled,
+    uploadSignatureEnabled,
+    drawSignatureEnabled,
+    qrSignatureEnabled,
+    qrSignatureContext,
+    initialSignature,
+  }) => {
     const [localSignature, setLocalSignature] = useState(initialSignature);
 
     return (
@@ -36,6 +48,8 @@ export const SignFieldSignatureDialog = createCallable<SignFieldSignatureDialogP
               typedSignatureEnabled={typedSignatureEnabled}
               uploadSignatureEnabled={uploadSignatureEnabled}
               drawSignatureEnabled={drawSignatureEnabled}
+              qrSignatureEnabled={qrSignatureEnabled}
+              qrSignatureContext={qrSignatureContext}
             />
           </div>
 

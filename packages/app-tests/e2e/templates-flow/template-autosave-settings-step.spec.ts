@@ -152,6 +152,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
       expect(retrievedTemplate.templateMeta?.drawSignatureEnabled).toBe(false);
       expect(retrievedTemplate.templateMeta?.typedSignatureEnabled).toBe(false);
       expect(retrievedTemplate.templateMeta?.uploadSignatureEnabled).toBe(true);
+      expect(retrievedTemplate.templateMeta?.qrSignatureEnabled).toBe(true);
     }).toPass();
   });
 

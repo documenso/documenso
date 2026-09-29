@@ -17,6 +17,7 @@ export enum DocumentSignatureType {
   DRAW = 'draw',
   TYPE = 'type',
   UPLOAD = 'upload',
+  QR = 'qr',
 }
 
 export const formatTeamUrl = (teamUrl: string, baseUrl?: string) => {
@@ -97,10 +98,16 @@ export const extractTeamSignatureSettings = (
     typedSignatureEnabled: boolean | null;
     drawSignatureEnabled: boolean | null;
     uploadSignatureEnabled: boolean | null;
+    qrSignatureEnabled: boolean | null;
   } | null,
 ) => {
   if (!settings) {
-    return [DocumentSignatureType.TYPE, DocumentSignatureType.UPLOAD, DocumentSignatureType.DRAW];
+    return [
+      DocumentSignatureType.TYPE,
+      DocumentSignatureType.UPLOAD,
+      DocumentSignatureType.DRAW,
+      DocumentSignatureType.QR,
+    ];
   }
 
   const signatureTypes: DocumentSignatureType[] = [];
@@ -115,6 +122,10 @@ export const extractTeamSignatureSettings = (
 
   if (settings.uploadSignatureEnabled) {
     signatureTypes.push(DocumentSignatureType.UPLOAD);
+  }
+
+  if (settings.qrSignatureEnabled) {
+    signatureTypes.push(DocumentSignatureType.QR);
   }
 
   return signatureTypes;
@@ -190,6 +201,7 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
     typedSignatureEnabled: null,
     uploadSignatureEnabled: null,
     drawSignatureEnabled: null,
+    qrSignatureEnabled: null,
 
     brandingEnabled: null,
     brandingLogo: null,

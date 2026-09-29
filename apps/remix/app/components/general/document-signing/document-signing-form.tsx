@@ -260,6 +260,8 @@ export const DocumentSigningForm = ({
                         typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
                         uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
                         drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
+                        qrSignatureEnabled={document.documentMeta?.qrSignatureEnabled}
+                        qrSignatureContext={{ type: 'DOCUMENT_SIGNATURE', recipientToken: recipient.token }}
                       />
                     </div>
                   )}

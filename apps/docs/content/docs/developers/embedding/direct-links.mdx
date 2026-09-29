@@ -390,6 +390,7 @@ const response = await fetch(`${BASE_URL}/template/update`, {
       typedSignatureEnabled: true, // Allow typed signatures
       drawSignatureEnabled: true, // Allow drawn signatures
       uploadSignatureEnabled: false, // Disable uploaded signatures
+      qrSignatureEnabled: true, // Allow QR code handoff to a mobile device
     },
   }),
 });
