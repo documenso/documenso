@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
@@ -54,6 +55,7 @@ export type EmbedSignDocumentV1ClientPageProps = {
   completedFields: DocumentField[];
   metadata?: DocumentMeta | null;
   isCompleted?: boolean;
+  isRejected?: boolean;
   hidePoweredBy?: boolean;
   allowWhitelabelling?: boolean;
   allRecipients?: RecipientWithFields[];
@@ -69,19 +71,23 @@ export const EmbedSignDocumentV1ClientPage = ({
   completedFields,
   metadata,
   isCompleted,
+  isRejected,
   hidePoweredBy = false,
   allowWhitelabelling = false,
   allRecipients = [],
 }: EmbedSignDocumentV1ClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const { fullName, email, signature, setFullName, setEmail, setSignature } = useRequiredDocumentSigningContext();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
   const [hasCompletedDocument, setHasCompletedDocument] = useState(isCompleted);
-  const [hasRejectedDocument, setHasRejectedDocument] = useState(recipient.signingStatus === SigningStatus.REJECTED);
+  const [hasRejectedDocument, setHasRejectedDocument] = useState(
+    isRejected ?? recipient.signingStatus === SigningStatus.REJECTED,
+  );
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(
     allRecipients.length > 0 ? allRecipients[0].id : null,
   );
@@ -154,6 +160,14 @@ export const EmbedSignDocumentV1ClientPage = ({
 
       setHasCompletedDocument(true);
     } catch (err) {
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'complete_document',
+        recipientId: recipient.id,
+        documentId,
+        envelopeId,
+      });
+
       if (window.parent) {
         window.parent.postMessage(
           {
@@ -236,11 +250,58 @@ export const EmbedSignDocumentV1ClientPage = ({
       }
     } catch (err) {
       console.error(err);
+
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'embed_init',
+        recipientId: recipient.id,
+        documentId,
+        envelopeId,
+      });
+
       setHasFinishedInit(true);
     }
 
     // !: While the two setters are stable we still want to ensure we're avoiding
     // !: re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!window.parent) {
+      return;
+    }
+
+    if (hasRejectedDocument) {
+      window.parent.postMessage(
+        {
+          action: 'document-rejected',
+          data: {
+            token,
+            documentId,
+            recipientId: recipient.id,
+          },
+        },
+        '*',
+      );
+
+      return;
+    }
+
+    if (hasCompletedDocument) {
+      window.parent.postMessage(
+        {
+          action: 'document-completed',
+          data: {
+            token,
+            documentId,
+            recipientId: recipient.id,
+          },
+        },
+        '*',
+      );
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

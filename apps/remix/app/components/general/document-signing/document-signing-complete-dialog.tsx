@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { type TRecipientAccessAuth, ZDocumentAccessAuthSchema } from '@documenso/lib/types/document-auth';
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
@@ -88,6 +89,7 @@ export const DocumentSigningCompleteDialog = ({
   position,
   disableNameInput = false,
 }: DocumentSigningCompleteDialogProps) => {
+  const analytics = useAnalytics();
   const { t, i18n } = useLingui();
   const { toast } = useToast();
 
@@ -100,8 +102,10 @@ export const DocumentSigningCompleteDialog = ({
 
   const { isNameLocked, isEmailLocked } = useEmbedSigningContext() || {};
 
+  const canDictateNextSigner = allowDictateNextSigner && Boolean(defaultNextSigner);
+
   const form = useForm<TNextSignerFormSchema>({
-    resolver: allowDictateNextSigner ? zodResolver(ZNextSignerFormSchema) : undefined,
+    resolver: canDictateNextSigner ? zodResolver(ZNextSignerFormSchema) : undefined,
     defaultValues: {
       name: defaultNextSigner?.name ?? '',
       email: defaultNextSigner?.email ?? '',
@@ -178,6 +182,11 @@ export const DocumentSigningCompleteDialog = ({
 
         return;
       }
+
+      analytics.captureException(error, {
+        source: 'signing',
+        location: 'complete_document',
+      });
 
       // This dialog owns the completion error toast for every signing surface
       // so the user gets a specific, actionable message. Callers should run
@@ -317,7 +326,7 @@ export const DocumentSigningCompleteDialog = ({
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onFormSubmit)}>
-                {allowDictateNextSigner && defaultNextSigner && (
+                {canDictateNextSigner && (
                   <div className="mb-4 flex flex-col gap-4">
                     <div className="flex flex-col gap-4 md:flex-row">
                       <FormField

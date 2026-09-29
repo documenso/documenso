@@ -1,4 +1,3 @@
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
@@ -20,7 +19,8 @@ import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 import { CheckCircle2Icon, ChevronRightIcon, PencilIcon, TerminalIcon, XCircleIcon } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { debounce, parseAsString, useQueryState } from 'nuqs';
+import { useMemo } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
@@ -51,13 +51,14 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
   const { toast } = useToast();
 
   const { pathname } = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
   const team = useCurrentTeam();
 
-  const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
-
-  const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
+  const [searchQuery, setSearchQuery] = useQueryState(
+    'query',
+    parseAsString.withDefault('').withOptions({ shallow: false, limitUrlUpdates: debounce(500) }),
+  );
 
   const parsedSearchParams = WebhookSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
@@ -80,26 +81,6 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
     events: parsedSearchParams.events,
     query: parsedSearchParams.query,
   });
-
-  /**
-   * Handle debouncing the search query.
-   */
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams?.toString());
-
-    params.set('query', debouncedSearchQuery);
-
-    if (debouncedSearchQuery === '') {
-      params.delete('query');
-    }
-
-    // If nothing  to change then do nothing.
-    if (params.toString() === searchParams?.toString()) {
-      return;
-    }
-
-    setSearchParams(params);
-  }, [debouncedSearchQuery, pathname, searchParams]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({
@@ -252,8 +233,8 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
       <div className="mt-4">
         <div className="mb-4 flex flex-row items-center justify-between gap-x-4">
           <Input
-            defaultValue={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => void setSearchQuery(e.target.value || null)}
             placeholder={t`Search by ID`}
           />
 

@@ -119,7 +119,7 @@ Full reference in the [V2 OpenAPI reference](https://openapi.documenso.com).
 | ------------------------------------------------- | ----------------------------------------------------- |
 | `GET /api/v2/document`                            | `GET /api/v2/envelope`                                |
 | `GET /api/v2/document/{documentId}`               | `GET /api/v2/envelope/{envelopeId}`                   |
-| `POST /api/v2/document/get-many`                  | `POST /api/v2/envelope/get-many`                      |
+| `POST /api/v2/document/get-many`                  | `POST /api/v2/envelope/get-many` (body changes from `documentIds: number[]` to `ids: { type: "documentId"; ids: number[] }`) |
 | `POST /api/v2/document/create`                    | `POST /api/v2/envelope/create`                        |
 | `POST /api/v2/document/create/beta`               | `POST /api/v2/envelope/create`                        |
 | `POST /api/v2/document/update`                    | `POST /api/v2/envelope/update`                        |
@@ -140,7 +140,7 @@ Full reference in the [V2 OpenAPI reference](https://openapi.documenso.com).
 | ------------------------------------- | ------------------------------------------------ |
 | `GET /api/v2/template`                | `GET /api/v2/envelope` (with `type=TEMPLATE`)    |
 | `GET /api/v2/template/{templateId}`   | `GET /api/v2/envelope/{envelopeId}`              |
-| `POST /api/v2/template/get-many`      | `POST /api/v2/envelope/get-many`                 |
+| `POST /api/v2/template/get-many`      | `POST /api/v2/envelope/get-many` (body changes from `templateIds: number[]` to `ids: { type: "templateId"; ids: number[] }`) |
 | `POST /api/v2/template/create`        | `POST /api/v2/envelope/create` (`type=TEMPLATE`) |
 | `POST /api/v2/template/create/beta`   | `POST /api/v2/envelope/create` (`type=TEMPLATE`) |
 | `POST /api/v2/template/update`        | `POST /api/v2/envelope/update`                   |

@@ -26,16 +26,16 @@
     "nanoid": "^5.1.6",
     "prisma": "^6.19.0",
     "prisma-extension-kysely": "^3.0.0",
-    "prisma-kysely": "^2.3.0",
-    "prisma-json-types-generator": "^3.6.2",
     "ts-pattern": "^5.9.0",
-    "zod": "^3.25.76",
-    "zod-prisma-types": "3.3.5"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",
+    "prisma-kysely": "^2.3.0",
+    "prisma-json-types-generator": "^3.6.2",
     "tsx": "^4.23.1",
-    "typescript": "5.6.2"
+    "typescript": "5.6.2",
+    "zod-prisma-types": "3.3.5"
   }
 }
