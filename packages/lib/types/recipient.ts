@@ -135,4 +135,4 @@ export const ZRecipientEmailSchema = z.union([z.literal(''), zEmail('Invalid ema
 export const ZRecipientSigningOrderSchema = z
   .number()
   .int('Signing order must be an integer')
-  .min(1, 'Signing order must be greater than 0');
+  .min(0, 'Signing order must be equal to or greater than 0');
