@@ -172,39 +172,15 @@ export const useEditorRecipients = ({ envelope }: EditorRecipientsProps): UseEdi
       return !canRecipientBeModified(persistedRecipient, envelope.fields);
     };
 
-    // A recipient without a persisted order means "last" everywhere else — the
-    // server sorts NULLS LAST. Continue numbering after the highest existing
-    // order rather than guessing from array position: a guess can land on a
-    // real order, and equal orders now mean "same signing step".
-    let fallbackOrder = sourceRecipients.reduce(
-      (highest, recipient) => Math.max(highest, recipient.signingOrder ?? 0),
-      0,
-    );
-
-    const signingOrderByRecipientId = new Map<number, number | undefined>();
-
-    for (const recipient of sourceRecipients) {
-      if (isCcRecipient(recipient)) {
-        signingOrderByRecipientId.set(recipient.id, undefined);
-      } else if (typeof recipient.signingOrder === 'number') {
-        signingOrderByRecipientId.set(recipient.id, recipient.signingOrder);
-      } else if (isRecipientLocked(recipient.id)) {
-        // A locked null order must round-trip as-is: a synthetic number would
-        // read as a change to a recipient the server refuses to modify.
-        signingOrderByRecipientId.set(recipient.id, undefined);
-      } else {
-        fallbackOrder += 1;
-        signingOrderByRecipientId.set(recipient.id, fallbackOrder);
-      }
-    }
-
+    // Persisted orders round-trip as-is; `normalizeGroupedSigningOrders`
+    // decides whether an unordered recipient can be numbered.
     const formRecipients = sourceRecipients.map((recipient) => ({
       id: recipient.id,
       formId: String(recipient.id),
       name: recipient.name,
       email: recipient.email,
       role: recipient.role,
-      signingOrder: signingOrderByRecipientId.get(recipient.id),
+      signingOrder: isCcRecipient(recipient) ? undefined : (recipient.signingOrder ?? undefined),
       actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
     }));
 

@@ -100,14 +100,22 @@ export const updateEnvelopeRecipients = async ({
     });
   }
 
+  const orderUpdates = recipients.flatMap((update) => {
+    const existingRecipient = envelope.recipients.find((recipient) => recipient.id === update.id);
+
+    if (!existingRecipient || update.signingOrder === undefined) {
+      return [];
+    }
+
+    return [{ ...existingRecipient, ...update }];
+  });
+
+  const orderUpdateIds = new Set(orderUpdates.map((recipient) => recipient.id));
+
   assertCompatibleRecipientGrouping({
     signatureLevel: envelope.signatureLevel,
-    // Combine the existing recipients with the new ones to see if the grouping is compatible.
-    recipients: envelope.recipients.map((existingRecipient) => {
-      const update = recipients.find((recipient) => recipient.id === existingRecipient.id);
-
-      return update ? { ...existingRecipient, ...update } : existingRecipient;
-    }),
+    recipients: orderUpdates,
+    existingRecipients: envelope.recipients.filter((recipient) => !orderUpdateIds.has(recipient.id)),
   });
 
   const recipientsToUpdate = recipients.map((recipient) => {

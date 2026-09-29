@@ -8,11 +8,9 @@ import { apiSignin } from '../fixtures/authentication';
 import { getRecipientEmailInputs, getRecipientStepCards, setRecipientName } from '../fixtures/envelope-editor';
 
 /**
- * A recipient with no persisted signing order means "last" everywhere on the
- * server (queries sort NULLS LAST, and `effectiveSigningOrder` maps null to the end).
  * The editor must not invent an order from array position: the guess can land
- * on a real order — which now means "same signing step" — or move the
- * recipient ahead of one that was meant to sign first.
+ * on a real order (a signing step) or move the recipient ahead of one meant to
+ * sign first.
  */
 
 const seedMixedOrderEnvelope = async (options: { firstOrder: number }) => {

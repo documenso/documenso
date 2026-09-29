@@ -1,82 +1,42 @@
 import { RecipientRole } from '@prisma/client';
 import { describe, expect, it } from 'vitest';
 
-import {
-  getAssistableRecipientsWhereInput,
-  getLaterSigningStepRecipientsWhereInput,
-  getRecipientFieldsWhereInput,
-} from './recipient-queries';
+import { getLaterSigningStepRecipientsWhereInput, getRecipientFieldsWhereInput } from './recipient-queries';
 
 describe('getLaterSigningStepRecipientsWhereInput', () => {
-  it('scopes ordered assistants to their own envelope', () => {
-    const where = getLaterSigningStepRecipientsWhereInput({ signingOrder: 2, envelopeId: 'envelope_1' });
+  it('follows a numbered assistant with higher numbers and every unordered recipient', () => {
+    const where = getLaterSigningStepRecipientsWhereInput({ id: 10, signingOrder: 2, envelopeId: 'envelope_1' });
 
-    // Envelope scoping must be baked into the predicate itself — the
-    // signingOrder arms alone would match recipients across every envelope.
     expect(where).toEqual({
       envelopeId: 'envelope_1',
       OR: [{ signingOrder: { gt: 2 } }, { signingOrder: null }],
     });
   });
 
-  // A non-finite order bypassing the types would emit `{ gt: undefined }` /
-  // `{ gt: NaN }`, which Prisma silently drops — inverting the predicate into
-  // match-everything. The runtime backstop must throw instead of failing open.
-  it('throws when a non-numeric signing order bypasses the types', () => {
-    expect(() =>
-      getLaterSigningStepRecipientsWhereInput({
-        signingOrder: undefined as unknown as number,
-        envelopeId: 'envelope_1',
-      }),
-    ).toThrow();
-
-    expect(() =>
-      getLaterSigningStepRecipientsWhereInput({
-        signingOrder: NaN,
-        envelopeId: 'envelope_1',
-      }),
-    ).toThrow();
-  });
-});
-
-describe('getAssistableRecipientsWhereInput', () => {
-  it('scopes to the envelope and matches self plus strictly later steps', () => {
-    const where = getAssistableRecipientsWhereInput({ id: 10, signingOrder: 2, envelopeId: 'envelope_1' });
+  it('follows an unordered assistant with later unordered recipients only', () => {
+    const where = getLaterSigningStepRecipientsWhereInput({ id: 10, signingOrder: null, envelopeId: 'envelope_1' });
 
     expect(where).toEqual({
       envelopeId: 'envelope_1',
-      OR: [
-        { id: 10 },
-        {
-          envelopeId: 'envelope_1',
-          OR: [{ signingOrder: { gt: 2 } }, { signingOrder: null }],
-        },
-      ],
+      signingOrder: null,
+      id: { gt: 10 },
     });
   });
 
-  it('matches only self for a null-order assistant', () => {
-    // A null-order assistant sits in the last step: nobody comes after them,
-    // so no later-step predicate exists at all — just the self match.
-    expect(getAssistableRecipientsWhereInput({ id: 10, signingOrder: null, envelopeId: 'envelope_1' })).toEqual({
-      envelopeId: 'envelope_1',
-      id: 10,
-    });
-  });
-
-  // `{ gt: undefined }` is silently dropped by Prisma, turning a comparison
-  // arm into match-everything — non-numeric orders must fail closed to self.
-  it('matches only self when the signing order is undefined (fail closed)', () => {
-    expect(
-      getAssistableRecipientsWhereInput({
-        id: 10,
-        signingOrder: undefined as unknown as number | null,
+  // `{ gt: undefined }` / `{ gt: NaN }` is silently dropped by Prisma, which
+  // would invert the predicate into match-everything. Fail closed instead.
+  it('throws when a non-finite id or order bypasses the types', () => {
+    expect(() =>
+      getLaterSigningStepRecipientsWhereInput({
+        id: undefined as unknown as number,
+        signingOrder: null,
         envelopeId: 'envelope_1',
       }),
-    ).toEqual({
-      envelopeId: 'envelope_1',
-      id: 10,
-    });
+    ).toThrow();
+
+    expect(() =>
+      getLaterSigningStepRecipientsWhereInput({ id: 10, signingOrder: NaN, envelopeId: 'envelope_1' }),
+    ).toThrow();
   });
 });
 
@@ -88,25 +48,23 @@ describe('getRecipientFieldsWhereInput', () => {
     envelopeId: 'envelope_1',
   };
 
-  it('restricts non-assistants to their own recipient row', () => {
-    const where = getRecipientFieldsWhereInput({
-      recipient: { ...assistant, role: RecipientRole.SIGNER },
-      allowAssistantAccessToOtherRecipients: true,
-    });
+  it('restricts non-assistants and disallowed assistants to their own recipient row', () => {
+    expect(
+      getRecipientFieldsWhereInput({
+        recipient: { ...assistant, role: RecipientRole.SIGNER },
+        allowAssistantAccessToOtherRecipients: true,
+      }),
+    ).toEqual({ id: 10 });
 
-    expect(where).toEqual({ id: 10 });
+    expect(
+      getRecipientFieldsWhereInput({
+        recipient: assistant,
+        allowAssistantAccessToOtherRecipients: false,
+      }),
+    ).toEqual({ id: 10 });
   });
 
-  it('restricts assistants to their own recipient row when access is not allowed', () => {
-    const where = getRecipientFieldsWhereInput({
-      recipient: assistant,
-      allowAssistantAccessToOtherRecipients: false,
-    });
-
-    expect(where).toEqual({ id: 10 });
-  });
-
-  it('scopes assistant access to unsigned recipients in the same envelope', () => {
+  it('scopes assistant access to unsigned recipients positioned after them in the same envelope', () => {
     const where = getRecipientFieldsWhereInput({
       recipient: assistant,
       allowAssistantAccessToOtherRecipients: true,
@@ -127,19 +85,6 @@ describe('getRecipientFieldsWhereInput', () => {
           ],
         },
       ],
-    });
-  });
-
-  it('collapses a null-order assistant to their own unsigned fields', () => {
-    const where = getRecipientFieldsWhereInput({
-      recipient: { ...assistant, signingOrder: null },
-      allowAssistantAccessToOtherRecipients: true,
-    });
-
-    expect(where).toEqual({
-      signingStatus: { not: 'SIGNED' },
-      envelopeId: 'envelope_1',
-      AND: [{ envelopeId: 'envelope_1', id: 10 }],
     });
   });
 });

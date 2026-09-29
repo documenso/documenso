@@ -6,7 +6,8 @@ import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/enve
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
-import { effectiveSigningOrder, getNextDictatableRecipient } from '@documenso/lib/utils/recipient-groups';
+import { getNextDictatableRecipient } from '@documenso/lib/utils/recipient-groups';
+import { isRecipientBefore } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { EnvelopeType, type Field, FieldType, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
@@ -237,14 +238,15 @@ export const EnvelopeSigningProvider = ({
   }, [envelopeData.recipient.fields]);
 
   /**
-   * Assistant recipients are those that have a signing order after the assistant.
+   * Assistant recipients are those positioned strictly after the assistant —
+   * never their own group peers.
    */
   const assistantRecipients = useMemo(() => {
     if (recipient.role !== RecipientRole.ASSISTANT) {
       return [];
     }
 
-    return envelope.recipients.filter((r) => effectiveSigningOrder(r) > effectiveSigningOrder(recipient));
+    return envelope.recipients.filter((r) => isRecipientBefore(recipient, r));
   }, [envelope.recipients, recipient]);
 
   /**

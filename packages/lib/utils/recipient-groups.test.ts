@@ -54,17 +54,17 @@ describe('groupRecipientsBySigningOrder', () => {
     expect(steps.map((step) => step.members.map((m) => m.formId))).toEqual([['a'], ['c', 'b']]);
   });
 
-  it('collects recipients without a signing order into a single tail step', () => {
+  it('places each recipient without a signing order in its own step, after numbered steps, by id', () => {
     const recipients = [
-      { formId: 'a', role: RecipientRole.SIGNER, signingOrder: 1 },
-      { formId: 'b', role: RecipientRole.SIGNER, signingOrder: null },
-      { formId: 'c', role: RecipientRole.SIGNER, signingOrder: undefined },
+      { id: 30, formId: 'c', role: RecipientRole.SIGNER, signingOrder: null },
+      { id: 20, formId: 'b', role: RecipientRole.SIGNER, signingOrder: null },
+      { id: 40, formId: 'a', role: RecipientRole.SIGNER, signingOrder: 1 },
     ];
 
     const { steps } = groupRecipientsBySigningOrder(recipients);
 
-    expect(steps).toHaveLength(2);
-    expect(steps[1].members.map((m) => m.formId)).toEqual(['b', 'c']);
+    expect(steps.map((step) => step.order)).toEqual([1, null, null]);
+    expect(steps.map((step) => step.members.map((m) => m.formId))).toEqual([['a'], ['b'], ['c']]);
   });
 });
 
@@ -177,19 +177,64 @@ describe('normalizeGroupedSigningOrders', () => {
     ]);
   });
 
-  it('leaves a locked recipient without a persisted order alone', () => {
-    const recipients: Array<{ formId: string; role: RecipientRole; signingOrder: number | null }> = [
-      { formId: 'locked', role: RecipientRole.SIGNER, signingOrder: null },
-      { formId: 'a', role: RecipientRole.SIGNER, signingOrder: null },
+  it('numbers an editable unordered recipient after a numbered locked step', () => {
+    const recipients = [
+      { id: 2, formId: 'b', role: RecipientRole.SIGNER, signingOrder: null },
+      { id: 1, formId: 'locked', role: RecipientRole.SIGNER, signingOrder: 1 },
     ];
 
-    // Both share the null tail step, so the whole step is locked.
+    const normalized = normalizeGroupedSigningOrders(recipients, (r) => r.formId !== 'locked');
+
+    expect(normalized.map((r) => [r.formId, r.signingOrder])).toEqual([
+      ['locked', 1],
+      ['b', 2],
+    ]);
+  });
+
+  // Numbers sort ahead of unordered rows, so giving 'b' or the new signer a
+  // number would move them in front of the locked recipient who already acted.
+  it('keeps everything unordered behind a locked recipient without an order', () => {
+    const recipients = [
+      { id: 1, formId: 'locked', role: RecipientRole.SIGNER, signingOrder: null },
+      { id: 2, formId: 'b', role: RecipientRole.SIGNER, signingOrder: null },
+      { formId: 'new', role: RecipientRole.SIGNER, signingOrder: undefined },
+      { formId: 'cc', role: RecipientRole.CC, signingOrder: undefined },
+    ];
+
     const normalized = normalizeGroupedSigningOrders(recipients, (r) => r.formId !== 'locked');
 
     expect(normalized.map((r) => [r.formId, r.signingOrder])).toEqual([
       ['locked', undefined],
-      ['a', undefined],
+      ['b', undefined],
+      ['new', undefined],
+      ['cc', undefined],
     ]);
+  });
+});
+
+describe('editor operations behind a locked unordered recipient', () => {
+  const frozen = () => [
+    { id: 1, formId: 'locked', role: RecipientRole.SIGNER, signingOrder: null },
+    { id: 2, formId: 'b', role: RecipientRole.SIGNER, signingOrder: null },
+    { id: 3, formId: 'c', role: RecipientRole.SIGNER, signingOrder: null },
+  ];
+
+  const canUpdate = (r: { formId: string }) => r.formId !== 'locked';
+
+  const positions = (signers: Array<{ formId: string; signingOrder?: number }>) =>
+    signers.map((signer) => [signer.formId, signer.signingOrder]);
+
+  const expected = [
+    ['locked', undefined],
+    ['b', undefined],
+    ['c', undefined],
+  ];
+
+  it('refuses to number or move anything', () => {
+    expect(positions(reorderStep(frozen(), 2, 1, canUpdate))).toEqual(expected);
+    expect(positions(extractRecipientToNewStep(frozen(), 'b', 3, canUpdate))).toEqual(expected);
+    expect(positions(mergeSteps(frozen(), 2, 1, canUpdate))).toEqual(expected);
+    expect(positions(moveRecipientToStep(frozen(), 'c', 1, canUpdate))).toEqual(expected);
   });
 });
 
@@ -496,15 +541,23 @@ describe('isRecipientTurnBySigningOrder', () => {
     expect(isRecipientTurnBySigningOrder(recipients, recipients[1])).toBe(true);
   });
 
-  it('treats recipients without a signing order as a parallel tail group', () => {
+  it('sequences recipients without a signing order one at a time by id', () => {
     const recipients = [
       recipient(1, 1, SigningStatus.SIGNED),
-      recipient(2, null, SigningStatus.NOT_SIGNED),
       recipient(3, null, SigningStatus.NOT_SIGNED),
+      recipient(2, null, SigningStatus.NOT_SIGNED),
     ];
 
-    expect(isRecipientTurnBySigningOrder(recipients, recipients[1])).toBe(true);
     expect(isRecipientTurnBySigningOrder(recipients, recipients[2])).toBe(true);
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[1])).toBe(false);
+  });
+
+  it('orders group members by id when strictly sequential', () => {
+    const recipients = [recipient(2, 1, SigningStatus.NOT_SIGNED), recipient(1, 1, SigningStatus.NOT_SIGNED)];
+
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[0], { strictlySequential: true })).toBe(false);
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[1], { strictlySequential: true })).toBe(true);
+    expect(isRecipientTurnBySigningOrder(recipients, recipients[0])).toBe(true);
   });
 });
 
@@ -553,6 +606,18 @@ describe('getRecipientsInActiveSigningStep', () => {
     const recipients = [candidate(1, 1, SigningStatus.SIGNED), candidate(2, 2, SigningStatus.REJECTED)];
 
     expect(getRecipientsInActiveSigningStep(recipients)).toEqual([]);
+  });
+
+  it('activates a single unordered recipient at a time, lowest id first', () => {
+    const recipients = [candidate(7, null), candidate(5, null), candidate(9, null)];
+
+    expect(getRecipientsInActiveSigningStep(recipients).map((r) => r.id)).toEqual([5]);
+  });
+
+  it('activates only the lowest id of a group when strictly sequential', () => {
+    const recipients = [candidate(4, 1), candidate(3, 1), candidate(5, 2)];
+
+    expect(getRecipientsInActiveSigningStep(recipients, { strictlySequential: true }).map((r) => r.id)).toEqual([3]);
   });
 });
 
@@ -642,5 +707,15 @@ describe('getNextDictatableRecipient', () => {
     const recipients = [recipient(1, 1, SigningStatus.NOT_SIGNED), recipient(2, 2, SigningStatus.SIGNED)];
 
     expect(getNextDictatableRecipient({ recipients, currentRecipientId: 1 })).toBeNull();
+  });
+
+  it('treats the next unordered recipient by id as a single-recipient step', () => {
+    const recipients = [
+      recipient(1, null, SigningStatus.NOT_SIGNED),
+      recipient(2, null, SigningStatus.NOT_SIGNED),
+      recipient(3, null, SigningStatus.NOT_SIGNED),
+    ];
+
+    expect(getNextDictatableRecipient({ recipients, currentRecipientId: 1 })?.id).toBe(2);
   });
 });

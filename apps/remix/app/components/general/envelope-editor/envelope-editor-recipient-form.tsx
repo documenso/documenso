@@ -9,7 +9,7 @@ import { useOptionalSession } from '@documenso/lib/client-only/providers/session
 import type { TDetectedRecipientSchema } from '@documenso/lib/server-only/ai/envelope/detect-recipients/schema';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
-import { groupRecipientsBySigningOrder, normalizeGroupedSigningOrders } from '@documenso/lib/utils/recipient-groups';
+import { normalizeGroupedSigningOrders } from '@documenso/lib/utils/recipient-groups';
 import { canEditorRecipientBeModified } from '@documenso/lib/utils/recipients';
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -146,8 +146,6 @@ export const EnvelopeEditorRecipientForm = () => {
     name: 'signers',
   });
 
-  const stepCount = useMemo(() => groupRecipientsBySigningOrder(watchedSigners).steps.length, [watchedSigners]);
-
   const emptySignerIndex = watchedSigners.findIndex(
     (signer) =>
       !signer.name && !signer.email && envelope.fields.filter((field) => field.recipientId === signer.id).length === 0,
@@ -192,15 +190,12 @@ export const EnvelopeEditorRecipientForm = () => {
       email: '',
       role: RecipientRole.SIGNER,
       actionAuth: [],
-      signingOrder: stepCount + 1,
+      signingOrder: undefined,
     });
   };
 
   const onAiDetectionComplete = (detectedRecipients: TDetectedRecipientSchema[]) => {
     const currentSigners = form.getValues('signers');
-
-    let nextSigningOrder =
-      currentSigners.length > 0 ? Math.max(...currentSigners.map((s) => s.signingOrder ?? 0)) + 1 : 1;
 
     // If the only signer is the default empty signer lets just replace it with the detected recipients
     if (currentSigners.length === 1 && !currentSigners[0].name && !currentSigners[0].email) {
@@ -234,10 +229,8 @@ export const EnvelopeEditorRecipientForm = () => {
         email: recipient.email,
         role: recipient.role,
         actionAuth: [],
-        signingOrder: nextSigningOrder,
+        signingOrder: undefined,
       });
-
-      nextSigningOrder += 1;
     }
 
     updateEditorSigners(form, normalizeSigningOrders(currentSigners));
@@ -274,7 +267,7 @@ export const EnvelopeEditorRecipientForm = () => {
           email: currentEditorEmail ?? '',
           role: RecipientRole.SIGNER,
           actionAuth: [],
-          signingOrder: stepCount + 1,
+          signingOrder: undefined,
         },
         true,
       );

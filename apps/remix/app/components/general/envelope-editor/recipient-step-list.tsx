@@ -8,6 +8,7 @@ import {
   extractRecipientToNewStep,
   getLastLockedStepIndex,
   groupRecipientsBySigningOrder,
+  isSigningOrderFrozen,
   mergeSteps,
   moveRecipientToStep,
   normalizeGroupedSigningOrders,
@@ -79,6 +80,11 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
   // after can still be rearranged freely.
   const lastLockedStepIndex = useMemo(
     () => getLastLockedStepIndex(steps, (signer) => canEditorRecipientBeModified(envelope, signer.id)),
+    [steps, envelope],
+  );
+
+  const isOrderingFrozen = useMemo(
+    () => isSigningOrderFrozen(steps, (signer) => canEditorRecipientBeModified(envelope, signer.id)),
     [steps, envelope],
   );
 
@@ -326,7 +332,7 @@ export const RecipientStepList = ({ showAdvancedSettings }: RecipientStepListPro
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef} className="flex w-full flex-col">
                   {steps.map((step, stepIndex) => {
-                    const isStepLocked = stepIndex <= lastLockedStepIndex;
+                    const isStepLocked = isOrderingFrozen || stepIndex <= lastLockedStepIndex;
 
                     return (
                       <Draggable

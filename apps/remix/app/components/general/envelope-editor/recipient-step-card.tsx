@@ -126,6 +126,8 @@ export const RecipientStepCard = ({
   const isGroup = step.members.length > 1;
   const isCombineTarget = draggingType === 'STEP' && Boolean(draggableSnapshot.combineTargetFor);
 
+  const stepLabel = step.order ?? stepIndex + 1;
+
   // All droppable ids are anchored to the first member's formId (never a
   // positional index) so they stay stable while cards are reordered —
   // @hello-pangea/dnd does not support changing ids on mounted elements.
@@ -182,7 +184,7 @@ export const RecipientStepCard = ({
                 </span>
 
                 <Badge variant={isGroup ? 'default' : 'neutral'} size="small">
-                  <Trans>Group {step.order}</Trans>
+                  <Trans>Group {stepLabel}</Trans>
                 </Badge>
 
                 {isGroup && (

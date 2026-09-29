@@ -23,6 +23,34 @@ describe('recipient signing order helpers', () => {
     expect(sortRecipientsForSigningOrder(recipients).map((recipient) => recipient.id)).toEqual([2, 1]);
   });
 
+  it('sorts recipients without a signing order after numbered ones, by id', () => {
+    const recipients = [
+      { id: 3, role: RecipientRole.SIGNER, signingOrder: null },
+      { id: 4, role: RecipientRole.CC, signingOrder: null },
+      { id: 2, role: RecipientRole.SIGNER, signingOrder: null },
+      { id: 5, role: RecipientRole.SIGNER, signingOrder: 9 },
+    ];
+
+    expect(sortRecipientsForSigningOrder(recipients).map((recipient) => recipient.id)).toEqual([5, 2, 3, 4]);
+  });
+
+  it('treats an unordered assistant as last only when no unordered recipient has a higher id', () => {
+    expect(
+      isAssistantLastSigner([
+        { id: 2, role: RecipientRole.ASSISTANT, signingOrder: null },
+        { id: 1, role: RecipientRole.SIGNER, signingOrder: null },
+        { id: 3, role: RecipientRole.SIGNER, signingOrder: 1 },
+      ]),
+    ).toBe(true);
+
+    expect(
+      isAssistantLastSigner([
+        { id: 1, role: RecipientRole.ASSISTANT, signingOrder: null },
+        { id: 2, role: RecipientRole.SIGNER, signingOrder: null },
+      ]),
+    ).toBe(false);
+  });
+
   it('sorts and normalizes active recipient signing order and removes it from CC recipients', () => {
     const recipients = [
       { id: 1, role: RecipientRole.CC, signingOrder: 1 },

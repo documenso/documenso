@@ -41,11 +41,16 @@ import {
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
-import { getRecipientsWithMissingFields } from '../../utils/recipients';
+import {
+  getRecipientsWithMissingFields,
+  isRecipientBefore,
+  sortRecipientsBySigningPosition,
+} from '../../utils/recipients';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { assignOmittedRecipientSigningOrders } from '../recipient/assign-omitted-recipient-signing-orders';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -211,6 +216,16 @@ export const createDocumentFromDirectTemplate = async ({
   const nonDirectTemplateRecipients = directTemplateEnvelope.recipients.filter(
     (recipient) => recipient.id !== directTemplateRecipient.id,
   );
+
+  // Number unordered recipients by template position since the copies get new ids.
+  const signingOrderByTemplateRecipientId = new Map(
+    assignOmittedRecipientSigningOrders({
+      recipients: sortRecipientsBySigningPosition(recipients),
+    }).map((recipient) => [recipient.id, recipient.signingOrder]),
+  );
+
+  const resolveSigningOrder = (templateRecipientId: number) =>
+    signingOrderByTemplateRecipientId.get(templateRecipientId) ?? null;
 
   // Carry the template's level forward, coercing if the instance mode has
   // changed since the template was created. ZSignatureLevelSchema parses the
@@ -411,7 +426,7 @@ export const createDocumentFromDirectTemplate = async ({
                 }),
                 sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
                 signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
-                signingOrder: recipient.signingOrder,
+                signingOrder: resolveSigningOrder(recipient.id),
                 token: nanoid(),
               };
             }),
@@ -483,7 +498,7 @@ export const createDocumentFromDirectTemplate = async ({
         signingStatus: SigningStatus.SIGNED,
         sendStatus: SendStatus.SENT,
         signedAt: initialRequestTime,
-        signingOrder: directTemplateRecipient.signingOrder,
+        signingOrder: resolveSigningOrder(directTemplateRecipient.id),
         fields: {
           createMany: {
             data: directTemplateNonSignatureFields.map(({ templateField, customText }) => {
@@ -698,14 +713,12 @@ export const createDocumentFromDirectTemplate = async ({
 
       const nextRecipients = getRecipientsInActiveSigningStep(pendingRecipients);
 
-      const directRecipientOrder = createdDirectRecipient.signingOrder ?? Number.MAX_SAFE_INTEGER;
-
       // The direct recipient can share a step with other recipients (a signing
       // group). Those peers are still pending, so without this check they would
       // look like the "next" step and be dictated over — dictation may only
       // affect a strictly later step.
-      const hasCompletedCurrentStep = nextRecipients.every(
-        (pendingRecipient) => (pendingRecipient.signingOrder ?? Number.MAX_SAFE_INTEGER) > directRecipientOrder,
+      const hasCompletedCurrentStep = nextRecipients.every((pendingRecipient) =>
+        isRecipientBefore(createdDirectRecipient, pendingRecipient),
       );
 
       // Dictation can only apply when the next step is a single recipient.

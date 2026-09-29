@@ -21,12 +21,13 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import type { TRecipientAccessAuth } from '../../types/document-auth';
 import { DocumentAuth } from '../../types/document-auth';
+import { isTspEnvelope } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { getRecipientsInActiveSigningStep, isRecipientTurnBySigningOrder } from '../../utils/recipient-groups';
-import { assertRecipientNotExpired } from '../../utils/recipients';
+import { assertRecipientNotExpired, isRecipientBefore } from '../../utils/recipients';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { isRecipientAuthorized } from './is-recipient-authorized';
@@ -453,19 +454,21 @@ export const completeDocumentWithToken = async ({
     });
 
     if (envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-      const nextRecipients = getRecipientsInActiveSigningStep(pendingRecipients);
+      const sequencing = { strictlySequential: isTspEnvelope(envelope) };
 
-      const currentRecipientOrder = recipient.signingOrder ?? Number.MAX_SAFE_INTEGER;
+      const nextRecipients = getRecipientsInActiveSigningStep(pendingRecipients, sequencing);
 
-      const hasCompletedCurrentStep = nextRecipients.every(
-        (pendingRecipient) => (pendingRecipient.signingOrder ?? Number.MAX_SAFE_INTEGER) > currentRecipientOrder,
+      // Peers still pending in the current step are not the "next" step:
+      // nobody advances until the whole group has completed.
+      const hasCompletedCurrentStep = nextRecipients.every((pendingRecipient) =>
+        isRecipientBefore(recipient, pendingRecipient, sequencing),
       );
 
       if (
         nextRecipients.length > 0 &&
         hasCompletedCurrentStep &&
         // Ensure that the next recipient can actually act on the document.
-        isRecipientTurnBySigningOrder(pendingRecipients, nextRecipients[0])
+        isRecipientTurnBySigningOrder(pendingRecipients, nextRecipients[0], sequencing)
       ) {
         // Dictation is only allowed when advancing to a single-recipient step.
         const canDictateNextSigner =

@@ -1,6 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import { DocumentSigningOrder, EnvelopeType } from '@prisma/client';
 
+import { isTspEnvelope } from '../../types/signature-level';
 import { isRecipientTurnBySigningOrder } from '../../utils/recipient-groups';
 
 export type GetIsRecipientTurnOptions = {
@@ -33,5 +34,7 @@ export async function getIsRecipientsTurnToSign({ token }: GetIsRecipientTurnOpt
     return false;
   }
 
-  return isRecipientTurnBySigningOrder(envelope.recipients, currentRecipient);
+  return isRecipientTurnBySigningOrder(envelope.recipients, currentRecipient, {
+    strictlySequential: isTspEnvelope(envelope),
+  });
 }

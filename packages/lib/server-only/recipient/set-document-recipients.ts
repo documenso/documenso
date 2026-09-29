@@ -19,6 +19,7 @@ import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
+import { resolveReplacedRecipientSigningOrders } from './assign-omitted-recipient-signing-orders';
 
 export interface SetDocumentRecipientsOptions {
   userId: number;
@@ -99,17 +100,21 @@ export const setDocumentRecipients = async ({
     });
   }
 
-  assertCompatibleRecipientGrouping({
-    signatureLevel: envelope.signatureLevel,
-    recipients,
+  const existingRecipients = envelope.recipients;
+
+  const { recipients: normalizedRecipients, requestedOrderRecipients } = resolveReplacedRecipientSigningOrders({
+    recipients: recipients.map((recipient) => ({
+      ...recipient,
+      email: recipient.email.toLowerCase(),
+    })),
+    existingRecipients,
   });
 
-  const normalizedRecipients = recipients.map((recipient) => ({
-    ...recipient,
-    email: recipient.email.toLowerCase(),
-  }));
-
-  const existingRecipients = envelope.recipients;
+  assertCompatibleRecipientGrouping({
+    signatureLevel: envelope.signatureLevel,
+    recipients: requestedOrderRecipients,
+    existingRecipients: normalizedRecipients.filter((recipient) => !requestedOrderRecipients.includes(recipient)),
+  });
 
   const removedRecipients = existingRecipients.filter(
     (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),

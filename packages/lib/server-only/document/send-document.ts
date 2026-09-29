@@ -42,7 +42,6 @@ import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
-import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -149,17 +148,12 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     envelope.documentMeta.signingOrder = DocumentSigningOrder.SEQUENTIAL;
   }
 
-  assertCompatibleRecipientGrouping({
-    signatureLevel: envelope.signatureLevel,
-    recipients: envelope.recipients,
-  });
-
   let recipientsToNotify = envelope.recipients;
 
   if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-    // Get the currently active signing group. Recipients sharing the lowest
-    // pending signing order act in parallel within their group.
-    recipientsToNotify = getRecipientsInActiveSigningStep(envelope.recipients);
+    recipientsToNotify = getRecipientsInActiveSigningStep(envelope.recipients, {
+      strictlySequential: isTspEnvelope(envelope),
+    });
   }
 
   if (envelope.envelopeItems.length === 0) {

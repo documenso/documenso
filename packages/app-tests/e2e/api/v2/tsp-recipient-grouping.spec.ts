@@ -73,17 +73,24 @@ test('[TSP_GROUPING]: rejects a second recipient joining an existing step on an 
   expect(recipients).toHaveLength(1);
 });
 
-test('[TSP_GROUPING]: rejects two recipients without a signing order on a QES envelope', async ({ request }) => {
+test('[TSP_GROUPING]: numbers recipients created without a signing order on a QES envelope', async ({ request }) => {
   const { envelopeId, token } = await seedEnvelopeAtSignatureLevel(request, 'QES');
 
-  // Both land in the same tail step, so they would sign in parallel.
-  const response = await createRecipients(request, token, envelopeId, [{}, {}]);
+  const response = await createRecipients(request, token, envelopeId, [{}, { signingOrder: 3 }, {}]);
 
-  expect(response.status()).toBe(400);
+  expect(response.ok(), await response.text()).toBeTruthy();
 
-  const recipients = await prisma.recipient.findMany({ where: { envelopeId } });
+  const recipients = await prisma.recipient.findMany({ where: { envelopeId }, orderBy: { id: 'asc' } });
 
-  expect(recipients).toHaveLength(0);
+  expect(recipients.map((recipient) => recipient.signingOrder)).toEqual([4, 3, 5]);
+
+  const second = await createRecipients(request, token, envelopeId, [{}]);
+
+  expect(second.ok(), await second.text()).toBeTruthy();
+
+  const recipientsAfter = await prisma.recipient.findMany({ where: { envelopeId }, orderBy: { id: 'asc' } });
+
+  expect(recipientsAfter.map((recipient) => recipient.signingOrder)).toEqual([4, 3, 5, 6]);
 });
 
 test('[TSP_GROUPING]: accepts distinct signing orders on an AES envelope', async ({ request }) => {
