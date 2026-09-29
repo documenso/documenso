@@ -11,7 +11,9 @@ import {
   interactWithCanvasPastActionBar,
   placeContentOnPdf,
   selectEditorTab,
+  uploadImage,
   waitForContentsAutosave,
+  waitForUploadToLand,
 } from '../fixtures/contents';
 import {
   clickAddMyselfButton,
@@ -135,17 +137,15 @@ test('editing a duplicated image content mid-save keeps saving', async ({ page }
 
   const png = await createCanvas(60, 30).encode('png');
 
-  await root
-    .locator('input[id^="content-image-input-"]')
-    .setInputFiles({ name: 'image.png', mimeType: 'image/png', buffer: png });
+  await uploadImage(root, { name: 'image.png', mimeType: 'image/png', buffer: png });
+  await waitForUploadToLand(root);
 
   await waitForContentsAutosave(surface);
   await expect.poll(async () => (await getContentRows(envelopeId)).length).toBe(1);
 
   const { firstContentSetInFlight } = await installContentSetLag(page, 4000);
 
-  // Duplicating clones the image server side, so the response carries a
-  // different data content id than was sent.
+  // The duplicate shares the original's image rather than getting a copy.
   await getContentActionButton(root, 'Duplicate').click();
 
   await firstContentSetInFlight;
@@ -167,14 +167,15 @@ test('editing a duplicated image content mid-save keeps saving', async ({ page }
 
   expect(rows).toHaveLength(2);
 
-  // Both contents keep their own image, and neither points at a deleted row.
+  // Both contents keep the image they share, and it has not been deleted.
   const dataContentIds = rows.flatMap((row) => (row.dataContentId ? [row.dataContentId] : []));
 
-  expect(new Set(dataContentIds).size).toBe(2);
+  expect(dataContentIds).toHaveLength(2);
+  expect(new Set(dataContentIds).size).toBe(1);
 
   const dataContents = await prisma.dataContent.findMany({ where: { id: { in: dataContentIds } } });
 
-  expect(dataContents).toHaveLength(2);
+  expect(dataContents).toHaveLength(1);
 });
 
 /**

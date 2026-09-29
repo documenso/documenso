@@ -76,9 +76,11 @@ const createEnvelope = async (request: APIRequestContext, authToken: string) => 
  * Build a distributable envelope holding `contentCount` contents, of which
  * `imageCount` are image contents, then attempt to distribute it.
  *
- * Contents are inserted directly since they are not part of the public API.
- * Image contents are given a real image, since sending rejects an image
- * content without one and decodes it to draw it into the PDF.
+ * Contents are inserted directly rather than created through the API, since
+ * the API refuses to create an envelope over the limits and these tests need
+ * one, as left behind when an organisation's plan is lowered. Image contents
+ * are given a real image, since sending rejects an image content without one
+ * and decodes it to draw it into the PDF.
  */
 const buildAndDistributeEnvelopeWithContents = async ({
   request,

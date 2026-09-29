@@ -6,7 +6,6 @@ import {
   type TEditorEnvelope,
 } from '@documenso/lib/types/envelope-editor';
 import { trpc } from '@documenso/trpc/react';
-import type { TSetEnvelopeContentsResponse } from '@documenso/trpc/server/envelope-router/set-envelope-contents.types';
 import type { TSetEnvelopeFieldsResponse } from '@documenso/trpc/server/envelope-router/set-envelope-fields.types';
 import type { TSetEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/set-envelope-recipients.types';
 import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
@@ -20,6 +19,7 @@ import { createContext, useCallback, useContext, useMemo, useRef, useState, useS
 import { useSearchParams } from 'react-router';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import { PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX } from '../../utils/embed-config';
 import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
 import { useAnalytics } from '../hooks/use-analytics';
 import type { TLocalContent } from '../hooks/use-editor-contents';
@@ -168,8 +168,6 @@ export const EnvelopeEditorProvider = ({
 
   const [autosaveError, setAutosaveError] = useState<boolean>(false);
 
-  const [selectedEditorTab, setSelectedEditorTab] = useState<EnvelopeEditorTab>('fields');
-
   const [isPlacingItem, setIsPlacingItem] = useState(false);
 
   const isCscMode = IS_INSTANCE_CSC_MODE();
@@ -196,6 +194,10 @@ export const EnvelopeEditorProvider = ({
       },
     };
   }, [isCscMode, providedEditorConfig]);
+
+  const [selectedEditorTab, setSelectedEditorTab] = useState<EnvelopeEditorTab>(
+    editorConfig.general?.allowAddFieldsStep ? 'fields' : 'contents',
+  );
 
   const externalFlushCallbacksRef = useRef<Map<string, () => Promise<void>>>(new Map());
   const pendingMutationsRef = useRef<Set<Promise<unknown>>>(new Set());
@@ -379,7 +381,7 @@ export const EnvelopeEditorProvider = ({
     isPending: isContentsMutationPending,
   } = useEnvelopeAutosave(async (localContents: TLocalContent[]) => {
     try {
-      let contents: TSetEnvelopeContentsResponse['data'] = [];
+      let contents: TEditorEnvelopeContentWithFormId[] = [];
 
       const currentEnvelope = getEnvelope();
 
@@ -736,6 +738,13 @@ const mapLocalRecipientsToRecipients = ({
   });
 };
 
+/**
+ * An envelope content, with the local ID of the content it was saved from.
+ */
+type TEditorEnvelopeContentWithFormId = TEditorEnvelope['contents'][number] & {
+  formId?: string;
+};
+
 type MapLocalContentsToContentsOptions = {
   localContents: TLocalContent[];
   envelope: TEditorEnvelope;
@@ -744,16 +753,19 @@ type MapLocalContentsToContentsOptions = {
 const mapLocalContentsToContents = ({
   envelope,
   localContents,
-}: MapLocalContentsToContentsOptions): TEditorEnvelope['contents'] => {
+}: MapLocalContentsToContentsOptions): TEditorEnvelopeContentWithFormId[] => {
   return localContents.map((content) => {
     return {
-      // Local contents that have not been persisted yet use their formId as a
-      // placeholder ID until the server returns the real one.
-      id: content.id ?? content.formId,
+      // New contents get a temporary ID, which is swapped for a real one when
+      // the embedded envelope is saved. It is written back to the local
+      // content (via `formId`) so it stays the same from then on.
+      id: content.id ?? `${PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX}${content.formId}`,
+      formId: content.formId,
       envelopeId: envelope.id,
       envelopeItemId: content.envelopeItemId,
       contentMeta: content.contentMeta,
       dataContentId: content.dataContentId,
+      data: content.data,
     };
   });
 };

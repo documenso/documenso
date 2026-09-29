@@ -1,3 +1,4 @@
+import { createCanvas } from '@napi-rs/canvas';
 import { expect, type Locator, type Page } from '@playwright/test';
 import type Konva from 'konva';
 
@@ -5,6 +6,39 @@ import type { TEnvelopeEditorSurface } from './envelope-editor';
 import { getKonvaElementCountForPage } from './konva';
 
 export type ContentButtonName = 'Text' | 'Line' | 'Rectangle' | 'Highlight' | 'Image';
+
+export type TestImageFile = { name: string; mimeType: string; buffer: Buffer };
+
+/**
+ * Generate a solid color image of the given size in memory.
+ */
+export const createImageFile = async (
+  name: string,
+  width: number,
+  height: number,
+  format: 'png' | 'jpeg' | 'webp' = 'png',
+): Promise<TestImageFile> => {
+  const canvas = createCanvas(width, height);
+  const context = canvas.getContext('2d');
+
+  context.fillStyle = 'rgb(30, 120, 220)';
+  context.fillRect(0, 0, width, height);
+
+  const buffer = format === 'png' ? await canvas.encode('png') : await canvas.encode(format);
+
+  return { name, mimeType: `image/${format}`, buffer };
+};
+
+/**
+ * A real GIF labelled as a PNG, as when the file is renamed. The declared type
+ * passes every check made before the bytes are read, so only decoding the
+ * image can reject it.
+ */
+export const createGifLabelledAsPng = (name: string): TestImageFile => ({
+  name,
+  mimeType: 'image/png',
+  buffer: Buffer.from('R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', 'base64'),
+});
 
 /**
  * Switch the fields step sidebar to the given tab.
@@ -198,6 +232,30 @@ export const waitForContentSelection = async (root: Page, contentIds: string[], 
  */
 export const getContentActionButton = (root: Page, title: string): Locator =>
   root.getByTestId('envelope-canvas-action-bar').locator(`button[title="${title}"]`);
+
+/**
+ * Upload through the action bar. Clicking Upload / Replace opens the upload
+ * dialog, which immediately opens the native picker; the file is set on that.
+ *
+ * Returns as soon as the file is handed over. Follow with
+ * `waitForUploadToLand` for a successful upload, or check the dialog's error
+ * text for a rejected one.
+ */
+export const uploadImage = async (root: Page, file: TestImageFile) => {
+  const fileChooser = root.waitForEvent('filechooser');
+
+  await getContentActionButton(root, 'Upload image').or(getContentActionButton(root, 'Replace image')).click();
+
+  await (await fileChooser).setFiles({ name: file.name, mimeType: file.mimeType, buffer: file.buffer });
+};
+
+/**
+ * Wait for a successful upload's dialog to close.
+ */
+export const waitForUploadToLand = async (root: Page) => {
+  await expect(root.getByTestId('content-image-uploading')).toHaveCount(0);
+  await expect(root.getByRole('dialog')).toHaveCount(0);
+};
 
 /**
  * Wait for the editor's debounced autosave to flush.

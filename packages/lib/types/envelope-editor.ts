@@ -25,6 +25,7 @@ export const ZEnvelopeEditorSettingsSchema = z.object({
     allowConfigureEnvelopeTitle: z.boolean(),
     allowUploadAndRecipientStep: z.boolean(),
     allowAddFieldsStep: z.boolean(),
+    allowAddContentsStep: z.boolean(),
     allowPreviewStep: z.boolean(),
     minimizeLeftSidebar: z.boolean(),
   }),
@@ -112,6 +113,7 @@ export const DEFAULT_EDITOR_CONFIG: EnvelopeEditorConfig = {
     allowConfigureEnvelopeTitle: true,
     allowUploadAndRecipientStep: true,
     allowAddFieldsStep: true,
+    allowAddContentsStep: true,
     allowPreviewStep: true,
     minimizeLeftSidebar: false,
   },
@@ -171,6 +173,7 @@ export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
     allowConfigureEnvelopeTitle: true,
     allowUploadAndRecipientStep: true,
     allowAddFieldsStep: true,
+    allowAddContentsStep: true,
     allowPreviewStep: true,
     minimizeLeftSidebar: true,
   },
@@ -290,7 +293,10 @@ export const ZEditorEnvelopeSchema = EnvelopeSchema.pick({
   }),
   recipients: ZEnvelopeRecipientLiteSchema.array(),
   fields: ZEnvelopeFieldSchema.array(),
-  contents: ZEnvelopeContentSchema.array(),
+  contents: ZEnvelopeContentSchema.extend({
+    // Only used for embedded.
+    data: z.instanceof(File).optional(),
+  }).array(),
   envelopeItems: EnvelopeItemSchema.pick({
     envelopeId: true,
     id: true,

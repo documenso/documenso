@@ -13,7 +13,13 @@ import { areContentsImprinted } from '../../utils/envelope';
 /**
  * The minimum content data required to render a content.
  */
-export type EnvelopeRenderContent = Pick<EnvelopeContent, 'id' | 'envelopeItemId' | 'contentMeta' | 'dataContentId'>;
+export type EnvelopeRenderContent = Pick<EnvelopeContent, 'id' | 'envelopeItemId' | 'contentMeta' | 'dataContentId'> & {
+  /**
+   * The file of an image which has not been uploaded yet, e.g. one picked in
+   * the embedded editor. It is drawn from the file rather than fetched.
+   */
+  data?: Blob;
+};
 
 import type { EnvelopePageItemsVisibility } from '../../types/envelope-page-items-visibility';
 import type { FieldRenderMode } from '../../universal/field-renderer/field-renderer';

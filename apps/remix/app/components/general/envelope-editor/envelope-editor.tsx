@@ -90,7 +90,13 @@ export const EnvelopeEditor = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const {
-    general: { minimizeLeftSidebar, allowUploadAndRecipientStep, allowAddFieldsStep, allowPreviewStep },
+    general: {
+      minimizeLeftSidebar,
+      allowUploadAndRecipientStep,
+      allowAddFieldsStep,
+      allowAddContentsStep,
+      allowPreviewStep,
+    },
     actions: {
       allowDistributing,
       allowDirectLink,
@@ -108,7 +114,7 @@ export const EnvelopeEditor = () => {
       steps.push(UPLOAD_STEP);
     }
 
-    if (allowAddFieldsStep) {
+    if (allowAddFieldsStep || allowAddContentsStep) {
       steps.push(ADD_FIELDS_STEP);
     }
 
@@ -524,11 +530,16 @@ export const EnvelopeEditor = () => {
             pageToRender,
             allowUploadAndRecipientStep,
             allowAddFieldsStep,
+            allowAddContentsStep,
             allowPreviewStep,
           })
             .with({ pageToRender: 'loading' }, () => <SpinnerBox className="py-32" />)
             .with({ pageToRender: 'upload', allowUploadAndRecipientStep: true }, () => <EnvelopeEditorUploadPage />)
-            .with({ pageToRender: 'addFields', allowAddFieldsStep: true }, () => <EnvelopeEditorFieldsPage />)
+            .with(
+              { pageToRender: 'addFields', allowAddFieldsStep: true },
+              { pageToRender: 'addFields', allowAddContentsStep: true },
+              () => <EnvelopeEditorFieldsPage />,
+            )
             .with({ pageToRender: 'preview', allowPreviewStep: true }, () => <EnvelopeEditorPreviewPage />)
             .otherwise(() => null)}
         </div>

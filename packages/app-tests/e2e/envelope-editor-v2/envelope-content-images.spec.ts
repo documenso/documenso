@@ -1,16 +1,19 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import { createCanvas } from '@napi-rs/canvas';
 import { expect, type Page, test } from '@playwright/test';
 
 import {
+  createImageFile,
   getContentActionButton,
   getContentGroupsForPage,
   getPageCanvas,
   getPageSize,
   placeContentOnPdf,
   selectEditorTab,
+  type TestImageFile,
+  uploadImage,
   waitForContentsAutosave,
+  waitForUploadToLand,
 } from '../fixtures/contents';
 import {
   clickAddMyselfButton,
@@ -27,26 +30,6 @@ import { expectToastTextToBeVisible } from '../fixtures/generic';
  * Mirrors `CONTENT_IMAGE_DEFAULT_SIZE`.
  */
 const IMAGE_DEFAULT_SIZE = { width: 15, height: 10 };
-
-/**
- * Generate a solid color image of the given size in memory.
- */
-const createImageFile = async (
-  name: string,
-  width: number,
-  height: number,
-  format: 'png' | 'jpeg' | 'webp' = 'png',
-) => {
-  const canvas = createCanvas(width, height);
-  const context = canvas.getContext('2d');
-
-  context.fillStyle = 'rgb(30, 120, 220)';
-  context.fillRect(0, 0, width, height);
-
-  const buffer = format === 'png' ? await canvas.encode('png') : await canvas.encode(format);
-
-  return { name, mimeType: `image/${format}`, buffer };
-};
 
 /**
  * A minimal GIF, which is a real image in a format the editor does not accept.
@@ -79,32 +62,6 @@ const openContentsTab = async (surface: TEnvelopeEditorSurface, externalId: stri
 
   await selectEditorTab(surface.root, 'Contents');
   await expect(surface.root.getByRole('heading', { name: 'Add Content' })).toBeVisible();
-};
-
-type TestImageFile = { name: string; mimeType: string; buffer: Buffer };
-
-/**
- * Upload through the action bar. Clicking Upload / Replace opens the upload
- * dialog, which immediately opens the native picker; the file is set on that.
- *
- * Returns as soon as the file is handed over. Follow with
- * `waitForUploadToLand` for a successful upload, or check the dialog's error
- * text for a rejected one.
- */
-const uploadImage = async (root: Page, file: TestImageFile) => {
-  const fileChooser = root.waitForEvent('filechooser');
-
-  await getContentActionButton(root, 'Upload image').or(getContentActionButton(root, 'Replace image')).click();
-
-  await (await fileChooser).setFiles({ name: file.name, mimeType: file.mimeType, buffer: file.buffer });
-};
-
-/**
- * Wait for a successful upload's dialog to close.
- */
-const waitForUploadToLand = async (root: Page) => {
-  await expect(root.getByTestId('content-image-uploading')).toHaveCount(0);
-  await expect(root.getByRole('dialog')).toHaveCount(0);
 };
 
 /**

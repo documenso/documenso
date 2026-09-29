@@ -112,18 +112,9 @@ export const EnvelopeEditorFieldsPage = () => {
     editorConfig,
     selectedEditorTab,
     setSelectedEditorTab,
-    isEmbedded,
   } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem, setCurrentEnvelopeItem, viewerControls } = useCurrentEnvelopeRender();
-
-  /**
-   * Todo: Contents
-   *
-   * The embedded editor persists through the public envelope API, which does
-   * not carry contents yet, so authoring them there would silently lose them.
-   */
-  const isContentsTabAvailable = !isEmbedded;
 
   const { _ } = useLingui();
 
@@ -277,6 +268,10 @@ export const EnvelopeEditorFieldsPage = () => {
     });
   };
 
+  if (!editorConfig.general?.allowAddFieldsStep && !editorConfig.general?.allowAddContentsStep) {
+    return null;
+  }
+
   return (
     <>
       {/*
@@ -394,22 +389,18 @@ export const EnvelopeEditorFieldsPage = () => {
 
           {/* Right Section - Form Fields Panel */}
           {currentEnvelopeItem && envelope.recipients.length > 0 && (
-            <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-border border-l bg-background py-4">
+            <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-border border-l bg-background py-2">
               <Tabs value={selectedEditorTab} onValueChange={(value) => onEditorTabChange(value as EnvelopeEditorTab)}>
-                <TabsList
-                  className={cn('-mt-4 flex w-full flex-row border-b text-muted-foreground text-sm', {
-                    hidden: !isContentsTabAvailable,
-                  })}
-                >
-                  <TabsTrigger
-                    className="group flex min-h-12 w-1/2 items-center justify-center px-2 text-center hover:text-muted-foreground/80 data-[state=active]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))]"
-                    value="fields"
-                  >
-                    <MousePointerIcon className="mr-2 -ml-1 h-3.5 w-3.5 group-data-[state=active]:text-primary" />
-                    <Trans>Fields</Trans>
-                  </TabsTrigger>
+                {editorConfig.general?.allowAddFieldsStep && editorConfig.general?.allowAddContentsStep && (
+                  <TabsList className="-mt-4 flex w-full flex-row border-b pt-2 text-muted-foreground text-sm">
+                    <TabsTrigger
+                      className="group flex min-h-12 w-1/2 items-center justify-center px-2 text-center hover:text-muted-foreground/80 data-[state=active]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))]"
+                      value="fields"
+                    >
+                      <MousePointerIcon className="mr-2 -ml-1 h-3.5 w-3.5 group-data-[state=active]:text-primary" />
+                      <Trans>Fields</Trans>
+                    </TabsTrigger>
 
-                  {isContentsTabAvailable && (
                     <TabsTrigger
                       className="group flex min-h-12 w-1/2 items-center justify-center px-2 text-center hover:text-muted-foreground/80 data-[state=active]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))]"
                       value="contents"
@@ -417,8 +408,8 @@ export const EnvelopeEditorFieldsPage = () => {
                       <LayoutGridIcon className="mr-2 -ml-1 h-3.5 w-3.5 group-data-[state=active]:text-primary" />
                       <Trans>Contents</Trans>
                     </TabsTrigger>
-                  )}
-                </TabsList>
+                  </TabsList>
+                )}
 
                 {/* Fields tab */}
                 <TabsContent value="fields">

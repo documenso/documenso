@@ -1,16 +1,9 @@
 import sharp from 'sharp';
 import { match } from 'ts-pattern';
 
+import { CONTENT_IMAGE_MAX_EDGE, CONTENT_IMAGE_MAX_INPUT_PIXELS } from '../../constants/envelope-content';
 import { AppError } from '../../errors/app-error';
 import type { TDataContentImageMeta } from '../../types/data-content-meta';
-
-/**
- * The longest edge an uploaded content image is scaled down to, in pixels.
- *
- * Content images are drawn at page scale, so anything beyond this only
- * inflates storage and render times without a visible difference.
- */
-export const CONTENT_IMAGE_MAX_EDGE = 2048;
 
 /**
  * The longest file name kept for an uploaded content image, in UTF-16 code
@@ -27,14 +20,6 @@ export const CONTENT_IMAGE_MAX_FILE_NAME_LENGTH = 200;
  * The file name used when nothing usable is left of the uploaded name.
  */
 export const CONTENT_IMAGE_FALLBACK_FILE_NAME = 'image';
-
-/**
- * The maximum number of pixels an uploaded image may decode to.
- *
- * Bounds the memory used to decode an upload, since a tiny compressed file
- * can expand to a huge bitmap. Comfortably fits a 12 megapixel phone photo.
- */
-export const CONTENT_IMAGE_MAX_INPUT_PIXELS = 25_000_000;
 
 type SupportedImageFormat = 'png' | 'jpeg' | 'webp';
 

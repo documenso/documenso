@@ -1,14 +1,10 @@
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 
+import { CONTENT_IMAGE_MAX_EDGE } from '../../constants/envelope-content';
 import { AppError } from '../../errors/app-error';
 import { ZDataContentImageMeta } from '../../types/data-content-meta';
-import {
-  CONTENT_IMAGE_MAX_EDGE,
-  CONTENT_IMAGE_MAX_FILE_NAME_LENGTH,
-  getNormalizedImageFileName,
-  normalizeImage,
-} from './normalize-image';
+import { CONTENT_IMAGE_MAX_FILE_NAME_LENGTH, getNormalizedImageFileName, normalizeImage } from './normalize-image';
 
 const createImage = (width: number, height: number) =>
   sharp({

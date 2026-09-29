@@ -13,7 +13,11 @@ import {
 import type { TEnvelopeFieldAndMeta } from '@documenso/lib/types/field-meta';
 import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
 import { extractDerivedDocumentMeta } from '@documenso/lib/utils/document';
-import { buildEmbeddedEditorOptions, buildEmbeddedFeatures } from '@documenso/lib/utils/embed-config';
+import {
+  buildEmbeddedEditorOptions,
+  buildEmbeddedFeatures,
+  getPendingEmbedImagesToUpload,
+} from '@documenso/lib/utils/embed-config';
 import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-router/create-envelope.types';
@@ -172,7 +176,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
 
   const buildCreateEnvelopeRequest = (
     envelope: Omit<TEditorEnvelope, 'id'>,
-  ): { payload: TCreateEnvelopePayload; files: File[] } => {
+  ): { payload: TCreateEnvelopePayload; files: File[]; contentImages: File[] } => {
     const sortedItems = [...envelope.envelopeItems].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     const itemIdToIndex = new Map<string, number>();
@@ -224,6 +228,26 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       };
     });
 
+    const imagesToUpload = getPendingEmbedImagesToUpload(envelope.contents);
+
+    const contents = envelope.contents.map((content) => {
+      const image = imagesToUpload.find((imageToUpload) => imageToUpload.id === content.dataContentId);
+
+      // Nothing is uploaded before the envelope exists, so every image must
+      // go along with the request.
+      if (content.dataContentId && !image) {
+        throw new Error(`Content "${content.id}" has no image data`);
+      }
+
+      return {
+        identifier: itemIdToIndex.get(content.envelopeItemId),
+        contentMeta: content.contentMeta,
+        imageIndex: image?.index,
+      };
+    });
+
+    const contentImages = imagesToUpload.map((image) => image.file);
+
     const payload: TCreateEnvelopePayload = {
       title: envelope.title,
       type: envelope.type,
@@ -237,6 +261,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
         : undefined,
       folderId: envelope.folderId ?? undefined,
       recipients,
+      contents,
       attachments: envelope.attachments,
       meta: {
         ...envelope.documentMeta,
@@ -255,7 +280,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       },
     };
 
-    return { payload, files };
+    return { payload, files, contentImages };
   };
 
   const createEmbeddedEnvelope = async (envelopeWithoutId: Omit<TEditorEnvelope, 'id'>) => {
@@ -266,13 +291,17 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
     setIsCreatingEnvelope(true);
 
     try {
-      const { payload, files } = buildCreateEnvelopeRequest(envelopeWithoutId);
+      const { payload, files, contentImages } = buildCreateEnvelopeRequest(envelopeWithoutId);
 
       const formData = new FormData();
       formData.append('payload', JSON.stringify(payload));
 
       for (const file of files) {
         formData.append('files', file);
+      }
+
+      for (const contentImage of contentImages) {
+        formData.append('contentImages', contentImage);
       }
 
       const { id } = await createEmbeddingEnvelope(formData);

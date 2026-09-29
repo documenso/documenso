@@ -46,10 +46,21 @@ export type SetEnvelopeContentsOptions = {
      * This ID parameter is only here to allow users to duplicate data content without
      * reuploading it.
      *
-     * To attach a new image you must go through trpc.envelope.content.uploadImage
+     * To attach a new image you must go through trpc.envelope.content.uploadImage,
+     * or pass the data content in `newDataContents`.
      */
     dataContentId: string | null;
   }[];
+
+  /**
+   * Data contents created outside of this function which should (but not yet)
+   * belong to this envelope.
+   *
+   * Never pass data content IDs taken from a request here, since these are
+   * attached without checking where they came from.
+   */
+  newDataContents?: Pick<DataContent, 'id' | 'metadata'>[];
+
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -64,6 +75,7 @@ export const setEnvelopeContents = async ({
   teamId,
   id,
   contents,
+  newDataContents = [],
   requestMetadata,
 }: SetEnvelopeContentsOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
@@ -124,12 +136,14 @@ export const setEnvelopeContents = async ({
 
   const existingContents = envelope.contents.map(({ dataContent: _dataContent, ...content }) => content);
 
-  // Create a map of all the existing data contents on this envelope.
-  const attachedDataContents = new Map(
-    envelope.contents.flatMap((content) =>
-      content.dataContent ? [[content.dataContent.id, content.dataContent]] : [],
+  // Create a map of all the data contents which may be attached: the ones
+  // already on this envelope, and the ones the caller just created.
+  const attachedDataContents = new Map([
+    ...envelope.contents.flatMap((content) =>
+      content.dataContent ? [[content.dataContent.id, content.dataContent] as const] : [],
     ),
-  );
+    ...newDataContents.map((dataContent) => [dataContent.id, dataContent] as const),
+  ]);
 
   // The organisation's plan caps how much content an envelope may hold.
   assertEnvelopeContentSaveWithinLimits({

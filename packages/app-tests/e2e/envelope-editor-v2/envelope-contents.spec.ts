@@ -1,4 +1,10 @@
-import { nanoid } from '@documenso/lib/universal/id';
+import { createDataContentImage } from '@documenso/lib/server-only/data-content/create-data-content-image';
+import {
+  EnvelopeContentShapeType,
+  EnvelopeContentType,
+  ZEnvelopeContentMetaSchema,
+} from '@documenso/lib/types/envelope-content-meta';
+import { generateDatabaseId, nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -6,6 +12,7 @@ import { expect, type Page, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import {
+  createImageFile,
   getContentActionButton,
   getContentCountForPage,
   getContentGroupsForPage,
@@ -16,25 +23,31 @@ import {
   placeContentOnPdf,
   selectContentOnCanvas,
   selectEditorTab,
+  uploadImage,
   waitForContentSelection,
   waitForContentsAutosave,
+  waitForUploadToLand,
 } from '../fixtures/contents';
 import {
+  addEnvelopeItemPdf,
   clickAddMyselfButton,
   clickEnvelopeEditorStep,
   getEnvelopeEditorSettingsTrigger,
   openDocumentEnvelopeEditor,
   openEmbeddedEnvelopeEditor,
   openTemplateEnvelopeEditor,
+  persistEmbeddedEnvelope,
+  setRecipientEmail,
   type TEnvelopeEditorSurface,
+  type TEnvelopeEditorType,
 } from '../fixtures/envelope-editor';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
 import { getKonvaTransformerNodeCountForPage } from '../fixtures/konva';
 
 /**
- * Contents are only authored on the native document and template surfaces.
- * The embedded editor persists through the public envelope API, which does
- * not carry contents yet, so the tab is hidden there (see the embedded test).
+ * The native document and template surfaces autosave contents as they are
+ * edited. The embedded editor only saves when the envelope is created or
+ * updated, so its tests persist explicitly (see the embedded tests).
  */
 
 const openSettingsDialog = async (root: Page) => {
@@ -678,18 +691,332 @@ test.describe('template editor', () => {
   });
 });
 
+// --- Embedded editor ---
+
+/**
+ * Set up the embedded editor on the fields step with the contents tab open.
+ *
+ * The embedded editor has no "Add Myself", so the first recipient is filled
+ * in instead.
+ */
+const openEmbeddedContentsTab = async (surface: TEnvelopeEditorSurface) => {
+  const root = surface.root;
+
+  await setRecipientEmail(root, 0, `embedded-contents-${nanoid()}@test.documenso.com`);
+
+  await clickEnvelopeEditorStep(root, 'addFields');
+  await expect(getPageCanvas(root)).toBeVisible();
+
+  await selectEditorTab(root, 'Contents');
+  await expect(root.getByRole('heading', { name: 'Add Content' })).toBeVisible();
+};
+
+/**
+ * The content groups on a page which currently draw an image.
+ */
+const getDrawnImageCount = async (root: Page) =>
+  (await getContentGroupsForPage(root)).filter((group) => group.visibleChildren.includes('content-image')).length;
+
+const runEmbeddedCreateFlow = async (page: Page, envelopeType: TEnvelopeEditorType) => {
+  const externalId = `e2e-embed-contents-${nanoid()}`;
+
+  const surface = await openEmbeddedEnvelopeEditor(page, {
+    envelopeType,
+    externalId,
+    tokenNamePrefix: 'e2e-embed-contents',
+  });
+
+  const root = surface.root;
+
+  await addEnvelopeItemPdf(root, 'embedded-contents.pdf');
+  await openEmbeddedContentsTab(surface);
+
+  await placeContentOnPdf(root, 'Text', { x: 120, y: 120 });
+  await placeContentOnPdf(root, 'Rectangle', { x: 320, y: 120 });
+
+  // The envelope does not exist yet, so the image is held in the browser and
+  // drawn from there until the envelope is created.
+  await placeContentOnPdf(root, 'Image', { x: 120, y: 300 });
+  await uploadImage(root, await createImageFile('embedded-logo.png', 400, 200));
+  await waitForUploadToLand(root);
+
+  await expect(root.getByText('400 * 200')).toBeVisible();
+  await expect.poll(async () => await getDrawnImageCount(root)).toBe(1);
+
+  // The duplicate shares the image.
+  await getContentActionButton(root, 'Duplicate').click();
+  expect(await getContentCountForPage(root)).toBe(4);
+  await expect.poll(async () => await getDrawnImageCount(root)).toBe(2);
+
+  // The preview draws the images from the browser too.
+  await clickEnvelopeEditorStep(root, 'preview');
+  await expect.poll(async () => await getDrawnImageCount(root)).toBe(2);
+
+  await persistEmbeddedEnvelope(surface);
+
+  return { surface, externalId };
+};
+
+const assertEmbeddedCreatePersisted = async (surface: TEnvelopeEditorSurface, externalId: string) => {
+  const envelope = await findEnvelopeWithContents(surface, externalId);
+
+  expect(envelope.contents).toHaveLength(4);
+
+  const types = envelope.contents.map((content) => getMeta(content.contentMeta).type).sort();
+
+  expect(types).toEqual(['image', 'image', 'shape', 'text']);
+
+  const [image, duplicate] = envelope.contents.filter((content) => getMeta(content.contentMeta).type === 'image');
+
+  // The image was uploaded once and is shared by both contents.
+  expect(image.dataContentId).not.toBeNull();
+  expect(duplicate.dataContentId).toBe(image.dataContentId);
+
+  expect(getMeta(image.dataContent?.metadata)).toMatchObject({
+    type: 'image',
+    width: 400,
+    height: 200,
+    mimeType: 'image/png',
+    fileName: 'embedded-logo.png',
+  });
+};
+
+/**
+ * Seed an image content and a rectangle onto an existing envelope.
+ */
+const seedEmbeddedEditContents = async (envelopeId: string) => {
+  const envelopeItem = await prisma.envelopeItem.findFirstOrThrow({ where: { envelopeId } });
+
+  const png = await createImageFile('existing-logo.png', 300, 100);
+
+  const dataContent = await createDataContentImage({
+    file: {
+      name: png.name,
+      arrayBuffer: async () => await new Blob([png.buffer]).arrayBuffer(),
+    },
+  });
+
+  const imageContentId = generateDatabaseId('envelope_content');
+  const rectangleContentId = generateDatabaseId('envelope_content');
+
+  await prisma.envelopeContent.createMany({
+    data: [
+      {
+        id: imageContentId,
+        envelopeId,
+        envelopeItemId: envelopeItem.id,
+        dataContentId: dataContent.id,
+        contentMeta: ZEnvelopeContentMetaSchema.parse({
+          type: EnvelopeContentType.IMAGE,
+          page: 1,
+          positionX: 10,
+          positionY: 10,
+          width: 30,
+          height: 10,
+        }),
+      },
+      {
+        id: rectangleContentId,
+        envelopeId,
+        envelopeItemId: envelopeItem.id,
+        dataContentId: null,
+        contentMeta: ZEnvelopeContentMetaSchema.parse({
+          type: EnvelopeContentType.SHAPE,
+          shape: EnvelopeContentShapeType.RECTANGLE,
+          page: 1,
+          positionX: 10,
+          positionY: 40,
+          width: 20,
+          height: 10,
+        }),
+      },
+    ],
+  });
+
+  return { dataContentId: dataContent.id, imageContentId, rectangleContentId };
+};
+
+const runEmbeddedEditFlow = async (page: Page, envelopeType: TEnvelopeEditorType) => {
+  const surface = await openEmbeddedEnvelopeEditor(page, {
+    envelopeType,
+    mode: 'edit',
+    tokenNamePrefix: 'e2e-embed-contents',
+  });
+
+  const root = surface.root;
+  const envelopeId = surface.envelopeId;
+
+  if (!envelopeId) {
+    throw new Error('Envelope not found');
+  }
+
+  const seeded = await seedEmbeddedEditContents(envelopeId);
+
+  // Reload so the editor picks up the seeded contents.
+  await root.reload();
+  await expect(root.getByRole('heading', { name: 'Documents' })).toBeVisible();
+
+  await openEmbeddedContentsTab(surface);
+
+  // The existing image is loaded through the presign token.
+  expect(await getContentCountForPage(root)).toBe(2);
+  await expect.poll(async () => await getDrawnImageCount(root)).toBe(1);
+
+  const groups = await getContentGroupsForPage(root);
+  const imageGroup = groups.find((group) => group.contentType === 'image');
+  const rectangleGroup = groups.find((group) => group.contentType === 'shape');
+
+  if (!imageGroup || !rectangleGroup) {
+    throw new Error('Seeded contents not found');
+  }
+
+  const { width: pageWidth, height: pageHeight, scale } = await getPageSize(root);
+
+  // Remove the rectangle.
+  await selectContentOnCanvas(root, { x: (rectangleGroup.rect.x + 4) * scale, y: (rectangleGroup.rect.y + 4) * scale });
+  await waitForContentSelection(root, [rectangleGroup.id]);
+  await getContentActionButton(root, 'Remove').click();
+  expect(await getContentCountForPage(root)).toBe(1);
+
+  // Duplicate the existing image, which references the uploaded image rather
+  // than uploading it again.
+  await selectContentOnCanvas(root, { x: (imageGroup.rect.x + 4) * scale, y: (imageGroup.rect.y + 4) * scale });
+  await waitForContentSelection(root, [imageGroup.id]);
+  await getContentActionButton(root, 'Duplicate').click();
+  expect(await getContentCountForPage(root)).toBe(2);
+
+  // Add a new image in an empty part of the page.
+  await placeContentOnPdf(root, 'Image', { x: pageWidth * scale * 0.5, y: pageHeight * scale * 0.7 });
+  await uploadImage(root, await createImageFile('new-logo.png', 200, 200));
+  await waitForUploadToLand(root);
+
+  expect(await getContentCountForPage(root)).toBe(3);
+  await expect.poll(async () => await getDrawnImageCount(root)).toBe(3);
+
+  await persistEmbeddedEnvelope(surface);
+
+  return { envelopeId, seeded };
+};
+
+const assertEmbeddedEditPersisted = async (
+  envelopeId: string,
+  seeded: Awaited<ReturnType<typeof seedEmbeddedEditContents>>,
+) => {
+  const contents = await prisma.envelopeContent.findMany({
+    where: { envelopeId },
+    include: { dataContent: true },
+  });
+
+  expect(contents).toHaveLength(3);
+
+  // The rectangle was removed, the original image kept as is.
+  expect(contents.some((content) => content.id === seeded.rectangleContentId)).toBe(false);
+  expect(contents.some((content) => content.id === seeded.imageContentId)).toBe(true);
+
+  // The duplicate shares the existing image.
+  const withExistingImage = contents.filter((content) => content.dataContentId === seeded.dataContentId);
+
+  expect(withExistingImage).toHaveLength(2);
+
+  // The new image was uploaded with the update.
+  const withNewImage = contents.find((content) => content.dataContentId !== seeded.dataContentId);
+
+  expect(withNewImage?.dataContentId).not.toBeNull();
+  expect(getMeta(withNewImage?.dataContent?.metadata)).toMatchObject({
+    type: 'image',
+    width: 200,
+    height: 200,
+    fileName: 'new-logo.png',
+  });
+};
+
+/**
+ * How many times an image with the given file name was stored.
+ */
+const countDataContentsNamed = async (fileName: string) =>
+  await prisma.dataContent.count({
+    where: {
+      metadata: {
+        path: ['fileName'],
+        equals: fileName,
+      },
+    },
+  });
+
+const runEmbeddedImagesInUseFlow = async (page: Page) => {
+  const externalId = `e2e-embed-contents-${nanoid()}`;
+
+  const surface = await openEmbeddedEnvelopeEditor(page, {
+    envelopeType: 'DOCUMENT',
+    externalId,
+    tokenNamePrefix: 'e2e-embed-contents',
+  });
+
+  const root = surface.root;
+
+  const replacedImage = await createImageFile(`replaced-${nanoid()}.png`, 200, 100);
+  const keptImage = await createImageFile(`kept-${nanoid()}.png`, 200, 100);
+  const removedImage = await createImageFile(`removed-${nanoid()}.png`, 200, 100);
+
+  await addEnvelopeItemPdf(root, 'embedded-contents.pdf');
+  await openEmbeddedContentsTab(surface);
+
+  // An image which is replaced before saving.
+  await placeContentOnPdf(root, 'Image', { x: 120, y: 120 });
+  await uploadImage(root, replacedImage);
+  await waitForUploadToLand(root);
+  await uploadImage(root, keptImage);
+  await waitForUploadToLand(root);
+
+  // An image which is removed before saving.
+  await placeContentOnPdf(root, 'Image', { x: 120, y: 400 });
+  await uploadImage(root, removedImage);
+  await waitForUploadToLand(root);
+  await root.getByRole('button', { name: 'Remove image' }).click();
+  await expect(root.getByText('Click to upload or drag and drop')).toBeVisible();
+
+  await persistEmbeddedEnvelope(surface);
+
+  return { surface, externalId, replacedImage, keptImage, removedImage };
+};
+
 test.describe('embedded editor', () => {
-  test('contents tab is not available', async ({ page }) => {
-    const surface = await openEmbeddedEnvelopeEditor(page, {
-      envelopeType: 'DOCUMENT',
-      mode: 'edit',
-      tokenNamePrefix: 'e2e-embed-contents',
-    });
+  test('create a document with contents and an image', async ({ page }) => {
+    const { surface, externalId } = await runEmbeddedCreateFlow(page, 'DOCUMENT');
 
-    await clickEnvelopeEditorStep(surface.root, 'addFields');
-    await expect(getPageCanvas(surface.root)).toBeVisible();
+    await assertEmbeddedCreatePersisted(surface, externalId);
+  });
 
-    await expect(surface.root.getByRole('tab', { name: 'Contents' })).toHaveCount(0);
-    await expect(surface.root.getByRole('button', { name: 'Rectangle', exact: true })).toHaveCount(0);
+  test('create a template with contents and an image', async ({ page }) => {
+    const { surface, externalId } = await runEmbeddedCreateFlow(page, 'TEMPLATE');
+
+    await assertEmbeddedCreatePersisted(surface, externalId);
+  });
+
+  test('update the contents of an existing document', async ({ page }) => {
+    const { envelopeId, seeded } = await runEmbeddedEditFlow(page, 'DOCUMENT');
+
+    await assertEmbeddedEditPersisted(envelopeId, seeded);
+  });
+
+  test('update the contents of an existing template', async ({ page }) => {
+    const { envelopeId, seeded } = await runEmbeddedEditFlow(page, 'TEMPLATE');
+
+    await assertEmbeddedEditPersisted(envelopeId, seeded);
+  });
+
+  test('only uploads the images which are still in use', async ({ page }) => {
+    const { surface, externalId, replacedImage, keptImage, removedImage } = await runEmbeddedImagesInUseFlow(page);
+
+    const envelope = await findEnvelopeWithContents(surface, externalId);
+    const withImage = envelope.contents.filter((content) => content.dataContentId !== null);
+
+    expect(envelope.contents).toHaveLength(2);
+    expect(withImage).toHaveLength(1);
+    expect(getMeta(withImage[0].dataContent?.metadata)).toMatchObject({ fileName: keptImage.name });
+
+    // The replaced and removed images were never uploaded.
+    expect(await countDataContentsNamed(replacedImage.name)).toBe(0);
+    expect(await countDataContentsNamed(removedImage.name)).toBe(0);
   });
 });

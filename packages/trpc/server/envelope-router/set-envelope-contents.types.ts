@@ -1,27 +1,39 @@
 import { ZEnvelopeContentSchema } from '@documenso/lib/types/envelope-content';
 import { ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';
+import { isNonNullish, unique } from 'remeda';
 import { z } from 'zod';
 
 export const ZSetEnvelopeContentsRequestSchema = z.object({
   envelopeId: z.string(),
-  contents: z.array(
-    z.object({
-      id: z.string().optional().describe('The id of the content. If not provided, a new content will be created.'),
-      formId: z.string().optional().describe('A temporary ID to keep track of new contents created'),
-      envelopeItemId: z
-        .string()
-        .describe(
-          'The id of the envelope item to put the content on. Fixed once created, an existing content cannot be moved to another item.',
-        ),
-      contentMeta: ZEnvelopeContentMetaSchema,
-      dataContentId: z
-        .string()
-        .nullable()
-        .describe(
-          'The id of a data content (e.g. an image) already attached to a content on this envelope, or null for none. New images are attached via the upload image route.',
-        ),
-    }),
-  ),
+  contents: z
+    .array(
+      z.object({
+        id: z.string().optional().describe('The id of the content. If not provided, a new content will be created.'),
+        formId: z.string().optional().describe('A temporary ID to keep track of new contents created'),
+        envelopeItemId: z
+          .string()
+          .describe(
+            'The id of the envelope item to put the content on. Fixed once created, an existing content cannot be moved to another item.',
+          ),
+        contentMeta: ZEnvelopeContentMetaSchema,
+        dataContentId: z
+          .string()
+          .nullable()
+          .describe(
+            'The id of a data content (e.g. an image) already attached to a content on this envelope, or null for none. New images are attached via the upload image route.',
+          ),
+      }),
+    )
+    .refine(
+      (contents) => {
+        const ids = contents.map((content) => content.id).filter(isNonNullish);
+
+        return unique(ids).length === ids.length;
+      },
+      {
+        message: 'Content IDs must be unique, no duplicate values allowed',
+      },
+    ),
 });
 
 export const ZSetEnvelopeContentsResponseSchema = z.object({

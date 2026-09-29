@@ -2,6 +2,7 @@ import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
+import { ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';
 import {
   ZClampedFieldHeightSchema,
   ZClampedFieldPositionXSchema,
@@ -15,7 +16,7 @@ import { EnvelopeType } from '@prisma/client';
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
-import { zfdFile, zodFormData } from '../../utils/zod-form-data';
+import { zfdContentImageFile, zfdFile, zodFormData } from '../../utils/zod-form-data';
 import { ZDocumentExternalIdSchema, ZDocumentTitleSchema, ZDocumentVisibilitySchema } from '../document-router/schema';
 import type { TrpcRouteMeta } from '../trpc';
 import { ZCreateEnvelopeRecipientSchema } from './envelope-recipients/create-envelope-recipients.types';
@@ -67,6 +68,24 @@ export const ZCreateEnvelopePayloadSchema = z.object({
       }),
     )
     .optional(),
+  contents: z
+    .object({
+      identifier: z
+        .union([z.string(), z.number()])
+        .describe('Either the filename or the index of the file that was uploaded to attach the content to.')
+        .optional(),
+      contentMeta: ZEnvelopeContentMetaSchema.describe('All the properties of the content being placed.'),
+      imageIndex: z
+        .number()
+        .int()
+        .min(0)
+        .describe(
+          'The index of the file in `contentImages` to show in the content. Only image contents can hold an image.',
+        )
+        .optional(),
+    })
+    .array()
+    .optional(),
   meta: ZDocumentMetaCreateSchema.optional(),
   attachments: z
     .array(
@@ -82,6 +101,7 @@ export const ZCreateEnvelopePayloadSchema = z.object({
 export const ZCreateEnvelopeRequestSchema = zodFormData({
   payload: zfd.json(ZCreateEnvelopePayloadSchema),
   files: zfd.repeatableOfType(zfdFile()),
+  contentImages: zfd.repeatableOfType(zfdContentImageFile()),
 });
 
 export const ZCreateEnvelopeResponseSchema = z.object({

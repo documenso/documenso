@@ -5,7 +5,7 @@ import type { ContentImageStatus, ContentImageStatusMap } from '../../universal/
 import type { ContentImageMap, ContentImageSource } from '../../universal/content-renderer/content-renderer';
 import { getDataContentIds } from '../../utils/envelope-content';
 import { getDataContentImageUrl } from '../../utils/envelope-download';
-import { type ContentImageDetails, loadContentImage } from '../load-content-image';
+import { type ContentImageDetails, decodeLocalContentImage, loadContentImage } from '../load-content-image';
 import { useLatestRef } from './use-latest-ref';
 
 export type ContentImages = {
@@ -50,7 +50,11 @@ type UseContentImagesOptions = {
    */
   envelopeItemId: string | null;
 
-  contents: Pick<EnvelopeContent, 'envelopeItemId' | 'dataContentId'>[];
+  /**
+   * Data is only used for embeds, where the image has yet to be uploaded since
+   * embeds are all built locally before being sent at the end of the flow.
+   */
+  contents: (Pick<EnvelopeContent, 'envelopeItemId' | 'dataContentId'> & { data?: Blob })[];
   token: string | undefined;
   presignToken?: string | undefined;
 };
@@ -85,6 +89,10 @@ export const useContentImages = ({
   presignToken,
 }: UseContentImagesOptions): ContentImages => {
   const [state, setState] = useState<ContentImagesState>(createEmptyState);
+
+  // Read when a load starts, so the effect does not re-run on every content
+  // change. A content always holds its file before its ID is requested.
+  const contentsRef = useLatestRef(contents);
 
   // Mirrors of the state for the effects, so starting loads does not depend
   // on the state itself (which would re-run the effect on every update) and
@@ -123,9 +131,15 @@ export const useContentImages = ({
     }));
 
     for (const dataContentId of unrequestedDataContentIds) {
-      const url = getDataContentImageUrl({ envelopeId, dataContentId, token, presignToken });
+      const localImage = contentsRef.current.find(
+        (content) => content.dataContentId === dataContentId && content.data,
+      )?.data;
 
-      void loadContentImage(url)
+      const loadImage = localImage
+        ? decodeLocalContentImage(localImage)
+        : loadContentImage(getDataContentImageUrl({ envelopeId, dataContentId, token, presignToken }));
+
+      void loadImage
         .then(({ image, details }) => {
           if (mountIdRef.current !== mountId) {
             closeImage(image);

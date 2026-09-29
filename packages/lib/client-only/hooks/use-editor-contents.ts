@@ -27,6 +27,9 @@ export const ZLocalContentSchema = z.object({
   // This is the ID of the uploaded data content (e.g. an image) attached to
   // the content, or null for none.
   dataContentId: z.string().nullable(),
+  // The file of an image which has not been uploaded yet, referenced by a
+  // temporary `dataContentId`. Only used for embedded.
+  data: z.instanceof(File).optional(),
 });
 
 export type TLocalContent = z.infer<typeof ZLocalContentSchema>;
@@ -97,6 +100,7 @@ export const useEditorContents = ({
       envelopeItemId: content.envelopeItemId,
       contentMeta: content.contentMeta,
       dataContentId: content.dataContentId,
+      data: content.data,
     }),
     onChange: handleContentsUpdate,
   });

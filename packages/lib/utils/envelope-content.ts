@@ -1,33 +1,13 @@
-import type { I18n, MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
 import type { EnvelopeContent, OrganisationClaim, Prisma } from '@prisma/client';
-import { firstBy, isNonNullish, mapValues, sortBy, unique } from 'remeda';
+import { firstBy, isNonNullish, sortBy, unique } from 'remeda';
 
 import { AppError, AppErrorCode } from '../errors/app-error';
 import {
   CONTENT_MAX_Z_INDEX,
   CONTENT_TYPE_DATA_CONTENT_TYPE,
-  EnvelopeContentShapeType,
   EnvelopeContentType,
 } from '../types/envelope-content-meta';
 import { generateDatabaseId } from '../universal/id';
-
-// Note: The friendly names live here rather than in the meta types module,
-// since that module is imported by the generated Prisma zod schemas and must
-// stay free of the lingui macro (which is not transformed everywhere the
-// schemas are loaded, e.g. in the e2e test runner).
-
-export const FRIENDLY_CONTENT_TYPE: Record<EnvelopeContentType, MessageDescriptor> = {
-  [EnvelopeContentType.TEXT]: msg`Text`,
-  [EnvelopeContentType.LINE]: msg`Line`,
-  [EnvelopeContentType.SHAPE]: msg`Shape`,
-  [EnvelopeContentType.HIGHLIGHT]: msg`Highlight`,
-  [EnvelopeContentType.IMAGE]: msg`Image`,
-};
-
-export const FRIENDLY_CONTENT_SHAPE_TYPE: Record<EnvelopeContentShapeType, MessageDescriptor> = {
-  [EnvelopeContentShapeType.RECTANGLE]: msg`Rectangle`,
-};
 
 type EnvelopeContentWithData = {
   dataContentId: string | null;
@@ -149,14 +129,6 @@ export const assertEnvelopeContentSaveWithinLimits = ({
       statusCode: 400,
     });
   }
-};
-
-/**
- * Resolve the translated names for each content type, used by the content
- * renderer for placeholder labels.
- */
-export const getClientSideContentTranslations = ({ t }: I18n): Record<EnvelopeContentType, string> => {
-  return mapValues(FRIENDLY_CONTENT_TYPE, (descriptor) => t(descriptor));
 };
 
 type OrderedContent = {

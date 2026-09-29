@@ -46,6 +46,16 @@ export const EditorContentImageSettings = ({ formId, dataContentId }: EditorCont
         void ContentImageUploadDialog.call({ formId, file });
       }
     },
+    // A file which is too large or not a supported image goes to the dialog
+    // as well, which shows why it cannot be used. When several files were
+    // dropped, the first is used.
+    onDropRejected: (fileRejections) => {
+      const [rejection] = fileRejections;
+
+      if (rejection) {
+        void ContentImageUploadDialog.call({ formId, file: rejection.file });
+      }
+    },
   });
 
   if (dataContentId) {
@@ -85,7 +95,7 @@ export const EditorContentImageSettings = ({ formId, dataContentId }: EditorCont
             variant="outline"
             className="h-7 px-2 text-xs"
             title={t`Remove image`}
-            onClick={() => editorContents.updateContentByFormId(formId, { dataContentId: null })}
+            onClick={() => editorContents.updateContentByFormId(formId, { dataContentId: null, data: undefined })}
           >
             <TrashIcon className="h-4 w-4" strokeWidth={1.5} />
           </Button>

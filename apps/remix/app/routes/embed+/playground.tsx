@@ -50,6 +50,7 @@ export default function EmbedPlaygroundPage() {
     allowConfigureEnvelopeTitle: true,
     allowUploadAndRecipientStep: true,
     allowAddFieldsStep: true,
+    allowAddContentsStep: true,
     allowPreviewStep: true,
     minimizeLeftSidebar: true,
   });

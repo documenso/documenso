@@ -1,3 +1,4 @@
+import { decodeLocalContentImage } from '@documenso/lib/client-only/load-content-image';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import {
@@ -7,7 +8,10 @@ import {
 import { AppError } from '@documenso/lib/errors/app-error';
 import { EnvelopeContentType } from '@documenso/lib/types/envelope-content-meta';
 import { resolveAttachedImageBox } from '@documenso/lib/universal/content-renderer/content-image-box';
+import { nanoid } from '@documenso/lib/universal/id';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
+import { PRESIGNED_DATA_CONTENT_ID_PREFIX } from '@documenso/lib/utils/embed-config';
+import type { Size } from '@documenso/lib/utils/geometry';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -36,6 +40,22 @@ type ContentImageUploadDialogProps = {
 type UploadStatus = 'picking' | 'uploading' | 'invalid-image' | 'too-large' | 'failed';
 
 /**
+ * Why the server would reject the file, if it would, so the user finds out
+ * before it is uploaded. Applies to dropped and picked files alike.
+ */
+const getRejectionReason = (file: File): 'too-large' | 'invalid-image' | null => {
+  if (file.size > megabytesToBytes(APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT)) {
+    return 'too-large';
+  }
+
+  if (!APP_CONTENT_IMAGE_MIME_TYPES.some((accepted) => accepted === file.type)) {
+    return 'invalid-image';
+  }
+
+  return null;
+};
+
+/**
  * Attach an image to an image content.
  *
  * Blocks the editor from the moment it is opened until the upload settles,
@@ -48,75 +68,109 @@ type UploadStatus = 'picking' | 'uploading' | 'invalid-image' | 'too-large' | 'f
 export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogProps, void>(
   ({ call, formId, file: droppedFile }) => {
     const { t } = useLingui();
-    const { editorContents, flushAutosave, envelope } = useCurrentEnvelopeEditor();
+    const { editorContents, flushAutosave, envelope, isEmbedded } = useCurrentEnvelopeEditor();
     const { contentImages, pageSizes } = useCurrentEnvelopeRender();
 
     const { mutateAsync: uploadImage } = trpc.envelope.content.uploadImage.useMutation();
 
     const inputRef = useRef<HTMLInputElement>(null);
-    const [status, setStatus] = useState<UploadStatus>(droppedFile ? 'uploading' : 'picking');
+
+    const [status, setStatus] = useState<UploadStatus>(() => {
+      if (!droppedFile) {
+        return 'picking';
+      }
+
+      return getRejectionReason(droppedFile) ?? 'uploading';
+    });
+
+    /**
+     * Point the content at its new image, fitting its box to the image.
+     *
+     * `data` is the file of an image which has not been uploaded yet.
+     */
+    const attachImage = (dataContentId: string, image: Size, data?: File) => {
+      // Re-read in case the content moved while the image was on its way.
+      const latest = editorContents.getContentByFormId(formId);
+
+      if (!latest || latest.contentMeta.type !== EnvelopeContentType.IMAGE) {
+        return;
+      }
+
+      const { contentMeta } = latest;
+      const page = pageSizes.get(latest.envelopeItemId, contentMeta.page);
+
+      const box = page
+        ? resolveAttachedImageBox({
+            image,
+            page,
+            box: {
+              positionX: contentMeta.positionX,
+              positionY: contentMeta.positionY,
+              width: contentMeta.width,
+              height: contentMeta.height,
+            },
+          })
+        : null;
+
+      editorContents.updateContentByFormId(formId, {
+        dataContentId,
+        data,
+        contentMeta: box ? { ...contentMeta, ...box } : contentMeta,
+      });
+    };
+
+    const uploadToServer = async (file: File) => {
+      // The content must exist on the server before an image can be
+      // attached to it.
+      await flushAutosave();
+
+      const content = editorContents.getContentByFormId(formId);
+
+      if (!content?.id || content.contentMeta.type !== EnvelopeContentType.IMAGE) {
+        throw new AppError('CONTENT_NOT_PERSISTED');
+      }
+
+      const formData = new FormData();
+
+      formData.append('payload', JSON.stringify({ envelopeId: envelope.id, envelopeContentId: content.id }));
+      formData.append('file', file);
+
+      const { dataContent } = await uploadImage(formData);
+
+      // Decode the local file at the size the server normalized it to, so
+      // the preview matches what the route would serve.
+      const image = await createImageBitmap(file, {
+        resizeWidth: dataContent.metadata.width,
+        resizeHeight: dataContent.metadata.height,
+        resizeQuality: 'high',
+      }).catch(() => null);
+
+      if (image) {
+        contentImages.setImage(dataContent.id, image, {
+          fileSize: dataContent.metadata.fileSize,
+        });
+      }
+
+      attachImage(dataContent.id, dataContent.metadata);
+    };
 
     const upload = async (file: File) => {
       setStatus('uploading');
 
       try {
-        // The content must exist on the server before an image can be
-        // attached to it.
-        await flushAutosave();
+        if (isEmbedded) {
+          // Decoded the way the server will store it, which also rejects what
+          // the server would, since it only sees the image once the envelope is
+          // saved.
+          const { image, details } = await decodeLocalContentImage(file);
 
-        const content = editorContents.getContentByFormId(formId);
+          const dataContentId = `${PRESIGNED_DATA_CONTENT_ID_PREFIX}${nanoid()}`;
 
-        if (!content?.id || content.contentMeta.type !== EnvelopeContentType.IMAGE) {
-          throw new AppError('CONTENT_NOT_PERSISTED');
-        }
+          contentImages.setImage(dataContentId, image, details);
 
-        const formData = new FormData();
-
-        formData.append('payload', JSON.stringify({ envelopeId: envelope.id, envelopeContentId: content.id }));
-        formData.append('file', file);
-
-        const { dataContent } = await uploadImage(formData);
-
-        // Decode the local file at the size the server normalized it to, so
-        // the preview matches what the route would serve without another
-        // request.
-        const image = await createImageBitmap(file, {
-          imageOrientation: 'from-image',
-          resizeWidth: dataContent.metadata.width,
-          resizeHeight: dataContent.metadata.height,
-          resizeQuality: 'high',
-        }).catch(() => null);
-
-        if (image) {
-          contentImages.setImage(dataContent.id, image, {
-            fileSize: dataContent.metadata.fileSize,
-          });
-        }
-
-        // Re-read in case the content moved while the upload was in flight.
-        const latest = editorContents.getContentByFormId(formId);
-
-        if (latest && latest.contentMeta.type === EnvelopeContentType.IMAGE) {
-          const { contentMeta } = latest;
-          const page = pageSizes.get(latest.envelopeItemId, contentMeta.page);
-
-          const box = page
-            ? resolveAttachedImageBox({
-                image: dataContent.metadata,
-                page,
-                box: {
-                  positionX: contentMeta.positionX,
-                  positionY: contentMeta.positionY,
-                  width: contentMeta.width,
-                  height: contentMeta.height,
-                },
-              })
-            : null;
-
-          editorContents.updateContentByFormId(formId, {
-            dataContentId: dataContent.id,
-            contentMeta: box ? { ...contentMeta, ...box } : contentMeta,
-          });
+          attachImage(dataContentId, image, file);
+        } else {
+          await uploadToServer(file);
         }
 
         call.end();
@@ -150,7 +204,8 @@ export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogP
     }, [call]);
 
     // Start immediately: upload the dropped file, or open the picker so the
-    // user does not have to click twice.
+    // user does not have to click twice. A dropped file the server would
+    // reject opens on the reason instead.
     const hasStartedRef = useRef(false);
 
     useEffect(() => {
@@ -160,10 +215,13 @@ export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogP
 
       hasStartedRef.current = true;
 
-      if (droppedFile) {
-        void upload(droppedFile);
-      } else {
+      if (!droppedFile) {
         inputRef.current?.click();
+        return;
+      }
+
+      if (!getRejectionReason(droppedFile)) {
+        void upload(droppedFile);
       }
     }, []);
 
@@ -177,15 +235,10 @@ export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogP
         return;
       }
 
-      // Reject what the server would reject before uploading it, so the
-      // picker path gets the same feedback as a drop.
-      if (file.size > megabytesToBytes(APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT)) {
-        setStatus('too-large');
-        return;
-      }
+      const rejectionReason = getRejectionReason(file);
 
-      if (!APP_CONTENT_IMAGE_MIME_TYPES.some((accepted) => accepted === file.type)) {
-        setStatus('invalid-image');
+      if (rejectionReason) {
+        setStatus(rejectionReason);
         return;
       }
 

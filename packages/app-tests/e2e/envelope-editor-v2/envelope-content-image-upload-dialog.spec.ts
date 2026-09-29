@@ -1,3 +1,5 @@
+import { APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/envelope-content';
+import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { prisma } from '@documenso/prisma';
 import { createCanvas } from '@napi-rs/canvas';
 import { expect, type Page, test } from '@playwright/test';
@@ -49,6 +51,37 @@ const uploadThroughDialog = async (page: Page, buffer: Buffer) => {
 
   await (await fileChooser).setFiles({ name: 'logo.png', mimeType: 'image/png', buffer });
 };
+
+test('a dropped file which cannot be used shows why', async ({ page }) => {
+  await openContentsEditor(page);
+
+  await placeContentOnPdf(page, 'Image', { x: 200, y: 200 });
+
+  const dropzoneInput = page
+    .locator('div[role="button"]', { hasText: 'Click to upload or drag and drop' })
+    .locator('input[type="file"]');
+
+  // Not a supported image.
+  await dropzoneInput.setInputFiles({
+    name: 'animated.gif',
+    mimeType: 'image/gif',
+    buffer: Buffer.from('R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', 'base64'),
+  });
+
+  await expect(page.getByText('This image could not be read. Use a PNG, JPEG or WebP file.')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Close' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+
+  // Over the size limit.
+  await dropzoneInput.setInputFiles({
+    name: 'huge.png',
+    mimeType: 'image/png',
+    buffer: Buffer.alloc(megabytesToBytes(APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT) + 1),
+  });
+
+  await expect(page.getByText(`This image is larger than ${APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT} MB.`)).toBeVisible();
+});
 
 test('the dialog blocks the editor while an image uploads', async ({ page }) => {
   const surface = await openContentsEditor(page);

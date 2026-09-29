@@ -188,13 +188,18 @@ export const EnvelopeEditorUploadPage = () => {
     // Directly commit the files for embedded documents since those are not uploaded
     // until the end of the embedded flow.
     if (isEmbedded) {
+      // New items go after the existing ones, in the order they were added.
+      // Deleting an item does not renumber the rest, so this continues from
+      // the highest order rather than the item count.
+      const highestOrder = envelope.envelopeItems.reduce((highest, item) => Math.max(highest, item.order), 0);
+
       setLocalEnvelope({
         envelopeItems: [
           ...envelope.envelopeItems,
-          ...newUploadingFiles.map((file) => ({
+          ...newUploadingFiles.map((file, index) => ({
             id: file.envelopeItemId!,
             title: file.title,
-            order: envelope.envelopeItems.length + 1,
+            order: highestOrder + index + 1,
             envelopeId: envelope.id,
             data: file.data!,
             documentDataId: '',

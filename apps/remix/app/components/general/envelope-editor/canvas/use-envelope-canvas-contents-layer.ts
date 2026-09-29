@@ -18,11 +18,8 @@ import {
   MIN_CONTENT_WIDTH_PX,
 } from '@documenso/lib/universal/content-renderer/content-renderer';
 import { renderContent } from '@documenso/lib/universal/content-renderer/render-content';
-import {
-  getClientSideContentTranslations,
-  getLocalContentOrderId,
-  sortContentsForRender,
-} from '@documenso/lib/utils/envelope-content';
+import { getLocalContentOrderId, sortContentsForRender } from '@documenso/lib/utils/envelope-content';
+import { getClientSideContentTranslations } from '@documenso/lib/utils/envelope-content-translations';
 import type { PercentageBox } from '@documenso/lib/utils/geometry';
 import { getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
 import { useLingui } from '@lingui/react/macro';
