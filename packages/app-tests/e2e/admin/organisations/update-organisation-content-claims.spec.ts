@@ -20,7 +20,7 @@ test('[ADMIN]: update envelope content claims for an organisation', async ({ pag
     redirectPath: `/admin/organisations/${organisation.id}`,
   });
 
-  await expect(page.getByText('Manage organisation')).toBeVisible();
+  await expect(page.getByText('Manage organization')).toBeVisible();
 
   const contentCountInput = page.getByLabel('Envelope Content Count', { exact: true });
   const imageCountInput = page.getByLabel('Envelope Content Image Count', { exact: true });
@@ -35,7 +35,7 @@ test('[ADMIN]: update envelope content claims for an organisation', async ({ pag
   // "Update role" buttons also match a non-exact name.
   await page.getByRole('button', { name: 'Update', exact: true }).last().click();
 
-  await expectToastTextToBeVisible(page, 'Organisation has been updated successfully');
+  await expectToastTextToBeVisible(page, 'Organization has been updated successfully');
 
   await expect(async () => {
     const claim = await prisma.organisationClaim.findFirstOrThrow({

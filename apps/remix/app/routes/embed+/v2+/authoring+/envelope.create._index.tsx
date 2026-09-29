@@ -427,7 +427,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
   return (
     <div className="relative min-h-screen min-w-screen">
       {isCreatingEnvelope && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background">
           <Spinner />
 
           <p className="mt-2 text-muted-foreground text-sm">
@@ -441,7 +441,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       )}
 
       {createdEnvelope && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background">
           <div className="mx-auto w-full max-w-md text-center">
             <CheckCircle2Icon className="mx-auto h-16 w-16 text-primary" />
 
