@@ -16,7 +16,7 @@ import {
   ZDocumentMetaTimezoneSchema,
 } from '@documenso/lib/types/document-meta';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+import { isHttpUrl } from '@documenso/lib/utils/is-http-url';
 import { canAccessTeamDocument, DocumentSignatureType, extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
@@ -97,7 +97,7 @@ export const ZAddSettingsFormSchema = z.object({
     redirectUrl: z
       .string()
       .optional()
-      .refine((value) => value === undefined || value === '' || isValidRedirectUrl(value), {
+      .refine((value) => value === undefined || value === '' || isHttpUrl(value), {
         message: 'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
     language: z

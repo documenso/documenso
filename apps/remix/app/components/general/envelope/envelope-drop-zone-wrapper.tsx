@@ -93,14 +93,6 @@ export const EnvelopeDropZoneWrapper = ({ children, type, className }: EnvelopeD
         duration: 5000,
       });
 
-      if (type === EnvelopeType.DOCUMENT) {
-        analytics.capture('App: Document Uploaded', {
-          userId: user.id,
-          documentId: id,
-          timestamp: new Date().toISOString(),
-        });
-      }
-
       const pathPrefix = type === EnvelopeType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
       const aiQueryParam = team.preferences.aiFeaturesEnabled ? '?ai=true' : '';
@@ -108,6 +100,11 @@ export const EnvelopeDropZoneWrapper = ({ children, type, className }: EnvelopeD
       await navigate(`${pathPrefix}/${id}/edit${aiQueryParam}`);
     } catch (err) {
       const error = AppError.parseError(err);
+
+      analytics.captureException(err, {
+        source: 'editor',
+        location: 'upload_document',
+      });
 
       const errorMessage = getUploadErrorMessage(error.code);
 

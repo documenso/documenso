@@ -170,7 +170,10 @@ export const TemplatesTableActionDropdown = ({
         onOpenChange={setRenameDialogOpen}
         envelopeType="template"
         onSuccess={async () => {
-          await trpcUtils.template.findTemplates.invalidate();
+          await Promise.all([
+            trpcUtils.template.findTemplates.invalidate(),
+            trpcUtils.template.findTemplatesInternal.invalidate(),
+          ]);
         }}
       />
     </DropdownMenu>
