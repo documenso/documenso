@@ -19,7 +19,7 @@ import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
-import { RecipientRole } from '@prisma/client';
+import { RecipientRole, SigningStatus } from '@prisma/client';
 import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -80,7 +80,11 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     );
   }
 
-  if (isRecipientExpired(recipient)) {
+  const isCompleted = recipient.signingStatus === SigningStatus.SIGNED || isDocumentCompleted(document.status);
+  const isRejected = recipient.signingStatus === SigningStatus.REJECTED;
+  const hasRecipientActioned = isCompleted || isRejected;
+
+  if (!hasRecipientActioned && isRecipientExpired(recipient)) {
     throw data(
       {
         type: 'embed-recipient-expired',
@@ -115,7 +119,7 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     );
   }
 
-  const isRecipientsTurnToSign = await getIsRecipientsTurnToSign({ token });
+  const isRecipientsTurnToSign = hasRecipientActioned || (await getIsRecipientsTurnToSign({ token }));
 
   if (!isRecipientsTurnToSign) {
     throw data(
@@ -173,6 +177,8 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     recipient,
     fields,
     completedFields,
+    isCompleted,
+    isRejected,
     hidePoweredBy,
     allowEmbedSigningWhitelabel,
   };
@@ -392,6 +398,8 @@ const EmbedSignDocumentPageV1 = ({ data }: { data: Awaited<ReturnType<typeof han
     recipient,
     fields,
     completedFields,
+    isCompleted,
+    isRejected,
     hidePoweredBy,
     allowEmbedSigningWhitelabel,
   } = data;
@@ -415,7 +423,8 @@ const EmbedSignDocumentPageV1 = ({ data }: { data: Awaited<ReturnType<typeof han
           fields={fields}
           completedFields={completedFields}
           metadata={document.documentMeta}
-          isCompleted={isDocumentCompleted(document.status)}
+          isCompleted={isCompleted}
+          isRejected={isRejected}
           hidePoweredBy={hidePoweredBy}
           allowWhitelabelling={allowEmbedSigningWhitelabel}
           allRecipients={allRecipients}
