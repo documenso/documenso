@@ -40,6 +40,8 @@ import { assertEnvelopeContentSaveWithinLimits } from '../../utils/envelope-cont
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { assignOmittedRecipientSigningOrders } from '../recipient/assign-omitted-recipient-signing-orders';
+import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -302,6 +304,27 @@ export const createEnvelope = async ({
     assertCompatibleRecipientRole({ signatureLevel, role: recipient.role });
   }
 
+  const parsedDefaultRecipients =
+    settings.defaultRecipients && !bypassDefaultRecipients
+      ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+      : [];
+
+  const defaultRecipients: CreateEnvelopeRecipientOptions[] = parsedDefaultRecipients.map((recipient) => ({
+    email: recipient.email,
+    name: recipient.name,
+    role: recipient.role,
+  }));
+
+  const requestedRecipients = [...(data.recipients ?? []), ...defaultRecipients];
+
+  assertCompatibleRecipientGrouping({ signatureLevel, recipients: requestedRecipients });
+
+  const recipientsToCreate = assignOmittedRecipientSigningOrders({ recipients: requestedRecipients });
+
+  const visibility = visibilityOverride || settings.documentVisibility;
+
+  const emailId = meta?.emailId;
+
   const contents = (data.contents ?? []).map((content) => ({
     ...content,
     contentMeta: ZEnvelopeContentMetaSchema.parse(content.contentMeta),
@@ -313,10 +336,6 @@ export const createEnvelope = async ({
     existingTypes: [],
     claim: team.organisation.organisationClaim,
   });
-
-  const visibility = visibilityOverride || settings.documentVisibility;
-
-  const emailId = meta?.emailId;
 
   // Validate that the email ID belongs to the organisation.
   if (emailId) {
@@ -437,21 +456,8 @@ export const createEnvelope = async ({
 
     const firstEnvelopeItem = envelope.envelopeItems[0];
 
-    const defaultRecipients =
-      settings.defaultRecipients && !bypassDefaultRecipients
-        ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
-        : [];
-
-    const mappedDefaultRecipients: CreateEnvelopeRecipientOptions[] = defaultRecipients.map((recipient) => ({
-      email: recipient.email,
-      name: recipient.name,
-      role: recipient.role,
-    }));
-
-    const allRecipients = [...(data.recipients || []), ...mappedDefaultRecipients];
-
     await Promise.all(
-      allRecipients.map(async (recipient) => {
+      recipientsToCreate.map(async (recipient) => {
         const recipientAuthOptions = createRecipientAuthOptions({
           accessAuth: recipient.accessAuth ?? [],
           actionAuth: recipient.actionAuth ?? [],
