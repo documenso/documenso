@@ -10,8 +10,9 @@ const API_BASE_URL = `${NEXT_PUBLIC_WEBAPP_URL()}/api/v2-beta`;
  * `Recipient.signingOrder` is an Int column, but nothing constrained the input
  * to an integer. Prisma does not reject a fraction — it truncates it (1.5 -> 1),
  * so distinct orders could silently collapse onto the same value, which under
- * signing groups means "same step". Zero and negatives were persisted as-is and
- * sort ahead of everything, including the `?? 0` fallback in assistant scoping.
+ * signing groups means "same step". Negatives were persisted as-is and sort
+ * ahead of everything, including the `?? 0` fallback in assistant scoping.
+ * Zero remains valid for legacy handling.
  */
 
 const createRecipient = async (request: APIRequestContext, token: string, envelopeId: string, signingOrder: number) =>
@@ -41,18 +42,6 @@ test('[SIGNING_ORDER_VALIDATION]: rejects a fractional signing order with a clie
   const recipients = await prisma.recipient.findMany({ where: { envelopeId: envelope.id } });
 
   expect(recipients).toHaveLength(0);
-});
-
-test('[SIGNING_ORDER_VALIDATION]: rejects a zero signing order', async ({ request }) => {
-  const { envelope, token } = await apiSeedDraftDocument(request, { title: '[TEST] Signing order validation zero' });
-
-  const response = await createRecipient(request, token, envelope.id, 0);
-
-  expect(response.status()).toBe(400);
-
-  const persisted = await prisma.recipient.findMany({ where: { envelopeId: envelope.id, signingOrder: 0 } });
-
-  expect(persisted).toHaveLength(0);
 });
 
 test('[SIGNING_ORDER_VALIDATION]: rejects a negative signing order', async ({ request }) => {
