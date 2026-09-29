@@ -1,6 +1,6 @@
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
+import type { DocumentDistributionMethod, DocumentSigningOrder, Prisma } from '@prisma/client';
 import {
   DocumentSource,
   EnvelopeType,
@@ -52,6 +52,9 @@ import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { assignOmittedRecipientSigningOrders } from '../recipient/assign-omitted-recipient-signing-orders';
+import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
+import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -309,6 +312,11 @@ export const createDocumentFromTemplate = async ({
       include: {
         fields: true,
       },
+      // Unordered template recipients are numbered in this sequence.
+      orderBy: [
+        { signingOrder: { sort: 'asc', nulls: 'last' } },
+        { id: 'asc' },
+      ] satisfies Prisma.RecipientOrderByWithRelationInput[],
     },
     envelopeItems: {
       include: {
@@ -430,8 +438,6 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
-  const allFinalRecipients = [...finalRecipients, ...defaultRecipientsFinal];
-
   // Key = original envelope item ID
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
@@ -523,6 +529,26 @@ export const createDocumentFromTemplate = async ({
     requested: ZSignatureLevelSchema.parse(template.signatureLevel),
     strict: false,
   });
+
+  const requestedOrderRecipients = finalRecipients.filter((finalRecipient) => {
+    const override = recipients.find((recipient) => recipient.id === finalRecipient.templateRecipientId);
+
+    return typeof override?.signingOrder === 'number';
+  });
+
+  assertCompatibleRecipientGrouping({
+    signatureLevel,
+    recipients: requestedOrderRecipients,
+    existingRecipients: finalRecipients.filter((recipient) => !requestedOrderRecipients.includes(recipient)),
+  });
+
+  const allFinalRecipients = assignOmittedRecipientSigningOrders({
+    recipients: [...finalRecipients, ...defaultRecipientsFinal],
+  });
+
+  for (const recipient of allFinalRecipients) {
+    assertCompatibleRecipientRole({ signatureLevel, role: recipient.role });
+  }
 
   const documentMeta = await prisma.documentMeta.create({
     data: extractDerivedDocumentMeta(
