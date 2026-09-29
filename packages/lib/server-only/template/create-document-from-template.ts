@@ -113,6 +113,7 @@ export type CreateDocumentFromTemplateOptions = {
     uploadSignatureEnabled?: boolean;
     drawSignatureEnabled?: boolean;
     envelopeExpirationPeriod?: TEnvelopeExpirationPeriod | null;
+    allowDocumentRejection?: boolean;
   };
 
   formValues?: TDocumentFormValues;
@@ -542,6 +543,7 @@ export const createDocumentFromTemplate = async ({
         drawSignatureEnabled: override?.drawSignatureEnabled ?? template.documentMeta?.drawSignatureEnabled,
         allowDictateNextSigner: override?.allowDictateNextSigner ?? template.documentMeta?.allowDictateNextSigner,
         envelopeExpirationPeriod: override?.envelopeExpirationPeriod ?? template.documentMeta?.envelopeExpirationPeriod,
+        allowDocumentRejection: override?.allowDocumentRejection ?? template.documentMeta?.allowDocumentRejection,
       },
       signatureLevel,
     ),

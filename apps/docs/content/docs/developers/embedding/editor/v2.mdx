@@ -186,6 +186,15 @@ Controls envelope configuration options. Set to `null` to hide envelope settings
 | `allowConfigureEmailSender`         | `boolean` | `true`  | Allow configuring the email sender        |
 | `allowConfigureEmailReplyTo`        | `boolean` | `true`  | Allow configuring the email reply-to      |
 
+<Callout title="Allow Document Rejection">
+  The settings dialog also contains an "Allow Document Rejection" option that is always shown. It sets the document's
+  own rejection setting (`meta.allowDocumentRejection` in the API) and defaults to the organisation or team document
+  preference. This
+  is separate from the `allowDocumentRejection` option of the embedded signing views: that option only controls the
+  signing embed's UI, while this one is stored on the document and enforced by the server. A recipient can reject only
+  when both allow it.
+</Callout>
+
 ### Actions
 
 Controls available actions during editing:

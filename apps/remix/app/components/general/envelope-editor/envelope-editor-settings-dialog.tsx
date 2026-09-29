@@ -110,6 +110,7 @@ export const ZAddSettingsFormSchema = z.object({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
+    allowDocumentRejection: z.boolean(),
     envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
     reminderSettings: ZEnvelopeReminderSettings.nullish(),
   }),
@@ -200,6 +201,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
         emailReplyTo: envelope.documentMeta.emailReplyTo ?? undefined,
         emailSettings: ZDocumentEmailSettingsSchema.parse(envelope.documentMeta.emailSettings),
         signatureTypes: extractTeamSignatureSettings(envelope.documentMeta),
+        allowDocumentRejection: envelope.documentMeta.allowDocumentRejection,
         envelopeExpirationPeriod: envelope.documentMeta?.envelopeExpirationPeriod ?? null,
         reminderSettings: envelope.documentMeta?.reminderSettings ?? null,
       },
@@ -249,6 +251,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
       message,
       subject,
       emailReplyTo,
+      allowDocumentRejection,
       envelopeExpirationPeriod,
       reminderSettings,
     } = data.meta;
@@ -278,6 +281,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+          allowDocumentRejection,
           envelopeExpirationPeriod,
           reminderSettings,
         },
@@ -464,6 +468,52 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                           )}
                         />
                       )}
+
+                      <FormField
+                        control={form.control}
+                        name="meta.allowDocumentRejection"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex flex-row items-center">
+                              <Trans>Allow Document Rejection</Trans>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="mx-2 h-4 w-4" />
+                                </TooltipTrigger>
+
+                                <TooltipContent className="max-w-xs text-muted-foreground">
+                                  <Trans>
+                                    Controls whether recipients can reject the document from the signing page.
+                                  </Trans>
+                                </TooltipContent>
+                              </Tooltip>
+                            </FormLabel>
+
+                            <FormControl>
+                              <Select
+                                value={field.value ? 'true' : 'false'}
+                                onValueChange={(value) => field.onChange(value === 'true')}
+                              >
+                                <SelectTrigger className="bg-background" data-testid="allow-document-rejection-trigger">
+                                  <SelectValue />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                  <SelectItem value="true">
+                                    <Trans>Yes</Trans>
+                                  </SelectItem>
+
+                                  <SelectItem value="false">
+                                    <Trans>No</Trans>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                       {settings.allowConfigureDateFormat && (
                         <FormField

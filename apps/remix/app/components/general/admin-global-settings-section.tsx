@@ -138,6 +138,12 @@ export const AdminGlobalSettingsSection = ({
         </DetailsValue>
       </DetailsCard>
 
+      <DetailsCard label={<Trans>Allow document rejection</Trans>}>
+        <DetailsValue>
+          {booleanValue(settings.allowDocumentRejection, inheritedSettings?.allowDocumentRejection)}
+        </DetailsValue>
+      </DetailsCard>
+
       <DetailsCard label={<Trans>Typed signature</Trans>}>
         <DetailsValue>
           {booleanValue(settings.typedSignatureEnabled, inheritedSettings?.typedSignatureEnabled)}

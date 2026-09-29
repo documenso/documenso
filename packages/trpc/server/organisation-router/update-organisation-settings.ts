@@ -39,6 +39,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       drawSignatureEnabled,
       defaultRecipients,
       delegateDocumentOwnership,
+      allowDocumentRejection,
       envelopeExpirationPeriod,
       reminderSettings,
 
@@ -167,6 +168,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             drawSignatureEnabled,
             defaultRecipients: defaultRecipients === null ? Prisma.DbNull : defaultRecipients,
             delegateDocumentOwnership: derivedDelegateDocumentOwnership,
+            allowDocumentRejection,
             envelopeExpirationPeriod: envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
             reminderSettings: reminderSettings === null ? Prisma.DbNull : reminderSettings,
 

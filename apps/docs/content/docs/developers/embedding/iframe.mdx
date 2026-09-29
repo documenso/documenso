@@ -47,9 +47,19 @@ Documenso expects the fragment to be **base64** of:
 | `lockEmail` | `boolean` | Lock the email field (prevents editing). |
 | `language` | `string` | Force the embed language (e.g. `en`). |
 | `darkModeDisabled` | `boolean` | Disable dark mode behavior. |
-| `allowDocumentRejection` | `boolean` | Allow or disallow document rejection. |
+| `allowDocumentRejection` | `boolean` | Show the reject option in the embed. Defaults to `false`. The document must also allow rejection, see below. |
 | `css` | `string` | Inject custom CSS into the embed. |
 | `cssVars` | `object` | Override embed CSS variables (see the CSS Variables page). |
+
+<Callout title="allowDocumentRejection and the document's own setting">
+  Two settings control whether a recipient can reject a document in an embed, and both must allow it:
+
+  - `allowDocumentRejection` above, which you pass per embed. It only controls your embed's UI and defaults to `false`.
+  - The document's own "Allow Document Rejection" setting. Its default comes from the organisation or team document
+    preferences, and it can be changed per document in the editor or through the API (`meta.allowDocumentRejection`).
+    When it is disabled, the reject option stays hidden even if you pass `allowDocumentRejection: true`, and the server
+    refuses rejection requests for that document.
+</Callout>
 
 #### Example
 

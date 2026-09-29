@@ -43,6 +43,7 @@ export type TDocumentPreferencesFormSchema = {
   signatureTypes: DocumentSignatureType[];
   defaultRecipients: TDefaultRecipients | null;
   delegateDocumentOwnership: boolean | null;
+  allowDocumentRejection: boolean | null;
   aiFeaturesEnabled: boolean | null;
 };
 
@@ -57,6 +58,7 @@ type SettingsSubset = Pick<
   | 'drawSignatureEnabled'
   | 'defaultRecipients'
   | 'delegateDocumentOwnership'
+  | 'allowDocumentRejection'
   | 'aiFeaturesEnabled'
 >;
 
@@ -77,6 +79,7 @@ const getDocumentPreferencesFormValues = (settings: SettingsSubset): TDocumentPr
     signatureTypes: extractTeamSignatureSettings({ ...settings }),
     defaultRecipients: settings.defaultRecipients ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients) : null,
     delegateDocumentOwnership: settings.delegateDocumentOwnership,
+    allowDocumentRejection: settings.allowDocumentRejection,
     aiFeaturesEnabled: settings.aiFeaturesEnabled,
   };
 };
@@ -101,6 +104,7 @@ export const DocumentPreferencesForm = ({ settings, onFormSubmit, canInherit }: 
     }),
     defaultRecipients: ZDefaultRecipientsSchema.nullable(),
     delegateDocumentOwnership: z.boolean().nullable(),
+    allowDocumentRejection: z.boolean().nullable(),
     aiFeaturesEnabled: z.boolean().nullable(),
   });
 
@@ -481,6 +485,60 @@ export const DocumentPreferencesForm = ({ settings, onFormSubmit, canInherit }: 
 
                 <FormDescription>
                   <Trans>Enable team API tokens to delegate document ownership to another team member.</Trans>
+                </FormDescription>
+              </InheritableField>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="allowDocumentRejection"
+            render={({ field }) => (
+              <InheritableField
+                className="flex-1"
+                canInherit={canInherit}
+                isInherited={field.value === null}
+                label={<Trans>Allow Document Rejection</Trans>}
+                testId="allow-document-rejection"
+              >
+                <FormControl>
+                  <Select
+                    {...field}
+                    value={field.value === null ? '-1' : field.value.toString()}
+                    onValueChange={(value) =>
+                      field.onChange(value === 'true' ? true : value === 'false' ? false : null)
+                    }
+                  >
+                    <SelectTrigger
+                      className="bg-background text-muted-foreground"
+                      data-testid="allow-document-rejection-trigger"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem value="true">
+                        <Trans>Yes</Trans>
+                      </SelectItem>
+
+                      <SelectItem value="false">
+                        <Trans>No</Trans>
+                      </SelectItem>
+
+                      {canInherit && (
+                        <SelectItem value={'-1'}>
+                          <Trans>Inherit from organisation</Trans>
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+
+                <FormDescription>
+                  <Trans>
+                    Controls whether recipients can reject newly created documents from the signing page. Existing
+                    documents keep their current setting. You can change it per document in the document settings.
+                  </Trans>
                 </FormDescription>
               </InheritableField>
             )}

@@ -70,6 +70,9 @@ export const extractDerivedDocumentMeta = (
 
     // Reminder settings.
     reminderSettings: meta.reminderSettings ?? settings.reminderSettings ?? null,
+
+    // Rejection settings.
+    allowDocumentRejection: meta.allowDocumentRejection ?? settings.allowDocumentRejection,
   } satisfies Omit<DocumentMeta, 'id'>;
 };
 

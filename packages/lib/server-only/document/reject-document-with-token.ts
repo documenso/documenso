@@ -33,7 +33,11 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
       envelope: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
     },
     include: {
-      envelope: true,
+      envelope: {
+        include: {
+          documentMeta: true,
+        },
+      },
     },
   });
 
@@ -48,6 +52,14 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
   if (envelope.status !== DocumentStatus.PENDING) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: `Document ${envelope.id} must be pending to reject`,
+    });
+  }
+
+  // Hiding the reject button on the signing page is not enough because the
+  // recipient can call this endpoint directly, so enforce the setting here.
+  if (!envelope.documentMeta.allowDocumentRejection) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Document ${envelope.id} does not allow rejection`,
     });
   }
 

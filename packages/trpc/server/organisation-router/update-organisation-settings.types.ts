@@ -27,6 +27,7 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
     drawSignatureEnabled: z.boolean().optional(),
     defaultRecipients: ZDefaultRecipientsSchema.nullish(),
     delegateDocumentOwnership: z.boolean().nullish(),
+    allowDocumentRejection: z.boolean().optional(),
     envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.optional(),
     reminderSettings: ZEnvelopeReminderSettings.optional(),
 

@@ -28,6 +28,7 @@ export const ZDocumentMetaSchema = DocumentMetaSchema.pick({
   typedSignatureEnabled: true,
   uploadSignatureEnabled: true,
   drawSignatureEnabled: true,
+  allowDocumentRejection: true,
   language: true,
   emailSettings: true,
 });
@@ -105,6 +106,12 @@ export const ZDocumentMetaUploadSignatureEnabledSchema = z
   .boolean()
   .describe('Whether to allow recipients to sign using an uploaded signature.');
 
+export const ZDocumentMetaAllowDocumentRejectionSchema = z
+  .boolean()
+  .describe(
+    'Whether recipients can reject the document from the signing page. Defaults to the organisation or team document preference. In embedded signing the embed must also enable its own allowDocumentRejection option.',
+  );
+
 /**
  * Note: Any updates to this will cause public API changes. You will need to update
  * all corresponding areas where this is used (some places that use this needs to pass
@@ -123,6 +130,7 @@ export const ZDocumentMetaCreateSchema = z.object({
   typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
   uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
   drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+  allowDocumentRejection: ZDocumentMetaAllowDocumentRejectionSchema.optional(),
   emailId: z.string().nullish(),
   emailReplyTo: zEmail().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.nullish(),

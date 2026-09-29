@@ -96,6 +96,9 @@ export const DocumentPreferencesResetDialog = ({
               <li>
                 <Trans>Delegate document ownership</Trans>
               </li>
+              <li>
+                <Trans>Allow document rejection</Trans>
+              </li>
               {showAiFeatures && (
                 <li>
                   <Trans>AI features</Trans>
