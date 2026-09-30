@@ -569,31 +569,39 @@ const document = await response.json();
 </Tab>
 </Tabs>
 
-
 ### Omit document PDFs from email
 
-Set `meta.emailSettings.attachDocument` to `false` when creating or updating a document or template. Completion emails still go to the enabled recipients and owner, and retain their document links. This also omits PDFs from CC completion emails.
+Set `meta.emailSettings.attachDocument` to `false` when you create or update a document or template. Completion emails still go to the owner and to the enabled recipients, including CC recipients. These emails keep their document links but do not include the PDFs.
 
-| Parameter | Type | Default | Description |
-| --------- | ---- | ------- | ----------- |
-| `[meta.emailSettings.attachDocument]` | boolean | `true` | Attach completed document PDFs to emails. Set to `false` for links only. |
+| Field                               | Type    | Required | Description                                                   |
+| ----------------------------------- | ------- | -------- | ------------------------------------------------------------- |
+| `meta.emailSettings.attachDocument` | boolean | No       | Attach completed document PDFs to emails. Defaults to `true`. |
 
-For example, update an envelope with this request body:
+The `emailSettings` object replaces all saved email settings. Each setting that you leave out becomes `true`. To change only the attachments, send the complete object with your current values:
 
 ```json
 {
   "envelopeId": "envelope_abc123",
   "meta": {
     "emailSettings": {
-      "attachDocument": false
+      "attachDocument": false,
+      "recipientSigningRequest": true,
+      "recipientRemoved": true,
+      "recipientSigned": true,
+      "documentPending": true,
+      "documentCompleted": true,
+      "documentDeleted": true,
+      "ownerDocumentCompleted": true,
+      "ownerRecipientExpired": true,
+      "ownerDocumentCreated": true
     }
   }
 }
 ```
 
-When using a template with `/envelope/use`, pass the option in `override.emailSettings`. The document and template APIs, including API v1, accept the same boolean option in their email settings. Non-boolean values are rejected.
+When you use a template with `/envelope/use`, set the option in `override.emailSettings`. The document and template APIs, including API v1, accept the same option. The API rejects values that are not booleans.
 
-If you omit the email settings on creation, the document inherits the team's defaults, which can inherit from the organisation. Existing documents and templates retain their saved settings when those defaults change. If you provide an email settings object without `attachDocument`, attachments stay enabled for backward compatibility.
+If you omit the email settings on creation, the document inherits the team's defaults, which can inherit from the organisation. Existing documents and templates keep their saved settings when those defaults change.
 
 ---
 

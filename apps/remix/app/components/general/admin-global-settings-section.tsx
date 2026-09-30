@@ -10,7 +10,7 @@ import type { ReactNode } from 'react';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 
 const EMAIL_SETTINGS_LABELS: Record<keyof TDocumentEmailSettings, MessageDescriptor> = {
-  attachDocument: msg`Attach completed document PDFs`,
+  attachDocument: msg`Attach completed document PDFs to emails`,
   recipientSigningRequest: msg`Recipient signing request`,
   recipientRemoved: msg`Recipient removed`,
   recipientSigned: msg`Recipient signed`,
