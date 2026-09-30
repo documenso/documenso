@@ -48,7 +48,6 @@ const seedContent = async (envelopeId: string, envelopeItemId: string, page: num
       contentMeta: ZEnvelopeContentMetaSchema.parse({
         type: EnvelopeContentType.TEXT,
         page,
-        rotation: 0,
         positionX: 10,
         positionY: 10,
         width: 20,
@@ -70,6 +69,10 @@ const countContents = async (envelopeId: string) => await prisma.envelopeContent
 test('does not recreate contents removed by a pdf replacement', async ({ page }) => {
   const surface = await openDocumentEnvelopeEditor(page);
   const { root, envelopeId } = surface;
+
+  if (!envelopeId) {
+    throw new Error('Expected the document editor surface to have an envelopeId');
+  }
 
   // A three page PDF so a content can live on a page the replacement drops.
   await replacePdf(root, multiPagePdfBuffer, 'multi-page.pdf');

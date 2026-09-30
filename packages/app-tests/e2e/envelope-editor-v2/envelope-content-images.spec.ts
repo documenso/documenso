@@ -127,7 +127,7 @@ const runUploadReplaceRemoveFlow = async (surface: TEnvelopeEditorSurface) => {
   await uploadImage(root, wide);
   await waitForUploadToLand(root);
 
-  await expect(root.getByText('wide-logo.png')).toBeVisible();
+  // The settings panel shows the image's size and dimensions.
   await expect(root.getByText('400 * 200')).toBeVisible();
 
   const [withWide] = await getContentGroupsForPage(root);
@@ -157,7 +157,7 @@ const runUploadReplaceRemoveFlow = async (surface: TEnvelopeEditorSurface) => {
   await uploadImage(root, tall);
   await waitForUploadToLand(root);
 
-  await expect(root.getByText('tall-logo.jpg')).toBeVisible();
+  await expect(root.getByText('100 * 300')).toBeVisible();
 
   const [withTall] = await getContentGroupsForPage(root);
 
@@ -224,7 +224,7 @@ const runActionBarUploadFlow = async (surface: TEnvelopeEditorSurface) => {
 
   await (await fileChooser).setFiles({ name: huge.name, mimeType: huge.mimeType, buffer: huge.buffer });
 
-  await expect(root.getByText('huge-logo.png')).toBeVisible();
+  await expect(root.getByText('2000 * 2000')).toBeVisible();
   await expect(getContentActionButton(root, 'Replace image')).toBeVisible();
 
   const pageSize = await getPageSize(root);
@@ -333,7 +333,7 @@ const runSendGuardFlow = async (surface: TEnvelopeEditorSurface) => {
 
   await uploadImage(root, logo);
   await waitForUploadToLand(root);
-  await expect(root.getByText('logo.png')).toBeVisible();
+  await expect(root.getByText('120 * 60')).toBeVisible();
 
   await waitForContentsAutosave(surface);
 

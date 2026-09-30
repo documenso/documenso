@@ -25,7 +25,6 @@ const seedStaticContents = async (envelopeId: string, envelopeItemId: string) =>
         contentMeta: ZEnvelopeContentMetaSchema.parse({
           type: EnvelopeContentType.TEXT,
           page: 1,
-          rotation: 0,
           zIndex: 0,
           positionX: 10,
           positionY: 10,

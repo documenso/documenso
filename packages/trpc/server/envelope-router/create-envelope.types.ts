@@ -53,8 +53,10 @@ export const ZCreateEnvelopePayloadSchema = z.object({
         fields: ZEnvelopeFieldAndMetaSchema.and(
           z.object({
             identifier: z
-              .union([z.string(), z.number()])
-              .describe('Either the filename or the index of the file that was uploaded to attach the field to.')
+              .union([z.string(), z.number().int().min(0)])
+              .describe(
+                'Either the filename or the zero-based index of the file that was uploaded to attach the field to.',
+              )
               .optional(),
             page: ZFieldPageNumberSchema,
             positionX: ZClampedFieldPositionXSchema,
@@ -71,8 +73,8 @@ export const ZCreateEnvelopePayloadSchema = z.object({
   contents: z
     .object({
       identifier: z
-        .union([z.string(), z.number()])
-        .describe('Either the filename or the index of the file that was uploaded to attach the content to.')
+        .union([z.string(), z.number().int().min(0)])
+        .describe('Either the filename or the zero-based index of the file that was uploaded to attach the content to.')
         .optional(),
       contentMeta: ZEnvelopeContentMetaSchema.describe('All the properties of the content being placed.'),
       imageIndex: z

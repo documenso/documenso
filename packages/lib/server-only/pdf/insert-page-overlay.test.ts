@@ -8,6 +8,7 @@ import sharp from 'sharp';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { EnvelopeContentShapeType, EnvelopeContentType } from '../../types/envelope-content-meta';
+import type { ContentImageSource } from '../../universal/content-renderer/content-renderer';
 import { insertPageOverlays } from './insert-page-overlay';
 
 /**
@@ -38,6 +39,7 @@ const RED_RECTANGLE_OVERLAY: Overlay = {
         zIndex: 0,
         rotation: 0,
         ...RECT,
+        fillColor: null,
         fillOpacity: 0,
         strokeWidth: STROKE_WIDTH,
         strokeColor: '#ff0000',
@@ -78,7 +80,9 @@ const createBlueImageOverlay = async (): Promise<Overlay> => {
         dataContentId: 'data_blue',
       },
     ],
-    images: new Map([['data_blue', new SkiaImage(Buffer.from(png))]]),
+    // On the server a skia image stands in for a browser image, passed the
+    // same way `loadContentImages` passes it.
+    images: new Map([['data_blue', new SkiaImage(Buffer.from(png)) as unknown as ContentImageSource]]),
   };
 };
 

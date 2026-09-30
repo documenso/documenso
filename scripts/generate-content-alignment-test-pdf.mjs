@@ -22,7 +22,8 @@ const GRID = {
   columnWidth: 28,
   columnGap: 1,
   rowHeight: 7,
-  rowGap: 1,
+  // Holds each box's label, which sits just above the box.
+  rowGap: 2,
 };
 
 const cellLeft = (column) => GRID.startX + column * (GRID.columnWidth + GRID.columnGap);
@@ -34,8 +35,11 @@ function makeCell(row, column, label, { rows = 1, columns = 1 } = {}) {
   const width = columns * GRID.columnWidth + (columns - 1) * GRID.columnGap;
   const height = rows * GRID.rowHeight + (rows - 1) * GRID.rowGap;
 
+  // The label is anchored to the top of its box and lifted by its own height
+  // (see `.label`), so it sits in the gap above the box rather than reaching
+  // into the row above.
   return `
-    <div class="label" style="left:${left}%;top:${top - 1.4}%;">${label}</div>
+    <div class="label" style="left:${left}%;top:${top}%;">${label}</div>
     <div class="box" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%;"></div>`;
 }
 
@@ -71,10 +75,6 @@ function makeTextPage() {
   content += makeCell(4, 0, 'LINE_HEIGHT_1.6');
   content += makeCell(4, 1, 'LETTER_SPACING_3');
   content += makeCell(4, 2, 'WRAPPED', { rows: 2 });
-
-  content += makeRowLabel(6, 'ROTATION');
-  content += makeCell(6, 0, 'ROTATED_15', { rows: 2 });
-  content += makeCell(6, 1, 'ROTATED_90', { rows: 2, columns: 1 });
 
   return content;
 }
@@ -161,10 +161,6 @@ function makeHighlightPage() {
   content += makeCell(2, 0, 'HIGHLIGHT OVER THIS PRINTED TEXT', { columns: 3 });
   content += `<div class="body-text" style="left:${cellLeft(0) + 1}%;top:${cellTop(2) + 2}%;">The quick brown fox jumps over the lazy dog. A highlight is drawn over this line.</div>`;
 
-  content += makeRowLabel(3, 'ROTATION');
-  content += makeCell(3, 0, 'ROTATED_15', { rows: 2 });
-  content += makeCell(3, 1, 'ROTATED_45', { rows: 2 });
-
   return content;
 }
 
@@ -210,7 +206,7 @@ const html = `<!DOCTYPE html>
   .row-label { position: absolute; font-size: 7px; font-weight: bold; color: #666; width: 6%; }
   .body-text { position: absolute; font-size: 11px; color: #333; }
   .box { position: absolute; border: 1px solid #999; box-sizing: border-box; }
-  .label { position: absolute; font-size: 7px; color: #c00; font-weight: bold; z-index: 9999; }
+  .label { position: absolute; font-size: 7px; line-height: 1; white-space: nowrap; color: #c00; font-weight: bold; z-index: 9999; transform: translateY(calc(-100% - 4px)); }
 </style>
 </head>
 <body>

@@ -46,9 +46,18 @@ export const CONTENT_ALIGNMENT_PAGES = {
 } as const;
 
 /**
- * The page is A4, so a square in page units needs the width scaled by this.
+ * The size of the PDF's pages in points, the unit contents are drawn in.
+ *
+ * Positions are percentages of the page's width and height, which are not the
+ * same length, so anything which has to keep its shape (a square, a rotation)
+ * is worked out in points.
  */
-const A4_ASPECT = 210 / 297;
+const PAGE_SIZE = { width: 595.92, height: 842.88 };
+
+const toPointsX = (percent: number) => (percent / 100) * PAGE_SIZE.width;
+const toPointsY = (percent: number) => (percent / 100) * PAGE_SIZE.height;
+const toPercentX = (points: number) => (points / PAGE_SIZE.width) * 100;
+const toPercentY = (points: number) => (points / PAGE_SIZE.height) * 100;
 
 /**
  * The grid printed on every page of the PDF, as percentages of the page.
@@ -59,7 +68,8 @@ export const CONTENT_ALIGNMENT_GRID = {
   columnWidth: 28,
   columnGap: 1,
   rowHeight: 7,
-  rowGap: 1,
+  // Holds each box's label, which the PDF prints just above the box.
+  rowGap: 2,
 };
 
 const cell = (row: number, column: number, { rows = 1, columns = 1 }: { rows?: number; columns?: number } = {}) => {
@@ -73,33 +83,78 @@ const cell = (row: number, column: number, { rows = 1, columns = 1 }: { rows?: n
   };
 };
 
+/**
+ * The box of a grid cell as printed on the PDF, for anything else placed on
+ * it, e.g. the seed's signature field.
+ */
+export const getContentAlignmentCell = cell;
+
 type Box = ReturnType<typeof cell>;
 
 /**
- * A box half the size of a cell, placed at the cell's center.
+ * The box of a content which can be rotated, i.e. a shape or an image.
+ */
+type RotatableBox = Box & { rotation?: number };
+
+/**
+ * A box half the size of a cell, rotated by `rotation` and centered in the
+ * cell.
  *
  * Contents rotate about their top left corner (see `ZContentRotationSchema`),
- * so a rotated box placed at a cell's top left would sweep outside the cell.
- * Starting from the center keeps every rotation within the cell.
+ * so that corner is placed wherever the rotation needs it for the box's center
+ * to land on the cell's center. Throws if the rotated box would not fit in the
+ * cell, since it would then reach into the neighbouring cells.
  */
-const halfCell = (row: number, column: number, options: { rows?: number; columns?: number } = {}) => {
+const rotatedHalfCell = (
+  row: number,
+  column: number,
+  rotation: number,
+  options: { rows?: number; columns?: number } = {},
+): RotatableBox => {
   const box = cell(row, column, options);
 
+  const width = box.width / 2;
+  const height = box.height / 2;
+
+  // Half the box's width and height, in points.
+  const halfWidth = toPointsX(width) / 2;
+  const halfHeight = toPointsY(height) / 2;
+
+  const radians = (rotation * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+
+  // Where the box's center ends up, relative to its top left corner.
+  const centerX = halfWidth * cos - halfHeight * sin;
+  const centerY = halfWidth * sin + halfHeight * cos;
+
+  // How far the rotated box reaches from its center along each axis.
+  const reachX = Math.abs(halfWidth * cos) + Math.abs(halfHeight * sin);
+  const reachY = Math.abs(halfWidth * sin) + Math.abs(halfHeight * cos);
+
+  const cellWidth = toPointsX(box.width);
+  const cellHeight = toPointsY(box.height);
+
+  if (reachX * 2 > cellWidth || reachY * 2 > cellHeight) {
+    throw new Error(`A half size box rotated by ${rotation} degrees does not fit in cell ${row}, ${column}`);
+  }
+
   return {
-    positionX: box.positionX + box.width / 2,
-    positionY: box.positionY + box.height / 2,
-    width: box.width / 2,
-    height: box.height / 2,
+    positionX: box.positionX + toPercentX(cellWidth / 2 - centerX),
+    positionY: box.positionY + toPercentY(cellHeight / 2 - centerY),
+    width,
+    height,
+    rotation,
   };
 };
 
 /**
- * A square box in page units, as tall as the given number of rows.
+ * A square box as tall as the given number of rows.
  */
-const square = (row: number, column: number, rows: number) => {
+const square = (row: number, column: number, rows: number): Box => {
   const box = cell(row, column, { rows });
 
-  return { ...box, width: box.height * A4_ASPECT };
+  return { ...box, width: toPercentX(toPointsY(box.height)) };
 };
 
 // --- Builders ---
@@ -108,22 +163,14 @@ type Overrides<T> = Partial<Omit<T, 'type'>>;
 
 const text = (box: Box, meta: Overrides<TContentTextMeta> & { text: string }): ContentTestData => ({
   page: CONTENT_ALIGNMENT_PAGES.text,
-  contentMeta: { type: EnvelopeContentType.TEXT, page: CONTENT_ALIGNMENT_PAGES.text, rotation: 0, ...box, ...meta },
+  contentMeta: { type: EnvelopeContentType.TEXT, page: CONTENT_ALIGNMENT_PAGES.text, ...box, ...meta },
 });
 
 type LinePoints = { x1: number; y1: number; x2: number; y2: number };
 
-const horizontal = (box: Box): LinePoints => ({
-  x1: box.positionX,
-  x2: box.positionX + box.width,
-  y1: box.positionY + box.height / 2,
-  y2: box.positionY + box.height / 2,
-});
+type LineMeta = { strokeWidth: number; strokeColor?: string; strokeStyle?: 'solid' | 'dashed' | 'dotted' };
 
-const line = (
-  points: LinePoints,
-  meta: { strokeWidth: number; strokeColor?: string; strokeStyle?: 'solid' | 'dashed' | 'dotted' },
-): ContentTestData => ({
+const line = (points: LinePoints, meta: LineMeta): ContentTestData => ({
   page: CONTENT_ALIGNMENT_PAGES.line,
   contentMeta: {
     type: EnvelopeContentType.LINE,
@@ -135,7 +182,21 @@ const line = (
   },
 });
 
-const rectangle = (box: Box, meta: Overrides<TContentShapeMeta> = {}): ContentTestData => ({
+/**
+ * A horizontal line across the middle of a box.
+ *
+ * Round line ends reach past the line's points by half its width, so the
+ * points are pulled in by that much to keep the whole line within its box.
+ * Otherwise thick lines in neighbouring columns join across the gap.
+ */
+const horizontalLine = (box: Box, meta: LineMeta): ContentTestData => {
+  const inset = toPercentX(meta.strokeWidth / 2);
+  const y = box.positionY + box.height / 2;
+
+  return line({ x1: box.positionX + inset, y1: y, x2: box.positionX + box.width - inset, y2: y }, meta);
+};
+
+const rectangle = (box: RotatableBox, meta: Overrides<TContentShapeMeta> = {}): ContentTestData => ({
   page: CONTENT_ALIGNMENT_PAGES.shape,
   contentMeta: {
     type: EnvelopeContentType.SHAPE,
@@ -155,7 +216,6 @@ const highlight = (box: Box, meta: Overrides<TContentHighlightMeta> = {}): Conte
   contentMeta: {
     type: EnvelopeContentType.HIGHLIGHT,
     page: CONTENT_ALIGNMENT_PAGES.highlight,
-    rotation: 0,
     color: '#ffe600',
     fillOpacity: 0.4,
     ...box,
@@ -163,7 +223,7 @@ const highlight = (box: Box, meta: Overrides<TContentHighlightMeta> = {}): Conte
   },
 });
 
-const image = (box: Box, meta: Overrides<TContentImageMeta> = {}): ContentTestData => ({
+const image = (box: RotatableBox, meta: Overrides<TContentImageMeta> = {}): ContentTestData => ({
   page: CONTENT_ALIGNMENT_PAGES.image,
   image: 'logo',
   contentMeta: { type: EnvelopeContentType.IMAGE, page: CONTENT_ALIGNMENT_PAGES.image, rotation: 0, ...box, ...meta },
@@ -184,30 +244,26 @@ const TEXT_CONTENTS: ContentTestData[] = [
   text(cell(3, 1), { text: 'Size 14', fontSize: 14, color: '#d00000' }),
   text(cell(3, 2), { text: 'Size 24 cropped to the box', fontSize: 24 }),
 
-  text(cell(4, 0), { text: 'Two lines of text wrap here', lineHeight: 1.6 }),
+  // Long enough to wrap, so the line height shows in the gap between the lines.
+  text(cell(4, 0), { text: 'Two lines of text, wrapped and spaced apart by the line height', lineHeight: 1.6 }),
   text(cell(4, 1), { text: 'Spaced', letterSpacing: 3 }),
   text(cell(4, 2, { rows: 2 }), {
     text: 'A longer paragraph of text which wraps onto several lines within its box, centered both ways.',
     textAlign: 'center',
     verticalAlign: 'middle',
   }),
-
-  // Rotation pivots on the box's top left corner, so a 90 degree rotation
-  // hangs down the left edge of its cell. Inset it so it stays inside.
-  text(cell(6, 0, { rows: 2 }), { text: 'Rotated 15', rotation: 15 }),
-  text({ ...cell(6, 1, { rows: 2 }), positionX: cell(6, 1).positionX + 8 }, { text: 'Rotated 90', rotation: 90 }),
 ];
 
 // --- Page 2: Lines ---
 
 const LINE_CONTENTS: ContentTestData[] = [
-  line(horizontal(cell(0, 0)), { strokeWidth: 1, strokeStyle: 'solid' }),
-  line(horizontal(cell(0, 1)), { strokeWidth: 2, strokeStyle: 'dashed' }),
-  line(horizontal(cell(0, 2)), { strokeWidth: 3, strokeStyle: 'dotted' }),
+  horizontalLine(cell(0, 0), { strokeWidth: 1, strokeStyle: 'solid' }),
+  horizontalLine(cell(0, 1), { strokeWidth: 2, strokeStyle: 'dashed' }),
+  horizontalLine(cell(0, 2), { strokeWidth: 3, strokeStyle: 'dotted' }),
 
-  line(horizontal(cell(1, 0)), { strokeWidth: 0.5 }),
-  line(horizontal(cell(1, 1)), { strokeWidth: 5 }),
-  line(horizontal(cell(1, 2)), { strokeWidth: 10 }),
+  horizontalLine(cell(1, 0), { strokeWidth: 0.5 }),
+  horizontalLine(cell(1, 1), { strokeWidth: 5 }),
+  horizontalLine(cell(1, 2), { strokeWidth: 10 }),
 
   // Diagonals across the full width, corner to corner.
   ...(() => {
@@ -313,11 +369,10 @@ const SHAPE_CONTENTS: ContentTestData[] = [
   rectangle(square(2, 0, 2), { strokeWidth: 2 }),
   rectangle(cell(2, 1, { columns: 2 }), { strokeWidth: 1, fillColor: '#e5e7eb', fillOpacity: 1 }),
 
-  // Rotation pivots on the box's top left corner. Half sized boxes placed
-  // towards the right of their cells keep the swept shape within the cell.
-  rectangle(halfCell(4, 0, { rows: 2 }), { strokeWidth: 2, strokeColor: '#d00000', rotation: 15 }),
-  rectangle(halfCell(4, 1, { rows: 2 }), { strokeWidth: 2, strokeColor: '#00aa55', rotation: 45 }),
-  rectangle(halfCell(4, 2, { rows: 2 }), { strokeWidth: 2, strokeColor: '#0055aa', rotation: 90 }),
+  // Each rotated shape is centered in its cell, clear of the stacking row.
+  rectangle(rotatedHalfCell(4, 0, 15, { rows: 2 }), { strokeWidth: 2, strokeColor: '#d00000' }),
+  rectangle(rotatedHalfCell(4, 1, 45, { rows: 2 }), { strokeWidth: 2, strokeColor: '#00aa55' }),
+  rectangle(rotatedHalfCell(4, 2, 90, { rows: 2 }), { strokeWidth: 2, strokeColor: '#0055aa' }),
 
   // Stacking. Each cell holds two overlapping filled rectangles: the first
   // (top left) and the second (offset to the bottom right). The rectangles
@@ -342,9 +397,6 @@ const HIGHLIGHT_CONTENTS: ContentTestData[] = [
   highlight(cell(1, 2), { fillOpacity: 1 }),
 
   highlight(cell(2, 0, { columns: 3 })),
-
-  highlight(halfCell(3, 0, { rows: 2 }), { rotation: 15 }),
-  highlight(halfCell(3, 1, { rows: 2 }), { rotation: 45 }),
 ];
 
 // --- Page 5: Images ---
@@ -357,14 +409,13 @@ const IMAGE_CONTENTS: ContentTestData[] = [
 
   image(cell(3, 0, { columns: 3, rows: 2 })),
 
-  // Rotation pivots on the box's top left corner. Half sized boxes placed
-  // towards the right of their cells keep the swept image within the cell.
-  image(halfCell(5, 0, { rows: 2 }), { rotation: 15 }),
-  image(halfCell(5, 1, { rows: 2 }), { rotation: 45 }),
-  image(halfCell(5, 2, { rows: 2 }), { rotation: 90 }),
+  // Each rotated image is centered in its cell, clear of its neighbours.
+  image(rotatedHalfCell(5, 0, 15, { rows: 2 })),
+  image(rotatedHalfCell(5, 1, 45, { rows: 2 })),
+  image(rotatedHalfCell(5, 2, 90, { rows: 2 })),
 
-  image(halfCell(7, 0, { rows: 2 }), { rotation: 180 }),
-  image(halfCell(7, 1, { rows: 2 }), { rotation: 270 }),
+  image(rotatedHalfCell(7, 0, 180, { rows: 2 })),
+  image(rotatedHalfCell(7, 1, 270, { rows: 2 })),
 ];
 
 export const CONTENT_ALIGNMENT_TEST_CONTENTS: ContentTestData[] = [

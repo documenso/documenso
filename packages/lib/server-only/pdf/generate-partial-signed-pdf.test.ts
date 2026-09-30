@@ -40,7 +40,7 @@ const rectangle = {
 
 describe('generatePartialSignedPdf', () => {
   it('produces a valid PDF when there is nothing to draw', async () => {
-    const output = await generatePartialSignedPdf({ pdfData: examplePdf });
+    const output = await generatePartialSignedPdf({ pdfData: examplePdf, fields: [] });
 
     const pdf = await PDF.load(output);
 
@@ -48,7 +48,7 @@ describe('generatePartialSignedPdf', () => {
   });
 
   it('draws the contents onto the page', async () => {
-    const output = await generatePartialSignedPdf({ pdfData: examplePdf, contents: [rectangle] });
+    const output = await generatePartialSignedPdf({ pdfData: examplePdf, fields: [], contents: [rectangle] });
 
     // The overlay is added as a new XObject, so the file must grow and must
     // still be a valid single page PDF.

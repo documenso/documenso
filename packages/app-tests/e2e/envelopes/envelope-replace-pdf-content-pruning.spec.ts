@@ -21,7 +21,6 @@ const multiPagePdf = fs.readFileSync(path.join(__dirname, '../../../../assets/fi
 const textMetaOnPage = (page: number) => ({
   type: EnvelopeContentType.TEXT,
   page,
-  rotation: 0,
   positionX: 10,
   positionY: 10,
   width: 20,
@@ -93,43 +92,6 @@ test('replacing a PDF drops contents which fall beyond the new page count', asyn
   const contentMeta = contents[0].contentMeta as { page?: number };
 
   expect(contentMeta.page).toBe(1);
-});
-
-test('replacing a PDF keeps a content which has no page of its own', async () => {
-  const { user, team } = await seedUser();
-
-  const document = await seedBlankDocument(user, team.id, { internalVersion: 2 });
-
-  await replacePdf(document.id, multiPagePdf, 'multi-page.pdf');
-
-  const envelope = await prisma.envelope.findUniqueOrThrow({
-    where: { id: document.id },
-    include: { envelopeItems: true },
-  });
-
-  // A content without a page belongs to the first page, so it always fits.
-  await prisma.envelopeContent.create({
-    data: {
-      id: generateDatabaseId('envelope_content'),
-      envelopeId: envelope.id,
-      envelopeItemId: envelope.envelopeItems[0].id,
-      contentMeta: ZEnvelopeContentMetaSchema.parse({
-        type: EnvelopeContentType.TEXT,
-        rotation: 0,
-        positionX: 10,
-        positionY: 10,
-        width: 20,
-        height: 6,
-        text: 'No page',
-      }),
-    },
-  });
-
-  await replacePdf(document.id, singlePagePdf, 'single-page.pdf');
-
-  const contents = await prisma.envelopeContent.findMany({ where: { envelopeId: envelope.id } });
-
-  expect(contents).toHaveLength(1);
 });
 
 test('replacing a PDF keeps contents which still fit', async () => {

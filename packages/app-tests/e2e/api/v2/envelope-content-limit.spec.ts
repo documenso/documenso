@@ -179,7 +179,6 @@ const buildAndDistributeEnvelopeWithContents = async ({
             : {
                 type: EnvelopeContentType.TEXT,
                 page: 1,
-                rotation: 0,
                 zIndex: 0,
                 positionX: 10,
                 positionY: 10,

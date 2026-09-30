@@ -35,7 +35,7 @@ const createPng = async () => {
 const seedTemplateWithImageContent = async (page: Page) => {
   const { user, team } = await seedUser();
 
-  const template = await seedBlankTemplate(user, team.id, { internalVersion: 2 });
+  const template = await seedBlankTemplate(user, team.id, { createTemplateOptions: { internalVersion: 2 } });
 
   const envelope = await prisma.envelope.findFirstOrThrow({
     where: { id: template.id },

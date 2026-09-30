@@ -31,7 +31,6 @@ const seedTiedContents = async (envelopeId: string) => {
       contentMeta: ZEnvelopeContentMetaSchema.parse({
         type: EnvelopeContentType.TEXT,
         page: 1,
-        rotation: 0,
         positionX,
         positionY: 20,
         width: 10,

@@ -146,9 +146,20 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
       window.removeEventListener('touchcancel', onWindowPointerUp);
     };
 
+    /**
+     * Whether the current press started on an empty area of the stage.
+     *
+     * Releasing a resize handle without dragging it reaches the stage as a
+     * click on the stage itself. Only a press which started on the empty page
+     * makes an empty click, otherwise that release would deselect the item.
+     */
+    let isPressOnEmptyStage = false;
+
     stage.on('mousedown.marquee touchstart.marquee', (e) => {
+      isPressOnEmptyStage = e.target === stage;
+
       // Do nothing if the pointer is down on a shape.
-      if (e.target !== stage) {
+      if (!isPressOnEmptyStage) {
         return;
       }
 
@@ -178,7 +189,7 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
         return;
       }
 
-      if (e.target === stage) {
+      if (e.target === stage && isPressOnEmptyStage) {
         onEmptyClickRef.current();
       }
     });

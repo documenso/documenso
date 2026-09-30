@@ -2,7 +2,7 @@ import { createDataContentImage } from '@documenso/lib/server-only/data-content/
 import { EnvelopeContentType, ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import { seedPendingDocument } from '@documenso/prisma/seed/documents';
+import { seedBlankDocument, seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { createCanvas } from '@napi-rs/canvas';
 import { expect, test } from '@playwright/test';
@@ -13,6 +13,10 @@ import { apiSignin } from '../fixtures/authentication';
  * A page and everything drawn on it appear together. The page image is held
  * back until the content images are loaded too, so a page is never shown in a
  * half drawn state.
+ *
+ * Contents are only drawn in the browser while the document is a draft. Once
+ * it is sent they are part of the PDF, so the signing page loads no content
+ * images at all.
  */
 
 const IMAGE_LOAD_MS = 4000;
@@ -20,15 +24,12 @@ const IMAGE_LOAD_MS = 4000;
 test('a page waiting on its content images shows a loader', async ({ page }) => {
   const { user, team } = await seedUser();
 
-  const document = await seedPendingDocument(user, team.id, [user], { internalVersion: 2 });
+  const document = await seedBlankDocument(user, team.id, { internalVersion: 2 });
 
   const envelope = await prisma.envelope.findUniqueOrThrow({
     where: { id: document.id },
-    include: { envelopeItems: true, recipients: true },
+    include: { envelopeItems: true },
   });
-
-  // The seeded fields carry no `fieldMeta`, which the v2 signer rejects.
-  await prisma.field.deleteMany({ where: { envelopeId: envelope.id } });
 
   const png = await createCanvas(60, 30).encode('png');
 
@@ -61,7 +62,11 @@ test('a page waiting on its content images shows a loader', async ({ page }) => 
     await route.continue();
   });
 
-  await apiSignin({ page, email: user.email, redirectPath: `/sign/${envelope.recipients[0].token}` });
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/t/${team.url}/documents/${envelope.id}/edit?step=addFields`,
+  });
 
   const pageLoader = page.getByTestId('page-loader').first();
   const pageImage = page.locator('img[alt=""]').first();

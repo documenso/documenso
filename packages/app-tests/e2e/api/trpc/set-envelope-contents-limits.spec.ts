@@ -29,7 +29,6 @@ test.describe.configure({
 const textMeta = (index: number, overrides: { zIndex?: number } = {}): TEnvelopeContentMetaInput => ({
   type: EnvelopeContentType.TEXT,
   page: 1,
-  rotation: 0,
   positionX: 10,
   positionY: 10,
   width: 20,

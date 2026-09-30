@@ -71,7 +71,9 @@ test('a selected content survives zooming', async ({ page }) => {
 
   await placeContentOnPdf(root, 'Text', { x: 160, y: 160 });
 
-  await selectContentOnCanvas(root, { x: 170, y: 170 });
+  // Clicked in the middle, where it was placed. Placing already selects it,
+  // and near its edges a click lands on the handles of that selection.
+  await selectContentOnCanvas(root, { x: 160, y: 160 });
 
   await expect.poll(() => getKonvaTransformerNodeCountForPage(root, 1)).toBe(1);
   await expect(root.getByTestId('envelope-canvas-action-bar')).toBeVisible();

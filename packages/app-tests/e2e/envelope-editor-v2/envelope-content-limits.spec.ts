@@ -122,7 +122,12 @@ test('duplicate is hidden at the limit and existing contents stay removable', as
   const [content] = await getContentGroupsForPage(root);
   const { scale } = await getPageSize(root);
 
-  await selectContentOnCanvas(root, { x: (content.rect.x + 4) * scale, y: (content.rect.y + 4) * scale });
+  // Clicked in the middle. Placing already selects it, and near its edges a
+  // click lands on the handles of that selection.
+  await selectContentOnCanvas(root, {
+    x: (content.rect.x + content.rect.width / 2) * scale,
+    y: (content.rect.y + content.rect.height / 2) * scale,
+  });
 
   // Duplicating would add a content, so it is gone; removing is still offered.
   await expect(getContentActionButton(root, 'Duplicate')).toHaveCount(0);

@@ -25,10 +25,11 @@ test.describe.configure({
  * transform.
  */
 
-const textMeta = (overrides: Partial<TEnvelopeContentMetaInput> = {}): TEnvelopeContentMetaInput => ({
+type TextMetaInput = Extract<TEnvelopeContentMetaInput, { type: EnvelopeContentType.TEXT }>;
+
+const textMeta = (overrides: Partial<Omit<TextMetaInput, 'type'>> = {}): TEnvelopeContentMetaInput => ({
   type: EnvelopeContentType.TEXT,
   page: 1,
-  rotation: 0,
   positionX: 10,
   positionY: 10,
   width: 20,
@@ -67,7 +68,7 @@ const setupEnvelope = async (page: Page, type: 'document' | 'template' = 'docume
   const envelopeRecord =
     type === 'document'
       ? await seedBlankDocument(user, team.id, { internalVersion: 2 })
-      : await seedBlankTemplate(user, team.id, { internalVersion: 2 });
+      : await seedBlankTemplate(user, team.id, { createTemplateOptions: { internalVersion: 2 } });
 
   await apiSignin({ page, email: user.email, redirectPath: `/t/${team.url}/documents` });
 

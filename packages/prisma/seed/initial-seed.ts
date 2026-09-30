@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   CONTENT_ALIGNMENT_LOGO_PNG,
   CONTENT_ALIGNMENT_TEST_CONTENTS,
+  getContentAlignmentCell,
 } from '@documenso/app-tests/constants/content-alignment-pdf';
 import { ALIGNMENT_TEST_FIELDS } from '@documenso/app-tests/constants/field-alignment-pdf';
 import { FIELD_META_TEST_FIELDS } from '@documenso/app-tests/constants/field-meta-pdf';
@@ -551,16 +552,13 @@ export const seedContentAlignmentTestDocument = async ({
   const recipientId = recipients[0].id;
   const envelopeItemId = envelopeItems[0].id;
 
-  // The one field, in the spare cell of the text page's rotation row.
+  // The one field, in the free row below the text page's grid.
   await prisma.field.create({
     data: {
       type: 'SIGNATURE',
       fieldMeta: { type: 'signature', overflow: 'auto' },
       page: 1,
-      positionX: 66,
-      positionY: 60,
-      width: 28,
-      height: 7,
+      ...getContentAlignmentCell(6, 0),
       recipientId,
       envelopeItemId,
       envelopeId: id,

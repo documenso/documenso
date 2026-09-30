@@ -2,7 +2,7 @@ import { APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/en
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { prisma } from '@documenso/prisma';
 import { createCanvas } from '@napi-rs/canvas';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type FileChooser, type Page, test } from '@playwright/test';
 
 import {
   getContentActionButton,
@@ -51,6 +51,15 @@ const uploadThroughDialog = async (page: Page, buffer: Buffer) => {
 
   await (await fileChooser).setFiles({ name: 'logo.png', mimeType: 'image/png', buffer });
 };
+
+/**
+ * The upload dialog, including while it is hidden.
+ *
+ * While the native picker is open the dialog hides its content and shows only
+ * its overlay. Role locators skip hidden elements unless told otherwise, so
+ * without `includeHidden` an open dialog would look closed.
+ */
+const getUploadDialog = (page: Page) => page.getByRole('dialog', { includeHidden: true });
 
 test('a dropped file which cannot be used shows why', async ({ page }) => {
   await openContentsEditor(page);
@@ -147,33 +156,75 @@ test('the upload lands on the content it was opened for', async ({ page }) => {
 });
 
 /**
- * Dismissing the native picker leaves the dialog open on its "Choose image"
- * button. Pressing that must reopen the picker even though the dialog's
- * state has not changed.
+ * Dismissing the native picker closes the dialog, so picking again means
+ * opening it again. That must start a fresh picker rather than reuse the
+ * dismissed dialog's state.
  */
-test('the picker can be reopened from the dialog after being dismissed', async ({ page }) => {
+test('the picker can be reopened after being dismissed', async ({ page }) => {
   const surface = await openContentsEditor(page);
 
   await placeContentOnPdf(page, 'Image', { x: 200, y: 200 });
   await waitForContentsAutosave(surface);
 
-  // Open the picker and leave it unanswered: the dialog stays on "picking".
+  const dialog = getUploadDialog(page);
+
+  // Nothing matches before the dialog opens, so what matches below is the
+  // upload dialog rather than some other hidden dialog.
+  await expect(dialog).toHaveCount(0);
+
   const firstChooser = page.waitForEvent('filechooser');
 
   await getContentActionButton(page, 'Upload image').click();
   await firstChooser;
 
-  await expect(page.getByRole('button', { name: 'Choose image' })).toBeVisible();
+  await expect(dialog).toHaveCount(1);
 
-  // Pressing the dialog's button opens a fresh picker.
+  // Playwright cannot dismiss a native picker, but the browser reports a
+  // dismissal as a `cancel` event on the input.
+  await page.locator('input[id^="content-image-input-"]').dispatchEvent('cancel');
+  await expect(dialog).toHaveCount(0);
+
   const secondChooser = page.waitForEvent('filechooser');
 
-  await page.getByRole('button', { name: 'Choose image' }).click();
+  await getContentActionButton(page, 'Upload image').click();
 
   await (await secondChooser).setFiles({ name: 'logo.png', mimeType: 'image/png', buffer: await createPng() });
 
   await expect(getContentActionButton(page, 'Replace image')).toBeVisible();
 });
+
+/**
+ * The drop area opens the upload dialog from the keyboard too. Only the
+ * dialog's picker may open: the dropzone used to open its own picker as well,
+ * so a keyboard user got two.
+ */
+for (const key of ['Enter', 'Space']) {
+  test(`pressing ${key} on the drop area opens a single file picker`, async ({ page }) => {
+    await openContentsEditor(page);
+
+    await placeContentOnPdf(page, 'Image', { x: 200, y: 200 });
+
+    const choosers: FileChooser[] = [];
+
+    page.on('filechooser', (chooser) => choosers.push(chooser));
+
+    await page.locator('div[role="button"]', { hasText: 'Click to upload or drag and drop' }).focus();
+    await page.keyboard.press(key);
+
+    // Give a second picker time to open, as it used to.
+    await expect.poll(() => choosers.length).toBeGreaterThan(0);
+    await page.waitForTimeout(1000);
+
+    expect(choosers).toHaveLength(1);
+
+    // The one picker is the upload dialog's, so the file goes through it.
+    expect(await choosers[0].element().getAttribute('id')).toMatch(/^content-image-input-/);
+
+    await choosers[0].setFiles({ name: 'logo.png', mimeType: 'image/png', buffer: await createPng() });
+
+    await expect(getContentActionButton(page, 'Replace image')).toBeVisible();
+  });
+}
 
 test('cancelling the picker closes the dialog', async ({ page }) => {
   const surface = await openContentsEditor(page);
@@ -181,19 +232,30 @@ test('cancelling the picker closes the dialog', async ({ page }) => {
   await placeContentOnPdf(page, 'Image', { x: 200, y: 200 });
   await waitForContentsAutosave(surface);
 
+  const dialog = getUploadDialog(page);
+
+  // Nothing matches before the dialog opens, so what matches below is the
+  // upload dialog rather than some other hidden dialog.
+  await expect(dialog).toHaveCount(0);
+
   const chooser = page.waitForEvent('filechooser');
 
   await getContentActionButton(page, 'Upload image').click();
   await chooser;
 
-  await expect(page.getByRole('dialog')).toBeVisible();
+  // While the picker is open only the dialog's overlay shows, which still
+  // blocks the editor. A trial click checks that without clicking.
+  await expect(dialog).toHaveCount(1);
+  await expect(getPageCanvas(page).click({ position: { x: 50, y: 50 }, trial: true, timeout: 1500 })).rejects.toThrow();
 
   // Playwright cannot dismiss a native picker, but the browser reports a
   // dismissal as a `cancel` event on the input, which is what the dialog
   // listens for.
   await page.locator('input[id^="content-image-input-"]').dispatchEvent('cancel');
 
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  // The dialog is gone and the editor can be used again.
+  await expect(dialog).toHaveCount(0);
+  await getPageCanvas(page).click({ position: { x: 50, y: 50 }, trial: true });
   await expect(getContentActionButton(page, 'Upload image')).toBeVisible();
 });
 

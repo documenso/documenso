@@ -251,10 +251,13 @@ export const uploadImage = async (root: Page, file: TestImageFile) => {
 
 /**
  * Wait for a successful upload's dialog to close.
+ *
+ * Hidden dialogs count too: while its picker is open the dialog hides its
+ * content, and a dialog stuck like that has not finished.
  */
 export const waitForUploadToLand = async (root: Page) => {
   await expect(root.getByTestId('content-image-uploading')).toHaveCount(0);
-  await expect(root.getByRole('dialog')).toHaveCount(0);
+  await expect(root.getByRole('dialog', { includeHidden: true })).toHaveCount(0);
 };
 
 /**

@@ -113,6 +113,12 @@ export const EditorContentImageSettings = ({ formId, dataContentId }: EditorCont
         onKeyDown: (event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
+
+            // The dropzone runs its own handler after this one unless the
+            // event is stopped, and that would open its own picker as well
+            // as the dialog's.
+            event.stopPropagation();
+
             void ContentImageUploadDialog.call({ formId });
           }
         },
