@@ -569,6 +569,32 @@ const document = await response.json();
 </Tab>
 </Tabs>
 
+
+### Omit document PDFs from email
+
+Set `meta.emailSettings.attachDocument` to `false` when creating or updating a document or template. Completion emails still go to the enabled recipients and owner, and retain their document links. This also omits PDFs from CC completion emails.
+
+| Parameter | Type | Default | Description |
+| --------- | ---- | ------- | ----------- |
+| `[meta.emailSettings.attachDocument]` | boolean | `true` | Attach completed document PDFs to emails. Set to `false` for links only. |
+
+For example, update an envelope with this request body:
+
+```json
+{
+  "envelopeId": "envelope_abc123",
+  "meta": {
+    "emailSettings": {
+      "attachDocument": false
+    }
+  }
+}
+```
+
+When using a template with `/envelope/use`, pass the option in `override.emailSettings`. The document and template APIs, including API v1, accept the same boolean option in their email settings. Non-boolean values are rejected.
+
+If you omit the email settings on creation, the document inherits the team's defaults, which can inherit from the organisation. Existing documents and templates retain their saved settings when those defaults change. If you provide an email settings object without `attachDocument`, attachments stay enabled for backward compatibility.
+
 ---
 
 ## Send Document

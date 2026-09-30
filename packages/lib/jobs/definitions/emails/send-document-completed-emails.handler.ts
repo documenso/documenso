@@ -26,17 +26,6 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
   const envelope = await prisma.envelope.findUnique({
     where: unsafeBuildEnvelopeIdQuery({ type: 'envelopeId', id: envelopeId }, EnvelopeType.DOCUMENT),
     include: {
-      envelopeItems: {
-        include: {
-          documentData: {
-            select: {
-              type: true,
-              id: true,
-              data: true,
-            },
-          },
-        },
-      },
       documentMeta: true,
       recipients: true,
       user: {
@@ -83,15 +72,39 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
 
   const { user: owner } = envelope;
 
+  const emailSettings = extractDerivedDocumentEmailSettings(envelope.documentMeta);
+  const isDocumentCompletedEmailEnabled = emailSettings.documentCompleted;
+  const isOwnerDocumentCompletedEmailEnabled = emailSettings.ownerDocumentCompleted;
+
+  if (!isDocumentCompletedEmailEnabled && !isOwnerDocumentCompletedEmailEnabled) {
+    return;
+  }
+
+  // Fetch PDF data only when attachments are enabled. Database-backed PDFs can
+  // contain the entire file in documentData.data.
+  const envelopeItems = emailSettings.attachDocument
+    ? await prisma.envelopeItem.findMany({
+        where: { envelopeId: envelope.id },
+        include: {
+          documentData: {
+            select: {
+              type: true,
+              data: true,
+            },
+          },
+        },
+      })
+    : [];
+
   const completedDocumentEmailAttachments = await Promise.all(
-    envelope.envelopeItems.map(async (envelopeItem) => {
+    envelopeItems.map(async (envelopeItem) => {
       const file = await getFileServerSide(envelopeItem.documentData);
 
       // Use the envelope title for version 1, and the envelope item title for version 2.
-      const fileNameToUse = envelope.internalVersion === 1 ? envelope.title : envelopeItem.title + '.pdf';
+      const fileNameToUse = envelope.internalVersion === 1 ? envelope.title : `${envelopeItem.title}.pdf`;
 
       return {
-        filename: fileNameToUse.endsWith('.pdf') ? fileNameToUse : fileNameToUse + '.pdf',
+        filename: fileNameToUse.endsWith('.pdf') ? fileNameToUse : `${fileNameToUse}.pdf`,
         content: Buffer.from(file),
         contentType: 'application/pdf',
       };
@@ -107,10 +120,6 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
   if (envelope.team?.url) {
     documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${envelope.team.url}/documents/${envelope.id}`;
   }
-
-  const emailSettings = extractDerivedDocumentEmailSettings(envelope.documentMeta);
-  const isDocumentCompletedEmailEnabled = emailSettings.documentCompleted;
-  const isOwnerDocumentCompletedEmailEnabled = emailSettings.ownerDocumentCompleted;
 
   // Send email to document owner if:
   // 1. Owner document completed emails are enabled AND
