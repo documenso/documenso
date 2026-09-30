@@ -15322,15 +15322,3 @@ msgstr "Il tuo codice di verifica:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "tuo-dominio.com altro-dominio.com"
-
-#: apps/remix/app/components/general/admin-global-settings-section.tsx
-msgid "Attach completed document PDFs"
-msgstr ""
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Attach completed document PDFs to emails"
-msgstr ""
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Includes document PDFs in completion emails to the owner and all recipients, including CCs. Disable this to send emails with document links only."
-msgstr ""
