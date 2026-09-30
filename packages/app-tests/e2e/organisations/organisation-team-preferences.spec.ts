@@ -215,8 +215,6 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Reply to email' }).click();
   await page.getByRole('textbox', { name: 'Reply to email' }).fill('organisation@documenso.com');
 
-  await page.getByRole('checkbox', { name: 'Attach completed document PDFs to emails' }).uncheck();
-
   // Update email document settings by enabling/disabling some checkboxes
   await page.getByRole('checkbox', { name: 'Email the owner when a recipient signs' }).uncheck();
   await page.getByRole('checkbox', { name: 'Email the signer if the document is still pending' }).uncheck();
@@ -232,7 +230,6 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   // Check that the team settings have inherited these values.
   expect(teamSettings.emailReplyTo).toEqual('organisation@documenso.com');
   expect(teamSettings.emailDocumentSettings).toEqual({
-    attachDocument: false,
     recipientSigningRequest: true,
     recipientRemoved: true,
     recipientSigned: false, // unchecked
@@ -276,7 +273,6 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   // Check that the team settings have overridden the organisation values.
   expect(updatedTeamSettings.emailReplyTo).toEqual('team@example.com');
   expect(updatedTeamSettings.emailDocumentSettings).toEqual({
-    attachDocument: true,
     recipientSigned: true,
     recipientSigningRequest: false,
     recipientRemoved: true,
@@ -299,7 +295,6 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
 
   expect(teamOverrideDocumentMeta.emailReplyTo).toEqual('team@example.com');
   expect(teamOverrideDocumentMeta.emailSettings).toEqual({
-    attachDocument: true,
     recipientSigned: true,
     recipientSigningRequest: false,
     recipientRemoved: true,
@@ -327,7 +322,6 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   // Check that the team settings now inherit from organisation again.
   expect(inheritedTeamSettings.emailReplyTo).toEqual('organisation@documenso.com');
   expect(inheritedTeamSettings.emailDocumentSettings).toEqual({
-    attachDocument: false,
     recipientSigningRequest: true,
     recipientRemoved: true,
     recipientSigned: false,
@@ -350,7 +344,6 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
 
   expect(documentMeta.emailReplyTo).toEqual('organisation@documenso.com');
   expect(documentMeta.emailSettings).toEqual({
-    attachDocument: false,
     recipientSigningRequest: true,
     recipientRemoved: true,
     recipientSigned: false,
@@ -361,22 +354,4 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     ownerDocumentCompleted: true,
     ownerDocumentCreated: true,
   });
-
-  // Re-enable attachments and verify that inherited defaults change only for new documents.
-  await page.goto(`/o/${organisation.url}/settings/email`);
-  const attachmentControl = page.getByRole('checkbox', { name: 'Attach completed document PDFs to emails' });
-  await expect(attachmentControl).not.toBeChecked();
-  await attachmentControl.check();
-  await page.getByRole('button', { name: 'Save changes' }).first().click();
-  await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
-  await page.reload();
-  await expect(attachmentControl).toBeChecked();
-
-  const restoredSettings = await getTeamSettings({ teamId: team.id });
-  expect(restoredSettings.emailDocumentSettings.attachDocument).toBe(true);
-  const newDocument = await seedTeamDocumentWithMeta(team);
-  const newMeta = await prisma.documentMeta.findUniqueOrThrow({ where: { id: newDocument.documentMetaId } });
-  expect(newMeta.emailSettings?.attachDocument).toBe(true);
-  const existingMeta = await prisma.documentMeta.findUniqueOrThrow({ where: { id: document.documentMetaId } });
-  expect(existingMeta.emailSettings?.attachDocument).toBe(false);
 });
