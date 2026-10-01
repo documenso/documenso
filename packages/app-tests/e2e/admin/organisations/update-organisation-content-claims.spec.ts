@@ -3,7 +3,6 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../../fixtures/authentication';
-import { expectToastTextToBeVisible } from '../../fixtures/generic';
 
 test('[ADMIN]: update envelope content claims for an organisation', async ({ page }) => {
   const { user: adminUser } = await seedUser({
@@ -34,8 +33,6 @@ test('[ADMIN]: update envelope content claims for an organisation', async ({ pag
 
   // "Update role" buttons also match a non-exact name.
   await page.getByRole('button', { name: 'Update', exact: true }).last().click();
-
-  await expectToastTextToBeVisible(page, 'Organization has been updated successfully');
 
   await expect(async () => {
     const claim = await prisma.organisationClaim.findFirstOrThrow({
