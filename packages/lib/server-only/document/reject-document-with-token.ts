@@ -51,6 +51,12 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
     });
   }
 
+  if (recipient.signingStatus !== SigningStatus.NOT_SIGNED) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Recipient ${recipient.id} has already actioned this document`,
+    });
+  }
+
   assertRecipientNotExpired(recipient);
 
   // Update the recipient status to rejected

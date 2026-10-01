@@ -411,7 +411,7 @@ test('[ADMIN][DELETE_ORG]: the original owner loses access after deletion', asyn
   });
 
   // They should NOT see the organisation settings heading for this org.
-  await expect(page.getByText('Organisation Settings')).not.toBeVisible();
+  await expect(page.getByText('Organization Settings')).not.toBeVisible();
 });
 
 // ─── Access control: UI ──────────────────────────────────────────────────────

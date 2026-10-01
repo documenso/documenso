@@ -1,4 +1,5 @@
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
@@ -34,6 +35,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
   const { t, i18n } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();
+  const analytics = useAnalytics();
 
   const team = useCurrentTeam();
 
@@ -111,6 +113,11 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
       const error = AppError.parseError(err);
 
       console.error(err);
+
+      analytics.captureException(err, {
+        source: 'editor',
+        location: 'upload_document',
+      });
 
       const errorMessage = getUploadErrorMessage(error.code);
 

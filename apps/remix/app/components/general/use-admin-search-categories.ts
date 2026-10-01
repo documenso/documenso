@@ -39,13 +39,14 @@ const ADMIN_GROUP_ICONS: Record<TAdminSearchResultType, LucideIcon> = {
 
 /**
  * Admin list pages which support prefilling their search from the URL, used
- * for the "View all results" links on capped groups. Teams, recipients and
+ * for the "View all results" links on capped groups. Teams and
  * subscriptions have no admin list pages.
  */
 const ADMIN_GROUP_LIST_PATHS: Partial<Record<TAdminSearchResultType, (_query: string) => string>> = {
   document: (query) => `/admin/documents?term=${encodeURIComponent(query)}`,
   user: (query) => `/admin/users?search=${encodeURIComponent(query)}`,
   organisation: (query) => `/admin/organisations?query=${encodeURIComponent(query)}`,
+  recipient: (query) => `/admin/documents?term=${encodeURIComponent(`recipient:${query}`)}`,
 };
 
 export type UseAdminSearchCategoriesOptions = {

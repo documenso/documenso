@@ -28,6 +28,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { useCurrentTeam } from '~/providers/team';
+import { useCspNonce } from '~/utils/nonce';
 import { getDistributeErrorMessage } from '~/utils/toast-error-messages';
 
 export type DocumentEditFormProps = {
@@ -42,6 +43,7 @@ const EditDocumentSteps: EditDocumentStep[] = ['settings', 'signers', 'fields', 
 export const DocumentEditForm = ({ className, initialDocument, documentRootPath }: DocumentEditFormProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
+  const cspNonce = useCspNonce();
 
   const navigate = useNavigate();
 
@@ -473,6 +475,7 @@ export const DocumentEditForm = ({ className, initialDocument, documentRootPath 
               onSubmit={onAddSignersFormSubmit}
               onAutoSave={onAddSignersFormAutoSave}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
+              nonce={cspNonce}
             />
 
             <AddFieldsFormPartial

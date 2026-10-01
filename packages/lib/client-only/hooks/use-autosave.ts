@@ -8,7 +8,7 @@ type SaveRequest<T, R> = {
 export const useAutoSave = <T, R = void>(onSave: (data: T) => Promise<R>, options: { delay?: number } = {}) => {
   const { delay = 2000 } = options;
 
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const saveQueueRef = useRef<SaveRequest<T, R>[]>([]);
   const isProcessingRef = useRef(false);
 
