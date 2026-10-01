@@ -268,7 +268,9 @@ export const EnvelopeEditorFieldsPage = () => {
     });
   };
 
-  if (!editorConfig.general?.allowAddFieldsStep && !editorConfig.general?.allowAddContentsStep) {
+  const { allowContents } = editorConfig.actions;
+
+  if (!editorConfig.general?.allowAddFieldsStep) {
     return null;
   }
 
@@ -371,7 +373,7 @@ export const EnvelopeEditorFieldsPage = () => {
                   customPageRenderer={EnvelopeEditorFieldsPageRenderer}
                   scrollParentRef={scrollableContainerRef}
                   errorMessage={PDF_VIEWER_ERROR_MESSAGES.editor}
-                  toolbar={['zoom', 'fields', 'contents']}
+                  toolbar={allowContents ? ['zoom', 'fields', 'contents'] : ['zoom', 'fields']}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">
@@ -391,7 +393,7 @@ export const EnvelopeEditorFieldsPage = () => {
           {currentEnvelopeItem && envelope.recipients.length > 0 && (
             <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-border border-l bg-background py-2">
               <Tabs value={selectedEditorTab} onValueChange={(value) => onEditorTabChange(value as EnvelopeEditorTab)}>
-                {editorConfig.general?.allowAddFieldsStep && editorConfig.general?.allowAddContentsStep && (
+                {allowContents && (
                   <TabsList className="-mt-4 flex w-full flex-row border-b pt-2 text-muted-foreground text-sm">
                     <TabsTrigger
                       className="group flex min-h-12 w-1/2 items-center justify-center px-2 text-center hover:text-muted-foreground/80 data-[state=active]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))]"
@@ -623,43 +625,45 @@ export const EnvelopeEditorFieldsPage = () => {
                 </TabsContent>
 
                 {/* Contents tab */}
-                <TabsContent value="contents">
-                  <section className="px-4">
-                    <h3 className="mb-2 font-semibold text-foreground text-sm">
-                      <Trans>Add Content</Trans>
-                    </h3>
+                {allowContents && (
+                  <TabsContent value="contents">
+                    <section className="px-4">
+                      <h3 className="mb-2 font-semibold text-foreground text-sm">
+                        <Trans>Add Content</Trans>
+                      </h3>
 
-                    <EnvelopeEditorContentDragDrop selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null} />
-                  </section>
+                      <EnvelopeEditorContentDragDrop selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null} />
+                    </section>
 
-                  {/* Content details section. */}
-                  <AnimateGenericFadeInOut key={editorContents.selectedContent?.formId}>
-                    {selectedContent && (
-                      <section>
-                        <Separator className="my-4" />
+                    {/* Content details section. */}
+                    <AnimateGenericFadeInOut key={editorContents.selectedContent?.formId}>
+                      {selectedContent && (
+                        <section>
+                          <Separator className="my-4" />
 
-                        <div className="px-4 [&_label]:text-foreground/70 [&_label]:text-xs">
-                          <h3 className="font-semibold text-sm">
-                            {_(ContentSettingsTypeTranslations[selectedContent.contentMeta.type])}
-                          </h3>
+                          <div className="px-4 [&_label]:text-foreground/70 [&_label]:text-xs">
+                            <h3 className="font-semibold text-sm">
+                              {_(ContentSettingsTypeTranslations[selectedContent.contentMeta.type])}
+                            </h3>
 
-                          {match(selectedContent.contentMeta.type)
-                            .with(EnvelopeContentType.TEXT, () => <EditorContentTextForm />)
-                            .with(EnvelopeContentType.LINE, () => <EditorContentLineForm />)
-                            .with(EnvelopeContentType.SHAPE, () => <EditorContentShapeForm />)
-                            .with(EnvelopeContentType.HIGHLIGHT, () => <EditorContentHighlightForm />)
-                            .with(EnvelopeContentType.IMAGE, () => (
-                              <EditorContentImageSettings
-                                formId={selectedContent.formId}
-                                dataContentId={selectedContent.dataContentId ?? null}
-                              />
-                            ))
-                            .exhaustive()}
-                        </div>
-                      </section>
-                    )}
-                  </AnimateGenericFadeInOut>
-                </TabsContent>
+                            {match(selectedContent.contentMeta.type)
+                              .with(EnvelopeContentType.TEXT, () => <EditorContentTextForm />)
+                              .with(EnvelopeContentType.LINE, () => <EditorContentLineForm />)
+                              .with(EnvelopeContentType.SHAPE, () => <EditorContentShapeForm />)
+                              .with(EnvelopeContentType.HIGHLIGHT, () => <EditorContentHighlightForm />)
+                              .with(EnvelopeContentType.IMAGE, () => (
+                                <EditorContentImageSettings
+                                  formId={selectedContent.formId}
+                                  dataContentId={selectedContent.dataContentId ?? null}
+                                />
+                              ))
+                              .exhaustive()}
+                          </div>
+                        </section>
+                      )}
+                    </AnimateGenericFadeInOut>
+                  </TabsContent>
+                )}
               </Tabs>
             </div>
           )}

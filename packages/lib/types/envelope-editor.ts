@@ -25,7 +25,6 @@ export const ZEnvelopeEditorSettingsSchema = z.object({
     allowConfigureEnvelopeTitle: z.boolean(),
     allowUploadAndRecipientStep: z.boolean(),
     allowAddFieldsStep: z.boolean(),
-    allowAddContentsStep: z.boolean(),
     allowPreviewStep: z.boolean(),
     minimizeLeftSidebar: z.boolean(),
   }),
@@ -54,6 +53,7 @@ export const ZEnvelopeEditorSettingsSchema = z.object({
    * Action related configurations.
    */
   actions: z.object({
+    allowContents: z.boolean(),
     allowAttachments: z.boolean(),
     allowDistributing: z.boolean(),
     allowDirectLink: z.boolean(),
@@ -113,7 +113,6 @@ export const DEFAULT_EDITOR_CONFIG: EnvelopeEditorConfig = {
     allowConfigureEnvelopeTitle: true,
     allowUploadAndRecipientStep: true,
     allowAddFieldsStep: true,
-    allowAddContentsStep: true,
     allowPreviewStep: true,
     minimizeLeftSidebar: false,
   },
@@ -130,6 +129,7 @@ export const DEFAULT_EDITOR_CONFIG: EnvelopeEditorConfig = {
     allowConfigureEmailReplyTo: true,
   },
   actions: {
+    allowContents: true,
     allowAttachments: true,
     allowDistributing: true,
     allowDirectLink: true,
@@ -173,7 +173,6 @@ export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
     allowConfigureEnvelopeTitle: true,
     allowUploadAndRecipientStep: true,
     allowAddFieldsStep: true,
-    allowAddContentsStep: true,
     allowPreviewStep: true,
     minimizeLeftSidebar: true,
   },
@@ -190,6 +189,7 @@ export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
     allowConfigureEmailReplyTo: true,
   },
   actions: {
+    allowContents: true,
     allowAttachments: true,
     allowDistributing: false, // These are not supported for embeds, and are directly excluded in the embedded repo.
     allowDirectLink: false, // These are not supported for embeds, and are directly excluded in the embedded repo.

@@ -50,7 +50,6 @@ export default function EmbedPlaygroundPage() {
     allowConfigureEnvelopeTitle: true,
     allowUploadAndRecipientStep: true,
     allowAddFieldsStep: true,
-    allowAddContentsStep: true,
     allowPreviewStep: true,
     minimizeLeftSidebar: true,
   });
@@ -68,6 +67,7 @@ export default function EmbedPlaygroundPage() {
   });
 
   const [actionsFeatures, setActionsFeatures] = useState({
+    allowContents: true,
     allowAttachments: true,
     allowDistributing: false,
     allowDirectLink: false,

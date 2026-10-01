@@ -92,8 +92,6 @@ export const buildEmbeddedFeatures = (features: DeepPartial<EnvelopeEditorConfig
         DEFAULT_EMBEDDED_EDITOR_CONFIG.general.allowUploadAndRecipientStep,
       allowAddFieldsStep:
         features.general?.allowAddFieldsStep ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.general.allowAddFieldsStep,
-      allowAddContentsStep:
-        features.general?.allowAddContentsStep ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.general.allowAddContentsStep,
       allowPreviewStep: features.general?.allowPreviewStep ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.general.allowPreviewStep,
       minimizeLeftSidebar:
         features.general?.minimizeLeftSidebar ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.general.minimizeLeftSidebar,
@@ -136,6 +134,7 @@ export const buildEmbeddedFeatures = (features: DeepPartial<EnvelopeEditorConfig
         : null,
 
     actions: {
+      allowContents: features.actions?.allowContents ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowContents,
       allowAttachments: features.actions?.allowAttachments ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowAttachments,
       allowDistributing:
         features.actions?.allowDistributing ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDistributing,

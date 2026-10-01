@@ -206,9 +206,7 @@ export const EnvelopeEditorProvider = ({
     };
   }, [isCscMode, providedEditorConfig]);
 
-  const [selectedEditorTab, setSelectedEditorTab] = useState<EnvelopeEditorTab>(
-    editorConfig.general?.allowAddFieldsStep ? 'fields' : 'contents',
-  );
+  const [selectedEditorTab, setSelectedEditorTab] = useState<EnvelopeEditorTab>('fields');
 
   const externalFlushCallbacksRef = useRef<Map<string, () => Promise<void>>>(new Map());
   const pendingMutationsRef = useRef<Set<Promise<unknown>>>(new Set());
