@@ -1,17 +1,11 @@
 import { trpc } from '@documenso/trpc/react';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 
 import { EmailPreferencesForm, type TEmailPreferencesFormSchema } from '~/components/forms/email-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { useCurrentTeam } from '~/providers/team';
-import { appMetaTags } from '~/utils/meta';
-
-export function meta() {
-  return appMetaTags(msg`Settings`);
-}
 
 export default function TeamEmailSettingsGeneral() {
   const { t } = useLingui();
@@ -27,7 +21,7 @@ export default function TeamEmailSettingsGeneral() {
 
   const onEmailPreferencesSubmit = async (data: TEmailPreferencesFormSchema) => {
     try {
-      const { emailId, emailReplyTo, emailDocumentSettings } = data;
+      const { emailId, emailReplyTo, emailDocumentSettings, includeSenderDetails } = data;
 
       await updateTeamSettings({
         teamId: team.id,
@@ -36,6 +30,7 @@ export default function TeamEmailSettingsGeneral() {
           emailReplyTo,
           // emailReplyToName,
           emailDocumentSettings,
+          includeSenderDetails,
         },
       });
 
@@ -59,7 +54,7 @@ export default function TeamEmailSettingsGeneral() {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <SettingsHeader title={t`Email Preferences`} subtitle={t`You can manage your email preferences here.`} />
 
       <section>

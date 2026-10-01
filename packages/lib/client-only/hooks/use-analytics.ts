@@ -31,18 +31,21 @@ export function useAnalytics() {
   };
 
   /**
-   * Capture an analytic event.
+   * Capture an exception event.
    *
    * @param error The error to capture.
-   * @param properties Properties to attach to the event.
+   * @param properties Properties to attach to the event, such as `source`, `location`,
+   * `recipientId` or `envelopeId`. Never attach recipient tokens.
    */
-  const captureException = (error: Error, properties?: Record<string, unknown>) => {
+  const captureException = (error: unknown, properties?: Record<string, unknown>) => {
     if (!isPostHogEnabled) {
       return;
     }
 
+    const errorToCapture = error instanceof Error ? error : new Error(String(error));
+
     void getPosthog().then(({ default: posthog }) => {
-      posthog.captureException(error, properties);
+      posthog.captureException(errorToCapture, properties);
     });
   };
 

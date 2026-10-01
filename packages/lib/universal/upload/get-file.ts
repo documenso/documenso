@@ -2,6 +2,8 @@ import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
 
+import { formatPath } from '../../constants/app';
+
 export type GetFileOptions = {
   type: DocumentDataType;
   data: string;
@@ -36,7 +38,7 @@ const getFileFromBytes64 = (data: string) => {
 };
 
 const getFileFromS3 = async (key: string) => {
-  const getPresignedUrlResponse = await fetch(`/api/files/presigned-get-url`, {
+  const getPresignedUrlResponse = await fetch(formatPath('/api/files/presigned-get-url'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

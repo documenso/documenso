@@ -13,7 +13,10 @@ export const updateDocumentMeta: TrpcRouteMeta = {
     method: 'POST',
     path: '/document/update',
     summary: 'Update document',
+    description:
+      'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
     tags: ['Document'],
+    deprecated: true,
   },
 };
 

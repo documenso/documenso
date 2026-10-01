@@ -68,7 +68,7 @@ const AvatarWithText = ({
 
     <div className={cn('flex flex-col truncate text-left font-normal text-sm', textSectionClassName)}>
       <span className="truncate text-foreground">{primaryText}</span>
-      <span className="truncate text-muted-foreground text-xs">{secondaryText}</span>
+      {secondaryText && <span className="truncate text-muted-foreground text-xs">{secondaryText}</span>}
     </div>
 
     {rightSideComponent}

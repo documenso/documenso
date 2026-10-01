@@ -120,20 +120,25 @@ Specific parts of the embed can be targeted with CSS classes for granular stylin
 
 ### Component Classes
 
-| Class                             | Description                                   |
-| --------------------------------- | --------------------------------------------- |
-| `.embed--Root`                    | Main container for the embedded experience    |
-| `.embed--DocumentContainer`       | Container for the document and signing widget |
-| `.embed--DocumentViewer`          | Container for the document viewer             |
-| `.embed--DocumentWidget`          | The signing widget container                  |
-| `.embed--DocumentWidgetContainer` | Outer container for the signing widget        |
-| `.embed--DocumentWidgetHeader`    | Header section of the signing widget          |
-| `.embed--DocumentWidgetContent`   | Main content area of the signing widget       |
-| `.embed--DocumentWidgetForm`      | Form section within the signing widget        |
-| `.embed--DocumentWidgetFooter`    | Footer section of the signing widget          |
-| `.embed--WaitingForTurn`          | Waiting screen when it is not the user's turn |
-| `.embed--DocumentCompleted`       | Completion screen after signing               |
-| `.field--FieldRootContainer`      | Base container for document fields            |
+| Class                                    | Description                                   |
+| ---------------------------------------- | --------------------------------------------- |
+| `.embed--Root`                           | Main container for the embedded experience    |
+| `.embed--DocumentContainer`              | Container for the document and signing widget |
+| `.embed--DocumentViewer`                 | Container for the document viewer             |
+| `.embed--DocumentWidget`                 | The signing widget container                  |
+| `.embed--DocumentWidgetContainer`        | Outer container for the signing widget        |
+| `.embed--DocumentWidgetHeader`           | Header section of the signing widget          |
+| `.embed--DocumentWidgetContent`          | Main content area of the signing widget       |
+| `.embed--DocumentWidgetForm`             | Form section within the signing widget        |
+| `.embed--DocumentWidgetFooter`           | Footer section of the signing widget          |
+| `.embed--WaitingForTurn`                 | Waiting screen when it is not the user's turn |
+| `.embed--DocumentCompleted`              | Completion screen after signing               |
+| `.embed--DocumentCompletedCard`          | Signature card on the completion screen       |
+| `.embed--DocumentCompletedTitle`         | Title on the completion screen                |
+| `.embed--DocumentCompletedStatus`        | Status line on the completion screen          |
+| `.embed--DocumentCompletedDescription`   | Description text on the completion screen     |
+| `.embed--DocumentRejected`               | Rejection screen after rejecting the document |
+| `.field--FieldRootContainer`             | Base container for document fields            |
 
 ### Field Data Attributes
 
@@ -144,6 +149,7 @@ Fields expose data attributes for state-based styling:
 | `[data-field-type]` | `SIGNATURE`, `TEXT`, `CHECKBOX`, `RADIO`, etc. | The type of field                    |
 | `[data-inserted]`   | `true`, `false`                                | Whether the field has been filled    |
 | `[data-validate]`   | `true`, `false`                                | Whether the field is being validated |
+| `[data-readonly]`   | `true`, `false`                                | Whether the field is read-only       |
 
 ### Example
 
@@ -155,7 +161,7 @@ Fields expose data attributes for state-based styling:
 
 /* Style filled fields */
 .field--FieldRootContainer[data-inserted='true'] {
-  background-color: var(--primary);
+  background-color: hsl(var(--primary));
   opacity: 0.2;
 }
 

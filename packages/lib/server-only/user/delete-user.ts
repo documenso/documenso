@@ -1,6 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { jobs } from '../../jobs/client';
 import { deleteOrganisation } from '../organisation/delete-organisation';
 
 export type DeleteUserOptions = {
@@ -59,6 +60,13 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
       })),
     );
 
+  // Organisations the user is a member of (but not owner). Owned organisations
+  // are fully torn down below (including subscription cancellation), so only
+  // these need a seat sync after the user's memberships cascade away.
+  const memberOrganisationIds = user.organisationMember
+    .filter((member) => member.organisation.ownerUserId !== user.id)
+    .map((member) => member.organisationId);
+
   // For organisations the user owns - fully tear them down (orphan envelopes,
   // delete the organisation, and cancel any Stripe subscription). Without this
   // the organisations would only cascade away when the user row is deleted,
@@ -82,9 +90,21 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
     }),
   );
 
-  return await prisma.user.delete({
+  const deletedUser = await prisma.user.delete({
     where: {
       id: user.id,
     },
   });
+
+  // The user's memberships were cascade-deleted with the user row — queue a
+  // seat sync for each organisation they belonged to so the Stripe quantity
+  // trues down to the new member count (no proration, no credit).
+  for (const organisationId of memberOrganisationIds) {
+    await jobs.triggerJob({
+      name: 'internal.sync-organisation-seats',
+      payload: { organisationId },
+    });
+  }
+
+  return deletedUser;
 };

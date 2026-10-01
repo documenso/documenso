@@ -1,4 +1,5 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { useChildRouteFlags } from '@documenso/lib/client-only/hooks/use-child-route-flags';
 import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
@@ -45,6 +46,8 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
   const { banner } = loaderData;
 
   const { user, organisations } = useSession();
+
+  const { layoutMode } = useChildRouteFlags();
 
   const teamUrl = params.teamUrl;
   const orgUrl = params.orgUrl;
@@ -108,23 +111,26 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
   return (
     <OrganisationProvider organisation={currentOrganisation}>
       <TeamProvider team={currentTeam || null}>
-        <OrganisationBillingBanner />
+        <div className={cn({ 'md:flex md:h-dvh md:flex-col md:overflow-hidden': layoutMode === 'settings' })}>
+          <OrganisationBillingBanner />
 
-        <OrganisationQuotaBanner />
+          <OrganisationQuotaBanner />
 
-        {!user.emailVerified && <VerifyEmailBanner email={user.email} />}
+          {!user.emailVerified && <VerifyEmailBanner email={user.email} />}
 
-        {banner && !hideHeader && <AppBanner banner={banner} />}
+          {banner && !hideHeader && <AppBanner banner={banner} />}
 
-        {!hideHeader && <Header />}
+          {!hideHeader && <Header fullWidth={layoutMode === 'settings'} />}
 
-        <main
-          className={cn({
-            'mt-8 pb-8 md:mt-12 md:pb-12': !hideHeader,
-          })}
-        >
-          <Outlet />
-        </main>
+          <main
+            className={cn({
+              'mt-8 pb-8 md:mt-12 md:pb-12': !hideHeader && layoutMode !== 'settings',
+              'md:flex md:min-h-0 md:flex-1 md:flex-col': layoutMode === 'settings',
+            })}
+          >
+            <Outlet />
+          </main>
+        </div>
       </TeamProvider>
     </OrganisationProvider>
   );

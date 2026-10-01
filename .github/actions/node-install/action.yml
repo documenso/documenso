@@ -2,7 +2,7 @@ name: 'Setup node'
 inputs:
   node_version:
     required: false
-    default: v22.x
+    default: v24.x
 
 runs:
   using: 'composite'

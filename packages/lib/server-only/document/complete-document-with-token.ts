@@ -21,11 +21,13 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import type { TRecipientAccessAuth } from '../../types/document-auth';
 import { DocumentAuth } from '../../types/document-auth';
+import { isTspEnvelope } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
-import { assertRecipientNotExpired } from '../../utils/recipients';
+import { getRecipientsInActiveSigningStep, isRecipientTurnBySigningOrder } from '../../utils/recipient-groups';
+import { assertRecipientNotExpired, isRecipientBefore } from '../../utils/recipients';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { isRecipientAuthorized } from './is-recipient-authorized';
@@ -56,10 +58,10 @@ export const completeDocumentWithToken = async ({
   userId,
   accessAuthOptions,
   requestMetadata,
-  nextSigner,
+  nextSigner: dictatedNextSigner,
   recipientOverride,
 }: CompleteDocumentWithTokenOptions) => {
-  const envelope = await prisma.envelope.findFirstOrThrow({
+  const envelope = await prisma.envelope.findFirst({
     where: {
       ...unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
       recipients: {
@@ -78,23 +80,55 @@ export const completeDocumentWithToken = async ({
     },
   });
 
-  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
-
-  if (envelope.status !== DocumentStatus.PENDING) {
-    throw new Error(`Document ${envelope.id} must be pending`);
+  // The most common cause is a stale signing page: the document was deleted,
+  // or the recipient was removed, after the link was opened. Surface a
+  // NOT_FOUND instead of leaking a Prisma P2025 as a 500.
+  if (!envelope) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found for the provided signing token',
+      statusCode: 404,
+    });
   }
 
+  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
   if (envelope.recipients.length === 0) {
-    throw new Error(`Document ${envelope.id} has no recipient with token ${token}`);
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `Document ${envelope.id} has no recipient with the provided token`,
+      statusCode: 404,
+    });
   }
 
   const [recipient] = envelope.recipients;
 
-  assertRecipientNotExpired(recipient);
-
+  // A retried or duplicate completion request for an already signed
+  // recipient throws a code the router resolves idempotently. This must be
+  // checked before the envelope status guard since the envelope may have
+  // been completed and sealed by the recipient's original request.
   if (recipient.signingStatus === SigningStatus.SIGNED) {
-    throw new Error(`Recipient ${recipient.id} has already signed`);
+    throw new AppError(AppErrorCode.RECIPIENT_ALREADY_SIGNED, {
+      message: `Recipient ${recipient.id} has already signed`,
+      statusCode: 400,
+    });
   }
+
+  if (envelope.status !== DocumentStatus.PENDING) {
+    const envelopeStatusErrorCode: Record<DocumentStatus, AppErrorCode> = {
+      [DocumentStatus.DRAFT]: AppErrorCode.ENVELOPE_DRAFT,
+      [DocumentStatus.COMPLETED]: AppErrorCode.ENVELOPE_COMPLETED,
+      [DocumentStatus.REJECTED]: AppErrorCode.ENVELOPE_REJECTED,
+      [DocumentStatus.CANCELLED]: AppErrorCode.ENVELOPE_CANCELLED,
+      // Unreachable: guarded by the status check above.
+      [DocumentStatus.PENDING]: AppErrorCode.INVALID_REQUEST,
+    };
+
+    throw new AppError(envelopeStatusErrorCode[envelope.status], {
+      message: `Document ${envelope.id} must be pending to be completed, found ${envelope.status}`,
+      statusCode: 400,
+    });
+  }
+
+  assertRecipientNotExpired(recipient);
 
   if (recipient.signingStatus === SigningStatus.REJECTED) {
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
@@ -109,7 +143,10 @@ export const completeDocumentWithToken = async ({
     });
 
     if (!isRecipientsTurn) {
-      throw new Error(`Recipient ${recipient.id} attempted to complete the document before it was their turn`);
+      throw new AppError(AppErrorCode.RECIPIENT_OUT_OF_TURN, {
+        message: `Recipient ${recipient.id} attempted to complete the document before it was their turn`,
+        statusCode: 400,
+      });
     }
   }
 
@@ -272,13 +309,22 @@ export const completeDocumentWithToken = async ({
   }
 
   if (fieldsContainUnsignedRequiredField(fields)) {
-    throw new Error(`Recipient ${recipient.id} has unsigned fields`);
+    throw new AppError(AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS, {
+      message: `Recipient ${recipient.id} has unsigned fields`,
+      statusCode: 400,
+    });
   }
 
   await prisma.$transaction(async (tx) => {
-    await tx.recipient.update({
+    // Conditional update so two concurrent completion requests can't both
+    // proceed: only the request that transitions the recipient to SIGNED
+    // continues, the loser sees a count of 0 and aborts.
+    const { count: updatedRecipientCount } = await tx.recipient.updateMany({
       where: {
         id: recipient.id,
+        signingStatus: {
+          not: SigningStatus.SIGNED,
+        },
       },
       data: {
         signingStatus: SigningStatus.SIGNED,
@@ -287,6 +333,16 @@ export const completeDocumentWithToken = async ({
         email: recipientEmail,
       },
     });
+
+    // A concurrent request completed the recipient between our initial read
+    // and this transaction. Abort so the winning request handles all side
+    // effects, the router resolves this code idempotently.
+    if (updatedRecipientCount === 0) {
+      throw new AppError(AppErrorCode.RECIPIENT_ALREADY_SIGNED, {
+        message: `Recipient ${recipient.id} has already signed`,
+        statusCode: 400,
+      });
+    }
 
     if (recipientEmail !== recipient.email || recipientName !== recipient.name) {
       await tx.documentAuditLog.create({
@@ -369,6 +425,7 @@ export const completeDocumentWithToken = async ({
     select: {
       id: true,
       signingOrder: true,
+      signingStatus: true,
       name: true,
       email: true,
       role: true,
@@ -397,65 +454,100 @@ export const completeDocumentWithToken = async ({
     });
 
     if (envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-      const [nextRecipient] = pendingRecipients;
+      const sequencing = { strictlySequential: isTspEnvelope(envelope) };
 
-      await prisma.$transaction(async (tx) => {
-        if (nextSigner && envelope.documentMeta?.allowDictateNextSigner) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
-              envelopeId: envelope.id,
-              user: {
-                name: recipientName,
-                email: recipientEmail,
-              },
-              requestMetadata,
+      const nextRecipients = getRecipientsInActiveSigningStep(pendingRecipients, sequencing);
+
+      // Peers still pending in the current step are not the "next" step:
+      // nobody advances until the whole group has completed.
+      const hasCompletedCurrentStep = nextRecipients.every((pendingRecipient) =>
+        isRecipientBefore(recipient, pendingRecipient, sequencing),
+      );
+
+      if (
+        nextRecipients.length > 0 &&
+        hasCompletedCurrentStep &&
+        // Ensure that the next recipient can actually act on the document.
+        isRecipientTurnBySigningOrder(pendingRecipients, nextRecipients[0], sequencing)
+      ) {
+        // Dictation is only allowed when advancing to a single-recipient step.
+        const canDictateNextSigner =
+          Boolean(dictatedNextSigner) &&
+          Boolean(envelope.documentMeta?.allowDictateNextSigner) &&
+          nextRecipients.length === 1;
+
+        if (canDictateNextSigner && dictatedNextSigner) {
+          await prisma.$transaction(async (tx) => {
+            const [nextRecipient] = nextRecipients;
+
+            await tx.recipient.update({
+              where: { id: nextRecipient.id },
               data: {
-                recipientEmail: nextRecipient.email,
-                recipientName: nextRecipient.name,
-                recipientId: nextRecipient.id,
-                recipientRole: nextRecipient.role,
-                changes: [
-                  {
-                    type: RECIPIENT_DIFF_TYPE.NAME,
-                    from: nextRecipient.name,
-                    to: nextSigner.name,
-                  },
-                  {
-                    type: RECIPIENT_DIFF_TYPE.EMAIL,
-                    from: nextRecipient.email,
-                    to: nextSigner.email,
-                  },
-                ],
+                sendStatus: SendStatus.SENT,
+                sentAt: new Date(),
+                name: dictatedNextSigner.name,
+                email: dictatedNextSigner.email,
               },
-            }),
+            });
+
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
+                envelopeId: envelope.id,
+                user: {
+                  name: recipientName,
+                  email: recipientEmail,
+                },
+                requestMetadata,
+                data: {
+                  recipientEmail: nextRecipient.email,
+                  recipientName: nextRecipient.name,
+                  recipientId: nextRecipient.id,
+                  recipientRole: nextRecipient.role,
+                  changes: [
+                    {
+                      type: RECIPIENT_DIFF_TYPE.NAME,
+                      from: nextRecipient.name,
+                      to: dictatedNextSigner.name,
+                    },
+                    {
+                      type: RECIPIENT_DIFF_TYPE.EMAIL,
+                      from: nextRecipient.email,
+                      to: dictatedNextSigner.email,
+                    },
+                  ],
+                },
+              }),
+            });
+          });
+        } else {
+          await prisma.recipient.updateMany({
+            where: {
+              id: {
+                in: nextRecipients.map((nextRecipient) => nextRecipient.id),
+              },
+            },
+            data: {
+              sendStatus: SendStatus.SENT,
+              sentAt: new Date(),
+            },
           });
         }
 
-        await tx.recipient.update({
-          where: { id: nextRecipient.id },
-          data: {
-            sendStatus: SendStatus.SENT,
-            sentAt: new Date(),
-            ...(nextSigner && envelope.documentMeta?.allowDictateNextSigner
-              ? {
-                  name: nextSigner.name,
-                  email: nextSigner.email,
-                }
-              : {}),
-          },
-        });
-      });
-
-      await jobs.triggerJob({
-        name: 'send.signing.requested.email',
-        payload: {
-          userId: envelope.userId,
-          documentId: legacyDocumentId,
-          recipientId: nextRecipient.id,
-          requestMetadata,
-        },
-      });
+        await Promise.allSettled(
+          nextRecipients.map((nextRecipient) =>
+            jobs.triggerJob({
+              name: 'send.signing.requested.email',
+              payload: {
+                userId: envelope.userId,
+                documentId: legacyDocumentId,
+                recipientId: nextRecipient.id,
+                requestMetadata,
+              },
+            }),
+          ),
+        );
+      }
     }
   }
 

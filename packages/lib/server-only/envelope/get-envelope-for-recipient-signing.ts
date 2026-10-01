@@ -12,6 +12,8 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAuthMethods } from '../../types/document-auth';
 import { ZEnvelopeFieldSchema, ZFieldSchema } from '../../types/field';
 import { ZRecipientLiteSchema } from '../../types/recipient';
+import { isTspEnvelope } from '../../types/signature-level';
+import { isRecipientTurnBySigningOrder } from '../../utils/recipient-groups';
 import { isRecipientExpired } from '../../utils/recipients';
 import { isRecipientAuthorized } from '../document/is-recipient-authorized';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -260,18 +262,9 @@ export const getEnvelopeForRecipientSigning = async ({
     },
   });
 
-  let isRecipientsTurn = true;
-
-  const currentRecipientIndex = envelope.recipients.findIndex((r) => r.token === token);
-
-  if (envelope.documentMeta.signingOrder === DocumentSigningOrder.SEQUENTIAL && currentRecipientIndex !== -1) {
-    for (let i = 0; i < currentRecipientIndex; i++) {
-      if (envelope.recipients[i].signingStatus !== SigningStatus.SIGNED) {
-        isRecipientsTurn = false;
-        break;
-      }
-    }
-  }
+  const isRecipientsTurn =
+    envelope.documentMeta.signingOrder !== DocumentSigningOrder.SEQUENTIAL ||
+    isRecipientTurnBySigningOrder(envelope.recipients, recipient, { strictlySequential: isTspEnvelope(envelope) });
 
   const sender = settings.includeSenderDetails
     ? {

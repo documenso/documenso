@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -5,9 +6,12 @@ import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { ChevronLeft } from 'lucide-react';
+import { useEffect } from 'react';
 import { isRouteErrorResponse, Link, Outlet } from 'react-router';
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { PublicLegalLinks } from '~/components/general/public-legal-links';
+
 import type { Route } from './+types/_layout';
 
 export function meta() {
@@ -33,22 +37,36 @@ export default function RecipientLayout({ matches }: Route.ComponentProps) {
   );
 
   return (
-    <div className="min-h-screen">
-      {!hideHeader && sessionData?.user && <AuthenticatedHeader />}
+    <div className="flex min-h-screen flex-col justify-between">
+      <div>
+        {!hideHeader && sessionData?.user && <AuthenticatedHeader />}
 
-      <main
-        className={cn({
-          'mt-8 mb-8 px-4 md:mt-12 md:mb-12 md:px-8': !hideHeader,
-        })}
-      >
-        <Outlet />
-      </main>
+        <main
+          className={cn({
+            'mt-8 mb-8 px-4 md:mt-12 md:mb-12 md:px-8': !hideHeader,
+          })}
+        >
+          <Outlet />
+        </main>
+      </div>
+
+      {!hideHeader && (
+        <footer className="py-4">
+          <PublicLegalLinks />
+        </footer>
+      )}
     </div>
   );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  const analytics = useAnalytics();
+
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
+
+  useEffect(() => {
+    analytics.captureException(error, { source: 'signing', location: 'recipient_layout_boundary' });
+  }, [error]);
 
   return (
     <GenericErrorLayout

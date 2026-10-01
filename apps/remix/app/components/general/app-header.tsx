@@ -1,5 +1,3 @@
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { getRootHref } from '@documenso/lib/utils/params';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -14,15 +12,15 @@ import { BrandingLogo } from '~/components/general/branding-logo';
 import { AppCommandMenu } from './app-command-menu';
 import { AppNavDesktop } from './app-nav-desktop';
 import { AppNavMobile } from './app-nav-mobile';
-import { MenuSwitcher } from './menu-switcher';
 import { OrgMenuSwitcher } from './org-menu-switcher';
 
-export type HeaderProps = HTMLAttributes<HTMLDivElement>;
+export type HeaderProps = HTMLAttributes<HTMLDivElement> & {
+  /** Span the full viewport width instead of the centered max-w-screen-xl container. */
+  fullWidth?: boolean;
+};
 
-export const Header = ({ className, ...props }: HeaderProps) => {
+export const Header = ({ className, fullWidth = false, ...props }: HeaderProps) => {
   const params = useParams();
-
-  const { organisations } = useSession();
 
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
@@ -51,12 +49,18 @@ export const Header = ({ className, ...props }: HeaderProps) => {
     <header
       className={cn(
         'sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent bg-background/95 backdrop-blur duration-200 supports-backdrop-blur:bg-background/60',
-        scrollY > 5 && 'border-b-border',
+        (scrollY > 5 || fullWidth) && 'border-b-border',
         className,
       )}
       {...props}
     >
-      <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:justify-normal md:px-8">
+      <div
+        className={cn(
+          'mx-auto flex w-full items-center justify-between gap-x-4 px-4 md:justify-normal',
+          fullWidth ? 'md:px-6' : 'max-w-screen-xl md:px-8',
+        )}
+        data-testid="app-header-container"
+      >
         <Link
           to={getRootHref(params)}
           className="hidden rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:inline"
@@ -78,7 +82,9 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           </Link>
         </Button>
 
-        <div className="md:ml-4">{isPersonalLayout(organisations) ? <MenuSwitcher /> : <OrgMenuSwitcher />}</div>
+        <div className="md:ml-4">
+          <OrgMenuSwitcher />
+        </div>
 
         <div className="flex flex-row items-center space-x-4 md:hidden">
           <button onClick={() => setIsCommandMenuOpen(true)}>

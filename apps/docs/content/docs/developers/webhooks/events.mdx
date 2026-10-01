@@ -33,13 +33,14 @@ All webhook events share a common structure:
 
 | Field            | Type      | Description                                            |
 | ---------------- | --------- | ------------------------------------------------------ |
-| `id`             | number    | Document or template ID                                |
+| `id`             | number    | Legacy numeric v1 document or template ID              |
+| `envelopeId`     | string    | Canonical v2 identifier (`envelope_` + 16 characters)  |
 | `externalId`     | string?   | External identifier for integration                    |
 | `userId`         | number    | Owner's user ID                                        |
 | `authOptions`    | object?   | Document-level authentication options                  |
 | `formValues`     | object?   | PDF form values associated with the document           |
 | `title`          | string    | Document or template title                             |
-| `status`         | string    | Current status: `DRAFT`, `PENDING`, `COMPLETED`        |
+| `status`         | string    | Current status: `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED`, `CANCELLED` |
 | `visibility`     | string    | Document visibility setting                            |
 | `createdAt`      | datetime  | Document creation timestamp                            |
 | `updatedAt`      | datetime  | Last modification timestamp                            |
@@ -47,8 +48,8 @@ All webhook events share a common structure:
 | `deletedAt`      | datetime? | Deletion timestamp                                     |
 | `teamId`         | number?   | Team ID if document belongs to a team                  |
 | `templateId`     | number?   | Template ID if created from a template                 |
-| `source`         | string    | Source: `DOCUMENT` or `TEMPLATE`                       |
-| `documentMeta`   | object    | Document metadata (subject, message, signing options)  |
+| `source`         | string    | Source: `DOCUMENT`, `TEMPLATE`, or `TEMPLATE_DIRECT_LINK` |
+| `documentMeta`   | object?   | Nullable document metadata (subject, message, signing options) |
 | `recipients`     | array     | List of recipient objects                              |
 | `Recipient`      | array     | List of recipient objects (legacy, same as recipients) |
 
@@ -60,7 +61,6 @@ All webhook events share a common structure:
 | `subject`                  | string? | Email subject line                      |
 | `message`                  | string? | Email message body                      |
 | `timezone`                 | string  | Timezone for date display               |
-| `password`                 | string? | Document access password (if set)       |
 | `dateFormat`               | string  | Date format string                      |
 | `redirectUrl`              | string? | URL to redirect after signing           |
 | `signingOrder`             | string  | `PARALLEL` or `SEQUENTIAL`              |
@@ -77,8 +77,9 @@ All webhook events share a common structure:
 | Field                  | Type      | Description                                |
 | ---------------------- | --------- | ------------------------------------------ |
 | `id`                   | number    | Recipient ID                               |
-| `documentId`           | number?   | Parent document ID                         |
-| `templateId`           | number?   | Template ID if created from a template     |
+| `envelopeId`           | string    | Canonical parent envelope ID               |
+| `documentId`           | number?   | Legacy parent document ID; null for templates |
+| `templateId`           | number?   | Legacy parent template ID; null for documents |
 | `email`                | string    | Recipient email address                    |
 | `name`                 | string    | Recipient name                             |
 | `token`                | string    | Unique signing token                       |
@@ -93,6 +94,8 @@ All webhook events share a common structure:
 | `signingStatus`        | string    | `NOT_SIGNED`, `SIGNED`, or `REJECTED`      |
 | `sendStatus`           | string    | `NOT_SENT` or `SENT`                       |
 | `rejectionReason`      | string?   | Reason if recipient rejected               |
+
+Use `recipient.envelopeId` as the reliable parent link. The legacy `documentId` and `templateId` fields depend on the parent envelope type, so one of them is always null.
 
 ---
 
@@ -111,6 +114,7 @@ Triggered when a new document is created.
   "event": "DOCUMENT_CREATED",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "externalId": null,
     "userId": 1,
     "authOptions": null,
@@ -129,9 +133,8 @@ Triggered when a new document is created.
       "id": "doc_meta_123",
       "subject": "Please sign this document",
       "message": "Hello, please review and sign this document.",
-      "timezone": "UTC",
-      "password": null,
-      "dateFormat": "MM/DD/YYYY",
+      "timezone": "Etc/UTC",
+      "dateFormat": "yyyy-MM-dd hh:mm a",
       "redirectUrl": null,
       "signingOrder": "PARALLEL",
       "allowDictateNextSigner": false,
@@ -145,6 +148,7 @@ Triggered when a new document is created.
     "recipients": [
       {
         "id": 52,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -166,6 +170,7 @@ Triggered when a new document is created.
     "Recipient": [
       {
         "id": 52,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -203,6 +208,7 @@ The document status changes to `PENDING` and recipients have `sendStatus: "SENT"
   "event": "DOCUMENT_SENT",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "externalId": null,
     "userId": 1,
     "authOptions": null,
@@ -221,9 +227,8 @@ The document status changes to `PENDING` and recipients have `sendStatus: "SENT"
       "id": "doc_meta_123",
       "subject": "Please sign this document",
       "message": "Hello, please review and sign this document.",
-      "timezone": "UTC",
-      "password": null,
-      "dateFormat": "MM/DD/YYYY",
+      "timezone": "Etc/UTC",
+      "dateFormat": "yyyy-MM-dd hh:mm a",
       "redirectUrl": null,
       "signingOrder": "PARALLEL",
       "allowDictateNextSigner": false,
@@ -237,6 +242,7 @@ The document status changes to `PENDING` and recipients have `sendStatus: "SENT"
     "recipients": [
       {
         "id": 52,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -258,6 +264,7 @@ The document status changes to `PENDING` and recipients have `sendStatus: "SENT"
     "Recipient": [
       {
         "id": 52,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -295,12 +302,14 @@ The recipient's `readStatus` changes to `OPENED`.
   "event": "DOCUMENT_OPENED",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "PENDING",
     "title": "contract.pdf",
     "source": "DOCUMENT",
     "recipients": [
       {
         "id": 52,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "email": "signer@example.com",
         "name": "John Doe",
         "role": "SIGNER",
@@ -328,6 +337,7 @@ The recipient's `signingStatus` changes to `SIGNED` and `signedAt` is populated.
   "event": "DOCUMENT_SIGNED",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "COMPLETED",
     "title": "contract.pdf",
     "source": "DOCUMENT",
@@ -335,6 +345,7 @@ The recipient's `signingStatus` changes to `SIGNED` and `signedAt` is populated.
     "recipients": [
       {
         "id": 51,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "email": "signer@example.com",
         "name": "John Doe",
         "role": "SIGNER",
@@ -361,12 +372,14 @@ Triggered when an individual recipient completes their required action (signing,
   "event": "DOCUMENT_RECIPIENT_COMPLETED",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "PENDING",
     "title": "contract.pdf",
     "source": "DOCUMENT",
     "recipients": [
       {
         "id": 52,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "email": "signer@example.com",
         "name": "John Doe",
         "role": "SIGNER",
@@ -395,6 +408,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
   "event": "DOCUMENT_COMPLETED",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "externalId": null,
     "userId": 1,
     "authOptions": null,
@@ -413,9 +427,8 @@ The document status changes to `COMPLETED` and `completedAt` is set.
       "id": "doc_meta_123",
       "subject": "Please sign this document",
       "message": "Hello, please review and sign this document.",
-      "timezone": "UTC",
-      "password": null,
-      "dateFormat": "MM/DD/YYYY",
+      "timezone": "Etc/UTC",
+      "dateFormat": "yyyy-MM-dd hh:mm a",
       "redirectUrl": null,
       "signingOrder": "PARALLEL",
       "allowDictateNextSigner": false,
@@ -429,6 +442,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
     "recipients": [
       {
         "id": 50,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "reviewer@example.com",
@@ -451,6 +465,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
       },
       {
         "id": 51,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -475,6 +490,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
     "Recipient": [
       {
         "id": 50,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "reviewer@example.com",
@@ -497,6 +513,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
       },
       {
         "id": 51,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -537,12 +554,14 @@ The recipient's `signingStatus` changes to `REJECTED` and `rejectionReason` cont
   "event": "DOCUMENT_REJECTED",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "PENDING",
     "title": "contract.pdf",
     "source": "DOCUMENT",
     "recipients": [
       {
         "id": 52,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "email": "signer@example.com",
         "name": "John Doe",
         "role": "SIGNER",
@@ -561,7 +580,7 @@ The recipient's `signingStatus` changes to `REJECTED` and `rejectionReason` cont
 
 ### `document.cancelled`
 
-Triggered when the document owner or a team member deletes a document. Draft and pending documents are hard-deleted, while completed documents are soft-deleted.
+Triggered when a pending document is explicitly cancelled with `POST /envelope/cancel`, or when a document owner or team member deletes a document. Deleting a draft or pending document hard-deletes it, while deleting a completed document soft-deletes it.
 
 This event is **not** triggered when a recipient hides a document from their inbox.
 
@@ -572,6 +591,7 @@ This event is **not** triggered when a recipient hides a document from their inb
   "event": "DOCUMENT_CANCELLED",
   "payload": {
     "id": 7,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "externalId": null,
     "userId": 3,
     "authOptions": null,
@@ -591,7 +611,6 @@ This event is **not** triggered when a recipient hides a document from their inb
       "subject": "",
       "message": "",
       "timezone": "Etc/UTC",
-      "password": null,
       "dateFormat": "yyyy-MM-dd hh:mm a",
       "redirectUrl": "",
       "signingOrder": "PARALLEL",
@@ -606,6 +625,7 @@ This event is **not** triggered when a recipient hides a document from their inb
     "recipients": [
       {
         "id": 7,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 7,
         "templateId": null,
         "email": "signer@example.com",
@@ -627,6 +647,7 @@ This event is **not** triggered when a recipient hides a document from their inb
     "Recipient": [
       {
         "id": 7,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 7,
         "templateId": null,
         "email": "signer@example.com",
@@ -651,6 +672,45 @@ This event is **not** triggered when a recipient hides a document from their inb
 }
 ```
 
+### `recipient.expired`
+
+Triggered when a recipient's signing deadline passes on a pending document before they sign or reject it.
+
+**Event name:** `RECIPIENT_EXPIRED`
+
+The recipient's `expiresAt` contains the signing deadline, and `expirationNotifiedAt` is set when the expiration is processed.
+
+```json
+{
+  "event": "RECIPIENT_EXPIRED",
+  "payload": {
+    "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
+    "status": "PENDING",
+    "title": "contract.pdf",
+    "source": "DOCUMENT",
+    "recipients": [
+      {
+        "id": 52,
+        "envelopeId": "envelope_abcdefhiklmnorst",
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "role": "SIGNER",
+        "expiresAt": "2024-04-22T11:51:00.000Z",
+        "expirationNotifiedAt": "2024-04-22T11:52:00.000Z",
+        "readStatus": "OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:52:00.000Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
+}
+```
+
 ### `document.reminder.sent`
 
 Triggered when a reminder email is sent to a recipient who has not yet completed their action.
@@ -662,12 +722,14 @@ Triggered when a reminder email is sent to a recipient who has not yet completed
   "event": "DOCUMENT_REMINDER_SENT",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "PENDING",
     "title": "contract.pdf",
     "source": "DOCUMENT",
     "recipients": [
       {
         "id": 52,
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "email": "signer@example.com",
         "name": "John Doe",
         "role": "SIGNER",
@@ -686,7 +748,7 @@ Triggered when a reminder email is sent to a recipient who has not yet completed
 
 ## Template Events
 
-Template events track changes to reusable document templates. Template payloads use the same structure as document payloads, with `source` set to `TEMPLATE` and `templateId` populated.
+Template events track changes to reusable document templates. Template payloads use the same structure as document payloads. For `TEMPLATE_CREATED`, `TEMPLATE_UPDATED`, and `TEMPLATE_DELETED` the template's own legacy numeric ID is in `id` and `templateId` is `null`. Only `TEMPLATE_USED` — whose payload describes the new document envelope created from the template — carries the originating template's legacy ID in `templateId`, with `source` set to `TEMPLATE`.
 
 ### `template.created`
 
@@ -699,9 +761,10 @@ Triggered when a new template is created.
   "event": "TEMPLATE_CREATED",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "title": "My Template",
     "status": "DRAFT",
-    "templateId": 10,
+    "templateId": null,
     "source": "TEMPLATE",
     "recipients": []
   },
@@ -721,9 +784,10 @@ Triggered when a template's settings, recipients, or fields are modified.
   "event": "TEMPLATE_UPDATED",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "title": "My Updated Template",
     "status": "DRAFT",
-    "templateId": 10,
+    "templateId": null,
     "source": "TEMPLATE",
     "recipients": []
   },
@@ -743,9 +807,10 @@ Triggered when a template is deleted.
   "event": "TEMPLATE_DELETED",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "title": "Deleted Template",
     "status": "DRAFT",
-    "templateId": 10,
+    "templateId": null,
     "source": "TEMPLATE",
     "recipients": []
   },
@@ -765,6 +830,7 @@ Triggered when a document is created from a template. This event fires alongside
   "event": "TEMPLATE_USED",
   "payload": {
     "id": 10,
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "title": "Document from Template",
     "status": "DRAFT",
     "templateId": 10,
@@ -791,7 +857,8 @@ Triggered when a document is created from a template. This event fires alongside
 | `DOCUMENT_RECIPIENT_COMPLETED` | Recipient completes their action           | Recipient `signingStatus: "SIGNED"`, `signedAt` set          |
 | `DOCUMENT_COMPLETED`         | All recipients complete actions               | `status: "COMPLETED"`, `completedAt` set                     |
 | `DOCUMENT_REJECTED`          | Recipient rejects document                   | Recipient `signingStatus: "REJECTED"`, `rejectionReason` set |
-| `DOCUMENT_CANCELLED`         | Owner or team member deletes document        | Document cancelled or deleted                                |
+| `DOCUMENT_CANCELLED`         | Pending document explicitly cancelled, or document deleted | `status: "CANCELLED"` after explicit cancellation; deletion may remove or soft-delete the document |
+| `RECIPIENT_EXPIRED`          | Recipient signing deadline passes            | Recipient `expiresAt` passed, `expirationNotifiedAt` set           |
 | `DOCUMENT_REMINDER_SENT`     | Reminder email sent to recipient             | No status changes                                            |
 
 ### Template Events
@@ -821,7 +888,7 @@ When processing webhook events:
     **Process idempotently** — Webhooks may be retried, so handle duplicate events
   </Step>
   <Step>
-    **Respond quickly** — Return a 200 status code within 30 seconds
+    **Respond quickly** — Return a `2xx` status code within 10 seconds
   </Step>
 </Steps>
 

@@ -13,7 +13,7 @@ There are three distinct kinds of limit:
 | ---------------------- | ------------------------------------------------- | ----------------------- |
 | Resource quota         | Documents, emails, and API requests **per month** | Yes — per claim and org |
 | Resource rate limit    | The same resources over a short window (e.g. `1h`) | Yes — per claim and org |
-| Global HTTP rate limit | API requests per IP (100/min, hardcoded)          | No — see [Limitations](#limitations) |
+| Global HTTP rate limit | API requests per IP (1000/min, hardcoded)         | No — see [Limitations](#limitations) |
 
 ## Prerequisites
 
@@ -91,7 +91,7 @@ Monthly quota usage is keyed to the **UTC calendar month**. There is no schedule
 
 ## Limitations
 
-The **global HTTP rate limit is not configurable.** Documenso enforces a hardcoded **100 requests per minute per IP address** on its API endpoint groups (`/api/v1`, `/api/v2`, and the tRPC API are limited separately), returning `429 Too Many Requests`. It is a per-IP safeguard applied at the HTTP layer — not per-organisation, not stored on any claim, and not adjustable from the admin panel. See [Rate Limits](/docs/developers/api/rate-limits).
+The **global HTTP rate limit is not configurable.** Documenso enforces a hardcoded **1000 requests per minute per IP address** on its API endpoint groups (`/api/v1`, `/api/v2`, and the tRPC API are limited separately), returning `429 Too Many Requests`. It is a per-IP safeguard applied at the HTTP layer — not per-organisation, not stored on any claim, and not adjustable from the admin panel. See [Rate Limits](/docs/developers/api/rate-limits).
 
 ## Troubleshooting
 

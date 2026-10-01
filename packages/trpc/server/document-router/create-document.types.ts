@@ -25,8 +25,10 @@ export const createDocumentMeta: TrpcRouteMeta = {
     path: '/document/create',
     contentTypes: ['multipart/form-data'],
     summary: 'Create document',
-    description: 'Create a document using form data.',
+    description:
+      'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
     tags: ['Document'],
+    deprecated: true,
   },
 };
 

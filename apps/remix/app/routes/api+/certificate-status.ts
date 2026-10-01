@@ -1,8 +1,8 @@
 import { getCertificateStatus } from '@documenso/lib/server-only/cert/cert-status';
 
-export const loader = () => {
+export const loader = async () => {
   try {
-    const certStatus = getCertificateStatus();
+    const certStatus = await getCertificateStatus();
 
     return Response.json({
       isAvailable: certStatus.isAvailable,

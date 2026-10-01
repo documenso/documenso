@@ -1,18 +1,17 @@
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
-import { maskRecipientTokensForDocument } from '@documenso/lib/utils/mask-recipient-tokens-for-document';
 import { prisma } from '@documenso/prisma';
 import type { Envelope, Prisma } from '@prisma/client';
 import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
-import { ZFindInboxRequestSchema, ZFindInboxResponseSchema } from './find-inbox.types';
+import { type TInboxStatus, ZFindInboxRequestSchema, ZFindInboxResponseSchema } from './find-inbox.types';
 
 export const findInboxRoute = authenticatedProcedure
   .input(ZFindInboxRequestSchema)
   .output(ZFindInboxResponseSchema)
   .query(async ({ input, ctx }) => {
-    const { page, perPage } = input;
+    const { page, perPage, query, status } = input;
 
     const userId = ctx.user.id;
 
@@ -20,6 +19,8 @@ export const findInboxRoute = authenticatedProcedure
       userId,
       page,
       perPage,
+      query,
+      status,
     });
 
     return {
@@ -32,13 +33,22 @@ export type FindInboxOptions = {
   userId: number;
   page?: number;
   perPage?: number;
+  /**
+   * Case insensitive search against the document title.
+   */
+  query?: string;
+
+  /**
+   * Restrict results to a single status. When omitted, every non-draft status is returned.
+   */
+  status?: TInboxStatus;
   orderBy?: {
     column: keyof Omit<Envelope, 'envelope'>;
     direction: 'asc' | 'desc';
   };
 };
 
-export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: FindInboxOptions) => {
+export const findInbox = async ({ userId, page = 1, perPage = 10, query = '', status, orderBy }: FindInboxOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -51,10 +61,11 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
+  const searchQuery = query.trim();
 
   const whereClause: Prisma.EnvelopeWhereInput = {
     type: EnvelopeType.DOCUMENT,
-    status: {
+    status: status ?? {
       not: DocumentStatus.DRAFT,
     },
     deletedAt: null,
@@ -67,6 +78,13 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
       },
     },
   };
+
+  if (searchQuery.length > 0) {
+    whereClause.title = {
+      contains: searchQuery,
+      mode: 'insensitive',
+    };
+  }
 
   const [data, count] = await Promise.all([
     prisma.envelope.findMany({
@@ -106,12 +124,15 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
     }),
   ]);
 
-  const maskedData = data.map((document) =>
-    maskRecipientTokensForDocument({
-      document,
-      user,
-    }),
-  );
+  // Not using the maskRecipientTokensForDocument helper here because it needs a
+  // rework due to recipients vs Recipient.
+  const maskedData = data.map((document) => ({
+    ...document,
+    recipients: document.recipients.map((recipient) => ({
+      ...recipient,
+      token: recipient.email === user.email ? recipient.token : '',
+    })),
+  }));
 
   return {
     data: maskedData,

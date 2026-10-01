@@ -5,49 +5,68 @@ import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
+import { Button } from '@documenso/ui/primitives/button';
 import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
-import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType, OrganisationType } from '@prisma/client';
-import { Bird } from 'lucide-react';
-import { parseAsStringLiteral, useQueryState } from 'nuqs';
+import { Bird, XIcon } from 'lucide-react';
+import { useQueryStates } from 'nuqs';
 import { useMemo, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
 import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
 import { FolderGrid } from '~/components/general/folder/folder-grid';
+import { TemplateSearch } from '~/components/general/template/template-search';
 import { EnvelopesTableBulkActionBar } from '~/components/tables/envelopes-table-bulk-action-bar';
 import { TemplatesTable } from '~/components/tables/templates-table';
+import { TemplatesTableOwnerFilter } from '~/components/tables/templates-table-owner-filter';
+import { TemplatesTableViewFilter } from '~/components/tables/templates-table-view-filter';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
-
-const TEMPLATE_VIEWS = ['team', 'organisation'] as const;
-
-type TemplateView = (typeof TEMPLATE_VIEWS)[number];
+import { templatesSearchParams } from '~/utils/templates-search-params';
 
 export function meta() {
   return appMetaTags(msg`Templates`);
 }
+
+// Stable initial value: `useSessionStorage` keeps its setter identity stable
+// only while the initial value reference is stable.
+const EMPTY_ROW_SELECTION: RowSelectionState = {};
 
 export default function TemplatesPage() {
   const team = useCurrentTeam();
   const organisation = useCurrentOrganisation();
 
   const { folderId } = useParams();
-  const [searchParams] = useSearchParams();
+  const [findTemplateSearchParams, setFindTemplateSearchParams] = useQueryStates(templatesSearchParams, {
+    history: 'push',
+  });
+  const page = findTemplateSearchParams.page || undefined;
+  const perPage = findTemplateSearchParams.perPage || undefined;
+  const query = findTemplateSearchParams.query || undefined;
+  const ownerIds = findTemplateSearchParams.ownerIds ?? undefined;
 
-  const page = Number(searchParams.get('page')) || 1;
-  const perPage = Number(searchParams.get('perPage')) || 10;
+  const isOrgView = findTemplateSearchParams.view === 'organisation';
+  const showOrgFilter = organisation.type !== OrganisationType.PERSONAL;
 
-  const [view, setView] = useQueryState('view', parseAsStringLiteral(TEMPLATE_VIEWS).withDefault('team'));
+  const hasActiveFilters = Boolean(ownerIds?.length);
+  const isSearchingOrFiltering = hasActiveFilters || Boolean(query);
 
-  const isOrgView = view === 'organisation';
-  const showOrgTab = organisation.type !== OrganisationType.PERSONAL;
+  const onResetFilters = () => {
+    void setFindTemplateSearchParams({
+      ownerIds: null,
+      page: null,
+    });
+  };
 
-  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('templates-bulk-selection', {});
+  // Scoped by team so selections made in one team never leak into another.
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
+    `templates-bulk-selection-${team.id}`,
+    EMPTY_ROW_SELECTION,
+  );
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
@@ -58,11 +77,13 @@ export default function TemplatesPage() {
   const documentRootPath = formatDocumentsPath(team.url);
   const templateRootPath = formatTemplatesPath(team.url);
 
-  const teamTemplatesQuery = trpc.template.findTemplates.useQuery(
+  const teamTemplatesQuery = trpc.template.findTemplatesInternal.useQuery(
     {
       page,
       perPage,
       folderId,
+      query,
+      ownerIds,
     },
     {
       enabled: !isOrgView,
@@ -73,6 +94,7 @@ export default function TemplatesPage() {
     {
       page,
       perPage,
+      query,
     },
     {
       enabled: isOrgView,
@@ -80,14 +102,6 @@ export default function TemplatesPage() {
   );
 
   const activeQuery = isOrgView ? orgTemplatesQuery : teamTemplatesQuery;
-
-  const handleViewChange = (newView: string) => {
-    if (newView !== 'team' && newView !== 'organisation') {
-      return;
-    }
-
-    void setView(newView === 'team' ? null : newView);
-  };
 
   return (
     <EnvelopeDropZoneWrapper type={EnvelopeType.TEMPLATE}>
@@ -106,31 +120,25 @@ export default function TemplatesPage() {
             </h1>
           </div>
 
-          {showOrgTab && (
-            <div className="mt-6">
-              <Tabs value={view} onValueChange={handleViewChange} data-testid="template-view-tabs">
-                <TabsList>
-                  <TabsTrigger
-                    className="min-w-[60px] hover:text-foreground"
-                    value="team"
-                    data-testid="template-tab-team"
-                  >
-                    <Trans>Team</Trans>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    className="min-w-[60px] hover:text-foreground"
-                    value="organisation"
-                    data-testid="template-tab-organisation"
-                  >
-                    <Trans>Organisation</Trans>
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+          <div className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-4">
+            <div className="w-56">
+              <TemplateSearch />
             </div>
-          )}
+
+            {showOrgFilter && <TemplatesTableViewFilter />}
+
+            {!isOrgView && <TemplatesTableOwnerFilter teamId={team.id} />}
+
+            {hasActiveFilters && (
+              <Button variant="ghost" className="px-2 text-muted-foreground lg:px-3" onClick={onResetFilters}>
+                <Trans>Reset</Trans>
+                <XIcon className="ml-1 h-4 w-4" />
+              </Button>
+            )}
+          </div>
 
           <div className="mt-8">
-            {activeQuery.data && activeQuery.data.count === 0 ? (
+            {activeQuery.data && activeQuery.data.count === 0 && !isSearchingOrFiltering ? (
               <div className="flex h-96 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
                 <Bird className="h-12 w-12" strokeWidth={1.5} />
 
