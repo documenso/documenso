@@ -1,4 +1,5 @@
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
+import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
@@ -25,6 +26,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -32,6 +34,7 @@ import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
 import { AlertTriangleIcon, FileTextIcon, PencilIcon, SparklesIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
@@ -84,6 +87,7 @@ export const EnvelopeEditorFieldsPage = () => {
   const { currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
   const { _ } = useLingui();
+  const { toast } = useToast();
 
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
@@ -95,6 +99,34 @@ export const EnvelopeEditorFieldsPage = () => {
   );
 
   const selectedField = useMemo(() => structuredClone(editorFields.selectedField), [editorFields.selectedField]);
+
+  const [copiedField, setCopiedField] = useState<TLocalField | null>(null);
+
+  useHotkeys(['ctrl+c', 'meta+c'], (event) => {
+    // Keep the native copy when the user has selected text.
+    if (!selectedField || window.getSelection()?.toString()) {
+      return;
+    }
+
+    event.preventDefault();
+    setCopiedField(selectedField);
+
+    toast({
+      title: _(msg`Copied field`),
+      description: _(msg`Copied field to clipboard`),
+    });
+  });
+
+  useHotkeys(['ctrl+v', 'meta+v'], (event) => {
+    if (!copiedField) {
+      return;
+    }
+
+    event.preventDefault();
+
+    // Paste the next copy offset from the last one, so repeated pastes do not stack.
+    setCopiedField(editorFields.duplicateField(copiedField));
+  });
 
   /**
    * Debounce the fields used for overlap detection so we don't recompute on every

@@ -633,6 +633,65 @@ const assertDuplicateDeleteFieldPersistedInDatabase = async ({
   expect(envelope.fields[0].type).toBe(FieldType.SIGNATURE);
 };
 
+// --- Copy and paste fields flow ---
+
+type TCopyPasteFlowResult = {
+  externalId: string;
+};
+
+const runCopyPasteFieldFlow = async (surface: TEnvelopeEditorSurface): Promise<TCopyPasteFlowResult> => {
+  const externalId = `e2e-copy-paste-${nanoid()}`;
+  const root = surface.root;
+
+  await updateExternalId(surface, externalId);
+  await setupRecipientsForFieldPlacement(surface);
+
+  await clickEnvelopeEditorStep(root, 'addFields');
+  await expect(root.locator('.konva-container canvas').first()).toBeVisible();
+
+  await placeFieldOnPdf(root, 'Signature', { x: 150, y: 150 });
+  await selectFieldOnCanvas(root, { x: 150, y: 150 });
+
+  await root.keyboard.press('ControlOrMeta+c');
+  await root.keyboard.press('ControlOrMeta+v');
+  await root.keyboard.press('ControlOrMeta+v');
+
+  await expect.poll(async () => getKonvaElementCountForPage(root, 1, '.field-group')).toBe(3);
+
+  // Navigate away and back to persist changes.
+  await clickEnvelopeEditorStep(root, 'upload');
+  await clickEnvelopeEditorStep(root, 'addFields');
+  await expect.poll(async () => getKonvaElementCountForPage(root, 1, '.field-group')).toBe(3);
+
+  return { externalId };
+};
+
+const assertCopyPasteFieldPersistedInDatabase = async ({
+  surface,
+  externalId,
+}: {
+  surface: TEnvelopeEditorSurface;
+  externalId: string;
+}) => {
+  const envelope = await prisma.envelope.findFirstOrThrow({
+    where: {
+      externalId,
+      userId: surface.userId,
+      teamId: surface.teamId,
+      type: surface.envelopeType,
+    },
+    orderBy: { createdAt: 'desc' },
+    include: { fields: true },
+  });
+
+  expect(envelope.fields).toHaveLength(3);
+  expect(envelope.fields.every((field) => field.type === FieldType.SIGNATURE)).toBe(true);
+
+  // Each paste is offset from the previous one, so no two fields share a position.
+  const positions = new Set(envelope.fields.map((field) => `${field.positionX}:${field.positionY}`));
+  expect(positions.size).toBe(3);
+};
+
 // --- Change field type flow ---
 
 type TChangeFieldTypeFlowResult = {
@@ -902,6 +961,16 @@ test.describe('document editor', () => {
     });
   });
 
+  test('copy and paste fields with keyboard shortcuts', async ({ page }) => {
+    const surface = await openDocumentEnvelopeEditor(page);
+    const result = await runCopyPasteFieldFlow(surface);
+
+    await assertCopyPasteFieldPersistedInDatabase({
+      surface,
+      ...result,
+    });
+  });
+
   test('place and configure all 10 field types', async ({ page }) => {
     const surface = await openDocumentEnvelopeEditor(page);
     const result = await runAllFieldTypesFlow(surface);
@@ -959,6 +1028,16 @@ test.describe('template editor', () => {
     const result = await runDuplicateDeleteFieldFlow(surface);
 
     await assertDuplicateDeleteFieldPersistedInDatabase({
+      surface,
+      ...result,
+    });
+  });
+
+  test('copy and paste fields with keyboard shortcuts', async ({ page }) => {
+    const surface = await openTemplateEnvelopeEditor(page);
+    const result = await runCopyPasteFieldFlow(surface);
+
+    await assertCopyPasteFieldPersistedInDatabase({
       surface,
       ...result,
     });
