@@ -42,7 +42,11 @@ import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
-import { insertContentsIntoEnvelopeItem } from '../envelope-content/insert-contents-into-envelope-item';
+import {
+  commitRenderedEnvelopeItems,
+  type RenderedEnvelopeItem,
+  renderContentsIntoEnvelopeItem,
+} from '../envelope-content/insert-contents-into-envelope-item';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -81,6 +85,7 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
           id: true,
           dataContentId: true,
           contentMeta: true,
+          envelopeItemId: true,
         },
       },
       envelopeItems: {
@@ -226,12 +231,25 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     });
   }
 
+  // Render the contents into a copy of every item's PDF up front. The items are
+  // only pointed at those copies once everything else has passed, inside the
+  // transaction that moves the envelope on from DRAFT, so a failure in any item
+  // or in any later step leaves every item on its original file rather than
+  // some of them on a rendered one which the next send would render onto again.
+  let renderedEnvelopeItems: RenderedEnvelopeItem[] = [];
+
   if (envelope.status === DocumentStatus.DRAFT) {
-    await Promise.all(
-      envelope.envelopeItems.map(async (envelopeItem) => {
-        await insertContentsIntoEnvelopeItem({ envelopeItemId: envelopeItem.id });
-      }),
+    const results = await Promise.all(
+      envelope.envelopeItems
+        .filter((envelopeItem) => {
+          const foundContents = envelope.contents.filter((content) => content.envelopeItemId === envelopeItem.id);
+
+          return foundContents.length > 0;
+        })
+        .map(async (envelopeItem) => renderContentsIntoEnvelopeItem({ envelopeItemId: envelopeItem.id })),
     );
+
+    renderedEnvelopeItems = results.filter((result): result is RenderedEnvelopeItem => result !== null);
   }
 
   const allRecipientsHaveNoActionToTake = envelope.recipients.every(
@@ -239,6 +257,14 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
   );
 
   if (allRecipientsHaveNoActionToTake) {
+    // This path never moves the envelope to PENDING, so the rendered PDFs are
+    // switched in here, before the seal picks them up.
+    if (renderedEnvelopeItems.length > 0) {
+      await prisma.$transaction(async (tx) => {
+        await commitRenderedEnvelopeItems(tx, renderedEnvelopeItems);
+      });
+    }
+
     await jobs.triggerJob({
       name: 'internal.seal-document',
       payload: {
@@ -284,11 +310,17 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
   if (isTspEnvelope(envelope) && envelope.status === DocumentStatus.DRAFT) {
     await materializeTspAnchorsForEnvelope({
       envelopeId: envelope.id,
+      // Override the envelope items which have contents with updated document data.
+      documentDataOverrides: Object.fromEntries(
+        renderedEnvelopeItems.map((item) => [item.envelopeItemId, item.documentData]),
+      ),
     });
   }
 
   const updatedEnvelope = await prisma.$transaction(async (tx) => {
     if (envelope.status === DocumentStatus.DRAFT) {
+      await commitRenderedEnvelopeItems(tx, renderedEnvelopeItems);
+
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,

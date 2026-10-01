@@ -9,12 +9,11 @@ import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.serv
 import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
-import { createCanvas } from '@napi-rs/canvas';
 import { expect, type Page, test } from '@playwright/test';
 import { DocumentStatus, RecipientRole } from '@prisma/client';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 import { apiSignin } from '../fixtures/authentication';
+import { channelAtOpacity, samplePixelAtBoxCentre } from '../fixtures/pdf-pixels';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -43,46 +42,8 @@ const translucentGreen: TEnvelopeContentMetaInput = {
   fillOpacity: FILL_OPACITY,
 };
 
-/**
- * Red/blue channel of pure green at the given opacity over white.
- */
-const channelAtOpacity = (opacity: number) => Math.round(255 * (1 - opacity));
-
 const SINGLE_DRAW = channelAtOpacity(FILL_OPACITY);
 const DOUBLE_DRAW = channelAtOpacity(1 - (1 - FILL_OPACITY) ** 2);
-
-/**
- * Render the first page of a PDF and return the pixel at the centre of the
- * given percentage box.
- */
-const samplePixelAtBoxCentre = async (
-  pdfBytes: Uint8Array,
-  box: { positionX: number; positionY: number; width: number; height: number },
-) => {
-  const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
-  const page = await pdf.getPage(1);
-
-  const scale = 2;
-  const viewport = page.getViewport({ scale });
-
-  const canvas = createCanvas(viewport.width, viewport.height);
-  const canvasContext = canvas.getContext('2d');
-
-  await page.render({
-    // @ts-expect-error @napi-rs/canvas satisfies runtime requirements for pdfjs
-    canvas,
-    // @ts-expect-error @napi-rs/canvas satisfies runtime requirements for pdfjs
-    canvasContext,
-    viewport,
-  }).promise;
-
-  const x = Math.round(viewport.width * ((box.positionX + box.width / 2) / 100));
-  const y = Math.round(viewport.height * ((box.positionY + box.height / 2) / 100));
-
-  const [r, g, b] = canvasContext.getImageData(x, y, 1, 1).data;
-
-  return { r, g, b };
-};
 
 const setupEnvelopeWithContent = async (page: Page) => {
   const { user, team } = await seedUser();
