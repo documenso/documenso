@@ -4,7 +4,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { Envelope, EnvelopeContent, Field, Recipient } from '@prisma/client';
+import { type Envelope, type EnvelopeContent, EnvelopeType, type Field, type Recipient } from '@prisma/client';
 
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { convertPlaceholdersToFieldInputs, extractPdfPlaceholders } from '../pdf/auto-place-fields';
@@ -148,19 +148,34 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
       },
     });
 
-    const outOfBoundsContentIds = itemContents
-      .filter((content) => content.contentMeta.page > filePageCount)
-      .map((content) => content.id);
+    const outOfBoundsContents = itemContents.filter((content) => content.contentMeta.page > filePageCount);
 
     // Delete contents that reference pages beyond the new PDF's page count.
-    if (outOfBoundsContentIds.length > 0) {
+    if (outOfBoundsContents.length > 0) {
       await tx.envelopeContent.deleteMany({
         where: {
           id: {
-            in: outOfBoundsContentIds,
+            in: outOfBoundsContents.map((content) => content.id),
           },
         },
       });
+
+      if (envelope.type === EnvelopeType.DOCUMENT) {
+        await tx.documentAuditLog.createMany({
+          data: outOfBoundsContents.map((content) =>
+            createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.CONTENT_DELETED,
+              envelopeId: envelope.id,
+              metadata: apiRequestMetadata,
+              data: {
+                contentId: content.id,
+                contentType: content.contentMeta.type,
+                envelopeItemId,
+              },
+            }),
+          ),
+        });
+      }
 
       didContentsChange = true;
     }

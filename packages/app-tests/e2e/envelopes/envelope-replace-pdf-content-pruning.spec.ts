@@ -5,6 +5,7 @@ import { EnvelopeContentType, ZEnvelopeContentMetaSchema } from '@documenso/lib/
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
+import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
 
@@ -27,6 +28,13 @@ const textMetaOnPage = (page: number) => ({
   height: 6,
   text: `Page ${page}`,
 });
+
+/**
+ * The type name is written out since the module declaring it carries lingui
+ * macros the test runner cannot transform.
+ */
+const getContentDeletedLogs = async (envelopeId: string) =>
+  await prisma.documentAuditLog.findMany({ where: { envelopeId, type: 'CONTENT_DELETED' } });
 
 const replacePdf = async (envelopeId: string, buffer: Buffer, name: string) => {
   const envelope = await prisma.envelope.findUniqueOrThrow({
@@ -69,9 +77,17 @@ test('replacing a PDF drops contents which fall beyond the new page count', asyn
 
   const envelopeItemId = envelope.envelopeItems[0].id;
 
+  const [pageOneContentId, pageThreeContentId] = [
+    generateDatabaseId('envelope_content'),
+    generateDatabaseId('envelope_content'),
+  ];
+
   await prisma.envelopeContent.createMany({
-    data: [1, 3].map((page) => ({
-      id: generateDatabaseId('envelope_content'),
+    data: [
+      { id: pageOneContentId, page: 1 },
+      { id: pageThreeContentId, page: 3 },
+    ].map(({ id, page }) => ({
+      id,
       envelopeId: envelope.id,
       envelopeItemId,
       contentMeta: ZEnvelopeContentMetaSchema.parse(textMetaOnPage(page)),
@@ -82,16 +98,52 @@ test('replacing a PDF drops contents which fall beyond the new page count', asyn
 
   const contents = await prisma.envelopeContent.findMany({
     where: { envelopeId: envelope.id },
-    select: { contentMeta: true },
+    select: { id: true, contentMeta: true },
   });
 
   // The page 1 content survives, the page 3 content is gone.
   expect(contents).toHaveLength(1);
+  expect(contents[0].id).toBe(pageOneContentId);
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const contentMeta = contents[0].contentMeta as { page?: number };
+  // The dropped content is logged the same way one removed in the editor is,
+  // attributed to the user who replaced the PDF.
+  const deletedLogs = await getContentDeletedLogs(envelope.id);
 
-  expect(contentMeta.page).toBe(1);
+  expect(deletedLogs).toHaveLength(1);
+  expect(deletedLogs[0].data).toEqual({
+    contentId: pageThreeContentId,
+    contentType: EnvelopeContentType.TEXT,
+    envelopeItemId,
+  });
+  expect(deletedLogs[0].userId).toBe(user.id);
+  expect(deletedLogs[0].email).toBe(user.email);
+});
+
+test('replacing a PDF on a template drops contents without logging', async () => {
+  const { user, team } = await seedUser();
+
+  const template = await seedBlankTemplate(user, team.id, { createTemplateOptions: { internalVersion: 2 } });
+
+  await replacePdf(template.id, multiPagePdf, 'multi-page.pdf');
+
+  const envelope = await prisma.envelope.findUniqueOrThrow({
+    where: { id: template.id },
+    include: { envelopeItems: true },
+  });
+
+  await prisma.envelopeContent.createMany({
+    data: [1, 3].map((page) => ({
+      id: generateDatabaseId('envelope_content'),
+      envelopeId: envelope.id,
+      envelopeItemId: envelope.envelopeItems[0].id,
+      contentMeta: ZEnvelopeContentMetaSchema.parse(textMetaOnPage(page)),
+    })),
+  });
+
+  await replacePdf(template.id, singlePagePdf, 'single-page.pdf');
+
+  expect(await prisma.envelopeContent.count({ where: { envelopeId: envelope.id } })).toBe(1);
+  expect(await getContentDeletedLogs(envelope.id)).toHaveLength(0);
 });
 
 test('replacing a PDF keeps contents which still fit', async () => {
@@ -121,4 +173,5 @@ test('replacing a PDF keeps contents which still fit', async () => {
   const contents = await prisma.envelopeContent.findMany({ where: { envelopeId: envelope.id } });
 
   expect(contents).toHaveLength(3);
+  expect(await getContentDeletedLogs(envelope.id)).toHaveLength(0);
 });
