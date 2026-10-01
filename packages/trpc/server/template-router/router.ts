@@ -237,7 +237,7 @@ export const templateRouter = router({
 
       const pdf = await convertToPdf(file, ctx.logger);
 
-      const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide(
+      const { documentData: templateDocumentData } = await putNormalizedPdfFileServerSide(
         {
           name: file.name,
           type: 'application/pdf',
@@ -263,7 +263,7 @@ export const templateRouter = router({
           title,
           envelopeItems: [
             {
-              documentDataId: templateDocumentDataId,
+              documentDataId: templateDocumentData.id,
             },
           ],
           folderId,

@@ -89,7 +89,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
     buffer = await insertFormValuesInPdf({ pdf: buffer, formValues: envelope.formValues });
   }
 
-  const normalized = await normalizePdf(buffer, {
+  const { pdf: normalized } = await normalizePdf(buffer, {
     flattenForm: envelope.type !== 'TEMPLATE',
   });
 

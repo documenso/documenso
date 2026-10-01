@@ -66,6 +66,9 @@ type PutNormalizedPdfFileOptions = {
 
 /**
  * Uploads a pdf file and normalizes it.
+ *
+ * Returns the created document data and the file's page count, in the same
+ * shape as `putPdfFileServerSide`.
  */
 export const putNormalizedPdfFileServerSide = async (
   file: File,
@@ -73,21 +76,26 @@ export const putNormalizedPdfFileServerSide = async (
 ) => {
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const normalized = await normalizePdf(buffer, normalizePdfOptions);
+  const { pdf: normalized, pageCount } = await normalizePdf(buffer, normalizePdfOptions);
 
   const fileName = file.name.endsWith('.pdf') ? file.name : `${file.name}.pdf`;
 
-  const documentData = await putFileServerSide({
+  const uploadedFile = await putFileServerSide({
     name: fileName,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(normalized),
   });
 
-  return await createDocumentData({
-    type: documentData.type,
-    data: documentData.data,
+  const documentData = await createDocumentData({
+    type: uploadedFile.type,
+    data: uploadedFile.data,
     initialData,
   });
+
+  return {
+    documentData,
+    filePageCount: pageCount,
+  };
 };
 
 /**

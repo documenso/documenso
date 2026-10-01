@@ -3,6 +3,7 @@ import type { PDF } from '@libpdf/core';
 import { PDF as PDFDocument } from '@libpdf/core';
 import { groupBy, unique } from 'remeda';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { ContentImageMap } from '../../universal/content-renderer/content-renderer';
 import { insertFieldInPDFV2, type OverlayContent } from './insert-field-in-pdf-v2';
 
@@ -33,7 +34,9 @@ export const insertPageOverlays = async ({ pdfDoc, fields, contents = [], images
     const page = pdfDoc.getPage(pageNumber - 1);
 
     if (!page) {
-      throw new Error(`Page ${pageNumber} does not exist`);
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Page ${pageNumber} does not exist`,
+      });
     }
 
     const pageWidth = page.width;

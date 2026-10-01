@@ -144,7 +144,7 @@ export const createEnvelopeRouteCaller = async ({
         });
       }
 
-      const normalized = await normalizePdf(pdf, {
+      const { pdf: normalized } = await normalizePdf(pdf, {
         flattenForm: type !== EnvelopeType.TEMPLATE,
       });
 

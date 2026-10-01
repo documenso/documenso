@@ -54,7 +54,11 @@ export const ZContentLetterSpacingSchema = z
  * All content geometry is percentage based (0-100) relative to the page, unlike
  * fields which are stored in page units and clamped separately.
  */
-export const ZContentPageNumberSchema = z.number().min(1).describe('The page number the content will be on.');
+export const ZContentPageNumberSchema = z
+  .number()
+  .int()
+  .min(1)
+  .describe('The page number the content will be on. Starts from 1.');
 
 export const ZContentPercentageSchema = z.number().min(0).max(100);
 

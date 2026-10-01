@@ -2,8 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
-import { EnvelopeContentType, type TEnvelopeContentMetaInput } from '@documenso/lib/types/envelope-content-meta';
-import { nanoid } from '@documenso/lib/universal/id';
+import {
+  EnvelopeContentType,
+  type TEnvelopeContentMetaInput,
+  ZEnvelopeContentMetaSchema,
+} from '@documenso/lib/types/envelope-content-meta';
+import { generateDatabaseId, nanoid } from '@documenso/lib/universal/id';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -32,6 +36,9 @@ test.describe.configure({
  */
 
 const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf'));
+
+// Three pages, against the single page of `example.pdf`.
+const multiPagePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'));
 
 const textMeta = (text: string): TEnvelopeContentMetaInput => ({
   type: EnvelopeContentType.TEXT,
@@ -344,6 +351,70 @@ test.describe('Copy contents to new envelopes', () => {
 
     // Nothing was written against the source.
     expect(await prisma.documentAuditLog.count({ where: { envelopeId: sourceId } })).toBe(sourceAuditLogCount);
+  });
+
+  test('envelope/use leaves behind contents on pages a custom file does not have', async ({ request }) => {
+    // A template with a three page file.
+    const createForm = new FormData();
+
+    createForm.append(
+      'payload',
+      JSON.stringify({ type: EnvelopeType.TEMPLATE, title: 'Template With Contents On Later Pages' }),
+    );
+
+    createForm.append('files', new File([multiPagePdfBuffer], 'multi-page.pdf', { type: 'application/pdf' }));
+
+    const createRes = await request.post(`${baseUrl}/envelope/create`, {
+      headers: { Authorization: `Bearer ${token}` },
+      multipart: createForm,
+    });
+
+    expect(createRes.ok(), await createRes.text()).toBeTruthy();
+
+    const { id: templateId } = (await createRes.json()) as TCreateEnvelopeResponse;
+
+    const template = await prisma.envelope.findUniqueOrThrow({
+      where: { id: templateId },
+      include: { envelopeItems: true },
+    });
+
+    // A content on its first and third page, as the editor would have placed.
+    await prisma.envelopeContent.createMany({
+      data: [1, 3].map((page) => ({
+        id: generateDatabaseId('envelope_content'),
+        envelopeId: templateId,
+        envelopeItemId: template.envelopeItems[0].id,
+        contentMeta: ZEnvelopeContentMetaSchema.parse({ ...textMeta(`On page ${page}`), page }),
+      })),
+    });
+
+    // Use it with a single page file in place of the template's own.
+    const payload: TUseEnvelopePayload = {
+      envelopeId: templateId,
+      customDocumentData: [{ identifier: 0, envelopeItemId: template.envelopeItems[0].id }],
+    };
+
+    const useForm = new FormData();
+
+    useForm.append('payload', JSON.stringify(payload));
+    useForm.append('files', new File([examplePdfBuffer], 'single-page.pdf', { type: 'application/pdf' }));
+
+    const useRes = await request.post(`${baseUrl}/envelope/use`, {
+      headers: { Authorization: `Bearer ${token}` },
+      multipart: useForm,
+    });
+
+    expect(useRes.ok(), await useRes.text()).toBeTruthy();
+
+    const { id: documentId } = (await useRes.json()) as TUseEnvelopeResponse;
+
+    // Only the page 1 content made it across, the template keeps both.
+    const copied = await getContentSummaries(documentId);
+
+    expect(copied).toHaveLength(1);
+    expect(copied[0].contentMeta).toMatchObject({ page: 1, text: 'On page 1' });
+
+    expect(await prisma.envelopeContent.count({ where: { envelopeId: templateId } })).toBe(2);
   });
 
   test('envelope/duplicate logs nothing for a template', async ({ request }) => {

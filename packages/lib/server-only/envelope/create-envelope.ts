@@ -261,7 +261,7 @@ export const createEnvelope = async ({
 
         const buffer = await getFileServerSide(documentData);
 
-        const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer), {
+        const { pdf: normalizedPdf } = await makeNormalizedPdf(Buffer.from(buffer), {
           flattenForm: type !== EnvelopeType.TEMPLATE,
         });
 

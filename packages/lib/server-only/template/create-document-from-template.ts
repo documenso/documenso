@@ -451,6 +451,13 @@ export const createDocumentFromTemplate = async ({
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
 
+  // Key = original envelope item ID
+  // Value = the page count of the custom file which replaced its PDF.
+  //
+  // Only items given a custom file are counted, since the template's own
+  // files have the pages its contents were placed on.
+  const replacedEnvelopeItemPageCounts = new Map<string, number>();
+
   // Duplicate the envelope item data.
   // Note: This is duplicated in createDocumentFromDirectTemplate
   const envelopeItemsToCreate = await Promise.all(
@@ -496,7 +503,7 @@ export const createDocumentFromTemplate = async ({
 
       // The copy keeps the source as its initial data, so the two share the
       // stored file rather than re-uploading it.
-      const newDocumentData = await putNormalizedPdfFileServerSide(
+      const { documentData: newDocumentData, filePageCount } = await putNormalizedPdfFileServerSide(
         {
           name: titleToUse,
           type: 'application/pdf',
@@ -506,6 +513,10 @@ export const createDocumentFromTemplate = async ({
           initialData: documentDataToDuplicate.data,
         },
       );
+
+      if (foundCustomDocumentData) {
+        replacedEnvelopeItemPageCounts.set(item.id, filePageCount);
+      }
 
       const newEnvelopeItemId = prefixedId('envelope_item');
 
@@ -583,11 +594,18 @@ export const createDocumentFromTemplate = async ({
 
   const envelopeId = prefixedId('envelope');
 
+  // Trim the contents if the replaced PDF has fewer pages than the content's page.
+  const contentsToCopy = template.contents.filter((content) => {
+    const replacedPageCount = replacedEnvelopeItemPageCounts.get(content.envelopeItemId);
+
+    return replacedPageCount === undefined || content.contentMeta.page <= replacedPageCount;
+  });
+
   // The template's contents are remapped onto the new envelope items up front
   // so they can be inserted as soon as the envelope exists.
   const contentsToCreate = includeContents
     ? buildEnvelopeContentCopyData({
-        contents: template.contents,
+        contents: contentsToCopy,
         envelopeId,
         envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
       })
