@@ -13506,7 +13506,7 @@ msgstr "En attente des autres"
 
 #: packages/lib/jobs/definitions/emails/send-document-pending-email.handler.ts
 msgid "Waiting for others to complete signing"
-msgstr ""
+msgstr "En attente que les autres terminent de signer"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Waiting for others to sign"
