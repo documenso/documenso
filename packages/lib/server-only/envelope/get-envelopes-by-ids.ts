@@ -75,6 +75,7 @@ export const getEnvelopesByIds = async ({ ids, userId, teamId, type }: GetEnvelo
         },
       },
       fields: true,
+      contents: true,
       team: {
         select: {
           id: true,

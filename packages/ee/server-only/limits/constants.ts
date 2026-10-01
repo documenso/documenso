@@ -35,3 +35,18 @@ export const DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT = 5;
  * 0 = Unlimited recipients.
  */
 export const DEFAULT_RECIPIENT_COUNT = 20;
+
+/**
+ * Used as an initial value for the frontend before values are loaded from the server.
+ *
+ * 0 = Unlimited contents, matching the value existing organisation claims
+ * were backfilled with.
+ */
+export const DEFAULT_ENVELOPE_CONTENT_COUNT = 0;
+
+/**
+ * Used as an initial value for the frontend before values are loaded from the server.
+ *
+ * 0 = Unlimited image contents.
+ */
+export const DEFAULT_ENVELOPE_CONTENT_IMAGE_COUNT = 0;

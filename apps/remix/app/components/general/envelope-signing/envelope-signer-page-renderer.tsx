@@ -10,6 +10,7 @@ import { isBase64Image } from '@documenso/lib/constants/signatures';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { ZFullFieldSchema } from '@documenso/lib/types/field';
+import { renderStaticContents } from '@documenso/lib/universal/content-renderer/render-static-contents';
 import {
   createFieldCanvasStyleCache,
   type FieldCanvasStyleCache,
@@ -17,6 +18,7 @@ import {
 import { createSpinner } from '@documenso/lib/universal/field-renderer/field-generic-items';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import { areContentsImprinted } from '@documenso/lib/utils/envelope';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
@@ -49,7 +51,7 @@ type GenericLocalField = TEnvelope['fields'][number] & {
 
 export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
-  const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
+  const { currentEnvelopeItem, contentImages, setRenderError } = useCurrentEnvelopeRender();
   const { sessionData } = useOptionalSession();
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
@@ -536,9 +538,38 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
   };
 
   /**
+   * Render the contents when required.
+   *
+   * Since contents are imprinted on sent, we still need to render them for direct templates.
+   */
+  const renderContents = () => {
+    if (!pageLayer.current || areContentsImprinted(envelope.status)) {
+      return;
+    }
+
+    try {
+      renderStaticContents({
+        contents: envelope.contents.filter(
+          (content) => content.contentMeta.page === pageNumber && content.envelopeItemId === currentEnvelopeItem?.id,
+        ),
+        pageLayer: pageLayer.current,
+        pageWidth: unscaledViewport.width,
+        pageHeight: unscaledViewport.height,
+        scale,
+        mode: 'sign',
+        images: contentImages.images,
+      });
+    } catch (err) {
+      console.error(err);
+      setRenderError(true);
+    }
+  };
+
+  /**
    * Initialize the Konva page canvas and all fields and interactions.
    */
   const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
+    renderContents();
     renderFields();
     currentPageLayer.batchDraw();
   };
@@ -577,6 +608,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
     pageLayer.current.destroyChildren();
     cachedRenderFields.current.clear();
 
+    renderContents();
     renderFields();
 
     pageLayer.current.batchDraw();

@@ -31,6 +31,9 @@ export const createEnvelopeMeta: TrpcRouteMeta = {
   },
 };
 
+/**
+ * Note: This is reused in the embedding routes.
+ */
 export const ZCreateEnvelopePayloadSchema = z.object({
   title: ZDocumentTitleSchema,
   type: z.nativeEnum(EnvelopeType),
@@ -52,8 +55,10 @@ export const ZCreateEnvelopePayloadSchema = z.object({
         fields: ZEnvelopeFieldAndMetaSchema.and(
           z.object({
             identifier: z
-              .union([z.string(), z.number()])
-              .describe('Either the filename or the index of the file that was uploaded to attach the field to.')
+              .union([z.string(), z.number().int().min(0)])
+              .describe(
+                'Either the filename or the zero-based index of the file that was uploaded to attach the field to.',
+              )
               .optional(),
             page: ZFieldPageNumberSchema,
             positionX: ZClampedFieldPositionXSchema,

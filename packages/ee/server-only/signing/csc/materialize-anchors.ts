@@ -4,11 +4,23 @@ import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.serv
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { prisma } from '@documenso/prisma';
 import { PDF } from '@libpdf/core';
+import type { DocumentData } from '@prisma/client';
 
 import { buildTspAnchorName, buildTspStampName } from './pdf-names';
 
 export type MaterializeTspAnchorsForEnvelopeOptions = {
   envelopeId: string;
+
+  /**
+   * Document data to materialise onto instead of the one an envelope item
+   * currently points at, keyed by envelope item ID.
+   *
+   * Sending renders the envelope contents into new document data rows which
+   * the items are only pointed at once the send commits. The anchors have to
+   * go onto those rendered bytes, since the content render flattens the PDF
+   * and would strip them otherwise.
+   */
+  documentDataOverrides?: Record<string, DocumentData>;
 };
 
 /**
@@ -29,6 +41,7 @@ export type MaterializeTspAnchorsForEnvelopeOptions = {
  */
 export const materializeTspAnchorsForEnvelope = async ({
   envelopeId,
+  documentDataOverrides = {},
 }: MaterializeTspAnchorsForEnvelopeOptions): Promise<void> => {
   const envelope = await prisma.envelope.findUnique({
     where: {
@@ -86,7 +99,9 @@ export const materializeTspAnchorsForEnvelope = async ({
       }
     }
 
-    const bytes = await getFileServerSide(envelopeItem.documentData);
+    const documentData = documentDataOverrides[envelopeItem.id] ?? envelopeItem.documentData;
+
+    const bytes = await getFileServerSide(documentData);
     const pdfDoc = await PDF.load(bytes);
 
     if (isAlreadyMaterialised(pdfDoc, expectedAnchorNames, expectedStampNames)) {
@@ -174,14 +189,14 @@ export const materializeTspAnchorsForEnvelope = async ({
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(newBytes),
       },
-      envelopeItem.documentData.initialData ?? undefined,
+      documentData.initialData ?? undefined,
     );
 
     // Copy the persisted bytes reference (S3 key or BYTES_64 payload) onto the
     // existing DocumentData row in place. `envelopeItem.documentDataId` stays
     // put — see file-level docblock for the rationale.
     await prisma.documentData.update({
-      where: { id: envelopeItem.documentDataId },
+      where: { id: documentData.id },
       data: {
         type: uploaded.documentData.type,
         data: uploaded.documentData.data,

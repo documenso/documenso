@@ -44,6 +44,7 @@ export const EnvelopeDuplicateDialog = ({ envelopeId, envelopeType, trigger }: E
     defaultValues: {
       includeRecipients: true,
       includeFields: true,
+      includeContents: true,
     },
   });
 
@@ -67,13 +68,14 @@ export const EnvelopeDuplicateDialog = ({ envelopeId, envelopeType, trigger }: E
   });
 
   const onDuplicate = async () => {
-    const { includeRecipients, includeFields } = form.getValues();
+    const { includeRecipients, includeFields, includeContents } = form.getValues();
 
     try {
       await duplicateEnvelope({
         envelopeId,
         includeRecipients,
         includeFields: includeRecipients && includeFields,
+        includeContents,
       });
     } catch {
       toast({
@@ -155,6 +157,23 @@ export const EnvelopeDuplicateDialog = ({ envelopeId, envelopeType, trigger }: E
                 />
                 <Label htmlFor="envelopeDuplicateIncludeFields" className={!includeRecipients ? 'opacity-50' : ''}>
                   <Trans>Include Fields</Trans>
+                </Label>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={form.control}
+            name="includeContents"
+            render={({ field }) => (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="envelopeDuplicateIncludeContents"
+                  checked={field.value}
+                  onCheckedChange={(checked) => field.onChange(checked === true)}
+                />
+                <Label htmlFor="envelopeDuplicateIncludeContents">
+                  <Trans>Include Contents</Trans>
                 </Label>
               </div>
             )}

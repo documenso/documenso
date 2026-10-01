@@ -176,6 +176,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               envelopeItems={envelope.envelopeItems}
               token={undefined}
               fields={envelope.fields}
+              contents={envelope.contents}
               recipients={envelope.recipients}
               overrideSettings={{
                 showRecipientTooltip: true,
@@ -255,7 +256,6 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               <div className="mt-4 border-t px-4 pt-4">
                 <TemplateUseDialog
                   envelopeId={envelope.id}
-                  templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
                   templateSigningOrder={envelope.documentMeta?.signingOrder}
                   recipients={envelope.recipients}
                   documentRootPath={documentRootPath}

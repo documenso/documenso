@@ -2,16 +2,18 @@ import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import type { DocumentAuditLog, DocumentMeta, Field, Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
-import { isDeepEqual } from 'remeda';
+import { isDeepEqual, unique } from 'remeda';
 import { match } from 'ts-pattern';
 
 import type {
   TDocumentAuditLog,
+  TDocumentAuditLogContentDiffSchema,
   TDocumentAuditLogDocumentMetaDiffSchema,
   TDocumentAuditLogFieldDiffSchema,
   TDocumentAuditLogRecipientDiffSchema,
 } from '../types/document-audit-logs';
 import {
+  CONTENT_DIFF_TYPE,
   DOCUMENT_AUDIT_LOG_TYPE,
   DOCUMENT_META_DIFF_TYPE,
   FIELD_DIFF_TYPE,
@@ -19,6 +21,7 @@ import {
   ZDocumentAuditLogSchema,
 } from '../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../types/document-auth';
+import type { TEnvelopeContentMeta } from '../types/envelope-content-meta';
 import type { ApiRequestMetadata, RequestMetadata } from '../universal/extract-request-metadata';
 
 type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
@@ -142,6 +145,69 @@ export const diffRecipientChanges = (
       type: RECIPIENT_DIFF_TYPE.NAME,
       from: oldRecipient.name,
       to: newRecipient.name,
+    });
+  }
+
+  return diffs;
+};
+
+/**
+ * Audit log values are stored as JSON, so anything which is not already a
+ * scalar is recorded by its serialised form rather than being dropped.
+ */
+const toContentDiffValue = (value: unknown) => {
+  if (value === undefined || value === null) {
+    return null;
+  }
+
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return value;
+  }
+
+  return JSON.stringify(value);
+};
+
+type ContentDiffSource = {
+  contentMeta: TEnvelopeContentMeta;
+  dataContentId?: string | null;
+};
+
+/**
+ * Every content meta key and the attached image are compared.
+ */
+export const diffContentChanges = (
+  oldContent: ContentDiffSource,
+  newContent: ContentDiffSource,
+): TDocumentAuditLogContentDiffSchema[] => {
+  const diffs: TDocumentAuditLogContentDiffSchema[] = [];
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const oldValues = oldContent.contentMeta as unknown as Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const newValues = newContent.contentMeta as unknown as Record<string, unknown>;
+
+  // Sorted so a given change always produces the same record.
+  const propertyKeys = unique([...Object.keys(oldValues), ...Object.keys(newValues)]).sort();
+
+  for (const key of propertyKeys) {
+    const fromValue = toContentDiffValue(oldValues[key]);
+    const toValue = toContentDiffValue(newValues[key]);
+
+    if (fromValue !== toValue) {
+      diffs.push({ type: CONTENT_DIFF_TYPE.PROPERTY, key, from: fromValue, to: toValue });
+    }
+  }
+
+  // The attached image lives alongside the content meta rather than within it.
+  const fromDataContentId = oldContent.dataContentId ?? null;
+  const toDataContentId = newContent.dataContentId ?? null;
+
+  if (fromDataContentId !== toDataContentId) {
+    diffs.push({
+      type: CONTENT_DIFF_TYPE.PROPERTY,
+      key: 'dataContentId',
+      from: fromDataContentId,
+      to: toDataContentId,
     });
   }
 
@@ -291,6 +357,30 @@ export const formatDocumentAuditLogAction = (i18n: I18n, auditLog: TDocumentAudi
   const prefix = isCurrentUser ? i18n._(msg`You`) : user || '';
 
   const description = match(auditLog)
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.CONTENT_CREATED }, () => ({
+      anonymous: msg({
+        message: `A content was added`,
+        context: `Audit log format`,
+      }),
+      you: msg`You added a content`,
+      user: msg`${user} added a content`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.CONTENT_DELETED }, () => ({
+      anonymous: msg({
+        message: `A content was removed`,
+        context: `Audit log format`,
+      }),
+      you: msg`You removed a content`,
+      user: msg`${user} removed a content`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.CONTENT_UPDATED }, () => ({
+      anonymous: msg({
+        message: `A content was updated`,
+        context: `Audit log format`,
+      }),
+      you: msg`You updated a content`,
+      user: msg`${user} updated a content`,
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED }, () => ({
       anonymous: msg({
         message: `A field was added`,

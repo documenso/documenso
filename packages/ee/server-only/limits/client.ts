@@ -1,6 +1,11 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 
-import { DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT, FREE_PLAN_LIMITS } from './constants';
+import {
+  DEFAULT_ENVELOPE_CONTENT_COUNT,
+  DEFAULT_ENVELOPE_CONTENT_IMAGE_COUNT,
+  DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
+  FREE_PLAN_LIMITS,
+} from './constants';
 import type { TLimitsResponseSchema } from './schema';
 import { ZLimitsResponseSchema } from './schema';
 
@@ -33,6 +38,8 @@ export const getLimits = async ({ headers, teamId }: GetLimitsOptions) => {
         quota: FREE_PLAN_LIMITS,
         remaining: FREE_PLAN_LIMITS,
         maximumEnvelopeItemCount: DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
+        maximumEnvelopeContentCount: DEFAULT_ENVELOPE_CONTENT_COUNT,
+        maximumEnvelopeContentImageCount: DEFAULT_ENVELOPE_CONTENT_IMAGE_COUNT,
       } satisfies TLimitsResponseSchema;
     });
 };
