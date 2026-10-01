@@ -11,13 +11,13 @@ import { Hono } from 'hono';
 import type { HonoEnv } from '../../router';
 import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest, resolveFileUploadUserId } from './files.helpers';
 import {
-  type TUploadPdfResponse,
   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileRequestParamsSchema,
   ZGetEnvelopeItemFileRequestQuerySchema,
   ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileTokenRequestParamsSchema,
   ZUploadPdfRequestSchema,
+  ZUploadPdfResponseSchema,
 } from './files.types';
 import getDataContentImageRoute from './routes/get-data-content-image';
 import getDataContentImageByTokenRoute from './routes/get-data-content-image-by-token';
@@ -54,11 +54,9 @@ export const filesRoute = new Hono<HonoEnv>()
 
       const { documentData } = await putNormalizedPdfFileServerSide(file);
 
-      // Typed so the response cannot drift from the shape `putPdfFile` reads
-      // on the client.
-      const response: TUploadPdfResponse = documentData;
-
-      return c.json(response);
+      // Parsed so the response cannot drift from the shape `putPdfFile` reads
+      // on the client, and so the file bytes are stripped rather than sent back.
+      return c.json(ZUploadPdfResponseSchema.parse(documentData));
     } catch (error) {
       console.error('Upload failed:', error);
       return c.json({ error: 'Upload failed' }, 500);
