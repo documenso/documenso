@@ -166,3 +166,19 @@ export const resolveFieldCanvasStyle = (
 
   return style;
 };
+
+/**
+ * Resolve the `--primary` color from the same cascade as the fields, so canvas
+ * elements such as the loading spinner follow team and embed branding.
+ */
+export const resolvePrimaryColor = () => {
+  const $anchor = document.querySelector(FIELD_PROBE_ANCHOR_SELECTOR);
+
+  if (!$anchor) {
+    return undefined;
+  }
+
+  const color = colord(`hsl(${window.getComputedStyle($anchor).getPropertyValue('--primary')})`);
+
+  return color.isValid() ? color.toRgbString() : undefined;
+};
