@@ -209,9 +209,6 @@ export const duplicateEnvelope = async ({
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
         envelopeId: duplicatedEnvelope.id,
-        user: {
-          id: userId,
-        },
         metadata: requestMetadata,
         data: {
           title: duplicatedEnvelope.title,
@@ -268,9 +265,6 @@ export const duplicateEnvelope = async ({
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
             envelopeId: duplicatedEnvelope.id,
-            user: {
-              id: userId,
-            },
             metadata: requestMetadata,
             data: {
               fieldId: field.secondaryId,
@@ -304,9 +298,6 @@ export const duplicateEnvelope = async ({
         createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.CONTENT_CREATED,
           envelopeId: duplicatedEnvelope.id,
-          user: {
-            id: userId,
-          },
           metadata: requestMetadata,
           data: {
             contentId: content.id,

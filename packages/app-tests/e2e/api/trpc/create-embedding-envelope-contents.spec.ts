@@ -10,13 +10,12 @@ import {
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
-import type {
-  TCreateEnvelopePayload,
-  TCreateEnvelopeResponse,
-} from '@documenso/trpc/server/envelope-router/create-envelope.types';
+import type { ZCreateEmbeddingEnvelopePayloadSchema } from '@documenso/trpc/server/embedding-router/create-embedding-envelope.types';
+import type { TCreateEnvelopeResponse } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
-import { type APIRequestContext, expect, test } from '@playwright/test';
+import { type APIRequestContext, type APIResponse, expect, test } from '@playwright/test';
 import { EnvelopeType, FieldType, RecipientRole, type Team } from '@prisma/client';
+import type { z } from 'zod';
 
 import { createGifLabelledAsPng, createImageFile, type TestImageFile } from '../../fixtures/contents';
 
@@ -35,21 +34,32 @@ type TCreateContentInput = {
   imageIndex?: number;
 };
 
+/**
+ * The payload as sent, i.e. before any defaults are applied.
+ */
+type TCreateEmbeddingEnvelopePayloadInput = z.input<typeof ZCreateEmbeddingEnvelopePayloadSchema>;
+
 type CreateEnvelopeWithContentsOptions = {
   request: APIRequestContext;
-  token: string;
-  payload?: Partial<Omit<TCreateEnvelopePayload, 'contents'>>;
+
+  /**
+   * A presign token, since only the embedded editor may create an envelope
+   * with contents.
+   */
+  presignToken: string;
+  payload?: Partial<Omit<TCreateEmbeddingEnvelopePayloadInput, 'contents'>>;
   contents: TCreateContentInput[];
   pdfNames?: string[];
   images?: TestImageFile[];
 };
 
 /**
- * Create an envelope with contents through the public create route.
+ * Create an envelope with contents through the embedded create route, as the
+ * embedded editor does.
  */
 const createEnvelopeWithContents = async ({
   request,
-  token,
+  presignToken,
   payload = {},
   contents,
   pdfNames = ['example.pdf'],
@@ -75,10 +85,36 @@ const createEnvelopeWithContents = async ({
     formData.append('contentImages', new File([image.buffer], image.name, { type: image.mimeType }));
   }
 
-  return await request.post(`${baseUrl}/envelope/create`, {
-    headers: { Authorization: `Bearer ${token}` },
+  return await request.post(`${WEBAPP_BASE_URL}/api/trpc/embeddingPresign.createEmbeddingEnvelope`, {
+    headers: { authorization: `Bearer ${presignToken}` },
     multipart: formData,
   });
+};
+
+/**
+ * The ID of the envelope a successful embedded create returned. tRPC wraps
+ * the result, unlike the OpenAPI routes.
+ */
+const getCreatedEnvelopeId = async (res: APIResponse) => {
+  const body: { result: { data: { json: TCreateEnvelopeResponse } } } = await res.json();
+
+  return body.result.data.json.id;
+};
+
+/**
+ * A presign token for the team, as the embedded editor is given.
+ */
+const createPresignToken = async (request: APIRequestContext, apiToken: string) => {
+  const res = await request.post(`${WEBAPP_BASE_URL}/api/v2/embedding/create-presign-token`, {
+    headers: { Authorization: `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
+    data: {},
+  });
+
+  expect(res.ok(), await res.text()).toBeTruthy();
+
+  const { token }: { token: string } = await res.json();
+
+  return token;
 };
 
 const getEnvelope = async (request: APIRequestContext, token: string, envelopeId: string) => {
@@ -154,14 +190,13 @@ const imageMeta = (positionY: number): TEnvelopeContentMetaInput => ({
 
 test.describe('Create envelope with contents', () => {
   let team: Team;
-  let userId: number;
   let token: string;
+  let presignToken: string;
 
-  test.beforeEach(async () => {
+  test.beforeEach(async ({ request }) => {
     const seeded = await seedUser();
 
     team = seeded.team;
-    userId = seeded.user.id;
 
     ({ token } = await createApiToken({
       userId: seeded.user.id,
@@ -169,6 +204,8 @@ test.describe('Create envelope with contents', () => {
       tokenName: 'test-envelope-create-contents',
       expiresIn: null,
     }));
+
+    presignToken = await createPresignToken(request, token);
   });
 
   for (const envelopeType of [EnvelopeType.DOCUMENT, EnvelopeType.TEMPLATE]) {
@@ -177,7 +214,7 @@ test.describe('Create envelope with contents', () => {
 
       const res = await createEnvelopeWithContents({
         request,
-        token,
+        presignToken,
         payload: { type: envelopeType },
         contents: [
           { contentMeta: textMeta('Hello') },
@@ -193,7 +230,7 @@ test.describe('Create envelope with contents', () => {
 
       expect(res.ok(), await res.text()).toBeTruthy();
 
-      const { id } = (await res.json()) as TCreateEnvelopeResponse;
+      const id = await getCreatedEnvelopeId(res);
 
       // Contents are returned by the public get route.
       const envelope = await getEnvelope(request, token, id);
@@ -234,7 +271,7 @@ test.describe('Create envelope with contents', () => {
   test('places each content on the file it identifies', async ({ request }) => {
     const res = await createEnvelopeWithContents({
       request,
-      token,
+      presignToken,
       pdfNames: ['first.pdf', 'second.pdf'],
       contents: [
         { contentMeta: textMeta('Default') },
@@ -245,7 +282,7 @@ test.describe('Create envelope with contents', () => {
 
     expect(res.ok(), await res.text()).toBeTruthy();
 
-    const { id } = (await res.json()) as TCreateEnvelopeResponse;
+    const id = await getCreatedEnvelopeId(res);
 
     const envelope = await getEnvelope(request, token, id);
     const [first, second] = [...envelope.envelopeItems].sort((a, b) => a.order - b.order);
@@ -276,7 +313,7 @@ test.describe('Create envelope with contents', () => {
 
     const res = await createEnvelopeWithContents({
       request,
-      token,
+      presignToken,
       payload: { externalId },
       contents: [
         { contentMeta: imageMeta(40), imageIndex: 0 },
@@ -302,7 +339,7 @@ test.describe('Create envelope with contents', () => {
     // The example PDF has a single page.
     const res = await createEnvelopeWithContents({
       request,
-      token,
+      presignToken,
       payload: { externalId },
       contents: [{ contentMeta: { ...imageMeta(40), page: 2 }, imageIndex: 0 }],
       images: [image],
@@ -322,7 +359,7 @@ test.describe('Create envelope with contents', () => {
 
     const res = await createEnvelopeWithContents({
       request,
-      token,
+      presignToken,
       payload: { externalId },
       contents: [{ contentMeta: imageMeta(40), imageIndex: 1 }],
       images: [await createImageFile(`index-${nanoid()}.png`, 50, 50)],
@@ -340,7 +377,7 @@ test.describe('Create envelope with contents', () => {
 
     const res = await createEnvelopeWithContents({
       request,
-      token,
+      presignToken,
       payload: { externalId },
       contents: [{ contentMeta: textMeta('Not an image'), imageIndex: 0 }],
       images: [image],
@@ -364,7 +401,7 @@ test.describe('Create envelope with contents', () => {
       // Only "example.pdf" is uploaded, at index 0.
       const res = await createEnvelopeWithContents({
         request,
-        token,
+        presignToken,
         payload: { externalId },
         contents: [{ identifier, contentMeta: imageMeta(40), imageIndex: 0 }],
         images: [image],
@@ -391,7 +428,7 @@ test.describe('Create envelope with contents', () => {
 
       const res = await createEnvelopeWithContents({
         request,
-        token,
+        presignToken,
         payload: { externalId },
         contents: [{ identifier, contentMeta: textMeta('Bad index') }],
       });
@@ -405,7 +442,7 @@ test.describe('Create envelope with contents', () => {
 
       const res = await createEnvelopeWithContents({
         request,
-        token,
+        presignToken,
         payload: {
           externalId,
           recipients: [
@@ -441,7 +478,7 @@ test.describe('Create envelope with contents', () => {
 
     const res = await createEnvelopeWithContents({
       request,
-      token,
+      presignToken,
       payload: {
         recipients: [
           {
@@ -460,7 +497,7 @@ test.describe('Create envelope with contents', () => {
 
     expect(res.ok(), await res.text()).toBeTruthy();
 
-    const { id } = (await res.json()) as TCreateEnvelopeResponse;
+    const id = await getCreatedEnvelopeId(res);
 
     const envelope = await prisma.envelope.findUniqueOrThrow({
       where: { id },
@@ -474,9 +511,13 @@ test.describe('Create envelope with contents', () => {
     const fieldLogs = auditLogs.filter((log) => log.type === 'FIELD_CREATED');
     const contentLogs = auditLogs.filter((log) => log.type === 'CONTENT_CREATED');
 
-    // Attributed to the user who made the request.
+    // Attributed from the request metadata like the editor's own logs. The
+    // embedded routes carry no audit user, so these are anonymous, the same
+    // as contents saved through the embedded update route.
     for (const log of auditLogs) {
-      expect(log.userId).toBe(userId);
+      expect(log.userId).toBeNull();
+      expect(log.email).toBeNull();
+      expect(log.name).toBeNull();
     }
 
     // One entry per field, carrying the same identifiers the editor's logs do.
@@ -522,7 +563,7 @@ test.describe('Create envelope with contents', () => {
   test('does not log fields or contents on a template', async ({ request }) => {
     const res = await createEnvelopeWithContents({
       request,
-      token,
+      presignToken,
       payload: {
         type: EnvelopeType.TEMPLATE,
         recipients: [
@@ -539,7 +580,7 @@ test.describe('Create envelope with contents', () => {
 
     expect(res.ok(), await res.text()).toBeTruthy();
 
-    const { id } = (await res.json()) as TCreateEnvelopeResponse;
+    const id = await getCreatedEnvelopeId(res);
 
     expect(await prisma.documentAuditLog.count({ where: { envelopeId: id } })).toBe(0);
   });
@@ -550,7 +591,7 @@ test.describe('Create envelope with contents', () => {
 
     const res = await createEnvelopeWithContents({
       request,
-      token,
+      presignToken,
       payload: { externalId },
       contents: [{ contentMeta: imageMeta(40), imageIndex: 0 }],
       images: [image],
@@ -563,7 +604,41 @@ test.describe('Create envelope with contents', () => {
     expect(await countDataContentsNamed(image.name)).toBe(0);
   });
 
-  test('documents contents on the public create route', async ({ request }) => {
+  test('the public create route ignores contents', async ({ request }) => {
+    const externalId = `e2e-public-contents-${nanoid()}`;
+    const image = await createImageFile(`public-${nanoid()}.png`, 50, 50);
+
+    const formData = new FormData();
+
+    // Sent in the embedded shape, which the public route does not accept.
+    formData.append(
+      'payload',
+      JSON.stringify({
+        type: EnvelopeType.DOCUMENT,
+        title: 'Public Envelope',
+        externalId,
+        contents: [{ contentMeta: textMeta('Ignored') }, { contentMeta: imageMeta(40), imageIndex: 0 }],
+      }),
+    );
+
+    formData.append('files', new File([examplePdfBuffer], 'example.pdf', { type: 'application/pdf' }));
+    formData.append('contentImages', new File([image.buffer], image.name, { type: image.mimeType }));
+
+    const res = await request.post(`${baseUrl}/envelope/create`, {
+      headers: { Authorization: `Bearer ${token}` },
+      multipart: formData,
+    });
+
+    expect(res.ok(), await res.text()).toBeTruthy();
+
+    const { id } = (await res.json()) as TCreateEnvelopeResponse;
+
+    // The envelope is created without them, and the image is never stored.
+    expect(await prisma.envelopeContent.count({ where: { envelopeId: id } })).toBe(0);
+    expect(await countDataContentsNamed(image.name)).toBe(0);
+  });
+
+  test('does not document contents on the public create route', async ({ request }) => {
     const res = await request.get(`${WEBAPP_BASE_URL}/api/v2/openapi.json`);
 
     expect(res.ok()).toBeTruthy();
@@ -581,16 +656,8 @@ test.describe('Create envelope with contents', () => {
       'properties',
     ];
 
-    expect(openApiDocument).toHaveProperty([...requestSchemaPath, 'contentImages']);
-
-    expect(openApiDocument).toHaveProperty([
-      ...requestSchemaPath,
-      'payload',
-      'properties',
-      'contents',
-      'items',
-      'properties',
-      'imageIndex',
-    ]);
+    expect(openApiDocument).toHaveProperty([...requestSchemaPath, 'files']);
+    expect(openApiDocument).not.toHaveProperty([...requestSchemaPath, 'contentImages']);
+    expect(openApiDocument).not.toHaveProperty([...requestSchemaPath, 'payload', 'properties', 'contents']);
   });
 });

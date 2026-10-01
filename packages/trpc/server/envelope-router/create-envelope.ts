@@ -13,8 +13,8 @@ import type { Logger } from 'pino';
 import { match, P } from 'ts-pattern';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
+import type { TCreateEmbeddingEnvelopeRequest } from '../embedding-router/create-embedding-envelope.types';
 import { authenticatedProcedure } from '../trpc';
-import type { TCreateEnvelopeRequest } from './create-envelope.types';
 import {
   createEnvelopeMeta,
   ZCreateEnvelopeRequestSchema,
@@ -51,7 +51,16 @@ type CreateEnvelopeRouteOptions = {
    * Unverified team ID.
    */
   teamId: number;
-  input: TCreateEnvelopeRequest;
+
+  /**
+   * This function is used by both embeds and normal flows.
+   *
+   * Since embeds also allow setting contents, we need to remap the type to allow
+   * undefined contents for normal flows.
+   */
+  input: Omit<TCreateEmbeddingEnvelopeRequest, 'contentImages'> & {
+    contentImages?: File[];
+  };
   apiRequestMetadata: ApiRequestMetadata;
 
   /**
@@ -73,7 +82,7 @@ export const createEnvelopeRouteCaller = async ({
   logger,
   options = {},
 }: CreateEnvelopeRouteOptions) => {
-  const { payload, files, contentImages } = input;
+  const { payload, files, contentImages = [] } = input;
 
   const {
     title,

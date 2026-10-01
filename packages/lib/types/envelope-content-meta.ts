@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CONTENT_TEXT_MAX_LENGTH } from '../constants/envelope-content';
 import { DataContentType } from './data-content-meta';
 
 // Note: The default is different to fields (12), the range is the same.
@@ -237,7 +238,7 @@ export const ZBasePositionalContentMetaSchema = z.object({
 
 export const ZContentTextMetaSchema = ZBasePositionalContentMetaSchema.extend({
   type: z.literal(EnvelopeContentType.TEXT),
-  text: z.string().optional().default(''),
+  text: z.string().max(CONTENT_TEXT_MAX_LENGTH).optional().default(''),
   textAlign: ZContentTextAlignSchema.optional().default(DEFAULT_CONTENT_TEXT_ALIGN),
   verticalAlign: ZContentVerticalAlignSchema.optional().default(DEFAULT_CONTENT_VERTICAL_ALIGN),
   lineHeight: ZContentLineHeightSchema.optional().default(DEFAULT_CONTENT_LINE_HEIGHT),

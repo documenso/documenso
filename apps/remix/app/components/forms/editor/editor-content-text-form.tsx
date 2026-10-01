@@ -1,3 +1,4 @@
+import { CONTENT_TEXT_MAX_LENGTH } from '@documenso/lib/constants/envelope-content';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -47,6 +48,7 @@ export const EditorContentTextForm = () => {
                   className="h-auto"
                   placeholder={t`Add text to the document`}
                   rows={3}
+                  maxLength={CONTENT_TEXT_MAX_LENGTH}
                   {...field}
                 />
               </FormControl>

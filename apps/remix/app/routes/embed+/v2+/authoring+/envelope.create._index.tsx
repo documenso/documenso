@@ -20,7 +20,7 @@ import {
 } from '@documenso/lib/utils/embed-config';
 import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
-import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-router/create-envelope.types';
+import type { TCreateEmbeddingEnvelopePayload } from '@documenso/trpc/server/embedding-router/create-embedding-envelope.types';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -176,7 +176,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
 
   const buildCreateEnvelopeRequest = (
     envelope: Omit<TEditorEnvelope, 'id'>,
-  ): { payload: TCreateEnvelopePayload; files: File[]; contentImages: File[] } => {
+  ): { payload: TCreateEmbeddingEnvelopePayload; files: File[]; contentImages: File[] } => {
     const sortedItems = [...envelope.envelopeItems].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     const itemIdToIndex = new Map<string, number>();
@@ -248,7 +248,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
 
     const contentImages = imagesToUpload.map((image) => image.file);
 
-    const payload: TCreateEnvelopePayload = {
+    const payload: TCreateEmbeddingEnvelopePayload = {
       title: envelope.title,
       type: envelope.type,
       externalId: envelope.externalId ?? undefined,

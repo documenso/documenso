@@ -30,6 +30,15 @@ export const CONTENT_IMAGE_MAX_EDGE = 2048;
 export const CONTENT_IMAGE_MAX_INPUT_PIXELS = 25_000_000;
 
 /**
+ * The longest text a text content may hold.
+ *
+ * Text is the only free-form value on a content, and it is recorded in full
+ * in the audit log on every save, so it is capped the same as a document
+ * message.
+ */
+export const CONTENT_TEXT_MAX_LENGTH = 5_000;
+
+/**
  * The number of contents allowed on a single envelope.
  *
  * 0 = Unlimited contents.

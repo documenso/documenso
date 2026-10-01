@@ -53,8 +53,12 @@ const IMAGE_META: TEnvelopeContentMetaInput = {
 };
 
 /**
- * Create an envelope with two files through the public create route, with a
- * text on each file and an image on the second.
+ * Create an envelope with two files, with a text on each file and an image on
+ * the second.
+ *
+ * Goes through the embedded create route, since only the embedded editor may
+ * create an envelope with contents, using a presign token minted from the
+ * API token.
  */
 const createSourceEnvelope = async (
   request: APIRequestContext,
@@ -62,6 +66,15 @@ const createSourceEnvelope = async (
   type: EnvelopeType,
   options: { withSignerFields?: boolean } = {},
 ) => {
+  const presignRes = await request.post(`${WEBAPP_BASE_URL}/api/v2/embedding/create-presign-token`, {
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    data: {},
+  });
+
+  expect(presignRes.ok(), await presignRes.text()).toBeTruthy();
+
+  const { token: presignToken }: { token: string } = await presignRes.json();
+
   const image = await createImageFile(`copy-${nanoid()}.png`, 120, 60);
 
   const formData = new FormData();
@@ -98,16 +111,17 @@ const createSourceEnvelope = async (
 
   formData.append('contentImages', new File([image.buffer], image.name, { type: image.mimeType }));
 
-  const res = await request.post(`${baseUrl}/envelope/create`, {
-    headers: { Authorization: `Bearer ${token}` },
+  const res = await request.post(`${WEBAPP_BASE_URL}/api/trpc/embeddingPresign.createEmbeddingEnvelope`, {
+    headers: { authorization: `Bearer ${presignToken}` },
     multipart: formData,
   });
 
   expect(res.ok(), await res.text()).toBeTruthy();
 
-  const { id } = (await res.json()) as TCreateEnvelopeResponse;
+  // tRPC wraps the result, unlike the OpenAPI routes.
+  const body: { result: { data: { json: TCreateEnvelopeResponse } } } = await res.json();
 
-  return id;
+  return body.result.data.json.id;
 };
 
 /**
@@ -226,9 +240,12 @@ const getCopyRoute = (name: string): CopyRoute => {
 
 test.describe('Copy contents to new envelopes', () => {
   let token: string;
+  let teamName: string;
 
   test.beforeEach(async () => {
     const { user, team } = await seedUser();
+
+    teamName = team.name;
 
     ({ token } = await createApiToken({
       userId: user.id,
@@ -283,6 +300,12 @@ test.describe('Copy contents to new envelopes', () => {
     // The copy's own creation is on record, with the copied title.
     expect(logsOfType('DOCUMENT_CREATED')).toHaveLength(1);
     expect(logsOfType('DOCUMENT_CREATED')[0].data).toMatchObject({ title: copy.title });
+
+    // Attributed from the request metadata, which for a team API token is the team.
+    for (const log of auditLogs) {
+      expect(log.userId).toBeNull();
+      expect(log.name).toBe(teamName);
+    }
 
     // One entry per copied field, naming the copy's own field and recipient IDs.
     const [signer] = copy.recipients;

@@ -726,9 +726,6 @@ export const createEnvelope = async ({
         return createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
           envelopeId: envelope.id,
-          user: {
-            id: userId,
-          },
           metadata: requestMetadata,
           data: {
             fieldId: field.secondaryId,
@@ -743,9 +740,6 @@ export const createEnvelope = async ({
         createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.CONTENT_CREATED,
           envelopeId: envelope.id,
-          user: {
-            id: userId,
-          },
           metadata: requestMetadata,
           data: {
             contentId: content.id,

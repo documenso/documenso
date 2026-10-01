@@ -270,7 +270,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const { allowContents } = editorConfig.actions;
 
-  if (!editorConfig.general?.allowAddFieldsStep) {
+  if (!editorConfig.general.allowAddFieldsStep) {
     return null;
   }
 
