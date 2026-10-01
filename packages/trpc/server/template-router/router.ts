@@ -455,6 +455,7 @@ export const templateRouter = router({
           type: 'templateId',
           id: templateId,
         },
+        requestMetadata: ctx.metadata,
       });
 
       return mapEnvelopeToTemplateLite(duplicatedEnvelope.envelope);

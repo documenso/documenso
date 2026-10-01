@@ -154,12 +154,14 @@ const imageMeta = (positionY: number): TEnvelopeContentMetaInput => ({
 
 test.describe('Create envelope with contents', () => {
   let team: Team;
+  let userId: number;
   let token: string;
 
   test.beforeEach(async () => {
     const seeded = await seedUser();
 
     team = seeded.team;
+    userId = seeded.user.id;
 
     ({ token } = await createApiToken({
       userId: seeded.user.id,
@@ -433,6 +435,114 @@ test.describe('Create envelope with contents', () => {
       expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
     });
   }
+
+  test('logs each created field and content on a document', async ({ request }) => {
+    const signerEmail = `signer-${nanoid()}@test.documenso.com`;
+
+    const res = await createEnvelopeWithContents({
+      request,
+      token,
+      payload: {
+        recipients: [
+          {
+            email: signerEmail,
+            name: 'Signer',
+            role: RecipientRole.SIGNER,
+            fields: [
+              { type: FieldType.SIGNATURE, page: 1, positionX: 10, positionY: 10, width: 10, height: 5 },
+              { type: FieldType.NAME, page: 1, positionX: 10, positionY: 20, width: 10, height: 5 },
+            ],
+          },
+        ],
+      },
+      contents: [{ contentMeta: textMeta('Hello') }, { contentMeta: RECTANGLE_META }],
+    });
+
+    expect(res.ok(), await res.text()).toBeTruthy();
+
+    const { id } = (await res.json()) as TCreateEnvelopeResponse;
+
+    const envelope = await prisma.envelope.findUniqueOrThrow({
+      where: { id },
+      include: { recipients: true, fields: true, contents: true },
+    });
+
+    const auditLogs = await prisma.documentAuditLog.findMany({
+      where: { envelopeId: id, type: { in: ['FIELD_CREATED', 'CONTENT_CREATED'] } },
+    });
+
+    const fieldLogs = auditLogs.filter((log) => log.type === 'FIELD_CREATED');
+    const contentLogs = auditLogs.filter((log) => log.type === 'CONTENT_CREATED');
+
+    // Attributed to the user who made the request.
+    for (const log of auditLogs) {
+      expect(log.userId).toBe(userId);
+    }
+
+    // One entry per field, carrying the same identifiers the editor's logs do.
+    expect(fieldLogs).toHaveLength(2);
+
+    const [signer] = envelope.recipients;
+
+    const byFieldId = (a: { fieldId: string }, b: { fieldId: string }) => a.fieldId.localeCompare(b.fieldId);
+
+    const loggedFields = fieldLogs.map((log) => log.data as { fieldId: string }).sort(byFieldId);
+
+    const expectedFields = envelope.fields
+      .map((field) => ({
+        fieldId: field.secondaryId,
+        fieldRecipientEmail: signer.email,
+        fieldRecipientId: signer.id,
+        fieldType: field.type,
+      }))
+      .sort(byFieldId);
+
+    expect(loggedFields).toEqual(expectedFields);
+
+    // One entry per content, with the full meta as created.
+    expect(contentLogs).toHaveLength(2);
+
+    for (const content of envelope.contents) {
+      const log = contentLogs.find((log) => {
+        const data = log.data as { contentId?: string };
+
+        return data.contentId === content.id;
+      });
+
+      expect(log?.data).toEqual({
+        contentId: content.id,
+        contentType: content.contentMeta.type,
+        envelopeItemId: content.envelopeItemId,
+        contentMeta: content.contentMeta,
+        dataContentId: null,
+      });
+    }
+  });
+
+  test('does not log fields or contents on a template', async ({ request }) => {
+    const res = await createEnvelopeWithContents({
+      request,
+      token,
+      payload: {
+        type: EnvelopeType.TEMPLATE,
+        recipients: [
+          {
+            email: `signer-${nanoid()}@test.documenso.com`,
+            name: 'Signer',
+            role: RecipientRole.SIGNER,
+            fields: [{ type: FieldType.SIGNATURE, page: 1, positionX: 10, positionY: 10, width: 10, height: 5 }],
+          },
+        ],
+      },
+      contents: [{ contentMeta: textMeta('Hello') }],
+    });
+
+    expect(res.ok(), await res.text()).toBeTruthy();
+
+    const { id } = (await res.json()) as TCreateEnvelopeResponse;
+
+    expect(await prisma.documentAuditLog.count({ where: { envelopeId: id } })).toBe(0);
+  });
 
   test('rejects an image which is not really a PNG, JPEG or WebP', async ({ request }) => {
     const externalId = `e2e-contents-format-${nanoid()}`;

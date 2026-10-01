@@ -7,6 +7,7 @@ import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipient
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { generateDatabaseId, nanoid, prefixedId } from '@documenso/lib/universal/id';
+import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import type { DocumentMeta, DocumentVisibility, TemplateType } from '@prisma/client';
@@ -516,25 +517,29 @@ export const createEnvelope = async ({
       }),
     );
 
-    if (contents.length > 0) {
+    // Built up front so the generated IDs can be reused for the audit logs
+    // without reading the rows back.
+    const contentsToCreate = contents.map((content) => {
+      const envelopeItem = envelope.envelopeItems.find((item) => item.documentDataId === content.documentDataId);
+
+      if (!envelopeItem) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Document data not found',
+        });
+      }
+
+      return {
+        id: generateDatabaseId('envelope_content'),
+        envelopeId: envelope.id,
+        envelopeItemId: envelopeItem.id,
+        contentMeta: content.contentMeta,
+        dataContentId: content.dataContentId,
+      };
+    });
+
+    if (contentsToCreate.length > 0) {
       await tx.envelopeContent.createMany({
-        data: contents.map((content) => {
-          const envelopeItem = envelope.envelopeItems.find((item) => item.documentDataId === content.documentDataId);
-
-          if (!envelopeItem) {
-            throw new AppError(AppErrorCode.NOT_FOUND, {
-              message: 'Document data not found',
-            });
-          }
-
-          return {
-            id: generateDatabaseId('envelope_content'),
-            envelopeId: envelope.id,
-            envelopeItemId: envelopeItem.id,
-            contentMeta: content.contentMeta,
-            dataContentId: content.dataContentId,
-          };
-        }),
+        data: contentsToCreate,
       });
     }
 
@@ -706,6 +711,57 @@ export const createEnvelope = async ({
               teamName: team.name,
             },
           }),
+        });
+      }
+
+      const fieldAuditLogs: CreateDocumentAuditLogDataResponse[] = createdEnvelope.fields.map((field) => {
+        const fieldRecipient = createdEnvelope.recipients.find((recipient) => recipient.id === field.recipientId);
+
+        if (!fieldRecipient) {
+          throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+            message: `Recipient ${field.recipientId} not found for field ${field.secondaryId}`,
+          });
+        }
+
+        return createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
+          envelopeId: envelope.id,
+          user: {
+            id: userId,
+          },
+          metadata: requestMetadata,
+          data: {
+            fieldId: field.secondaryId,
+            fieldRecipientEmail: fieldRecipient.email,
+            fieldRecipientId: fieldRecipient.id,
+            fieldType: field.type,
+          },
+        });
+      });
+
+      const contentAuditLogs: CreateDocumentAuditLogDataResponse[] = contentsToCreate.map((content) =>
+        createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.CONTENT_CREATED,
+          envelopeId: envelope.id,
+          user: {
+            id: userId,
+          },
+          metadata: requestMetadata,
+          data: {
+            contentId: content.id,
+            contentType: content.contentMeta.type,
+            envelopeItemId: content.envelopeItemId,
+            contentMeta: content.contentMeta,
+            dataContentId: content.dataContentId,
+          },
+        }),
+      );
+
+      const itemAuditLogs = [...fieldAuditLogs, ...contentAuditLogs];
+
+      if (itemAuditLogs.length > 0) {
+        await tx.documentAuditLog.createMany({
+          data: itemAuditLogs,
         });
       }
     }

@@ -28,6 +28,7 @@ export const duplicateEnvelopeRoute = authenticatedProcedure
         type: 'envelopeId',
         id: envelopeId,
       },
+      requestMetadata: ctx.metadata,
       overrides: {
         includeRecipients,
         includeFields,

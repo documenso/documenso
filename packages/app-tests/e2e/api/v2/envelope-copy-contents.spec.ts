@@ -14,7 +14,7 @@ import type {
   TUseEnvelopeResponse,
 } from '@documenso/trpc/server/envelope-router/use-envelope.types';
 import { type APIRequestContext, expect, test } from '@playwright/test';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType, FieldType, RecipientRole } from '@prisma/client';
 
 import { createImageFile } from '../../fixtures/contents';
 
@@ -56,7 +56,12 @@ const IMAGE_META: TEnvelopeContentMetaInput = {
  * Create an envelope with two files through the public create route, with a
  * text on each file and an image on the second.
  */
-const createSourceEnvelope = async (request: APIRequestContext, token: string, type: EnvelopeType) => {
+const createSourceEnvelope = async (
+  request: APIRequestContext,
+  token: string,
+  type: EnvelopeType,
+  options: { withSignerFields?: boolean } = {},
+) => {
   const image = await createImageFile(`copy-${nanoid()}.png`, 120, 60);
 
   const formData = new FormData();
@@ -66,6 +71,19 @@ const createSourceEnvelope = async (request: APIRequestContext, token: string, t
     JSON.stringify({
       type,
       title: 'Envelope With Contents',
+      recipients: options.withSignerFields
+        ? [
+            {
+              email: `signer-${nanoid()}@test.documenso.com`,
+              name: 'Signer',
+              role: RecipientRole.SIGNER,
+              fields: [
+                { type: FieldType.SIGNATURE, page: 1, positionX: 10, positionY: 60, width: 10, height: 5 },
+                { type: FieldType.NAME, page: 1, positionX: 10, positionY: 70, width: 10, height: 5 },
+              ],
+            },
+          ]
+        : undefined,
       contents: [
         { identifier: 'first.pdf', contentMeta: textMeta('On the first file') },
         { identifier: 'second.pdf', contentMeta: textMeta('On the second file') },
@@ -196,6 +214,16 @@ const COPY_ROUTES: CopyRoute[] = [
   },
 ];
 
+const getCopyRoute = (name: string): CopyRoute => {
+  const route = COPY_ROUTES.find((copyRoute) => copyRoute.name === name);
+
+  if (!route) {
+    throw new Error(`Unknown copy route ${name}`);
+  }
+
+  return route;
+};
+
 test.describe('Copy contents to new envelopes', () => {
   let token: string;
 
@@ -235,4 +263,80 @@ test.describe('Copy contents to new envelopes', () => {
       expect(await prisma.envelopeContent.count({ where: { envelopeId: sourceId } })).toBe(3);
     });
   }
+
+  test('envelope/duplicate logs the copied document, fields and contents', async ({ request }) => {
+    const sourceId = await createSourceEnvelope(request, token, EnvelopeType.DOCUMENT, { withSignerFields: true });
+
+    const sourceAuditLogCount = await prisma.documentAuditLog.count({ where: { envelopeId: sourceId } });
+
+    const copyId = await getCopyRoute('envelope/duplicate').copy({ request, token, sourceId });
+
+    const copy = await prisma.envelope.findUniqueOrThrow({
+      where: { id: copyId },
+      include: { recipients: true, fields: true, contents: true },
+    });
+
+    const auditLogs = await prisma.documentAuditLog.findMany({ where: { envelopeId: copyId } });
+
+    const logsOfType = (type: string) => auditLogs.filter((log) => log.type === type);
+
+    // The copy's own creation is on record, with the copied title.
+    expect(logsOfType('DOCUMENT_CREATED')).toHaveLength(1);
+    expect(logsOfType('DOCUMENT_CREATED')[0].data).toMatchObject({ title: copy.title });
+
+    // One entry per copied field, naming the copy's own field and recipient IDs.
+    const [signer] = copy.recipients;
+
+    expect(copy.fields).toHaveLength(2);
+
+    expect(logsOfType('FIELD_CREATED').map((log) => log.data)).toEqual(
+      expect.arrayContaining(
+        copy.fields.map((field) => ({
+          fieldId: field.secondaryId,
+          fieldRecipientEmail: signer.email,
+          fieldRecipientId: signer.id,
+          fieldType: field.type,
+        })),
+      ),
+    );
+
+    expect(logsOfType('FIELD_CREATED')).toHaveLength(2);
+
+    // One entry per copied content, naming the copy's own content and item IDs.
+    expect(copy.contents).toHaveLength(3);
+
+    expect(logsOfType('CONTENT_CREATED').map((log) => log.data)).toEqual(
+      expect.arrayContaining(
+        copy.contents.map((content) => ({
+          contentId: content.id,
+          contentType: content.contentMeta.type,
+          envelopeItemId: content.envelopeItemId,
+          contentMeta: content.contentMeta,
+          dataContentId: content.dataContentId,
+        })),
+      ),
+    );
+
+    expect(logsOfType('CONTENT_CREATED')).toHaveLength(3);
+
+    // Nothing was written against the source.
+    expect(await prisma.documentAuditLog.count({ where: { envelopeId: sourceId } })).toBe(sourceAuditLogCount);
+  });
+
+  test('envelope/duplicate logs nothing for a template', async ({ request }) => {
+    const sourceId = await createSourceEnvelope(request, token, EnvelopeType.TEMPLATE, { withSignerFields: true });
+
+    const copyId = await getCopyRoute('envelope/duplicate').copy({ request, token, sourceId });
+
+    const copy = await prisma.envelope.findUniqueOrThrow({
+      where: { id: copyId },
+      include: { fields: true, contents: true },
+    });
+
+    // The fields and contents are copied, but a template has no audit trail.
+    expect(copy.type).toBe(EnvelopeType.TEMPLATE);
+    expect(copy.fields).toHaveLength(2);
+    expect(copy.contents).toHaveLength(3);
+    expect(await prisma.documentAuditLog.count({ where: { envelopeId: copyId } })).toBe(0);
+  });
 });
