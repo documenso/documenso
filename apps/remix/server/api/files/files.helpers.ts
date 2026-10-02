@@ -1,8 +1,8 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { generatePartialSignedPdf } from '@documenso/lib/server-only/pdf/generate-partial-signed-pdf';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { prisma } from '@documenso/prisma';
@@ -261,6 +261,7 @@ const handlePendingFileRequest = async ({
 
 type CheckEnvelopeFileAccessOptions = {
   userId: number;
+  envelopeId: string;
   teamId: number;
   envelopeType: EnvelopeType;
   templateType: TemplateType;
@@ -269,19 +270,36 @@ type CheckEnvelopeFileAccessOptions = {
 /**
  * Check whether a user has access to an envelope's file.
  *
- * First checks team membership. If that fails and the envelope is an
- * ORGANISATION template (not a document), falls back to checking whether
- * the user belongs to any team in the same organisation.
+ * Re-derives access through the same visibility-gated where-input used by the
+ * tRPC envelope read path (`getEnvelopeWhereInput`), so a user's team role and
+ * the envelope's `visibility` are enforced here exactly as they are everywhere
+ * else. Falls back to an organisation-membership check for ORGANISATION
+ * templates, which are not owned by a single team.
  */
 export const checkEnvelopeFileAccess = async ({
   userId,
+  envelopeId,
   teamId,
   envelopeType,
   templateType,
 }: CheckEnvelopeFileAccessOptions): Promise<boolean> => {
-  const team = await getTeamById({ userId, teamId }).catch(() => null);
+  const hasVisibilityGatedAccess = await getEnvelopeWhereInput({
+    id: { type: 'envelopeId', id: envelopeId },
+    userId,
+    teamId,
+    type: null,
+  })
+    .then(async ({ envelopeWhereInput }) => {
+      const envelope = await prisma.envelope.findFirst({
+        where: { ...envelopeWhereInput, id: envelopeId },
+        select: { id: true },
+      });
 
-  if (team) {
+      return envelope !== null;
+    })
+    .catch(() => false);
+
+  if (hasVisibilityGatedAccess) {
     return true;
   }
 
