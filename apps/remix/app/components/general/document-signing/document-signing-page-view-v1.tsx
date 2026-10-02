@@ -13,7 +13,6 @@ import {
 } from '@documenso/lib/types/field-meta';
 import type { CompletedField } from '@documenso/lib/types/fields';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
-import { resolveDocumentSender } from '@documenso/lib/utils/document-sender';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
@@ -132,14 +131,13 @@ export const DocumentSigningPageViewV1 = ({
     }
   };
 
-  const sender = resolveDocumentSender({
-    includeSenderDetails,
-    user: document.user,
-    team: document.team,
-  });
+  let senderName = document.user.name ?? '';
+  let senderEmail = `(${document.user.email})`;
 
-  const senderName = sender.name;
-  const senderEmail = sender.email ? `(${sender.email})` : '';
+  if (!includeSenderDetails) {
+    senderName = document.team?.name ?? '';
+    senderEmail = document.team?.teamEmail?.email ? `(${document.team.teamEmail.email})` : '';
+  }
 
   const selectedSigner = allRecipients?.find((r) => r.id === selectedSignerId);
   const targetSigner = recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
