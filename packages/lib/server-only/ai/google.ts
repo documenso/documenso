@@ -7,3 +7,10 @@ export const vertex = createVertex({
   location: env('GOOGLE_VERTEX_LOCATION') || 'global',
   apiKey: env('GOOGLE_VERTEX_API_KEY'),
 });
+
+export const DEFAULT_VERTEX_MODEL = 'gemini-3-flash-preview';
+
+export const getVertexModel = (model?: string) => {
+  return vertex(model || env('GOOGLE_VERTEX_MODEL') || DEFAULT_VERTEX_MODEL);
+};
+
