@@ -146,7 +146,7 @@ export const AvatarImageForm = ({ className, team, organisation }: AvatarImageFo
                     <div className="relative">
                       <Avatar className="h-16 w-16 border-2 border-solid">
                         {avatarImageId && <AvatarImage src={formatAvatarUrl(avatarImageId)} />}
-                        <AvatarFallback className="text-gray-400 text-sm">{initials}</AvatarFallback>
+                        <AvatarFallback className="text-muted-foreground text-sm">{initials}</AvatarFallback>
                       </Avatar>
 
                       {hasAvatarImage && (
