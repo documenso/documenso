@@ -8,7 +8,7 @@ import {
   ZDocumentActionAuthTypesSchema,
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentEmailSettingsInputSchema } from '@documenso/lib/types/document-email';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZRecipientSigningOrderSchema } from '@documenso/lib/types/recipient';
@@ -172,7 +172,7 @@ export const ZCreateDocumentMutationSchema = z.object({
       uploadSignatureEnabled: z.boolean().optional().default(true),
       drawSignatureEnabled: z.boolean().optional().default(true),
       distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional(),
-      emailSettings: ZDocumentEmailSettingsSchema.optional(),
+      emailSettings: ZDocumentEmailSettingsInputSchema.optional(),
     })
     .partial()
     .optional()
@@ -341,7 +341,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
       typedSignatureEnabled: z.boolean(),
       uploadSignatureEnabled: z.boolean(),
       drawSignatureEnabled: z.boolean(),
-      emailSettings: ZDocumentEmailSettingsSchema,
+      emailSettings: ZDocumentEmailSettingsInputSchema,
     })
     .partial()
     .optional(),

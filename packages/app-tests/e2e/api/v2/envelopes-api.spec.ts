@@ -198,6 +198,7 @@ test.describe('API V2 Envelopes', () => {
           drawSignatureEnabled: false,
           emailReplyTo: userA.email,
           emailSettings: {
+            attachDocument: false,
             recipientSigningRequest: false,
             recipientRemoved: false,
             recipientSigned: false,

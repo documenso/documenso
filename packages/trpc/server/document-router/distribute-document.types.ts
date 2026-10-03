@@ -1,5 +1,5 @@
 import { ZDocumentLiteSchema } from '@documenso/lib/types/document';
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentEmailSettingsInputSchema } from '@documenso/lib/types/document-email';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -39,7 +39,7 @@ export const ZDistributeDocumentRequestSchema = z.object({
       language: ZDocumentMetaLanguageSchema.optional(),
       emailId: z.string().nullish(),
       emailReplyTo: zEmail().nullish(),
-      emailSettings: ZDocumentEmailSettingsSchema.optional(),
+      emailSettings: ZDocumentEmailSettingsInputSchema.optional(),
     })
     .optional(),
 });
