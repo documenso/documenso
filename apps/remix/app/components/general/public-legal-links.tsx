@@ -4,7 +4,9 @@ import {
   NEXT_PUBLIC_TERMS_OF_SERVICE_URL,
 } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
-import { Trans } from '@lingui/react/macro';
+import { DropdownMenuItem, DropdownMenuSeparator } from '@documenso/ui/primitives/dropdown-menu';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Link } from 'react-router';
 
 export type PublicLegalLinksProps = {
@@ -12,49 +14,70 @@ export type PublicLegalLinksProps = {
 };
 
 export const PublicLegalLinks = ({ className }: PublicLegalLinksProps) => {
-  const termsUrl = NEXT_PUBLIC_TERMS_OF_SERVICE_URL();
-  const privacyUrl = NEXT_PUBLIC_PRIVACY_POLICY_URL();
-  const imprintUrl = NEXT_PUBLIC_IMPRINT_URL();
+  const { _ } = useLingui();
+
+  const links = getPublicLegalLinks();
+
+  if (links.length === 0) {
+    return null;
+  }
 
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground',
+        'flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-muted-foreground text-xs',
         className,
       )}
     >
-      {termsUrl && (
+      {links.map((link) => (
         <Link
-          to={termsUrl}
+          key={link.href}
+          to={link.href}
           target="_blank"
           rel="noopener noreferrer"
           className="duration-200 hover:text-foreground hover:underline"
         >
-          <Trans>Terms of Service</Trans>
+          {_(link.label)}
         </Link>
-      )}
-
-      {privacyUrl && (
-        <Link
-          to={privacyUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="duration-200 hover:text-foreground hover:underline"
-        >
-          <Trans>Privacy Policy</Trans>
-        </Link>
-      )}
-
-      {imprintUrl && (
-        <Link
-          to={imprintUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="duration-200 hover:text-foreground hover:underline"
-        >
-          <Trans>Imprint</Trans>
-        </Link>
-      )}
+      ))}
     </div>
   );
+};
+
+export const PublicLegalLinksDropdownMenuItems = () => {
+  const { _ } = useLingui();
+
+  const links = getPublicLegalLinks();
+
+  if (links.length === 0) {
+    return null;
+  }
+
+  return (
+    <>
+      <DropdownMenuSeparator />
+
+      {links.map((link) => (
+        <DropdownMenuItem key={link.href} asChild className="text-muted-foreground text-xs">
+          <Link to={link.href} target="_blank" rel="noopener noreferrer">
+            {_(link.label)}
+          </Link>
+        </DropdownMenuItem>
+      ))}
+    </>
+  );
+};
+
+const getPublicLegalLinks = () => {
+  const termsUrl = NEXT_PUBLIC_TERMS_OF_SERVICE_URL();
+  const privacyUrl = NEXT_PUBLIC_PRIVACY_POLICY_URL();
+  const imprintUrl = NEXT_PUBLIC_IMPRINT_URL();
+
+  const links = [
+    termsUrl ? { label: msg`Terms of Service`, href: termsUrl } : null,
+    privacyUrl ? { label: msg`Privacy Policy`, href: privacyUrl } : null,
+    imprintUrl ? { label: msg`Imprint`, href: imprintUrl } : null,
+  ];
+
+  return links.filter((link) => link !== null);
 };
