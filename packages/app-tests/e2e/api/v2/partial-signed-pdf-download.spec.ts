@@ -241,4 +241,197 @@ test.describe('API V2 partial signed PDF downloads', () => {
     expect(legacyResponse.status()).toBe(400);
     expect(legacyError.code).toBe('ENVELOPE_LEGACY');
   });
+
+  test('allows recipients to download the partial PDF via their token', async ({ request }) => {
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+      recipients: [
+        { email: 'partial-token-1@test.documenso.com', name: 'Partial Token 1' },
+        { email: 'partial-token-2@test.documenso.com', name: 'Partial Token 2' },
+      ],
+      fieldsPerRecipient: [
+        [{ type: FieldType.SIGNATURE, page: 1, positionX: 5, positionY: 5, width: 15, height: 5 }],
+        [
+          {
+            type: FieldType.SIGNATURE,
+            page: 1,
+            positionX: 5,
+            positionY: 15,
+            width: 15,
+            height: 5,
+          },
+        ],
+      ],
+    });
+
+    const [recipientOne, recipientTwo] = distributeResult.recipients;
+    const documentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+    const envelopeItem = envelope.envelopeItems[0];
+    const recipientOneField = envelope.fields.find((field) => field.recipientId === recipientOne.id);
+
+    if (!recipientOneField) {
+      throw new Error('Expected signature field not found');
+    }
+
+    const tokenDownloadUrl = (token: string) =>
+      `${WEBAPP_BASE_URL}/api/files/token/${token}/envelopeItem/${envelopeItem.id}/download/pending`;
+
+    // Recipient one inserts their field without completing the document.
+    await trpcMutation(request, 'envelope.field.sign', {
+      token: recipientOne.token,
+      fieldId: recipientOneField.id,
+      fieldValue: {
+        type: FieldType.SIGNATURE,
+        value: 'Signature',
+      },
+    });
+
+    const recipientOneResponse = await request.get(tokenDownloadUrl(recipientOne.token));
+
+    expect(recipientOneResponse.status()).toBe(200);
+    expect(recipientOneResponse.headers()['content-type']).toContain('application/pdf');
+    expect(recipientOneResponse.headers()['cache-control']).toBe('no-store, private');
+    expect(recipientOneResponse.headers()['content-disposition']).toContain('_pending.pdf');
+    await getPdfBytes(recipientOneResponse);
+
+    // Recipient two must not see recipient one's in-progress field. The ETag is
+    // derived from the included fields, so the two downloads must differ.
+    const recipientTwoResponse = await request.get(tokenDownloadUrl(recipientTwo.token));
+
+    expect(recipientTwoResponse.status()).toBe(200);
+    await getPdfBytes(recipientTwoResponse);
+
+    expect(recipientOneResponse.headers().etag).not.toBe(recipientTwoResponse.headers().etag);
+
+    // Once recipient one completes, their field becomes visible to recipient two.
+    await trpcMutation(request, 'recipient.completeDocumentWithToken', {
+      token: recipientOne.token,
+      documentId,
+    });
+
+    await expect(async () => {
+      const dbRecipient = await prisma.recipient.findFirstOrThrow({
+        where: {
+          id: recipientOne.id,
+        },
+      });
+
+      expect(dbRecipient.signingStatus).toBe(SigningStatus.SIGNED);
+    }).toPass();
+
+    const afterCompletionResponse = await request.get(tokenDownloadUrl(recipientTwo.token));
+
+    expect(afterCompletionResponse.status()).toBe(200);
+    expect(afterCompletionResponse.headers().etag).toBe(recipientOneResponse.headers().etag);
+  });
+
+  test('includes fields filled by an assistant in their partial PDF', async ({ request }) => {
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+      recipients: [
+        {
+          email: 'partial-assistant@test.documenso.com',
+          name: 'Partial Assistant',
+          role: 'ASSISTANT',
+          signingOrder: 1,
+        },
+        {
+          email: 'partial-assisted-signer@test.documenso.com',
+          name: 'Partial Assisted Signer',
+          role: 'SIGNER',
+          signingOrder: 2,
+        },
+        {
+          email: 'partial-other-signer@test.documenso.com',
+          name: 'Partial Other Signer',
+          role: 'SIGNER',
+          signingOrder: 3,
+        },
+      ],
+      fieldsPerRecipient: [
+        [],
+        [
+          { type: FieldType.SIGNATURE, page: 1, positionX: 5, positionY: 5, width: 15, height: 5 },
+          { type: FieldType.TEXT, page: 1, positionX: 5, positionY: 15, width: 15, height: 5 },
+        ],
+        [{ type: FieldType.SIGNATURE, page: 1, positionX: 5, positionY: 25, width: 15, height: 5 }],
+      ],
+    });
+
+    const assistant = distributeResult.recipients.find(
+      (recipient) => recipient.email === 'partial-assistant@test.documenso.com',
+    );
+    const signer = distributeResult.recipients.find(
+      (recipient) => recipient.email === 'partial-assisted-signer@test.documenso.com',
+    );
+    const other = distributeResult.recipients.find(
+      (recipient) => recipient.email === 'partial-other-signer@test.documenso.com',
+    );
+    const textField = envelope.fields.find(
+      (field) => field.recipientId === signer?.id && field.type === FieldType.TEXT,
+    );
+
+    if (!assistant || !signer || !other || !textField) {
+      throw new Error('Expected assistant test fields');
+    }
+
+    await trpcMutation(request, 'field.signFieldWithToken', {
+      token: assistant.token,
+      fieldId: textField.id,
+      value: 'Filled by assistant',
+      isBase64: false,
+    });
+
+    const download = (token: string) =>
+      request.get(
+        `${WEBAPP_BASE_URL}/api/files/token/${token}/envelopeItem/${envelope.envelopeItems[0].id}/download/pending`,
+      );
+
+    const [assistantPdf, signerPdf, otherPdf] = await Promise.all([
+      download(assistant.token),
+      download(signer.token),
+      download(other.token),
+    ]);
+
+    expect(assistantPdf.status()).toBe(200);
+    expect(signerPdf.status()).toBe(200);
+    expect(otherPdf.status()).toBe(200);
+    expect(assistantPdf.headers().etag).toBe(signerPdf.headers().etag);
+    expect(assistantPdf.headers().etag).not.toBe(otherPdf.headers().etag);
+  });
+
+  test('rejects a recipient token pending download once the envelope is completed', async ({ request }) => {
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request);
+
+    const [recipient] = distributeResult.recipients;
+    const documentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+    const recipientField = envelope.fields.find((field) => field.recipientId === recipient.id);
+
+    if (!recipientField) {
+      throw new Error('Expected signature field not found');
+    }
+
+    await signAndCompleteRecipient({
+      request,
+      token: recipient.token,
+      documentId,
+      fieldId: recipientField.id,
+    });
+
+    await expect(async () => {
+      const dbEnvelope = await prisma.envelope.findUniqueOrThrow({
+        where: {
+          id: envelope.id,
+        },
+      });
+
+      expect(dbEnvelope.status).toBe(DocumentStatus.COMPLETED);
+    }).toPass({ timeout: 15_000 });
+
+    const completedResponse = await request.get(
+      `${WEBAPP_BASE_URL}/api/files/token/${recipient.token}/envelopeItem/${envelope.envelopeItems[0].id}/download/pending`,
+    );
+    const completedError = await completedResponse.json();
+
+    expect(completedResponse.status()).toBe(400);
+    expect(completedError.code).toBe('ENVELOPE_COMPLETED');
+  });
 });
