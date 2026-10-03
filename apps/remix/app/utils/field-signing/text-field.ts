@@ -21,27 +21,22 @@ export const handleTextFieldClick = async (
     });
   }
 
-  if (field.inserted) {
-    return {
-      type: FieldType.TEXT,
-      value: null,
-    };
-  }
-
   let textToInsert = text;
 
   if (!textToInsert) {
     textToInsert = await SignFieldTextDialog.call({
       fieldMeta: field.fieldMeta,
+      defaultValue: field.inserted ? field.customText : undefined,
     });
   }
 
-  if (!textToInsert) {
+  if (textToInsert === null) {
     return null;
   }
 
+  // An empty value clears the field.
   return {
     type: FieldType.TEXT,
-    value: textToInsert,
+    value: textToInsert || null,
   };
 };
