@@ -171,7 +171,7 @@ export const EnvelopesBulkDownloadDialog = ({
             const { filename, blob } = await fetchPDF({
               envelopeItem,
               token: undefined,
-              fileName: envelopeItem.title,
+              fileName: envelopeItems.length === 1 ? envelope.title : envelopeItem.title,
               version: downloadVersion,
             });
 

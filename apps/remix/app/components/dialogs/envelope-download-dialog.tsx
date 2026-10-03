@@ -37,6 +37,12 @@ type EnvelopeDownloadDialogProps = {
   envelopeItems?: EnvelopeItemToDownload[];
 
   /**
+   * Used as the display/download name for single-item envelopes, since item titles
+   * are never updated when the envelope is renamed.
+   */
+  envelopeTitle: string;
+
+  /**
    * The recipient token to download the document.
    *
    * If not provided, it will be assumed that the current user can access the document.
@@ -50,6 +56,7 @@ export const EnvelopeDownloadDialog = ({
   envelopeStatus,
   isLegacy,
   envelopeItems: initialEnvelopeItems,
+  envelopeTitle,
   token,
   trigger,
 }: EnvelopeDownloadDialogProps) => {
@@ -104,6 +111,8 @@ export const EnvelopeDownloadDialog = ({
 
   const envelopeItems = envelopeItemsPayload?.data || [];
 
+  const getItemTitle = (item: EnvelopeItemToDownload) => (envelopeItems.length === 1 ? envelopeTitle : item.title);
+
   const onDownload = async (envelopeItem: EnvelopeItemToDownload, version: 'original' | 'signed' | 'pending') => {
     const { id: envelopeItemId } = envelopeItem;
 
@@ -120,7 +129,7 @@ export const EnvelopeDownloadDialog = ({
       await downloadPDF({
         envelopeItem,
         token,
-        fileName: envelopeItem.title,
+        fileName: getItemTitle(envelopeItem),
         version,
       });
 
@@ -186,8 +195,8 @@ export const EnvelopeDownloadDialog = ({
 
                   <div className="min-w-0 flex-1">
                     {/* Todo: Envelopes - Fix overflow */}
-                    <h4 className="truncate font-medium text-foreground text-sm" title={item.title}>
-                      {item.title}
+                    <h4 className="truncate font-medium text-foreground text-sm" title={getItemTitle(item)}>
+                      {getItemTitle(item)}
                     </h4>
                     <p className="mt-0.5 text-muted-foreground text-xs">
                       <Trans>PDF Document</Trans>

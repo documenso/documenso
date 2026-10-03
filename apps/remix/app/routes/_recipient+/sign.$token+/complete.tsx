@@ -260,6 +260,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                   envelopeId={document.envelopeId}
                   envelopeStatus={document.status}
                   envelopeItems={document.envelopeItems}
+                  envelopeTitle={document.title}
                   token={recipient?.token}
                   trigger={
                     <Button type="button" variant="outline" className="flex-1 md:flex-initial">

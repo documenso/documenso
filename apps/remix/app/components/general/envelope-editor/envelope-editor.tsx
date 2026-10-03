@@ -440,6 +440,7 @@ export const EnvelopeEditor = () => {
                 envelopeStatus={envelope.status}
                 isLegacy={envelope.internalVersion === 1}
                 envelopeItems={envelope.envelopeItems}
+                envelopeTitle={envelope.title}
                 trigger={
                   <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Download PDF`)}>
                     <DownloadCloudIcon className="h-4 w-4" />
