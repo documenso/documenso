@@ -8,9 +8,10 @@ import {
 } from '@documenso/prisma/seed/documents';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import { DocumentStatus, RecipientRole, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus, TeamMemberRole } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -37,6 +38,7 @@ const searchInbox = async (page: Page, query: string) => {
 // spelling "Canceled" for the `Cancelled` source string.
 const INBOX_STATUS_LABELS = {
   [DocumentStatus.PENDING]: 'Pending',
+  [ExtendedDocumentStatus.PARTIALLY_APPROVED]: 'Partially Approved',
   [DocumentStatus.COMPLETED]: 'Completed',
   [DocumentStatus.REJECTED]: 'Rejected',
   [DocumentStatus.CANCELLED]: 'Canceled',
@@ -123,6 +125,41 @@ test.describe('Inbox - Search & Status Filter', () => {
     for (const hiddenStatus of ['Draft', 'Inbox', 'All', 'Expired']) {
       await expect(page.getByRole('option', { name: hiddenStatus, exact: true })).not.toBeVisible();
     }
+  });
+
+  test('should show signed pending documents as partially approved', async ({ page }) => {
+    const { user: sender, team: senderTeam } = await seedUser();
+    const { user: recipient } = await seedUser();
+    const { user: otherRecipient } = await seedUser();
+
+    await seedPendingDocument(sender, senderTeam.id, [recipient, otherRecipient], {
+      createDocumentOptions: { title: 'Inbox Unsigned Document' },
+    });
+
+    const signed = await seedPendingDocument(sender, senderTeam.id, [recipient, otherRecipient], {
+      createDocumentOptions: { title: 'Inbox Signed Document' },
+    });
+
+    await prisma.recipient.updateMany({
+      where: { envelopeId: signed.id, email: recipient.email },
+      data: { signingStatus: SigningStatus.SIGNED },
+    });
+
+    await apiSignin({ page, email: recipient.email, redirectPath: '/inbox' });
+
+    await expect(inboxRow(page, 'Inbox Unsigned Document')).toContainText('Pending');
+    await expect(inboxRow(page, 'Inbox Signed Document')).toContainText('Partially Approved');
+
+    await selectInboxStatus(page, DocumentStatus.PENDING);
+
+    await expect(inboxRow(page, 'Inbox Unsigned Document')).toBeVisible();
+    await expect(inboxRow(page, 'Inbox Signed Document')).not.toBeVisible();
+
+    await selectInboxStatus(page, ExtendedDocumentStatus.PARTIALLY_APPROVED);
+
+    await expect(page.getByTestId('documents-table-status-filter')).toContainText('Partially Approved');
+    await expect(inboxRow(page, 'Inbox Signed Document')).toBeVisible();
+    await expect(inboxRow(page, 'Inbox Unsigned Document')).not.toBeVisible();
   });
 
   test('should filter documents by title', async ({ page }) => {
