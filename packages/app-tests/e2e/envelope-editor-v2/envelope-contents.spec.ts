@@ -19,6 +19,7 @@ import {
   getFieldCountForPage,
   getPageCanvas,
   getPageSize,
+  getTransformerAnchorPosition,
   interactWithCanvasPastActionBar,
   placeContentOnPdf,
   selectContentOnCanvas,
@@ -526,6 +527,107 @@ const assertResizePinnedToPage = async (surface: TEnvelopeEditorSurface, externa
   expect(Number(meta.positionY) + Number(meta.height)).toBeCloseTo(100, 3);
 };
 
+// --- Rotated resize is pinned to the page ---
+
+const runRotatedResizePinnedToPageFlow = async (surface: TEnvelopeEditorSurface) => {
+  const externalId = `e2e-contents-rotated-resize-${nanoid()}`;
+  const root = surface.root;
+
+  await openContentsTab(surface, externalId);
+
+  // Near the bottom right so the rotated box has little room to grow into.
+  await placeContentOnPdf(root, 'Rectangle', { x: 400, y: 500 });
+
+  const [group] = await getContentGroupsForPage(root);
+
+  await waitForContentSelection(root, [group.id]);
+
+  // Rotate by dragging the rotater anchor a quarter turn clockwise around
+  // the box, so the corners no longer line up with the page edges.
+  const rotater = await getTransformerAnchorPosition(root, 'rotater');
+  const bottomRight = await getTransformerAnchorPosition(root, 'bottom-right');
+
+  await interactWithCanvasPastActionBar(root, async () => {
+    await root.mouse.move(rotater.x, rotater.y);
+    await root.mouse.down();
+    await root.mouse.move(bottomRight.x + 40, rotater.y + 60, { steps: 10 });
+    await root.mouse.up();
+  });
+
+  // Then drag a corner anchor far past the page's bottom right corner.
+  const canvas = await getPageCanvas(root).boundingBox();
+
+  if (!canvas) {
+    throw new Error('Canvas bounding box not available');
+  }
+
+  const corner = await getTransformerAnchorPosition(root, 'bottom-right');
+
+  await interactWithCanvasPastActionBar(root, async () => {
+    await root.mouse.move(corner.x, corner.y);
+    await root.mouse.down();
+    await root.mouse.move(canvas.x + canvas.width + 300, canvas.y + canvas.height + 300, { steps: 10 });
+    await root.mouse.up();
+  });
+
+  await waitForContentsAutosave(surface);
+
+  return { externalId };
+};
+
+const assertRotatedResizePinnedToPage = async (surface: TEnvelopeEditorSurface, externalId: string) => {
+  const envelope = await findEnvelopeWithContents(surface, externalId);
+
+  expect(envelope.contents).toHaveLength(1);
+
+  const meta = getMeta(envelope.contents[0].contentMeta);
+  const page = await getPageSize(surface.root);
+
+  const rotation = Number(meta.rotation);
+
+  // The box did rotate, otherwise the axis aligned bound would have covered this.
+  expect(rotation).toBeGreaterThan(5);
+  expect(rotation).toBeLessThan(355);
+
+  // Every corner of the rotated footprint is on the page. The box rotates
+  // about its top left corner, matching the content renderer.
+  const originX = (Number(meta.positionX) / 100) * page.width;
+  const originY = (Number(meta.positionY) / 100) * page.height;
+  const width = (Number(meta.width) / 100) * page.width;
+  const height = (Number(meta.height) / 100) * page.height;
+
+  const radians = (rotation * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+
+  const corners = [
+    [0, 0],
+    [width, 0],
+    [0, height],
+    [width, height],
+  ].map(([x, y]) => ({ x: originX + x * cos - y * sin, y: originY + x * sin + y * cos }));
+
+  // A point of slack for the pixel to percent round trip.
+  for (const corner of corners) {
+    expect(corner.x).toBeGreaterThanOrEqual(-1);
+    expect(corner.x).toBeLessThanOrEqual(page.width + 1);
+    expect(corner.y).toBeGreaterThanOrEqual(-1);
+    expect(corner.y).toBeLessThanOrEqual(page.height + 1);
+  }
+
+  // And the drag was not simply refused: the box did grow until it met an
+  // edge, so at least one corner sits on the page boundary.
+  const isOnEdge = corners.some(
+    (corner) =>
+      Math.abs(corner.x) < 2 ||
+      Math.abs(corner.x - page.width) < 2 ||
+      Math.abs(corner.y) < 2 ||
+      Math.abs(corner.y - page.height) < 2,
+  );
+
+  expect(isOnEdge).toBe(true);
+};
+
 // --- Selecting brings to front ---
 
 const runSelectBringsToFrontFlow = async (surface: TEnvelopeEditorSurface) => {
@@ -620,6 +722,13 @@ test.describe('document editor', () => {
     const { externalId } = await runResizePinnedToPageFlow(surface);
 
     await assertResizePinnedToPage(surface, externalId);
+  });
+
+  test('resizing a rotated content is pinned to the page bounds', async ({ page }) => {
+    const surface = await openDocumentEnvelopeEditor(page);
+    const { externalId } = await runRotatedResizePinnedToPageFlow(surface);
+
+    await assertRotatedResizePinnedToPage(surface, externalId);
   });
 
   test('selecting a content brings it to the front', async ({ page }) => {

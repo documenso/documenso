@@ -190,8 +190,8 @@ type ContentTransformerConfigOptions = {
  *   type. Multi-selections rotate around a shared pivot, which cannot be
  *   represented in the per content metadata.
  * - A single image content with an image attached resizes from the
- *   corners with its ratio locked, since its box always has the image's
- *   shape. Placeholders resize freely until an image is attached.
+ *   corners only, with its ratio locked, so the image is never stretched.
+ *   Placeholders resize freely from every anchor until an image is attached.
  */
 export const getContentTransformerConfig = (
   types: (EnvelopeContentType | undefined)[],

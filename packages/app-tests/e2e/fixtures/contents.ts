@@ -227,6 +227,39 @@ export const waitForContentSelection = async (root: Page, contentIds: string[], 
 };
 
 /**
+ * The screen position of one of the selection's transformer anchors, e.g.
+ * `bottom-right` or `rotater`, so it can be grabbed with the mouse.
+ */
+export const getTransformerAnchorPosition = async (root: Page, anchorName: string, pageNumber = 1) => {
+  const canvasBox = await getPageCanvas(root).boundingBox();
+
+  if (!canvasBox) {
+    throw new Error('Canvas bounding box not available');
+  }
+
+  const anchor = await root.evaluate(
+    ({ anchorName, pageNumber }) => {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const konva: typeof Konva = (window as unknown as { Konva: typeof Konva }).Konva;
+
+      const stage = konva.stages.find((currentStage) => currentStage.attrs.id === `page-${pageNumber}`);
+      const node = stage?.findOne(`.${anchorName}`);
+
+      if (!node) {
+        throw new Error(`The selection has no ${anchorName} anchor`);
+      }
+
+      const rect = node.getClientRect();
+
+      return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+    },
+    { anchorName, pageNumber },
+  );
+
+  return { x: canvasBox.x + anchor.x, y: canvasBox.y + anchor.y };
+};
+
+/**
  * Open the settings dialog and set the external ID used to find the envelope
  * in the database.
  */

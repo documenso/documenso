@@ -17,9 +17,11 @@ import {
 /**
  * Render an image content.
  *
- * The image is fitted within the content box preserving its aspect ratio.
- * The full box remains the content's bounds and clickable area, so resizing
- * and selection behave the same as other box contents.
+ * The image is fitted within the content box preserving its aspect ratio
+ * (CSS `object-fit: contain`). The box takes the image's shape when the image
+ * is attached (see `resolveAttachedImageBox`) and the transformer only
+ * resizes it from the corners with that ratio kept, so in practice the image
+ * fills the box; the fit is a safety net for boxes which do not match.
  *
  * Until an image is attached (or while it is loading) a dashed placeholder
  * is shown instead, except when exporting.

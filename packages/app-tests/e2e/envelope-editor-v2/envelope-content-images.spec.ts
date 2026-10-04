@@ -8,10 +8,12 @@ import {
   getContentGroupsForPage,
   getPageCanvas,
   getPageSize,
+  interactWithCanvasPastActionBar,
   placeContentOnPdf,
   selectEditorTab,
   type TestImageFile,
   uploadImage,
+  waitForContentSelection,
   waitForContentsAutosave,
   waitForUploadToLand,
 } from '../fixtures/contents';
@@ -120,8 +122,8 @@ const runUploadReplaceRemoveFlow = async (surface: TEnvelopeEditorSurface) => {
 
   expect(placeholder.visibleChildren).toContain('content-placeholder-rect');
 
-  // Upload a wide 2:1 image. The box is still the default size, so it is
-  // sized to the image at one point per pixel.
+  // Upload a wide 2:1 image. The box keeps its width and takes the image's
+  // ratio for its height.
   const wide = await createImageFile('wide-logo.png', 400, 200);
 
   await uploadImage(root, wide);
@@ -134,6 +136,7 @@ const runUploadReplaceRemoveFlow = async (surface: TEnvelopeEditorSurface) => {
 
   expect(withWide.visibleChildren).toContain('content-image');
   expect(withWide.visibleChildren).not.toContain('content-placeholder-rect');
+  expect(withWide.rect.width).toBeCloseTo(placeholder.rect.width, 0);
   expect(withWide.rect.width / withWide.rect.height).toBeCloseTo(2, 1);
 
   await waitForContentsAutosave(surface);
@@ -150,8 +153,8 @@ const runUploadReplaceRemoveFlow = async (surface: TEnvelopeEditorSurface) => {
     fileName: 'wide-logo.png',
   });
 
-  // The box is no longer the default size, so replacing with a tall image
-  // tightens the box around the fitted image rather than resizing to it.
+  // Replacing with a tall image keeps the width again and grows the height
+  // to the new ratio, since there is room below the box on the page.
   const tall = await createImageFile('tall-logo.jpg', 100, 300, 'jpeg');
 
   await uploadImage(root, tall);
@@ -161,9 +164,9 @@ const runUploadReplaceRemoveFlow = async (surface: TEnvelopeEditorSurface) => {
 
   const [withTall] = await getContentGroupsForPage(root);
 
+  expect(withTall.rect.width).toBeCloseTo(withWide.rect.width, 0);
   expect(withTall.rect.width / withTall.rect.height).toBeCloseTo(1 / 3, 1);
-  expect(withTall.rect.width).toBeLessThanOrEqual(withWide.rect.width + 0.5);
-  expect(withTall.rect.height).toBeLessThanOrEqual(withWide.rect.height + 0.5);
+  expect(withTall.rect.height).toBeGreaterThan(withWide.rect.height);
 
   await waitForContentsAutosave(surface);
 
@@ -245,11 +248,11 @@ const assertActionBarUploadPersisted = async (
 
   expect(imageContent.dataContent).not.toBeNull();
 
-  // A 2000px square exceeds the page, so its width is capped at 80% of the
-  // page width and the height follows the square ratio in page points, i.e.
-  // 80% of the page width expressed as a percentage of the page height.
-  expect(Number(meta.width)).toBeCloseTo(80, 0);
-  expect(Number(meta.height)).toBeCloseTo((80 * pageSize.width) / pageSize.height, 0);
+  // The image's pixel size is irrelevant: the box keeps its 15% width and
+  // the height follows the square ratio in page points, i.e. 15% of the
+  // page width expressed as a percentage of the page height.
+  expect(Number(meta.width)).toBeCloseTo(15, 0);
+  expect(Number(meta.height)).toBeCloseTo((15 * pageSize.width) / pageSize.height, 0);
   expect(Number(meta.positionX) + Number(meta.width)).toBeLessThanOrEqual(100);
   expect(Number(meta.positionY) + Number(meta.height)).toBeLessThanOrEqual(100);
 };
@@ -343,9 +346,81 @@ const runSendGuardFlow = async (surface: TEnvelopeEditorSurface) => {
   await expect(root.getByRole('button', { name: 'Send', exact: true })).toBeVisible();
 };
 
+// --- Ratio locked resize is pinned to the page ---
+
+const runRatioResizePinnedToPageFlow = async (surface: TEnvelopeEditorSurface) => {
+  const externalId = `e2e-content-images-resize-${nanoid()}`;
+  const root = surface.root;
+
+  await openContentsTab(surface, externalId);
+
+  await placeContentOnPdf(root, 'Image', { x: 200, y: 200 });
+
+  // A 2:1 image, so the box is ratio locked from the corners once attached.
+  await uploadImage(root, await createImageFile('wide-logo.png', 400, 200));
+  await waitForUploadToLand(root);
+
+  const canvas = getPageCanvas(root);
+  const box = await canvas.boundingBox();
+
+  if (!box) {
+    throw new Error('Canvas bounding box not available');
+  }
+
+  const [group] = await getContentGroupsForPage(root);
+  const { scale } = await getPageSize(root);
+
+  await waitForContentSelection(root, [group.id]);
+
+  // Drag the bottom right anchor well past the page's bottom right corner.
+  const anchorX = box.x + (group.rect.x + group.rect.width) * scale;
+  const anchorY = box.y + (group.rect.y + group.rect.height) * scale;
+
+  await interactWithCanvasPastActionBar(root, async () => {
+    await root.mouse.move(anchorX, anchorY);
+    await root.mouse.down();
+    await root.mouse.move(box.x + box.width + 200, box.y + box.height + 200, { steps: 10 });
+    await root.mouse.up();
+  });
+
+  await waitForContentsAutosave(surface);
+
+  return { externalId };
+};
+
+const assertRatioResizePinnedToPage = async (surface: TEnvelopeEditorSurface, externalId: string) => {
+  const envelope = await findEnvelopeWithContents(surface, externalId);
+
+  expect(envelope.contents).toHaveLength(1);
+
+  const meta = getMeta(envelope.contents[0].contentMeta);
+  const { width: pageWidth, height: pageHeight } = await getPageSize(surface.root);
+
+  const right = Number(meta.positionX) + Number(meta.width);
+  const bottom = Number(meta.positionY) + Number(meta.height);
+
+  // The box stayed on the page, growing until one axis hit the edge, and
+  // kept the image's 2:1 ratio in page points while doing so.
+  expect(right).toBeLessThanOrEqual(100.001);
+  expect(bottom).toBeLessThanOrEqual(100.001);
+  expect(Math.max(right, bottom)).toBeCloseTo(100, 1);
+
+  const widthPoints = (Number(meta.width) / 100) * pageWidth;
+  const heightPoints = (Number(meta.height) / 100) * pageHeight;
+
+  expect(widthPoints / heightPoints).toBeCloseTo(2, 1);
+};
+
 // --- Tests ---
 
 test.describe('document editor', () => {
+  test('a ratio locked resize is pinned to the page bounds', async ({ page }) => {
+    const surface = await openDocumentEnvelopeEditor(page);
+    const { externalId } = await runRatioResizePinnedToPageFlow(surface);
+
+    await assertRatioResizePinnedToPage(surface, externalId);
+  });
+
   test('upload, replace and remove a content image', async ({ page }) => {
     const surface = await openDocumentEnvelopeEditor(page);
 

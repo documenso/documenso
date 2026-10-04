@@ -2,6 +2,7 @@ import { useLatestRef } from '@documenso/lib/client-only/hooks/use-latest-ref';
 import type { TransformerSelectionConfig } from '@documenso/lib/universal/konva/transformer';
 import {
   boundTransformerBoxToPage,
+  boundTransformerBoxToPageKeepingRatio,
   DEFAULT_TRANSFORMER_SELECTION_CONFIG,
 } from '@documenso/lib/universal/konva/transformer';
 import { getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
@@ -209,9 +210,18 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
         // so pin the resize to the stage's own size.
         const stage = layer.getStage();
 
-        const bounded = stage
-          ? boundTransformerBoxToPage(newBox, { width: stage.width(), height: stage.height() })
-          : newBox;
+        if (!stage) {
+          return newBox;
+        }
+
+        const page = { width: stage.width(), height: stage.height() };
+
+        // A ratio locked resize has to shrink both axes together, so it is
+        // bounded about its fixed corner rather than edge by edge. Read via
+        // the ref since the transformer is still being constructed here.
+        const bounded = transformerRef.current?.keepRatio()
+          ? boundTransformerBoxToPageKeepingRatio(oldBox, newBox, page)
+          : boundTransformerBoxToPage(oldBox, newBox, page);
 
         // Enforce minimum size
         if (bounded.width < 30 || bounded.height < 20) {
