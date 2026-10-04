@@ -143,6 +143,13 @@ NEXT_PRIVATE_MICROSOFT_CLIENT_ID=<your-application-client-id>
 NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET=<your-client-secret-value>
 ```
 
+If your Microsoft tenant does not emit an `email_verified` claim and you trust
+tenant-managed email identities, you can bypass that claim check:
+
+```
+NEXT_PRIVATE_MICROSOFT_SKIP_VERIFY=true
+```
+
 </Step>
 </Steps>
 
