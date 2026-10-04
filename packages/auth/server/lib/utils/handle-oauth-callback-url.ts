@@ -5,6 +5,7 @@ import {
   isSignupEnabledForProvider,
 } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { isTwoFactorAuthenticationEnabled } from '@documenso/lib/server-only/2fa/is-2fa-availble';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
@@ -18,12 +19,30 @@ import { deleteCookie } from 'hono/cookie';
 
 import type { OAuthClientOptions } from '../../config';
 import { AuthenticationErrorCode } from '../errors/error-codes';
+import { setPendingTwoFactorCookie } from '../session/pending-2fa';
 import { onAuthorize } from './authorizer';
 import { getOpenIdConfiguration } from './open-id';
 
 type HandleOAuthCallbackUrlOptions = {
   c: Context;
   clientOptions: OAuthClientOptions;
+};
+
+/**
+ * Builds the redirect used when an OAuth login must be completed with a second
+ * factor. The user is sent back to the sign in page with a marker so the UI can
+ * prompt for a TOTP / backup code instead of showing the provider buttons.
+ */
+const buildTwoFactorRedirect = (redirectPath: string) => {
+  const url = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
+
+  url.searchParams.set('twoFactor', 'required');
+
+  if (redirectPath) {
+    url.searchParams.set('returnTo', redirectPath);
+  }
+
+  return url.toString();
 };
 
 export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOptions) => {
@@ -50,6 +69,8 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
       user: {
         select: {
           id: true,
+          twoFactorEnabled: true,
+          twoFactorSecret: true,
         },
       },
     },
@@ -57,6 +78,16 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   // Directly log in user if account already exists.
   if (existingAccount) {
+    // Enforce the second factor before issuing a session. Without this an
+    // attacker who controls the OAuth identity (or who simply knows the
+    // password of a linked provider) could bypass 2FA entirely by choosing
+    // "Continue with Google" instead of the password form.
+    if (isTwoFactorAuthenticationEnabled({ user: existingAccount.user })) {
+      await setPendingTwoFactorCookie(c, existingAccount.user.id);
+
+      return c.redirect(buildTwoFactorRedirect(redirectPath), 302);
+    }
+
     await onAuthorize({ userId: existingAccount.user.id }, c);
 
     return c.redirect(redirectPath, 302);
@@ -68,7 +99,10 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     },
     select: {
       id: true,
+      email: true,
       emailVerified: true,
+      twoFactorEnabled: true,
+      twoFactorSecret: true,
     },
   });
 
@@ -113,6 +147,13 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
         });
       }
     });
+
+    // Same second factor enforcement as the linked-account path above.
+    if (isTwoFactorAuthenticationEnabled({ user: userWithSameEmail })) {
+      await setPendingTwoFactorCookie(c, userWithSameEmail.id);
+
+      return c.redirect(buildTwoFactorRedirect(redirectPath), 302);
+    }
 
     await onAuthorize({ userId: userWithSameEmail.id }, c);
 

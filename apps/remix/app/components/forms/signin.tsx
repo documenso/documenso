@@ -65,6 +65,11 @@ export type SignInFormProps = {
   isOIDCSSOEnabled?: boolean;
   oidcProviderLabel?: string;
   returnTo?: string;
+  /**
+   * Set when the OAuth callback paused the sign in for a second factor.
+   * The form then opens the 2FA dialog instead of showing the provider buttons.
+   */
+  isTwoFactorPending?: boolean;
 };
 
 export const SignInForm = ({
@@ -76,13 +81,14 @@ export const SignInForm = ({
   isOIDCSSOEnabled,
   oidcProviderLabel,
   returnTo,
+  isTwoFactorPending = false,
 }: SignInFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
   const navigate = useNavigate();
 
-  const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] = useState(false);
+  const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] = useState(isTwoFactorPending);
   const [isEmbeddedRedirect, setIsEmbeddedRedirect] = useState(false);
 
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<'totp' | 'backup'>('totp');
@@ -198,7 +204,46 @@ export const SignInForm = ({
     }
   };
 
+  /**
+   * Completes an OAuth sign in that was paused for a second factor.
+   *
+   * The pending user id is carried by a signed cookie, so only the code is
+   * sent. On success the session is issued and the user is redirected.
+   */
+  const onCompleteOAuthTwoFactor = async ({ totpCode, backupCode }: TSignInFormSchema) => {
+    try {
+      await authClient.twoFactor.completeOAuth({
+        totpCode,
+        backupCode,
+        redirectPath,
+      });
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code)
+        .with(
+          AuthenticationErrorCode.InvalidTwoFactorCode,
+          () => msg`The two-factor authentication code provided is incorrect.`,
+        )
+        .otherwise(() => handleFallbackErrorMessages(error.code));
+
+      toast({
+        title: _(msg`Unable to sign in`),
+        description: _(errorMessage),
+        variant: 'destructive',
+      });
+    }
+  };
+
   const onFormSubmit = async ({ email, password, totpCode, backupCode }: TSignInFormSchema) => {
+    // When the OAuth callback paused the sign in for a second factor there is
+    // no password to submit: only the code matters.
+    if (isTwoFactorPending) {
+      await onCompleteOAuthTwoFactor({ email, password, totpCode, backupCode });
+
+      return;
+    }
+
     const $turnstile = isTwoFactorAuthenticationDialogOpen ? twoFactorTurnstileRef.current : turnstileRef.current;
 
     try {
