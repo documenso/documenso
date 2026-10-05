@@ -323,6 +323,14 @@ export const formatDocumentAuditLogAction = (i18n: I18n, auditLog: TDocumentAudi
       you: msg`You added a recipient`,
       user: msg`${user} added a recipient`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED, data: { removedByAdmin: true } }, () => ({
+      anonymous: msg({
+        message: `A recipient was removed by an administrator`,
+        context: `Audit log format`,
+      }),
+      you: msg`You removed a recipient as an administrator`,
+      user: msg`${user} removed a recipient as an administrator`,
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED }, () => ({
       anonymous: msg({
         message: `A recipient was removed`,
