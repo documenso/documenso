@@ -23,6 +23,7 @@ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-re
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
+import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { isTspEnvelope } from '@documenso/lib/types/signature-level';
@@ -45,6 +46,7 @@ import { DocumentSigningAuthProvider } from '~/components/general/document-signi
 import { DocumentSigningPageViewV1 } from '~/components/general/document-signing/document-signing-page-view-v1';
 import { DocumentSigningPageViewV2 } from '~/components/general/document-signing/document-signing-page-view-v2';
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
+import { DocumentSigningSenderDisabledPage } from '~/components/general/document-signing/document-signing-sender-disabled-page';
 import { EnvelopeSigningProvider } from '~/components/general/document-signing/envelope-signing-provider';
 import { RecipientBranding } from '~/components/general/recipient-branding';
 import { useCspNonce } from '~/utils/nonce';
@@ -344,6 +346,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
         select: {
           internalVersion: true,
           teamId: true,
+          userId: true,
         },
       },
     },
@@ -351,6 +354,19 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 
   if (!foundRecipient) {
     throw new Response('Not Found', { status: 404 });
+  }
+
+  // Resolved here rather than via the token fetchers so branding is never loaded for a disabled sender.
+  try {
+    await assertSenderNotDisabled({ userId: foundRecipient.envelope.userId });
+  } catch (e) {
+    if (AppError.parseError(e).code === AppErrorCode.SENDER_DISABLED) {
+      return superLoaderJson({
+        isSenderDisabled: true,
+      } as const);
+    }
+
+    throw e;
   }
 
   const branding = await loadRecipientBrandingByTeamId({
@@ -370,6 +386,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 
     return superLoaderJson(
       {
+        isSenderDisabled: false,
         version: 2,
         payload: payloadV2,
         branding,
@@ -381,6 +398,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
   const payloadV1 = await handleV1Loader(loaderArgs);
 
   return superLoaderJson({
+    isSenderDisabled: false,
     version: 1,
     payload: payloadV1,
     branding,
@@ -390,6 +408,10 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 export default function SigningPage() {
   const data = useSuperLoaderData<typeof loader>();
   const cspNonce = useCspNonce();
+
+  if (data.isSenderDisabled) {
+    return <DocumentSigningSenderDisabledPage />;
+  }
 
   return (
     <>

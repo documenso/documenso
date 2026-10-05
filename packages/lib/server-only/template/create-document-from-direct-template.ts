@@ -53,6 +53,7 @@ import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisat
 import { assignOmittedRecipientSigningOrders } from '../recipient/assign-omitted-recipient-signing-orders';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
+import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentFromDirectTemplateOptions = {
@@ -145,6 +146,8 @@ export const createDocumentFromDirectTemplate = async ({
   if (!directTemplateEnvelope?.directLink?.enabled) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Invalid or missing template' });
   }
+
+  await assertSenderNotDisabled({ userId: directTemplateEnvelope.userId });
 
   if (
     nextSigner &&
