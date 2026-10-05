@@ -10,6 +10,7 @@ import type { PartialAccount } from '../server/lib/utils/get-accounts';
 import type { ActiveSession } from '../server/lib/utils/get-session';
 import { handleSignInRedirect } from '../server/lib/utils/redirect';
 import type {
+  TCompleteOAuthTwoFactorRequestSchema,
   TDisableTwoFactorRequestSchema,
   TEnableTwoFactorRequestSchema,
   TViewTwoFactorRecoveryCodesRequestSchema,
@@ -256,6 +257,28 @@ export class AuthClient {
       }
 
       return response.json();
+    },
+    /**
+     * Completes an OAuth sign in that was paused for a second factor.
+     *
+     * The pending user id lives in a signed cookie set by the OAuth callback,
+     * so no identifier is sent from the client.
+     */
+    completeOAuth: async (data: TCompleteOAuthTwoFactorRequestSchema & { redirectPath?: string }) => {
+      const response = await this.client['two-factor']['complete-oauth'].$post({
+        json: {
+          totpCode: data.totpCode,
+          backupCode: data.backupCode,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+
+        throw AppError.parseError(error);
+      }
+
+      handleSignInRedirect(data.redirectPath);
     },
   };
 

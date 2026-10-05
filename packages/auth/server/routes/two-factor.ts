@@ -2,21 +2,94 @@ import { AppError } from '@documenso/lib/errors/app-error';
 import { disableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/disable-2fa';
 import { enableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/enable-2fa';
 import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
+import { validateTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/validate-2fa';
 import { viewBackupCodes } from '@documenso/lib/server-only/2fa/view-backup-codes';
 import { prisma } from '@documenso/prisma';
 import { sValidator } from '@hono/standard-validator';
+import { UserSecurityAuditLogType } from '@prisma/client';
 import { Hono } from 'hono';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
+import { deletePendingTwoFactorCookie, getPendingTwoFactorUserId } from '../lib/session/pending-2fa';
+import { onAuthorize } from '../lib/utils/authorizer';
 import { getSession } from '../lib/utils/get-session';
 import type { HonoAuthContext } from '../types/context';
 import {
+  ZCompleteOAuthTwoFactorRequestSchema,
   ZDisableTwoFactorRequestSchema,
   ZEnableTwoFactorRequestSchema,
   ZViewTwoFactorRecoveryCodesRequestSchema,
 } from './two-factor.types';
 
 export const twoFactorRoute = new Hono<HonoAuthContext>()
+  /**
+   * Complete an OAuth sign in that was paused for a second factor.
+   *
+   * The OAuth callback sets a signed `pending2fa` cookie instead of a session
+   * when the account has 2FA enabled. This endpoint consumes that cookie,
+   * validates the TOTP / backup code and only then issues the session.
+   */
+  .post('/complete-oauth', sValidator('json', ZCompleteOAuthTwoFactorRequestSchema), async (c) => {
+    const requestMetadata = c.get('requestMetadata');
+
+    const userId = await getPendingTwoFactorUserId(c);
+
+    if (!userId) {
+      throw new AppError(AuthenticationErrorCode.InvalidRequest, {
+        message: 'No pending two factor authentication found',
+      });
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        email: true,
+        twoFactorEnabled: true,
+        twoFactorSecret: true,
+        twoFactorBackupCodes: true,
+      },
+    });
+
+    if (!user || !user.twoFactorEnabled) {
+      await deletePendingTwoFactorCookie(c);
+
+      throw new AppError(AuthenticationErrorCode.InvalidRequest, {
+        message: 'No pending two factor authentication found',
+      });
+    }
+
+    const { totpCode, backupCode } = c.req.valid('json');
+
+    const isValid = await validateTwoFactorAuthentication({
+      user,
+      totpCode,
+      backupCode,
+    });
+
+    if (!isValid) {
+      await prisma.userSecurityAuditLog.create({
+        data: {
+          userId: user.id,
+          ipAddress: requestMetadata.ipAddress,
+          userAgent: requestMetadata.userAgent,
+          type: UserSecurityAuditLogType.SIGN_IN_2FA_FAIL,
+        },
+      });
+
+      throw new AppError(AuthenticationErrorCode.InvalidTwoFactorCode);
+    }
+
+    // Second factor satisfied: clear the pending marker and issue the session.
+    await deletePendingTwoFactorCookie(c);
+
+    await onAuthorize({ userId: user.id }, c);
+
+    return c.text('OK', 201);
+  })
+
   /**
    * Setup two factor authentication.
    */

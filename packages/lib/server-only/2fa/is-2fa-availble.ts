@@ -3,7 +3,7 @@ import type { User } from '@prisma/client';
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
 
 type IsTwoFactorAuthenticationEnabledOptions = {
-  user: User;
+  user: Pick<User, 'twoFactorEnabled'>;
 };
 
 export const isTwoFactorAuthenticationEnabled = ({ user }: IsTwoFactorAuthenticationEnabledOptions) => {

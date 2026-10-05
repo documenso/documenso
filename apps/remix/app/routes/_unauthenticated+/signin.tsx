@@ -56,6 +56,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   returnTo = isValidReturnTo(returnTo) ? normalizeReturnTo(returnTo) : undefined;
 
+  // Set by the OAuth callback when the account has 2FA enabled: the sign in is
+  // paused until the user provides a second factor.
+  const isTwoFactorPending = new URL(request.url).searchParams.get('twoFactor') === 'required';
+
   if (isAuthenticated) {
     throw redirect(returnTo || '/');
   }
@@ -69,6 +73,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     oidcProviderLabel,
     returnTo,
     shouldAutoRedirectToOIDC,
+    isTwoFactorPending,
   };
 }
 
@@ -82,6 +87,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
     oidcProviderLabel,
     returnTo,
     shouldAutoRedirectToOIDC,
+    isTwoFactorPending,
   } = loaderData;
 
   const { _ } = useLingui();
@@ -146,6 +152,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
           isOIDCSSOEnabled={isOIDCSSOEnabled}
           oidcProviderLabel={oidcProviderLabel}
           returnTo={returnTo}
+          isTwoFactorPending={isTwoFactorPending}
         />
 
         {!isEmbeddedRedirect && isSignupEnabled && (
