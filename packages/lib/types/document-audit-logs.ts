@@ -713,7 +713,10 @@ export const ZDocumentAuditLogEventRecipientUpdatedSchema = z.object({
  */
 export const ZDocumentAuditLogEventRecipientRemovedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED),
-  data: ZBaseRecipientDataSchema,
+  data: ZBaseRecipientDataSchema.extend({
+    removedByAdmin: z.boolean().optional(),
+    reason: z.string().optional(),
+  }),
 });
 
 /**

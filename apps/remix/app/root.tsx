@@ -23,13 +23,16 @@ import {
   useMatches,
 } from 'react-router';
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
+import { nonceMiddleware } from '~/middleware/nonce';
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
 import { GenericErrorLayout } from './components/general/generic-error-layout';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
-import { nonce } from './utils/nonce';
+import { nonce, nonceContext } from './utils/nonce';
+
+export const middleware = [nonceMiddleware];
 
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
@@ -74,7 +77,7 @@ export async function loader({ context, request }: Route.LoaderArgs) {
       // Surface the per-request CSP nonce produced by `securityHeadersMiddleware` so all
       // SSR-rendered <script>/<style> elements in this layout (and child
       // routes that need it) can carry the matching nonce attribute.
-      nonce: context.nonce,
+      nonce: context.get(nonceContext),
       session: session.isAuthenticated
         ? {
             user: session.user,
@@ -146,7 +149,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
           <style
             nonce={nonce(cspNonce)}
             dangerouslySetInnerHTML={{
-              __html: `*, *::before, *::after { animation: none !important; transition: none !important; }`,
+              __html: `*, *::before, *::after { animation: none !important; transition-duration: 0.001s !important; transition-delay: 0s !important; }`,
             }}
           />
         )}

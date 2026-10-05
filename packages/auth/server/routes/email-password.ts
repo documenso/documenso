@@ -21,6 +21,7 @@ import {
   resendVerifyEmailRateLimit,
   resetPasswordRateLimit,
   signupRateLimit,
+  updatePasswordRateLimit,
   verifyEmailRateLimit,
 } from '@documenso/lib/server-only/rate-limit/rate-limits';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
@@ -248,7 +249,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    * Update password endpoint.
    */
   .post('/update-password', sValidator('json', ZUpdatePasswordSchema), async (c) => {
-    const { password, currentPassword } = c.req.valid('json');
+    const { password, currentPassword, totpCode, backupCode } = c.req.valid('json');
     const requestMetadata = c.get('requestMetadata');
 
     if (!isSigninEnabledForProvider('email')) {
@@ -259,10 +260,25 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const { session, user } = await getSession(c);
 
+    const updateLimitResult = await updatePasswordRateLimit.check({
+      ip: requestMetadata.ipAddress ?? 'unknown',
+      identifier: String(user.id),
+    });
+
+    const updateLimited = rateLimitResponse(c, updateLimitResult);
+
+    if (updateLimited) {
+      throw new HTTPException(429, {
+        res: updateLimited,
+      });
+    }
+
     await updatePassword({
       userId: user.id,
       password,
       currentPassword,
+      totpCode,
+      backupCode,
       requestMetadata,
     });
 

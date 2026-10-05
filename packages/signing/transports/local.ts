@@ -22,10 +22,20 @@ const loadP12 = (): Uint8Array => {
   throw new Error('No certificate found for local signing');
 };
 
-export const createLocalSigner = async () => {
+export type CreateLocalSignerOptions = {
+  /**
+   * Fetch missing intermediates via AIA. Leave on for sealing.
+   * Turn off for health checks so they do not hit the network.
+   *
+   * @default true
+   */
+  buildChain?: boolean;
+};
+
+export const createLocalSigner = async ({ buildChain = true }: CreateLocalSignerOptions = {}) => {
   const p12 = loadP12();
 
   return await P12Signer.create(p12, env('NEXT_PRIVATE_SIGNING_PASSPHRASE') || '', {
-    buildChain: true,
+    buildChain,
   });
 };

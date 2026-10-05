@@ -21,11 +21,13 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import type { TRecipientAccessAuth } from '../../types/document-auth';
 import { DocumentAuth } from '../../types/document-auth';
+import { isTspEnvelope } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
-import { assertRecipientNotExpired } from '../../utils/recipients';
+import { getRecipientsInActiveSigningStep, isRecipientTurnBySigningOrder } from '../../utils/recipient-groups';
+import { assertRecipientNotExpired, isRecipientBefore } from '../../utils/recipients';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { isRecipientAuthorized } from './is-recipient-authorized';
@@ -56,7 +58,7 @@ export const completeDocumentWithToken = async ({
   userId,
   accessAuthOptions,
   requestMetadata,
-  nextSigner,
+  nextSigner: dictatedNextSigner,
   recipientOverride,
 }: CompleteDocumentWithTokenOptions) => {
   const envelope = await prisma.envelope.findFirst({
@@ -423,6 +425,7 @@ export const completeDocumentWithToken = async ({
     select: {
       id: true,
       signingOrder: true,
+      signingStatus: true,
       name: true,
       email: true,
       role: true,
@@ -451,65 +454,100 @@ export const completeDocumentWithToken = async ({
     });
 
     if (envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-      const [nextRecipient] = pendingRecipients;
+      const sequencing = { strictlySequential: isTspEnvelope(envelope) };
 
-      await prisma.$transaction(async (tx) => {
-        if (nextSigner && envelope.documentMeta?.allowDictateNextSigner) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
-              envelopeId: envelope.id,
-              user: {
-                name: recipientName,
-                email: recipientEmail,
-              },
-              requestMetadata,
+      const nextRecipients = getRecipientsInActiveSigningStep(pendingRecipients, sequencing);
+
+      // Peers still pending in the current step are not the "next" step:
+      // nobody advances until the whole group has completed.
+      const hasCompletedCurrentStep = nextRecipients.every((pendingRecipient) =>
+        isRecipientBefore(recipient, pendingRecipient, sequencing),
+      );
+
+      if (
+        nextRecipients.length > 0 &&
+        hasCompletedCurrentStep &&
+        // Ensure that the next recipient can actually act on the document.
+        isRecipientTurnBySigningOrder(pendingRecipients, nextRecipients[0], sequencing)
+      ) {
+        // Dictation is only allowed when advancing to a single-recipient step.
+        const canDictateNextSigner =
+          Boolean(dictatedNextSigner) &&
+          Boolean(envelope.documentMeta?.allowDictateNextSigner) &&
+          nextRecipients.length === 1;
+
+        if (canDictateNextSigner && dictatedNextSigner) {
+          await prisma.$transaction(async (tx) => {
+            const [nextRecipient] = nextRecipients;
+
+            await tx.recipient.update({
+              where: { id: nextRecipient.id },
               data: {
-                recipientEmail: nextRecipient.email,
-                recipientName: nextRecipient.name,
-                recipientId: nextRecipient.id,
-                recipientRole: nextRecipient.role,
-                changes: [
-                  {
-                    type: RECIPIENT_DIFF_TYPE.NAME,
-                    from: nextRecipient.name,
-                    to: nextSigner.name,
-                  },
-                  {
-                    type: RECIPIENT_DIFF_TYPE.EMAIL,
-                    from: nextRecipient.email,
-                    to: nextSigner.email,
-                  },
-                ],
+                sendStatus: SendStatus.SENT,
+                sentAt: new Date(),
+                name: dictatedNextSigner.name,
+                email: dictatedNextSigner.email,
               },
-            }),
+            });
+
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
+                envelopeId: envelope.id,
+                user: {
+                  name: recipientName,
+                  email: recipientEmail,
+                },
+                requestMetadata,
+                data: {
+                  recipientEmail: nextRecipient.email,
+                  recipientName: nextRecipient.name,
+                  recipientId: nextRecipient.id,
+                  recipientRole: nextRecipient.role,
+                  changes: [
+                    {
+                      type: RECIPIENT_DIFF_TYPE.NAME,
+                      from: nextRecipient.name,
+                      to: dictatedNextSigner.name,
+                    },
+                    {
+                      type: RECIPIENT_DIFF_TYPE.EMAIL,
+                      from: nextRecipient.email,
+                      to: dictatedNextSigner.email,
+                    },
+                  ],
+                },
+              }),
+            });
+          });
+        } else {
+          await prisma.recipient.updateMany({
+            where: {
+              id: {
+                in: nextRecipients.map((nextRecipient) => nextRecipient.id),
+              },
+            },
+            data: {
+              sendStatus: SendStatus.SENT,
+              sentAt: new Date(),
+            },
           });
         }
 
-        await tx.recipient.update({
-          where: { id: nextRecipient.id },
-          data: {
-            sendStatus: SendStatus.SENT,
-            sentAt: new Date(),
-            ...(nextSigner && envelope.documentMeta?.allowDictateNextSigner
-              ? {
-                  name: nextSigner.name,
-                  email: nextSigner.email,
-                }
-              : {}),
-          },
-        });
-      });
-
-      await jobs.triggerJob({
-        name: 'send.signing.requested.email',
-        payload: {
-          userId: envelope.userId,
-          documentId: legacyDocumentId,
-          recipientId: nextRecipient.id,
-          requestMetadata,
-        },
-      });
+        await Promise.allSettled(
+          nextRecipients.map((nextRecipient) =>
+            jobs.triggerJob({
+              name: 'send.signing.requested.email',
+              payload: {
+                userId: envelope.userId,
+                documentId: legacyDocumentId,
+                recipientId: nextRecipient.id,
+                requestMetadata,
+              },
+            }),
+          ),
+        );
+      }
     }
   }
 

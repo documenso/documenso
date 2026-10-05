@@ -22,19 +22,19 @@ import { findTemplates } from '@documenso/lib/server-only/template/find-template
 import { getOrganisationTemplateById } from '@documenso/lib/server-only/template/get-organisation-template-by-id';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
+import { validateBulkSendCsv } from '@documenso/lib/server-only/template/validate-bulk-send-csv';
 import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
-import { mapFieldToLegacyField } from '@documenso/lib/utils/fields';
-import { mapRecipientToLegacyRecipient } from '@documenso/lib/utils/recipients';
-import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
+import { mapEnvelopeToTemplateLite, mapEnvelopeToTemplateMany } from '@documenso/lib/utils/templates';
 import { prisma } from '@documenso/prisma';
 import type { Envelope } from '@prisma/client';
 import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
+import { findTemplatesInternalRoute } from './find-templates-internal';
 import { getTemplatesByIdsRoute } from './get-templates-by-ids';
 import {
   ZBulkSendTemplateMutationSchema,
@@ -101,34 +101,14 @@ export const templateRouter = router({
       // Remapping for backwards compatibility.
       return {
         ...result,
-        data: result.data.map((envelope) => {
-          const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
-
-          return {
-            id: legacyTemplateId,
-            envelopeId: envelope.id,
-            type: envelope.templateType,
-            visibility: envelope.visibility,
-            externalId: envelope.externalId,
-            title: envelope.title,
-            userId: envelope.userId,
-            teamId: envelope.teamId,
-            authOptions: envelope.authOptions,
-            createdAt: envelope.createdAt,
-            updatedAt: envelope.updatedAt,
-            publicTitle: envelope.publicTitle,
-            publicDescription: envelope.publicDescription,
-            folderId: envelope.folderId,
-            useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
-            team: envelope.team,
-            fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),
-            recipients: envelope.recipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
-            templateMeta: envelope.documentMeta,
-            directLink: envelope.directLink,
-          };
-        }),
+        data: result.data.map((envelope) => mapEnvelopeToTemplateMany(envelope)),
       };
     }),
+
+  /**
+   * @private
+   */
+  findTemplatesInternal: findTemplatesInternalRoute,
 
   /**
    * @private
@@ -148,32 +128,7 @@ export const templateRouter = router({
       // Remapping for backwards compatibility.
       return {
         ...result,
-        data: result.data.map((envelope) => {
-          const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
-
-          return {
-            id: legacyTemplateId,
-            envelopeId: envelope.id,
-            type: envelope.templateType,
-            visibility: envelope.visibility,
-            externalId: envelope.externalId,
-            title: envelope.title,
-            userId: envelope.userId,
-            teamId: envelope.teamId,
-            authOptions: envelope.authOptions,
-            createdAt: envelope.createdAt,
-            updatedAt: envelope.updatedAt,
-            publicTitle: envelope.publicTitle,
-            publicDescription: envelope.publicDescription,
-            folderId: envelope.folderId,
-            useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
-            team: envelope.team,
-            fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),
-            recipients: envelope.recipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
-            templateMeta: envelope.documentMeta,
-            directLink: envelope.directLink,
-          };
-        }),
+        data: result.data.map((envelope) => mapEnvelopeToTemplateMany(envelope)),
       };
     }),
 
@@ -879,6 +834,15 @@ export const templateRouter = router({
       });
     }
 
+    const csvValidationResult = validateBulkSendCsv({
+      csvContent: csv,
+      recipientCount: template.recipients.length,
+    });
+
+    if (!csvValidationResult.success) {
+      return { success: false as const, error: csvValidationResult.error };
+    }
+
     await jobs.triggerJob({
       name: 'internal.bulk-send-template',
       payload: {
@@ -891,6 +855,6 @@ export const templateRouter = router({
       },
     });
 
-    return { success: true };
+    return { success: true as const };
   }),
 });

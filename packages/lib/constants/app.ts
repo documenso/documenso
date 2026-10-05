@@ -45,6 +45,14 @@ export const formatPath = (path: string): string => {
 export const NEXT_PUBLIC_SIGNING_CONTACT_INFO = () =>
   env('NEXT_PUBLIC_SIGNING_CONTACT_INFO') ?? NEXT_PUBLIC_WEBAPP_URL();
 
+export const NEXT_PUBLIC_TERMS_OF_SERVICE_URL = () =>
+  env('NEXT_PUBLIC_TERMS_OF_SERVICE_URL') ?? (IS_DOCUMENSO_CLOUD() ? 'https://documen.so/terms' : undefined);
+
+export const NEXT_PUBLIC_PRIVACY_POLICY_URL = () =>
+  env('NEXT_PUBLIC_PRIVACY_POLICY_URL') ?? (IS_DOCUMENSO_CLOUD() ? 'https://documen.so/privacy' : undefined);
+
+export const NEXT_PUBLIC_IMPRINT_URL = () => env('NEXT_PUBLIC_IMPRINT_URL');
+
 export const NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER = () =>
   env('NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER') === 'true';
 
@@ -92,6 +100,9 @@ export const IS_AI_FEATURES_CONFIGURED = (): boolean => {
 export const NEXT_PRIVATE_USE_PLAYWRIGHT_PDF = () => env('NEXT_PRIVATE_USE_PLAYWRIGHT_PDF') === 'true';
 
 export const NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY = () => env('NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY');
+export const NEXT_PRIVATE_SIGNING_REASON = () => env('NEXT_PRIVATE_SIGNING_REASON') || 'Signed by Documenso';
+
+export const NEXT_PRIVATE_SIGNING_TRANSPORT = () => env('NEXT_PRIVATE_SIGNING_TRANSPORT') || 'local';
 
 /**
  * Whether this Documenso instance is running in CSC (Cloud Signature Consortium) mode.
