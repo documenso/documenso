@@ -78,6 +78,16 @@ export const updatePasswordRateLimit = createRateLimit({
   window: '15m',
 });
 
+/**
+ * Bounds guessing of the 2FA code that a recipient enters to complete a document.
+ */
+export const verifyAccess2FACodeRateLimit = createRateLimit({
+  action: 'recipient.verify-access-2fa-code',
+  max: 5,
+  globalMax: 50,
+  window: '15m',
+});
+
 export const reportSenderRateLimit = createRateLimit({
   action: 'recipient.report-sender',
   max: 1,

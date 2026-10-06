@@ -10,6 +10,7 @@ import type { TAuthenticationResponseJSONSchema } from '../../types/webauthn';
 import { getAuthenticatorOptions } from '../../utils/authenticator';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { validateTwoFactorTokenFromEmail } from '../2fa/email/validate-2fa-token-from-email';
+import { validateExternal2FACode } from '../2fa/external-2fa-code';
 import { verifyTwoFactorAuthenticationToken } from '../2fa/verify-2fa-token';
 import { verifyPassword } from '../2fa/verify-password';
 
@@ -17,7 +18,7 @@ type IsRecipientAuthorizedOptions = {
   // !: Probably find a better name than 'ACCESS_2FA' if requirements change.
   type: 'ACCESS' | 'ACCESS_2FA' | 'ACTION';
   documentAuthOptions: Envelope['authOptions'];
-  recipient: Pick<Recipient, 'authOptions' | 'email' | 'envelopeId'>;
+  recipient: Pick<Recipient, 'id' | 'authOptions' | 'email' | 'envelopeId'>;
 
   /**
    * The ID of the user who initiated the request.
@@ -74,7 +75,12 @@ export const isRecipientAuthorized = async ({
   }
 
   // Early true return for ACCESS auth if all methods are 2FA since validation happens in ACCESS_2FA.
-  if (type === 'ACCESS' && authMethods.every((method) => method === DocumentAuth.TWO_FACTOR_AUTH)) {
+  if (
+    type === 'ACCESS' &&
+    authMethods.every(
+      (method) => method === DocumentAuth.TWO_FACTOR_AUTH || method === DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH,
+    )
+  ) {
     return true;
   }
 
@@ -151,6 +157,17 @@ export const isRecipientAuthorized = async ({
         user,
         totpCode: token,
         window: 10, // 5 minutes worth of tokens
+      });
+    })
+    .with({ type: DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH }, async ({ token }) => {
+      if (type === 'ACCESS') {
+        return true;
+      }
+
+      return await validateExternal2FACode({
+        envelopeId: recipient.envelopeId,
+        recipientId: recipient.id,
+        code: token,
       });
     })
     .with({ type: DocumentAuth.PASSWORD }, async ({ password }) => {

@@ -123,7 +123,9 @@ export const DocumentSigningCompleteDialog = ({
   const isComplete = useMemo(() => !fieldsContainUnsignedRequiredField(fields), [fields]);
 
   const completionRequires2FA = useMemo(
-    () => derivedRecipientAccessAuth.includes('TWO_FACTOR_AUTH'),
+    () =>
+      derivedRecipientAccessAuth.includes('TWO_FACTOR_AUTH') ||
+      derivedRecipientAccessAuth.includes('EXTERNAL_TWO_FACTOR_AUTH'),
     [derivedRecipientAccessAuth],
   );
 
@@ -178,6 +180,15 @@ export const DocumentSigningCompleteDialog = ({
         form.setValue('accessAuthOptions', undefined);
 
         setTwoFactorValidationError('Invalid verification code. Please try again.');
+        setShowTwoFactorForm(true);
+
+        return;
+      }
+
+      if (AppErrorCode.TOO_MANY_REQUESTS === err.code && data.accessAuthOptions) {
+        form.setValue('accessAuthOptions', undefined);
+
+        setTwoFactorValidationError(t`Too many verification attempts. Please wait 15 minutes and try again.`);
         setShowTwoFactorForm(true);
 
         return;

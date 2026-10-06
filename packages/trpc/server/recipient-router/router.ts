@@ -1,5 +1,6 @@
 import { prepareCscRecipientSigning } from '@documenso/ee/server-only/signing/csc/prepare-recipient-signing';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { assertRecipientAccess2FA } from '@documenso/lib/server-only/document/assert-recipient-access-2fa';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
@@ -609,7 +610,14 @@ export const recipientRouter = router({
             ...unsafeBuildEnvelopeIdQuery({ type: 'documentId', id: documentId }, EnvelopeType.DOCUMENT),
             recipients: { some: { token } },
           },
-          select: { signatureLevel: true, internalVersion: true, userId: true },
+          select: {
+            id: true,
+            authOptions: true,
+            signatureLevel: true,
+            internalVersion: true,
+            userId: true,
+            recipients: { where: { token } },
+          },
         });
 
         // The most common cause is a stale signing page: the document was
@@ -627,6 +635,15 @@ export const recipientRouter = router({
         await assertSenderNotDisabled({ userId: envelope.userId });
 
         if (isTspEnvelope(envelope)) {
+          // The CSC flow signs outside `completeDocumentWithToken`, so check the access 2FA here.
+          await assertRecipientAccess2FA({
+            envelope,
+            recipient: envelope.recipients[0],
+            accessAuthOptions,
+            userId: ctx.user?.id,
+            requestMetadata: ctx.metadata.requestMetadata,
+          });
+
           return await prepareCscRecipientSigning({
             recipientToken: token,
             requestMetadata: ctx.metadata.requestMetadata,
