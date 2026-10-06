@@ -1,6 +1,35 @@
 import { z } from 'zod';
 import { CONTENT_TEXT_MAX_LENGTH } from '../constants/envelope-content';
+import { FIVE_DECIMAL_PLACES, roundTo } from '../utils/geometry';
 import { DataContentType } from './data-content-meta';
+
+/**
+ * The smallest step between stored numbers, i.e. one unit in the fifth
+ * decimal place. Written as a literal since `10 ** -5` is not exact in
+ * floating point.
+ */
+const CONTENT_NUMBER_STEP = 0.00001;
+
+/**
+ * Whether a number is exactly representable at the stored precision, i.e.
+ * has at most five decimal places.
+ *
+ * Values are rejected rather than rounded, so the editor rounds everything
+ * it produces (see `roundTo`) before it is saved.
+ *
+ * Checked by round tripping rather than Zod's `multipleOf`, which compares
+ * at a fixed scale and lets values far below the step (e.g. `1e-300`)
+ * through as zero.
+ */
+const isFiveDecimalPlacesRefinement = (value: number) => roundTo(value, FIVE_DECIMAL_PLACES) === value;
+
+const FIVE_DECIMAL_PLACES_ERROR = { message: 'Must have at most five decimal places' };
+
+/**
+ * Half a step, so sums of stored values compare against a bound without
+ * false rejections.
+ */
+const GEOMETRY_TOLERANCE = CONTENT_NUMBER_STEP / 2;
 
 // Note: The default is different to fields (12), the range is the same.
 export const DEFAULT_CONTENT_FONT_SIZE = 10;
@@ -38,14 +67,18 @@ export const DEFAULT_CONTENT_VERTICAL_ALIGN: TContentVerticalAlign = 'middle';
 
 export const ZContentLineHeightSchema = z
   .number()
+  .finite()
   .min(CONTENT_MIN_LINE_HEIGHT)
   .max(CONTENT_MAX_LINE_HEIGHT)
+  .refine(isFiveDecimalPlacesRefinement, FIVE_DECIMAL_PLACES_ERROR)
   .describe('The line height of the text');
 
 export const ZContentLetterSpacingSchema = z
   .number()
+  .finite()
   .min(CONTENT_MIN_LETTER_SPACING)
   .max(CONTENT_MAX_LETTER_SPACING)
+  .refine(isFiveDecimalPlacesRefinement, FIVE_DECIMAL_PLACES_ERROR)
   .describe('The spacing between each character');
 
 /**
@@ -60,7 +93,25 @@ export const ZContentPageNumberSchema = z
   .min(1)
   .describe('The page number the content will be on. Starts from 1.');
 
-export const ZContentPercentageSchema = z.number().min(0).max(100);
+export const ZContentPercentageSchema = z
+  .number()
+  .finite()
+  .min(0)
+  .max(100)
+  .refine(isFiveDecimalPlacesRefinement, FIVE_DECIMAL_PLACES_ERROR);
+
+/**
+ * A percentage which must be visibly non zero, for sizes. The smallest value
+ * which survives rounding to the stored precision.
+ */
+const CONTENT_MIN_SIZE_PERCENTAGE = CONTENT_NUMBER_STEP;
+
+export const ZContentSizePercentageSchema = z
+  .number()
+  .finite()
+  .min(CONTENT_MIN_SIZE_PERCENTAGE)
+  .max(100)
+  .refine(isFiveDecimalPlacesRefinement, FIVE_DECIMAL_PLACES_ERROR);
 
 export const ZContentPositionXSchema = ZContentPercentageSchema.describe(
   'The percentage based X coordinate where the content will be placed.',
@@ -70,11 +121,11 @@ export const ZContentPositionYSchema = ZContentPercentageSchema.describe(
   'The percentage based Y coordinate where the content will be placed.',
 );
 
-export const ZContentWidthSchema = ZContentPercentageSchema.describe(
+export const ZContentWidthSchema = ZContentSizePercentageSchema.describe(
   'The percentage based width of the content on the page.',
 );
 
-export const ZContentHeightSchema = ZContentPercentageSchema.describe(
+export const ZContentHeightSchema = ZContentSizePercentageSchema.describe(
   'The percentage based height of the content on the page.',
 );
 
@@ -89,15 +140,19 @@ export const ZContentHeightSchema = ZContentPercentageSchema.describe(
  */
 export const ZContentRotationSchema = z
   .number()
+  .finite()
   .min(0)
   .lt(360)
+  .refine(isFiveDecimalPlacesRefinement, FIVE_DECIMAL_PLACES_ERROR)
   .describe('Rotation in degrees, clockwise, about the top left corner of the content.');
 
 /**
- * Normalize any rotation in degrees to the [0, 360) range.
+ * Normalize any rotation in degrees to the [0, 360) range at the stored
+ * precision.
  *
  * Non-finite input (`NaN`, `Infinity`) is treated as no rotation rather
- * than propagated, since `%` would turn it into `NaN`.
+ * than propagated, since `%` would turn it into `NaN`. The wrap runs again
+ * after rounding so a value just under 360 cannot round up to it.
  */
 export const normalizeContentRotation = (rotation: number) => {
   if (!Number.isFinite(rotation)) {
@@ -106,17 +161,30 @@ export const normalizeContentRotation = (rotation: number) => {
 
   // `%` keeps the sign of the dividend, so a negative rotation needs the
   // extra `+ 360` before the second `%` to land in the positive range.
-  return ((rotation % 360) + 360) % 360;
+  const wrapped = ((rotation % 360) + 360) % 360;
+
+  return roundTo(wrapped, FIVE_DECIMAL_PLACES) % 360;
 };
 
 /**
- * A hex color (`#rgb` or `#rrggbb`).
+ * A hex color (`#rgb` or `#rrggbb`), stored as lowercase `#rrggbb` so the
+ * same color always has one spelling and compares equal.
  *
  * Kept strict since colors are drawn directly onto the canvas and PDF.
  */
 export const ZContentColorSchema = z
   .string()
   .regex(/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i, 'Must be a valid hex color')
+  .transform((color) => {
+    const hex = color.slice(1).toLowerCase();
+
+    const expanded = hex.length === 3 ? [...hex].map((digit) => digit + digit).join('') : hex;
+
+    return `#${expanded}`;
+  })
+  // Piped so the OpenAPI generator has a typed output for response schemas,
+  // which a bare transform does not give it.
+  .pipe(z.string().regex(/^#[0-9a-f]{6}$/))
   .describe('A hex color');
 
 export const DEFAULT_CONTENT_TEXT_COLOR = '#000000';
@@ -133,7 +201,12 @@ export const DEFAULT_CONTENT_FILL_OPACITY = 1;
 /**
  * Opacity as a fraction between 0 (transparent) and 1 (opaque).
  */
-export const ZContentOpacitySchema = z.number().min(0).max(1);
+export const ZContentOpacitySchema = z
+  .number()
+  .finite()
+  .min(0)
+  .max(1)
+  .refine(isFiveDecimalPlacesRefinement, FIVE_DECIMAL_PLACES_ERROR);
 
 /**
  * Stroke width in unscaled page units.
@@ -158,7 +231,12 @@ export const DEFAULT_CONTENT_Z_INDEX = 0;
  */
 export const ZContentZIndexSchema = z.number().int().min(0).max(CONTENT_MAX_Z_INDEX);
 
-export const ZContentStrokeWidthSchema = z.number().min(CONTENT_MIN_STROKE_WIDTH).max(CONTENT_MAX_STROKE_WIDTH);
+export const ZContentStrokeWidthSchema = z
+  .number()
+  .finite()
+  .min(CONTENT_MIN_STROKE_WIDTH)
+  .max(CONTENT_MAX_STROKE_WIDTH)
+  .refine(isFiveDecimalPlacesRefinement, FIVE_DECIMAL_PLACES_ERROR);
 
 export const ZContentStrokeStyleSchema = z.enum(['solid', 'dashed', 'dotted']);
 export type TContentStrokeStyle = z.infer<typeof ZContentStrokeStyleSchema>;
@@ -240,19 +318,55 @@ export const ZBasePositionalContentMetaSchema = z.object({
 
 // TEXT CONTENT
 
+/**
+ * Characters which must not appear in content text.
+ *
+ * - C0 and C1 control characters other than tab and newline, and DEL. These
+ *   have no glyphs and can break text shaping and PDF text encoding.
+ * - Bidirectional overrides and isolates, which can visually reorder the
+ *   surrounding text in the sealed document.
+ */
+const CONTENT_TEXT_FORBIDDEN_CHARACTERS =
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping control characters is the point
+  /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\u202A-\u202E\u2066-\u2069]/g;
+
+/**
+ * A lone UTF-16 surrogate, i.e. half of a pair without its other half, which
+ * is not a valid character and cannot be encoded into a PDF.
+ */
+const LONE_SURROGATE = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g;
+
+/**
+ * Line endings are stored as `\n` only.
+ */
+const LINE_ENDINGS = /\r\n?/g;
+
+export const ZContentTextSchema = z
+  .string()
+  .max(CONTENT_TEXT_MAX_LENGTH)
+  .transform((text) =>
+    text.replace(LINE_ENDINGS, '\n').replace(CONTENT_TEXT_FORBIDDEN_CHARACTERS, '').replace(LONE_SURROGATE, ''),
+  )
+  // Piped so the OpenAPI generator has a typed output for response schemas,
+  // which a bare transform does not give it.
+  .pipe(z.string().max(CONTENT_TEXT_MAX_LENGTH))
+  .describe('The text to draw');
+
+export const ZContentFontSizeSchema = z
+  .number()
+  .finite()
+  .min(CONTENT_MIN_FONT_SIZE)
+  .max(CONTENT_MAX_FONT_SIZE)
+  .refine(isFiveDecimalPlacesRefinement, FIVE_DECIMAL_PLACES_ERROR);
+
 export const ZContentTextMetaSchema = ZBasePositionalContentMetaSchema.extend({
   type: z.literal(EnvelopeContentType.TEXT),
-  text: z.string().max(CONTENT_TEXT_MAX_LENGTH).optional().default(''),
+  text: ZContentTextSchema.optional().default(''),
   textAlign: ZContentTextAlignSchema.optional().default(DEFAULT_CONTENT_TEXT_ALIGN),
   verticalAlign: ZContentVerticalAlignSchema.optional().default(DEFAULT_CONTENT_VERTICAL_ALIGN),
   lineHeight: ZContentLineHeightSchema.optional().default(DEFAULT_CONTENT_LINE_HEIGHT),
   letterSpacing: ZContentLetterSpacingSchema.optional().default(DEFAULT_CONTENT_LETTER_SPACING),
-  fontSize: z
-    .number()
-    .min(CONTENT_MIN_FONT_SIZE)
-    .max(CONTENT_MAX_FONT_SIZE)
-    .optional()
-    .default(DEFAULT_CONTENT_FONT_SIZE),
+  fontSize: ZContentFontSizeSchema.optional().default(DEFAULT_CONTENT_FONT_SIZE),
   color: ZContentColorSchema.optional().default(DEFAULT_CONTENT_TEXT_COLOR),
 });
 
@@ -414,7 +528,11 @@ export const CONTENT_META_DEFAULT_VALUES: Record<EnvelopeContentType, TEnvelopeC
   [EnvelopeContentType.IMAGE]: CONTENT_IMAGE_META_DEFAULT_VALUES,
 } as const;
 
-export const ZEnvelopeContentMetaSchema = z.discriminatedUnion('type', [
+/**
+ * The per type schemas, kept as plain objects so they can be extended and
+ * picked from. Cross field checks live on the union below.
+ */
+const ZEnvelopeContentMetaUnionSchema = z.discriminatedUnion('type', [
   ZContentTextMetaSchema,
   ZContentLineMetaSchema,
   ZContentShapeMetaSchema,
@@ -422,12 +540,47 @@ export const ZEnvelopeContentMetaSchema = z.discriminatedUnion('type', [
   ZContentImageMetaSchema,
 ]);
 
-export type TEnvelopeContentMetaInput = z.input<typeof ZEnvelopeContentMetaSchema>;
+export const ZEnvelopeContentMetaSchema = ZEnvelopeContentMetaUnionSchema.superRefine((meta, ctx) => {
+  if (meta.type === EnvelopeContentType.LINE) {
+    return;
+  }
+
+  // Reject an upright box whose far edges run past the page. Each side is
+  // bounded on its own, so this is the only check which sees them together.
+  //
+  // A rotated box's footprint depends on the page's aspect ratio, which the
+  // schema does not know, so only its pivot is bounded here (by the position
+  // schemas) and the editor keeps the footprint on the page when saving. API
+  // callers are told to compensate, see `ZContentRotationSchema`.
+  if (getContentRotation(meta) !== 0) {
+    return;
+  }
+
+  // Each axis is reported on its own so the caller is pointed at the side
+  // which actually overflows.
+  if (meta.positionX + meta.width > 100 + GEOMETRY_TOLERANCE) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'The content must lie within the page',
+      path: ['width'],
+    });
+  }
+
+  if (meta.positionY + meta.height > 100 + GEOMETRY_TOLERANCE) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'The content must lie within the page',
+      path: ['height'],
+    });
+  }
+});
+
+export type TEnvelopeContentMetaInput = z.input<typeof ZEnvelopeContentMetaUnionSchema>;
 
 /**
  * The parsed meta of any content, i.e. with every default applied.
  */
-export type TEnvelopeContentMeta = z.output<typeof ZEnvelopeContentMetaSchema>;
+export type TEnvelopeContentMeta = z.output<typeof ZEnvelopeContentMetaUnionSchema>;
 
 /**
  * The meta of any box content, see `BOX_CONTENT_TYPES`.

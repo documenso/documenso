@@ -30,6 +30,27 @@ export type PercentageBox = {
   height: number;
 };
 
+/**
+ * The precision content geometry is stored at. Five decimal places is far
+ * below a pixel at any page size and zoom while still keeping float noise
+ * from the canvas (e.g. `33.300000000000004`) out of the stored values and
+ * their diffs.
+ *
+ * Only contents are rounded, see `use-editor-contents`. Fields are stored as
+ * is.
+ */
+export const FIVE_DECIMAL_PLACES = 5;
+
+/**
+ * Round to a fixed number of decimal places, normalising `-0` to `0`.
+ */
+export const roundTo = (value: number, decimals: number) => {
+  const factor = 10 ** decimals;
+
+  // `+ 0` turns a `-0` result into `0`.
+  return Math.round(value * factor) / factor + 0;
+};
+
 export const clampPercentage = (value: number) => clamp(value, { min: 0, max: 100 });
 
 /**

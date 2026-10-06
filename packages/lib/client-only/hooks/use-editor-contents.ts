@@ -1,8 +1,14 @@
 import type { TEnvelopeContentMeta } from '@documenso/lib/types/envelope-content-meta';
-import { EnvelopeContentType, ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';
+import {
+  EnvelopeContentType,
+  getContentRotation,
+  normalizeContentRotation,
+  ZEnvelopeContentMetaSchema,
+} from '@documenso/lib/types/envelope-content-meta';
 import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { getLocalContentOrderId, getNextContentZIndex, isContentOnTop } from '@documenso/lib/utils/envelope-content';
-import { clampPercentage, clampPercentageBox } from '@documenso/lib/utils/geometry';
+import type { PercentageBox } from '@documenso/lib/utils/geometry';
+import { clampPercentage, FIVE_DECIMAL_PLACES, roundTo } from '@documenso/lib/utils/geometry';
 import { useCallback } from 'react';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
@@ -281,21 +287,94 @@ export const useEditorContents = ({
 };
 
 /**
- * Restrict the positional values of a content meta to be within the page bounds.
+ * Clamp a content percentage to the page at the stored precision.
  *
- * Positional values are handled per content type since they differ, e.g. lines
- * use start/end coordinates instead of a position and size.
+ * Content specific: the shared `clampPercentage` does not round, since
+ * fields are stored as is.
+ */
+const clampContentPercentage = (value: number) => roundTo(clampPercentage(value), FIVE_DECIMAL_PLACES);
+
+/**
+ * Clamp every side of a content box to the page at the stored precision.
+ */
+const clampContentPercentageBox = <T extends PercentageBox>(box: T): T => ({
+  ...box,
+  positionX: clampContentPercentage(box.positionX),
+  positionY: clampContentPercentage(box.positionY),
+  width: clampContentPercentage(box.width),
+  height: clampContentPercentage(box.height),
+});
+
+/**
+ * Restrict a content meta to what the server accepts: every number at the
+ * stored precision and the positional values within the page bounds.
+ *
+ * Each value is clamped on its own, which is all that can be done without
+ * the page size. Upright boxes are also kept from running past the far
+ * edges; rotated footprints are kept on the page by the canvas when the
+ * transform is read, which knows the page. Lines use start/end coordinates
+ * instead of a position and size.
+ *
+ * Rotation wraps as well as rounds, so a value just under a full turn cannot
+ * round up to 360 and fall outside the accepted range.
  */
 const restrictContentMetaPosValues = (contentMeta: TEnvelopeContentMeta): TEnvelopeContentMeta => {
   return match(contentMeta)
     .with({ type: EnvelopeContentType.LINE }, (meta) => ({
       ...meta,
-      x1: clampPercentage(meta.x1),
-      y1: clampPercentage(meta.y1),
-      x2: clampPercentage(meta.x2),
-      y2: clampPercentage(meta.y2),
+      x1: clampContentPercentage(meta.x1),
+      y1: clampContentPercentage(meta.y1),
+      x2: clampContentPercentage(meta.x2),
+      y2: clampContentPercentage(meta.y2),
+      strokeWidth: roundTo(meta.strokeWidth, FIVE_DECIMAL_PLACES),
     }))
-    .otherwise((meta) => clampPercentageBox(meta));
+    .with({ type: EnvelopeContentType.TEXT }, (meta) =>
+      restrictBoxToPage({
+        ...meta,
+        fontSize: roundTo(meta.fontSize, FIVE_DECIMAL_PLACES),
+        lineHeight: roundTo(meta.lineHeight, FIVE_DECIMAL_PLACES),
+        letterSpacing: roundTo(meta.letterSpacing, FIVE_DECIMAL_PLACES),
+      }),
+    )
+    .with({ type: EnvelopeContentType.SHAPE }, (meta) =>
+      restrictBoxToPage({
+        ...meta,
+        rotation: normalizeContentRotation(meta.rotation),
+        strokeWidth: roundTo(meta.strokeWidth, FIVE_DECIMAL_PLACES),
+        fillOpacity: roundTo(meta.fillOpacity, FIVE_DECIMAL_PLACES),
+      }),
+    )
+    .with({ type: EnvelopeContentType.HIGHLIGHT }, (meta) =>
+      restrictBoxToPage({
+        ...meta,
+        fillOpacity: roundTo(meta.fillOpacity, FIVE_DECIMAL_PLACES),
+      }),
+    )
+    .with({ type: EnvelopeContentType.IMAGE }, (meta) =>
+      restrictBoxToPage({
+        ...meta,
+        rotation: normalizeContentRotation(meta.rotation),
+      }),
+    )
+    .exhaustive();
+};
+
+/**
+ * Clamp a box to the page, and keep an upright one from running past the
+ * far edges.
+ */
+const restrictBoxToPage = <T extends Exclude<TEnvelopeContentMeta, { type: EnvelopeContentType.LINE }>>(meta: T): T => {
+  const clamped = clampContentPercentageBox(meta);
+
+  if (getContentRotation(clamped) !== 0) {
+    return clamped;
+  }
+
+  return {
+    ...clamped,
+    positionX: Math.min(clamped.positionX, roundTo(100 - clamped.width, FIVE_DECIMAL_PLACES)),
+    positionY: Math.min(clamped.positionY, roundTo(100 - clamped.height, FIVE_DECIMAL_PLACES)),
+  };
 };
 
 /**
