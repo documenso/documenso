@@ -7,6 +7,7 @@ import { getEnvelopeForDirectTemplateSigning } from '@documenso/lib/server-only/
 import { getEnvelopeRequiredAccessData } from '@documenso/lib/server-only/envelope/get-envelope-required-access-data';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
+import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
@@ -269,6 +270,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
       envelope: {
         select: {
           internalVersion: true,
+          userId: true,
         },
       },
     },
@@ -276,6 +278,23 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 
   if (!foundDirectLink) {
     throw new Response('Not Found', { status: 404 });
+  }
+
+  try {
+    await assertSenderNotDisabled({ userId: foundDirectLink.envelope.userId });
+  } catch (e) {
+    if (AppError.parseError(e).code === AppErrorCode.SENDER_DISABLED) {
+      throw data(
+        {
+          type: 'embed-sender-disabled',
+        },
+        {
+          status: 403,
+        },
+      );
+    }
+
+    throw e;
   }
 
   if (foundDirectLink.envelope.internalVersion === 2) {

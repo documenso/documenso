@@ -32,7 +32,7 @@ type FindOrganisationStatsOptions = {
   claimId?: string;
   page?: number;
   perPage?: number;
-  orderByColumn?: 'documentCount' | 'emailCount' | 'apiCount' | 'emailReports' | 'totalCount';
+  orderByColumn?: 'documentCount' | 'emailCount' | 'apiCount' | 'emailReports' | 'teamCount' | 'totalCount';
   orderByDirection?: 'asc' | 'desc';
 };
 
@@ -95,6 +95,12 @@ export const findOrganisationStats = async ({
       'OrganisationClaim.documentQuota as documentQuota',
       'OrganisationClaim.emailQuota as emailQuota',
       'OrganisationClaim.apiQuota as apiQuota',
+      // Teams have no monthly history, so this is the current count for every period.
+      eb
+        .selectFrom('Team')
+        .whereRef('Team.organisationId', '=', 'Organisation.id')
+        .select(sql<number>`count("Team"."id")`.as('count'))
+        .as('teamCount'),
       totalCountExpression.as('totalCount'),
       eb.fn.countAll().over().as('totalRows'),
     ])
@@ -104,6 +110,7 @@ export const findOrganisationStats = async ({
         .with('emailCount', () => qb.orderBy('OrganisationMonthlyStat.emailCount', orderByDirection))
         .with('apiCount', () => qb.orderBy('OrganisationMonthlyStat.apiCount', orderByDirection))
         .with('emailReports', () => qb.orderBy('OrganisationMonthlyStat.emailReports', orderByDirection))
+        .with('teamCount', () => qb.orderBy('teamCount', orderByDirection))
         .with('totalCount', () => qb.orderBy(totalCountExpression, orderByDirection))
         .with(undefined, () =>
           // Default ordering mirrors the desired SQL: email, api, document descending.
@@ -132,6 +139,7 @@ export const findOrganisationStats = async ({
     emailCount: Number(row.emailCount),
     apiCount: Number(row.apiCount),
     emailReports: Number(row.emailReports),
+    teamCount: Number(row.teamCount),
     documentQuota: row.documentQuota === null ? null : Number(row.documentQuota),
     emailQuota: row.emailQuota === null ? null : Number(row.emailQuota),
     apiQuota: row.apiQuota === null ? null : Number(row.apiQuota),

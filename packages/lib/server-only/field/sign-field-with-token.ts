@@ -28,6 +28,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { getRecipientFieldsWhereInput } from '../../utils/recipient-queries';
 import { assertRecipientNotExpired } from '../../utils/recipients';
 import { validateFieldAuth } from '../document/validate-field-auth';
+import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 
 export type SignFieldWithTokenOptions = {
   token: string;
@@ -91,6 +92,8 @@ export const signFieldWithToken = async ({
   if (!recipient) {
     throw new Error(`Recipient not found for field ${field.id}`);
   }
+
+  await assertSenderNotDisabled({ userId: envelope.userId });
 
   if (envelope.deletedAt) {
     throw new Error(`Document ${envelope.id} has been deleted`);

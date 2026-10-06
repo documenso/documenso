@@ -17,6 +17,7 @@ import { match } from 'ts-pattern';
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { BrandingLogo } from '~/components/general/branding-logo';
+import { PublicLegalLinksDropdownMenuItems } from '~/components/general/public-legal-links';
 
 import { BrandingLogoIcon } from '../branding-logo-icon';
 import { DocumentSigningRejectDialog } from '../document-signing/document-signing-reject-dialog';
@@ -87,7 +88,10 @@ export const EnvelopeSignerHeader = () => {
 const MobileDropdownMenu = () => {
   const { envelope, recipient } = useRequiredEnvelopeSigningContext();
 
-  const { allowDocumentRejection } = useEmbedSigningContext() || {};
+  const embedSigningContext = useEmbedSigningContext();
+
+  const isEmbedSigning = embedSigningContext !== null;
+  const { allowDocumentRejection } = embedSigningContext || {};
 
   return (
     <DropdownMenu>
@@ -127,6 +131,8 @@ const MobileDropdownMenu = () => {
             }
           />
         )}
+
+        {!isEmbedSigning && <PublicLegalLinksDropdownMenuItems />}
       </DropdownMenuContent>
     </DropdownMenu>
   );

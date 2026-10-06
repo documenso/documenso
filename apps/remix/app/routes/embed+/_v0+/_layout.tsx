@@ -15,6 +15,7 @@ import { EmbedDocumentRejected } from '~/components/embed/embed-document-rejecte
 import { EmbedDocumentWaitingForTurn } from '~/components/embed/embed-document-waiting-for-turn';
 import { EmbedPaywall } from '~/components/embed/embed-paywall';
 import { EmbedRecipientExpired } from '~/components/embed/embed-recipient-expired';
+import { EmbedSenderDisabled } from '~/components/embed/embed-sender-disabled';
 
 import type { Route } from './+types/_layout';
 
@@ -62,6 +63,7 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
         'embed-paywall',
         'embed-waiting-for-turn',
         'embed-recipient-expired',
+        'embed-sender-disabled',
         'embed-document-rejected',
         'embed-document-completed',
       ].includes(error.data?.type);
@@ -97,6 +99,10 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
 
     if (error.status === 403 && error.data.type === 'embed-recipient-expired') {
       return <EmbedRecipientExpired />;
+    }
+
+    if (error.status === 403 && error.data.type === 'embed-sender-disabled') {
+      return <EmbedSenderDisabled />;
     }
 
     // !: Not used at the moment, may be removed in the future.

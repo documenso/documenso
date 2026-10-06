@@ -5,6 +5,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { loadRecipientBrandingByTeamId } from '@documenso/lib/server-only/branding/load-recipient-branding';
 import { getEnvelopeForDirectTemplateSigning } from '@documenso/lib/server-only/envelope/get-envelope-for-direct-template-signing';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
+import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { getRecipientsWithMissingFields } from '@documenso/lib/utils/recipients';
@@ -22,6 +23,7 @@ import { DocumentSigningAuthPageView } from '~/components/general/document-signi
 import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';
 import { DocumentSigningPageViewV2 } from '~/components/general/document-signing/document-signing-page-view-v2';
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
+import { DocumentSigningSenderDisabledPage } from '~/components/general/document-signing/document-signing-sender-disabled-page';
 import { EnvelopeSigningProvider } from '~/components/general/document-signing/envelope-signing-provider';
 import { RecipientBranding } from '~/components/general/recipient-branding';
 import { useCspNonce } from '~/utils/nonce';
@@ -149,11 +151,25 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
     select: {
       internalVersion: true,
       teamId: true,
+      userId: true,
     },
   });
 
   if (!directEnvelope) {
     throw new Response('Not Found', { status: 404 });
+  }
+
+  // Resolved here rather than via the token fetchers so branding is never loaded for a disabled sender.
+  try {
+    await assertSenderNotDisabled({ userId: directEnvelope.userId });
+  } catch (e) {
+    if (AppError.parseError(e).code === AppErrorCode.SENDER_DISABLED) {
+      return superLoaderJson({
+        isSenderDisabled: true,
+      } as const);
+    }
+
+    throw e;
   }
 
   const branding = await loadRecipientBrandingByTeamId({
@@ -164,6 +180,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
     const payloadV2 = await handleV2Loader(loaderArgs);
 
     return superLoaderJson({
+      isSenderDisabled: false,
       version: 2,
       payload: payloadV2,
       branding,
@@ -173,6 +190,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
   const payloadV1 = await handleV1Loader(loaderArgs);
 
   return superLoaderJson({
+    isSenderDisabled: false,
     version: 1,
     payload: payloadV1,
     branding,
@@ -182,6 +200,10 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 export default function DirectTemplatePage() {
   const data = useSuperLoaderData<typeof loader>();
   const cspNonce = useCspNonce();
+
+  if (data.isSenderDisabled) {
+    return <DocumentSigningSenderDisabledPage />;
+  }
 
   return (
     <>
