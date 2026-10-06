@@ -9,6 +9,7 @@ import {
   type TContentTextMeta,
   type TEnvelopeContentMetaInput,
 } from '@documenso/lib/types/envelope-content-meta';
+import { FIVE_DECIMAL_PLACES, roundTo } from '@documenso/lib/utils/geometry';
 
 /**
  * A content to seed for the visual regression test, laid out on the labelled
@@ -161,9 +162,31 @@ const square = (row: number, column: number, rows: number): Box => {
 
 type Overrides<T> = Partial<Omit<T, 'type'>>;
 
+/**
+ * Round a box or line's numbers to the precision the content schema accepts.
+ *
+ * The grid maths above (point conversions, halves, fractions of a cell)
+ * leaves float noise such as `19.200000000000003`, which the editor would
+ * round away before saving. The fixtures do the same so they are stored the
+ * way a real content would be.
+ */
+const roundGeometry = <T extends Record<string, number | undefined>>(geometry: T): T => {
+  const rounded = { ...geometry };
+
+  for (const key of Object.keys(rounded) as (keyof T)[]) {
+    const value = rounded[key];
+
+    if (typeof value === 'number') {
+      rounded[key] = roundTo(value, FIVE_DECIMAL_PLACES) as T[keyof T];
+    }
+  }
+
+  return rounded;
+};
+
 const text = (box: Box, meta: Overrides<TContentTextMeta> & { text: string }): ContentTestData => ({
   page: CONTENT_ALIGNMENT_PAGES.text,
-  contentMeta: { type: EnvelopeContentType.TEXT, page: CONTENT_ALIGNMENT_PAGES.text, ...box, ...meta },
+  contentMeta: { type: EnvelopeContentType.TEXT, page: CONTENT_ALIGNMENT_PAGES.text, ...roundGeometry(box), ...meta },
 });
 
 type LinePoints = { x1: number; y1: number; x2: number; y2: number };
@@ -177,7 +200,7 @@ const line = (points: LinePoints, meta: LineMeta): ContentTestData => ({
     page: CONTENT_ALIGNMENT_PAGES.line,
     strokeColor: '#000000',
     strokeStyle: 'solid',
-    ...points,
+    ...roundGeometry(points),
     ...meta,
   },
 });
@@ -206,7 +229,7 @@ const rectangle = (box: RotatableBox, meta: Overrides<TContentShapeMeta> = {}): 
     strokeWidth: 1,
     strokeColor: '#000000',
     strokeStyle: 'solid',
-    ...box,
+    ...roundGeometry(box),
     ...meta,
   },
 });
@@ -218,7 +241,7 @@ const highlight = (box: Box, meta: Overrides<TContentHighlightMeta> = {}): Conte
     page: CONTENT_ALIGNMENT_PAGES.highlight,
     color: '#ffe600',
     fillOpacity: 0.4,
-    ...box,
+    ...roundGeometry(box),
     ...meta,
   },
 });
@@ -226,7 +249,13 @@ const highlight = (box: Box, meta: Overrides<TContentHighlightMeta> = {}): Conte
 const image = (box: RotatableBox, meta: Overrides<TContentImageMeta> = {}): ContentTestData => ({
   page: CONTENT_ALIGNMENT_PAGES.image,
   image: 'logo',
-  contentMeta: { type: EnvelopeContentType.IMAGE, page: CONTENT_ALIGNMENT_PAGES.image, rotation: 0, ...box, ...meta },
+  contentMeta: {
+    type: EnvelopeContentType.IMAGE,
+    page: CONTENT_ALIGNMENT_PAGES.image,
+    rotation: 0,
+    ...roundGeometry(box),
+    ...meta,
+  },
 });
 
 // --- Page 1: Text ---

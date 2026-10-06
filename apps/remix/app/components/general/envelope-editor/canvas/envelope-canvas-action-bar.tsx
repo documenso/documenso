@@ -123,7 +123,6 @@ export const EnvelopeCanvasActionButton = ({ title, icon: Icon, onClick }: Envel
       title={title}
       className="rounded-md p-1.5 text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
       onClick={onClick}
-      onTouchEnd={onClick}
     >
       <Icon className="h-3.5 w-3.5" />
     </button>
