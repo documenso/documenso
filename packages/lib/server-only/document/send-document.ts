@@ -257,11 +257,20 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
   );
 
   if (allRecipientsHaveNoActionToTake) {
-    // This path never moves the envelope to PENDING, so the rendered PDFs are
-    // switched in here, before the seal picks them up.
-    if (renderedEnvelopeItems.length > 0) {
+    // Render the contents directly onto the envelope items and proceed to seal
+    // since there's no-one left to act on the envelope.
+    if (envelope.status === DocumentStatus.DRAFT) {
       await prisma.$transaction(async (tx) => {
         await commitRenderedEnvelopeItems(tx, renderedEnvelopeItems);
+
+        await tx.envelope.update({
+          where: {
+            id: envelope.id,
+          },
+          data: {
+            status: DocumentStatus.PENDING,
+          },
+        });
       });
     }
 
