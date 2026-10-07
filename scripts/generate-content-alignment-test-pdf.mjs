@@ -26,14 +26,35 @@ const GRID = {
   rowGap: 2,
 };
 
+// The size of the generated pages in points (A4 as Chromium prints it). Keep
+// in sync with `PAGE_SIZE` in the fixture. Percentages of the width and
+// height are not the same length, so a box which has to keep its shape (a
+// square) is worked out in points.
+const PAGE_SIZE = { width: 595.92, height: 842.88 };
+
+const toPointsY = (percent) => (percent / 100) * PAGE_SIZE.height;
+const toPercentX = (points) => (points / PAGE_SIZE.width) * 100;
+
 const cellLeft = (column) => GRID.startX + column * (GRID.columnWidth + GRID.columnGap);
 const cellTop = (row) => GRID.startY + row * (GRID.rowHeight + GRID.rowGap);
+const cellHeight = (rows) => rows * GRID.rowHeight + (rows - 1) * GRID.rowGap;
 
-function makeCell(row, column, label, { rows = 1, columns = 1 } = {}) {
+/**
+ * The width which makes a box as tall as `rows` square, matching `square` in
+ * the fixture.
+ */
+const squareWidth = (rows) => toPercentX(toPointsY(cellHeight(rows)));
+
+/**
+ * A labelled box. `width` overrides the column based width for the few boxes
+ * whose content is narrower than its cell, so the printed box outlines what
+ * the fixture actually places there.
+ */
+function makeCell(row, column, label, { rows = 1, columns = 1, width: widthOverride } = {}) {
   const left = cellLeft(column);
   const top = cellTop(row);
-  const width = columns * GRID.columnWidth + (columns - 1) * GRID.columnGap;
-  const height = rows * GRID.rowHeight + (rows - 1) * GRID.rowGap;
+  const width = widthOverride ?? columns * GRID.columnWidth + (columns - 1) * GRID.columnGap;
+  const height = cellHeight(rows);
 
   // The label is anchored to the top of its box and lifted by its own height
   // (see `.label`), so it sits in the gap above the box rather than reaching
@@ -124,7 +145,7 @@ function makeShapePage() {
   content += makeCell(1, 2, 'FILL_BLUE_NO_STROKE');
 
   content += makeRowLabel(2, 'SIZE');
-  content += makeCell(2, 0, 'SQUARE', { rows: 2 });
+  content += makeCell(2, 0, 'SQUARE', { rows: 2, width: squareWidth(2) });
   content += makeCell(2, 1, 'FULL_WIDTH_BELOW', { columns: 2 });
 
   content += makeRowLabel(4, 'ROTATION');
@@ -171,8 +192,8 @@ function makeImagePage() {
 
   content += makeRowLabel(0, 'FIT');
   content += makeCell(0, 0, 'WIDE_BOX (FILLS WIDTH)', { rows: 2 });
-  content += makeCell(0, 1, 'SQUARE_BOX (LETTERBOXED)', { rows: 2 });
-  content += makeCell(0, 2, 'TALL_BOX (CENTERED)', { rows: 3 });
+  content += makeCell(0, 1, 'SQUARE_BOX (LETTERBOXED)', { rows: 2, width: squareWidth(2) });
+  content += makeCell(0, 2, 'TALL_BOX (CENTERED)', { rows: 3, width: GRID.columnWidth / 2 });
 
   content += makeRowLabel(3, 'SIZE');
   content += makeCell(3, 0, 'FULL_WIDTH', { columns: 3, rows: 2 });
