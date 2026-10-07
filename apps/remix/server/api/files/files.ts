@@ -152,6 +152,9 @@ export const filesRoute = new Hono<HonoEnv>()
             id: envelopeId,
           },
           include: {
+            _count: {
+              select: { envelopeItems: true },
+            },
             envelopeItems: {
               where: {
                 id: envelopeItemId,
@@ -200,7 +203,7 @@ export const filesRoute = new Hono<HonoEnv>()
         }
 
         const baseOptions = {
-          title: envelopeItem.title,
+          title: envelope._count.envelopeItems === 1 ? envelope.title : envelopeItem.title,
           documentData: envelopeItem.documentData,
           isDownload: true,
           context: c,
@@ -314,7 +317,13 @@ export const filesRoute = new Hono<HonoEnv>()
       const envelopeItem = await prisma.envelopeItem.findUnique({
         where: envelopeWhereQuery,
         include: {
-          envelope: true,
+          envelope: {
+            include: {
+              _count: {
+                select: { envelopeItems: true },
+              },
+            },
+          },
           documentData: true,
         },
       });
@@ -328,7 +337,7 @@ export const filesRoute = new Hono<HonoEnv>()
       }
 
       return await handleEnvelopeItemFileRequest({
-        title: envelopeItem.title,
+        title: envelopeItem.envelope._count.envelopeItems === 1 ? envelopeItem.envelope.title : envelopeItem.title,
         status: envelopeItem.envelope.status,
         documentData: envelopeItem.documentData,
         version,
