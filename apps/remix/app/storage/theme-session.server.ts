@@ -1,4 +1,4 @@
-import { getCookieDomain, useSecureCookies } from '@documenso/lib/constants/auth';
+import { getCookieDomain, shouldUseSecureCookies } from '@documenso/lib/constants/auth';
 import { createCookieSessionStorage } from 'react-router';
 import { createThemeSessionResolver } from 'remix-themes';
 
@@ -9,7 +9,7 @@ const themeSessionStorage = createCookieSessionStorage({
     httpOnly: true,
     sameSite: 'lax',
     secrets: ['insecure-secret-do-not-care'],
-    secure: useSecureCookies,
+    secure: shouldUseSecureCookies(),
     domain: getCookieDomain(),
     maxAge: 60 * 60 * 24 * 365,
   },

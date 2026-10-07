@@ -1,4 +1,5 @@
 import { authClient } from '@documenso/auth/client';
+import type { ActiveSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -35,6 +36,9 @@ export default function SettingsSecuritySessions() {
   const { session } = useSession();
 
   const results = data?.sessions ?? [];
+
+  const sessions = results.filter((result) => !result.isEmbed);
+  const embedSessions = results.filter((result) => result.isEmbed);
 
   const columns = useMemo(() => {
     return [
@@ -89,7 +93,7 @@ export default function SettingsSecuritySessions() {
           />
         ),
       },
-    ] satisfies DataTableColumnDef<(typeof results)[number]>[];
+    ] satisfies DataTableColumnDef<ActiveSession>[];
   }, []);
 
   return (
@@ -99,41 +103,75 @@ export default function SettingsSecuritySessions() {
       </SettingsHeader>
 
       <div className="mt-4">
-        <DataTable
-          columns={columns}
-          data={results}
-          hasFilters={false}
-          error={{
-            enable: isLoadingError,
-          }}
-          skeleton={{
-            enable: isLoading,
-            rows: 3,
-            component: (
-              <>
-                <TableCell>
-                  <Skeleton className="h-4 w-40 rounded-full" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-24 rounded-full" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-24 rounded-full" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-24 rounded-full" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-8 w-16 rounded" />
-                </TableCell>
-              </>
-            ),
-          }}
-        />
+        <SessionsTable columns={columns} data={sessions} isLoading={isLoading} isLoadingError={isLoadingError} />
       </div>
+
+      {embedSessions.length > 0 && (
+        <div className="mt-8">
+          <h3 className="font-medium text-lg">
+            <Trans>Embed sessions</Trans>
+          </h3>
+
+          <p className="mt-1 text-muted-foreground text-sm">
+            <Trans>Sessions created by signing in to Documenso embedded on another website.</Trans>
+          </p>
+
+          <div className="mt-4">
+            <SessionsTable
+              columns={columns}
+              data={embedSessions}
+              isLoading={isLoading}
+              isLoadingError={isLoadingError}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+type SessionsTableProps = {
+  columns: DataTableColumnDef<ActiveSession>[];
+  data: ActiveSession[];
+  isLoading: boolean;
+  isLoadingError: boolean;
+};
+
+const SessionsTable = ({ columns, data, isLoading, isLoadingError }: SessionsTableProps) => {
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      hasFilters={false}
+      error={{
+        enable: isLoadingError,
+      }}
+      skeleton={{
+        enable: isLoading,
+        rows: 3,
+        component: (
+          <>
+            <TableCell>
+              <Skeleton className="h-4 w-40 rounded-full" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-24 rounded-full" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-24 rounded-full" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-24 rounded-full" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-8 w-16 rounded" />
+            </TableCell>
+          </>
+        ),
+      }}
+    />
+  );
+};
 
 type SessionRevokeButtonProps = {
   sessionId: string;

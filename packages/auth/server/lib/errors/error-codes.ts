@@ -4,6 +4,7 @@ export const AuthenticationErrorCode = {
   InvalidCredentials: 'INVALID_CREDENTIALS',
   SessionNotFound: 'SESSION_NOT_FOUND',
   SessionExpired: 'SESSION_EXPIRED',
+  EmbedSessionRestricted: 'EMBED_SESSION_RESTRICTED',
   InvalidToken: 'INVALID_TOKEN',
   MissingToken: 'MISSING_TOKEN',
   InvalidRequest: 'INVALID_REQUEST',

@@ -8,6 +8,7 @@ import { expect, test } from '@playwright/test';
 import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
 
 import { apiSeedDraftDocument, apiSeedPendingDocument } from '../../fixtures/api-seeds';
+import { WEBAPP_ORIGIN_HEADERS } from '../../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const API_BASE_URL = `${WEBAPP_BASE_URL}/api/v2-beta`;
@@ -15,6 +16,7 @@ const API_BASE_URL = `${WEBAPP_BASE_URL}/api/v2-beta`;
 const trpcMutation = async (request: APIRequestContext, procedure: string, input: Record<string, unknown>) => {
   const res = await request.post(`${WEBAPP_BASE_URL}/api/trpc/${procedure}`, {
     headers: {
+      ...WEBAPP_ORIGIN_HEADERS,
       'content-type': 'application/json',
     },
     data: JSON.stringify({ json: input }),

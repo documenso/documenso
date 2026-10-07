@@ -1,7 +1,7 @@
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import {
-  buildClearCscBlockingErrorCookieHeader,
+  expiredCscBlockingErrorCookieHeader,
   readCscBlockingErrorFromRequest,
 } from '@documenso/ee/server-only/signing/csc/cookies/blocking-error-cookie';
 import { readCscSadSessionFromRequest } from '@documenso/ee/server-only/signing/csc/cookies/sad-session-cookie';
@@ -289,7 +289,7 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
         isDocumentAccessValid: true,
         envelopeForSigning,
         csc: { state: 'blocked', code: blockingError.code } as const,
-        responseHeaders: { 'Set-Cookie': buildClearCscBlockingErrorCookieHeader() },
+        responseHeaders: { 'Set-Cookie': expiredCscBlockingErrorCookieHeader() },
       } as const;
     }
 

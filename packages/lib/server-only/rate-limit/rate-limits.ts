@@ -66,6 +66,20 @@ export const linkOrgAccountRateLimit = createRateLimit({
   window: '1h',
 });
 
+export const embedAuthStartRateLimit = createRateLimit({
+  action: 'auth.embed-start',
+  max: 100,
+  window: '15m',
+});
+
+// IP only: the nonce must never be a rate limit key (it would be persisted in plaintext).
+// The client polls every 2s, so this allows ~40 concurrent flows behind one IP.
+export const embedAuthRedeemRateLimit = createRateLimit({
+  action: 'auth.embed-redeem',
+  max: 1200,
+  window: '1m',
+});
+
 // ---- Auth (Tier 3 - Authenticated, verifies secrets) ----
 
 /**

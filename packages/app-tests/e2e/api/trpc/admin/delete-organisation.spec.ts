@@ -4,7 +4,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
-import { apiSignin } from '../../../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../../../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -19,7 +19,7 @@ const callDeleteOrganisation = async (
   },
 ) => {
   return await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/admin.organisation.delete`, {
-    headers: { 'content-type': 'application/json' },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
     data: JSON.stringify({ json: input }),
   });
 };
@@ -161,7 +161,7 @@ test('[ADMIN][TRPC][DELETE_ORG]: zod schema rejects malformed input', async ({ p
 
   // Missing organisationName and sendEmailToOwner.
   const res = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/admin.organisation.delete`, {
-    headers: { 'content-type': 'application/json' },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
     data: JSON.stringify({ json: { organisationId: 'whatever' } }),
   });
 

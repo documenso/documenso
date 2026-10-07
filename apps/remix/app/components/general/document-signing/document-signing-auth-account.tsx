@@ -1,4 +1,6 @@
 import { authClient } from '@documenso/auth/client';
+import { useIsFramed } from '@documenso/lib/client-only/hooks/use-is-framed';
+import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { formatPath } from '@documenso/lib/constants/app';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -7,7 +9,10 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
 import { useState } from 'react';
+import { useRevalidator } from 'react-router';
 import { match } from 'ts-pattern';
+
+import { EmbedPopupAuth } from '~/components/embed/embed-popup-auth';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 
@@ -20,13 +25,27 @@ export const DocumentSigningAuthAccount = ({
   actionTarget = 'FIELD',
   onOpenChange,
 }: DocumentSigningAuthAccountProps) => {
-  const { recipient, isDirectTemplate } = useRequiredDocumentSigningAuthContext();
+  const { recipient, user, isDirectTemplate } = useRequiredDocumentSigningAuthContext();
 
   const { t } = useLingui();
 
   const { toast } = useToast();
 
+  const isFramed = useIsFramed();
+
+  const { refreshSession } = useOptionalSession();
+  const { revalidate } = useRevalidator();
+
   const [isSigningOut, setIsSigningOut] = useState(false);
+
+  // Direct templates accept any account, so a mismatch only matters for regular recipients.
+  const mismatchedUserEmail = user && !isDirectTemplate && user.email !== recipient.email ? user.email : undefined;
+
+  const onPopupAuthSuccess = async () => {
+    await Promise.all([refreshSession(), revalidate()]);
+
+    onOpenChange(false);
+  };
 
   const handleChangeAccount = async (email: string) => {
     try {
@@ -34,10 +53,10 @@ export const DocumentSigningAuthAccount = ({
 
       const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
 
+      const emailHash = isDirectTemplate ? '' : `#email=${encodeURIComponent(email)}`;
+
       await authClient.signOut({
-        redirectPath: formatPath(
-          `/signin?returnTo=${encodeURIComponent(currentPath)}#embedded=true&email=${isDirectTemplate ? '' : email}`,
-        ),
+        redirectPath: formatPath(`/signin?returnTo=${encodeURIComponent(currentPath)}${emailHash}`),
       });
     } catch {
       setIsSigningOut(false);
@@ -152,15 +171,31 @@ export const DocumentSigningAuthAccount = ({
         </AlertDescription>
       </Alert>
 
-      <DialogFooter>
-        <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-          <Trans>Cancel</Trans>
-        </Button>
+      {isFramed ? (
+        <>
+          <EmbedPopupAuth
+            email={isDirectTemplate ? undefined : recipient.email}
+            signedInAs={mismatchedUserEmail}
+            onSuccess={() => void onPopupAuthSuccess()}
+          />
 
-        <Button onClick={async () => handleChangeAccount(recipient.email)} loading={isSigningOut}>
-          <Trans>Login</Trans>
-        </Button>
-      </DialogFooter>
+          <DialogFooter>
+            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+              <Trans>Cancel</Trans>
+            </Button>
+          </DialogFooter>
+        </>
+      ) : (
+        <DialogFooter>
+          <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+            <Trans>Cancel</Trans>
+          </Button>
+
+          <Button onClick={async () => handleChangeAccount(recipient.email)} loading={isSigningOut}>
+            <Trans>Login</Trans>
+          </Button>
+        </DialogFooter>
+      )}
     </fieldset>
   );
 };

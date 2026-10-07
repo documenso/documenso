@@ -143,10 +143,23 @@ export const MultiSignDocumentSigningView = ({
     try {
       setIsSubmitting(true);
 
-      await completeDocumentWithToken({
+      const result = await completeDocumentWithToken({
         documentId: document!.id,
         token,
       });
+
+      // TSP envelopes return a CSC authorize URL the multisign embed cannot run.
+      if (result.status === 'REDIRECT') {
+        onDocumentError?.();
+
+        toast({
+          title: _(msg`Unable to sign document`),
+          description: _(msg`Qualified electronic signatures are not supported in this embed.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
 
       onBack();
 
