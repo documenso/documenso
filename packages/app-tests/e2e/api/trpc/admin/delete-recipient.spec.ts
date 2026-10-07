@@ -7,7 +7,7 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { DocumentSigningOrder, DocumentStatus, SendStatus, SigningStatus } from '@prisma/client';
 
-import { apiSignin } from '../../../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../../../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -15,7 +15,7 @@ test.describe.configure({ mode: 'parallel' });
 
 const callDeleteRecipient = async (page: Page, input: { id: number; reason?: string }) => {
   return await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/admin.recipient.delete`, {
-    headers: { 'content-type': 'application/json' },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
     data: JSON.stringify({ json: { reason: 'Removed at the request of the sender', ...input } }),
   });
 };

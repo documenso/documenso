@@ -6,7 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Page, test } from '@playwright/test';
 
-import { apiSignin } from './fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from './fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -43,7 +43,10 @@ const postOrganisationBrandingLogo = async (page: Page, organisationId: string, 
 
   return await page
     .context()
-    .request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/organisation.settings.updateBrandingLogo`, { multipart });
+    .request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/organisation.settings.updateBrandingLogo`, {
+      headers: WEBAPP_ORIGIN_HEADERS,
+      multipart,
+    });
 };
 
 /**

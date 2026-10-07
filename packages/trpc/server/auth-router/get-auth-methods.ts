@@ -7,6 +7,7 @@ import { ZGetAuthMethodsResponseSchema } from './get-auth-methods.types';
  * Get the sign in methods available to the current user.
  */
 export const getAuthMethodsRoute = authenticatedProcedure
+  .meta({ allowEmbedSession: true })
   .output(ZGetAuthMethodsResponseSchema)
   .query(async ({ ctx }) => {
     const authMethods = await getUserAuthMethods({

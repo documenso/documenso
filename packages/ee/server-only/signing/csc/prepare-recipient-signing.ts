@@ -52,6 +52,8 @@ export type PrepareCscRecipientSigningOptions = {
 export type PrepareCscRecipientSigningResult = {
   status: 'REDIRECT';
   redirectUrl: string;
+  /** The `CscSession` the redirect authorises; embeds use it to drive the popup flow instead of navigating. */
+  sessionId: string;
 };
 
 export const prepareCscRecipientSigning = async (
@@ -244,5 +246,6 @@ export const prepareCscRecipientSigning = async (
   return {
     status: 'REDIRECT',
     redirectUrl,
+    sessionId: session.id,
   };
 };

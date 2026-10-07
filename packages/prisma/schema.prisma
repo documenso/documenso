@@ -372,10 +372,24 @@ model Session {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  isEmbed Boolean @default(false)
+
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([sessionToken])
+}
+
+// Short-lived, nonce-keyed relay of a secret between two browsing contexts.
+// `id` is sha256(nonce), `type` is AUTH_HANDOFF_TYPE, `payload` is encrypted JSON.
+model AuthHandoff {
+  id        String   @id
+  type      String
+  payload   String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([expiresAt])
 }
 
 enum DocumentStatus {

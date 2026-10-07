@@ -78,7 +78,6 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-authentication-required',
-        returnTo: `/embed/direct/${token}`,
       },
       {
         status: 401,
@@ -170,7 +169,6 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
       {
         type: 'embed-authentication-required',
         email: envelopeForSigning.recipientEmail,
-        returnTo: `/embed/direct/${token}`,
       },
       {
         status: 401,
@@ -212,8 +210,7 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-authentication-required',
-        email: user?.email || recipient.email,
-        returnTo: `/embed/direct/${token}`,
+        email: recipient.email,
       },
       {
         status: 401,
