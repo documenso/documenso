@@ -1,6 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import { Image as SkiaImage } from '@documenso/skia-canvas';
 import type { EnvelopeContent } from '@prisma/client';
+import pMap from 'p-map';
 
 import { DataContentType } from '../../types/data-content-meta';
 import type { ContentImageMap, ContentImageSource } from '../../universal/content-renderer/content-renderer';
@@ -30,8 +31,9 @@ export const loadContentImages = async (
     },
   });
 
-  const entries = await Promise.all(
-    dataContents.map(async (dataContent): Promise<[string, ContentImageSource] | null> => {
+  const entries = await pMap(
+    dataContents,
+    async (dataContent): Promise<[string, ContentImageSource] | null> => {
       if (dataContent.metadata.type !== DataContentType.IMAGE) {
         return null;
       }
@@ -42,7 +44,8 @@ export const loadContentImages = async (
       });
 
       return [dataContent.id, new SkiaImage(Buffer.from(bytes)) as unknown as ContentImageSource];
-    }),
+    },
+    { concurrency: 6 },
   );
 
   return new Map(entries.filter((entry) => entry !== null));
