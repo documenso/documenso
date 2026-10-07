@@ -67,8 +67,18 @@ export const ColorPicker = ({
     }
   }, [nonce]);
 
+  // A custom trigger is rendered as is, so it cannot be told it is disabled
+  // the way the default button is. Refusing to open covers either trigger.
+  const onOpenChange = (open: boolean) => {
+    if (open && disabled) {
+      return;
+    }
+
+    setIsOpen(open);
+  };
+
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={onOpenChange}>
       {trigger ? (
         <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       ) : (
