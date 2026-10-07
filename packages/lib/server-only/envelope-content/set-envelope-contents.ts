@@ -9,9 +9,10 @@ import type { ApiRequestMetadata } from '../../universal/extract-request-metadat
 import { generateDatabaseId } from '../../universal/id';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData, diffContentChanges } from '../../utils/document-audit-logs';
-import { canContentBeChanged, type EnvelopeIdOptions } from '../../utils/envelope';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { assertEnvelopeContentSaveWithinLimits } from '../../utils/envelope-content';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertContentCanBeChanged } from './assert-content-can-be-changed';
 
 export type SetEnvelopeContentsOptions = {
   userId: number;
@@ -128,11 +129,8 @@ export const setEnvelopeContents = async ({
 
   // Contents are part of the authored document, so they follow the same
   // rules as the file itself (frozen once sent, always editable on templates).
-  if (!canContentBeChanged(envelope)) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Contents can no longer be modified for this envelope',
-    });
-  }
+  // Checked again inside the transaction below.
+  await assertContentCanBeChanged(envelope);
 
   const existingContents = envelope.contents.map(({ dataContent: _dataContent, ...content }) => content);
 
@@ -192,6 +190,10 @@ export const setEnvelopeContents = async ({
   const isAuditLogRequired = envelope.type === EnvelopeType.DOCUMENT;
 
   const persistedContents = await prisma.$transaction(async (tx) => {
+    // The envelope may have been sent since it was read above, in which case
+    // its contents have already been rendered into the PDF and must not change.
+    await assertContentCanBeChanged(envelope, tx);
+
     // Collected as the contents are written and inserted in one go at the end
     // of the transaction, rather than a round trip per content.
     const auditLogs: CreateDocumentAuditLogDataResponse[] = [];

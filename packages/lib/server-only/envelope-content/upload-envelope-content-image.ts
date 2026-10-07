@@ -6,9 +6,10 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { EnvelopeContentType } from '../../types/envelope-content-meta';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { canContentBeChanged, type EnvelopeIdOptions } from '../../utils/envelope';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { createDataContentImage } from '../data-content/create-data-content-image';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertContentCanBeChanged } from './assert-content-can-be-changed';
 
 export type UploadEnvelopeContentImageOptions = {
   userId: number;
@@ -64,11 +65,9 @@ export const uploadEnvelopeContentImage = async ({
     });
   }
 
-  if (!canContentBeChanged(content.envelope)) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Contents can no longer be modified for this envelope',
-    });
-  }
+  // Checked again inside the transaction below, since the upload between the
+  // two is slow enough for the envelope to have been sent in the meantime.
+  await assertContentCanBeChanged(content.envelope);
 
   if (content.contentMeta.type !== EnvelopeContentType.IMAGE) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -79,6 +78,8 @@ export const uploadEnvelopeContentImage = async ({
   const dataContent = await createDataContentImage({ file });
 
   const updatedContent = await prisma.$transaction(async (tx) => {
+    await assertContentCanBeChanged(content.envelope, tx);
+
     const updated = await tx.envelopeContent.update({
       where: {
         id: content.id,
