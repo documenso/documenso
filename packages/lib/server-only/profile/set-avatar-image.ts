@@ -1,8 +1,9 @@
 import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@prisma/client';
 
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/organisations';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
-import { AppError } from '../../errors/app-error';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { optimiseAvatar } from '../../utils/images/avatar';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
@@ -83,58 +84,79 @@ export const setAvatarImage = async ({ userId, target, bytes, requestMetadata }:
     oldAvatarImageId = user.avatarImageId;
   }
 
-  if (oldAvatarImageId) {
-    await prisma.avatarImage.delete({
-      where: {
-        id: oldAvatarImageId,
-      },
-    });
-  }
-
-  let newAvatarImageId: string | null = null;
+  let optimisedBytes: Buffer | null = null;
 
   if (bytes) {
-    const optimisedBytes = await optimiseAvatar(bytes);
-
-    const avatarImage = await prisma.avatarImage.create({
-      data: {
-        bytes: optimisedBytes.toString('base64'),
-      },
-    });
-
-    newAvatarImageId = avatarImage.id;
+    optimisedBytes = await optimiseAvatar(bytes);
   }
 
-  // TODO: Audit Logs
+  return await prisma.$transaction(async (tx) => {
+    if (oldAvatarImageId) {
+      await tx.avatarImage.delete({
+        where: {
+          id: oldAvatarImageId,
+        },
+      });
+    }
 
-  if (target.type === 'team') {
-    await prisma.team.update({
-      where: {
-        id: target.teamId,
-      },
-      data: {
-        avatarImageId: newAvatarImageId,
-      },
-    });
-  } else if (target.type === 'organisation') {
-    await prisma.organisation.update({
-      where: {
-        id: target.organisationId,
-      },
-      data: {
-        avatarImageId: newAvatarImageId,
-      },
-    });
-  } else {
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        avatarImageId: newAvatarImageId,
-      },
-    });
-  }
+    let newAvatarImageId: string | null = null;
 
-  return newAvatarImageId;
+    if (bytes) {
+      if (!optimisedBytes) {
+        throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+          message: 'Avatar optimisation returned an empty buffer',
+        });
+      }
+
+      const avatarImage = await tx.avatarImage.create({
+        data: {
+          bytes: optimisedBytes.toString('base64'),
+        },
+      });
+
+      newAvatarImageId = avatarImage.id;
+    }
+
+    if (bytes || oldAvatarImageId) {
+      await tx.userSecurityAuditLog.create({
+        data: {
+          userId,
+          type: UserSecurityAuditLogType.AVATAR_UPDATED,
+          userAgent: requestMetadata.requestMetadata.userAgent,
+          ipAddress: requestMetadata.requestMetadata.ipAddress,
+        },
+      });
+    }
+
+    if (target.type === 'team') {
+      await tx.team.update({
+        where: {
+          id: target.teamId,
+        },
+        data: {
+          avatarImageId: newAvatarImageId,
+        },
+      });
+    } else if (target.type === 'organisation') {
+      await tx.organisation.update({
+        where: {
+          id: target.organisationId,
+        },
+        data: {
+          avatarImageId: newAvatarImageId,
+        },
+      });
+    } else {
+      await tx.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          avatarImageId: newAvatarImageId,
+        },
+      });
+    }
+
+    return newAvatarImageId;
+  });
 };
