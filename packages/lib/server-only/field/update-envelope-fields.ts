@@ -1,5 +1,6 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData, diffFieldChanges } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
@@ -95,7 +96,12 @@ export const updateEnvelopeFields = async ({
     }
 
     const fieldType = field.type || originalField.type;
-    const fieldMetaType = field.fieldMeta?.type || originalField.fieldMeta?.type;
+    const isFieldTypeChanged = fieldType !== originalField.type;
+
+    // An omitted fieldMeta keeps the stored one, unless the field type changes.
+    const fallbackFieldMeta = isFieldTypeChanged ? FIELD_META_DEFAULT_VALUES[fieldType] : undefined;
+    const fieldMeta = field.fieldMeta ?? fallbackFieldMeta;
+    const fieldMetaType = fieldMeta?.type || originalField.fieldMeta?.type;
 
     // Not going to mess with V1 envelopes.
     if (envelope.internalVersion === 2 && fieldMetaType && fieldMetaType.toLowerCase() !== fieldType.toLowerCase()) {
@@ -112,7 +118,10 @@ export const updateEnvelopeFields = async ({
 
     return {
       originalField,
-      updateData: field,
+      updateData: {
+        ...field,
+        fieldMeta,
+      },
       recipientEmail: recipient.email,
     };
   });
