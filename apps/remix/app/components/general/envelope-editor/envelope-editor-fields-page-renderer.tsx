@@ -538,15 +538,13 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     //
     // `addField` already marks a newly created field as the selected field, so this
     // makes a field placed via the palette (drag-drop) or marquee creation show its
-    // resize handles immediately -- no second click needed. It also clears the canvas
-    // selection when the selected field is cleared (e.g. when the author starts
-    // placing another field), so the floating action toolbar can't intercept the next
-    // placement click. Runs after the render loop above so the field's group exists.
+    // resize handles immediately -- no second click needed. Runs after the render loop
+    // above so the field's group exists.
     const selectedFormId = editorFields.selectedField?.formId ?? null;
-    const isSingleCanvasSelection = selectedKonvaFieldGroups.length === 1;
 
     if (selectedFormId && localPageFields.some((field) => field.formId === selectedFormId)) {
-      const isAlreadySelected = isSingleCanvasSelection && selectedKonvaFieldGroups[0].id() === selectedFormId;
+      const isAlreadySelected =
+        liveSelectedFieldGroups.length === 1 && liveSelectedFieldGroups[0].id() === selectedFormId;
 
       if (!isAlreadySelected) {
         const fieldGroupToSelect = pageLayer.current.findOne(`#${selectedFormId}`);
@@ -555,8 +553,16 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
           setSelectedFields([fieldGroupToSelect], { isAutoSelect: true });
         }
       }
-    } else if (selectedFormId === null && isSingleCanvasSelection) {
-      setSelectedFields([]);
+    } else if (
+      liveSelectedFieldGroups.some(
+        (fieldGroup) => !editorFields.selectedFields.some((field) => field.formId === fieldGroup.id()),
+      )
+    ) {
+      // The selection moved to another page, or the editor cleared it (for example, when
+      // the author starts to place another field). Clear this page only, so the new
+      // selection stays and the floating toolbar cannot intercept the next placement click.
+      interactiveTransformer.current?.nodes([]);
+      setSelectedKonvaFieldGroups([]);
     }
 
     // Rerender the transformer
@@ -569,6 +575,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     overlappingFieldFormIds,
     isFieldChanging,
     editorFields.selectedField?.formId,
+    editorFields.selectedFields,
   ]);
 
   const setSelectedFields = (nodes: Konva.Node[], options?: { isAutoSelect?: boolean }) => {
@@ -584,16 +591,10 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     interactiveTransformer.current?.nodes(fieldGroups);
     setSelectedKonvaFieldGroups(fieldGroups);
 
-    if (fieldGroups.length === 0 || fieldGroups.length > 1) {
-      editorFields.setSelectedField(null);
-    }
+    editorFields.setSelectedFields(fieldGroups.map((fieldGroup) => fieldGroup.id()));
 
-    // Handle single field selection.
     if (fieldGroups.length === 1) {
-      const fieldGroup = fieldGroups[0];
-
-      editorFields.setSelectedField(fieldGroup.id());
-      fieldGroup.moveToTop();
+      fieldGroups[0].moveToTop();
     }
   };
 
