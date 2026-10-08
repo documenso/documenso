@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 export const ZFindDocumentAuditLogsRequestSchema = ZFindSearchParamsSchema.extend({
   envelopeId: z.string(),
+  recipientId: z.number().optional(),
   orderByColumn: z.enum(['createdAt']).optional(),
   orderByDirection: z.enum(['asc', 'desc']).optional(),
 });

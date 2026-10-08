@@ -1,4 +1,5 @@
 import { JobClient } from './client/client';
+import { SEND_ADMIN_RECIPIENT_REMOVED_EMAILS_JOB_DEFINITION } from './definitions/emails/send-admin-recipient-removed-emails';
 import { SEND_ADMIN_USER_CREATED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-admin-user-created-email';
 import { SEND_CONFIRMATION_EMAIL_JOB_DEFINITION } from './definitions/emails/send-confirmation-email';
 import { SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION } from './definitions/emails/send-document-cancelled-emails';
@@ -7,6 +8,7 @@ import { SEND_DOCUMENT_CREATED_FROM_DIRECT_TEMPLATE_EMAIL_JOB_DEFINITION } from 
 import { SEND_DOCUMENT_DELETED_EMAILS_JOB_DEFINITION } from './definitions/emails/send-document-deleted-emails';
 import { SEND_DOCUMENT_PENDING_EMAIL_JOB_DEFINITION } from './definitions/emails/send-document-pending-email';
 import { SEND_ORGANISATION_LIMIT_ALERT_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-limit-alert-email';
+import { SEND_ORGANISATION_LIMITS_UPDATED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-limits-updated-email';
 import { SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-member-joined-email';
 import { SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-member-left-email';
 import { SEND_OWNER_RECIPIENT_EXPIRED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-owner-recipient-expired-email';
@@ -21,6 +23,7 @@ import { ALERT_ORGANISATION_SEAT_DRIFT_JOB_DEFINITION } from './definitions/inte
 import { BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION } from './definitions/internal/backport-subscription-claims';
 import { BULK_SEND_TEMPLATE_JOB_DEFINITION } from './definitions/internal/bulk-send-template';
 import { CANCEL_ORGANISATION_SUBSCRIPTION_JOB_DEFINITION } from './definitions/internal/cancel-organisation-subscription';
+import { CLEANUP_AUTH_HANDOFFS_JOB_DEFINITION } from './definitions/internal/cleanup-auth-handoffs';
 import { CLEANUP_RATE_LIMITS_JOB_DEFINITION } from './definitions/internal/cleanup-rate-limits';
 import { EXECUTE_WEBHOOK_JOB_DEFINITION } from './definitions/internal/execute-webhook';
 import { EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION } from './definitions/internal/expire-recipients-sweep';
@@ -43,6 +46,7 @@ export const jobsClient = new JobClient([
   SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION,
   SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION,
   SEND_ORGANISATION_LIMIT_ALERT_EMAIL_JOB_DEFINITION,
+  SEND_ORGANISATION_LIMITS_UPDATED_EMAIL_JOB_DEFINITION,
   SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION,
   SEAL_DOCUMENT_JOB_DEFINITION,
   SEAL_DOCUMENT_SWEEP_JOB_DEFINITION,
@@ -50,6 +54,7 @@ export const jobsClient = new JobClient([
   SEND_SIGNING_REJECTION_EMAILS_JOB_DEFINITION,
   SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION,
   SEND_RECIPIENT_REMOVED_EMAIL_JOB_DEFINITION,
+  SEND_ADMIN_RECIPIENT_REMOVED_EMAILS_JOB_DEFINITION,
   SEND_DOCUMENT_COMPLETED_EMAILS_JOB_DEFINITION,
   SEND_DOCUMENT_DELETED_EMAILS_JOB_DEFINITION,
   SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION,
@@ -64,6 +69,7 @@ export const jobsClient = new JobClient([
   SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION,
   PROCESS_SIGNING_REMINDER_JOB_DEFINITION,
   CLEANUP_RATE_LIMITS_JOB_DEFINITION,
+  CLEANUP_AUTH_HANDOFFS_JOB_DEFINITION,
   SYNC_EMAIL_DOMAINS_JOB_DEFINITION,
   ADMIN_DELETE_ORGANISATION_JOB_DEFINITION,
   ALERT_ORGANISATION_SEAT_DRIFT_JOB_DEFINITION,

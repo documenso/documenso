@@ -45,6 +45,14 @@ export const formatPath = (path: string): string => {
 export const NEXT_PUBLIC_SIGNING_CONTACT_INFO = () =>
   env('NEXT_PUBLIC_SIGNING_CONTACT_INFO') ?? NEXT_PUBLIC_WEBAPP_URL();
 
+export const NEXT_PUBLIC_TERMS_OF_SERVICE_URL = () =>
+  env('NEXT_PUBLIC_TERMS_OF_SERVICE_URL') ?? (IS_DOCUMENSO_CLOUD() ? 'https://documen.so/terms' : undefined);
+
+export const NEXT_PUBLIC_PRIVACY_POLICY_URL = () =>
+  env('NEXT_PUBLIC_PRIVACY_POLICY_URL') ?? (IS_DOCUMENSO_CLOUD() ? 'https://documen.so/privacy' : undefined);
+
+export const NEXT_PUBLIC_IMPRINT_URL = () => env('NEXT_PUBLIC_IMPRINT_URL');
+
 export const NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER = () =>
   env('NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER') === 'true';
 

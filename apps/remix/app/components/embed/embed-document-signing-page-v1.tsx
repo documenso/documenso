@@ -55,6 +55,7 @@ export type EmbedSignDocumentV1ClientPageProps = {
   completedFields: DocumentField[];
   metadata?: DocumentMeta | null;
   isCompleted?: boolean;
+  isRejected?: boolean;
   hidePoweredBy?: boolean;
   allowWhitelabelling?: boolean;
   allRecipients?: RecipientWithFields[];
@@ -70,6 +71,7 @@ export const EmbedSignDocumentV1ClientPage = ({
   completedFields,
   metadata,
   isCompleted,
+  isRejected,
   hidePoweredBy = false,
   allowWhitelabelling = false,
   allRecipients = [],
@@ -83,7 +85,9 @@ export const EmbedSignDocumentV1ClientPage = ({
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
   const [hasCompletedDocument, setHasCompletedDocument] = useState(isCompleted);
-  const [hasRejectedDocument, setHasRejectedDocument] = useState(recipient.signingStatus === SigningStatus.REJECTED);
+  const [hasRejectedDocument, setHasRejectedDocument] = useState(
+    isRejected ?? recipient.signingStatus === SigningStatus.REJECTED,
+  );
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(
     allRecipients.length > 0 ? allRecipients[0].id : null,
   );
@@ -135,10 +139,31 @@ export const EmbedSignDocumentV1ClientPage = ({
         return;
       }
 
-      await completeDocumentWithToken({
+      const result = await completeDocumentWithToken({
         documentId,
         token,
       });
+
+      // TSP envelopes return a CSC authorize URL that only the v2 embed can run.
+      if (result.status === 'REDIRECT') {
+        if (window.parent) {
+          window.parent.postMessage(
+            {
+              action: 'document-error',
+              data: null,
+            },
+            '*',
+          );
+        }
+
+        toast({
+          title: _(msg`Unable to sign document`),
+          description: _(msg`Qualified electronic signatures are not supported in this embed.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
 
       if (window.parent) {
         window.parent.postMessage(
@@ -260,6 +285,44 @@ export const EmbedSignDocumentV1ClientPage = ({
 
     // !: While the two setters are stable we still want to ensure we're avoiding
     // !: re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!window.parent) {
+      return;
+    }
+
+    if (hasRejectedDocument) {
+      window.parent.postMessage(
+        {
+          action: 'document-rejected',
+          data: {
+            token,
+            documentId,
+            recipientId: recipient.id,
+          },
+        },
+        '*',
+      );
+
+      return;
+    }
+
+    if (hasCompletedDocument) {
+      window.parent.postMessage(
+        {
+          action: 'document-completed',
+          data: {
+            token,
+            documentId,
+            recipientId: recipient.id,
+          },
+        },
+        '*',
+      );
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

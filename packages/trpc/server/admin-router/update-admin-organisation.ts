@@ -1,4 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { jobs } from '@documenso/lib/jobs/client';
+import { hasOrganisationLimitsChanged } from '@documenso/lib/universal/organisation-limit-changes';
 import { prisma } from '@documenso/prisma';
 
 import { adminProcedure } from '../trpc';
@@ -11,11 +13,12 @@ export const updateAdminOrganisationRoute = adminProcedure
   .input(ZUpdateAdminOrganisationRequestSchema)
   .output(ZUpdateAdminOrganisationResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { organisationId, data } = input;
+    const { organisationId, data, notifyOrganisation } = input;
 
     ctx.logger.info({
       input: {
         organisationId,
+        notifyOrganisation,
       },
     });
 
@@ -33,6 +36,8 @@ export const updateAdminOrganisationRoute = adminProcedure
     }
 
     const { name, url, customerId, claims, originalSubscriptionClaimId } = data;
+
+    const isLimitsChanged = claims ? hasOrganisationLimitsChanged(organisation.organisationClaim, claims) : false;
 
     await prisma.organisation.update({
       where: {
@@ -54,4 +59,26 @@ export const updateAdminOrganisationRoute = adminProcedure
         originalSubscriptionClaimId,
       },
     });
+
+    if (!notifyOrganisation) {
+      return { isNotificationSent: false };
+    }
+
+    if (!isLimitsChanged) {
+      ctx.logger.info({
+        msg: 'Skipping organisation limits updated email, no limits changed',
+        organisationId,
+      });
+
+      return { isNotificationSent: false };
+    }
+
+    await jobs.triggerJob({
+      name: 'send.organisation-limits-updated.email',
+      payload: {
+        organisationId,
+      },
+    });
+
+    return { isNotificationSent: true };
   });

@@ -1,11 +1,14 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { IS_INSTANCE_CSC_MODE } from '@documenso/lib/constants/app';
 import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
+import { isTspEnvelope } from '@documenso/lib/types/signature-level';
 import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
 import { prisma } from '@documenso/prisma';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Trans } from '@lingui/react/macro';
 import { SigningStatus } from '@prisma/client';
 import { useEffect, useLayoutEffect, useState } from 'react';
@@ -41,6 +44,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     }),
   );
 
+  // The CSC popup flow is only implemented by the v2 embed.
+  const hasUnsupportedTspEnvelope = IS_INSTANCE_CSC_MODE() && envelopes.some(({ document }) => isTspEnvelope(document));
+
   // Check the first envelope for whitelabelling settings (assuming all docs are from same team)
   const firstDocument = envelopes[0]?.document;
 
@@ -59,6 +65,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       user,
       hidePoweredBy: false,
       allowWhitelabelling: false,
+      hasUnsupportedTspEnvelope,
     });
   }
 
@@ -95,11 +102,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     user,
     hidePoweredBy,
     allowWhitelabelling,
+    hasUnsupportedTspEnvelope,
   });
 }
 
 export default function MultisignPage() {
-  const { envelopes, user, hidePoweredBy, allowWhitelabelling } = useSuperLoaderData<typeof loader>();
+  const { envelopes, user, hidePoweredBy, allowWhitelabelling, hasUnsupportedTspEnvelope } =
+    useSuperLoaderData<typeof loader>();
 
   const revalidator = useRevalidator();
 
@@ -257,6 +266,18 @@ export default function MultisignPage() {
     // !: re-renders.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (hasUnsupportedTspEnvelope) {
+    return (
+      <div className="flex min-h-[100dvh] w-full items-center justify-center p-4">
+        <Alert variant="destructive" className="w-full max-w-md">
+          <AlertDescription>
+            <Trans>Qualified electronic signatures are not supported in this embed.</Trans>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   // If a document is selected, show the signing view
   if (selectedDocument && selectedRecipient) {

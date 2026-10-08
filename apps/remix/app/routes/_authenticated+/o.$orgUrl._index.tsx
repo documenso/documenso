@@ -1,7 +1,11 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
+import {
+  canAccessOrganisationAnalytics,
+  canExecuteOrganisationAction,
+  formatOrganisationAnalyticsPath,
+} from '@documenso/lib/utils/organisations';
 import { canExecuteTeamAction, formatTeamUrl } from '@documenso/lib/utils/teams';
 import type { TGetOrganisationSessionResponse } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
@@ -17,6 +21,7 @@ import {
 import { Trans, useLingui } from '@lingui/react/macro';
 import {
   ArrowRight,
+  BarChart3Icon,
   CalendarIcon,
   MoreVerticalIcon,
   PlusIcon,
@@ -114,11 +119,22 @@ export default function OrganisationSettingsTeamsPage() {
           </p>
         </div>
 
-        <Button asChild>
-          <Link to={`/o/${organisation.url}/settings/general`}>
-            <Trans>Manage Organisation</Trans>
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          {canAccessOrganisationAnalytics(organisation.currentOrganisationRole) && (
+            <Button variant="outline" asChild>
+              <Link to={formatOrganisationAnalyticsPath(organisation.url)}>
+                <BarChart3Icon className="mr-2 h-4 w-4" />
+                <Trans>Analytics</Trans>
+              </Link>
+            </Button>
+          )}
+
+          <Button asChild>
+            <Link to={`/o/${organisation.url}/settings/general`}>
+              <Trans>Manage Organisation</Trans>
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

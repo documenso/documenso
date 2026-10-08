@@ -1,7 +1,7 @@
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import {
-  buildClearCscBlockingErrorCookieHeader,
+  expiredCscBlockingErrorCookieHeader,
   readCscBlockingErrorFromRequest,
 } from '@documenso/ee/server-only/signing/csc/cookies/blocking-error-cookie';
 import { readCscSadSessionFromRequest } from '@documenso/ee/server-only/signing/csc/cookies/sad-session-cookie';
@@ -23,6 +23,7 @@ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-re
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
+import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { isTspEnvelope } from '@documenso/lib/types/signature-level';
@@ -45,6 +46,7 @@ import { DocumentSigningAuthProvider } from '~/components/general/document-signi
 import { DocumentSigningPageViewV1 } from '~/components/general/document-signing/document-signing-page-view-v1';
 import { DocumentSigningPageViewV2 } from '~/components/general/document-signing/document-signing-page-view-v2';
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
+import { DocumentSigningSenderDisabledPage } from '~/components/general/document-signing/document-signing-sender-disabled-page';
 import { EnvelopeSigningProvider } from '~/components/general/document-signing/envelope-signing-provider';
 import { RecipientBranding } from '~/components/general/recipient-branding';
 import { useCspNonce } from '~/utils/nonce';
@@ -93,22 +95,23 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
         })
       : [recipient];
 
-  if (
-    document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL &&
-    recipient.role !== RecipientRole.ASSISTANT
-  ) {
-    const nextPendingRecipient = await getNextPendingRecipient({
-      documentId: document.id,
-      currentRecipientId: recipient.id,
-    });
+  // Dictation eligibility must be decided here, over the FULL recipient list
+  // — the same computation the completion route enforces. `allRecipients` is
+  // role-scoped (assistants only see strictly later steps, not their own
+  // group peers), so deriving it client-side from that list would offer
+  // dictation the server then silently ignores.
+  const nextPendingRecipient =
+    document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL
+      ? await getNextPendingRecipient({
+          documentId: document.id,
+          currentRecipientId: recipient.id,
+        })
+      : null;
 
-    if (nextPendingRecipient) {
-      allRecipients.push({
-        ...nextPendingRecipient,
-        fields: [],
-      });
-    }
-  }
+  // Only the identity is needed client-side (dictation flag + prefill).
+  const nextRecipient = nextPendingRecipient
+    ? { name: nextPendingRecipient.name, email: nextPendingRecipient.email }
+    : null;
 
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
@@ -170,6 +173,7 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     recipient,
     recipientWithFields,
     allRecipients,
+    nextRecipient,
     completedFields,
     recipientSignature,
     isRecipientsTurn,
@@ -285,7 +289,7 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
         isDocumentAccessValid: true,
         envelopeForSigning,
         csc: { state: 'blocked', code: blockingError.code } as const,
-        responseHeaders: { 'Set-Cookie': buildClearCscBlockingErrorCookieHeader() },
+        responseHeaders: { 'Set-Cookie': expiredCscBlockingErrorCookieHeader() },
       } as const;
     }
 
@@ -342,6 +346,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
         select: {
           internalVersion: true,
           teamId: true,
+          userId: true,
         },
       },
     },
@@ -349,6 +354,19 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 
   if (!foundRecipient) {
     throw new Response('Not Found', { status: 404 });
+  }
+
+  // Resolved here rather than via the token fetchers so branding is never loaded for a disabled sender.
+  try {
+    await assertSenderNotDisabled({ userId: foundRecipient.envelope.userId });
+  } catch (e) {
+    if (AppError.parseError(e).code === AppErrorCode.SENDER_DISABLED) {
+      return superLoaderJson({
+        isSenderDisabled: true,
+      } as const);
+    }
+
+    throw e;
   }
 
   const branding = await loadRecipientBrandingByTeamId({
@@ -368,6 +386,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 
     return superLoaderJson(
       {
+        isSenderDisabled: false,
         version: 2,
         payload: payloadV2,
         branding,
@@ -379,6 +398,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
   const payloadV1 = await handleV1Loader(loaderArgs);
 
   return superLoaderJson({
+    isSenderDisabled: false,
     version: 1,
     payload: payloadV1,
     branding,
@@ -388,6 +408,10 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 export default function SigningPage() {
   const data = useSuperLoaderData<typeof loader>();
   const cspNonce = useCspNonce();
+
+  if (data.isSenderDisabled) {
+    return <DocumentSigningSenderDisabledPage />;
+  }
 
   return (
     <>
@@ -414,6 +438,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
     recipientSignature,
     isRecipientsTurn,
     allRecipients,
+    nextRecipient,
     includeSenderDetails,
     branding,
     recipientWithFields,
@@ -486,6 +511,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
             completedFields={completedFields}
             isRecipientsTurn={isRecipientsTurn}
             allRecipients={allRecipients}
+            nextRecipient={nextRecipient ?? undefined}
             includeSenderDetails={includeSenderDetails}
             branding={branding}
           />

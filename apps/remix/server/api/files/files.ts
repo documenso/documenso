@@ -1,4 +1,4 @@
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getOptionalNonEmbedSession } from '@documenso/auth/server/lib/session/embed-session-restrictions';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
@@ -65,7 +65,7 @@ export const filesRoute = new Hono<HonoEnv>()
       const { envelopeId, envelopeItemId } = c.req.valid('param');
       const { token } = c.req.query();
 
-      const session = await getOptionalSession(c);
+      const session = await getOptionalNonEmbedSession(c);
 
       let userId = session.user?.id;
 
@@ -141,7 +141,7 @@ export const filesRoute = new Hono<HonoEnv>()
       try {
         const { envelopeId, envelopeItemId, version } = c.req.valid('param');
 
-        const session = await getOptionalSession(c);
+        const session = await getOptionalNonEmbedSession(c);
 
         if (!session.user) {
           return c.json({ error: 'Unauthorized' }, 401);

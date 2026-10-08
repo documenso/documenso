@@ -2,6 +2,7 @@ import { AppErrorCode } from '@documenso/lib/errors/app-error';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans } from '@lingui/react/macro';
 import { AlertTriangleIcon } from 'lucide-react';
+import { match } from 'ts-pattern';
 
 export type CscRecipientBlockedPageProps = {
   code: string;
@@ -21,41 +22,18 @@ export type CscRecipientBlockedPageProps = {
 export const CscRecipientBlockedPage = ({ code, recipientToken }: CscRecipientBlockedPageProps) => {
   const retryUrl = `/api/csc/oauth/authorize?scope=service&token=${encodeURIComponent(recipientToken)}`;
 
+  const { title, description } = getCscRecipientBlockedCopy(code);
+
   return (
     <div className="-mx-4 flex max-w-[100vw] flex-col items-center overflow-x-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-16 xl:pt-24">
       <AlertTriangleIcon className="h-12 w-12 text-destructive" />
 
       <h2 className="mt-6 max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-4xl">
-        {code === AppErrorCode.CSC_CREDENTIAL_LIST_EMPTY ? (
-          <Trans>No signing credentials available</Trans>
-        ) : code === AppErrorCode.CSC_CERT_INVALID ? (
-          <Trans>Signing certificate is invalid</Trans>
-        ) : code === AppErrorCode.CSC_ALGORITHM_REFUSED ? (
-          <Trans>Signing algorithm is not supported</Trans>
-        ) : (
-          <Trans>Unable to start the signing flow</Trans>
-        )}
+        {title}
       </h2>
 
       <p className="mt-2.5 max-w-[60ch] text-center font-medium text-muted-foreground/60 text-sm md:text-base">
-        {code === AppErrorCode.CSC_CREDENTIAL_LIST_EMPTY ? (
-          <Trans>
-            Your signing provider returned no usable credentials for this account. Contact your administrator or signing
-            provider for assistance.
-          </Trans>
-        ) : code === AppErrorCode.CSC_CERT_INVALID ? (
-          <Trans>
-            Your signing certificate is invalid, expired, or missing a required key. Contact your administrator or
-            signing provider for assistance.
-          </Trans>
-        ) : code === AppErrorCode.CSC_ALGORITHM_REFUSED ? (
-          <Trans>
-            Your signing provider does not advertise a signing algorithm this document accepts. Contact your
-            administrator or signing provider for assistance.
-          </Trans>
-        ) : (
-          <Trans>Something went wrong while preparing the remote signature. Please try again.</Trans>
-        )}
+        {description}
       </p>
 
       <Button asChild className="mt-8">
@@ -66,3 +44,37 @@ export const CscRecipientBlockedPage = ({ code, recipientToken }: CscRecipientBl
     </div>
   );
 };
+
+export const getCscRecipientBlockedCopy = (code: string) =>
+  match(code)
+    .with(AppErrorCode.CSC_CREDENTIAL_LIST_EMPTY, () => ({
+      title: <Trans>No signing credentials available</Trans>,
+      description: (
+        <Trans>
+          Your signing provider returned no usable credentials for this account. Contact your administrator or signing
+          provider for assistance.
+        </Trans>
+      ),
+    }))
+    .with(AppErrorCode.CSC_CERT_INVALID, () => ({
+      title: <Trans>Signing certificate is invalid</Trans>,
+      description: (
+        <Trans>
+          Your signing certificate is invalid, expired, or missing a required key. Contact your administrator or signing
+          provider for assistance.
+        </Trans>
+      ),
+    }))
+    .with(AppErrorCode.CSC_ALGORITHM_REFUSED, () => ({
+      title: <Trans>Signing algorithm is not supported</Trans>,
+      description: (
+        <Trans>
+          Your signing provider does not advertise a signing algorithm this document accepts. Contact your administrator
+          or signing provider for assistance.
+        </Trans>
+      ),
+    }))
+    .otherwise(() => ({
+      title: <Trans>Unable to start the signing flow</Trans>,
+      description: <Trans>Something went wrong while preparing the remote signature. Please try again.</Trans>,
+    }));
