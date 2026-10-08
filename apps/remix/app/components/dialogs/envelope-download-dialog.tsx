@@ -1,4 +1,5 @@
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
+import { getEnvelopeItemDownloadTitle } from '@documenso/lib/utils/envelope-download';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -35,11 +36,6 @@ type EnvelopeDownloadDialogProps = {
    */
   isLegacy?: boolean;
   envelopeItems?: EnvelopeItemToDownload[];
-
-  /**
-   * Used as the display/download name for single-item envelopes, since item titles
-   * are never updated when the envelope is renamed.
-   */
   envelopeTitle: string;
 
   /**
@@ -111,7 +107,12 @@ export const EnvelopeDownloadDialog = ({
 
   const envelopeItems = envelopeItemsPayload?.data || [];
 
-  const getItemTitle = (item: EnvelopeItemToDownload) => (envelopeItems.length === 1 ? envelopeTitle : item.title);
+  const getItemTitle = (item: EnvelopeItemToDownload) =>
+    getEnvelopeItemDownloadTitle({
+      envelopeTitle,
+      envelopeItemTitle: item.title,
+      envelopeItemCount: envelopeItems.length,
+    });
 
   const onDownload = async (envelopeItem: EnvelopeItemToDownload, version: 'original' | 'signed' | 'pending') => {
     const { id: envelopeItemId } = envelopeItem;

@@ -5,6 +5,7 @@ import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-aud
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { getEnvelopeItemDownloadTitle } from '@documenso/lib/utils/envelope-download';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 import { sValidator } from '@hono/standard-validator';
@@ -109,7 +110,11 @@ export const downloadRoute = new Hono<HonoEnv>()
         }
 
         const baseOptions = {
-          title: envelopeItem.envelope._count.envelopeItems === 1 ? envelopeItem.envelope.title : envelopeItem.title,
+          title: getEnvelopeItemDownloadTitle({
+            envelopeTitle: envelopeItem.envelope.title,
+            envelopeItemTitle: envelopeItem.title,
+            envelopeItemCount: envelopeItem.envelope._count.envelopeItems,
+          }),
           documentData: envelopeItem.documentData,
           isDownload: true,
           context: c,
@@ -366,7 +371,11 @@ export const downloadRoute = new Hono<HonoEnv>()
       }
 
       return await handleEnvelopeItemFileRequest({
-        title: envelope.envelopeItems.length === 1 ? envelope.title : envelopeItem.title,
+        title: getEnvelopeItemDownloadTitle({
+          envelopeTitle: envelope.title,
+          envelopeItemTitle: envelopeItem.title,
+          envelopeItemCount: envelope.envelopeItems.length,
+        }),
         status: envelope.status,
         documentData: envelopeItem.documentData,
         version: version || 'signed',

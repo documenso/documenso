@@ -3,6 +3,24 @@ import type { EnvelopeItem } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 
+export type GetEnvelopeItemDownloadTitleOptions = {
+  envelopeTitle: string;
+  envelopeItemTitle: string;
+
+  /** Total number of items in the envelope, not just the ones loaded. */
+  envelopeItemCount: number;
+};
+
+/**
+ * Single-item envelopes are named after the envelope, since item titles aren't updated
+ * when the envelope is renamed. Multi-item envelopes keep per-item titles so files stay distinct.
+ */
+export const getEnvelopeItemDownloadTitle = ({
+  envelopeTitle,
+  envelopeItemTitle,
+  envelopeItemCount,
+}: GetEnvelopeItemDownloadTitleOptions) => (envelopeItemCount === 1 ? envelopeTitle : envelopeItemTitle);
+
 /**
  * `pending` is only supported when there is no recipient token (team/owner-side downloads
  * via the session-authed file route). The recipient-token route does not accept `pending`.

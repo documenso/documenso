@@ -3,6 +3,7 @@ import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { getEnvelopeItemDownloadTitle } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { sValidator } from '@hono/standard-validator';
 import type { Prisma } from '@prisma/client';
@@ -203,7 +204,11 @@ export const filesRoute = new Hono<HonoEnv>()
         }
 
         const baseOptions = {
-          title: envelope._count.envelopeItems === 1 ? envelope.title : envelopeItem.title,
+          title: getEnvelopeItemDownloadTitle({
+            envelopeTitle: envelope.title,
+            envelopeItemTitle: envelopeItem.title,
+            envelopeItemCount: envelope._count.envelopeItems,
+          }),
           documentData: envelopeItem.documentData,
           isDownload: true,
           context: c,
@@ -337,7 +342,11 @@ export const filesRoute = new Hono<HonoEnv>()
       }
 
       return await handleEnvelopeItemFileRequest({
-        title: envelopeItem.envelope._count.envelopeItems === 1 ? envelopeItem.envelope.title : envelopeItem.title,
+        title: getEnvelopeItemDownloadTitle({
+          envelopeTitle: envelopeItem.envelope.title,
+          envelopeItemTitle: envelopeItem.title,
+          envelopeItemCount: envelopeItem.envelope._count.envelopeItems,
+        }),
         status: envelopeItem.envelope.status,
         documentData: envelopeItem.documentData,
         version,
