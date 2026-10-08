@@ -40,7 +40,17 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
 
   return (
     <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-      <DialogContent>
+      <DialogContent
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          // Something in the dialog's mount/portal sequence steals focus
+          // back within ~1ms of a synchronous setFocus() call (confirmed via
+          // runtime instrumentation). Deferring with setTimeout survives it;
+          // requestAnimationFrame does NOT -- rAF never fires in some
+          // embedded/background render contexts, silently breaking focus.
+          setTimeout(() => form.setFocus('text'), 0);
+        }}
+      >
         <DialogHeader>
           <DialogTitle>{fieldMeta?.label || <Trans>Enter Text</Trans>}</DialogTitle>
 
