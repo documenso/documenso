@@ -110,12 +110,14 @@ export const filesRoute = new Hono<HonoEnv>()
       const hasAccess = await checkEnvelopeFileAccess({
         userId,
         teamId: envelope.teamId,
+        envelopeId,
         envelopeType: envelope.type,
         templateType: envelope.templateType,
+        visibility: envelope.visibility,
       });
 
       if (!hasAccess) {
-        return c.json({ error: 'User does not have access to the team that this envelope is associated with' }, 403);
+        return c.json({ error: 'User does not have access to this envelope' }, 403);
       }
 
       if (!envelopeItem.documentData) {
@@ -182,17 +184,14 @@ export const filesRoute = new Hono<HonoEnv>()
         const hasDownloadAccess = await checkEnvelopeFileAccess({
           userId: session.user.id,
           teamId: envelope.teamId,
+          envelopeId,
           envelopeType: envelope.type,
           templateType: envelope.templateType,
+          visibility: envelope.visibility,
         });
 
         if (!hasDownloadAccess) {
-          return c.json(
-            {
-              error: 'User does not have access to the team that this envelope is associated with',
-            },
-            403,
-          );
+          return c.json({ error: 'User does not have access to this envelope' }, 403);
         }
 
         if (!envelopeItem.documentData) {

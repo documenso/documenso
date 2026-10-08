@@ -54,7 +54,7 @@ route.get(
       return c.json({ error: 'Not found' }, 404);
     }
 
-    // Note: We authenticate whether the user can access this in the `getTeamById` below.
+    // Note: We authorize whether the user can access this in `checkEnvelopeFileAccess` below.
     const envelopeItem = await prisma.envelopeItem.findFirst({
       where: {
         id: envelopeItemId,
@@ -69,6 +69,7 @@ route.get(
             type: true,
             teamId: true,
             templateType: true,
+            visibility: true,
           },
         },
       },
@@ -82,8 +83,10 @@ route.get(
     const hasAccess = await checkEnvelopeFileAccess({
       userId,
       teamId: envelopeItem.envelope.teamId,
+      envelopeId,
       envelopeType: envelopeItem.envelope.type,
       templateType: envelopeItem.envelope.templateType,
+      visibility: envelopeItem.envelope.visibility,
     });
 
     if (!hasAccess) {

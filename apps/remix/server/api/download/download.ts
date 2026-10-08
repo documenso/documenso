@@ -5,7 +5,6 @@ import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-aud
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 import { sValidator } from '@hono/standard-validator';
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
@@ -75,12 +74,35 @@ export const downloadRoute = new Hono<HonoEnv>()
           version,
         });
 
+        const envelopeItemReference = await prisma.envelopeItem.findUnique({
+          where: {
+            id: envelopeItemId,
+          },
+          select: {
+            envelopeId: true,
+          },
+        });
+
+        if (!envelopeItemReference) {
+          return c.json({ error: 'Envelope item not found' }, 404);
+        }
+
+        // Apply the same owner / team-role visibility / team-email rules as every
+        // other envelope read path, rather than bare team membership.
+        const { envelopeWhereInput } = await getEnvelopeWhereInput({
+          id: {
+            type: 'envelopeId',
+            id: envelopeItemReference.envelopeId,
+          },
+          type: null,
+          userId: apiToken.user.id,
+          teamId: apiToken.teamId,
+        });
+
         const envelopeItem = await prisma.envelopeItem.findFirst({
           where: {
             id: envelopeItemId,
-            envelope: {
-              team: buildTeamWhereQuery({ teamId: apiToken.teamId, userId: apiToken.user.id }),
-            },
+            envelope: envelopeWhereInput,
           },
           include: {
             envelope: {
