@@ -31,14 +31,14 @@ export const EnvelopeItemSelector = ({
     >
       <div
         className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-medium text-xs ${
-          isSelected ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-600'
+          isSelected ? 'bg-green-100 text-green-600' : 'bg-muted text-muted-foreground'
         }`}
       >
         {number}
       </div>
       <div className="min-w-0 text-left">
         <div className="truncate font-medium text-sm">{primaryText}</div>
-        <div className="text-gray-500 text-xs">{secondaryText}</div>
+        <div className="text-muted-foreground text-xs">{secondaryText}</div>
       </div>
       {actionSlot ?? (
         <div

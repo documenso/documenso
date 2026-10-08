@@ -327,7 +327,7 @@ export const AddSettingsFormPartial = ({
 
             <Accordion type="multiple" className="mt-6">
               <AccordionItem value="advanced-options" className="border-none">
-                <AccordionTrigger className="mb-2 rounded border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
+                <AccordionTrigger className="mb-2 rounded border px-3 py-2 text-left text-foreground hover:bg-muted/50 hover:no-underline">
                   <Trans>Advanced Options</Trans>
                 </AccordionTrigger>
 
