@@ -51,6 +51,7 @@ export type PDFViewerProps = {
   scrollParentRef: ScrollTarget;
 
   onDocumentLoad?: () => void;
+  onAcroFormDetected?: (hasFields: boolean) => void;
 
   /**
    * Additional component to render next to the image, such as a Konva canvas
@@ -64,6 +65,7 @@ export default function PDFViewer({
   data,
   scrollParentRef,
   onDocumentLoad,
+  onAcroFormDetected,
   customPageRenderer,
   ...props
 }: PDFViewerProps) {
@@ -126,6 +128,20 @@ export default function PDFViewer({
         // eslint-disable-next-line require-atomic-updates
         pdfRef.current = loadedPdf;
 
+        if (onAcroFormDetected) {
+          try {
+            const fieldObjects = await loadedPdf.getFieldObjects();
+
+            if (!isCancelled) {
+              onAcroFormDetected(fieldObjects !== null && Object.keys(fieldObjects).length > 0);
+            }
+          } catch {
+            if (!isCancelled) {
+              onAcroFormDetected(false);
+            }
+          }
+        }
+
         // Fetch the pages
         const pages = await pMap(Array.from({ length: loadedPdf.numPages }), async (_, pageIndex) => {
           const page = await loadedPdf.getPage(pageIndex + 1);
@@ -175,7 +191,7 @@ export default function PDFViewer({
         pdfRef.current = null;
       }
     };
-  }, [data]);
+  }, [data, onAcroFormDetected]);
 
   // Notify when document is loaded
   useEffect(() => {
