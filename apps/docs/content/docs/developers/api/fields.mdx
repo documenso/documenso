@@ -339,7 +339,7 @@ POST /envelope/field/update-many
 | `envelopeId` | string | Yes      | The envelope ID               |
 | `data`       | array  | Yes      | Array of field update objects |
 
-Each entry in `data` requires the field `id` and `type`. Position properties (`page`, `positionX`, `positionY`, `width`, `height`), `envelopeItemId`, and `fieldMeta` are optional — only supplied values are updated. Placeholder positioning is not supported when updating; use coordinates.
+Each entry in `data` requires the field `id` and `type`. Position properties (`page`, `positionX`, `positionY`, `width`, `height`), `envelopeItemId`, and `fieldMeta` are optional — only provided values are updated. When `fieldMeta` is provided, it replaces the stored `fieldMeta` as a whole, so include every property you want to keep. Changing `type` without providing `fieldMeta` applies the default `fieldMeta` for the new type. Placeholder positioning is not supported when updating; use coordinates.
 
 ### Code Examples
 
