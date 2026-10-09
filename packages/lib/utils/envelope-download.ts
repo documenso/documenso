@@ -19,7 +19,9 @@ export const getEnvelopeItemDownloadTitle = ({
   envelopeTitle,
   envelopeItemTitle,
   envelopeItemCount,
-}: GetEnvelopeItemDownloadTitleOptions) => (envelopeItemCount === 1 ? envelopeTitle : envelopeItemTitle);
+}: GetEnvelopeItemDownloadTitleOptions) => {
+  return envelopeItemCount === 1 ? envelopeTitle : envelopeItemTitle;
+};
 
 /**
  * `pending` is only supported when there is no recipient token (team/owner-side downloads

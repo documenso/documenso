@@ -8,12 +8,26 @@ import { type APIRequestContext, expect, test } from '@playwright/test';
 import { apiCreateTestContext } from '../../fixtures/api-seeds';
 import { apiSignin } from '../../fixtures/authentication';
 
+type DownloadCase = {
+  client: APIRequestContext;
+  path: string;
+  headers?: Record<string, string>;
+};
+
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
-for (const itemCount of [1, 2]) {
-  test(`download filenames after renaming a ${itemCount}-item envelope`, async ({ page, request }) => {
+for (const { internalVersion, itemCount } of [
+  { internalVersion: 1, itemCount: 1 },
+  { internalVersion: 2, itemCount: 1 },
+  { internalVersion: 2, itemCount: 2 },
+]) {
+  test(`download filenames after renaming a V${internalVersion} ${itemCount}-item envelope`, async ({
+    page,
+    request,
+  }) => {
     const { user, team, token } = await apiCreateTestContext();
     const document = await seedDraftDocument(user, team.id, [user.email], {
+      internalVersion,
       createDocumentOptions: { title: 'original-upload.pdf' },
     });
 
@@ -54,7 +68,7 @@ for (const itemCount of [1, 2]) {
 
       for (const version of ['original', 'signed'] as const) {
         const filename = `${baseTitle}${version === 'signed' ? '_signed' : ''}.pdf`;
-        const downloads: { client: APIRequestContext; path: string; headers?: Record<string, string> }[] = [
+        const downloads: DownloadCase[] = [
           {
             client: page.request,
             path: `/api/files/envelope/${envelope.id}/envelopeItem/${item.id}/download/${version}`,

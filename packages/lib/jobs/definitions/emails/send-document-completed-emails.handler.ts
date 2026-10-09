@@ -88,11 +88,15 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
     envelope.envelopeItems.map(async (envelopeItem) => {
       const file = await getFileServerSide(envelopeItem.documentData);
 
-      const fileNameToUse = getEnvelopeItemDownloadTitle({
-        envelopeTitle: envelope.title,
-        envelopeItemTitle: envelopeItem.title,
-        envelopeItemCount: envelope.envelopeItems.length,
-      });
+      // Preserve legacy attachment names, including V1 envelopes with multiple items.
+      const fileNameToUse =
+        envelope.internalVersion === 1
+          ? envelope.title
+          : getEnvelopeItemDownloadTitle({
+              envelopeTitle: envelope.title,
+              envelopeItemTitle: envelopeItem.title,
+              envelopeItemCount: envelope.envelopeItems.length,
+            });
 
       return {
         filename: fileNameToUse.endsWith('.pdf') ? fileNameToUse : `${fileNameToUse}.pdf`,
