@@ -18,12 +18,34 @@ export const getPageSize = (page: PDFPage) => {
 
   try {
     mediaBox = page.getMediaBox();
+    if (!mediaBox) {
+      let parent = (page.node as any).Parent?.();
+      while (parent && !mediaBox) {
+        const parentMediaBox = parent.MediaBox?.();
+        if (parentMediaBox) {
+          mediaBox = parentMediaBox.asRectangle?.() ?? parentMediaBox;
+          break;
+        }
+        parent = parent.Parent?.();
+      }
+    }
   } catch {
     // MediaBox lookup can fail for malformed PDFs where the entry is not a valid PDFArray.
   }
 
   try {
     cropBox = page.getCropBox();
+    if (!cropBox) {
+      let parent = (page.node as any).Parent?.();
+      while (parent && !cropBox) {
+        const parentCropBox = parent.CropBox?.();
+        if (parentCropBox) {
+          cropBox = parentCropBox.asRectangle?.() ?? parentCropBox;
+          break;
+        }
+        parent = parent.Parent?.();
+      }
+    }
   } catch {
     // CropBox lookup can fail for malformed PDFs where the entry is not a valid PDFArray.
   }
