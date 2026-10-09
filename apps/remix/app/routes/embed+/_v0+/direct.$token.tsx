@@ -70,7 +70,7 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
   const isAccessAuthValid = derivedRecipientAccessAuth.every((auth) =>
     match(auth)
       .with(DocumentAccessAuth.ACCOUNT, () => !!user)
-      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => false) // Not supported for direct links
+      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, DocumentAccessAuth.EXTERNAL_TWO_FACTOR_AUTH, () => false) // Not supported for direct links
       .exhaustive(),
   );
 
@@ -202,7 +202,7 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
   const isAccessAuthValid = derivedRecipientAccessAuth.every((accesssAuth) =>
     match(accesssAuth)
       .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
-      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => false) // Not supported for direct links
+      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, DocumentAccessAuth.EXTERNAL_TWO_FACTOR_AUTH, () => false) // Not supported for direct links
       .exhaustive(),
   );
 

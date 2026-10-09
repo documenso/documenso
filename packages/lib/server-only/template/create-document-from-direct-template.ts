@@ -204,11 +204,12 @@ export const createDocumentFromDirectTemplate = async ({
   let directRecipientName = user?.name || initialDirectRecipientName;
 
   // Ensure typesafety when we add more options.
-  const isAccessAuthValid = match(derivedRecipientAccessAuth.at(0))
-    .with(DocumentAccessAuth.ACCOUNT, () => user && user?.email === directRecipientEmail)
-    .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => false) // Not supported for direct templates
-    .with(undefined, () => true)
-    .exhaustive();
+  const isAccessAuthValid = derivedRecipientAccessAuth.every((accessAuth) =>
+    match(accessAuth)
+      .with(DocumentAccessAuth.ACCOUNT, () => user && user?.email === directRecipientEmail)
+      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, DocumentAccessAuth.EXTERNAL_TWO_FACTOR_AUTH, () => false) // Not supported for direct templates
+      .exhaustive(),
+  );
 
   if (!isAccessAuthValid) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, { message: 'You must be logged in' });
@@ -287,6 +288,7 @@ export const createDocumentFromDirectTemplate = async ({
       const derivedRecipientActionAuth = await validateFieldAuth({
         documentAuthOptions: directTemplateEnvelope.authOptions,
         recipient: {
+          id: directTemplateRecipient.id,
           authOptions: directTemplateRecipient.authOptions,
           email: directRecipientEmail,
           envelopeId: directTemplateEnvelope.id,

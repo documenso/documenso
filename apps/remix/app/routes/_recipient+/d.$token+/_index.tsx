@@ -64,7 +64,7 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
   const isAccessAuthValid = derivedRecipientAccessAuth.every((auth) =>
     match(auth)
       .with(DocumentAccessAuth.ACCOUNT, () => Boolean(session.user))
-      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true)
+      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, DocumentAccessAuth.EXTERNAL_TWO_FACTOR_AUTH, () => true)
       .exhaustive(),
   );
 

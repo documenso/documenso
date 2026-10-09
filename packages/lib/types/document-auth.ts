@@ -5,7 +5,14 @@ import { ZAuthenticationResponseJSONSchema } from './webauthn';
 /**
  * All the available types of document authentication options for both access and action.
  */
-export const ZDocumentAuthTypesSchema = z.enum(['ACCOUNT', 'PASSKEY', 'TWO_FACTOR_AUTH', 'PASSWORD', 'EXPLICIT_NONE']);
+export const ZDocumentAuthTypesSchema = z.enum([
+  'ACCOUNT',
+  'PASSKEY',
+  'TWO_FACTOR_AUTH',
+  'EXTERNAL_TWO_FACTOR_AUTH',
+  'PASSWORD',
+  'EXPLICIT_NONE',
+]);
 
 export const DocumentAuth = ZDocumentAuthTypesSchema.Enum;
 
@@ -35,6 +42,14 @@ const ZDocumentAuth2FASchema = z.object({
 });
 
 /**
+ * A code that the sender gets through the API and sends to the recipient through their own channel, such as SMS.
+ */
+const ZDocumentAuthExternal2FASchema = z.object({
+  type: z.literal(DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH),
+  token: z.string().min(4).max(10),
+});
+
+/**
  * All the document auth methods for both accessing and actioning.
  */
 export const ZDocumentAuthMethodsSchema = z.discriminatedUnion('type', [
@@ -42,6 +57,7 @@ export const ZDocumentAuthMethodsSchema = z.discriminatedUnion('type', [
   ZDocumentAuthExplicitNoneSchema,
   ZDocumentAuthPasskeySchema,
   ZDocumentAuth2FASchema,
+  ZDocumentAuthExternal2FASchema,
   ZDocumentAuthPasswordSchema,
 ]);
 
@@ -53,10 +69,13 @@ export const ZDocumentAuthMethodsSchema = z.discriminatedUnion('type', [
 export const ZDocumentAccessAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuth2FASchema,
+  ZDocumentAuthExternal2FASchema,
 ]);
 export const ZDocumentAccessAuthTypesSchema = z
-  .enum([DocumentAuth.ACCOUNT, DocumentAuth.TWO_FACTOR_AUTH])
-  .describe('The type of authentication required for the recipient to access the document.');
+  .enum([DocumentAuth.ACCOUNT, DocumentAuth.TWO_FACTOR_AUTH, DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH])
+  .describe(
+    'The type of authentication required for the recipient to access the document. For EXTERNAL_TWO_FACTOR_AUTH, get the code from POST /envelope/recipient/{recipientId}/2fa-code and send it to the recipient yourself.',
+  );
 
 /**
  * The global document action auth methods.
@@ -83,10 +102,13 @@ export const ZDocumentActionAuthTypesSchema = z
 export const ZRecipientAccessAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuth2FASchema,
+  ZDocumentAuthExternal2FASchema,
 ]);
 export const ZRecipientAccessAuthTypesSchema = z
-  .enum([DocumentAuth.ACCOUNT, DocumentAuth.TWO_FACTOR_AUTH])
-  .describe('The type of authentication required for the recipient to access the document.');
+  .enum([DocumentAuth.ACCOUNT, DocumentAuth.TWO_FACTOR_AUTH, DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH])
+  .describe(
+    'The type of authentication required for the recipient to access the document. For EXTERNAL_TWO_FACTOR_AUTH, get the code from POST /envelope/recipient/{recipientId}/2fa-code and send it to the recipient yourself.',
+  );
 
 /**
  * The recipient action auth methods.
