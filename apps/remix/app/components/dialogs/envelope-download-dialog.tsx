@@ -1,4 +1,5 @@
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
+import { getEnvelopeItemDownloadTitle } from '@documenso/lib/utils/envelope-download';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -35,6 +36,7 @@ type EnvelopeDownloadDialogProps = {
    */
   isLegacy?: boolean;
   envelopeItems?: EnvelopeItemToDownload[];
+  envelopeTitle: string;
 
   /**
    * The recipient token to download the document.
@@ -50,6 +52,7 @@ export const EnvelopeDownloadDialog = ({
   envelopeStatus,
   isLegacy,
   envelopeItems: initialEnvelopeItems,
+  envelopeTitle,
   token,
   trigger,
 }: EnvelopeDownloadDialogProps) => {
@@ -104,6 +107,13 @@ export const EnvelopeDownloadDialog = ({
 
   const envelopeItems = envelopeItemsPayload?.data || [];
 
+  const getItemTitle = (item: EnvelopeItemToDownload) =>
+    getEnvelopeItemDownloadTitle({
+      envelopeTitle,
+      envelopeItemTitle: item.title,
+      envelopeItemCount: envelopeItems.length,
+    });
+
   const onDownload = async (envelopeItem: EnvelopeItemToDownload, version: 'original' | 'signed' | 'pending') => {
     const { id: envelopeItemId } = envelopeItem;
 
@@ -120,7 +130,7 @@ export const EnvelopeDownloadDialog = ({
       await downloadPDF({
         envelopeItem,
         token,
-        fileName: envelopeItem.title,
+        fileName: getItemTitle(envelopeItem),
         version,
       });
 
@@ -186,8 +196,8 @@ export const EnvelopeDownloadDialog = ({
 
                   <div className="min-w-0 flex-1">
                     {/* Todo: Envelopes - Fix overflow */}
-                    <h4 className="truncate font-medium text-foreground text-sm" title={item.title}>
-                      {item.title}
+                    <h4 className="truncate font-medium text-foreground text-sm" title={getItemTitle(item)}>
+                      {getItemTitle(item)}
                     </h4>
                     <p className="mt-0.5 text-muted-foreground text-xs">
                       <Trans>PDF Document</Trans>

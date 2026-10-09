@@ -5,6 +5,7 @@ import {
 } from '@documenso/lib/client-only/create-zip-writer';
 import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { fetchPDF } from '@documenso/lib/client-only/download-pdf';
+import { getEnvelopeItemDownloadTitle } from '@documenso/lib/utils/envelope-download';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -171,7 +172,11 @@ export const EnvelopesBulkDownloadDialog = ({
             const { filename, blob } = await fetchPDF({
               envelopeItem,
               token: undefined,
-              fileName: envelopeItem.title,
+              fileName: getEnvelopeItemDownloadTitle({
+                envelopeTitle: envelope.title,
+                envelopeItemTitle: envelopeItem.title,
+                envelopeItemCount: envelopeItems.length,
+              }),
               version: downloadVersion,
             });
 

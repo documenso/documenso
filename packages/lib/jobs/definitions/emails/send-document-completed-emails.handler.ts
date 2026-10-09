@@ -13,6 +13,7 @@ import { extractDerivedDocumentEmailSettings } from '../../../types/document-ema
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
+import { getEnvelopeItemDownloadTitle } from '../../../utils/envelope-download';
 import { isRecipientEmailValidForSending } from '../../../utils/recipients';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -87,11 +88,18 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
     envelope.envelopeItems.map(async (envelopeItem) => {
       const file = await getFileServerSide(envelopeItem.documentData);
 
-      // Use the envelope title for version 1, and the envelope item title for version 2.
-      const fileNameToUse = envelope.internalVersion === 1 ? envelope.title : envelopeItem.title + '.pdf';
+      // Preserve legacy attachment names, including V1 envelopes with multiple items.
+      const fileNameToUse =
+        envelope.internalVersion === 1
+          ? envelope.title
+          : getEnvelopeItemDownloadTitle({
+              envelopeTitle: envelope.title,
+              envelopeItemTitle: envelopeItem.title,
+              envelopeItemCount: envelope.envelopeItems.length,
+            });
 
       return {
-        filename: fileNameToUse.endsWith('.pdf') ? fileNameToUse : fileNameToUse + '.pdf',
+        filename: fileNameToUse.endsWith('.pdf') ? fileNameToUse : `${fileNameToUse}.pdf`,
         content: Buffer.from(file),
         contentType: 'application/pdf',
       };

@@ -66,6 +66,7 @@ export const TemplatesTableActionDropdown = ({
         <EnvelopeDownloadDialog
           envelopeId={row.envelopeId}
           envelopeStatus={DocumentStatus.DRAFT}
+          envelopeTitle={row.title}
           trigger={
             <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
               <div>
