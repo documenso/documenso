@@ -310,6 +310,32 @@ test.describe('embedded edit', () => {
     expect(items[0].title).toBe('Envelope Item A');
     expect(items[0].order).toBe(2); // Expect order 2 because deleting items does not drop the order of sequential items.
   });
+
+  test('items added together keep the order they were added in', async ({ page }) => {
+    const surface = await openEmbeddedEnvelopeEditor(page, {
+      envelopeType: 'DOCUMENT',
+      mode: 'edit',
+      tokenNamePrefix: 'e2e-embed-items-order',
+    });
+
+    const externalId = `e2e-items-order-${nanoid()}`;
+
+    await updateExternalId(surface, externalId);
+    await expect(getEnvelopeItemTitleInputs(surface.root)).toHaveCount(1);
+
+    // Both files are added in one go and not reordered afterwards, which
+    // would renumber every item.
+    await uploadFiles(surface.root, [createPdfPayload('first-added.pdf'), createPdfPayload('second-added.pdf')]);
+    await expect(getEnvelopeItemTitleInputs(surface.root)).toHaveCount(3);
+
+    await persistEmbeddedEnvelope(surface);
+
+    const items = await getEnvelopeItemsFromDatabase(surface, externalId);
+
+    expect(items.map((item) => item.order)).toEqual([1, 2, 3]);
+    expect(items[1].title).toContain('first-added');
+    expect(items[2].title).toContain('second-added');
+  });
 });
 
 test.describe('pending envelope title editing', () => {

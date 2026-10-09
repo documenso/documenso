@@ -8,20 +8,40 @@ import { useRef } from 'react';
 
 import type { PDFViewerProps } from './pdf-viewer';
 import PDFViewerLazy from './pdf-viewer-lazy';
+import type { EnvelopePdfViewerToolbarControl } from './pdf-viewer-toolbar';
+import { EnvelopePdfViewerToolbar } from './pdf-viewer-toolbar';
 
 export type EnvelopePdfViewerProps = {
   /**
    * The error message to render when there is an error.
    */
   errorMessage: { title: MessageDescriptor; description: MessageDescriptor } | null;
+
+  /**
+   * The controls to display in the floating viewer toolbar.
+   *
+   * When omitted no toolbar is rendered.
+   */
+  toolbar?: EnvelopePdfViewerToolbarControl[];
+
+  /**
+   * Additional class names for the floating viewer toolbar.
+   */
+  toolbarClassName?: string;
 } & Omit<PDFViewerProps, 'data'>;
 
-export const EnvelopePdfViewer = ({ errorMessage, className, ...props }: EnvelopePdfViewerProps) => {
+export const EnvelopePdfViewer = ({
+  errorMessage,
+  toolbar,
+  toolbarClassName,
+  className,
+  ...props
+}: EnvelopePdfViewerProps) => {
   const { t } = useLingui();
 
   const $el = useRef<HTMLDivElement>(null);
 
-  const { currentEnvelopeItem, renderError } = useCurrentEnvelopeRender();
+  const { currentEnvelopeItem, renderError, viewerControls } = useCurrentEnvelopeRender();
 
   if (renderError || !currentEnvelopeItem) {
     return (
@@ -45,12 +65,24 @@ export const EnvelopePdfViewer = ({ errorMessage, className, ...props }: Envelop
   }
 
   return (
-    <PDFViewerLazy
-      key={`${currentEnvelopeItem.envelopeId}-${currentEnvelopeItem.id}`}
-      {...props}
-      className={cn('h-full w-full max-w-[800px]', className)}
-      data={currentEnvelopeItem.data}
-    />
+    <>
+      <PDFViewerLazy
+        key={`${currentEnvelopeItem.envelopeId}-${currentEnvelopeItem.id}`}
+        {...props}
+        className={cn('h-full w-full', className)}
+        data={currentEnvelopeItem.data}
+        zoom={viewerControls.zoom}
+        maxPageWidth={800}
+      />
+
+      {toolbar && toolbar.length > 0 && (
+        <EnvelopePdfViewerToolbar
+          controls={toolbar}
+          scrollParentRef={props.scrollParentRef}
+          className={toolbarClassName}
+        />
+      )}
+    </>
   );
 };
 

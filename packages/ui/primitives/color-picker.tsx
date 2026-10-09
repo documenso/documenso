@@ -12,7 +12,12 @@ export type ColorPickerProps = {
   defaultValue?: string;
   onChange: (color: string) => void;
   nonce?: string;
-} & HTMLAttributes<HTMLDivElement>;
+
+  /**
+   * A custom element to open the picker, replacing the default swatch button.
+   */
+  trigger?: React.ReactNode;
+} & Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>;
 
 export const ColorPicker = ({
   className,
@@ -21,10 +26,25 @@ export const ColorPicker = ({
   defaultValue = '#000000',
   onChange,
   nonce,
+  trigger,
   ...props
 }: ColorPickerProps) => {
   const [color, setColor] = useState(value || defaultValue);
   const [inputColor, setInputColor] = useState(value || defaultValue);
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Follow external changes to the value (e.g. the same color being edited
+  // from another control) only while closed.
+  useEffect(() => {
+    if (isOpen) {
+      return;
+    }
+
+    const nextColor = value || defaultValue;
+
+    setColor(nextColor);
+    setInputColor(nextColor);
+  }, [value, defaultValue, isOpen]);
 
   const onColorChange = (newColor: string) => {
     setColor(newColor);
@@ -47,17 +67,31 @@ export const ColorPicker = ({
     }
   }, [nonce]);
 
+  // A custom trigger is rendered as is, so it cannot be told it is disabled
+  // the way the default button is. Refusing to open covers either trigger.
+  const onOpenChange = (open: boolean) => {
+    if (open && disabled) {
+      return;
+    }
+
+    setIsOpen(open);
+  };
+
   return (
-    <Popover>
-      <PopoverTrigger>
-        <button
-          type="button"
-          disabled={disabled}
-          className="h-12 w-12 rounded-md border bg-background p-1 disabled:pointer-events-none disabled:opacity-50"
-        >
-          <div className="h-full w-full rounded-sm" style={{ backgroundColor: color }} />
-        </button>
-      </PopoverTrigger>
+    <Popover open={isOpen} onOpenChange={onOpenChange}>
+      {trigger ? (
+        <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      ) : (
+        <PopoverTrigger>
+          <button
+            type="button"
+            disabled={disabled}
+            className="h-12 w-12 rounded-md border bg-background p-1 disabled:pointer-events-none disabled:opacity-50"
+          >
+            <div className="h-full w-full rounded-sm" style={{ backgroundColor: color }} />
+          </button>
+        </PopoverTrigger>
+      )}
 
       <PopoverContent className="w-auto">
         <HexColorPicker

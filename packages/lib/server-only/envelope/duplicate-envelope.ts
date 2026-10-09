@@ -4,10 +4,15 @@ import pMap from 'p-map';
 import { omit } from 'remeda';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZSignatureLevelSchema } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { nanoid, prefixedId } from '../../universal/id';
+import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
+import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { buildEnvelopeContentCopyData } from '../../utils/envelope-content';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
@@ -18,15 +23,28 @@ export interface DuplicateEnvelopeOptions {
   id: EnvelopeIdOptions;
   userId: number;
   teamId: number;
+  requestMetadata: ApiRequestMetadata;
   overrides?: {
     duplicateAsTemplate?: boolean;
     includeRecipients?: boolean;
     includeFields?: boolean;
+    includeContents?: boolean;
   };
 }
 
-export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: DuplicateEnvelopeOptions) => {
-  const { duplicateAsTemplate = false, includeRecipients = true, includeFields = true } = overrides ?? {};
+export const duplicateEnvelope = async ({
+  id,
+  userId,
+  teamId,
+  requestMetadata,
+  overrides,
+}: DuplicateEnvelopeOptions) => {
+  const {
+    duplicateAsTemplate = false,
+    includeRecipients = true,
+    includeFields = true,
+    includeContents = true,
+  } = overrides ?? {};
 
   const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
     id,
@@ -38,6 +56,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
   const envelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
     select: {
+      id: true,
       type: true,
       title: true,
       userId: true,
@@ -60,6 +79,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
       authOptions: true,
       visibility: true,
       documentMeta: true,
+      contents: true,
       recipients: {
         select: {
           email: true,
@@ -136,7 +156,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
       signatureLevel: duplicatedSignatureLevel,
       userId,
       teamId,
-      title: envelope.title + ' (copy)',
+      title: `${envelope.title} (copy)`,
       documentMetaId: createdDocumentMeta.id,
       authOptions: envelope.authOptions || undefined,
       visibility: envelope.visibility,
@@ -180,11 +200,34 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
     }),
   );
 
+  const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
+
+  const isAuditLogRequired = duplicatedEnvelope.type === EnvelopeType.DOCUMENT;
+
+  if (isAuditLogRequired) {
+    auditLogs.push(
+      createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
+        envelopeId: duplicatedEnvelope.id,
+        metadata: requestMetadata,
+        data: {
+          title: duplicatedEnvelope.title,
+          source: {
+            type: DocumentSource.DOCUMENT,
+          },
+        },
+      }),
+    );
+  }
+
   if (includeRecipients) {
-    await pMap(
+    const duplicatedRecipients = await pMap(
       envelope.recipients,
       async (recipient) =>
         prisma.recipient.create({
+          include: {
+            fields: true,
+          },
           data: {
             envelopeId: duplicatedEnvelope.id,
             email: recipient.email,
@@ -215,6 +258,65 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
         }),
       { concurrency: 5 },
     );
+
+    if (isAuditLogRequired) {
+      const fieldAuditLogs = duplicatedRecipients.flatMap((recipient) =>
+        recipient.fields.map((field) =>
+          createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
+            envelopeId: duplicatedEnvelope.id,
+            metadata: requestMetadata,
+            data: {
+              fieldId: field.secondaryId,
+              fieldRecipientEmail: recipient.email,
+              fieldRecipientId: recipient.id,
+              fieldType: field.type,
+            },
+          }),
+        ),
+      );
+
+      auditLogs.push(...fieldAuditLogs);
+    }
+  }
+
+  if (includeContents) {
+    const contentsToCreate = buildEnvelopeContentCopyData({
+      contents: envelope.contents,
+      envelopeId: duplicatedEnvelope.id,
+      envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
+    });
+
+    if (contentsToCreate.length > 0) {
+      await prisma.envelopeContent.createMany({
+        data: contentsToCreate,
+      });
+    }
+
+    if (isAuditLogRequired) {
+      const contentsAuditLogs = contentsToCreate.map((content) =>
+        createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.CONTENT_CREATED,
+          envelopeId: duplicatedEnvelope.id,
+          metadata: requestMetadata,
+          data: {
+            contentId: content.id,
+            contentType: content.contentMeta.type,
+            envelopeItemId: content.envelopeItemId,
+            contentMeta: content.contentMeta,
+            dataContentId: content.dataContentId ?? null,
+          },
+        }),
+      );
+
+      auditLogs.push(...contentsAuditLogs);
+    }
+  }
+
+  if (auditLogs.length > 0) {
+    await prisma.documentAuditLog.createMany({
+      data: auditLogs,
+    });
   }
 
   if (duplicatedEnvelope.type === EnvelopeType.DOCUMENT) {

@@ -47,6 +47,7 @@ import {
 } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { buildEnvelopeContentCopyData } from '../../utils/envelope-content';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -95,6 +96,12 @@ export type CreateDocumentFromTemplateOptions = {
     data: string;
     type?: 'link';
   }>;
+
+  /**
+   * Whether to copy the template's contents (text, shapes, images, etc.) onto
+   * the created document. Defaults to true.
+   */
+  includeContents?: boolean;
 
   /**
    * Values that will override the predefined values in the template.
@@ -305,6 +312,7 @@ export const createDocumentFromTemplate = async ({
   folderId,
   prefillFields,
   attachments,
+  includeContents = true,
   formValues,
 }: CreateDocumentFromTemplateOptions) => {
   const templateInclude = {
@@ -323,6 +331,7 @@ export const createDocumentFromTemplate = async ({
         documentData: true,
       },
     },
+    contents: true,
     documentMeta: true,
   } as const;
 
@@ -442,6 +451,13 @@ export const createDocumentFromTemplate = async ({
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
 
+  // Key = original envelope item ID
+  // Value = the page count of the custom file which replaced its PDF.
+  //
+  // Only items given a custom file are counted, since the template's own
+  // files have the pages its contents were placed on.
+  const replacedEnvelopeItemPageCounts = new Map<string, number>();
+
   // Duplicate the envelope item data.
   // Note: This is duplicated in createDocumentFromDirectTemplate
   const envelopeItemsToCreate = await Promise.all(
@@ -485,19 +501,22 @@ export const createDocumentFromTemplate = async ({
         });
       }
 
-      const duplicatedFile = await putNormalizedPdfFileServerSide({
-        name: titleToUse,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(buffer),
-      });
-
-      const newDocumentData = await prisma.documentData.create({
-        data: {
-          type: duplicatedFile.type,
-          data: duplicatedFile.data,
+      // The copy keeps the source as its initial data, so the two share the
+      // stored file rather than re-uploading it.
+      const { documentData: newDocumentData, filePageCount } = await putNormalizedPdfFileServerSide(
+        {
+          name: titleToUse,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(buffer),
+        },
+        {
           initialData: documentDataToDuplicate.data,
         },
-      });
+      );
+
+      if (foundCustomDocumentData) {
+        replacedEnvelopeItemPageCounts.set(item.id, filePageCount);
+      }
 
       const newEnvelopeItemId = prefixedId('envelope_item');
 
@@ -573,10 +592,29 @@ export const createDocumentFromTemplate = async ({
     ),
   });
 
+  const envelopeId = prefixedId('envelope');
+
+  // Trim the contents if the replaced PDF has fewer pages than the content's page.
+  const contentsToCopy = template.contents.filter((content) => {
+    const replacedPageCount = replacedEnvelopeItemPageCounts.get(content.envelopeItemId);
+
+    return replacedPageCount === undefined || content.contentMeta.page <= replacedPageCount;
+  });
+
+  // The template's contents are remapped onto the new envelope items up front
+  // so they can be inserted as soon as the envelope exists.
+  const contentsToCreate = includeContents
+    ? buildEnvelopeContentCopyData({
+        contents: contentsToCopy,
+        envelopeId,
+        envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
+      })
+    : [];
+
   const { envelope, createdEnvelope } = await prisma.$transaction(async (tx) => {
     const envelope = await tx.envelope.create({
       data: {
-        id: prefixedId('envelope'),
+        id: envelopeId,
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
         internalVersion: template.internalVersion,
@@ -637,6 +675,12 @@ export const createDocumentFromTemplate = async ({
         },
       },
     });
+
+    if (contentsToCreate.length > 0) {
+      await tx.envelopeContent.createMany({
+        data: contentsToCreate,
+      });
+    }
 
     let fieldsToCreate: Omit<Field, 'id' | 'secondaryId'>[] = [];
 

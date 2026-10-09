@@ -14,6 +14,8 @@ export const ZUpdateAdminOrganisationRequestSchema = z.object({
       memberCount: true,
       envelopeItemCount: true,
       recipientCount: true,
+      envelopeContentCount: true,
+      envelopeContentImageCount: true,
       flags: true,
       documentRateLimits: true,
       documentQuota: true,

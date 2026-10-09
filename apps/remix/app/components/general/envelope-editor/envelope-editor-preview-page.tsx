@@ -215,6 +215,7 @@ export const EnvelopeEditorPreviewPage = () => {
       envelopeItems={envelope.envelopeItems}
       token={undefined}
       fields={fieldsWithPlaceholders}
+      contents={envelope.contents}
       recipients={envelope.recipients.map((recipient) => ({
         ...recipient,
         signingStatus: SigningStatus.SIGNED,
@@ -225,7 +226,7 @@ export const EnvelopeEditorPreviewPage = () => {
       }}
     >
       <div className="relative flex h-full">
-        <div className="flex h-full w-full flex-col overflow-y-auto px-2" ref={scrollableContainerRef}>
+        <div className="flex h-full w-full flex-col overflow-x-auto overflow-y-auto px-2" ref={scrollableContainerRef}>
           {/* Horizontal envelope item selector */}
           <EnvelopeRendererFileSelector className="px-0" fields={editorFields.localFields} />
 
@@ -247,6 +248,7 @@ export const EnvelopeEditorPreviewPage = () => {
                 customPageRenderer={EnvelopeGenericPageRenderer}
                 scrollParentRef={scrollableContainerRef}
                 errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
+                toolbar={['zoom']}
               />
             ) : (
               <div className="flex flex-col items-center justify-center py-32">

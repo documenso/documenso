@@ -15,7 +15,7 @@ import { type Control, useFormContext } from 'react-hook-form';
 
 // Can't seem to get the non-any type to work with correct types.
 // Eg Control<{ fontSize?: number } doesn't seem to work when there are required items.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: See above
 type FormControlType = Control<any>;
 
 export const EditorGenericFontSizeField = ({
