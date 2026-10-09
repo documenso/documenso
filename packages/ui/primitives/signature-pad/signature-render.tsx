@@ -1,9 +1,8 @@
+import { getSignatureFontFamily } from '@documenso/lib/constants/pdf';
 import { isBase64Image, SIGNATURE_CANVAS_DPI } from '@documenso/lib/constants/signatures';
 import { useEffect, useRef } from 'react';
 
 import { cn } from '../../lib/utils';
-
-const SIGNATURE_FONT_FAMILY = 'Caveat';
 
 export type SignatureRenderProps = {
   className?: string;
@@ -41,9 +40,11 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
     // Calculate the desired width (25ch)
     const desiredWidth = canvasWidth * 0.85; // 85% of canvas width
 
+    const fontFamily = getSignatureFontFamily(value);
+
     // Start with a base font size
     let fontSize = 18;
-    ctx.font = `${fontSize}px ${SIGNATURE_FONT_FAMILY}`;
+    ctx.font = `${fontSize}px ${fontFamily}`;
 
     // Measure 10 characters and calculate scale factor
     const characterWidth = ctx.measureText('m'.repeat(10)).width;
@@ -53,7 +54,7 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
     fontSize = fontSize * scaleFactor;
 
     // Adjust font size if it exceeds canvas width
-    ctx.font = `${fontSize}px ${SIGNATURE_FONT_FAMILY}`;
+    ctx.font = `${fontSize}px ${fontFamily}`;
 
     const textWidth = ctx.measureText(value).width;
 
@@ -62,7 +63,7 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
     }
 
     // Set final font and render text
-    ctx.font = `${fontSize}px ${SIGNATURE_FONT_FAMILY}`;
+    ctx.font = `${fontSize}px ${fontFamily}`;
     ctx.fillText(value, canvasWidth / 2, canvasHeight / 2);
   };
 
@@ -120,7 +121,7 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
 
     const renderWhenFontIsReady = async () => {
       try {
-        await document.fonts?.load(`18px ${SIGNATURE_FONT_FAMILY}`);
+        await document.fonts?.load(`18px ${getSignatureFontFamily(value)}`);
       } finally {
         if (isMounted) {
           renderTypedSignature();

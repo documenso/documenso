@@ -17,11 +17,11 @@ const SIGNATURE_FONT_FAMILY_CAVEAT = 'Caveat';
 const SIGNATURE_FONT_FAMILY_NOTO =
   '"Noto Sans", "Noto Sans Chinese", "Noto Sans Japanese", "Noto Sans Korean", sans-serif';
 
-const isASCII = (str: string) => /^\p{ASCII}*$/u.test(str);
+const isSupportedByCaveat = (str: string) => /^[\u0020-\u00FF\u0100-\u017E\u0400-\u052F]*$/u.test(str);
 
 // Deliberately never mix handwriting + sans-serif within one signature.
 export const getSignatureFontFamily = (typedSignatureText: string): string =>
-  isASCII(typedSignatureText) ? SIGNATURE_FONT_FAMILY_CAVEAT : SIGNATURE_FONT_FAMILY_NOTO;
+  isSupportedByCaveat(typedSignatureText) ? SIGNATURE_FONT_FAMILY_CAVEAT : SIGNATURE_FONT_FAMILY_NOTO;
 
 export const PDF_SIZE_A4_72PPI = {
   width: 595,
