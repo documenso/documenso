@@ -65,7 +65,12 @@ export const isRecipientAuthorized = async ({
 
   const authMethods: TDocumentAuth[] = match(type)
     .with('ACCESS', () => derivedRecipientAccessAuth)
-    .with('ACCESS_2FA', () => derivedRecipientAccessAuth)
+    .with('ACCESS_2FA', () =>
+      // Account access is checked separately; it cannot substitute for a required code at completion.
+      derivedRecipientAccessAuth.filter(
+        (method) => method === DocumentAuth.TWO_FACTOR_AUTH || method === DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH,
+      ),
+    )
     .with('ACTION', () => derivedRecipientActionAuth)
     .exhaustive();
 

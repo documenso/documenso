@@ -5,6 +5,8 @@ import { isRecipientAuthorized } from '../document/is-recipient-authorized';
 import { generateTwoFactorTokenFromEmail } from './email/generate-2fa-token-from-email';
 import { generateExternal2FACode } from './external-2fa-code';
 
+vi.mock('../../constants/crypto', () => ({ DOCUMENSO_ENCRYPTION_KEY: 'external-2fa-regression-test-key' }));
+
 const recipient = {
   id: 7,
   envelopeId: 'envelope_external2fatest',
@@ -77,5 +79,30 @@ describe('external 2FA code', () => {
     const { code } = await generateExternal2FACode({ envelopeId: recipient.envelopeId, recipientId: recipient.id });
 
     expect(await checkCode(code, { ...recipient, id: 8 })).toBe(false);
+  });
+
+  it('binds the code to the envelope as well as the recipient', async () => {
+    const { code } = await generateExternal2FACode({ envelopeId: recipient.envelopeId, recipientId: recipient.id });
+
+    expect(await checkCode(code, { ...recipient, envelopeId: 'envelope_other' })).toBe(false);
+  });
+
+  it('rejects external authentication for an email-only recipient', async () => {
+    const { code } = await generateExternal2FACode({ envelopeId: recipient.envelopeId, recipientId: recipient.id });
+
+    expect(
+      await checkCode(code, {
+        ...recipient,
+        authOptions: createRecipientAuthOptions({ accessAuth: ['TWO_FACTOR_AUTH'], actionAuth: [] }),
+      }),
+    ).toBe(false);
+  });
+
+  it('does not accept a code from a future time period', async () => {
+    vi.setSystemTime(new Date('2026-01-01T12:01:00.000Z'));
+    const { code } = await generateExternal2FACode({ envelopeId: recipient.envelopeId, recipientId: recipient.id });
+    vi.setSystemTime(new Date('2026-01-01T12:00:30.000Z'));
+
+    expect(await checkCode(code)).toBe(false);
   });
 });

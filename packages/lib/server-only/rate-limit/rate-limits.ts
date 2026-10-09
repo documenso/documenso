@@ -83,6 +83,7 @@ export const updatePasswordRateLimit = createRateLimit({
  */
 export const verifyAccess2FACodeRateLimit = createRateLimit({
   action: 'recipient.verify-access-2fa-code',
+  failClosed: true,
   max: 5,
   globalMax: 50,
   window: '15m',
