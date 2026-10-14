@@ -1,4 +1,3 @@
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { currentMonthlyPeriod } from '@documenso/lib/universal/monthly-period';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -6,8 +5,9 @@ import { Input } from '@documenso/ui/primitives/input';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router';
+import { debounce, parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
+import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 import {
@@ -52,13 +52,16 @@ export default function OrganisationStats() {
   const { t } = useLingui();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const { pathname } = useLocation();
 
-  const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
+  const [{ query: searchQuery }, setSearchFilters] = useQueryStates(
+    {
+      query: parseAsString.withDefault(''),
+      page: parseAsInteger,
+    },
+    { shallow: false, limitUrlUpdates: debounce(500) },
+  );
 
   const [displayMode, setDisplayMode] = useState<OrganisationStatsDisplayMode>('usage');
-
-  const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
 
   const periodOptions = useMemo(() => generatePeriodOptions(), []);
 
@@ -71,29 +74,12 @@ export default function OrganisationStats() {
 
   const claimOptions = claimsData?.data ?? [];
 
-  /**
-   * Handle debouncing the search query.
-   */
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams?.toString());
-
-    params.set('query', debouncedSearchQuery);
-
-    if (debouncedSearchQuery === '') {
-      params.delete('query');
-    }
-
-    if ((searchParams?.get('query') || '') !== debouncedSearchQuery) {
-      params.delete('page');
-    }
-
-    // If nothing to change then do nothing.
-    if (params.toString() === searchParams?.toString()) {
-      return;
-    }
-
-    setSearchParams(params);
-  }, [debouncedSearchQuery, pathname, searchParams]);
+  const onSearchQueryChange = (value: string) => {
+    void setSearchFilters({
+      query: value || null,
+      page: null,
+    });
+  };
 
   const onPeriodChange = (value: string) => {
     const params = new URLSearchParams(searchParams?.toString());
@@ -128,8 +114,8 @@ export default function OrganisationStats() {
 
       <div className="mt-4 flex flex-col gap-4 sm:flex-row">
         <Input
-          defaultValue={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchQuery}
+          onChange={(e) => onSearchQueryChange(e.target.value)}
           placeholder={t`Search by organisation name, URL or ID`}
           className="flex-1"
         />

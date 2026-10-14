@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import type { ImageLoadingState, PageRenderData } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { PDF_VIEWER_PAGE_CLASSNAME } from '@documenso/lib/constants/pdf-viewer';
 import { cn } from '@documenso/ui/lib/utils';
@@ -68,6 +69,7 @@ export default function PDFViewer({
 }: PDFViewerProps) {
   const { t } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const $el = useRef<HTMLDivElement>(null);
 
@@ -149,6 +151,11 @@ export default function PDFViewer({
 
         console.error(err);
         setLoadingState('error');
+
+        analytics.captureException(err, {
+          source: 'pdf_viewer',
+          location: 'pdf_load',
+        });
 
         toast({
           title: t`Error`,
@@ -366,6 +373,8 @@ const PdfViewerPage = ({
  * Manages rendering a page from a pdf.
  */
 const usePdfPageImage = ({ pageNumber, pdf, scale, scaledWidth, scaledHeight }: PdfViewerPageProps) => {
+  const analytics = useAnalytics();
+
   const [imageLoadingState, setImageLoadingState] = useState<ImageLoadingState>('loading');
 
   const [imageUrl, setImageUrl] = useState('');
@@ -457,6 +466,12 @@ const usePdfPageImage = ({ pageNumber, pdf, scale, scaledWidth, scaledHeight }: 
 
         if (!isCancelled) {
           console.error(err);
+
+          analytics.captureException(err, {
+            source: 'pdf_viewer',
+            location: 'pdf_page_render',
+          });
+
           setImageLoadingState('error');
         }
       } finally {

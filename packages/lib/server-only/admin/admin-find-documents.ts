@@ -10,7 +10,13 @@ export interface AdminFindDocumentsOptions {
   perPage?: number;
 }
 
-const ZPositiveIntegerSchema = z.coerce.number().int().positive();
+const MAX_POSTGRES_INT = 2147483647;
+
+/**
+ * IDs are Postgres int4 columns: values above the range can never be valid
+ * IDs and would make Prisma throw on overflow, so the schema rejects them.
+ */
+const ZPositiveIntegerSchema = z.coerce.number().int().positive().max(MAX_POSTGRES_INT);
 
 const emptyResponse = {
   data: [],
@@ -58,7 +64,41 @@ export const adminFindDocuments = async ({ query, page = 1, perPage = 10 }: Admi
     }
   }
 
-  if (query && query?.startsWith('envelope_')) {
+  if (query?.startsWith('recipient:')) {
+    const recipientQuery = query.slice('recipient:'.length).trim();
+
+    if (recipientQuery.length === 0) {
+      return emptyResponse;
+    }
+
+    // Bare numeric values are exact recipient ID lookups, consistent with the
+    // user: and team: prefixes. Oversized numbers cannot be IDs and fall back
+    // to the text search, mirroring the admin global search.
+    const parsedRecipientId = ZPositiveIntegerSchema.safeParse(recipientQuery);
+
+    if (/^\d+$/.test(recipientQuery) && parsedRecipientId.success) {
+      termFilters = {
+        recipients: {
+          some: {
+            id: parsedRecipientId.data,
+          },
+        },
+      };
+    } else {
+      termFilters = {
+        recipients: {
+          some: {
+            OR: [
+              { email: { contains: recipientQuery, mode: 'insensitive' } },
+              { name: { contains: recipientQuery, mode: 'insensitive' } },
+            ],
+          },
+        },
+      };
+    }
+  }
+
+  if (query?.startsWith('envelope_')) {
     termFilters = {
       id: {
         equals: query,
@@ -66,7 +106,7 @@ export const adminFindDocuments = async ({ query, page = 1, perPage = 10 }: Admi
     };
   }
 
-  if (query && query?.startsWith('document_')) {
+  if (query?.startsWith('document_')) {
     termFilters = {
       secondaryId: {
         equals: query,

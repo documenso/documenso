@@ -93,7 +93,7 @@ export const run = async ({ payload }: { payload: TSendDocumentPendingEmailJobDe
     },
     from: senderEmail,
     replyTo: replyToEmail,
-    subject: i18n._(msg`Waiting for others to complete signing.`),
+    subject: i18n._(msg`Waiting for others to complete signing`),
     html,
     text,
   });

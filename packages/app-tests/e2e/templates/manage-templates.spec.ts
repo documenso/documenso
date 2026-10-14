@@ -156,8 +156,8 @@ test('[TEMPLATES]: use template', async ({ page }) => {
   // Get input with Email label placeholder.
   await page.getByLabel('Email').click();
   await page.getByLabel('Email').fill(teamMemberUser.email);
-  await page.getByLabel('Name').click();
-  await page.getByLabel('Name').fill('name');
+  await page.getByRole('textbox', { name: 'Name', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Name', exact: true }).fill('name');
 
   await page.getByRole('button', { name: 'Create as draft' }).click();
   await page.waitForURL(/\/t\/.+\/documents/);

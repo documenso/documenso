@@ -66,6 +66,18 @@ export const linkOrgAccountRateLimit = createRateLimit({
   window: '1h',
 });
 
+// ---- Auth (Tier 3 - Authenticated, verifies secrets) ----
+
+/**
+ * Bounds guessing of the current password and 2FA code via the update password endpoint.
+ */
+export const updatePasswordRateLimit = createRateLimit({
+  action: 'auth.update-password',
+  max: 5,
+  globalMax: 20,
+  window: '15m',
+});
+
 export const reportSenderRateLimit = createRateLimit({
   action: 'recipient.report-sender',
   max: 1,

@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { AppError } from '@documenso/lib/errors/app-error';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
@@ -51,6 +52,7 @@ export const EnvelopeRedistributeDialog = ({ envelope, envelopeType, trigger }: 
 
   const { toast } = useToast();
   const { t, i18n } = useLingui();
+  const analytics = useAnalytics();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -95,6 +97,13 @@ export const EnvelopeRedistributeDialog = ({ envelope, envelopeType, trigger }: 
       setIsOpen(false);
     } catch (err) {
       const error = AppError.parseError(err);
+
+      analytics.captureException(err, {
+        source: 'editor',
+        location: 'redistribute_document',
+        envelopeId: envelope.id,
+      });
+
       const errorMessage = getDistributeErrorMessage(error.code);
 
       toast({
