@@ -985,7 +985,7 @@ model OrganisationGlobalSettings {
   brandingCompanyDetails String  @default("")
   brandingColors         Json? /// [TCssVarsSchema] @zod.custom.use(ZCssVarsSchema)
   brandingCss            String  @default("")
-  brandingLogoSize       String  @default("h-6")
+  brandingLogoSize       String  @default("SMALL")
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 

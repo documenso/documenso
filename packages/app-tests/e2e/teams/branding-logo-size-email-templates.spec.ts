@@ -1,11 +1,7 @@
-import { expect, test } from '@playwright/test';
-
 import { prisma } from '@documenso/prisma';
-import {
-  seedBlankDocument,
-  seedPendingDocumentWithFullFields,
-} from '@documenso/prisma/seed/documents';
+import { seedBlankDocument, seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -21,7 +17,7 @@ test('[BRANDING_LOGO_SIZE_EMAIL]: email template applies team branding logo size
       teamGlobalSettings: {
         update: {
           brandingEnabled: true,
-          brandingLogoSize: 'h-12',
+          brandingLogoSize: 'LARGE',
         },
       },
     },
@@ -41,7 +37,7 @@ test('[BRANDING_LOGO_SIZE_EMAIL]: email template applies team branding logo size
   });
 
   expect(updatedTeam?.teamGlobalSettings?.brandingEnabled).toBe(true);
-  expect(updatedTeam?.teamGlobalSettings?.brandingLogoSize).toBe('h-12');
+  expect(updatedTeam?.teamGlobalSettings?.brandingLogoSize).toBe('LARGE');
 
   // Verify document has the team reference
   const updatedDocument = await prisma.envelope.findUnique({
@@ -62,7 +58,7 @@ test('[BRANDING_LOGO_SIZE_EMAIL]: email template applies organization branding l
       organisationGlobalSettings: {
         update: {
           brandingEnabled: true,
-          brandingLogoSize: 'h-8',
+          brandingLogoSize: 'MEDIUM',
         },
       },
     },
@@ -82,7 +78,7 @@ test('[BRANDING_LOGO_SIZE_EMAIL]: email template applies organization branding l
   });
 
   expect(updatedOrganisation?.organisationGlobalSettings?.brandingEnabled).toBe(true);
-  expect(updatedOrganisation?.organisationGlobalSettings?.brandingLogoSize).toBe('h-8');
+  expect(updatedOrganisation?.organisationGlobalSettings?.brandingLogoSize).toBe('MEDIUM');
 
   // Verify document has the org reference
   const updatedDocument = await prisma.envelope.findUnique({
@@ -102,7 +98,7 @@ test('[BRANDING_LOGO_SIZE_EMAIL]: team logo size preference takes precedence', a
     data: {
       organisationGlobalSettings: {
         update: {
-          brandingLogoSize: 'h-6',
+          brandingLogoSize: 'SMALL',
         },
       },
     },
@@ -113,7 +109,7 @@ test('[BRANDING_LOGO_SIZE_EMAIL]: team logo size preference takes precedence', a
     data: {
       teamGlobalSettings: {
         update: {
-          brandingLogoSize: 'h-16',
+          brandingLogoSize: 'EXTRA_LARGE',
         },
       },
     },
@@ -125,7 +121,7 @@ test('[BRANDING_LOGO_SIZE_EMAIL]: team logo size preference takes precedence', a
     include: { teamGlobalSettings: true },
   });
 
-  expect(teamSettings?.teamGlobalSettings?.brandingLogoSize).toBe('h-16');
+  expect(teamSettings?.teamGlobalSettings?.brandingLogoSize).toBe('EXTRA_LARGE');
 
   // Get org settings - should have org's value
   const orgSettings = await prisma.organisation.findUnique({
@@ -133,12 +129,10 @@ test('[BRANDING_LOGO_SIZE_EMAIL]: team logo size preference takes precedence', a
     include: { organisationGlobalSettings: true },
   });
 
-  expect(orgSettings?.organisationGlobalSettings?.brandingLogoSize).toBe('h-6');
+  expect(orgSettings?.organisationGlobalSettings?.brandingLogoSize).toBe('SMALL');
 });
 
-test('[BRANDING_LOGO_SIZE_EMAIL]: document uses team branding settings for rendering', async ({
-  page,
-}) => {
+test('[BRANDING_LOGO_SIZE_EMAIL]: document uses team branding settings for rendering', async ({ page }) => {
   const { user, team } = await seedUser();
 
   // Create blank document
@@ -151,7 +145,7 @@ test('[BRANDING_LOGO_SIZE_EMAIL]: document uses team branding settings for rende
       teamGlobalSettings: {
         update: {
           brandingEnabled: true,
-          brandingLogoSize: 'h-12',
+          brandingLogoSize: 'LARGE',
         },
       },
     },
@@ -173,5 +167,5 @@ test('[BRANDING_LOGO_SIZE_EMAIL]: document uses team branding settings for rende
     include: { teamGlobalSettings: true },
   });
 
-  expect(teamData?.teamGlobalSettings?.brandingLogoSize).toBe('h-12');
+  expect(teamData?.teamGlobalSettings?.brandingLogoSize).toBe('LARGE');
 });

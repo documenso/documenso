@@ -1,7 +1,6 @@
-import { expect, test } from '@playwright/test';
-
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../../fixtures/authentication';
 
@@ -17,28 +16,26 @@ test('[BRANDING_LOGO_SIZE_API]: can update team branding logo size via tRPC', as
   });
 
   // Update team branding settings via tRPC
-  const updateResponse = await page
-    .context()
-    .request.post(`http://localhost:3001/api/trpc/team.settings.update`, {
-      headers: {
-        Cookie: await page
-          .context()
-          .cookies()
-          .then((cookies) => {
-            const cookieStr = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
-            return cookieStr;
-          }),
-      },
-      data: {
-        json: {
-          teamId: team.id,
-          data: {
-            brandingEnabled: true,
-            brandingLogoSize: 'h-12',
-          },
+  const updateResponse = await page.context().request.post(`http://localhost:3001/api/trpc/team.settings.update`, {
+    headers: {
+      Cookie: await page
+        .context()
+        .cookies()
+        .then((cookies) => {
+          const cookieStr = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
+          return cookieStr;
+        }),
+    },
+    data: {
+      json: {
+        teamId: team.id,
+        data: {
+          brandingEnabled: true,
+          brandingLogoSize: 'LARGE',
         },
       },
-    });
+    },
+  });
 
   expect(updateResponse.ok()).toBeTruthy();
 
@@ -48,13 +45,11 @@ test('[BRANDING_LOGO_SIZE_API]: can update team branding logo size via tRPC', as
     include: { teamGlobalSettings: true },
   });
 
-  expect(updatedTeam?.teamGlobalSettings?.brandingLogoSize).toBe('h-12');
+  expect(updatedTeam?.teamGlobalSettings?.brandingLogoSize).toBe('LARGE');
   expect(updatedTeam?.teamGlobalSettings?.brandingEnabled).toBe(true);
 });
 
-test('[BRANDING_LOGO_SIZE_API]: can update organization branding logo size via tRPC', async ({
-  page,
-}) => {
+test('[BRANDING_LOGO_SIZE_API]: can update organization branding logo size via tRPC', async ({ page }) => {
   const { user, organisation } = await seedUser({
     roles: {
       organisationRole: 'ADMIN',
@@ -85,7 +80,7 @@ test('[BRANDING_LOGO_SIZE_API]: can update organization branding logo size via t
           organisationId: organisation.id,
           data: {
             brandingEnabled: true,
-            brandingLogoSize: 'h-8',
+            brandingLogoSize: 'MEDIUM',
           },
         },
       },
@@ -99,13 +94,11 @@ test('[BRANDING_LOGO_SIZE_API]: can update organization branding logo size via t
     include: { organisationGlobalSettings: true },
   });
 
-  expect(updatedOrganisation?.organisationGlobalSettings?.brandingLogoSize).toBe('h-8');
+  expect(updatedOrganisation?.organisationGlobalSettings?.brandingLogoSize).toBe('MEDIUM');
   expect(updatedOrganisation?.organisationGlobalSettings?.brandingEnabled).toBe(true);
 });
 
-test('[BRANDING_LOGO_SIZE_API]: team can update through multiple size options', async ({
-  page,
-}) => {
+test('[BRANDING_LOGO_SIZE_API]: team can update through multiple size options', async ({ page }) => {
   const { user, team } = await seedUser();
 
   await apiSignin({
@@ -114,32 +107,28 @@ test('[BRANDING_LOGO_SIZE_API]: team can update through multiple size options', 
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  const sizes = ['h-6', 'h-8', 'h-12', 'h-16'];
+  const sizes = ['SMALL', 'MEDIUM', 'LARGE', 'EXTRA_LARGE'];
 
   for (const size of sizes) {
-    const updateResponse = await page
-      .context()
-      .request.post(`http://localhost:3001/api/trpc/team.settings.update`, {
-        headers: {
-          Cookie: await page
-            .context()
-            .cookies()
-            .then((cookies) => {
-              const cookieStr = cookies
-                .map((cookie) => `${cookie.name}=${cookie.value}`)
-                .join('; ');
-              return cookieStr;
-            }),
-        },
-        data: {
-          json: {
-            teamId: team.id,
-            data: {
-              brandingLogoSize: size,
-            },
+    const updateResponse = await page.context().request.post(`http://localhost:3001/api/trpc/team.settings.update`, {
+      headers: {
+        Cookie: await page
+          .context()
+          .cookies()
+          .then((cookies) => {
+            const cookieStr = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
+            return cookieStr;
+          }),
+      },
+      data: {
+        json: {
+          teamId: team.id,
+          data: {
+            brandingLogoSize: size,
           },
         },
-      });
+      },
+    });
 
     expect(updateResponse.ok()).toBeTruthy();
 
@@ -153,9 +142,7 @@ test('[BRANDING_LOGO_SIZE_API]: team can update through multiple size options', 
   }
 });
 
-test('[BRANDING_LOGO_SIZE_API]: organization can update through multiple size options', async ({
-  page,
-}) => {
+test('[BRANDING_LOGO_SIZE_API]: organization can update through multiple size options', async ({ page }) => {
   const { user, organisation } = await seedUser({
     roles: {
       organisationRole: 'ADMIN',
@@ -168,7 +155,7 @@ test('[BRANDING_LOGO_SIZE_API]: organization can update through multiple size op
     redirectPath: `/o/${organisation.url}/documents`,
   });
 
-  const sizes = ['h-6', 'h-8', 'h-12', 'h-16'];
+  const sizes = ['SMALL', 'MEDIUM', 'LARGE', 'EXTRA_LARGE'];
 
   for (const size of sizes) {
     const updateResponse = await page
@@ -179,9 +166,7 @@ test('[BRANDING_LOGO_SIZE_API]: organization can update through multiple size op
             .context()
             .cookies()
             .then((cookies) => {
-              const cookieStr = cookies
-                .map((cookie) => `${cookie.name}=${cookie.value}`)
-                .join('; ');
+              const cookieStr = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
               return cookieStr;
             }),
         },
@@ -222,34 +207,32 @@ test('[BRANDING_LOGO_SIZE_API]: can clear team branding logo size', async ({ pag
     data: {
       teamGlobalSettings: {
         update: {
-          brandingLogoSize: 'h-12',
+          brandingLogoSize: 'LARGE',
         },
       },
     },
   });
 
   // Now clear it via tRPC
-  const updateResponse = await page
-    .context()
-    .request.post(`http://localhost:3001/api/trpc/team.settings.update`, {
-      headers: {
-        Cookie: await page
-          .context()
-          .cookies()
-          .then((cookies) => {
-            const cookieStr = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
-            return cookieStr;
-          }),
-      },
-      data: {
-        json: {
-          teamId: team.id,
-          data: {
-            brandingLogoSize: null,
-          },
+  const updateResponse = await page.context().request.post(`http://localhost:3001/api/trpc/team.settings.update`, {
+    headers: {
+      Cookie: await page
+        .context()
+        .cookies()
+        .then((cookies) => {
+          const cookieStr = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
+          return cookieStr;
+        }),
+    },
+    data: {
+      json: {
+        teamId: team.id,
+        data: {
+          brandingLogoSize: null,
         },
       },
-    });
+    },
+  });
 
   expect(updateResponse.ok()).toBeTruthy();
 

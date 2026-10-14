@@ -1,17 +1,14 @@
-import { expect, test } from '@playwright/test';
-
 import { prisma } from '@documenso/prisma';
 import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
 import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
-test('[BRANDING_LOGO_SIZE_INTEGRATION]: non-admin user cannot update team branding', async ({
-  page,
-}) => {
+test('[BRANDING_LOGO_SIZE_INTEGRATION]: non-admin user cannot update team branding', async ({ page }) => {
   const { user: adminUser, team } = await seedUser();
 
   // Create a non-admin team member
@@ -41,9 +38,7 @@ test('[BRANDING_LOGO_SIZE_INTEGRATION]: non-admin user cannot update team brandi
   expect(isUnauthorized).toBeTruthy();
 });
 
-test('[BRANDING_LOGO_SIZE_INTEGRATION]: organization admin can update organization branding', async ({
-  page,
-}) => {
+test('[BRANDING_LOGO_SIZE_INTEGRATION]: organization admin can update organization branding', async ({ page }) => {
   const { user, organisation } = await seedUser({
     roles: {
       organisationRole: 'ADMIN',
@@ -84,12 +79,10 @@ test('[BRANDING_LOGO_SIZE_INTEGRATION]: organization admin can update organizati
     include: { organisationGlobalSettings: true },
   });
 
-  expect(orgSettings?.organisationGlobalSettings?.brandingLogoSize).toBe('h-12');
+  expect(orgSettings?.organisationGlobalSettings?.brandingLogoSize).toBe('LARGE');
 });
 
-test('[BRANDING_LOGO_SIZE_INTEGRATION]: non-admin organization member cannot update branding', async ({
-  page,
-}) => {
+test('[BRANDING_LOGO_SIZE_INTEGRATION]: non-admin organization member cannot update branding', async ({ page }) => {
   const { user: adminUser, organisation } = await seedUser({
     roles: {
       organisationRole: 'ADMIN',
@@ -127,9 +120,7 @@ test('[BRANDING_LOGO_SIZE_INTEGRATION]: non-admin organization member cannot upd
   expect(isUnauthorized).toBeTruthy();
 });
 
-test('[BRANDING_LOGO_SIZE_INTEGRATION]: changing branding disable does not affect logo size', async ({
-  page,
-}) => {
+test('[BRANDING_LOGO_SIZE_INTEGRATION]: changing branding disable does not affect logo size', async ({ page }) => {
   const { user, team } = await seedUser();
 
   await apiSignin({
@@ -172,7 +163,7 @@ test('[BRANDING_LOGO_SIZE_INTEGRATION]: changing branding disable does not affec
     include: { teamGlobalSettings: true },
   });
 
-  expect(teamSettings?.teamGlobalSettings?.brandingLogoSize).toBe('h-12');
+  expect(teamSettings?.teamGlobalSettings?.brandingLogoSize).toBe('LARGE');
 });
 
 test('[BRANDING_LOGO_SIZE_INTEGRATION]: team can have different logo sizes than parent organization', async ({
@@ -186,7 +177,7 @@ test('[BRANDING_LOGO_SIZE_INTEGRATION]: team can have different logo sizes than 
     data: {
       organisationGlobalSettings: {
         update: {
-          brandingLogoSize: 'h-6',
+          brandingLogoSize: 'SMALL',
         },
       },
     },
@@ -225,13 +216,11 @@ test('[BRANDING_LOGO_SIZE_INTEGRATION]: team can have different logo sizes than 
     include: { organisationGlobalSettings: true },
   });
 
-  expect(teamSettings?.teamGlobalSettings?.brandingLogoSize).toBe('h-16');
-  expect(orgSettings?.organisationGlobalSettings?.brandingLogoSize).toBe('h-6');
+  expect(teamSettings?.teamGlobalSettings?.brandingLogoSize).toBe('EXTRA_LARGE');
+  expect(orgSettings?.organisationGlobalSettings?.brandingLogoSize).toBe('SMALL');
 });
 
-test('[BRANDING_LOGO_SIZE_INTEGRATION]: all logo sizes render correctly in UI', async ({
-  page,
-}) => {
+test('[BRANDING_LOGO_SIZE_INTEGRATION]: all logo sizes render correctly in UI', async ({ page }) => {
   const { user, team } = await seedUser();
 
   await apiSignin({
