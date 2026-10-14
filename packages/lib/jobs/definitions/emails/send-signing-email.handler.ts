@@ -25,6 +25,7 @@ import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
+import { shouldShowNewAccountWarning } from '../../../utils/sender-trust';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningEmailJobDefinition } from './send-signing-email';
 
@@ -40,6 +41,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
         id: true,
         email: true,
         name: true,
+        createdAt: true,
       },
     }),
     prisma.envelope.findFirstOrThrow({
@@ -168,6 +170,13 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
   const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
   const reportUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}`;
 
+  const showNewAccountWarning =
+    !selfSigner &&
+    shouldShowNewAccountWarning({
+      userCreatedAt: user.createdAt,
+      organisationClaim: claims,
+    });
+
   const template = createElement(DocumentInviteEmailTemplate, {
     documentName: envelope.title,
     inviterName: user.name || undefined,
@@ -183,6 +192,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     teamEmail: team?.teamEmail?.email,
     includeSenderDetails: settings.includeSenderDetails,
     reportUrl,
+    newAccountWarningSenderEmail: showNewAccountWarning ? user.email : undefined,
   });
 
   if (isRecipientEmailValidForSending(recipient)) {
