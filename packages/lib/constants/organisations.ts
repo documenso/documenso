@@ -19,7 +19,7 @@ export const BRANDING_LOGO_SIZE_OPTIONS = BRANDING_LOGO_SIZE_VALUES.map((v) => (
   label: BRANDING_LOGO_SIZE_LABELS[v],
 }));
 
-export const DEFAULT_BRANDING_LOGO_SIZE = BRANDING_LOGO_SIZE_OPTIONS[0].value;
+export const DEFAULT_BRANDING_LOGO_SIZE: BrandingLogoSize = 'h-6';
 
 export const ORGANISATION_URL_ROOT_REGEX = /^\/t\/[^/]+\/?$/;
 export const ORGANISATION_URL_REGEX = /^\/t\/[^/]+/;
