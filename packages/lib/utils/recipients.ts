@@ -1,9 +1,10 @@
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { Envelope, Field, Recipient } from '@prisma/client';
-import { RecipientRole, SigningStatus } from '@prisma/client';
+import { EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
+import type { TEditorEnvelope } from '../types/envelope-editor';
 import type { TRecipientLite } from '../types/recipient';
 import { extractLegacyIds } from '../universal/id';
 import { zEmail } from './zod';
@@ -16,17 +17,108 @@ import { zEmail } from './zod';
 export const RECIPIENT_ROLES_THAT_REQUIRE_FIELDS = [RecipientRole.SIGNER] as const;
 
 // signingOrder isn't required when submitting the recipient form (Zod: z.number().optional())
-type RecipientWithSigningOrder = Pick<Recipient, 'role'> & Partial<Pick<Recipient, 'signingOrder'>>;
+type RecipientWithSigningOrder = Pick<Recipient, 'role'> & PositionedRecipient;
 
 export const isCcRecipient = (recipient: Pick<Recipient, 'role'>) => {
   return recipient.role === RecipientRole.CC;
 };
 
-export const isAssistantLastSigner = (recipients: Pick<Recipient, 'role'>[]) => {
-  const nonCcRecipients = recipients.filter((recipient) => !isCcRecipient(recipient));
-  const lastNonCcRecipient = nonCcRecipients[nonCcRecipients.length - 1];
+/**
+ * Recipients sharing an explicit signing order form a step and may act in
+ * parallel. A recipient without one (legacy rows predating automatic
+ * numbering) never shares a step: unordered recipients sort after every
+ * numbered recipient and among themselves by id, matching how the server has
+ * always processed them (`ORDER BY signingOrder NULLS LAST, id`).
+ */
+export type PositionedRecipient = {
+  id?: number | null;
+  signingOrder?: number | null;
+};
 
-  return lastNonCcRecipient?.role === RecipientRole.ASSISTANT;
+export const hasSigningOrder = (recipient: PositionedRecipient): recipient is { signingOrder: number } =>
+  typeof recipient.signingOrder === 'number';
+
+const hasPersistedId = (recipient: PositionedRecipient): recipient is { id: number } =>
+  typeof recipient.id === 'number';
+
+/**
+ * Unsaved (id-less) unordered recipients sort last, in input order.
+ */
+export const compareRecipientSigningPosition = (a: PositionedRecipient, b: PositionedRecipient): number => {
+  const aIsNumbered = hasSigningOrder(a);
+  const bIsNumbered = hasSigningOrder(b);
+
+  if (aIsNumbered && bIsNumbered) {
+    return a.signingOrder - b.signingOrder;
+  }
+
+  if (aIsNumbered !== bIsNumbered) {
+    return aIsNumbered ? -1 : 1;
+  }
+
+  const aHasId = hasPersistedId(a);
+  const bHasId = hasPersistedId(b);
+
+  if (aHasId && bHasId) {
+    return a.id - b.id;
+  }
+
+  if (aHasId !== bHasId) {
+    return aHasId ? -1 : 1;
+  }
+
+  return 0;
+};
+
+export const sortRecipientsBySigningPosition = <T extends PositionedRecipient>(recipients: T[]): T[] =>
+  [...recipients].sort(compareRecipientSigningPosition);
+
+export const isSameSigningStep = (a: PositionedRecipient, b: PositionedRecipient): boolean =>
+  hasSigningOrder(a) && hasSigningOrder(b) && a.signingOrder === b.signingOrder;
+
+/**
+ * Whether `recipient` must act before `other`.
+ *
+ * `strictlySequential` also orders group members by id so no two recipients
+ * are ever eligible at once — required on AES/QES, where a TSP signature is
+ * computed over a document snapshot and overlapping signers would invalidate
+ * each other's /ByteRange.
+ */
+export const isRecipientBefore = (
+  recipient: PositionedRecipient,
+  other: PositionedRecipient,
+  options: { strictlySequential?: boolean } = {},
+): boolean => {
+  const comparison = compareRecipientSigningPosition(recipient, other);
+
+  if (comparison !== 0) {
+    return comparison < 0;
+  }
+
+  if (!options.strictlySequential || !isSameSigningStep(recipient, other)) {
+    return false;
+  }
+
+  return hasPersistedId(recipient) && hasPersistedId(other) && recipient.id < other.id;
+};
+
+/**
+ * Whether an assistant sits in the last signing step (nobody after them to assist).
+ */
+export const isAssistantLastSigner = (recipients: RecipientWithSigningOrder[]) => {
+  const nonCcRecipients = sortRecipientsBySigningPosition(recipients.filter((recipient) => !isCcRecipient(recipient)));
+
+  const lastRecipient = nonCcRecipients[nonCcRecipients.length - 1];
+
+  if (!lastRecipient) {
+    return false;
+  }
+
+  return nonCcRecipients.some(
+    (recipient) =>
+      recipient.role === RecipientRole.ASSISTANT &&
+      (recipient === lastRecipient || isSameSigningStep(recipient, lastRecipient)),
+  );
 };
 
 export const sortRecipientsForSigningOrder = <T extends RecipientWithSigningOrder>(recipients: T[]): T[] => {
@@ -39,11 +131,7 @@ export const sortRecipientsForSigningOrder = <T extends RecipientWithSigningOrde
       return r1IsCcRecipient ? 1 : -1;
     }
 
-    // Order by signing order; missing orders sort last.
-    const r1SigningOrder = r1.signingOrder ?? Number.MAX_SAFE_INTEGER;
-    const r2SigningOrder = r2.signingOrder ?? Number.MAX_SAFE_INTEGER;
-
-    return r1SigningOrder - r2SigningOrder;
+    return compareRecipientSigningPosition(r1, r2);
   });
 };
 
@@ -118,6 +206,36 @@ export const canRecipientBeModified = (
   }
 
   return true;
+};
+
+/**
+ * Editor-level wrapper around `canRecipientBeModified`.
+ *
+ * Template recipients and unsaved (id-less) recipients can always be modified.
+ */
+export const canEditorRecipientBeModified = (
+  envelope: Pick<TEditorEnvelope, 'type' | 'recipients' | 'fields'>,
+  recipientId?: number,
+) => {
+  if (envelope.type === EnvelopeType.TEMPLATE) {
+    return true;
+  }
+
+  if (recipientId === undefined) {
+    return true;
+  }
+
+  const recipient = envelope.recipients.find((r) => r.id === recipientId);
+
+  // The envelope lags behind the form: a recipient the editor has just created
+  // is not in it yet. Such a recipient cannot have acted on the document, so
+  // treat an unknown id as modifiable — reporting it as locked would freeze
+  // reordering for a document nobody has signed.
+  if (!recipient) {
+    return true;
+  }
+
+  return canRecipientBeModified(recipient, envelope.fields);
 };
 
 /**
