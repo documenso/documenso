@@ -7,7 +7,7 @@ import type { OAuthClientOptions } from '../../config';
 import { sessionCookieOptions } from '../session/session-cookies';
 import { getOpenIdConfiguration } from './open-id';
 
-type HandleOAuthAuthorizeUrlOptions = {
+export type HandleOAuthAuthorizeUrlOptions = {
   /**
    * Hono context.
    */
@@ -29,16 +29,53 @@ type HandleOAuthAuthorizeUrlOptions = {
   prompt?: 'none' | 'login' | 'consent' | 'select_account';
 };
 
-const isOidcPrompt = (value: unknown): value is HandleOAuthAuthorizeUrlOptions['prompt'] => {
+export type ResolvePromptOptions = {
+  provider: string;
+  prompt?: HandleOAuthAuthorizeUrlOptions['prompt'];
+};
+
+export const isOidcPrompt = (value: unknown): value is NonNullable<HandleOAuthAuthorizeUrlOptions['prompt']> => {
   return value === 'none' || value === 'login' || value === 'consent' || value === 'select_account';
+};
+
+export type ResolvePromptFn = {
+  (options: ResolvePromptOptions): HandleOAuthAuthorizeUrlOptions['prompt'] | undefined;
+  (
+    provider: string,
+    prompt?: HandleOAuthAuthorizeUrlOptions['prompt'],
+  ): HandleOAuthAuthorizeUrlOptions['prompt'] | undefined;
+};
+
+export const resolvePrompt: ResolvePromptFn = (
+  providerOrOptions: string | ResolvePromptOptions,
+  prompt?: HandleOAuthAuthorizeUrlOptions['prompt'],
+): HandleOAuthAuthorizeUrlOptions['prompt'] | undefined => {
+  const provider = typeof providerOrOptions === 'string' ? providerOrOptions : providerOrOptions.provider;
+  const routePrompt = typeof providerOrOptions === 'string' ? prompt : providerOrOptions.prompt;
+
+  if (provider === 'oidc') {
+    const envPrompt = process.env.NEXT_PRIVATE_OIDC_PROMPT;
+
+    if (envPrompt === '') {
+      return undefined;
+    }
+
+    if (envPrompt !== undefined) {
+      if (isOidcPrompt(envPrompt)) {
+        return envPrompt;
+      }
+
+      return routePrompt ?? 'login';
+    }
+  }
+
+  return routePrompt ?? 'login';
 };
 
 const oauthCookieMaxAge = 60 * 10; // 10 minutes.
 
 export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOptions) => {
   const { c, clientOptions, redirectPath } = options;
-
-  let prompt = options.prompt ?? 'login';
 
   if (!clientOptions.clientId || !clientOptions.clientSecret) {
     throw new AppError(AppErrorCode.NOT_SETUP);
@@ -63,12 +100,14 @@ export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOp
     scopes,
   );
 
-  // Pass the prompt to the authorization endpoint.
-  if (process.env.NEXT_PRIVATE_OIDC_PROMPT && isOidcPrompt(process.env.NEXT_PRIVATE_OIDC_PROMPT)) {
-    prompt = process.env.NEXT_PRIVATE_OIDC_PROMPT;
-  }
+  const prompt = resolvePrompt({
+    provider: clientOptions.id,
+    prompt: options.prompt,
+  });
 
-  url.searchParams.set('prompt', prompt);
+  if (prompt !== undefined) {
+    url.searchParams.set('prompt', prompt);
+  }
 
   setCookie(c, `${clientOptions.id}_oauth_state`, state, {
     ...sessionCookieOptions,
