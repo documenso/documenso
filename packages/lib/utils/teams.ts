@@ -220,6 +220,8 @@ const BRANDING_KEYS = new Set<string>([
   'brandingLogoSize',
   'brandingUrl',
   'brandingCompanyDetails',
+  'brandingColors',
+  'brandingCss',
 ]);
 
 export const extractDerivedTeamSettings = (
