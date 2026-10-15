@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import { mailer } from '@documenso/email/mailer';
 import DocumentRejectedEmail from '@documenso/email/templates/document-rejected';
 import DocumentRejectionConfirmedEmail from '@documenso/email/templates/document-rejection-confirmed';
@@ -36,11 +37,19 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
             id: true,
             email: true,
             name: true,
+            createdAt: true,
+            twoFactorEnabled: true,
           },
         },
         documentMeta: true,
+        recipients: {
+          select: {
+            email: true,
+          },
+        },
         team: {
           select: {
+            id: true,
             teamEmail: true,
             name: true,
             url: true,
@@ -64,7 +73,17 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
     return;
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled, emailTransport } = await getEmailContext({
+  const {
+    branding,
+    emailLanguage,
+    senderEmail,
+    replyToEmail,
+    organisationId,
+    organisationType,
+    claims,
+    emailsDisabled,
+    emailTransport,
+  } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -78,7 +97,41 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
   // Send confirmation email to the recipient who rejected.
   // Skipped when the organisation has email sending disabled, since this is sent on its behalf.
   // The owner notification below intentionally uses the internal Documenso email, so it still sends.
-  if (!emailsDisabled && isRecipientEmailValidForSending(recipient)) {
+  const shouldEmailRecipient = !emailsDisabled && isRecipientEmailValidForSending(recipient);
+
+  // One check covers both emails, so a block stops them both.
+  const isBlocked = await io.runTask('check-admin-rules', async () => {
+    const adminRuleEngine = new AdminRuleEngine();
+
+    const result = await adminRuleEngine.run({
+      trigger: 'EMAIL_SENT',
+      envelope: {
+        ...envelope,
+        team: {
+          id: envelope.team.id,
+          url: envelope.team.url,
+          organisation: {
+            id: organisationId,
+            type: organisationType,
+            organisationClaim: claims,
+          },
+        },
+      },
+      sender: documentOwner,
+      emailType: 'rejected',
+      recipients: shouldEmailRecipient ? [recipient, documentOwner] : [documentOwner],
+    });
+
+    return result.isBlocked;
+  });
+
+  if (isBlocked) {
+    io.logger.info(`Rejection emails for recipient ${recipient.id} blocked by an admin rule`);
+
+    return;
+  }
+
+  if (shouldEmailRecipient) {
     await io.runTask('send-rejection-confirmation-email', async () => {
       const recipientTemplate = createElement(DocumentRejectionConfirmedEmail, {
         recipientName: recipient.name,

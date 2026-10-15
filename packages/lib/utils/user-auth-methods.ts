@@ -17,7 +17,7 @@ type DeriveUserAuthMethodsOptions = {
   accountProviders: string[];
 };
 
-const OAUTH_PROVIDER_AUTH_METHODS: Record<string, TUserAuthMethod> = {
+export const OAUTH_PROVIDER_AUTH_METHODS: Record<string, TUserAuthMethod> = {
   google: UserAuthMethod.GOOGLE,
   microsoft: UserAuthMethod.MICROSOFT,
   oidc: UserAuthMethod.OIDC,

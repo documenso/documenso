@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import DocumentReminderEmailTemplate from '@documenso/email/templates/document-reminder';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
@@ -67,10 +68,21 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
       envelope: {
         include: {
           documentMeta: true,
-          user: true,
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              createdAt: true,
+              twoFactorEnabled: true,
+              disabled: true,
+            },
+          },
           recipients: true,
           team: {
             select: {
+              id: true,
+              url: true,
               name: true,
             },
           },
@@ -125,6 +137,34 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
   // has email sending disabled.
   if (envelope.user.disabled || emailsDisabled) {
     io.logger.info(`Envelope ${envelope.id} skipping reminder: owner disabled or organisation emails disabled`);
+    return;
+  }
+
+  // Reminders go through the "Email sent" rules, like a manual resend, built from what's already
+  // loaded so they cost no extra query. A blocked reminder ends the recipient's automatic reminders:
+  // the claim above cleared `nextReminderAt`, and returning here keeps it cleared.
+  const adminRuleEngine = new AdminRuleEngine();
+
+  const { isBlocked } = await adminRuleEngine.run({
+    trigger: 'EMAIL_SENT',
+    envelope: {
+      ...envelope,
+      team: {
+        ...envelope.team,
+        organisation: {
+          id: organisationId,
+          type: organisationType,
+          organisationClaim: claims,
+        },
+      },
+    },
+    sender: envelope.user,
+    emailType: 'reminder',
+    recipients: [recipient],
+  });
+
+  if (isBlocked) {
+    io.logger.info(`Envelope ${envelope.id} ending reminders for recipient ${recipient.id}: blocked by an admin rule`);
     return;
   }
 

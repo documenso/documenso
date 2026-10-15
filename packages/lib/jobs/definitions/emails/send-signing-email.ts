@@ -10,6 +10,10 @@ const SEND_SIGNING_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   documentId: z.number(),
   recipientId: z.number(),
   requestMetadata: ZRequestMetadataSchema.optional(),
+  /**
+   * Skips the "Email sent" admin rules. Only for callers that already ran them for this email, as `sendDocument` does.
+   */
+  bypassAdminRules: z.boolean().optional(),
 });
 
 export type TSendSigningEmailJobDefinition = z.infer<typeof SEND_SIGNING_EMAIL_JOB_DEFINITION_SCHEMA>;
