@@ -306,7 +306,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                       type="password"
                       {...field}
                       value={field.value ?? ''}
-                      placeholder={field.value === null ? '**********************' : undefined}
+                      placeholder="**********************"
                     />
                   </FormControl>
                   <FormMessage />
