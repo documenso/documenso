@@ -56,7 +56,8 @@ export type SendDocumentOptions = {
   teamId: number;
   sendEmail?: boolean;
   /**
-   * Skips the admin rules, for callers that already ran them for this document, as direct links do.
+   * Skips the admin rules here, for callers that already ran them for this document, as direct links
+   * do. The signing email jobs still check each email when they send it.
    */
   bypassAdminRules?: boolean;
   requestMetadata: ApiRequestMetadata;
@@ -380,8 +381,6 @@ export const sendDocument = async ({
           documentId: legacyDocumentId,
           recipientId: recipient.id,
           requestMetadata: requestMetadata?.requestMetadata,
-          // These emails were already checked against the "Email sent" rules, here or by the caller.
-          bypassAdminRules: true,
         },
       });
     }),
@@ -449,7 +448,8 @@ type AssertAdminRulesAllowSendOptions = {
 
 /**
  * Runs the "Document sent" rules, then the "Email sent" rules for the signing requests about to go
- * out, and throws `ADMIN_RULE_BLOCKED` if either blocks.
+ * out, and throws `ADMIN_RULE_BLOCKED` if either blocks. A rule that turns off the organisation's
+ * emails needs no handling here: the signing email jobs check that setting when they run.
  */
 export const assertAdminRulesAllowSend = async ({
   envelope,
@@ -464,7 +464,10 @@ export const assertAdminRulesAllowSend = async ({
 
   await adminRuleEngine.runAndAssert({ trigger: 'DOCUMENT_SENT', envelope, sender });
 
-  if (recipientsToNotify.length === 0) {
+  // Recipients without an email address aren't emailed, so the "Email sent" rules leave them out.
+  const recipientsToEmail = recipientsToNotify.filter((recipient) => isRecipientEmailValidForSending(recipient));
+
+  if (recipientsToEmail.length === 0) {
     return;
   }
 
@@ -473,7 +476,7 @@ export const assertAdminRulesAllowSend = async ({
     envelope,
     sender,
     emailType: 'signing_request',
-    recipients: recipientsToNotify,
+    recipients: recipientsToEmail,
   });
 };
 

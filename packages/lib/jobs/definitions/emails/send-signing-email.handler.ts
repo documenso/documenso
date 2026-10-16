@@ -31,7 +31,7 @@ import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningEmailJobDefinition } from './send-signing-email';
 
 export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefinition; io: JobRunIO }) => {
-  const { userId, documentId, recipientId, requestMetadata, bypassAdminRules } = payload;
+  const { userId, documentId, recipientId, requestMetadata } = payload;
 
   const [user, envelope, recipient] = await Promise.all([
     prisma.user.findFirstOrThrow({
@@ -120,8 +120,11 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     return;
   }
 
-  if (!bypassAdminRules) {
-    const isBlocked = await io.runTask('check-admin-rules', async () => {
+  // Every email that goes out is checked against what's sent now, even when the send that queued it
+  // checked it already, since the recipient or the document can change in between.
+  if (isRecipientEmailValidForSending(recipient)) {
+    // Keyed by the address, so a retry reuses the result unless the address changed in between.
+    const adminRuleResult = await io.runTask(`check-admin-rules-${recipient.email}`, async () => {
       const recipients = await prisma.recipient.findMany({
         where: {
           envelopeId: envelope.id,
@@ -153,11 +156,15 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
         recipients: [recipient],
       });
 
-      return result.isBlocked;
+      return {
+        isBlocked: result.isBlocked,
+        hasDisabledEmails: result.hasDisabledEmails,
+      };
     });
 
-    if (isBlocked) {
-      io.logger.info(`Signing email for recipient ${recipient.id} blocked by an admin rule`);
+    // A rule that turns off the organisation's emails stops this email too, as if they were already off.
+    if (adminRuleResult.isBlocked || adminRuleResult.hasDisabledEmails) {
+      io.logger.info(`Signing email for recipient ${recipient.id} stopped by an admin rule`);
 
       return;
     }

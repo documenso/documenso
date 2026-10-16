@@ -112,9 +112,10 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
     ? envelope.recipients.filter((recipient) => isRecipientEmailValidForSending(recipient))
     : [];
 
-  // One check covers every completion email, so a block stops them all.
+  // One check covers every completion email, so a block stops them all. So does a rule that turns
+  // off the organisation's emails, as if they were already off.
   if (shouldEmailOwner || recipientsToNotify.length > 0) {
-    const isBlocked = await io.runTask('check-admin-rules', async () => {
+    const adminRuleResult = await io.runTask('check-admin-rules', async () => {
       const adminRuleEngine = new AdminRuleEngine();
 
       const result = await adminRuleEngine.run({
@@ -136,11 +137,14 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
         recipients: shouldEmailOwner ? [owner, ...recipientsToNotify] : recipientsToNotify,
       });
 
-      return result.isBlocked;
+      return {
+        isBlocked: result.isBlocked,
+        hasDisabledEmails: result.hasDisabledEmails,
+      };
     });
 
-    if (isBlocked) {
-      io.logger.info(`Completion emails for envelope ${envelope.id} blocked by an admin rule`);
+    if (adminRuleResult.isBlocked || adminRuleResult.hasDisabledEmails) {
+      io.logger.info(`Completion emails for envelope ${envelope.id} stopped by an admin rule`);
 
       return;
     }

@@ -46,6 +46,11 @@ export type AdminRuleRunResult = {
   blockedByRuleId: string | null;
   matchIds: string[];
   hasFailedActions: boolean;
+  /**
+   * Whether a rule turned off the organisation's emails. Email hook points read that setting before
+   * running the rules, so they check this to stop the email that triggered it too.
+   */
+  hasDisabledEmails: boolean;
 };
 
 export type AdminRuleEngineOptions = {
@@ -206,6 +211,7 @@ export class AdminRuleEngine {
       blockedByRuleId: evaluation.blockedByRuleId,
       matchIds: [],
       hasFailedActions: false,
+      hasDisabledEmails: false,
     };
 
     for (const { rule, actions } of evaluation.matches) {
@@ -224,6 +230,10 @@ export class AdminRuleEngine {
             await this.executeAction({ action, subject, ruleId: rule.id });
 
             actionsRun.push({ type: action.type, status: 'ran' });
+
+            if (action.type === 'disable_emails') {
+              result.hasDisabledEmails = true;
+            }
           } catch (error) {
             result.hasFailedActions = true;
 
@@ -351,6 +361,7 @@ export class AdminRuleEngine {
         blockedByRuleId: null,
         matchIds: [],
         hasFailedActions: false,
+        hasDisabledEmails: false,
       };
     }
 

@@ -353,13 +353,6 @@ export const createDocumentFromDirectTemplate = async ({
 
   const directTemplateSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature !== null);
 
-  // Enforce the organisation document-creation limit before creating the document.
-  await assertOrganisationRatesAndLimits({
-    organisationId: directTemplateEnvelope.team.organisationId,
-    type: 'document',
-    count: 1,
-  });
-
   const envelopeId = prefixedId('envelope');
 
   // Build a temporary envelope for admin rules checking before the actual document creation.
@@ -376,12 +369,20 @@ export const createDocumentFromDirectTemplate = async ({
   });
 
   // Checked before anything is created: `sendDocument` only runs once the document exists, and its
-  // errors are swallowed below.
+  // errors are swallowed below. Also before the quota is reserved, since a reservation is never
+  // released and a blocked submission creates no document.
   await assertAdminRulesAllowSend({
     envelope: temporaryEnvelopeForRules,
     sender: directTemplateEnvelope.user,
     recipientsToNotify: getSigningRequestRecipients({ envelope: temporaryEnvelopeForRules }),
     requestMetadata,
+  });
+
+  // Enforce the organisation document-creation limit before creating the document.
+  await assertOrganisationRatesAndLimits({
+    organisationId: directTemplateEnvelope.team.organisationId,
+    type: 'document',
+    count: 1,
   });
 
   const initialRequestTime = new Date();

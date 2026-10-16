@@ -154,22 +154,26 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
   // Don't resend any emails if signing request emails are off or the organisation has email sending disabled.
   const shouldSendEmails = emailContext !== null && !user.disabled && !emailContext.emailsDisabled;
 
+  // Recipients without an email address aren't emailed, so the "Email sent" rules leave them out.
+  const validRecipients = recipientsToRemind.filter((recipient) => isRecipientEmailValidForSending(recipient));
+
+  const adminRuleEngine = new AdminRuleEngine({
+    requestMetadata: requestMetadata.requestMetadata,
+    requestSource: requestMetadata.source,
+  });
+
   // Rules run before anything is written, so a blocked resend leaves the signing links, the
   // reminder cycle and the email quota untouched.
-  if (shouldSendEmails && recipientsToRemind.length > 0) {
-    const adminRuleEngine = new AdminRuleEngine({
-      requestMetadata: requestMetadata.requestMetadata,
-      requestSource: requestMetadata.source,
-    });
-
-    await adminRuleEngine.runAndAssert({
-      trigger: 'EMAIL_SENT',
-      envelope,
-      sender: user,
-      emailType: 'reminder',
-      recipients: recipientsToRemind,
-    });
-  }
+  const adminRuleResult =
+    shouldSendEmails && validRecipients.length > 0
+      ? await adminRuleEngine.runAndAssert({
+          trigger: 'EMAIL_SENT',
+          envelope,
+          sender: user,
+          emailType: 'reminder',
+          recipients: validRecipients,
+        })
+      : null;
 
   if (expiresAt && recipientsToRemind.length > 0) {
     await prisma.recipient.updateMany({
@@ -201,7 +205,8 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     ),
   );
 
-  if (!shouldSendEmails) {
+  // A rule that turns off the organisation's emails stops these emails too, as if they were already off.
+  if (!shouldSendEmails || adminRuleResult?.hasDisabledEmails) {
     return envelope;
   }
 

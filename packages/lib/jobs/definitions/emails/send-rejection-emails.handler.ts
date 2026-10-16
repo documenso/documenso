@@ -100,7 +100,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
   const shouldEmailRecipient = !emailsDisabled && isRecipientEmailValidForSending(recipient);
 
   // One check covers both emails, so a block stops them both.
-  const isBlocked = await io.runTask('check-admin-rules', async () => {
+  const adminRuleResult = await io.runTask('check-admin-rules', async () => {
     const adminRuleEngine = new AdminRuleEngine();
 
     const result = await adminRuleEngine.run({
@@ -122,16 +122,21 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
       recipients: shouldEmailRecipient ? [recipient, documentOwner] : [documentOwner],
     });
 
-    return result.isBlocked;
+    return {
+      isBlocked: result.isBlocked,
+      hasDisabledEmails: result.hasDisabledEmails,
+    };
   });
 
-  if (isBlocked) {
+  if (adminRuleResult.isBlocked) {
     io.logger.info(`Rejection emails for recipient ${recipient.id} blocked by an admin rule`);
 
     return;
   }
 
-  if (shouldEmailRecipient) {
+  // A rule that turns off the organisation's emails also stops the confirmation, as if they were
+  // already off. The owner's notification still sends.
+  if (shouldEmailRecipient && !adminRuleResult.hasDisabledEmails) {
     await io.runTask('send-rejection-confirmation-email', async () => {
       const recipientTemplate = createElement(DocumentRejectionConfirmedEmail, {
         recipientName: recipient.name,

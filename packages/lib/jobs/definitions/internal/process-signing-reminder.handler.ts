@@ -143,10 +143,11 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
 
   // Reminders go through the "Email sent" rules, like a manual resend, built from what's already
   // loaded so they cost no extra query. A blocked reminder ends the recipient's automatic reminders:
-  // the claim above cleared `nextReminderAt`, and returning here keeps it cleared.
+  // the claim above cleared `nextReminderAt`, and returning here keeps it cleared. So does a rule that
+  // turns off the organisation's emails, as if they were already off.
   const adminRuleEngine = new AdminRuleEngine();
 
-  const { isBlocked } = await adminRuleEngine.run({
+  const { isBlocked, hasDisabledEmails } = await adminRuleEngine.run({
     trigger: 'EMAIL_SENT',
     envelope: {
       ...envelope,
@@ -164,8 +165,8 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
     recipients: [recipient],
   });
 
-  if (isBlocked) {
-    io.logger.info(`Envelope ${envelope.id} ending reminders for recipient ${recipient.id}: blocked by an admin rule`);
+  if (isBlocked || hasDisabledEmails) {
+    io.logger.info(`Envelope ${envelope.id} ending reminders for recipient ${recipient.id}: stopped by an admin rule`);
     return;
   }
 

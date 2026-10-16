@@ -25,7 +25,7 @@ import { seedDraftDocument, seedPendingDocument } from '@documenso/prisma/seed/d
 import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedDirectTemplate } from '@documenso/prisma/seed/templates';
 import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { DocumentSigningOrder, DocumentSource, FieldType, RecipientRole, SendStatus, type User } from '@prisma/client';
 import { DateTime } from 'luxon';
 
@@ -259,6 +259,67 @@ const seedSequentialDocument = async ({ user, teamId }: SeedSequentialDocumentOp
 
   return { document, first, second };
 };
+
+type SeedDisableEmailsRuleOptions = {
+  user: User;
+  emailType: string;
+};
+
+// Turns off the sender's organisation emails when one type of email is about to go out, without a block.
+const seedDisableEmailsRule = async ({ user, emailType }: SeedDisableEmailsRuleOptions) =>
+  await seedRule({
+    trigger: 'EMAIL_SENT',
+    definition: buildDefinition({
+      conditions: [
+        { field: 'sender.email', operator: 'equals', value: user.email },
+        { field: 'email.type', operator: 'is', value: emailType },
+      ],
+      actions: [{ type: 'disable_emails', params: {} }],
+    }),
+  });
+
+type CountSentEmailsOptions = {
+  envelopeId: string;
+  recipientId?: number;
+};
+
+// Each email sent for a document gets an audit log entry.
+const countSentEmails = async ({ envelopeId, recipientId }: CountSentEmailsOptions) =>
+  await prisma.documentAuditLog.count({
+    where: {
+      envelopeId,
+      type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+      ...(recipientId !== undefined && {
+        data: {
+          path: ['recipientId'],
+          equals: recipientId,
+        },
+      }),
+    },
+  });
+
+type ResendDocumentInAppOptions = {
+  page: Page;
+  teamId: number;
+  envelopeId: string;
+  recipientIds: number[];
+};
+
+// Resends through the app: `resendDocument` renders emails with translated messages, which can't be
+// loaded in this test process.
+const resendDocumentInApp = async ({ page, teamId, envelopeId, recipientIds }: ResendDocumentInAppOptions) =>
+  await page.request.post('/api/trpc/envelope.redistribute', {
+    headers: {
+      ...WEBAPP_ORIGIN_HEADERS,
+      'x-team-id': String(teamId),
+    },
+    data: {
+      json: {
+        envelopeId,
+        recipients: recipientIds,
+      },
+    },
+  });
 
 type SubmitDirectLinkOptions = {
   template: Awaited<ReturnType<typeof seedDirectTemplate>>;
@@ -1111,21 +1172,13 @@ test('[ADMIN][RULES][ENGINE]: a blocked resend leaves the signing link and the r
     }),
   });
 
-  // Resend through the app: `resendDocument` renders emails with translated messages, which can't be
-  // loaded in this test process.
   await apiSignin({ page, email: user.email });
 
-  const response = await page.request.post('/api/trpc/envelope.redistribute', {
-    headers: {
-      ...WEBAPP_ORIGIN_HEADERS,
-      'x-team-id': String(team.id),
-    },
-    data: {
-      json: {
-        envelopeId: document.id,
-        recipients: [recipient.id],
-      },
-    },
+  const response = await resendDocumentInApp({
+    page,
+    teamId: team.id,
+    envelopeId: document.id,
+    recipientIds: [recipient.id],
   });
 
   expect(response.status()).toBe(403);
@@ -1144,7 +1197,95 @@ test('[ADMIN][RULES][ENGINE]: a blocked resend leaves the signing link and the r
   expect(updatedRecipient.reminderCount).toEqual(2);
 });
 
-test('[ADMIN][RULES][ENGINE]: the signing emails of a sent document are checked once, not again in their jobs', async () => {
+test('[ADMIN][RULES][ENGINE]: a rule that turns off emails also stops the resend that triggered it', async ({
+  page,
+}) => {
+  const { user, team } = await seedUser();
+
+  const document = await seedPendingDocument(user, team.id, ['recipient@example.com']);
+  const [recipient] = document.recipients;
+
+  await prisma.recipient.update({
+    where: {
+      id: recipient.id,
+    },
+    data: {
+      reminderCount: 2,
+    },
+  });
+
+  const rule = await seedDisableEmailsRule({ user, emailType: 'reminder' });
+
+  await apiSignin({ page, email: user.email });
+
+  const response = await resendDocumentInApp({
+    page,
+    teamId: team.id,
+    envelopeId: document.id,
+    recipientIds: [recipient.id],
+  });
+
+  expect(response.status()).toBe(200);
+
+  const match = await prisma.adminRuleMatch.findFirstOrThrow({
+    where: {
+      ruleId: rule.id,
+    },
+  });
+
+  expect(match.actionsRun).toEqual([{ type: 'disable_emails', status: 'ran' }]);
+
+  // The resend goes through, restarting the reminder cycle, but sends no email.
+  const updatedRecipient = await prisma.recipient.findFirstOrThrow({
+    where: {
+      id: recipient.id,
+    },
+  });
+
+  expect(updatedRecipient.reminderCount).toEqual(0);
+  expect(await countSentEmails({ envelopeId: document.id })).toEqual(0);
+});
+
+test('[ADMIN][RULES][ENGINE]: a resend to recipients without an email address is not checked', async ({ page }) => {
+  const { user, team } = await seedUser();
+
+  const document = await seedPendingDocument(user, team.id, ['recipient@example.com']);
+  const [recipient] = document.recipients;
+
+  await prisma.recipient.update({
+    where: {
+      id: recipient.id,
+    },
+    data: {
+      email: '',
+    },
+  });
+
+  const rule = await seedRule({
+    trigger: 'EMAIL_SENT',
+    definition: buildDefinition({
+      conditions: [
+        { field: 'sender.email', operator: 'equals', value: user.email },
+        { field: 'email.type', operator: 'is', value: 'reminder' },
+      ],
+      actions: [{ type: 'block_event', params: {} }],
+    }),
+  });
+
+  await apiSignin({ page, email: user.email });
+
+  const response = await resendDocumentInApp({
+    page,
+    teamId: team.id,
+    envelopeId: document.id,
+    recipientIds: [recipient.id],
+  });
+
+  expect(response.status()).toBe(200);
+  expect(await countRuleMatches(rule.id)).toEqual(0);
+});
+
+test('[ADMIN][RULES][ENGINE]: the signing emails of a sent document are checked again when their jobs send them', async () => {
   const { user, team } = await seedUser();
 
   const document = await seedDraftDocument(user, team.id, ['first@example.com', 'second@example.com']);
@@ -1196,8 +1337,74 @@ test('[ADMIN][RULES][ENGINE]: the signing emails of a sent document are checked 
     },
   });
 
-  // One evaluation, by `sendDocument`, covering both emails. The jobs skip the rules.
-  expect(matches.map((match) => match.eventSnapshot['email.recipient_count'])).toEqual([2]);
+  // Once by `sendDocument` for both emails, then again by each email's job.
+  const recipientCounts = matches.map((match) => match.eventSnapshot['email.recipient_count']);
+
+  expect(recipientCounts.sort()).toEqual([1, 1, 2]);
+});
+
+test('[ADMIN][RULES][ENGINE]: signing requests to recipients without an email address are not checked', async () => {
+  const { user, team } = await seedUser();
+
+  const document = await seedDraftDocument(user, team.id, ['recipient@example.com']);
+
+  await prisma.field.updateMany({
+    where: {
+      envelopeId: document.id,
+    },
+    data: {
+      type: FieldType.SIGNATURE,
+    },
+  });
+
+  await prisma.recipient.updateMany({
+    where: {
+      envelopeId: document.id,
+    },
+    data: {
+      email: '',
+    },
+  });
+
+  const rule = await seedRule({
+    trigger: 'EMAIL_SENT',
+    definition: buildDefinition({
+      conditions: [
+        { field: 'sender.email', operator: 'equals', value: user.email },
+        { field: 'email.type', operator: 'is', value: 'signing_request' },
+      ],
+      actions: [{ type: 'block_event', params: {} }],
+    }),
+  });
+
+  const error = await sendDocument({
+    id: { type: 'envelopeId', id: document.id },
+    userId: user.id,
+    teamId: team.id,
+    requestMetadata,
+  })
+    .then(() => null)
+    .catch((err) => AppError.parseError(err));
+
+  expect(error).toBeNull();
+
+  // There's nothing to email, so the job marks the recipient as sent without checking either.
+  const recipient = await prisma.recipient.findFirstOrThrow({
+    where: {
+      envelopeId: document.id,
+    },
+  });
+
+  await waitForRecipientJob({ jobId: 'send.signing.requested.email', recipientId: recipient.id });
+
+  const updatedRecipient = await prisma.recipient.findFirstOrThrow({
+    where: {
+      id: recipient.id,
+    },
+  });
+
+  expect(updatedRecipient.sendStatus).toEqual(SendStatus.SENT);
+  expect(await countRuleMatches(rule.id)).toEqual(0);
 });
 
 test('[ADMIN][RULES][ENGINE]: a blocked signing request for the next sequential step is not sent', async () => {
@@ -1317,6 +1524,81 @@ test('[ADMIN][RULES][ENGINE]: a blocked signing request after an admin removes t
   expect(match.actionsRun).toEqual([{ type: 'block_event', status: 'ran' }]);
 });
 
+test('[ADMIN][RULES][ENGINE]: a rule that turns off emails also stops the signing request that triggered it', async () => {
+  const { user, team } = await seedUser();
+
+  const { document, first, second } = await seedSequentialDocument({ user, teamId: team.id });
+
+  const rule = await seedDisableEmailsRule({ user, emailType: 'signing_request' });
+
+  await completeDocumentWithToken({
+    token: first.token,
+    id: { type: 'envelopeId', id: document.id },
+  });
+
+  await waitForRecipientJob({ jobId: 'send.signing.requested.email', recipientId: second.id });
+
+  const match = await prisma.adminRuleMatch.findFirstOrThrow({
+    where: {
+      ruleId: rule.id,
+    },
+  });
+
+  expect(match.actionsRun).toEqual([{ type: 'disable_emails', status: 'ran' }]);
+
+  // As if the organisation's emails were already off: no email, and the recipient isn't marked as sent.
+  const updatedSecond = await prisma.recipient.findFirstOrThrow({
+    where: {
+      id: second.id,
+    },
+  });
+
+  expect(updatedSecond.sendStatus).toEqual(SendStatus.NOT_SENT);
+  expect(await countSentEmails({ envelopeId: document.id, recipientId: second.id })).toEqual(0);
+});
+
+test('[ADMIN][RULES][ENGINE]: a next signer without an email address is not checked, and is marked as sent', async () => {
+  const { user, team } = await seedUser();
+
+  const { document, first, second } = await seedSequentialDocument({ user, teamId: team.id });
+
+  await prisma.recipient.update({
+    where: {
+      id: second.id,
+    },
+    data: {
+      email: '',
+    },
+  });
+
+  const rule = await seedRule({
+    trigger: 'EMAIL_SENT',
+    definition: buildDefinition({
+      conditions: [
+        { field: 'sender.email', operator: 'equals', value: user.email },
+        { field: 'email.type', operator: 'is', value: 'signing_request' },
+      ],
+      actions: [{ type: 'block_event', params: {} }],
+    }),
+  });
+
+  await completeDocumentWithToken({
+    token: first.token,
+    id: { type: 'envelopeId', id: document.id },
+  });
+
+  await waitForRecipientJob({ jobId: 'send.signing.requested.email', recipientId: second.id });
+
+  const updatedSecond = await prisma.recipient.findFirstOrThrow({
+    where: {
+      id: second.id,
+    },
+  });
+
+  expect(updatedSecond.sendStatus).toEqual(SendStatus.SENT);
+  expect(await countRuleMatches(rule.id)).toEqual(0);
+});
+
 test('[ADMIN][RULES][ENGINE]: blocked completion emails are not sent', async () => {
   const { user, team } = await seedUser();
 
@@ -1352,6 +1634,43 @@ test('[ADMIN][RULES][ENGINE]: blocked completion emails are not sent', async () 
 
   // The owner and the recipient would each have been emailed.
   expect(match.eventSnapshot['email.recipient_count']).toEqual(2);
+
+  const sentEmailCount = await prisma.documentAuditLog.count({
+    where: {
+      envelopeId: document.id,
+      type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+      data: {
+        path: ['emailType'],
+        equals: 'DOCUMENT_COMPLETED',
+      },
+    },
+  });
+
+  expect(sentEmailCount).toEqual(0);
+});
+
+test('[ADMIN][RULES][ENGINE]: a rule that turns off emails also stops the completion emails that triggered it', async () => {
+  const { user, team } = await seedUser();
+
+  const document = await seedPendingDocument(user, team.id, ['recipient@example.com']);
+  const [recipient] = document.recipients;
+
+  const rule = await seedDisableEmailsRule({ user, emailType: 'completed' });
+
+  await completeDocumentWithToken({
+    token: recipient.token,
+    id: { type: 'envelopeId', id: document.id },
+  });
+
+  await waitForEnvelopeJob({ jobId: 'send.document.completed.emails', envelopeId: document.id });
+
+  const match = await prisma.adminRuleMatch.findFirstOrThrow({
+    where: {
+      ruleId: rule.id,
+    },
+  });
+
+  expect(match.actionsRun).toEqual([{ type: 'disable_emails', status: 'ran' }]);
 
   const sentEmailCount = await prisma.documentAuditLog.count({
     where: {
@@ -1422,6 +1741,53 @@ test('[ADMIN][RULES][ENGINE]: blocked rejection emails are not sent', async () =
   expect(updatedRecipient.sendStatus).toEqual(SendStatus.NOT_SENT);
 });
 
+test("[ADMIN][RULES][ENGINE]: a rule that turns off emails stops the rejection confirmation, but not the owner's notice", async () => {
+  const { user, team } = await seedUser();
+
+  const document = await seedPendingDocument(user, team.id, ['recipient@example.com']);
+  const [recipient] = document.recipients;
+
+  const rule = await seedDisableEmailsRule({ user, emailType: 'rejected' });
+
+  await rejectDocumentWithToken({
+    token: recipient.token,
+    id: { type: 'envelopeId', id: document.id },
+    reason: 'Not for me',
+  });
+
+  await waitForRecipientJob({ jobId: 'send.signing.rejected.emails', recipientId: recipient.id });
+
+  const match = await prisma.adminRuleMatch.findFirstOrThrow({
+    where: {
+      ruleId: rule.id,
+    },
+  });
+
+  expect(match.actionsRun).toEqual([{ type: 'disable_emails', status: 'ran' }]);
+
+  // The job sends each email in its own task. The owner's notice uses Documenso's own email, so it
+  // still goes out.
+  const tasks = await prisma.backgroundJobTask.findMany({
+    where: {
+      backgroundJob: {
+        jobId: 'send.signing.rejected.emails',
+        payload: {
+          path: ['recipientId'],
+          equals: recipient.id,
+        },
+      },
+    },
+    select: {
+      name: true,
+    },
+  });
+
+  const taskNames = tasks.map((task) => task.name);
+
+  expect(taskNames).toContain('send-owner-notification-email');
+  expect(taskNames).not.toContain('send-rejection-confirmation-email');
+});
+
 test('[ADMIN][RULES][ENGINE]: a blocked automatic reminder is not sent, and no more are scheduled', async () => {
   const { user, team } = await seedUser();
 
@@ -1489,6 +1855,60 @@ test('[ADMIN][RULES][ENGINE]: a blocked automatic reminder is not sent, and no m
   expect(sentEmailCount).toEqual(0);
 
   // The block ends the recipient's automatic reminders.
+  const updatedRecipient = await prisma.recipient.findFirstOrThrow({
+    where: {
+      id: recipient.id,
+    },
+  });
+
+  expect(updatedRecipient.nextReminderAt).toBeNull();
+});
+
+test('[ADMIN][RULES][ENGINE]: a rule that turns off emails also stops the automatic reminder that triggered it', async () => {
+  const { user, team } = await seedUser();
+
+  const document = await seedPendingDocument(user, team.id, ['recipient@example.com']);
+  const [recipient] = document.recipients;
+
+  // With reminders on, a reminder that goes through schedules the next one.
+  await prisma.documentMeta.update({
+    where: {
+      id: document.documentMetaId,
+    },
+    data: {
+      reminderSettings: DEFAULT_ENVELOPE_REMINDER_SETTINGS,
+    },
+  });
+
+  await prisma.recipient.update({
+    where: {
+      id: recipient.id,
+    },
+    data: {
+      sentAt: new Date(),
+    },
+  });
+
+  const rule = await seedDisableEmailsRule({ user, emailType: 'reminder' });
+
+  await jobs.triggerJob({
+    name: 'internal.process-signing-reminder',
+    payload: {
+      recipientId: recipient.id,
+    },
+  });
+
+  await waitForRecipientJob({ jobId: 'internal.process-signing-reminder', recipientId: recipient.id });
+
+  const match = await prisma.adminRuleMatch.findFirstOrThrow({
+    where: {
+      ruleId: rule.id,
+    },
+  });
+
+  expect(match.actionsRun).toEqual([{ type: 'disable_emails', status: 'ran' }]);
+  expect(await countSentEmails({ envelopeId: document.id })).toEqual(0);
+
   const updatedRecipient = await prisma.recipient.findFirstOrThrow({
     where: {
       id: recipient.id,
@@ -1594,6 +2014,45 @@ test('[ADMIN][RULES][ENGINE]: a block stops a direct-link submission before anyt
   });
 
   expect(documentCount).toEqual(0);
+});
+
+test("[ADMIN][RULES][ENGINE]: a blocked direct-link submission uses none of the owner's document quota", async () => {
+  const { user, team } = await seedUser();
+
+  const template = await seedDirectTemplate({
+    userId: user.id,
+    teamId: team.id,
+  });
+
+  await seedRule({
+    trigger: 'DOCUMENT_SENT',
+    definition: buildDefinition({
+      conditions: [{ field: 'sender.email', operator: 'equals', value: user.email }],
+      actions: [{ type: 'block_event', params: {} }],
+    }),
+  });
+
+  // Tests skip the organisation's quota, so count it for this submission.
+  const bypassRateLimits = process.env.DANGEROUS_BYPASS_RATE_LIMITS;
+
+  process.env.DANGEROUS_BYPASS_RATE_LIMITS = 'false';
+
+  const error = await submitDirectLink({ template })
+    .then(() => null)
+    .catch((err) => AppError.parseError(err))
+    .finally(() => {
+      process.env.DANGEROUS_BYPASS_RATE_LIMITS = bypassRateLimits ?? '';
+    });
+
+  expect(error).toMatchObject({ code: 'ADMIN_RULE_BLOCKED' });
+
+  const monthlyStat = await prisma.organisationMonthlyStat.findFirst({
+    where: {
+      organisationId: team.organisationId,
+    },
+  });
+
+  expect(monthlyStat?.documentCount ?? 0).toEqual(0);
 });
 
 test('[ADMIN][RULES][ENGINE]: a direct-link submission is checked once, against the document it creates', async () => {
