@@ -158,7 +158,13 @@ export default function OrganisationAnalyticsPage({ loaderData }: Route.Componen
           columnLabel={<Trans>Team</Trans>}
           renderSummary={(count, activeCount) => (
             <>
-              <Plural value={count} one="# team" other="# teams" /> · <Trans>{activeCount} active this period</Trans>
+              <Plural value={count} one="# team" other="# teams" /> ·{' '}
+              <Plural
+                context="active teams"
+                value={activeCount}
+                one="# active this period"
+                other="# active this period"
+              />
             </>
           )}
           renderShowing={(visibleCount, totalCount) => (
