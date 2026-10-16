@@ -300,6 +300,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
     process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3' ? DocumentDataType.S3_PATH : DocumentDataType.BYTES_64;
 
   expect(document.title).toEqual('TEMPLATE_WITH_CUSTOM_DOC');
+  expect(document.envelopeItems[0].title).toEqual('field-font-alignment');
   expect(firstDocumentData.type).toEqual(expectedDocumentDataType);
 
   if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
@@ -396,6 +397,7 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
 
   expect(document.teamId).toEqual(team.id);
   expect(document.title).toEqual('TEAM_TEMPLATE_WITH_CUSTOM_DOC');
+  expect(document.envelopeItems[0].title).toEqual('field-font-alignment');
   expect(firstDocumentData.type).toEqual(expectedDocumentDataType);
 
   if (expectedDocumentDataType === DocumentDataType.BYTES_64) {

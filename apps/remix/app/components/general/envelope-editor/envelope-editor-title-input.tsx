@@ -8,6 +8,8 @@ const INPUT_WIDTH_PADDING = 16;
 export type EnvelopeItemTitleInputProps = {
   value: string;
   onChange: (value: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   className?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -17,6 +19,8 @@ export type EnvelopeItemTitleInputProps = {
 export const EnvelopeItemTitleInput = ({
   value,
   onChange,
+  onFocus,
+  onBlur,
   className,
   placeholder,
   disabled,
@@ -28,6 +32,16 @@ export const EnvelopeItemTitleInput = ({
   const [inputWidth, setInputWidth] = useState(200);
   const inputRef = useRef<HTMLInputElement>(null);
   const measureRef = useRef<HTMLSpanElement>(null);
+
+  // Reflect external value changes, but never while the user is typing.
+  useEffect(() => {
+    if (document.activeElement === inputRef.current) {
+      return;
+    }
+
+    setEnvelopeItemTitle(value);
+    setIsError(false);
+  }, [value]);
 
   useEffect(() => {
     if (measureRef.current) {
@@ -75,6 +89,8 @@ export const EnvelopeItemTitleInput = ({
         type="text"
         value={envelopeItemTitle}
         onChange={(e) => handleTitleChange(e.target.value)}
+        onFocus={onFocus}
+        onBlur={onBlur}
         disabled={disabled}
         style={{ width: `${inputWidth}px`, maxWidth: '100%' }}
         className={cn(

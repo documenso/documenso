@@ -135,7 +135,6 @@ export const DocumentCertificateQRView = ({
               envelopeId={envelopeItems[0].envelopeId}
               envelopeStatus={DocumentStatus.COMPLETED}
               envelopeItems={envelopeItems}
-              envelopeTitle={title}
               token={token}
               trigger={
                 <Button type="button" variant="outline" className="w-fit">
@@ -196,7 +195,6 @@ const DocumentCertificateQrV2 = ({ title, recipientCount, formattedDate, token }
           envelopeId={envelopeItems[0].envelopeId}
           envelopeStatus={DocumentStatus.COMPLETED}
           envelopeItems={envelopeItems}
-          envelopeTitle={title}
           token={token}
           trigger={
             <Button type="button" variant="outline" className="w-fit">

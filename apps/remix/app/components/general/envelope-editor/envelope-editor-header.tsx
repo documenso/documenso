@@ -14,11 +14,12 @@ import {
   SendIcon,
   SettingsIcon,
 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { EnvelopeDistributeDialog } from '~/components/dialogs/envelope-distribute-dialog';
+import { EnvelopeItemMatchTitleDialog } from '~/components/dialogs/envelope-item-match-title-dialog';
 import { EnvelopeRedistributeDialog } from '~/components/dialogs/envelope-redistribute-dialog';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { BrandingLogo } from '~/components/general/branding-logo';
@@ -54,6 +55,31 @@ export default function EnvelopeEditorHeader() {
     () => getEnvelopeItemPermissions(envelope, envelope.recipients),
     [envelope, envelope.recipients],
   );
+
+  const [isMatchTitleDialogOpen, setIsMatchTitleDialogOpen] = useState(false);
+
+  const envelopeTitleOnFocusRef = useRef(envelope.title);
+
+  const singleEnvelopeItem = envelope.envelopeItems.length === 1 ? envelope.envelopeItems[0] : null;
+
+  /**
+   * Offer to rename the only envelope item when the envelope title has changed,
+   * since downloads and emails are named after the item.
+   */
+  const onEnvelopeTitleBlur = () => {
+    const hasTitleChanged = envelope.title !== envelopeTitleOnFocusRef.current;
+
+    if (
+      !hasTitleChanged ||
+      !singleEnvelopeItem ||
+      singleEnvelopeItem.title === envelope.title ||
+      !editorConfig.envelopeItems?.allowConfigureTitle
+    ) {
+      return;
+    }
+
+    setIsMatchTitleDialogOpen(true);
+  };
 
   const handleCreateEmbeddedEnvelope = async () => {
     const latestEnvelope = await flushAutosave();
@@ -92,8 +118,20 @@ export default function EnvelopeEditorHeader() {
                   },
                 });
               }}
+              onFocus={() => {
+                envelopeTitleOnFocusRef.current = envelope.title;
+              }}
+              onBlur={onEnvelopeTitleBlur}
               placeholder={t`Envelope Title`}
             />
+
+            {singleEnvelopeItem && (
+              <EnvelopeItemMatchTitleDialog
+                envelopeItem={singleEnvelopeItem}
+                open={isMatchTitleDialogOpen}
+                onOpenChange={setIsMatchTitleDialogOpen}
+              />
+            )}
 
             {envelope.type === EnvelopeType.TEMPLATE && (
               <>
