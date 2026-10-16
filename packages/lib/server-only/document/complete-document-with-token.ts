@@ -20,7 +20,6 @@ import { DateTime } from 'luxon';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import type { TRecipientAccessAuth } from '../../types/document-auth';
-import { DocumentAuth } from '../../types/document-auth';
 import { isTspEnvelope } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
@@ -31,7 +30,7 @@ import { assertRecipientNotExpired, isRecipientBefore } from '../../utils/recipi
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
-import { isRecipientAuthorized } from './is-recipient-authorized';
+import { assertRecipientAccess2FA } from './assert-recipient-access-2fa';
 
 export type CompleteDocumentWithTokenOptions = {
   token: string;
@@ -153,63 +152,7 @@ export const completeDocumentWithToken = async ({
     }
   }
 
-  // Check ACCESS AUTH 2FA validation during document completion
-  const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
-    documentAuth: envelope.authOptions,
-    recipientAuth: recipient.authOptions,
-  });
-
-  if (derivedRecipientAccessAuth.includes(DocumentAuth.TWO_FACTOR_AUTH)) {
-    if (!accessAuthOptions) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'Access authentication required',
-      });
-    }
-
-    if (!recipient.email.trim()) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Recipient ${recipient.id} requires an email because they have auth requirements.`,
-      });
-    }
-
-    const isValid = await isRecipientAuthorized({
-      type: 'ACCESS_2FA',
-      documentAuthOptions: envelope.authOptions,
-      recipient: recipient,
-      userId, // Can be undefined for non-account recipients
-      authOptions: accessAuthOptions,
-    });
-
-    if (!isValid) {
-      await prisma.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED,
-          envelopeId: envelope.id,
-          data: {
-            recipientId: recipient.id,
-            recipientName: recipient.name,
-            recipientEmail: recipient.email,
-          },
-        }),
-      });
-
-      throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
-        message: 'Invalid 2FA authentication',
-      });
-    }
-
-    await prisma.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED,
-        envelopeId: envelope.id,
-        data: {
-          recipientId: recipient.id,
-          recipientName: recipient.name,
-          recipientEmail: recipient.email,
-        },
-      }),
-    });
-  }
+  await assertRecipientAccess2FA({ envelope, recipient, accessAuthOptions, userId, requestMetadata });
 
   let fields = await prisma.field.findMany({
     where: {

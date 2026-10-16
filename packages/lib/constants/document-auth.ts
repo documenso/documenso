@@ -22,6 +22,10 @@ export const DOCUMENT_AUTH_TYPES: Record<string, DocumentAuthTypeData> = {
     key: DocumentAuth.TWO_FACTOR_AUTH,
     value: msg`Require 2FA`,
   },
+  [DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH]: {
+    key: DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH,
+    value: msg`Require external 2FA`,
+  },
   [DocumentAuth.PASSWORD]: {
     key: DocumentAuth.PASSWORD,
     value: msg`Require password`,
