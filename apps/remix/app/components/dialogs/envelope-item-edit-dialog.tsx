@@ -1,6 +1,6 @@
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
-import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
+import { formatFileSize, megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { trpc } from '@documenso/trpc/react';
 import { ZDocumentTitleSchema } from '@documenso/trpc/server/document-router/schema';
 import type { TReplaceEnvelopeItemPdfPayload } from '@documenso/trpc/server/envelope-router/replace-envelope-item-pdf.types';
@@ -194,18 +194,6 @@ export const EnvelopeItemEditDialog = ({
       setIsDropping(false);
     }
   }, [isOpen, form, envelopeItem.title]);
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) {
-      return `${bytes} B`;
-    }
-
-    if (bytes < 1024 * 1024) {
-      return `${(bytes / 1024).toFixed(1)} KB`;
-    }
-
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
 
   return (
     <Dialog {...props} open={isOpen} onOpenChange={(value) => !form.formState.isSubmitting && setIsOpen(value)}>

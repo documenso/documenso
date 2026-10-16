@@ -1,0 +1,663 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
+import {
+  EnvelopeContentShapeType,
+  EnvelopeContentType,
+  type TEnvelopeContentMetaInput,
+} from '@documenso/lib/types/envelope-content-meta';
+import { nanoid } from '@documenso/lib/universal/id';
+import { prisma } from '@documenso/prisma';
+import { seedUser } from '@documenso/prisma/seed/users';
+import type { ZCreateEmbeddingEnvelopePayloadSchema } from '@documenso/trpc/server/embedding-router/create-embedding-envelope.types';
+import type { TCreateEnvelopeResponse } from '@documenso/trpc/server/envelope-router/create-envelope.types';
+import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
+import { type APIRequestContext, type APIResponse, expect, test } from '@playwright/test';
+import { EnvelopeType, FieldType, RecipientRole, type Team } from '@prisma/client';
+import type { z } from 'zod';
+
+import { createGifLabelledAsPng, createImageFile, type TestImageFile } from '../../fixtures/contents';
+
+const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
+const baseUrl = `${WEBAPP_BASE_URL}/api/v2-beta`;
+
+test.describe.configure({
+  mode: 'parallel',
+});
+
+const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf'));
+
+type TCreateContentInput = {
+  identifier?: string | number;
+  contentMeta: TEnvelopeContentMetaInput;
+  imageIndex?: number;
+};
+
+/**
+ * The payload as sent, i.e. before any defaults are applied.
+ */
+type TCreateEmbeddingEnvelopePayloadInput = z.input<typeof ZCreateEmbeddingEnvelopePayloadSchema>;
+
+type CreateEnvelopeWithContentsOptions = {
+  request: APIRequestContext;
+
+  /**
+   * A presign token, since only the embedded editor may create an envelope
+   * with contents.
+   */
+  presignToken: string;
+  payload?: Partial<Omit<TCreateEmbeddingEnvelopePayloadInput, 'contents'>>;
+  contents: TCreateContentInput[];
+  pdfNames?: string[];
+  images?: TestImageFile[];
+};
+
+/**
+ * Create an envelope with contents through the embedded create route, as the
+ * embedded editor does.
+ */
+const createEnvelopeWithContents = async ({
+  request,
+  presignToken,
+  payload = {},
+  contents,
+  pdfNames = ['example.pdf'],
+  images = [],
+}: CreateEnvelopeWithContentsOptions) => {
+  const formData = new FormData();
+
+  formData.append(
+    'payload',
+    JSON.stringify({
+      type: EnvelopeType.DOCUMENT,
+      title: 'Envelope With Contents',
+      ...payload,
+      contents,
+    }),
+  );
+
+  for (const pdfName of pdfNames) {
+    formData.append('files', new File([examplePdfBuffer], pdfName, { type: 'application/pdf' }));
+  }
+
+  for (const image of images) {
+    formData.append('contentImages', new File([image.buffer], image.name, { type: image.mimeType }));
+  }
+
+  return await request.post(`${WEBAPP_BASE_URL}/api/trpc/embeddingPresign.createEmbeddingEnvelope`, {
+    headers: { authorization: `Bearer ${presignToken}` },
+    multipart: formData,
+  });
+};
+
+/**
+ * The ID of the envelope a successful embedded create returned. tRPC wraps
+ * the result, unlike the OpenAPI routes.
+ */
+const getCreatedEnvelopeId = async (res: APIResponse) => {
+  const body: { result: { data: { json: TCreateEnvelopeResponse } } } = await res.json();
+
+  return body.result.data.json.id;
+};
+
+/**
+ * A presign token for the team, as the embedded editor is given.
+ */
+const createPresignToken = async (request: APIRequestContext, apiToken: string) => {
+  const res = await request.post(`${WEBAPP_BASE_URL}/api/v2/embedding/create-presign-token`, {
+    headers: { Authorization: `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
+    data: {},
+  });
+
+  expect(res.ok(), await res.text()).toBeTruthy();
+
+  const { token }: { token: string } = await res.json();
+
+  return token;
+};
+
+const getEnvelope = async (request: APIRequestContext, token: string, envelopeId: string) => {
+  const res = await request.get(`${baseUrl}/envelope/${envelopeId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  expect(res.ok()).toBeTruthy();
+
+  return (await res.json()) as TGetEnvelopeResponse;
+};
+
+/**
+ * Set the image content allowance on the organisation that owns the team.
+ */
+const setOrganisationContentImageLimit = async (team: Team, envelopeContentImageCount: number) => {
+  const organisationClaim = await prisma.organisationClaim.findFirstOrThrow({
+    where: {
+      organisation: {
+        id: team.organisationId,
+      },
+    },
+  });
+
+  await prisma.organisationClaim.update({
+    where: {
+      id: organisationClaim.id,
+    },
+    data: {
+      envelopeContentImageCount,
+    },
+  });
+};
+
+const countDataContentsNamed = async (fileName: string) =>
+  await prisma.dataContent.count({
+    where: {
+      metadata: {
+        path: ['fileName'],
+        equals: fileName,
+      },
+    },
+  });
+
+const textMeta = (text: string): TEnvelopeContentMetaInput => ({
+  type: EnvelopeContentType.TEXT,
+  page: 1,
+  positionX: 10,
+  positionY: 10,
+  width: 40,
+  height: 5,
+  text,
+});
+
+const RECTANGLE_META: TEnvelopeContentMetaInput = {
+  type: EnvelopeContentType.SHAPE,
+  shape: EnvelopeContentShapeType.RECTANGLE,
+  page: 1,
+  positionX: 10,
+  positionY: 20,
+  width: 20,
+  height: 10,
+};
+
+const imageMeta = (positionY: number): TEnvelopeContentMetaInput => ({
+  type: EnvelopeContentType.IMAGE,
+  page: 1,
+  positionX: 10,
+  positionY,
+  width: 30,
+  height: 10,
+});
+
+test.describe('Create envelope with contents', () => {
+  let team: Team;
+  let token: string;
+  let presignToken: string;
+
+  test.beforeEach(async ({ request }) => {
+    const seeded = await seedUser();
+
+    team = seeded.team;
+
+    ({ token } = await createApiToken({
+      userId: seeded.user.id,
+      teamId: team.id,
+      tokenName: 'test-envelope-create-contents',
+      expiresIn: null,
+    }));
+
+    presignToken = await createPresignToken(request, token);
+  });
+
+  for (const envelopeType of [EnvelopeType.DOCUMENT, EnvelopeType.TEMPLATE]) {
+    test(`creates a ${envelopeType.toLowerCase()} with contents and images`, async ({ request }) => {
+      const logo = await createImageFile(`logo-${nanoid()}.png`, 300, 100);
+
+      const res = await createEnvelopeWithContents({
+        request,
+        presignToken,
+        payload: { type: envelopeType },
+        contents: [
+          { contentMeta: textMeta('Hello') },
+          { contentMeta: RECTANGLE_META },
+          { contentMeta: imageMeta(40), imageIndex: 0 },
+          // A second content showing the same image.
+          { contentMeta: imageMeta(60), imageIndex: 0 },
+          // An image content which has no image yet.
+          { contentMeta: imageMeta(80) },
+        ],
+        images: [logo],
+      });
+
+      expect(res.ok(), await res.text()).toBeTruthy();
+
+      const id = await getCreatedEnvelopeId(res);
+
+      // Contents are returned by the public get route.
+      const envelope = await getEnvelope(request, token, id);
+      const [envelopeItem] = envelope.envelopeItems;
+
+      expect(envelope.contents).toHaveLength(5);
+      expect(envelope.contents.every((content) => content.envelopeItemId === envelopeItem.id)).toBe(true);
+
+      const text = envelope.contents.find((content) => content.contentMeta.type === EnvelopeContentType.TEXT);
+      const shape = envelope.contents.find((content) => content.contentMeta.type === EnvelopeContentType.SHAPE);
+
+      expect(text?.contentMeta).toMatchObject({ text: 'Hello', page: 1, positionX: 10, positionY: 10 });
+      expect(shape?.contentMeta).toMatchObject({ shape: EnvelopeContentShapeType.RECTANGLE });
+
+      const images = envelope.contents.filter((content) => content.contentMeta.type === EnvelopeContentType.IMAGE);
+      const withImage = images.filter((content) => content.dataContentId !== null);
+
+      expect(images).toHaveLength(3);
+      expect(withImage).toHaveLength(2);
+
+      // The image is stored once and shared by both contents showing it.
+      expect(withImage[0].dataContentId).toBe(withImage[1].dataContentId);
+
+      const dataContent = await prisma.dataContent.findUniqueOrThrow({
+        where: { id: withImage[0].dataContentId ?? '' },
+      });
+
+      expect(dataContent.metadata).toMatchObject({
+        type: 'image',
+        width: 300,
+        height: 100,
+        mimeType: 'image/png',
+        fileName: logo.name,
+      });
+    });
+  }
+
+  test('places each content on the file it identifies', async ({ request }) => {
+    const res = await createEnvelopeWithContents({
+      request,
+      presignToken,
+      pdfNames: ['first.pdf', 'second.pdf'],
+      contents: [
+        { contentMeta: textMeta('Default') },
+        { identifier: 'second.pdf', contentMeta: textMeta('By name') },
+        { identifier: 1, contentMeta: textMeta('By index') },
+      ],
+    });
+
+    expect(res.ok(), await res.text()).toBeTruthy();
+
+    const id = await getCreatedEnvelopeId(res);
+
+    const envelope = await getEnvelope(request, token, id);
+    const [first, second] = [...envelope.envelopeItems].sort((a, b) => a.order - b.order);
+
+    const envelopeItemIdByText = Object.fromEntries(
+      envelope.contents.map((content) => [
+        content.contentMeta.type === EnvelopeContentType.TEXT ? content.contentMeta.text : content.id,
+        content.envelopeItemId,
+      ]),
+    );
+
+    expect(envelopeItemIdByText).toEqual({
+      Default: first.id,
+      'By name': second.id,
+      'By index': second.id,
+    });
+  });
+
+  test('rejects contents over the limits without storing their images', async ({ request }) => {
+    await setOrganisationContentImageLimit(team, 1);
+
+    const externalId = `e2e-contents-limit-${nanoid()}`;
+
+    const images = await Promise.all([
+      createImageFile(`limit-a-${nanoid()}.png`, 50, 50),
+      createImageFile(`limit-b-${nanoid()}.png`, 50, 50),
+    ]);
+
+    const res = await createEnvelopeWithContents({
+      request,
+      presignToken,
+      payload: { externalId },
+      contents: [
+        { contentMeta: imageMeta(40), imageIndex: 0 },
+        { contentMeta: imageMeta(60), imageIndex: 1 },
+      ],
+      images,
+    });
+
+    expect(res.status()).toBe(400);
+    expect(await res.text()).toContain('ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED');
+
+    expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+
+    for (const image of images) {
+      expect(await countDataContentsNamed(image.name)).toBe(0);
+    }
+  });
+
+  test('rejects a content on a page its file does not have', async ({ request }) => {
+    const externalId = `e2e-contents-page-${nanoid()}`;
+    const image = await createImageFile(`page-${nanoid()}.png`, 50, 50);
+
+    // The example PDF has a single page.
+    const res = await createEnvelopeWithContents({
+      request,
+      presignToken,
+      payload: { externalId },
+      contents: [{ contentMeta: { ...imageMeta(40), page: 2 }, imageIndex: 0 }],
+      images: [image],
+    });
+
+    expect(res.status()).toBe(400);
+    expect(await res.text()).toContain('only has 1 page(s)');
+
+    expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+
+    // Rejected before the image was stored.
+    expect(await countDataContentsNamed(image.name)).toBe(0);
+  });
+
+  test('rejects an image index without an image', async ({ request }) => {
+    const externalId = `e2e-contents-index-${nanoid()}`;
+
+    const res = await createEnvelopeWithContents({
+      request,
+      presignToken,
+      payload: { externalId },
+      contents: [{ contentMeta: imageMeta(40), imageIndex: 1 }],
+      images: [await createImageFile(`index-${nanoid()}.png`, 50, 50)],
+    });
+
+    expect(res.status()).toBe(400);
+    expect(await res.text()).toContain('Invalid content image index');
+
+    expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+  });
+
+  test('rejects an image on a content which cannot hold one', async ({ request }) => {
+    const externalId = `e2e-contents-type-${nanoid()}`;
+    const image = await createImageFile(`type-${nanoid()}.png`, 50, 50);
+
+    const res = await createEnvelopeWithContents({
+      request,
+      presignToken,
+      payload: { externalId },
+      contents: [{ contentMeta: textMeta('Not an image'), imageIndex: 0 }],
+      images: [image],
+    });
+
+    expect(res.status()).toBe(400);
+    expect(await res.text()).toContain('A text content cannot hold an image');
+
+    expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+    expect(await countDataContentsNamed(image.name)).toBe(0);
+  });
+
+  for (const { identifier, description } of [
+    { identifier: 'missing.pdf', description: 'a file name' },
+    { identifier: 1, description: 'a file index' },
+  ]) {
+    test(`rejects a content on ${description} which was not uploaded`, async ({ request }) => {
+      const externalId = `e2e-contents-identifier-${nanoid()}`;
+      const image = await createImageFile(`identifier-${nanoid()}.png`, 50, 50);
+
+      // Only "example.pdf" is uploaded, at index 0.
+      const res = await createEnvelopeWithContents({
+        request,
+        presignToken,
+        payload: { externalId },
+        contents: [{ identifier, contentMeta: imageMeta(40), imageIndex: 0 }],
+        images: [image],
+      });
+
+      expect(res.status()).toBe(404);
+      expect(await res.text()).toContain('Document data not found');
+
+      expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+
+      // Rejected before the image was stored.
+      expect(await countDataContentsNamed(image.name)).toBe(0);
+    });
+  }
+
+  // A file is picked by its position counted from 0, so any other number is
+  // refused rather than read as some other file (-1 used to mean the last).
+  for (const { identifier, description } of [
+    { identifier: -1, description: 'a negative file index' },
+    { identifier: 0.5, description: 'a fractional file index' },
+  ]) {
+    test(`rejects a content on ${description}`, async ({ request }) => {
+      const externalId = `e2e-contents-bad-index-${nanoid()}`;
+
+      const res = await createEnvelopeWithContents({
+        request,
+        presignToken,
+        payload: { externalId },
+        contents: [{ identifier, contentMeta: textMeta('Bad index') }],
+      });
+
+      expect(res.status()).toBe(400);
+      expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+    });
+
+    test(`rejects a field on ${description}`, async ({ request }) => {
+      const externalId = `e2e-fields-bad-index-${nanoid()}`;
+
+      const res = await createEnvelopeWithContents({
+        request,
+        presignToken,
+        payload: {
+          externalId,
+          recipients: [
+            {
+              email: `signer-${nanoid()}@test.documenso.com`,
+              name: 'Signer',
+              role: RecipientRole.SIGNER,
+              fields: [
+                {
+                  type: FieldType.SIGNATURE,
+                  identifier,
+                  page: 1,
+                  positionX: 10,
+                  positionY: 10,
+                  width: 10,
+                  height: 5,
+                  fieldMeta: { type: 'signature', overflow: 'crop' },
+                },
+              ],
+            },
+          ],
+        },
+        contents: [],
+      });
+
+      expect(res.status()).toBe(400);
+      expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+    });
+  }
+
+  test('logs each created field and content on a document', async ({ request }) => {
+    const signerEmail = `signer-${nanoid()}@test.documenso.com`;
+
+    const res = await createEnvelopeWithContents({
+      request,
+      presignToken,
+      payload: {
+        recipients: [
+          {
+            email: signerEmail,
+            name: 'Signer',
+            role: RecipientRole.SIGNER,
+            fields: [
+              { type: FieldType.SIGNATURE, page: 1, positionX: 10, positionY: 10, width: 10, height: 5 },
+              { type: FieldType.NAME, page: 1, positionX: 10, positionY: 20, width: 10, height: 5 },
+            ],
+          },
+        ],
+      },
+      contents: [{ contentMeta: textMeta('Hello') }, { contentMeta: RECTANGLE_META }],
+    });
+
+    expect(res.ok(), await res.text()).toBeTruthy();
+
+    const id = await getCreatedEnvelopeId(res);
+
+    const envelope = await prisma.envelope.findUniqueOrThrow({
+      where: { id },
+      include: { recipients: true, fields: true, contents: true },
+    });
+
+    const auditLogs = await prisma.documentAuditLog.findMany({
+      where: { envelopeId: id, type: { in: ['FIELD_CREATED', 'CONTENT_CREATED'] } },
+    });
+
+    const fieldLogs = auditLogs.filter((log) => log.type === 'FIELD_CREATED');
+    const contentLogs = auditLogs.filter((log) => log.type === 'CONTENT_CREATED');
+
+    // Attributed from the request metadata like the editor's own logs. The
+    // embedded routes carry no audit user, so these are anonymous, the same
+    // as contents saved through the embedded update route.
+    for (const log of auditLogs) {
+      expect(log.userId).toBeNull();
+      expect(log.email).toBeNull();
+      expect(log.name).toBeNull();
+    }
+
+    // One entry per field, carrying the same identifiers the editor's logs do.
+    expect(fieldLogs).toHaveLength(2);
+
+    const [signer] = envelope.recipients;
+
+    const byFieldId = (a: { fieldId: string }, b: { fieldId: string }) => a.fieldId.localeCompare(b.fieldId);
+
+    const loggedFields = fieldLogs.map((log) => log.data as { fieldId: string }).sort(byFieldId);
+
+    const expectedFields = envelope.fields
+      .map((field) => ({
+        fieldId: field.secondaryId,
+        fieldRecipientEmail: signer.email,
+        fieldRecipientId: signer.id,
+        fieldType: field.type,
+      }))
+      .sort(byFieldId);
+
+    expect(loggedFields).toEqual(expectedFields);
+
+    // One entry per content, with the full meta as created.
+    expect(contentLogs).toHaveLength(2);
+
+    for (const content of envelope.contents) {
+      const log = contentLogs.find((log) => {
+        const data = log.data as { contentId?: string };
+
+        return data.contentId === content.id;
+      });
+
+      expect(log?.data).toEqual({
+        contentId: content.id,
+        contentType: content.contentMeta.type,
+        envelopeItemId: content.envelopeItemId,
+        contentMeta: content.contentMeta,
+        dataContentId: null,
+      });
+    }
+  });
+
+  test('does not log fields or contents on a template', async ({ request }) => {
+    const res = await createEnvelopeWithContents({
+      request,
+      presignToken,
+      payload: {
+        type: EnvelopeType.TEMPLATE,
+        recipients: [
+          {
+            email: `signer-${nanoid()}@test.documenso.com`,
+            name: 'Signer',
+            role: RecipientRole.SIGNER,
+            fields: [{ type: FieldType.SIGNATURE, page: 1, positionX: 10, positionY: 10, width: 10, height: 5 }],
+          },
+        ],
+      },
+      contents: [{ contentMeta: textMeta('Hello') }],
+    });
+
+    expect(res.ok(), await res.text()).toBeTruthy();
+
+    const id = await getCreatedEnvelopeId(res);
+
+    expect(await prisma.documentAuditLog.count({ where: { envelopeId: id } })).toBe(0);
+  });
+
+  test('rejects an image which is not really a PNG, JPEG or WebP', async ({ request }) => {
+    const externalId = `e2e-contents-format-${nanoid()}`;
+    const image = createGifLabelledAsPng(`format-${nanoid()}.png`);
+
+    const res = await createEnvelopeWithContents({
+      request,
+      presignToken,
+      payload: { externalId },
+      contents: [{ contentMeta: imageMeta(40), imageIndex: 0 }],
+      images: [image],
+    });
+
+    expect(res.status()).toBe(400);
+    expect(await res.text()).toContain('Unsupported image format: gif');
+
+    expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+    expect(await countDataContentsNamed(image.name)).toBe(0);
+  });
+
+  test('the public create route ignores contents', async ({ request }) => {
+    const externalId = `e2e-public-contents-${nanoid()}`;
+    const image = await createImageFile(`public-${nanoid()}.png`, 50, 50);
+
+    const formData = new FormData();
+
+    // Sent in the embedded shape, which the public route does not accept.
+    formData.append(
+      'payload',
+      JSON.stringify({
+        type: EnvelopeType.DOCUMENT,
+        title: 'Public Envelope',
+        externalId,
+        contents: [{ contentMeta: textMeta('Ignored') }, { contentMeta: imageMeta(40), imageIndex: 0 }],
+      }),
+    );
+
+    formData.append('files', new File([examplePdfBuffer], 'example.pdf', { type: 'application/pdf' }));
+    formData.append('contentImages', new File([image.buffer], image.name, { type: image.mimeType }));
+
+    const res = await request.post(`${baseUrl}/envelope/create`, {
+      headers: { Authorization: `Bearer ${token}` },
+      multipart: formData,
+    });
+
+    expect(res.ok(), await res.text()).toBeTruthy();
+
+    const { id } = (await res.json()) as TCreateEnvelopeResponse;
+
+    // The envelope is created without them, and the image is never stored.
+    expect(await prisma.envelopeContent.count({ where: { envelopeId: id } })).toBe(0);
+    expect(await countDataContentsNamed(image.name)).toBe(0);
+  });
+
+  test('does not document contents on the public create route', async ({ request }) => {
+    const res = await request.get(`${WEBAPP_BASE_URL}/api/v2/openapi.json`);
+
+    expect(res.ok()).toBeTruthy();
+
+    const openApiDocument: unknown = await res.json();
+
+    const requestSchemaPath = [
+      'paths',
+      '/envelope/create',
+      'post',
+      'requestBody',
+      'content',
+      'multipart/form-data',
+      'schema',
+      'properties',
+    ];
+
+    expect(openApiDocument).toHaveProperty([...requestSchemaPath, 'files']);
+    expect(openApiDocument).not.toHaveProperty([...requestSchemaPath, 'contentImages']);
+    expect(openApiDocument).not.toHaveProperty([...requestSchemaPath, 'payload', 'properties', 'contents']);
+  });
+});

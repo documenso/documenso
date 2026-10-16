@@ -6,12 +6,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  * Only one save runs at a time and the latest edit always wins. If the user
  * keeps editing while a save is on the wire, their newest changes get saved
  * right after, never dropped.
+ *
+ * A getter may be queued instead of a value, in which case it is read when
+ * the save is about to be sent rather than when it was queued. Callers whose
+ * state is corrected by the response of a save (e.g. rows which are assigned
+ * an ID by the server) need this, otherwise the queued save would be sent
+ * with data captured before that correction.
  */
 export function useEnvelopeAutosave<T>(saveFn: (data: T) => Promise<void>, delay = 1000) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // The edit waiting to be saved. Wrapped in an object so null always means "nothing queued".
-  const pendingRef = useRef<{ value: T } | null>(null);
+  const pendingRef = useRef<{ value: T | (() => T) } | null>(null);
 
   // The save currently running, if any. Shared so we never kick off two at once.
   const commitPromiseRef = useRef<Promise<void> | null>(null);
@@ -45,7 +51,8 @@ export function useEnvelopeAutosave<T>(saveFn: (data: T) => Promise<void>, delay
           const { value } = pendingRef.current;
           pendingRef.current = null;
 
-          await saveFnRef.current(value);
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          await saveFnRef.current(typeof value === 'function' ? (value as () => T)() : value);
         }
       } finally {
         // eslint-disable-next-line require-atomic-updates
@@ -61,7 +68,7 @@ export function useEnvelopeAutosave<T>(saveFn: (data: T) => Promise<void>, delay
   }, []);
 
   const triggerSave = useCallback(
-    (data: T) => {
+    (data: T | (() => T)) => {
       pendingRef.current = { value: data };
 
       setIsPending(true);

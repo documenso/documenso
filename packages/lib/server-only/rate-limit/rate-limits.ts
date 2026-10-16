@@ -137,3 +137,13 @@ export const fileUploadRateLimit = createRateLimit({
   max: 20,
   window: '1m',
 });
+
+/**
+ * Envelope content image uploads, kept separate from the document (PDF)
+ * upload budget so placing several images does not block uploading a PDF.
+ */
+export const envelopeContentRateLimit = createRateLimit({
+  action: 'api.envelope-content',
+  max: 20,
+  window: '1m',
+});

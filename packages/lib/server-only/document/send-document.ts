@@ -37,10 +37,16 @@ import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.
 import { isDocumentCompleted } from '../../utils/document';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { assertEnvelopeContentLimits, getContentsMissingImages } from '../../utils/envelope-content';
 import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import {
+  commitRenderedEnvelopeItems,
+  type RenderedEnvelopeItem,
+  renderContentsIntoEnvelopeItem,
+} from '../envelope-content/insert-contents-into-envelope-item';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -74,6 +80,14 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
       },
       fields: true,
       documentMeta: true,
+      contents: {
+        select: {
+          id: true,
+          dataContentId: true,
+          contentMeta: true,
+          envelopeItemId: true,
+        },
+      },
       envelopeItems: {
         select: {
           id: true,
@@ -94,6 +108,8 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
               organisationClaim: {
                 select: {
                   recipientCount: true,
+                  envelopeContentCount: true,
+                  envelopeContentImageCount: true,
                 },
               },
             },
@@ -186,6 +202,22 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     }
   });
 
+  // Validate that every image content has an image, since they
+  // render nothing otherwise and the document would silently ship without them.
+  const contentsMissingImages = getContentsMissingImages(envelope.contents);
+
+  if (contentsMissingImages.length > 0) {
+    throw new AppError('MISSING_CONTENT_IMAGE', {
+      message: `The following contents have no image attached: ${contentsMissingImages.map((content) => content.id).join(', ')}.`,
+      statusCode: 400,
+    });
+  }
+
+  assertEnvelopeContentLimits(
+    envelope.contents.map((content) => content.contentMeta.type),
+    envelope.team.organisation.organisationClaim,
+  );
+
   // Validate that recipients who require fields (e.g., signers need signature fields) have them.
   const recipientsWithMissingFields = getRecipientsWithMissingFields(envelope.recipients, envelope.fields);
 
@@ -199,11 +231,49 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     });
   }
 
+  // Render the contents into a copy of every item's PDF up front. The items are
+  // only pointed at those copies once everything else has passed, inside the
+  // transaction that moves the envelope on from DRAFT, so a failure in any item
+  // or in any later step leaves every item on its original file rather than
+  // some of them on a rendered one which the next send would render onto again.
+  let renderedEnvelopeItems: RenderedEnvelopeItem[] = [];
+
+  if (envelope.status === DocumentStatus.DRAFT) {
+    const results = await Promise.all(
+      envelope.envelopeItems
+        .filter((envelopeItem) => {
+          const foundContents = envelope.contents.filter((content) => content.envelopeItemId === envelopeItem.id);
+
+          return foundContents.length > 0;
+        })
+        .map(async (envelopeItem) => renderContentsIntoEnvelopeItem({ envelopeItemId: envelopeItem.id })),
+    );
+
+    renderedEnvelopeItems = results.filter((result): result is RenderedEnvelopeItem => result !== null);
+  }
+
   const allRecipientsHaveNoActionToTake = envelope.recipients.every(
     (recipient) => recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
   );
 
   if (allRecipientsHaveNoActionToTake) {
+    // Render the contents directly onto the envelope items and proceed to seal
+    // since there's no-one left to act on the envelope.
+    if (envelope.status === DocumentStatus.DRAFT) {
+      await prisma.$transaction(async (tx) => {
+        await commitRenderedEnvelopeItems(tx, renderedEnvelopeItems);
+
+        await tx.envelope.update({
+          where: {
+            id: envelope.id,
+          },
+          data: {
+            status: DocumentStatus.PENDING,
+          },
+        });
+      });
+    }
+
     await jobs.triggerJob({
       name: 'internal.seal-document',
       payload: {
@@ -249,11 +319,17 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
   if (isTspEnvelope(envelope) && envelope.status === DocumentStatus.DRAFT) {
     await materializeTspAnchorsForEnvelope({
       envelopeId: envelope.id,
+      // Override the envelope items which have contents with updated document data.
+      documentDataOverrides: Object.fromEntries(
+        renderedEnvelopeItems.map((item) => [item.envelopeItemId, item.documentData]),
+      ),
     });
   }
 
   const updatedEnvelope = await prisma.$transaction(async (tx) => {
     if (envelope.status === DocumentStatus.DRAFT) {
+      await commitRenderedEnvelopeItems(tx, renderedEnvelopeItems);
+
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
@@ -387,7 +463,7 @@ const injectFormValuesIntoDocument = async (
     fileName = `${envelope.title}.pdf`;
   }
 
-  const newDocumentData = await putNormalizedPdfFileServerSide({
+  const { documentData: newDocumentData } = await putNormalizedPdfFileServerSide({
     name: fileName,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(prefilled),

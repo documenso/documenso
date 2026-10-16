@@ -4,6 +4,10 @@ import {
   BRANDING_LOGO_MAX_SIZE_BYTES,
   BRANDING_LOGO_MAX_SIZE_MB,
 } from '@documenso/lib/constants/branding';
+import {
+  APP_CONTENT_IMAGE_MIME_TYPES,
+  APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT,
+} from '@documenso/lib/constants/envelope-content';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import type { ZodRawShape } from 'zod';
 import z from 'zod';
@@ -34,6 +38,23 @@ export const zfdBrandingImageFile = () => {
     })
     .refine((file) => BRANDING_LOGO_ALLOWED_TYPES.includes(file.type), {
       message: 'File must be a JPG, PNG, or WebP image',
+    });
+};
+
+/**
+ * A `zfd.file()` schema constrained to content images: size-limited and
+ * restricted to the content image MIME allowlist. The declared type is
+ * client controlled so this is only an early rejection; the bytes are
+ * verified while the image is normalized.
+ */
+export const zfdContentImageFile = () => {
+  return zfd
+    .file()
+    .refine((file) => file.size <= megabytesToBytes(APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT), {
+      message: `File cannot be larger than ${APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT}MB`,
+    })
+    .refine((file) => APP_CONTENT_IMAGE_MIME_TYPES.some((accepted) => accepted === file.type), {
+      message: 'File must be a PNG, JPEG or WebP image',
     });
 };
 

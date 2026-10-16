@@ -53,6 +53,13 @@ export const ZUseEnvelopePayloadSchema = z.object({
     .boolean()
     .describe('Whether to create the document as pending and distribute it to recipients.')
     .optional(),
+  includeContents: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe(
+      'Whether to copy the contents (text, shapes, images, etc.) from the template to the created document. Defaults to true.',
+    ),
   customDocumentData: z
     .array(
       z.object({
@@ -122,6 +129,9 @@ export const ZUseEnvelopeResponseSchema = z.object({
   recipients: ZRecipientWithSigningUrlSchema.array(),
 });
 
-export type TUseEnvelopePayload = z.infer<typeof ZUseEnvelopePayloadSchema>;
+/**
+ * The payload as a caller sends it, i.e. before defaults are applied.
+ */
+export type TUseEnvelopePayload = z.input<typeof ZUseEnvelopePayloadSchema>;
 export type TUseEnvelopeRequest = z.infer<typeof ZUseEnvelopeRequestSchema>;
 export type TUseEnvelopeResponse = z.infer<typeof ZUseEnvelopeResponseSchema>;

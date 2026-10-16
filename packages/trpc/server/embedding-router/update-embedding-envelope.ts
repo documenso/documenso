@@ -2,6 +2,8 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
+import { createEnvelopeContentImages } from '@documenso/lib/server-only/envelope-content/create-envelope-content-images';
+import { setEnvelopeContents } from '@documenso/lib/server-only/envelope-content/set-envelope-contents';
 import { UNSAFE_createEnvelopeItems } from '@documenso/lib/server-only/envelope-item/create-envelope-items';
 import { UNSAFE_deleteEnvelopeItem } from '@documenso/lib/server-only/envelope-item/delete-envelope-item';
 import { UNSAFE_replaceEnvelopeItemPdf } from '@documenso/lib/server-only/envelope-item/replace-envelope-item-pdf';
@@ -10,16 +12,22 @@ import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-field
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
+import { CONTENT_TYPE_DATA_CONTENT_TYPE } from '@documenso/lib/types/envelope-content-meta';
 import { nanoid } from '@documenso/lib/universal/id';
-import { PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
-import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
+import {
+  PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX,
+  PRESIGNED_ENVELOPE_ITEM_ID_PREFIX,
+} from '@documenso/lib/utils/embed-config';
+import { canContentBeChanged, getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
+import { assertEnvelopeContentSaveWithinLimits } from '@documenso/lib/utils/envelope-content';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { DocumentStatus, type EnvelopeContent, EnvelopeType, type OrganisationClaim } from '@prisma/client';
 import pMap from 'p-map';
 import { match } from 'ts-pattern';
 
 import { procedure } from '../trpc';
 import {
+  type TUpdateEmbeddingEnvelopePayload,
   ZUpdateEmbeddingEnvelopeRequestSchema,
   ZUpdateEmbeddingEnvelopeResponseSchema,
 } from './update-embedding-envelope.types';
@@ -28,7 +36,7 @@ export const updateEmbeddingEnvelopeRoute = procedure
   .input(ZUpdateEmbeddingEnvelopeRequestSchema)
   .output(ZUpdateEmbeddingEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { payload, files } = input;
+    const { payload, files, contentImages } = input;
     const { envelopeId, data, meta } = payload;
 
     ctx.logger.info({
@@ -77,6 +85,14 @@ export const updateEmbeddingEnvelopeRoute = procedure
         },
         recipients: true,
         envelopeAttachments: true,
+        contents: {
+          select: {
+            id: true,
+            envelopeItemId: true,
+            contentMeta: true,
+            dataContentId: true,
+          },
+        },
       },
     });
 
@@ -91,6 +107,10 @@ export const updateEmbeddingEnvelopeRoute = procedure
         message: 'Cannot modify completed envelope',
       });
     }
+
+    // Contents are frozen once the envelope has been sent, and the editor does
+    // not let them be changed from then on, so they are only saved before.
+    const contentsToSet = data.contents && canContentBeChanged(envelope) ? data.contents : null;
 
     // Step 1: Update the envelope items.
     const envelopeItemsToUpdate: EnvelopeItemUpdateOptions[] = [];
@@ -219,6 +239,25 @@ export const updateEmbeddingEnvelopeRoute = procedure
       }
     }
 
+    // Check the contents before anything is written, since they are only set
+    // in the last step, so an invalid content cannot leave the envelope half
+    // updated.
+    if (contentsToSet) {
+      assertEmbeddedContentsCanBeSet({
+        contents: contentsToSet,
+        envelopeItemIds: data.envelopeItems.map((item) => item.id),
+        existingContents: envelope.contents,
+        claim: organisationClaim,
+      });
+    }
+
+    // Store the new images the contents use, once each, before anything else
+    // is written so an invalid image or index fails the request cleanly.
+    const contentImageDataContents = await createEnvelopeContentImages({
+      contents: contentsToSet ?? [],
+      images: contentImages,
+    });
+
     if (envelopeItemIdsToDelete.length > 0) {
       await pMap(
         envelopeItemIdsToDelete,
@@ -270,6 +309,26 @@ export const updateEmbeddingEnvelopeRoute = procedure
         embeddedEnvelopeItemIdMapping[item.clientId] = item.id;
       });
     }
+
+    /**
+     * Resolve an envelope item ID sent by the client, which is the temporary
+     * ID for items created in this request.
+     */
+    const resolveEnvelopeItemId = (clientEnvelopeItemId: string) => {
+      let envelopeItemId = clientEnvelopeItemId;
+
+      if (envelopeItemId.startsWith(PRESIGNED_ENVELOPE_ITEM_ID_PREFIX)) {
+        envelopeItemId = embeddedEnvelopeItemIdMapping[envelopeItemId];
+      }
+
+      if (!envelopeItemId) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Envelope item not found',
+        });
+      }
+
+      return envelopeItemId;
+    };
 
     if (envelopeItemsToUpdate.length > 0) {
       await UNSAFE_updateEnvelopeItems({
@@ -387,25 +446,11 @@ export const updateEmbeddingEnvelopeRoute = procedure
         });
       }
 
-      return (recipient.fields ?? []).map((field) => {
-        let envelopeItemId = field.envelopeItemId;
-
-        if (envelopeItemId.startsWith(PRESIGNED_ENVELOPE_ITEM_ID_PREFIX)) {
-          envelopeItemId = embeddedEnvelopeItemIdMapping[envelopeItemId];
-        }
-
-        if (!envelopeItemId) {
-          throw new AppError(AppErrorCode.NOT_FOUND, {
-            message: 'Envelope item not found',
-          });
-        }
-
-        return {
-          ...field,
-          recipientId,
-          envelopeItemId,
-        };
-      });
+      return (recipient.fields ?? []).map((field) => ({
+        ...field,
+        recipientId,
+        envelopeItemId: resolveEnvelopeItemId(field.envelopeItemId),
+      }));
     });
 
     await match(envelope.type)
@@ -488,7 +533,118 @@ export const updateEmbeddingEnvelopeRoute = procedure
         });
       }
     }
+
+    // Step 6: Update the contents.
+    if (contentsToSet) {
+      await setEnvelopeContents({
+        userId: apiToken.userId,
+        teamId: apiToken.teamId,
+        id: {
+          type: 'envelopeId',
+          id: envelope.id,
+        },
+        contents: contentsToSet.map((content) => ({
+          // New contents only have a temporary ID, which creates them.
+          id: content.id.startsWith(PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX) ? undefined : content.id,
+          envelopeItemId: resolveEnvelopeItemId(content.envelopeItemId),
+          contentMeta: content.contentMeta,
+          dataContentId:
+            content.imageIndex !== undefined
+              ? (contentImageDataContents.get(content.imageIndex)?.id ?? null)
+              : content.dataContentId,
+        })),
+        newDataContents: [...contentImageDataContents.values()],
+        requestMetadata: ctx.metadata,
+      });
+    }
   });
+
+type AssertEmbeddedContentsCanBeSetOptions = {
+  contents: NonNullable<TUpdateEmbeddingEnvelopePayload['data']['contents']>;
+
+  /**
+   * The IDs of the envelope items the envelope will have, temporary ones
+   * included.
+   */
+  envelopeItemIds: string[];
+
+  existingContents: Pick<EnvelopeContent, 'id' | 'envelopeItemId' | 'contentMeta' | 'dataContentId'>[];
+  claim: Pick<OrganisationClaim, 'envelopeContentCount' | 'envelopeContentImageCount'>;
+};
+
+/**
+ * Throw if the contents cannot be set.
+ *
+ * `setEnvelopeContents` checks the same, but it runs last, once the envelope
+ * items, recipients and fields have already been written. Checking up front
+ * means a request which would fail there changes nothing.
+ *
+ * New images (`imageIndex`) are checked by `createEnvelopeContentImages`,
+ * which also runs before anything is written.
+ */
+const assertEmbeddedContentsCanBeSet = ({
+  contents,
+  envelopeItemIds,
+  existingContents,
+  claim,
+}: AssertEmbeddedContentsCanBeSetOptions) => {
+  // Contents on the envelope items being deleted go along with them.
+  const remainingContents = existingContents.filter((content) => envelopeItemIds.includes(content.envelopeItemId));
+
+  assertEnvelopeContentSaveWithinLimits({
+    incomingTypes: contents.map((content) => content.contentMeta.type),
+    existingTypes: remainingContents.map((content) => content.contentMeta.type),
+    claim,
+  });
+
+  // Only images already attached to this envelope may be reused, so a
+  // request cannot attach another envelope's image by its ID.
+  const attachedImageIds = new Set(
+    remainingContents.flatMap((content) => (content.dataContentId ? [content.dataContentId] : [])),
+  );
+
+  for (const content of contents) {
+    if (!envelopeItemIds.includes(content.envelopeItemId)) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Envelope item not found',
+      });
+    }
+
+    // Like envelope items, anything which is not a temporary ID must already
+    // exist, rather than being silently created.
+    if (!content.id.startsWith(PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX)) {
+      const existingContent = existingContents.find((existing) => existing.id === content.id);
+
+      if (!existingContent) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Envelope content not found',
+        });
+      }
+
+      if (existingContent.envelopeItemId !== content.envelopeItemId) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Content ${content.id} cannot be moved to a different envelope item`,
+        });
+      }
+    }
+
+    if (!content.dataContentId) {
+      continue;
+    }
+
+    if (!CONTENT_TYPE_DATA_CONTENT_TYPE[content.contentMeta.type]) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: `A ${content.contentMeta.type} content cannot hold an image`,
+      });
+    }
+
+    if (!attachedImageIds.has(content.dataContentId)) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: `Data content ${content.dataContentId} not found`,
+      });
+    }
+  }
+};
 
 type EnvelopeItemUpdateOptions = {
   envelopeItemId: string;
