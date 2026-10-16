@@ -18,6 +18,7 @@ export type OAuthClientOptions = {
   wellKnownUrl: string;
   redirectUrl: string;
   bypassEmailVerification?: boolean;
+  defaultOrganisationId?: string;
 };
 
 export const GoogleAuthOptions: OAuthClientOptions = {
@@ -48,4 +49,5 @@ export const OidcAuthOptions: OAuthClientOptions = {
   redirectUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/callback/oidc`,
   wellKnownUrl: env('NEXT_PRIVATE_OIDC_WELL_KNOWN') ?? '',
   bypassEmailVerification: env('NEXT_PRIVATE_OIDC_SKIP_VERIFY') === 'true',
+  defaultOrganisationId: env('NEXT_PRIVATE_OIDC_DEFAULT_ORGANISATION_ID'),
 };
