@@ -89,12 +89,12 @@ export const useEnvelopeRoute = authenticatedProcedure
     // Map custom document data using identifiers
     const customDocumentDataMapped = customDocumentData?.map((mapping) => {
       // Find the uploaded file by identifier
-      const documentDataId = match(mapping.identifier)
-        .with(P.string, (name) => uploadedFiles.find((file) => file.name === name)?.documentDataId)
-        .with(P.number, (index) => uploadedFiles.at(index)?.documentDataId)
+      const uploadedFile = match(mapping.identifier)
+        .with(P.string, (name) => uploadedFiles.find((file) => file.name === name))
+        .with(P.number, (index) => uploadedFiles.at(index))
         .exhaustive();
 
-      if (!documentDataId) {
+      if (!uploadedFile) {
         throw new AppError(AppErrorCode.NOT_FOUND, {
           message: `File with identifier "${mapping.identifier}" not found in uploaded files`,
         });
@@ -109,9 +109,11 @@ export const useEnvelopeRoute = authenticatedProcedure
         });
       }
 
+      // Name the envelope item after the uploaded file instead of the template item.
       return {
-        documentDataId,
+        documentDataId: uploadedFile.documentDataId,
         envelopeItemId: mapping.envelopeItemId,
+        title: uploadedFile.name,
       };
     });
 

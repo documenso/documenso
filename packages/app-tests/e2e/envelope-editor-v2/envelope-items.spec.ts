@@ -333,6 +333,13 @@ test.describe('pending envelope title editing', () => {
     const envelopeTitleInput = page.locator('[data-testid="envelope-title-input"]');
     await expect(envelopeTitleInput).toBeEnabled();
     await envelopeTitleInput.fill('Updated Pending Title');
+    await envelopeTitleInput.blur();
+
+    // Decline renaming the only envelope item to match the new envelope title.
+    const matchTitleDialog = page.getByRole('dialog');
+    await expect(matchTitleDialog.getByText('Update document title?')).toBeVisible();
+    await matchTitleDialog.getByRole('button', { name: 'Cancel' }).click();
+    await expect(matchTitleDialog).toBeHidden();
 
     // Edit the envelope item title.
     const itemTitleInput = getEnvelopeItemTitleInputs(page).first();
@@ -374,5 +381,46 @@ test.describe('pending envelope title editing', () => {
     // when canItemsBeModified is false. Verify at least that the handle is present
     // but we cannot programmatically assert isDragDisabled from the DOM.
     await expect(getEnvelopeItemDragHandles(page)).toHaveCount(1);
+  });
+
+  test('rename the only envelope item to match the envelope title', async ({ page }) => {
+    const recipientEmail = `recipient-${nanoid()}@test.documenso.com`;
+    const { user, team } = await seedUser();
+    const pendingDocument = await seedPendingDocument(user, team.id, [recipientEmail], {
+      internalVersion: 2,
+    });
+
+    await apiSignin({
+      page,
+      email: user.email,
+      redirectPath: `/t/${team.url}/documents/${pendingDocument.id}/edit`,
+    });
+
+    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
+
+    const envelopeTitleInput = page.locator('[data-testid="envelope-title-input"]');
+    await envelopeTitleInput.fill('Matched Title');
+    await envelopeTitleInput.blur();
+
+    const matchTitleDialog = page.getByRole('dialog');
+    await expect(matchTitleDialog.getByText('Update document title?')).toBeVisible();
+    await matchTitleDialog.getByRole('button', { name: 'Update' }).click();
+    await expect(matchTitleDialog).toBeHidden();
+
+    // The item title in the list reflects the rename without reloading.
+    await expect(getEnvelopeItemTitleInputs(page).first()).toHaveValue('Matched Title');
+
+    const updatedEnvelope = await prisma.envelope.findFirstOrThrow({
+      where: { id: pendingDocument.id },
+      include: { envelopeItems: true },
+    });
+
+    expect(updatedEnvelope.title).toBe('Matched Title');
+    expect(updatedEnvelope.envelopeItems[0].title).toBe('Matched Title');
+
+    // Blurring again without changing the title should not prompt.
+    await envelopeTitleInput.focus();
+    await envelopeTitleInput.blur();
+    await expect(matchTitleDialog).toBeHidden();
   });
 });
