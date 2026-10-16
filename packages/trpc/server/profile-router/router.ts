@@ -92,7 +92,7 @@ export const profileRouter = router({
 
       const parsedTeamId = teamId ? Number(teamId) : null;
 
-      if (typeof parsedTeamId === 'number') {
+      if (parsedTeamId !== null) {
         if (Number.isNaN(parsedTeamId) || parsedTeamId <= 0) {
           throw new AppError(AppErrorCode.INVALID_BODY, {
             message: 'Invalid team ID provided',

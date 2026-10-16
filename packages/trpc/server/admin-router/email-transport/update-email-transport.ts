@@ -1,7 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import {
   decryptEmailTransportConfig,
-  EMAIL_TRANSPORT_SECRET_KEYS,
   encryptEmailTransportConfig,
   ZEmailTransportConfigSchema,
 } from '@documenso/lib/server-only/email/email-transport-config';
@@ -30,16 +29,16 @@ export const updateEmailTransportRoute = adminProcedure
     const existingConfig = decryptEmailTransportConfig(existing.config);
 
     // Start from the incoming config; backfill empty secret fields from the existing
-    // config (only when the type is unchanged).
-    const merged: Record<string, unknown> = { ...data.config };
+    // config (only when the type is unchanged). Secrets are never sent back to the
+    // client, so a blank incoming value means "keep the existing secret".
+    const merged = { ...data.config };
 
-    if (existingConfig.type === data.config.type) {
-      for (const key of EMAIL_TRANSPORT_SECRET_KEYS) {
-        const incoming = (data.config as Record<string, unknown>)[key];
-        if (incoming === undefined || incoming === '') {
-          merged[key] = (existingConfig as Record<string, unknown>)[key];
-        }
-      }
+    if (merged.type === 'SMTP_AUTH' && existingConfig.type === 'SMTP_AUTH' && !merged.password) {
+      merged.password = existingConfig.password;
+    }
+
+    if (merged.type !== 'SMTP_AUTH' && merged.type === existingConfig.type && !merged.apiKey) {
+      merged.apiKey = existingConfig.apiKey;
     }
 
     const config = ZEmailTransportConfigSchema.parse(merged);
