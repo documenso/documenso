@@ -42,7 +42,7 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
       )}
 
       {branding.brandingEnabled && branding.brandingCompanyDetails && (
-        <Text className="my-8 text-muted-foreground text-sm">
+        <Text className="my-4 text-muted-foreground text-sm">
           {branding.brandingCompanyDetails.split('\n').map((line, idx) => {
             return (
               <Fragment key={idx}>
@@ -55,7 +55,7 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
       )}
 
       {branding.brandingEnabled && safeBrandingUrl && (
-        <Text className="my-8 text-muted-foreground text-sm">
+        <Text className="my-4 text-muted-foreground text-sm">
           <Link href={safeBrandingUrl} target="_blank">
             {safeBrandingUrl}
           </Link>
@@ -63,7 +63,7 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
       )}
 
       {!branding.brandingEnabled && (
-        <Text className="my-8 text-muted-foreground text-sm">
+        <Text className="my-4 text-muted-foreground text-sm">
           Documenso, Inc.
           <br />
           2261 Market Street, #5211, San Francisco, CA 94114, USA
