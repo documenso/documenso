@@ -172,3 +172,49 @@ export const invalidateSessions = async ({
     });
   });
 };
+
+type InvalidateAllUserSessionsOptions = {
+  userId: number;
+  metadata?: RequestMetadata;
+  isRevoke?: boolean;
+  tx?: Prisma.TransactionClient;
+};
+
+export const invalidateAllUserSessions = async ({
+  userId,
+  metadata = {},
+  isRevoke = true,
+  tx,
+}: InvalidateAllUserSessionsOptions): Promise<void> => {
+  const execute = async (client: Prisma.TransactionClient | typeof prisma) => {
+    const userSessions = await client.session.findMany({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (userSessions.length === 0) {
+      return;
+    }
+
+    await client.session.deleteMany({
+      where: { userId },
+    });
+
+    await client.userSecurityAuditLog.createMany({
+      data: userSessions.map(() => ({
+        userId,
+        ipAddress: metadata.ipAddress ?? null,
+        userAgent: metadata.userAgent ?? null,
+        type: isRevoke ? UserSecurityAuditLogType.SESSION_REVOKED : UserSecurityAuditLogType.SIGN_OUT,
+      })),
+    });
+  };
+
+  if (tx) {
+    await execute(tx);
+  } else {
+    await prisma.$transaction(async (t) => {
+      await execute(t);
+    });
+  }
+};
