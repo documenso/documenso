@@ -230,6 +230,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   // Check that the team settings have inherited these values.
   expect(teamSettings.emailReplyTo).toEqual('organisation@documenso.com');
   expect(teamSettings.emailDocumentSettings).toEqual({
+    attachDocument: true,
     recipientSigningRequest: true,
     recipientRemoved: true,
     recipientSigned: false, // unchecked
@@ -273,6 +274,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   // Check that the team settings have overridden the organisation values.
   expect(updatedTeamSettings.emailReplyTo).toEqual('team@example.com');
   expect(updatedTeamSettings.emailDocumentSettings).toEqual({
+    attachDocument: true,
     recipientSigned: true,
     recipientSigningRequest: false,
     recipientRemoved: true,
@@ -295,6 +297,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
 
   expect(teamOverrideDocumentMeta.emailReplyTo).toEqual('team@example.com');
   expect(teamOverrideDocumentMeta.emailSettings).toEqual({
+    attachDocument: true,
     recipientSigned: true,
     recipientSigningRequest: false,
     recipientRemoved: true,
@@ -322,6 +325,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   // Check that the team settings now inherit from organisation again.
   expect(inheritedTeamSettings.emailReplyTo).toEqual('organisation@documenso.com');
   expect(inheritedTeamSettings.emailDocumentSettings).toEqual({
+    attachDocument: true,
     recipientSigningRequest: true,
     recipientRemoved: true,
     recipientSigned: false,
@@ -344,6 +348,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
 
   expect(documentMeta.emailReplyTo).toEqual('organisation@documenso.com');
   expect(documentMeta.emailSettings).toEqual({
+    attachDocument: true,
     recipientSigningRequest: true,
     recipientRemoved: true,
     recipientSigned: false,

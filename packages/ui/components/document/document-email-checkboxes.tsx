@@ -21,6 +21,33 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
 
   return (
     <div className={cn('space-y-3', className)}>
+      <div className="flex flex-row items-center">
+        <Checkbox
+          id="attachDocument"
+          className="h-5 w-5"
+          checked={value.attachDocument ?? true}
+          onCheckedChange={(checked) => onChange({ ...value, attachDocument: Boolean(checked) })}
+        />
+
+        <label className="ml-2 flex flex-row items-center text-muted-foreground text-sm" htmlFor="attachDocument">
+          <Trans>Attach completed document PDFs to emails</Trans>
+
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="mx-2 h-4 w-4" />
+            </TooltipTrigger>
+
+            <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <p>
+                <Trans>
+                  Includes document PDFs in completion emails to the owner and all recipients, including CCs. Disable
+                  this to send emails with document links only.
+                </Trans>
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </label>
+      </div>
       {!isHidden(DocumentEmailEvents.RecipientSigned) && (
         <div className="flex flex-row items-center">
           <Checkbox
