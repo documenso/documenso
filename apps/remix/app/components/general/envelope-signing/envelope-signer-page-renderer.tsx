@@ -47,6 +47,70 @@ type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
 };
 
+/**
+ * The event a field group receives when the signer presses on it. It is dispatched
+ * from the stage by geometry (`dispatchFieldPointerDown`), never by Konva's own hit
+ * detection.
+ *
+ * Konva finds the shape under the pointer by reading one pixel back from its hit
+ * canvas (`getImageData`) and looking its colour up. Browsers and extensions that
+ * protect against canvas fingerprinting (Brave Shields, Firefox fingerprinting
+ * protection, anti-tracking extensions, antivirus "anti-track" features) alter the
+ * pixels read back. The lookup then finds nothing — the field never reacts, with no
+ * request and no error — or, worse, finds a neighbouring shape while searching
+ * around the pointer, and a press on one radio option lands on another.
+ *
+ * Every field group on the layer has an exact position and size, so the signing page
+ * does not need the hit canvas at all: the stage resolves the pressed field (and the
+ * checkbox/radio item under the pointer) by geometry and fires this event on it.
+ */
+const FIELD_POINTERDOWN_EVENT = 'fieldpointerdown';
+
+const dispatchFieldPointerDown = (
+  e: KonvaEventObject<PointerEvent>,
+  stage: Konva.Stage,
+  pageLayer: Konva.Layer,
+) => {
+  const pointer = stage.getPointerPosition();
+
+  if (!pointer) {
+    return;
+  }
+
+  const contains = (rect: { x: number; y: number; width: number; height: number }) =>
+    pointer.x >= rect.x &&
+    pointer.x <= rect.x + rect.width &&
+    pointer.y >= rect.y &&
+    pointer.y <= rect.y + rect.height;
+
+  const isGroup = (node: Konva.Node): node is Konva.Group => node.getClassName() === 'Group';
+
+  // Topmost first: a group moved to top on hover wins over the one it overlaps.
+  const fieldGroup = pageLayer
+    .getChildren()
+    .filter(isGroup)
+    .reverse()
+    .find((group) => group.isListening() && contains(group.getClientRect()));
+
+  if (!fieldGroup) {
+    return;
+  }
+
+  const item = fieldGroup
+    .find((node: Konva.Node) => node.isListening() && node.getAttr('internalCheckboxIndex') !== undefined)
+    .find((node) => contains(node.getClientRect()));
+
+  fieldGroup.fire(
+    FIELD_POINTERDOWN_EVENT,
+    {
+      evt: e.evt,
+      target: item ?? fieldGroup.findOne('.field-rect') ?? fieldGroup,
+      pointerId: e.pointerId,
+    },
+    false,
+  );
+};
+
 export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
@@ -416,8 +480,8 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
         .exhaustive();
     };
 
-    fieldGroup.off('pointerdown');
-    fieldGroup.on('pointerdown', handleFieldGroupClick);
+    fieldGroup.off(FIELD_POINTERDOWN_EVENT);
+    fieldGroup.on(FIELD_POINTERDOWN_EVENT, handleFieldGroupClick);
   };
 
   const renderFieldOnLayer = (
@@ -541,6 +605,13 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
   const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
     renderFields();
     currentPageLayer.batchDraw();
+
+    // Every press reaches the stage, directly or by bubbling from whatever shape
+    // Konva's hit canvas attributed it to; the field is resolved by geometry here.
+    currentStage.off('pointerdown.field-geometry');
+    currentStage.on('pointerdown.field-geometry', (e) =>
+      dispatchFieldPointerDown(e, currentStage, currentPageLayer),
+    );
   };
 
   /**
