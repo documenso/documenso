@@ -13,16 +13,20 @@ describe('getSignatureFontFamily', () => {
     expect(family).not.toContain('Caveat');
   };
 
-  it('returns Caveat for ASCII-only text', () => {
+  it('returns Caveat for ASCII and supported Latin Extended & Cyrillic text', () => {
     expectCaveat(getSignatureFontFamily('John Doe'));
     expectCaveat(getSignatureFontFamily(''));
+    expectCaveat(getSignatureFontFamily('François'));
+    expectCaveat(getSignatureFontFamily('Müller'));
+    expectCaveat(getSignatureFontFamily('Søren'));
+    expectCaveat(getSignatureFontFamily('Michał Bąk'));
+    expectCaveat(getSignatureFontFamily('Castaño'));
+    expectCaveat(getSignatureFontFamily('José'));
+    expectCaveat(getSignatureFontFamily('María'));
+    expectCaveat(getSignatureFontFamily('Иванов'));
   });
 
-  it('returns the Noto chain for any non-ASCII character', () => {
-    expectNotoChain(getSignatureFontFamily('François'));
-    expectNotoChain(getSignatureFontFamily('Müller'));
-    expectNotoChain(getSignatureFontFamily('Søren'));
-    expectNotoChain(getSignatureFontFamily('Иванов'));
+  it('returns the Noto chain for unsupported scripts', () => {
     expectNotoChain(getSignatureFontFamily('Ελληνικά'));
     expectNotoChain(getSignatureFontFamily('عربي'));
     expectNotoChain(getSignatureFontFamily('עברית'));
