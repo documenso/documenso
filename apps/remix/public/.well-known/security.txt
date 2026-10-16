@@ -12,3 +12,6 @@ Contact: https://github.com/documenso/documenso/issues/new?assignees=&labels=bug
 
 Preferred-Languages: en
 Canonical: https://documenso.com/.well-known/security.txt
+
+# Required by RFC 9116 (section 2.5.5). Refresh before this date.
+Expires: 2027-07-13T00:00:00.000Z
