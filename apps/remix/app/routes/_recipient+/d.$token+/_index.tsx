@@ -5,8 +5,10 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { loadRecipientBrandingByTeamId } from '@documenso/lib/server-only/branding/load-recipient-branding';
 import { getEnvelopeForDirectTemplateSigning } from '@documenso/lib/server-only/envelope/get-envelope-for-direct-template-signing';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
+import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { getRecipientsWithMissingFields } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { Plural } from '@lingui/react/macro';
 import { UsersIcon } from 'lucide-react';
@@ -14,12 +16,14 @@ import { redirect } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
+import { DirectTemplateInvalidPageView } from '~/components/general/direct-template/direct-template-invalid-page';
 import { DirectTemplatePageView } from '~/components/general/direct-template/direct-template-page';
 import { DirectTemplateAuthPageView } from '~/components/general/direct-template/direct-template-signing-auth-page';
 import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
 import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';
 import { DocumentSigningPageViewV2 } from '~/components/general/document-signing/document-signing-page-view-v2';
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
+import { DocumentSigningSenderDisabledPage } from '~/components/general/document-signing/document-signing-sender-disabled-page';
 import { EnvelopeSigningProvider } from '~/components/general/document-signing/envelope-signing-provider';
 import { RecipientBranding } from '~/components/general/recipient-branding';
 import { useCspNonce } from '~/utils/nonce';
@@ -70,8 +74,18 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     };
   }
 
+  const recipientsWithMissingFields = getRecipientsWithMissingFields(template.recipients, template.fields);
+
+  if (recipientsWithMissingFields.length > 0) {
+    return {
+      isAccessAuthValid: true,
+      isTemplateMissingSignatures: true,
+    } as const;
+  }
+
   return {
     isAccessAuthValid: true,
+    isTemplateMissingSignatures: false,
     template: {
       ...template,
       folder: null,
@@ -96,6 +110,7 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
     .then((envelopeForSigning) => {
       return {
         isDocumentAccessValid: true,
+        isTemplateMissingSignatures: false,
         envelopeForSigning,
       } as const;
     })
@@ -105,6 +120,13 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
       if (error.code === AppErrorCode.UNAUTHORIZED) {
         return {
           isDocumentAccessValid: false,
+        } as const;
+      }
+
+      if (error.code === AppErrorCode.MISSING_SIGNATURE_FIELD) {
+        return {
+          isDocumentAccessValid: true,
+          isTemplateMissingSignatures: true,
         } as const;
       }
 
@@ -129,11 +151,25 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
     select: {
       internalVersion: true,
       teamId: true,
+      userId: true,
     },
   });
 
   if (!directEnvelope) {
     throw new Response('Not Found', { status: 404 });
+  }
+
+  // Resolved here rather than via the token fetchers so branding is never loaded for a disabled sender.
+  try {
+    await assertSenderNotDisabled({ userId: directEnvelope.userId });
+  } catch (e) {
+    if (AppError.parseError(e).code === AppErrorCode.SENDER_DISABLED) {
+      return superLoaderJson({
+        isSenderDisabled: true,
+      } as const);
+    }
+
+    throw e;
   }
 
   const branding = await loadRecipientBrandingByTeamId({
@@ -144,6 +180,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
     const payloadV2 = await handleV2Loader(loaderArgs);
 
     return superLoaderJson({
+      isSenderDisabled: false,
       version: 2,
       payload: payloadV2,
       branding,
@@ -153,6 +190,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
   const payloadV1 = await handleV1Loader(loaderArgs);
 
   return superLoaderJson({
+    isSenderDisabled: false,
     version: 1,
     payload: payloadV1,
     branding,
@@ -162,6 +200,10 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 export default function DirectTemplatePage() {
   const data = useSuperLoaderData<typeof loader>();
   const cspNonce = useCspNonce();
+
+  if (data.isSenderDisabled) {
+    return <DocumentSigningSenderDisabledPage />;
+  }
 
   return (
     <>
@@ -179,6 +221,10 @@ const DirectSigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV
   // Should not be possible for directLink to be null.
   if (!data.isAccessAuthValid) {
     return <DirectTemplateAuthPageView />;
+  }
+
+  if (data.isTemplateMissingSignatures) {
+    return <DirectTemplateInvalidPageView />;
   }
 
   const { template, directTemplateRecipient } = data;
@@ -233,6 +279,10 @@ const DirectSigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV
 
   if (!data.isDocumentAccessValid) {
     return <DocumentSigningAuthPageView email={''} emailHasAccount={true} />;
+  }
+
+  if (data.isTemplateMissingSignatures) {
+    return <DirectTemplateInvalidPageView />;
   }
 
   const { envelope, recipient } = data.envelopeForSigning;

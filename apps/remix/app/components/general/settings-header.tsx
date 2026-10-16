@@ -12,9 +12,9 @@ export type SettingsHeaderProps = {
 export const SettingsHeader = ({ children, title, subtitle, className, hideDivider }: SettingsHeaderProps) => {
   return (
     <>
-      <div className={cn('flex flex-row items-center justify-between', className)}>
+      <div className={cn('mb-4 flex flex-row items-center justify-between', className)}>
         <div>
-          <h3 className="font-medium text-lg">{title}</h3>
+          <h2 className="font-bold text-xl">{title}</h2>
 
           <p className="text-muted-foreground text-sm md:mt-2">{subtitle}</p>
         </div>
@@ -22,7 +22,7 @@ export const SettingsHeader = ({ children, title, subtitle, className, hideDivid
         {children}
       </div>
 
-      {!hideDivider && <hr className="my-4" />}
+      {!hideDivider && <hr className="mb-4" />}
     </>
   );
 };

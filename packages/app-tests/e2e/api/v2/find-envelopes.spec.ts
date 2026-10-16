@@ -1055,3 +1055,120 @@ test.describe('Find Envelopes API - Cross-User Isolation', () => {
     expect(titles).not.toContain('Member Org Team Env');
   });
 });
+
+test.describe('Find Envelopes API - Expired Recipient Filter', () => {
+  test('hasExpiredRecipients=true returns only envelopes with an expired, unsigned recipient', async ({ request }) => {
+    const { user, team } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    const { token } = await createApiToken({
+      userId: user.id,
+      teamId: team.id,
+      tokenName: 'env-expired-token',
+      expiresIn: null,
+    });
+
+    const expiredEnvelope = await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired Envelope' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: expiredEnvelope.id },
+      data: { expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+    });
+
+    await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Active Envelope' },
+    });
+
+    const { json } = await findEnvelopes(request, token, {
+      type: EnvelopeType.DOCUMENT,
+      hasExpiredRecipients: 'true',
+    });
+    const titles = json!.data.map((d) => d.title);
+    expect(titles).toContain('Expired Envelope');
+    expect(titles).not.toContain('Active Envelope');
+    expect(json!.count).toBe(1);
+  });
+});
+
+// ─── Adversarial: Expired Recipient Filter cross-tenant isolation ────────────
+
+test.describe('Find Envelopes API - Adversarial: Cross-Team Expired Recipient Filter', () => {
+  const PAST = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  test('token scoped to team A must NOT see team B envelopes with expired recipients', async ({ request }) => {
+    const { user: userA, team: teamA } = await seedUser();
+    const { user: userB, team: teamB } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    const { token: tokenA } = await createApiToken({
+      userId: userA.id,
+      teamId: teamA.id,
+      tokenName: 'env-teamA-expired-token',
+      expiresIn: null,
+    });
+
+    const teamAEnvelope = await seedPendingDocument(userA, teamA.id, [recipient], {
+      createDocumentOptions: { title: 'TeamA Expired Envelope' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamAEnvelope.id },
+      data: { expiresAt: PAST },
+    });
+
+    const teamBEnvelope = await seedPendingDocument(userB, teamB.id, [recipient], {
+      createDocumentOptions: { title: 'TeamB Expired Envelope' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamBEnvelope.id },
+      data: { expiresAt: PAST },
+    });
+
+    const { json } = await findEnvelopes(request, tokenA, {
+      type: EnvelopeType.DOCUMENT,
+      hasExpiredRecipients: 'true',
+    });
+    const titles = json!.data.map((d) => d.title);
+    expect(titles).toContain('TeamA Expired Envelope');
+    expect(titles).not.toContain('TeamB Expired Envelope');
+    expect(json!.count).toBe(1);
+  });
+
+  test('shared recipient email across teams does not leak the other team expired envelopes', async ({ request }) => {
+    const { user: userA, team: teamA } = await seedUser();
+    const { user: userB, team: teamB } = await seedUser();
+    const { user: sharedRecipient } = await seedUser();
+
+    const { token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'env-teamB-expired-token',
+      expiresIn: null,
+    });
+
+    const teamAEnvelope = await seedPendingDocument(userA, teamA.id, [sharedRecipient], {
+      createDocumentOptions: { title: 'TeamA Shared Expired Envelope' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamAEnvelope.id },
+      data: { expiresAt: PAST },
+    });
+
+    const teamBEnvelope = await seedPendingDocument(userB, teamB.id, [sharedRecipient], {
+      createDocumentOptions: { title: 'TeamB Shared Expired Envelope' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamBEnvelope.id },
+      data: { expiresAt: PAST },
+    });
+
+    const { json } = await findEnvelopes(request, tokenB, {
+      type: EnvelopeType.DOCUMENT,
+      hasExpiredRecipients: 'true',
+    });
+    const titles = json!.data.map((d) => d.title);
+    expect(titles).toContain('TeamB Shared Expired Envelope');
+    expect(titles).not.toContain('TeamA Shared Expired Envelope');
+    expect(json!.count).toBe(1);
+  });
+});

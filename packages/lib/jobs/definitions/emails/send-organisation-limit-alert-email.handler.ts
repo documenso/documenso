@@ -129,6 +129,7 @@ export const run = async ({
       text: `
         Organisation: ${organisation.name}
         Organisation ID: ${organisation.id}
+        Admin URL: ${NEXT_PUBLIC_WEBAPP_URL()}/admin/organisations/${organisation.id}
         Organisation Claim Original ID: ${organisation.organisationClaim.originalSubscriptionClaimId}
         Email Quota: ${organisation.monthlyStats[0]?.emailCount || 0}/${organisation.organisationClaim.emailQuota ?? 'Unlimited'}
         API Quota: ${organisation.monthlyStats[0]?.apiCount || 0}/${organisation.organisationClaim.apiQuota ?? 'Unlimited'}

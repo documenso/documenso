@@ -1,4 +1,5 @@
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -8,6 +9,7 @@ import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { ChevronLeftIcon } from 'lucide-react';
+import { useEffect } from 'react';
 import { isRouteErrorResponse, Link, Outlet, redirect, type ShouldRevalidateFunctionArgs } from 'react-router';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
@@ -84,7 +86,17 @@ export default function TemplatesLayout() {
 }
 
 export function ErrorBoundary({ error, params }: Route.ErrorBoundaryProps) {
+  const analytics = useAnalytics();
+
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
+
+  useEffect(() => {
+    analytics.captureException(error, {
+      source: 'editor',
+      location: 'editor_layout_boundary',
+      envelopeId: params.id,
+    });
+  }, [error]);
 
   const errorCodeMap = {
     404: {

@@ -313,20 +313,14 @@ test.describe('Signing Certificate Tests', () => {
     await apiSignin({
       page,
       email: owner.email,
-      redirectPath: `/t/${team.url}/settings/document`,
+      redirectPath: `/t/${team.url}/settings/certificates`,
     });
 
-    await page
-      .getByRole('group')
-      .locator('div')
-      .filter({ hasText: 'Include the Signing' })
-      .getByRole('combobox')
-      .click();
+    await page.getByTestId('include-signing-certificate-trigger').click();
     await page.getByRole('option', { name: 'No' }).click();
 
     await page.getByRole('button', { name: 'Save changes' }).first().click();
-
-    await page.waitForTimeout(1000);
+    await expect(page.getByText('Your certificate preferences have been updated').first()).toBeVisible();
 
     // Verify the setting was saved
     const updatedTeam = await prisma.team.findFirstOrThrow({
@@ -337,23 +331,21 @@ test.describe('Signing Certificate Tests', () => {
     expect(updatedTeam.teamGlobalSettings?.includeSigningCertificate).toBe(false);
 
     // Toggle the setting back to true
-    await page
-      .getByRole('group')
-      .locator('div')
-      .filter({ hasText: 'Include the Signing' })
-      .getByRole('combobox')
-      .click();
+    await page.getByTestId('include-signing-certificate-trigger').click();
     await page.getByRole('option', { name: 'Yes' }).click();
     await page.getByRole('button', { name: 'Save changes' }).first().click();
 
-    await page.waitForTimeout(1000);
+    // The toast from the first save may still be visible, so poll the database
+    // for the saved value instead of waiting on UI signals.
+    await expect
+      .poll(async () => {
+        const updatedTeam = await prisma.team.findFirstOrThrow({
+          where: { id: team.id },
+          include: { teamGlobalSettings: true },
+        });
 
-    // Verify the setting was saved
-    const updatedTeam2 = await prisma.team.findFirstOrThrow({
-      where: { id: team.id },
-      include: { teamGlobalSettings: true },
-    });
-
-    expect(updatedTeam2.teamGlobalSettings?.includeSigningCertificate).toBe(true);
+        return updatedTeam.teamGlobalSettings?.includeSigningCertificate;
+      })
+      .toBe(true);
   });
 });

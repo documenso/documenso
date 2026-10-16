@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
@@ -25,6 +26,7 @@ export const EmbedSignDocumentV2ClientPage = ({
   allowWhitelabelling = false,
 }: EmbedSignDocumentV2ClientPageProps) => {
   const { _ } = useLingui();
+  const analytics = useAnalytics();
 
   const { envelope, recipient, envelopeData, setFullName, setEmail, fullName, email } =
     useRequiredEnvelopeSigningContext();
@@ -38,12 +40,18 @@ export const EmbedSignDocumentV2ClientPage = ({
   const [isNameLocked, setIsNameLocked] = useState(false);
   const [isEmailLocked, setIsEmailLocked] = useState(envelope.type === EnvelopeType.DOCUMENT && !!email);
 
+  // The signing provider's envelope data isn't refreshed on revalidation.
+  const [hasCompletedDocument, setHasCompletedDocument] = useState(isCompleted);
+  const [hasRejectedDocument, setHasRejectedDocument] = useState(isRejected);
+
   const onDocumentCompleted = (data: {
     token: string;
     documentId: number;
     envelopeId: string;
     recipientId: number;
   }) => {
+    setHasCompletedDocument(true);
+
     if (window.parent) {
       window.parent.postMessage(
         {
@@ -110,6 +118,8 @@ export const EmbedSignDocumentV2ClientPage = ({
     recipientId: number;
     reason?: string;
   }) => {
+    setHasRejectedDocument(true);
+
     if (window.parent) {
       window.parent.postMessage(
         {
@@ -170,6 +180,14 @@ export const EmbedSignDocumentV2ClientPage = ({
       }
     } catch (err) {
       console.error(err);
+
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'embed_init',
+        recipientId: recipient.id,
+        envelopeId: envelope.id,
+      });
+
       setHasFinishedInit(true);
     }
 
@@ -209,23 +227,26 @@ export const EmbedSignDocumentV2ClientPage = ({
     }
   }, [isRejected, envelope.id, recipient.id, recipient.token]);
 
-  if (isRejected) {
+  if (hasRejectedDocument) {
     return <EmbedDocumentRejected />;
   }
 
-  if (isCompleted) {
+  if (hasCompletedDocument) {
+    const completedSignature =
+      recipient.fields.find((field) => field.signature)?.signature ?? recipientSignature ?? null;
+
     return (
       <EmbedDocumentCompleted
         name={fullName}
         signature={
-          recipientSignature
+          completedSignature
             ? {
                 id: 1,
                 fieldId: 1,
                 recipientId: recipient.id,
                 created: new Date(),
-                signatureImageAsBase64: recipientSignature.signatureImageAsBase64,
-                typedSignature: recipientSignature.typedSignature,
+                signatureImageAsBase64: completedSignature.signatureImageAsBase64,
+                typedSignature: completedSignature.typedSignature,
               }
             : undefined
         }

@@ -89,6 +89,7 @@ export default function WebhookPage() {
   return (
     <div>
       <SettingsHeader
+        hideDivider
         title={t`Webhooks`}
         subtitle={t`On this page, you can create new Webhooks and manage the existing ones.`}
       >

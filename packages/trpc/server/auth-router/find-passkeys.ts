@@ -4,6 +4,7 @@ import { authenticatedProcedure } from '../trpc';
 import { ZFindPasskeysRequestSchema, ZFindPasskeysResponseSchema } from './find-passkeys.types';
 
 export const findPasskeysRoute = authenticatedProcedure
+  .meta({ allowEmbedSession: true })
   .input(ZFindPasskeysRequestSchema)
   .output(ZFindPasskeysResponseSchema)
   .query(async ({ input, ctx }) => {

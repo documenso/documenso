@@ -369,3 +369,4 @@ npm run test:dev -w @documenso/app-tests -- --grep "documents/<id>: add myself"
 - **Parallel test isolation**: Always use a unique `externalId` via `nanoid()` so parallel tests don't collide.
 - **Navigation verification**: Navigate away from and back to the current step to verify UI state persistence (the editor may re-render).
 - **Delete confirmation**: Native surfaces show a confirmation dialog for item deletion; embedded surfaces delete immediately.
+- **`Origin` header on `request.post()`**: Playwright's `APIRequestContext` never sends `Origin`, and the CSRF middleware (`apps/remix/server/csrf-middleware.ts`) rejects cookie-authenticated mutations without it (403). Spread `WEBAPP_ORIGIN_HEADERS` from `fixtures/authentication.ts` into `headers` on every `page.context().request.post()` / `.put()` / `.delete()` to `/api/auth/*`, `/api/trpc/*`, `/api/v2/*`, `/api/files/*` or `/api/ai/*`. Not needed for `Authorization: Bearer` / `api_` requests (exempt) or GETs.

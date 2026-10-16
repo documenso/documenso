@@ -7,6 +7,7 @@ on:
 jobs:
   label-when-assigned:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Label issue
         uses: actions/github-script@v6

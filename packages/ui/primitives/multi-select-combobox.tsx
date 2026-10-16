@@ -142,6 +142,7 @@ export function MultiSelectCombobox<T = OptionValue>({
         {showClearButton && !loading && (
           <div className="absolute top-0 right-8 bottom-0 flex items-center justify-center">
             <button
+              type="button"
               className="flex h-4 w-4 items-center justify-center rounded-full bg-muted-foreground/20"
               onClick={() => onChange([])}
             >

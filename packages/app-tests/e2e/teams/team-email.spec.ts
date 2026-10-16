@@ -1,4 +1,5 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { prisma } from '@documenso/prisma';
 import { seedTeamEmailVerification } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
@@ -29,7 +30,33 @@ test('[TEAMS]: send team email request', async ({ page }) => {
 });
 
 test('[TEAMS]: accept team email request', async ({ page }) => {
-  const { user, team } = await seedUser();
+  const { team } = await seedUser();
+
+  const teamEmailVerification = await seedTeamEmailVerification({
+    email: `team-email-verification--${team.url}@test.documenso.com`,
+    teamId: team.id,
+  });
+
+  const getTeamEmail = async () => prisma.teamEmail.findUnique({ where: { teamId: team.id } });
+
+  expect(await getTeamEmail()).toBeNull();
+
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/team/verify/email/${teamEmailVerification.token}`);
+
+  // Visiting the page (GET) must not verify the team email. An automated email link
+  // scanner or prefetcher must not be able to complete the verification.
+  await expect(page.getByRole('heading', { name: 'Verify team email' })).toBeVisible();
+  expect(await getTeamEmail()).toBeNull();
+
+  await page.getByRole('button', { name: 'Verify email' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Team email verified!' })).toBeVisible();
+
+  expect(await getTeamEmail()).not.toBeNull();
+});
+
+test('[TEAMS]: team email verification link is invalid once completed', async ({ page }) => {
+  const { team } = await seedUser();
 
   const teamEmailVerification = await seedTeamEmailVerification({
     email: `team-email-verification--${team.url}@test.documenso.com`,
@@ -37,7 +64,11 @@ test('[TEAMS]: accept team email request', async ({ page }) => {
   });
 
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/team/verify/email/${teamEmailVerification.token}`);
-  await expect(page.getByRole('heading')).toContainText('Team email verified!');
+  await page.getByRole('button', { name: 'Verify email' }).click();
+  await expect(page.getByRole('heading', { name: 'Team email verified!' })).toBeVisible();
+
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/team/verify/email/${teamEmailVerification.token}`);
+  await expect(page.getByRole('heading', { name: 'Team email already verified!' })).toBeVisible();
 });
 
 test('[TEAMS]: delete team email', async ({ page }) => {

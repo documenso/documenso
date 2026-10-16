@@ -110,7 +110,7 @@ test.describe('Default Recipients', () => {
     await page.getByRole('button', { name: 'Add Signer' }).click();
 
     // Add a regular signer using the v2 editor
-    await page.getByTestId('signer-email-input').last().fill('regular-signer@documenso.com');
+    await page.getByTestId('signer-email-input').first().fill('regular-signer@documenso.com');
     await page
       .getByPlaceholder(/Recipient/)
       .first()

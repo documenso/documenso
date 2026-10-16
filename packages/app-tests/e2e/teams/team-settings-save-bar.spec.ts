@@ -51,6 +51,10 @@ test('[ORGANISATIONS]: settings save bar floats when the form footer is off-scre
     isPersonalOrganisation: false,
   });
 
+  // Short (but still md+) viewport so the document preferences form overflows
+  // the internally-scrolling settings content pane.
+  await page.setViewportSize({ width: 1280, height: 720 });
+
   await apiSignin({
     page,
     email: user.email,
@@ -71,8 +75,10 @@ test('[ORGANISATIONS]: settings save bar floats when the form footer is off-scre
   await expect(page.getByRole('button', { name: 'Save changes' })).toBeVisible();
 
   // Scroll to the footer → the floating pill merges into the docked buttons and the
-  // notice disappears.
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  // notice disappears. The settings layout scrolls its content pane internally,
+  // so scroll that pane rather than the window.
+  const contentPane = page.getByTestId('unified-settings-content').locator('..');
+  await contentPane.evaluate((el) => el.scrollTo(0, el.scrollHeight));
 
   await expect(page.getByText('You have unsaved changes')).not.toBeVisible();
   await expect(page.getByRole('button', { name: 'Save changes' })).toBeVisible();

@@ -56,7 +56,7 @@ export const OrganisationUpdateForm = () => {
       await refreshSession();
 
       if (url !== organisation.url) {
-        await navigate(`/o/${url}/settings`);
+        await navigate(`/o/${url}/settings/general`);
       }
 
       toast({

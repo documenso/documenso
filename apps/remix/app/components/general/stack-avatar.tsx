@@ -1,4 +1,5 @@
 import { RecipientStatusType } from '@documenso/lib/client-only/recipient-type';
+import { cn } from '@documenso/ui/lib/utils';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 
 const ZIndexes: { [key: string]: string } = {
@@ -14,9 +15,10 @@ export type StackAvatarProps = {
   zIndex?: string;
   fallbackText?: string;
   type: RecipientStatusType;
+  className?: string;
 };
 
-export const StackAvatar = ({ first, zIndex, fallbackText = '', type }: StackAvatarProps) => {
+export const StackAvatar = ({ first, zIndex, fallbackText = '', type, className }: StackAvatarProps) => {
   let classes = '';
   let zIndexClass = '';
   const firstClass = first ? '' : '-ml-3';
@@ -46,7 +48,14 @@ export const StackAvatar = ({ first, zIndex, fallbackText = '', type }: StackAva
   }
 
   return (
-    <Avatar className={` ${zIndexClass} ${firstClass} h-10 w-10 border-2 border-white border-solid dark:border-border`}>
+    <Avatar
+      className={cn(
+        zIndexClass,
+        firstClass,
+        'h-10 w-10 border-2 border-white border-solid dark:border-border',
+        className,
+      )}
+    >
       <AvatarFallback className={classes}>{fallbackText}</AvatarFallback>
     </Avatar>
   );

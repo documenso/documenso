@@ -16,6 +16,7 @@ jobs:
   pull_translations:
     name: Pull translations
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment: Translations
     permissions:
       contents: write

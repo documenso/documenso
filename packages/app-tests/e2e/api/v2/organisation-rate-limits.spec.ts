@@ -37,7 +37,7 @@ import type { Organisation, Team, User } from '@prisma/client';
  *
  * --- GLOBAL LIMIT AWARENESS ---
  * apps/remix/server/router.ts applies a GLOBAL per-IP limiter to /api/v2/*:
- *   apiV2RateLimit = 100 requests / 1 minute (see rate-limits.ts).
+ *   apiV2RateLimit = 1000 requests / 1 minute (see rate-limits.ts).
  * Every per-org limit/quota configured here is kept FAR below that ceiling (single
  * digits) and the suite runs serially so the shared-IP global bucket is never the
  * thing that trips. A global-limit 429 is shaped `{ error }` whereas an org-limit
@@ -49,7 +49,7 @@ const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const baseUrl = `${WEBAPP_BASE_URL}/api/v2-beta`;
 
 // Run serially: all workers share one IP, and the global /api/v2 limiter is
-// per-IP. Serial execution keeps the shared global bucket well under 100/min.
+// per-IP. Serial execution keeps the shared global bucket well under 1000/min.
 test.describe.configure({ mode: 'serial' });
 
 // This suite is only meaningful with real rate limiting enabled. CI sets the

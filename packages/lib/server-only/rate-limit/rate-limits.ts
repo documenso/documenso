@@ -66,6 +66,32 @@ export const linkOrgAccountRateLimit = createRateLimit({
   window: '1h',
 });
 
+export const embedAuthStartRateLimit = createRateLimit({
+  action: 'auth.embed-start',
+  max: 100,
+  window: '15m',
+});
+
+// IP only: the nonce must never be a rate limit key (it would be persisted in plaintext).
+// The client polls every 2s, so this allows ~40 concurrent flows behind one IP.
+export const embedAuthRedeemRateLimit = createRateLimit({
+  action: 'auth.embed-redeem',
+  max: 1200,
+  window: '1m',
+});
+
+// ---- Auth (Tier 3 - Authenticated, verifies secrets) ----
+
+/**
+ * Bounds guessing of the current password and 2FA code via the update password endpoint.
+ */
+export const updatePasswordRateLimit = createRateLimit({
+  action: 'auth.update-password',
+  max: 5,
+  globalMax: 20,
+  window: '15m',
+});
+
 export const reportSenderRateLimit = createRateLimit({
   action: 'recipient.report-sender',
   max: 1,
@@ -84,13 +110,13 @@ export const syncSubscriptionRateLimit = createRateLimit({
 
 export const apiV1RateLimit = createRateLimit({
   action: 'api.v1',
-  max: 100,
+  max: 1000,
   window: '1m',
 });
 
 export const apiV2RateLimit = createRateLimit({
   action: 'api.v2',
-  max: 100,
+  max: 1000,
   window: '1m',
 });
 

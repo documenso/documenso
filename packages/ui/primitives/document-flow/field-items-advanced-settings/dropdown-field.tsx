@@ -89,7 +89,7 @@ export const DropdownFieldAdvancedSettings = ({
   }, [fieldState.defaultValue]);
 
   return (
-    <div className="flex flex-col gap-4 text-dark">
+    <div className="flex flex-col gap-4">
       <div>
         <Label>
           <Trans>Select default option</Trans>

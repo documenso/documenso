@@ -7,6 +7,7 @@ import {
 } from './create-passkey-authentication-options.types';
 
 export const createPasskeyAuthenticationOptionsRoute = authenticatedProcedure
+  .meta({ allowEmbedSession: true })
   .input(ZCreatePasskeyAuthenticationOptionsRequestSchema)
   .output(ZCreatePasskeyAuthenticationOptionsResponseSchema)
   .mutation(async ({ ctx, input }) => {

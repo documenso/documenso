@@ -2,11 +2,14 @@ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
 import { getEnvelopeForDirectTemplateSigning } from '@documenso/lib/server-only/envelope/get-envelope-for-direct-template-signing';
 import { getEnvelopeRequiredAccessData } from '@documenso/lib/server-only/envelope/get-envelope-required-access-data';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
+import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
+import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 import { data } from 'react-router';
@@ -75,7 +78,6 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-authentication-required',
-        returnTo: `/embed/direct/${token}`,
       },
       {
         status: 401,
@@ -92,6 +94,30 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
   }
 
   const fields = template.fields.filter((field) => field.recipientId === directTemplateRecipientId);
+
+  fireAndForget(async () => {
+    const team = await prisma.team.findFirst({
+      where: {
+        id: template.teamId,
+      },
+      select: {
+        organisationId: true,
+      },
+    });
+
+    captureServerEvent({
+      event: 'App: Embed Session Started',
+      userId: user?.id,
+      organisationId: team?.organisationId,
+      teamId: template.teamId,
+      properties: {
+        type: 'signing',
+        version: 'v0',
+        recipientId: recipient.id,
+        envelopeId: template.envelopeId,
+      },
+    });
+  });
 
   return {
     token,
@@ -143,7 +169,6 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
       {
         type: 'embed-authentication-required',
         email: envelopeForSigning.recipientEmail,
-        returnTo: `/embed/direct/${token}`,
       },
       {
         status: 401,
@@ -185,14 +210,37 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-authentication-required',
-        email: user?.email || recipient.email,
-        returnTo: `/embed/direct/${token}`,
+        email: recipient.email,
       },
       {
         status: 401,
       },
     );
   }
+
+  fireAndForget(async () => {
+    const team = await prisma.team.findFirst({
+      where: {
+        id: envelope.teamId,
+      },
+      select: {
+        organisationId: true,
+      },
+    });
+
+    captureServerEvent({
+      event: 'App: Embed Session Started',
+      userId: user?.id,
+      organisationId: team?.organisationId,
+      teamId: envelope.teamId,
+      properties: {
+        type: 'signing',
+        version: 'v0',
+        recipientId: recipient.id,
+        envelopeId: envelope.id,
+      },
+    });
+  });
 
   return {
     token,
@@ -219,6 +267,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
       envelope: {
         select: {
           internalVersion: true,
+          userId: true,
         },
       },
     },
@@ -226,6 +275,23 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 
   if (!foundDirectLink) {
     throw new Response('Not Found', { status: 404 });
+  }
+
+  try {
+    await assertSenderNotDisabled({ userId: foundDirectLink.envelope.userId });
+  } catch (e) {
+    if (AppError.parseError(e).code === AppErrorCode.SENDER_DISABLED) {
+      throw data(
+        {
+          type: 'embed-sender-disabled',
+        },
+        {
+          status: 403,
+        },
+      );
+    }
+
+    throw e;
   }
 
   if (foundDirectLink.envelope.internalVersion === 2) {

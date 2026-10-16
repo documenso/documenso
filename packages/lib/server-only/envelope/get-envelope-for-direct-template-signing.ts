@@ -5,8 +5,10 @@ import { match } from 'ts-pattern';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DocumentAccessAuth, type TDocumentAuthMethods } from '../../types/document-auth';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
+import { getRecipientsWithMissingFields } from '../../utils/recipients';
 import { extractFieldAutoInsertValues } from '../document/send-document';
 import { getTeamSettings } from '../team/get-team-settings';
+import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 import type { EnvelopeForSigningResponse } from './get-envelope-for-recipient-signing';
 import { ZEnvelopeForSigningResponse } from './get-envelope-for-recipient-signing';
 
@@ -97,6 +99,8 @@ export const getEnvelopeForDirectTemplateSigning = async ({
     });
   }
 
+  await assertSenderNotDisabled({ userId: envelope.userId });
+
   // Currently not using this since for direct templates "User" access means they just need to be
   // logged in.
   // const documentAccessValid = await isRecipientAuthorized({
@@ -122,6 +126,17 @@ export const getEnvelopeForDirectTemplateSigning = async ({
   if (!documentAccessValid) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'Invalid access values',
+    });
+  }
+
+  const recipientsWithMissingFields = getRecipientsWithMissingFields(
+    envelope.recipients,
+    envelope.recipients.flatMap((envelopeRecipient) => envelopeRecipient.fields),
+  );
+
+  if (recipientsWithMissingFields.length > 0) {
+    throw new AppError(AppErrorCode.MISSING_SIGNATURE_FIELD, {
+      message: 'One or more signers on this direct template are missing a signature field',
     });
   }
 
