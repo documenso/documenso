@@ -1,9 +1,11 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import { sendOrganisationAccountLinkConfirmationEmail } from '@documenso/ee/server-only/lib/send-organisation-account-link-confirmation-email';
 import { formatPath } from '@documenso/lib/constants/app';
 import { isDisposableEmail, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
+import { UserAuthMethod } from '@documenso/lib/types/user-auth-method';
 import { formatOrganisationLoginUrl } from '@documenso/lib/utils/organisation-authentication-portal';
 import { prisma } from '@documenso/prisma';
 import type { Context } from 'hono';
@@ -100,6 +102,14 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
     }).catch((err) => {
       // Todo: (RR7) Add logging.
       console.error(err);
+    });
+
+    const adminRuleEngine = new AdminRuleEngine({ requestMetadata: c.get('requestMetadata') });
+
+    await adminRuleEngine.run({
+      trigger: 'USER_SIGNED_UP',
+      user: userToLink,
+      signupMethod: UserAuthMethod.ORGANISATION_SSO,
     });
   }
 

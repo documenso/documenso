@@ -23,6 +23,8 @@
 - Use named exports for components
 - Never use 'use client' directive
 - Never use 1-line if statements
+- Never collapse objects in Prisma queries onto one line. Put each property on its own line, including nested `where`, `select`, `include`, `orderBy` and `data` objects (write `where: { id: userId }` across three lines, not one)
+- Apply the same to Zod schemas: spread `z.object()` shapes and `.pick()` / `.omit()` / `.extend()` objects one property per line. Single-key validator options like `.min(1, { message })` and short arrays like `z.enum([...])` can stay inline
 - Structure files: exported component, subcomponents, helpers, static content, types
 
 ## Error Handling & Validation

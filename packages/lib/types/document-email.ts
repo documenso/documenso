@@ -60,7 +60,9 @@ export const ZDocumentEmailSettingsSchema = z
 
 export type TDocumentEmailSettings = z.infer<typeof ZDocumentEmailSettingsSchema>;
 
-export const extractDerivedDocumentEmailSettings = (documentMeta?: DocumentMeta | null): TDocumentEmailSettings => {
+export const extractDerivedDocumentEmailSettings = (
+  documentMeta?: Pick<DocumentMeta, 'emailSettings' | 'distributionMethod'> | null,
+): TDocumentEmailSettings => {
   const emailSettings = ZDocumentEmailSettingsSchema.parse(documentMeta?.emailSettings ?? {});
 
   if (!documentMeta?.distributionMethod || documentMeta?.distributionMethod === DocumentDistributionMethod.EMAIL) {

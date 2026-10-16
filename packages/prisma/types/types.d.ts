@@ -1,4 +1,11 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import type {
+  TAdminRuleActionRuns,
+  TAdminRuleContext,
+  TAdminRuleDefinition,
+  TAdminRuleTrigger,
+} from '@documenso/lib/types/admin-rules';
+import type { TAdminTagType } from '@documenso/lib/types/admin-tags';
 import type { TDefaultRecipient } from '@documenso/lib/types/default-recipients';
 import type { TDocumentAuthOptions, TRecipientAuthOptions } from '@documenso/lib/types/document-auth';
 import type { TDocumentEmailSettings } from '@documenso/lib/types/document-email';
@@ -26,5 +33,12 @@ declare global {
     type EnvelopeAttachmentType = TEnvelopeAttachmentType;
 
     type DefaultRecipient = TDefaultRecipient;
+
+    type AdminRuleDefinition = TAdminRuleDefinition;
+    type AdminRuleContext = TAdminRuleContext;
+    type AdminRuleActionRuns = TAdminRuleActionRuns;
+    type AdminRuleTrigger = TAdminRuleTrigger;
+
+    type AdminTagType = TAdminTagType;
   }
 }
