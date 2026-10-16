@@ -47,6 +47,117 @@ type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
 };
 
+/**
+ * The event a field group receives when the signer presses on it. It is dispatched
+ * from the stage by geometry (`dispatchFieldPointerDown`), never by Konva's own hit
+ * detection.
+ *
+ * Konva finds the shape under the pointer by reading one pixel back from its hit
+ * canvas (`getImageData`) and looking its colour up. Browsers and extensions that
+ * protect against canvas fingerprinting (Brave Shields, Firefox fingerprinting
+ * protection, anti-tracking extensions, antivirus "anti-track" features) alter the
+ * pixels read back. The lookup then finds nothing — the field never reacts, with no
+ * request and no error — or, worse, finds a neighbouring shape while searching
+ * around the pointer, and a press on one radio option lands on another.
+ *
+ * Every field group on the layer has an exact position and size, so the signing page
+ * does not need the hit canvas at all: the stage resolves the pressed field (and the
+ * checkbox/radio item under the pointer) by geometry and fires this event on it.
+ */
+const FIELD_POINTERDOWN_EVENT = 'fieldpointerdown';
+
+/**
+ * The field group under the pointer and, for checkbox/radio fields, the item under it.
+ *
+ * Nodes are judged by their own `listening` attribute, not `isListening()`: the page layer
+ * itself does not listen (see `createPageCanvas`), so inheritance would hide everything.
+ * Other recipients' groups are rendered with `listening(false)` and are skipped; so are
+ * the non-interactive texts of generic fields.
+ */
+const resolveFieldUnderPointer = (stage: Konva.Stage, pageLayer: Konva.Layer) => {
+  const pointer = stage.getPointerPosition();
+
+  if (!pointer) {
+    return null;
+  }
+
+  const contains = (rect: { x: number; y: number; width: number; height: number }) =>
+    pointer.x >= rect.x &&
+    pointer.x <= rect.x + rect.width &&
+    pointer.y >= rect.y &&
+    pointer.y <= rect.y + rect.height;
+
+  const isGroup = (node: Konva.Node): node is Konva.Group => node.getClassName() === 'Group';
+
+  // Topmost first: a group moved to top on hover wins over the one it overlaps.
+  const fieldGroup = pageLayer
+    .getChildren()
+    .filter(isGroup)
+    .reverse()
+    .find((group) => group.listening() && contains(group.getClientRect()));
+
+  if (!fieldGroup) {
+    return null;
+  }
+
+  // Checkbox items carry `internalCheckboxIndex`, radio items `internalRadioIndex`; the
+  // field handler reads the one its type expects. Topmost first, as the hit canvas would.
+  const isItem = (node: Konva.Node) =>
+    node.listening() &&
+    (node.getAttr('internalCheckboxIndex') !== undefined ||
+      node.getAttr('internalRadioIndex') !== undefined);
+
+  const item = fieldGroup
+    .find(isItem)
+    .reverse()
+    .find((node) => contains(node.getClientRect()));
+
+  return { fieldGroup, item };
+};
+
+const dispatchFieldPointerDown = (
+  e: KonvaEventObject<PointerEvent>,
+  stage: Konva.Stage,
+  pageLayer: Konva.Layer,
+) => {
+  const resolved = resolveFieldUnderPointer(stage, pageLayer);
+
+  if (!resolved) {
+    return;
+  }
+
+  const { fieldGroup, item } = resolved;
+
+  fieldGroup.fire(
+    FIELD_POINTERDOWN_EVENT,
+    {
+      evt: e.evt,
+      target: item ?? fieldGroup.findOne('.field-rect') ?? fieldGroup,
+      pointerId: e.pointerId,
+    },
+    false,
+  );
+};
+
+/**
+ * Hover by geometry: fires the `mouseover` / `mouseout` the field groups already listen to
+ * (`createFieldHoverInteraction`) when the group under the pointer changes.
+ */
+const hoveredFieldGroups = new WeakMap<Konva.Stage, Konva.Group | null>();
+
+const dispatchFieldHover = (stage: Konva.Stage, pageLayer: Konva.Layer, leaving = false) => {
+  const next = leaving ? null : (resolveFieldUnderPointer(stage, pageLayer)?.fieldGroup ?? null);
+  const previous = hoveredFieldGroups.get(stage) ?? null;
+
+  if (next === previous) {
+    return;
+  }
+
+  hoveredFieldGroups.set(stage, next);
+  previous?.fire('mouseout', {}, false);
+  next?.fire('mouseover', {}, false);
+};
+
 export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
@@ -416,8 +527,8 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
         .exhaustive();
     };
 
-    fieldGroup.off('pointerdown');
-    fieldGroup.on('pointerdown', handleFieldGroupClick);
+    fieldGroup.off(FIELD_POINTERDOWN_EVENT);
+    fieldGroup.on(FIELD_POINTERDOWN_EVENT, handleFieldGroupClick);
   };
 
   const renderFieldOnLayer = (
@@ -541,6 +652,23 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
   const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
     renderFields();
     currentPageLayer.batchDraw();
+
+    // The layer does not take part in Konva's hit detection at all: every press and every
+    // move reaches the stage, and the field is resolved by geometry. Besides correctness
+    // under canvas anti-fingerprinting, this removes the cost of Konva's spiral search over
+    // altered pixels — measured at ~1,800 `getImageData` reads per press and per move.
+    currentPageLayer.listening(false);
+
+    currentStage.off('.field-geometry');
+    currentStage.on('pointerdown.field-geometry', (e) =>
+      dispatchFieldPointerDown(e, currentStage, currentPageLayer),
+    );
+    currentStage.on('pointermove.field-geometry', () =>
+      dispatchFieldHover(currentStage, currentPageLayer),
+    );
+    currentStage.on('mouseleave.field-geometry', () =>
+      dispatchFieldHover(currentStage, currentPageLayer, true),
+    );
   };
 
   /**
