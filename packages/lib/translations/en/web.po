@@ -2990,6 +2990,10 @@ msgstr "Checkout"
 msgid "Chinese"
 msgstr "Chinese"
 
+#: packages/lib/constants/i18n.ts
+msgid "Vietnamese"
+msgstr "Vietnamese"
+
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
 msgstr "Choose an existing recipient from below to continue"
