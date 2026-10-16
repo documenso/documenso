@@ -1000,6 +1000,7 @@ model OrganisationGlobalSettings {
   brandingCompanyDetails String  @default("")
   brandingColors         Json? /// [TCssVarsSchema] @zod.custom.use(ZCssVarsSchema)
   brandingCss            String  @default("")
+  brandingLogoSize       String  @default("SMALL")
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 
@@ -1043,6 +1044,7 @@ model TeamGlobalSettings {
   brandingCompanyDetails String?
   brandingColors         Json? /// [TCssVarsSchema] @zod.custom.use(ZCssVarsSchema)
   brandingCss            String?
+  brandingLogoSize       String?
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 
