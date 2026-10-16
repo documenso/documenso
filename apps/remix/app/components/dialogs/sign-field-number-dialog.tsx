@@ -20,10 +20,15 @@ import { z } from 'zod';
 
 export type SignFieldNumberDialogProps = {
   fieldMeta: TNumberFieldMeta;
+
+  /**
+   * The current value of the field. When set, an empty submit is allowed so the signer can clear the field.
+   */
+  defaultValue?: string;
 };
 
 export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, string | null>(
-  ({ call, fieldMeta }) => {
+  ({ call, fieldMeta, defaultValue }) => {
     const { t } = useLingui();
 
     // Needs to be inside dialog for translation purposes.
@@ -83,14 +88,16 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
       });
     };
 
+    const numberSchema = createNumberFieldSchema(fieldMeta);
+
     const ZSignFieldNumberFormSchema = z.object({
-      number: createNumberFieldSchema(fieldMeta),
+      number: defaultValue ? numberSchema.or(z.literal('')) : numberSchema,
     });
 
     const form = useForm<z.infer<typeof ZSignFieldNumberFormSchema>>({
       resolver: zodResolver(ZSignFieldNumberFormSchema),
       defaultValues: {
-        number: undefined,
+        number: defaultValue,
       },
     });
 
