@@ -96,8 +96,16 @@ const dispatchFieldPointerDown = (
     return;
   }
 
+  // Checkbox items carry `internalCheckboxIndex`, radio items `internalRadioIndex`; the
+  // field handler reads the one its type expects. Topmost first, as the hit canvas would.
+  const isItem = (node: Konva.Node) =>
+    node.isListening() &&
+    (node.getAttr('internalCheckboxIndex') !== undefined ||
+      node.getAttr('internalRadioIndex') !== undefined);
+
   const item = fieldGroup
-    .find((node: Konva.Node) => node.isListening() && node.getAttr('internalCheckboxIndex') !== undefined)
+    .find(isItem)
+    .reverse()
     .find((node) => contains(node.getClientRect()));
 
   fieldGroup.fire(
