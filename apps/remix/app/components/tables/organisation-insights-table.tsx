@@ -253,8 +253,8 @@ export const OrganisationInsightsTable = ({
       </div>
 
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/50">
-          <Loader className="h-8 w-8 animate-spin text-gray-500" />
+        <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+          <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       )}
     </div>
