@@ -160,12 +160,6 @@ export const filesRoute = new Hono<HonoEnv>()
                 documentData: true,
               },
             },
-            recipients: {
-              select: {
-                role: true,
-                signingStatus: true,
-              },
-            },
           },
         });
 
@@ -289,52 +283,94 @@ export const filesRoute = new Hono<HonoEnv>()
     '/token/:token/envelopeItem/:envelopeItemId/download/:version?',
     sValidator('param', ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema),
     async (c) => {
-      const { token, envelopeItemId, version } = c.req.valid('param');
+      const logger = c.get('logger');
 
-      let envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
-        id: envelopeItemId,
-        envelope: {
-          recipients: {
-            some: {
-              token,
-            },
-          },
-        },
-      };
+      try {
+        const { token, envelopeItemId, version } = c.req.valid('param');
 
-      if (token.startsWith('qr_')) {
-        envelopeWhereQuery = {
+        let envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
           id: envelopeItemId,
           envelope: {
-            qrToken: token,
+            recipients: {
+              some: {
+                token,
+              },
+            },
           },
         };
+
+        if (token.startsWith('qr_')) {
+          envelopeWhereQuery = {
+            id: envelopeItemId,
+            envelope: {
+              qrToken: token,
+            },
+          };
+        }
+
+        const envelopeItem = await prisma.envelopeItem.findUnique({
+          where: envelopeWhereQuery,
+          include: {
+            envelope: {
+              include: {
+                recipients: {
+                  where: {
+                    token,
+                  },
+                  select: {
+                    role: true,
+                    signingOrder: true,
+                    token: true,
+                  },
+                },
+              },
+            },
+            documentData: true,
+          },
+        });
+
+        if (!envelopeItem) {
+          return c.json({ error: 'Envelope item not found' }, 404);
+        }
+
+        if (!envelopeItem.documentData) {
+          return c.json({ error: 'Document data not found' }, 404);
+        }
+
+        const baseOptions = {
+          title: envelopeItem.title,
+          documentData: envelopeItem.documentData,
+          isDownload: true,
+          context: c,
+        } as const;
+
+        if (version === 'pending') {
+          return await handleEnvelopeItemFileRequest({
+            ...baseOptions,
+            version,
+            envelopeItemId: envelopeItem.id,
+            envelope: envelopeItem.envelope,
+            recipientToken: token,
+            recipient: envelopeItem.envelope.recipients[0],
+          });
+        }
+
+        return await handleEnvelopeItemFileRequest({
+          ...baseOptions,
+          version,
+          status: envelopeItem.envelope.status,
+        });
+      } catch (error) {
+        logger.error(error);
+
+        if (error instanceof AppError) {
+          const { status, body } = AppError.toRestAPIError(error);
+
+          return c.json({ error: body.message, code: error.code }, status);
+        }
+
+        return c.json({ error: 'Internal server error' }, 500);
       }
-
-      const envelopeItem = await prisma.envelopeItem.findUnique({
-        where: envelopeWhereQuery,
-        include: {
-          envelope: true,
-          documentData: true,
-        },
-      });
-
-      if (!envelopeItem) {
-        return c.json({ error: 'Envelope item not found' }, 404);
-      }
-
-      if (!envelopeItem.documentData) {
-        return c.json({ error: 'Document data not found' }, 404);
-      }
-
-      return await handleEnvelopeItemFileRequest({
-        title: envelopeItem.title,
-        status: envelopeItem.envelope.status,
-        documentData: envelopeItem.documentData,
-        version,
-        isDownload: true,
-        context: c,
-      });
     },
   );
 
