@@ -68,9 +68,11 @@ export const upsertFieldRect = (field: FieldToRender, options: RenderFieldElemen
   return fieldRect;
 };
 
+export const FIELD_SPINNER_NAME = 'loading-spinner-group';
+
 export const createSpinner = ({ fieldWidth, fieldHeight }: { fieldWidth: number; fieldHeight: number }) => {
   const loadingGroup = new Konva.Group({
-    name: 'loading-spinner-group',
+    name: FIELD_SPINNER_NAME,
     listening: false,
   });
 
@@ -111,6 +113,117 @@ export const createSpinner = ({ fieldWidth, fieldHeight }: { fieldWidth: number;
   anim.start();
 
   return loadingGroup;
+};
+
+/**
+ * Shows or hides the loading spinner on a rendered field.
+ */
+export const syncFieldSpinner = (fieldGroup: Konva.Group, isSigning: boolean) => {
+  const existingSpinner = fieldGroup.findOne(`.${FIELD_SPINNER_NAME}`);
+
+  if (!isSigning) {
+    existingSpinner?.destroy();
+    return;
+  }
+
+  if (existingSpinner) {
+    return;
+  }
+
+  const fieldRect = fieldGroup.findOne('.field-rect');
+
+  fieldGroup.add(
+    createSpinner({
+      fieldWidth: fieldRect ? fieldRect.width() : fieldGroup.width(),
+      fieldHeight: fieldRect ? fieldRect.height() : fieldGroup.height(),
+    }),
+  );
+};
+
+export const FIELD_GROUP_HIGHLIGHT_NAME = 'group-highlight';
+
+const FIELD_GROUP_HIGHLIGHT_OPACITY: Record<FieldGroupHighlightLevel, number> = {
+  focused: 0.3,
+  member: 0.06,
+};
+
+const FIELD_GROUP_HIGHLIGHT_FADE_SECONDS = 0.3;
+const FIELD_GROUP_HIGHLIGHT_TWEEN_ATTR = 'groupHighlightTween';
+
+/**
+ * How strongly a field is tinted as part of a highlighted group. The focused field is
+ * tinted like a hovered field and the other members more lightly.
+ */
+export type FieldGroupHighlightLevel = 'focused' | 'member';
+
+/**
+ * Adds, fades or removes the translucent overlay marking a rendered field as part of a
+ * highlighted group. An overlay is used rather than changing the field's fill so it does
+ * not fight the hover transition.
+ */
+export const syncFieldGroupHighlight = (fieldGroup: Konva.Group, level: FieldGroupHighlightLevel | null) => {
+  const existingHighlight = fieldGroup.findOne(`.${FIELD_GROUP_HIGHLIGHT_NAME}`);
+
+  if (!level) {
+    if (existingHighlight) {
+      tweenFieldGroupHighlight(existingHighlight, 0, () => existingHighlight.destroy());
+    }
+
+    return;
+  }
+
+  const opacity = FIELD_GROUP_HIGHLIGHT_OPACITY[level];
+
+  if (existingHighlight) {
+    tweenFieldGroupHighlight(existingHighlight, opacity);
+    return;
+  }
+
+  const fieldRect = fieldGroup.findOne('.field-rect');
+
+  if (!(fieldRect instanceof Konva.Rect)) {
+    return;
+  }
+
+  const highlightRect = new Konva.Rect({
+    name: FIELD_GROUP_HIGHLIGHT_NAME,
+    width: fieldRect.width(),
+    height: fieldRect.height(),
+    cornerRadius: fieldRect.cornerRadius(),
+    fill: fieldRect.stroke(),
+    opacity: 0,
+    listening: false,
+  });
+
+  fieldGroup.add(highlightRect);
+  highlightRect.zIndex(fieldRect.zIndex() + 1);
+
+  tweenFieldGroupHighlight(highlightRect, opacity);
+};
+
+/**
+ * Fades a group highlight to the given opacity, replacing any fade already running on it
+ * so rapid hover changes do not fight each other.
+ */
+const tweenFieldGroupHighlight = (highlight: Konva.Node, opacity: number, onFinish?: () => void) => {
+  const existingTween = highlight.getAttr(FIELD_GROUP_HIGHLIGHT_TWEEN_ATTR);
+
+  if (existingTween instanceof Konva.Tween) {
+    existingTween.destroy();
+  }
+
+  const tween = new Konva.Tween({
+    node: highlight,
+    duration: FIELD_GROUP_HIGHLIGHT_FADE_SECONDS,
+    opacity,
+    onFinish: () => {
+      highlight.setAttr(FIELD_GROUP_HIGHLIGHT_TWEEN_ATTR, null);
+      onFinish?.();
+    },
+  });
+
+  highlight.setAttr(FIELD_GROUP_HIGHLIGHT_TWEEN_ATTR, tween);
+  tween.play();
 };
 
 type CreateFieldHoverInteractionOptions = {

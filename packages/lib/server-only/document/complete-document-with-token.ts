@@ -4,6 +4,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '@documenso/lib/typ
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { assertRecipientSigningItemsComplete } from '@documenso/lib/utils/signing-items';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentSigningOrder,
@@ -311,7 +312,9 @@ export const completeDocumentWithToken = async ({
     });
   }
 
-  if (fieldsContainUnsignedRequiredField(fields)) {
+  if (envelope.internalVersion === 2) {
+    assertRecipientSigningItemsComplete(recipient.id, fields);
+  } else if (fieldsContainUnsignedRequiredField(fields)) {
     throw new AppError(AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS, {
       message: `Recipient ${recipient.id} has unsigned fields`,
       statusCode: 400,

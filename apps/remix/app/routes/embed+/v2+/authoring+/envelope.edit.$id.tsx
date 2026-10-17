@@ -210,6 +210,8 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
         positionY: Number(field.positionY),
         width: Number(field.width),
         height: Number(field.height),
+        groupId: field.groupId,
+        externalId: field.externalId,
         ...({
           type: field.type,
           fieldMeta: field.fieldMeta ?? undefined,

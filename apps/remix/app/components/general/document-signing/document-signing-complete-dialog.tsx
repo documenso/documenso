@@ -38,6 +38,11 @@ export type DocumentSigningCompleteDialogProps = {
   isSubmitting: boolean;
   documentTitle: string;
   fields: Field[];
+  /**
+   * Overrides whether the recipient is able to complete. Defaults to whether `fields`
+   * contains any unsigned required fields.
+   */
+  isComplete?: boolean;
   fieldsValidated: () => void | Promise<void>;
   onSignatureComplete: (
     nextSigner?: { name: string; email: string },
@@ -84,6 +89,7 @@ export const DocumentSigningCompleteDialog = ({
   isSubmitting,
   documentTitle,
   fields,
+  isComplete: isCompleteOverride,
   fieldsValidated,
   onSignatureComplete,
   recipient,
@@ -128,7 +134,10 @@ export const DocumentSigningCompleteDialog = ({
     },
   });
 
-  const isComplete = useMemo(() => !fieldsContainUnsignedRequiredField(fields), [fields]);
+  const isComplete = useMemo(
+    () => isCompleteOverride ?? !fieldsContainUnsignedRequiredField(fields),
+    [isCompleteOverride, fields],
+  );
 
   const completionRequires2FA = useMemo(
     () => derivedRecipientAccessAuth.includes('TWO_FACTOR_AUTH'),

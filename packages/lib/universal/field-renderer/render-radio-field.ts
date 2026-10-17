@@ -176,7 +176,8 @@ export const renderRadioFieldElement = (field: FieldToRender, options: RenderFie
       name: 'radio-text',
       x: textX,
       y: textY,
-      text: value,
+      // The text node is kept when labels are hidden so the option remains clickable.
+      text: radioMeta?.hideLabel ? '' : value,
       width: textWidth,
       height: textHeight,
       fontSize,

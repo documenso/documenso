@@ -35,6 +35,7 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
+import { assertFieldGroupAllowedForType, assertFieldGroupsValid } from '../../utils/field-groups';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
@@ -53,6 +54,8 @@ type CreateEnvelopeRecipientFieldOptions = TFieldAndMeta & {
   positionY: number;
   width: number;
   height: number;
+  groupId?: string | null;
+  externalId?: string | null;
 };
 
 type CreateEnvelopeRecipientOptions = {
@@ -299,6 +302,31 @@ export const createEnvelope = async ({
 
   const recipientsToCreate = assignOmittedRecipientSigningOrders({ recipients: requestedRecipients });
 
+  /*
+    Validate any field groups up front. Recipients don't have IDs yet so their index
+    is used as a stand-in, which is sufficient to enforce that groups don't span recipients.
+  */
+  const groupedFieldsToValidate = recipientsToCreate.flatMap((recipient, recipientIndex) =>
+    (recipient.fields ?? []).map((field) => {
+      assertFieldGroupAllowedForType(field.type, field.groupId);
+
+      if (field.groupId && internalVersion !== 2) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Field groups are only supported for V2 envelopes',
+        });
+      }
+
+      return {
+        type: field.type,
+        recipientId: recipientIndex,
+        groupId: field.groupId,
+        fieldMeta: field.fieldMeta,
+      };
+    }),
+  );
+
+  assertFieldGroupsValid(groupedFieldsToValidate);
+
   const visibility = visibilityOverride || settings.documentVisibility;
 
   const emailId = meta?.emailId;
@@ -458,6 +486,8 @@ export const createEnvelope = async ({
             customText: '',
             inserted: false,
             fieldMeta: field.fieldMeta || undefined,
+            groupId: field.groupId ?? null,
+            externalId: field.externalId ?? null,
           };
         });
 

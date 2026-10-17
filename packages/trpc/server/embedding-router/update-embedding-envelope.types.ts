@@ -1,10 +1,13 @@
 import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentMetaUpdateSchema } from '@documenso/lib/types/document-meta';
 import {
+  refineFieldGroupIdAllowedForType,
   ZClampedFieldHeightSchema,
   ZClampedFieldPositionXSchema,
   ZClampedFieldPositionYSchema,
   ZClampedFieldWidthSchema,
+  ZFieldExternalIdSchema,
+  ZFieldGroupIdSchema,
   ZFieldPageNumberSchema,
 } from '@documenso/lib/types/field';
 import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
@@ -78,8 +81,12 @@ export const ZUpdateEmbeddingEnvelopePayloadSchema = z.object({
           width: ZClampedFieldWidthSchema,
           height: ZClampedFieldHeightSchema,
           envelopeItemId: z.string(),
+          groupId: ZFieldGroupIdSchema,
+          externalId: ZFieldExternalIdSchema,
         }),
-      ).array(),
+      )
+        .superRefine(refineFieldGroupIdAllowedForType)
+        .array(),
     }).array(),
 
     /**

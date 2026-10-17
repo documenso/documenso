@@ -1,25 +1,17 @@
-import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
-import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
-import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
-import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
-import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import {
   FIELD_META_DEFAULT_VALUES,
   type TFieldMetaSchema as FieldMeta,
-  ZCheckboxFieldMeta,
-  ZDropdownFieldMeta,
   ZFieldMetaSchema,
-  ZNumberFieldMeta,
-  ZRadioFieldMeta,
-  ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
-import { EnvelopeType, FieldType } from '@prisma/client';
+import { EnvelopeType, type FieldType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { assertFieldGroupAllowedForType, assertFieldGroupsValid } from '../../utils/field-groups';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertFieldMetaValid } from './validate-field-meta';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
@@ -37,6 +29,14 @@ export type SetFieldsForTemplateOptions = {
     pageWidth: number;
     pageHeight: number;
     fieldMeta?: FieldMeta;
+    /**
+     * Omitted keeps the existing value, null clears it.
+     */
+    groupId?: string | null;
+    /**
+     * Omitted keeps the existing value, null clears it.
+     */
+    externalId?: string | null;
   }[];
 };
 
@@ -98,73 +98,61 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
       });
     }
 
+    // An omitted value keeps the stored one, an explicit null clears it.
+    const groupId = field.groupId === undefined ? (existing?.groupId ?? null) : field.groupId;
+    const externalId = field.externalId === undefined ? (existing?.externalId ?? null) : field.externalId;
+
+    assertFieldGroupAllowedForType(field.type, groupId);
+
+    // The type of a grouped field can never be changed since it would desync the group.
+    if (existing && existing.type !== field.type && (existing.groupId || groupId)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Cannot change the type of field ${existing.id} because it belongs to a group`,
+      });
+    }
+
+    if (groupId && envelope.internalVersion !== 2) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Field groups are only supported for V2 envelopes',
+      });
+    }
+
+    const parsedFieldMeta = field.fieldMeta
+      ? ZFieldMetaSchema.parse(field.fieldMeta)
+      : FIELD_META_DEFAULT_VALUES[field.type];
+
+    assertFieldMetaValid({
+      type: field.type,
+      fieldMeta: field.fieldMeta,
+      isGrouped: groupId !== null,
+    });
+
     return {
       ...field,
+      groupId,
+      externalId,
+      _parsedFieldMeta: parsedFieldMeta,
       _persisted: existing,
       _recipient: recipient,
     };
   });
 
+  // Since this is a full replace, the payload represents the final state of every field.
+  assertFieldGroupsValid(
+    linkedFields.map((field) => ({
+      id: field.id,
+      type: field.type,
+      recipientId: field.recipientId,
+      groupId: field.groupId,
+      fieldMeta: field._parsedFieldMeta,
+    })),
+  );
+
   const persistedFields = await Promise.all(
     // Disabling as wrapping promises here causes type issues
     // eslint-disable-next-line @typescript-eslint/promise-function-async
     linkedFields.map(async (field) => {
-      const parsedFieldMeta = field.fieldMeta
-        ? ZFieldMetaSchema.parse(field.fieldMeta)
-        : FIELD_META_DEFAULT_VALUES[field.type];
-
-      if (field.type === FieldType.TEXT && field.fieldMeta) {
-        const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
-        const errors = validateTextField(textFieldParsedMeta.text || '', textFieldParsedMeta);
-        if (errors.length > 0) {
-          throw new Error(errors.join(', '));
-        }
-      }
-
-      if (field.type === FieldType.NUMBER && field.fieldMeta) {
-        const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
-        const errors = validateNumberField(String(numberFieldParsedMeta.value || ''), numberFieldParsedMeta);
-        if (errors.length > 0) {
-          throw new Error(errors.join(', '));
-        }
-      }
-
-      if (field.type === FieldType.CHECKBOX) {
-        if (!field.fieldMeta) {
-          throw new Error('Checkbox field is missing required metadata');
-        }
-        const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
-        const errors = validateCheckboxField(
-          checkboxFieldParsedMeta?.values?.map((item) => item.value) ?? [],
-          checkboxFieldParsedMeta,
-        );
-        if (errors.length > 0) {
-          throw new Error(errors.join(', '));
-        }
-      }
-
-      if (field.type === FieldType.RADIO) {
-        if (!field.fieldMeta) {
-          throw new Error('Radio field is missing required metadata');
-        }
-        const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
-        const checkedRadioFieldValue = radioFieldParsedMeta.values?.find((option) => option.checked)?.value;
-        const errors = validateRadioField(checkedRadioFieldValue, radioFieldParsedMeta);
-        if (errors.length > 0) {
-          throw new Error(errors.join('. '));
-        }
-      }
-
-      if (field.type === FieldType.DROPDOWN) {
-        if (!field.fieldMeta) {
-          throw new Error('Dropdown field is missing required metadata');
-        }
-        const dropdownFieldParsedMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
-        const errors = validateDropdownField(undefined, dropdownFieldParsedMeta);
-        if (errors.length > 0) {
-          throw new Error(errors.join('. '));
-        }
-      }
+      const parsedFieldMeta = field._parsedFieldMeta;
 
       // Proceed with upsert operation
       const upsertedField = await prisma.field.upsert({
@@ -180,6 +168,8 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
           width: field.pageWidth,
           height: field.pageHeight,
           fieldMeta: parsedFieldMeta,
+          groupId: field.groupId,
+          externalId: field.externalId,
         },
         create: {
           type: field.type,
@@ -191,6 +181,8 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
           customText: '',
           inserted: false,
           fieldMeta: parsedFieldMeta,
+          groupId: field.groupId,
+          externalId: field.externalId,
           envelope: {
             connect: {
               id: envelope.id,

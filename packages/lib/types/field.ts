@@ -2,6 +2,7 @@ import { FieldSchema } from '@documenso/prisma/generated/zod/modelSchema/FieldSc
 import { FieldType, Prisma } from '@prisma/client';
 import { z } from 'zod';
 
+import { canFieldTypeBeGrouped } from '../constants/field-groups';
 import {
   FIELD_SIGNATURE_META_DEFAULT_VALUES,
   ZCheckboxFieldMeta,
@@ -43,6 +44,8 @@ export const ZFieldSchema = FieldSchema.pick({
   customText: true,
   inserted: true,
   fieldMeta: true,
+  groupId: true,
+  externalId: true,
 }).extend({
   // Backwards compatibility.
   documentId: z.number().nullish(),
@@ -53,6 +56,38 @@ export const ZEnvelopeFieldSchema = ZFieldSchema.omit({
   documentId: true,
   templateId: true,
 });
+
+export const ZFieldGroupIdSchema = z
+  .string()
+  .max(255)
+  .nullish()
+  .describe(
+    'An optional ID used to group fields together. Fields sharing a group ID act as a single logical field: they are inserted together and share validation rules. Must be unique per recipient and field type. Not available for signature, initials or date fields.',
+  );
+
+export const ZFieldExternalIdSchema = z
+  .string()
+  .max(255)
+  .nullish()
+  .describe('An optional external identifier for the field. Not validated or used internally.');
+
+/**
+ * Zod refinement which rejects a group ID on field types that cannot be grouped.
+ *
+ * Usage: `schema.superRefine(refineFieldGroupIdAllowedForType)`
+ */
+export const refineFieldGroupIdAllowedForType = (
+  field: { type: FieldType; groupId?: string | null },
+  ctx: z.RefinementCtx,
+) => {
+  if (field.groupId && !canFieldTypeBeGrouped(field.type)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['groupId'],
+      message: `${field.type} fields cannot be grouped`,
+    });
+  }
+};
 
 export const ZFieldPageNumberSchema = z.number().min(1).describe('The page number the field will be on.');
 

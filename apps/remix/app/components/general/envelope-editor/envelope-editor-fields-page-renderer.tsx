@@ -213,6 +213,55 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     highlight.moveToTop();
   };
 
+  /**
+   * Draws (or removes) a dotted outline over fields that belong to the same group as
+   * the currently selected field, so the author can see which fields act together.
+   */
+  const syncGroupSiblingHighlight = (fieldGroup: Konva.Group, isGroupSibling: boolean) => {
+    const existingHighlight = fieldGroup.findOne('.field-group-sibling-highlight');
+
+    if (!isGroupSibling || isFieldChanging) {
+      existingHighlight?.destroy();
+      return;
+    }
+
+    const fieldRect = fieldGroup.findOne('.field-rect');
+
+    if (!fieldRect) {
+      return;
+    }
+
+    const highlightAttrs = {
+      x: 0,
+      y: 0,
+      width: fieldRect.width(),
+      height: fieldRect.height(),
+      stroke: '#3b82f6',
+      strokeWidth: 2,
+      dash: [2, 3],
+      cornerRadius: 2,
+      strokeScaleEnabled: false,
+      listening: false,
+    } satisfies Partial<Konva.RectConfig>;
+
+    if (existingHighlight instanceof Konva.Rect) {
+      existingHighlight.setAttrs(highlightAttrs);
+      existingHighlight.moveToTop();
+      return;
+    }
+
+    const highlight = new Konva.Rect({
+      name: 'field-group-sibling-highlight',
+      ...highlightAttrs,
+    });
+
+    fieldGroup.add(highlight);
+    highlight.moveToTop();
+  };
+
+  const selectedFieldGroupId = editorFields.selectedField?.groupId ?? null;
+  const selectedFieldFormIdForGroup = editorFields.selectedField?.formId ?? null;
+
   const unsafeRenderFieldOnLayer = (field: TLocalField) => {
     if (!pageLayer.current) {
       return;
@@ -240,6 +289,13 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     });
 
     syncOverlapHighlight(fieldGroup, overlappingFieldFormIds.has(field.formId));
+
+    syncGroupSiblingHighlight(
+      fieldGroup,
+      selectedFieldGroupId !== null &&
+        field.groupId === selectedFieldGroupId &&
+        field.formId !== selectedFieldFormIdForGroup,
+    );
 
     if (!isFieldEditable) {
       return;
@@ -569,6 +625,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     overlappingFieldFormIds,
     isFieldChanging,
     editorFields.selectedField?.formId,
+    selectedFieldGroupId,
   ]);
 
   const setSelectedFields = (nodes: Konva.Node[], options?: { isAutoSelect?: boolean }) => {

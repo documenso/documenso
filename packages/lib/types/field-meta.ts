@@ -42,27 +42,18 @@ export const resolveFieldOverflowMode = (fieldMeta?: { overflow?: TFieldOverflow
   return fieldMeta?.overflow ?? 'crop';
 };
 
-/**
- * Grouped field types that use the same generic text rendering function.
- */
-export type GenericTextFieldTypeMetas =
-  | TInitialsFieldMeta
-  | TNameFieldMeta
-  | TEmailFieldMeta
-  | TDateFieldMeta
-  | TTextFieldMeta
-  | TNumberFieldMeta;
-
 const ZFieldMetaLineHeight = z.coerce
   .number()
   .min(FIELD_MIN_LINE_HEIGHT)
   .max(FIELD_MAX_LINE_HEIGHT)
   .describe('The line height of the text');
+
 const ZFieldMetaLetterSpacing = z.coerce
   .number()
   .min(FIELD_MIN_LETTER_SPACING)
   .max(FIELD_MAX_LETTER_SPACING)
   .describe('The spacing between each character');
+
 const ZFieldMetaVerticalAlign = z.enum(['top', 'middle', 'bottom']).describe('The vertical alignment of the text');
 
 export const ZBaseFieldMeta = z.object({
@@ -122,6 +113,18 @@ export const ZTextFieldMeta = ZBaseFieldMeta.extend({
 
 export type TTextFieldMeta = z.infer<typeof ZTextFieldMeta>;
 
+/**
+ * Metas of the field types rendered by the generic text field renderer. Keep in sync with
+ * the generic text field branch in `renderField`.
+ */
+export type GenericTextFieldTypeMetas =
+  | TInitialsFieldMeta
+  | TNameFieldMeta
+  | TEmailFieldMeta
+  | TDateFieldMeta
+  | TTextFieldMeta
+  | TNumberFieldMeta;
+
 export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('number'),
   numberFormat: z.string().nullish(),
@@ -136,8 +139,14 @@ export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
 
 export type TNumberFieldMeta = z.infer<typeof ZNumberFieldMeta>;
 
+const ZHideOptionLabels = z
+  .boolean()
+  .nullish()
+  .describe('Whether to hide the text next to each option when rendering the field.');
+
 export const ZRadioFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('radio'),
+  hideLabel: ZHideOptionLabels,
   values: z
     .array(
       z.object({
@@ -154,6 +163,7 @@ export type TRadioFieldMeta = z.infer<typeof ZRadioFieldMeta>;
 
 export const ZCheckboxFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('checkbox'),
+  hideLabel: ZHideOptionLabels,
   values: z
     .array(
       z.object({

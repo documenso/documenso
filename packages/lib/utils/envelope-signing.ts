@@ -1,4 +1,3 @@
-import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
@@ -14,10 +13,9 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import { toCheckboxCustomText, toRadioCustomText } from '@documenso/lib/utils/fields';
+import { parseCheckboxCustomText, toCheckboxCustomText, toRadioCustomText } from '@documenso/lib/utils/fields';
 import { zEmail } from '@documenso/lib/utils/zod';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
-import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import type { Field } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { DateTime } from 'luxon';
@@ -180,25 +178,8 @@ export const extractFieldInsertionValues = ({
         });
       }
 
-      const { validationRule, validationLength } = parsedCheckboxFieldParsedMeta;
-
-      if (validationRule && validationLength) {
-        const checkboxValidationRule = checkboxValidationSigns.find((sign) => sign.label === validationRule);
-
-        if (checkboxValidationRule) {
-          const isValid = validateCheckboxLength(selectedValues.length, checkboxValidationRule.value, validationLength);
-
-          if (!isValid) {
-            throw new AppError(AppErrorCode.INVALID_BODY, {
-              message: 'Checkbox values failed length validation',
-            });
-          }
-        } else {
-          // Should throw an error, but we don't want to throw configuration errors during signing.
-          // Todo: Logging.
-        }
-      }
-
+      // The validation rule is deliberately not enforced here. Recipients may select
+      // any options while signing, and the rule is enforced when they complete the document.
       return {
         customText: toCheckboxCustomText(fieldValue.value),
         inserted: true,
@@ -250,4 +231,146 @@ export const extractFieldInsertionValues = ({
       };
     })
     .exhaustive();
+};
+
+export type FieldInsertionValues = {
+  fieldId: number;
+  customText: string;
+  inserted: boolean;
+};
+
+export type ExtractGroupedRadioInsertionValuesOptions = {
+  /**
+   * Every field in the group.
+   */
+  fields: Field[];
+  /**
+   * The field which the option was selected on.
+   */
+  selectedFieldId: number;
+  /**
+   * The index of the selected option on the selected field, or null to uninsert the group.
+   */
+  selectedIndex: number | null;
+};
+
+/**
+ * Resolves the insertion values for a group of radio fields.
+ *
+ * Only one option can be selected across the group, so selecting an option on one
+ * field clears every other field. Every member is marked as inserted once the group
+ * has a selection so the group is treated as a single answered field.
+ */
+export const extractGroupedRadioInsertionValues = ({
+  fields,
+  selectedFieldId,
+  selectedIndex,
+}: ExtractGroupedRadioInsertionValuesOptions): FieldInsertionValues[] => {
+  const selectedField = fields.find((field) => field.id === selectedFieldId);
+
+  if (!selectedField) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `Field ${selectedFieldId} not found in group`,
+    });
+  }
+
+  if (selectedIndex === null) {
+    return fields.map((field) => ({
+      fieldId: field.id,
+      customText: '',
+      inserted: false,
+    }));
+  }
+
+  const parsedRadioFieldMeta = ZRadioFieldMeta.parse(selectedField.fieldMeta);
+  const radioFieldValues = parsedRadioFieldMeta.values || [];
+
+  if (!radioFieldValues[selectedIndex]) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Invalid radio value',
+    });
+  }
+
+  return fields.map((field) => ({
+    fieldId: field.id,
+    customText: field.id === selectedFieldId ? toRadioCustomText(selectedIndex) : '',
+    inserted: true,
+  }));
+};
+
+export type ExtractGroupedCheckboxInsertionValuesOptions = {
+  /**
+   * Every field in the group.
+   */
+  fields: Field[];
+  /**
+   * The selected option indices for the fields which have changed. Fields not included
+   * keep their current selection.
+   */
+  fieldValues: { fieldId: number; value: number[] }[];
+};
+
+/**
+ * Resolves the insertion values for a group of checkbox fields.
+ *
+ * Every member is marked as inserted once the group has any selection so the group is
+ * treated as a single answered field.
+ */
+export const extractGroupedCheckboxInsertionValues = ({
+  fields,
+  fieldValues,
+}: ExtractGroupedCheckboxInsertionValuesOptions): FieldInsertionValues[] => {
+  if (fields.length === 0) {
+    return [];
+  }
+
+  const selectedIndicesByFieldId = new Map(fieldValues.map(({ fieldId, value }) => [fieldId, value]));
+
+  for (const fieldId of selectedIndicesByFieldId.keys()) {
+    if (!fields.some((field) => field.id === fieldId)) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: `Field ${fieldId} not found in group`,
+      });
+    }
+  }
+
+  const memberSelections = fields.map((field) => {
+    const parsedCheckboxFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
+    const checkboxFieldValues = parsedCheckboxFieldMeta.values || [];
+
+    const selectedIndices =
+      selectedIndicesByFieldId.get(field.id) ?? (field.customText ? parseCheckboxCustomText(field.customText) : []);
+
+    if (selectedIndices.some((index) => !checkboxFieldValues[index])) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Invalid checkbox values',
+      });
+    }
+
+    return {
+      field,
+      selectedIndices,
+    };
+  });
+
+  const pooledSelectedCount = memberSelections.reduce(
+    (total, { selectedIndices }) => total + selectedIndices.length,
+    0,
+  );
+
+  if (pooledSelectedCount === 0) {
+    return fields.map((field) => ({
+      fieldId: field.id,
+      customText: '',
+      inserted: false,
+    }));
+  }
+
+  // The validation rule is deliberately not enforced here. Recipients may select any
+  // options while signing, and the rule is enforced when they complete the document.
+  return memberSelections.map(({ field, selectedIndices }) => ({
+    fieldId: field.id,
+    customText: selectedIndices.length > 0 ? toCheckboxCustomText(selectedIndices) : '',
+    inserted: true,
+  }));
 };

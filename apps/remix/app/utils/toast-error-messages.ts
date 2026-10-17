@@ -57,6 +57,10 @@ export const getSigningCompletionErrorMessage = (code: string): ToastMessageDesc
       title: msg`Some fields were not saved`,
       description: msg`One or more of your required fields have not been saved. Please refresh the page, complete any empty required fields, and try again.`,
     }))
+    .with(AppErrorCode.RECIPIENT_HAS_INVALID_FIELDS, () => ({
+      title: msg`Some fields are invalid`,
+      description: msg`One or more of your fields do not meet their requirements. Please review the highlighted fields and try again.`,
+    }))
     .with(AppErrorCode.RECIPIENT_OUT_OF_TURN, () => ({
       title: msg`It's not your turn to sign yet`,
       description: msg`This document is signed in a set order and other recipients must sign before you. You will receive an email when it is your turn.`,

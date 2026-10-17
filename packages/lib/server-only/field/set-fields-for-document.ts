@@ -1,30 +1,22 @@
-import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
-import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
-import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
-import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
-import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import {
   FIELD_META_DEFAULT_VALUES,
   type TFieldMetaSchema as FieldMeta,
-  ZCheckboxFieldMeta,
-  ZDropdownFieldMeta,
   ZFieldMetaSchema,
-  ZNumberFieldMeta,
-  ZRadioFieldMeta,
-  ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData, diffFieldChanges } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { EnvelopeType, type Field, FieldType } from '@prisma/client';
+import { EnvelopeType, type Field, type FieldType } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { assertFieldGroupAllowedForType, assertFieldGroupsValid } from '../../utils/field-groups';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertFieldMetaValid } from './validate-field-meta';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
@@ -118,84 +110,62 @@ export const setFieldsForDocument = async ({
       });
     }
 
+    // An omitted value keeps the stored one, an explicit null clears it.
+    const groupId = field.groupId === undefined ? (existing?.groupId ?? null) : field.groupId;
+    const externalId = field.externalId === undefined ? (existing?.externalId ?? null) : field.externalId;
+
+    assertFieldGroupAllowedForType(field.type, groupId);
+
+    // The type of a grouped field can never be changed since it would desync the group.
+    if (existing && existing.type !== field.type && (existing.groupId || groupId)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Cannot change the type of field ${existing.id} because it belongs to a group`,
+      });
+    }
+
+    if (groupId && envelope.internalVersion !== 2) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Field groups are only supported for V2 envelopes',
+      });
+    }
+
+    const parsedFieldMeta = field.fieldMeta
+      ? ZFieldMetaSchema.parse(field.fieldMeta)
+      : FIELD_META_DEFAULT_VALUES[field.type];
+
+    assertFieldMetaValid({
+      type: field.type,
+      fieldMeta: field.fieldMeta,
+      isGrouped: groupId !== null,
+    });
+
     return {
       ...field,
+      groupId,
+      externalId,
+      _parsedFieldMeta: parsedFieldMeta,
       _persisted: existing,
       _recipient: recipient,
     };
   });
+
+  // Since this is a full replace, the payload represents the final state of every field.
+  assertFieldGroupsValid(
+    linkedFields.map((field) => ({
+      id: field.id,
+      type: field.type,
+      recipientId: field.recipientId,
+      groupId: field.groupId,
+      fieldMeta: field._parsedFieldMeta,
+    })),
+  );
 
   const persistedFields = await prisma.$transaction(async (tx) => {
     return await Promise.all(
       linkedFields.map(async (field) => {
         const fieldSignerEmail = field._recipient.email.toLowerCase();
 
-        const parsedFieldMeta = field.fieldMeta
-          ? ZFieldMetaSchema.parse(field.fieldMeta)
-          : FIELD_META_DEFAULT_VALUES[field.type];
-
-        if (field.type === FieldType.TEXT && field.fieldMeta) {
-          const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
-          const errors = validateTextField(textFieldParsedMeta.text || '', textFieldParsedMeta);
-
-          if (errors.length > 0) {
-            throw new Error(errors.join(', '));
-          }
-        }
-
-        if (field.type === FieldType.NUMBER && field.fieldMeta) {
-          const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
-
-          const errors = validateNumberField(String(numberFieldParsedMeta.value || ''), numberFieldParsedMeta, false);
-
-          if (errors.length > 0) {
-            throw new Error(errors.join(', '));
-          }
-        }
-
-        if (field.type === FieldType.CHECKBOX) {
-          if (field.fieldMeta) {
-            const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
-            const errors = validateCheckboxField(
-              checkboxFieldParsedMeta?.values?.map((item) => item.value) ?? [],
-              checkboxFieldParsedMeta,
-            );
-
-            if (errors.length > 0) {
-              throw new Error(errors.join(', '));
-            }
-          } else {
-            throw new Error('To proceed further, please set at least one value for the Checkbox field');
-          }
-        }
-
-        if (field.type === FieldType.RADIO) {
-          if (field.fieldMeta) {
-            const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
-            const checkedRadioFieldValue = radioFieldParsedMeta.values?.find((option) => option.checked)?.value;
-
-            const errors = validateRadioField(checkedRadioFieldValue, radioFieldParsedMeta);
-
-            if (errors.length > 0) {
-              throw new Error(errors.join('. '));
-            }
-          } else {
-            throw new Error('To proceed further, please set at least one value for the Radio field');
-          }
-        }
-
-        if (field.type === FieldType.DROPDOWN) {
-          if (field.fieldMeta) {
-            const dropdownFieldParsedMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
-            const errors = validateDropdownField(undefined, dropdownFieldParsedMeta);
-
-            if (errors.length > 0) {
-              throw new Error(errors.join('. '));
-            }
-          } else {
-            throw new Error('To proceed further, please set at least one value for the Dropdown field');
-          }
-        }
+        const parsedFieldMeta = field._parsedFieldMeta;
 
         const upsertedField = await tx.field.upsert({
           where: {
@@ -210,6 +180,8 @@ export const setFieldsForDocument = async ({
             width: field.pageWidth,
             height: field.pageHeight,
             fieldMeta: parsedFieldMeta,
+            groupId: field.groupId,
+            externalId: field.externalId,
           },
           create: {
             type: field.type,
@@ -221,6 +193,8 @@ export const setFieldsForDocument = async ({
             customText: '',
             inserted: false,
             fieldMeta: parsedFieldMeta,
+            groupId: field.groupId,
+            externalId: field.externalId,
             envelope: {
               connect: {
                 id: envelope.id,
@@ -357,11 +331,22 @@ type FieldData = {
   pageWidth: number;
   pageHeight: number;
   fieldMeta?: FieldMeta;
+  /**
+   * Omitted keeps the existing value, null clears it.
+   */
+  groupId?: string | null;
+  /**
+   * Omitted keeps the existing value, null clears it.
+   */
+  externalId?: string | null;
 };
 
 const hasFieldBeenChanged = (field: Field, newFieldData: FieldData) => {
   const currentFieldMeta = field.fieldMeta || null;
   const newFieldMeta = newFieldData.fieldMeta || null;
+
+  const hasGroupIdChanged = newFieldData.groupId !== undefined && field.groupId !== newFieldData.groupId;
+  const hasExternalIdChanged = newFieldData.externalId !== undefined && field.externalId !== newFieldData.externalId;
 
   return (
     field.envelopeItemId !== newFieldData.envelopeItemId ||
@@ -371,6 +356,8 @@ const hasFieldBeenChanged = (field: Field, newFieldData: FieldData) => {
     field.positionY.toNumber() !== newFieldData.pageY ||
     field.width.toNumber() !== newFieldData.pageWidth ||
     field.height.toNumber() !== newFieldData.pageHeight ||
+    hasGroupIdChanged ||
+    hasExternalIdChanged ||
     !isDeepEqual(currentFieldMeta, newFieldMeta)
   );
 };

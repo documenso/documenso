@@ -239,6 +239,16 @@ export const EnvelopeEditorProvider = ({
   const editorFields = useEditorFields({
     envelope,
     handleFieldsUpdate: (fields) => setFieldsDebounced(fields),
+    onFieldGroupValidationRemoved: (groupIds) => {
+      toast({
+        title: t`Group validation removed`,
+        description:
+          groupIds.length === 1
+            ? t`Group "${groupIds[0]}" no longer satisfies its validation rule, so the rule has been removed from its fields.`
+            : t`${groupIds.length} groups no longer satisfy their validation rules, so the rules have been removed from their fields.`,
+        duration: 7500,
+      });
+    },
   });
 
   const editorRecipients = useEditorRecipients({
@@ -711,6 +721,8 @@ const mapLocalFieldsToFields = ({
       inserted: foundField?.inserted || false,
       customText: foundField?.customText || '',
       fieldMeta: field.fieldMeta || null,
+      groupId: field.groupId ?? null,
+      externalId: field.externalId ?? null,
     };
   });
 };

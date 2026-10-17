@@ -19,7 +19,7 @@ export const DocumentSigningMobileWidget = () => {
 
   const { hidePoweredBy = true } = useEmbedSigningContext() || {};
 
-  const { recipientFieldsRemaining, recipient, requiredRecipientFields } = useRequiredEnvelopeSigningContext();
+  const { recipientFieldsRemaining, recipient, requiredRecipientSigningItems } = useRequiredEnvelopeSigningContext();
 
   /**
    * Pre open the widget for assistants to let them know it's there.
@@ -97,7 +97,7 @@ export const DocumentSigningMobileWidget = () => {
                   layoutId="document-signing-mobile-widget-progress-bar"
                   className="absolute inset-y-0 left-0 bg-primary"
                   style={{
-                    width: `${requiredRecipientFields.length === 0 ? 100 : 100 - (100 / requiredRecipientFields.length) * (recipientFieldsRemaining.length ?? 0)}%`,
+                    width: `${requiredRecipientSigningItems.length === 0 ? 100 : 100 - (100 / requiredRecipientSigningItems.length) * (recipientFieldsRemaining.length ?? 0)}%`,
                   }}
                 />
               </div>

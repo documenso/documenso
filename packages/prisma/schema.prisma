@@ -719,10 +719,13 @@ model Field {
   recipient      Recipient    @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   signature      Signature?
   fieldMeta      Json? /// [FieldMeta] @zod.custom.use(ZFieldMetaNotOptionalSchema)
+  groupId        String?      @db.VarChar(255) /// @zod.string.max(255).describe("An optional ID used to group fields together. Fields sharing a group ID act as a single logical field. Not available for signature, initials or date fields.")
+  externalId     String?      @db.VarChar(255) /// @zod.string.max(255).describe("An optional external identifier for the field.")
 
   @@index([envelopeId])
   @@index([envelopeItemId])
   @@index([recipientId])
+  @@index([envelopeId, groupId])
 }
 
 model Signature {

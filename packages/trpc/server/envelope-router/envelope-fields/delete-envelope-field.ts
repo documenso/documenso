@@ -2,6 +2,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { assertFieldGroupsValid } from '@documenso/lib/utils/field-groups';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
@@ -86,6 +87,15 @@ export const deleteEnvelopeFieldRoute = authenticatedProcedure
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Recipient has already interacted with the document.',
       });
+    }
+
+    // Removing a field from a group must not leave the remaining group in an invalid state.
+    if (fieldToDelete.groupId) {
+      const remainingGroupMembers = recipientWithFields.fields.filter(
+        (field) => field.groupId === fieldToDelete.groupId && field.id !== fieldToDelete.id,
+      );
+
+      assertFieldGroupsValid(remainingGroupMembers);
     }
 
     await prisma.$transaction(async (tx) => {

@@ -20,6 +20,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { FIELD_GROUPS_TEST_FIELDS } from '@documenso/lib/constants/test-pdfs/field-groups-pdf';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -43,6 +44,7 @@ const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const API_BASE_URL = `${WEBAPP_BASE_URL}/api/v2-beta`;
 
 const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../assets/example.pdf'));
+const fieldGroupsPdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../assets/field-groups.pdf'));
 
 // ---------------------------------------------------------------------------
 // Types
@@ -67,6 +69,8 @@ export type ApiField = {
   width?: number;
   height?: number;
   fieldMeta?: Record<string, unknown>;
+  groupId?: string;
+  externalId?: string;
   placeholder?: string;
   matchAll?: boolean;
 };
@@ -98,6 +102,8 @@ export type ApiSeedEnvelopeOptions = {
         width?: number;
         height?: number;
         fieldMeta?: Record<string, unknown>;
+        groupId?: string;
+        externalId?: string;
       }>;
     }
   >;
@@ -224,6 +230,14 @@ export const apiCreateEnvelope = async (
             fieldPayload.fieldMeta = f.fieldMeta;
           }
 
+          if (f.groupId !== undefined) {
+            fieldPayload.groupId = f.groupId;
+          }
+
+          if (f.externalId !== undefined) {
+            fieldPayload.externalId = f.externalId;
+          }
+
           return fieldPayload;
         });
       }
@@ -337,6 +351,14 @@ export const apiCreateFields = async (
 
       if (f.fieldMeta !== undefined) {
         fieldPayload.fieldMeta = f.fieldMeta;
+      }
+
+      if (f.groupId !== undefined) {
+        fieldPayload.groupId = f.groupId;
+      }
+
+      if (f.externalId !== undefined) {
+        fieldPayload.externalId = f.externalId;
       }
 
       if (f.placeholder) {
@@ -478,6 +500,8 @@ export type ApiSeedDocumentOptions = {
       width?: number;
       height?: number;
       fieldMeta?: Record<string, unknown>;
+      groupId?: string;
+      externalId?: string;
     }>
   >;
   /** External ID for the envelope. */
@@ -841,6 +865,47 @@ export const apiSeedDirectTemplate = async (
     envelope,
     directLink,
   };
+};
+
+/**
+ * Seed a pending document using `assets/field-groups.pdf` with every grouped field
+ * defined in `@documenso/lib/constants/test-pdfs/field-groups-pdf.ts` attached to a single signer.
+ *
+ * @example
+ * ```ts
+ * const { envelope, distributeResult } = await apiSeedFieldGroupsDocument(request);
+ * const textA = findFieldGroupTestField(envelope.fields, FIELD_GROUP_EXTERNAL_IDS.textA);
+ * ```
+ */
+export const apiSeedFieldGroupsDocument = async (
+  request: APIRequestContext,
+  options: { recipient?: ApiRecipient; context?: ApiSeedContext } = {},
+): Promise<ApiSeedResult & { distributeResult: TDistributeEnvelopeResponse }> => {
+  const recipient = options.recipient ?? {
+    email: `field-groups-signer-${Date.now()}@test.documenso.com`,
+    name: 'Field Groups Signer',
+    role: 'SIGNER' as const,
+  };
+
+  return await apiSeedPendingDocument(request, {
+    context: options.context,
+    title: '[TEST] Field groups',
+    pdfFile: { name: 'field-groups.pdf', data: fieldGroupsPdfBuffer },
+    recipients: [recipient],
+    fieldsPerRecipient: [
+      FIELD_GROUPS_TEST_FIELDS.map((field) => ({
+        type: field.type,
+        page: field.page,
+        positionX: field.positionX,
+        positionY: field.positionY,
+        width: field.width,
+        height: field.height,
+        fieldMeta: field.fieldMeta,
+        groupId: field.groupId ?? undefined,
+        externalId: field.externalId,
+      })),
+    ],
+  });
 };
 
 /**

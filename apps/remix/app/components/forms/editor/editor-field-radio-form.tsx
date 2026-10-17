@@ -17,12 +17,14 @@ import type { z } from 'zod';
 
 import {
   EditorGenericFontSizeField,
+  EditorGenericHideLabelField,
   EditorGenericReadOnlyField,
   EditorGenericRequiredField,
 } from './editor-field-generic-field-forms';
 
 const ZRadioFieldFormSchema = ZRadioFieldMeta.pick({
   label: true,
+  hideLabel: true,
   direction: true,
   values: true,
   required: true,
@@ -64,6 +66,7 @@ export const EditorFieldRadioForm = ({
     mode: 'onChange',
     defaultValues: {
       label: value.label || '',
+      hideLabel: value.hideLabel ?? false,
       values: value.values || [{ id: 1, checked: false, value: t`Default value` }],
       required: value.required || false,
       readOnly: value.readOnly || false,
@@ -148,6 +151,8 @@ export const EditorFieldRadioForm = ({
           <EditorGenericRequiredField formControl={form.control} />
 
           <EditorGenericReadOnlyField formControl={form.control} />
+
+          <EditorGenericHideLabelField formControl={form.control} />
 
           <section className="space-y-2">
             <div className="-mx-4 mt-2 mb-4">

@@ -239,6 +239,8 @@ Receives an object with:
 | `value`    | `string`  | The field value.                             |
 | `isBase64` | `boolean` | Whether the value is a base64 encoded image. |
 
+Fields which share a group ID act as a single field. Signing one field in a group updates every field in the group, and this callback is called once for each updated field.
+
 ### onFieldUnsigned
 
 Receives an object with:
@@ -246,6 +248,8 @@ Receives an object with:
 | Field     | Type     | Description          |
 | --------- | -------- | -------------------- |
 | `fieldId` | `number` | The ID of the field. |
+
+Clearing a field in a group clears every field in the group, and this callback is called once for each cleared field.
 
 ---
 

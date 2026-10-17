@@ -66,6 +66,13 @@ export enum AppErrorCode {
   RECIPIENT_HAS_UNSIGNED_FIELDS = 'RECIPIENT_HAS_UNSIGNED_FIELDS',
 
   /**
+   * A completion request was made for a recipient with inserted fields which do
+   * not satisfy their validation rules, such as a checkbox group whose selected
+   * options do not meet the configured amount.
+   */
+  RECIPIENT_HAS_INVALID_FIELDS = 'RECIPIENT_HAS_INVALID_FIELDS',
+
+  /**
    * A completion request was made by a recipient in a sequential signing flow
    * before the preceding recipients have signed.
    */
@@ -129,6 +136,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.SENDER_DISABLED]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.MISSING_SIGNATURE_FIELD]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.RECIPIENT_HAS_INVALID_FIELDS]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.RECIPIENT_OUT_OF_TURN]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.CSC_INSTANCE_MODE_MISMATCH]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.CSC_UNLICENSED]: { code: 'FORBIDDEN', status: 403 },
@@ -339,6 +347,7 @@ export class AppError extends Error {
         AppErrorCode.ENVELOPE_TSP_LOCKED,
         AppErrorCode.MISSING_SIGNATURE_FIELD,
         AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS,
+        AppErrorCode.RECIPIENT_HAS_INVALID_FIELDS,
         AppErrorCode.RECIPIENT_OUT_OF_TURN,
         AppErrorCode.CSC_INSTANCE_MODE_MISMATCH,
         AppErrorCode.CSC_CREDENTIAL_LIST_EMPTY,

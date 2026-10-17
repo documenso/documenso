@@ -32,6 +32,7 @@ import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fiel
 import { isDocumentCompleted } from '../../../utils/document';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { mapDocumentIdToSecondaryId } from '../../../utils/envelope';
+import { fieldsContainPendingSigningItem } from '../../../utils/signing-items';
 import { jobs } from '../../client';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSealDocumentJobDefinition } from './seal-document';
@@ -124,9 +125,16 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
     // Get the rejection reason from the rejected recipient
     const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
 
+    // V2 envelopes treat field groups as a single field and enforce validation rules on
+    // inserted fields, matching the checks applied when each recipient completed.
+    const hasPendingFields =
+      envelope.internalVersion === 2
+        ? fieldsContainPendingSigningItem(fields)
+        : fieldsContainUnsignedRequiredField(fields);
+
     // Skip the field check if the document is rejected
-    if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
-      throw new Error(`Document ${envelope.id} has unsigned required fields`);
+    if (!isRejected && hasPendingFields) {
+      throw new Error(`Document ${envelope.id} has unsigned or invalid required fields`);
     }
 
     if (isResealing) {

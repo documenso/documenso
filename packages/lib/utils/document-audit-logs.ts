@@ -185,6 +185,30 @@ export const diffFieldChanges = (oldField: Field, newField: Field): TDocumentAud
     });
   }
 
+  if (oldField.groupId !== newField.groupId) {
+    diffs.push({
+      type: FIELD_DIFF_TYPE.GROUP_ID,
+      from: oldField.groupId,
+      to: newField.groupId,
+    });
+  }
+
+  if (oldField.externalId !== newField.externalId) {
+    diffs.push({
+      type: FIELD_DIFF_TYPE.EXTERNAL_ID,
+      from: oldField.externalId,
+      to: newField.externalId,
+    });
+  }
+
+  if (!isDeepEqual(oldField.fieldMeta, newField.fieldMeta)) {
+    diffs.push({
+      type: FIELD_DIFF_TYPE.FIELD_META,
+      from: oldField.fieldMeta,
+      to: newField.fieldMeta,
+    });
+  }
+
   return diffs;
 };
 

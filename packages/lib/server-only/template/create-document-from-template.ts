@@ -17,6 +17,7 @@ import { match } from 'ts-pattern';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { TEnvelopeExpirationPeriod } from '../../constants/envelope-expiration';
+import { isFieldGroupValueShared } from '../../constants/field-groups';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { ZDefaultRecipientsSchema } from '../../types/default-recipients';
@@ -679,6 +680,26 @@ export const createDocumentFromTemplate = async ({
       }
     }
 
+    /**
+     * Fields in a group which share their value also share the prefilled value, so a
+     * prefill for one member applies to every member which was not prefilled itself.
+     */
+    const groupPrefillFieldByGroupId = new Map<string, TFieldMetaPrefillFieldsSchema>();
+
+    for (const prefillField of prefillFields ?? []) {
+      const templateField = finalRecipients
+        .flatMap((recipient) => recipient.fields)
+        .find((field) => field.id === prefillField.id);
+
+      if (!templateField?.groupId || !isFieldGroupValueShared(templateField.type)) {
+        continue;
+      }
+
+      if (!groupPrefillFieldByGroupId.has(templateField.groupId)) {
+        groupPrefillFieldByGroupId.set(templateField.groupId, prefillField);
+      }
+    }
+
     Object.values(allFinalRecipients).forEach(({ token, fields }) => {
       const recipient = envelope.recipients.find((recipient) => recipient.token === token);
 
@@ -688,7 +709,9 @@ export const createDocumentFromTemplate = async ({
 
       fieldsToCreate = fieldsToCreate.concat(
         fields.map((field) => {
-          const prefillField = prefillFields?.find((value) => value.id === field.id);
+          const prefillField =
+            prefillFields?.find((value) => value.id === field.id) ??
+            (field.groupId ? groupPrefillFieldByGroupId.get(field.groupId) : undefined);
 
           const payload = {
             envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[field.envelopeItemId],
@@ -703,6 +726,8 @@ export const createDocumentFromTemplate = async ({
             customText: '',
             inserted: false,
             fieldMeta: field.fieldMeta,
+            groupId: field.groupId,
+            externalId: field.externalId,
           };
 
           if (prefillField) {

@@ -191,7 +191,8 @@ export const renderCheckboxFieldElement = (field: FieldToRender, options: Render
       name: 'checkbox-text',
       x: textX,
       y: textY,
-      text: value,
+      // The text node is kept when labels are hidden so the option remains clickable.
+      text: checkboxMeta?.hideLabel ? '' : value,
       width: textWidth,
       height: textHeight,
       fontSize,

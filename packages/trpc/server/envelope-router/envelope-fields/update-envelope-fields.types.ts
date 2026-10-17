@@ -1,4 +1,9 @@
-import { ZFieldSchema } from '@documenso/lib/types/field';
+import {
+  refineFieldGroupIdAllowedForType,
+  ZFieldExternalIdSchema,
+  ZFieldGroupIdSchema,
+  ZFieldSchema,
+} from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { z } from 'zod';
 
@@ -10,7 +15,8 @@ export const updateEnvelopeFieldsMeta: TrpcRouteMeta = {
     method: 'POST',
     path: '/envelope/field/update-many',
     summary: 'Update envelope fields',
-    description: 'Update multiple envelope fields for an envelope',
+    description:
+      'Update multiple envelope fields for an envelope. When a grouped field is updated, shared values are synced to every field in the group and the synced fields are included in the response.',
     tags: ['Envelope Fields'],
   },
 };
@@ -24,6 +30,8 @@ const ZUpdateFieldBaseSchema = ZFieldAndMetaSchema.and(
       .describe(
         'The ID of the envelope item to put the field on. If not provided, field will be placed on the first item.',
       ),
+    groupId: ZFieldGroupIdSchema,
+    externalId: ZFieldExternalIdSchema,
   }),
 );
 
@@ -34,7 +42,9 @@ const ZUpdateFieldBaseSchema = ZFieldAndMetaSchema.and(
 //   ZUpdateFieldBaseSchema.and(ZPlaceholderPositionSchema),
 // ]);
 
-const ZUpdateFieldSchema = ZUpdateFieldBaseSchema.and(ZCoordinatePositionSchema.partial());
+const ZUpdateFieldSchema = ZUpdateFieldBaseSchema.and(ZCoordinatePositionSchema.partial()).superRefine(
+  refineFieldGroupIdAllowedForType,
+);
 
 export const ZUpdateEnvelopeFieldsRequestSchema = z.object({
   envelopeId: z.string(),

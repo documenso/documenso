@@ -46,6 +46,7 @@ import {
   isRecipientBefore,
   sortRecipientsBySigningPosition,
 } from '../../utils/recipients';
+import { assertRecipientSigningItemsComplete } from '../../utils/signing-items';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -337,6 +338,37 @@ export const createDocumentFromDirectTemplate = async ({
     }),
   );
 
+  /**
+   * Whether a V2 field should be marked as inserted. Fields in a group act as one field,
+   * so every member is inserted once any member has a value.
+   */
+  const isDirectRecipientFieldInserted = (templateField: Field, customText: string | undefined): boolean => {
+    if (customText) {
+      return true;
+    }
+
+    if (!templateField.groupId) {
+      return false;
+    }
+
+    return createDirectRecipientFieldArgs.some(
+      (arg) => arg.templateField.groupId === templateField.groupId && Boolean(arg.customText),
+    );
+  };
+
+  // V2 enforces the same completion rules as the signing page, including validation
+  // rules which only apply once a field has been inserted.
+  if (directTemplateEnvelope.internalVersion === 2) {
+    assertRecipientSigningItemsComplete(
+      directTemplateRecipient.id,
+      createDirectRecipientFieldArgs.map(({ templateField, customText, signature }) => ({
+        ...templateField,
+        customText: customText ?? '',
+        inserted: signature !== null || isDirectRecipientFieldInserted(templateField, customText),
+      })),
+    );
+  }
+
   const directTemplateNonSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature === null);
 
   const directTemplateSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature !== null);
@@ -475,6 +507,8 @@ export const createDocumentFromDirectTemplate = async ({
           customText: '',
           inserted: false,
           fieldMeta: field.fieldMeta,
+          groupId: field.groupId,
+          externalId: field.externalId,
         })),
       );
     });
@@ -509,7 +543,7 @@ export const createDocumentFromDirectTemplate = async ({
 
               // Custom logic for V2 to only insert if values exist.
               if (directTemplateEnvelope.internalVersion === 2) {
-                inserted = customText !== '';
+                inserted = isDirectRecipientFieldInserted(templateField, customText);
               }
 
               return {
@@ -524,6 +558,8 @@ export const createDocumentFromDirectTemplate = async ({
                 customText: customText ?? '',
                 inserted,
                 fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
+                groupId: templateField.groupId,
+                externalId: templateField.externalId,
               };
             }),
           },
@@ -556,6 +592,7 @@ export const createDocumentFromDirectTemplate = async ({
             customText: '',
             inserted: true,
             fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
+            externalId: templateField.externalId,
             signature: {
               create: {
                 recipientId: createdDirectRecipient.id,

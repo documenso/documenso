@@ -5,7 +5,9 @@ import { ALIGNMENT_TEST_FIELDS } from '@documenso/app-tests/constants/field-alig
 import { FIELD_META_TEST_FIELDS } from '@documenso/app-tests/constants/field-meta-pdf';
 import { OVERFLOW_TEST_FIELDS } from '@documenso/app-tests/constants/field-overflow-pdf';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
+import { FIELD_GROUPS_TEST_FIELDS } from '@documenso/lib/constants/test-pdfs/field-groups-pdf';
 import { incrementDocumentId, incrementTemplateId } from '@documenso/lib/server-only/envelope/increment-id';
+import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL, DIRECT_TEMPLATE_RECIPIENT_NAME } from '../../lib/constants/direct-templates';
@@ -266,7 +268,149 @@ export const seedDatabase = async () => {
       insertFields: true,
       status: DocumentStatus.PENDING,
     }),
+    seedFieldGroupsTestDocument({
+      userId: exampleUser.user.id,
+      teamId: exampleUser.team.id,
+      recipientName: exampleUser.user.name || '',
+      recipientEmail: exampleUser.user.email,
+      status: DocumentStatus.DRAFT,
+    }),
+    seedFieldGroupsTestDocument({
+      userId: exampleUser.user.id,
+      teamId: exampleUser.team.id,
+      recipientName: exampleUser.user.name || '',
+      recipientEmail: exampleUser.user.email,
+      status: DocumentStatus.DRAFT,
+      type: EnvelopeType.TEMPLATE,
+    }),
+    seedFieldGroupsTestDocument({
+      userId: adminUser.user.id,
+      teamId: adminUser.team.id,
+      recipientName: adminUser.user.name || '',
+      recipientEmail: adminUser.user.email,
+      status: DocumentStatus.DRAFT,
+    }),
   ]);
+};
+
+/**
+ * Seeds `assets/field-groups.pdf` with every grouped field test case attached to one
+ * recipient. Used to try field groups in the editor and signing page.
+ */
+export const seedFieldGroupsTestDocument = async ({
+  userId,
+  teamId,
+  recipientName,
+  recipientEmail,
+  status,
+  type = EnvelopeType.DOCUMENT,
+}: {
+  userId: number;
+  teamId: number;
+  recipientName: string;
+  recipientEmail: string;
+  status: DocumentStatus;
+  type?: EnvelopeType;
+}) => {
+  const fieldGroupsPdf = fs.readFileSync(path.join(__dirname, '../../../assets/field-groups.pdf')).toString('base64');
+
+  const documentData = await createDocumentData({ documentData: fieldGroupsPdf });
+
+  const secondaryId =
+    type === EnvelopeType.DOCUMENT
+      ? await incrementDocumentId().then((v) => v.formattedDocumentId)
+      : await incrementTemplateId().then((v) => v.formattedTemplateId);
+
+  const documentMeta = await prisma.documentMeta.create({
+    data: {},
+  });
+
+  const createdEnvelope = await prisma.envelope.create({
+    data: {
+      id: prefixedId('envelope'),
+      secondaryId,
+      internalVersion: 2,
+      signatureLevel: SignatureLevel.SES,
+      type,
+      documentMetaId: documentMeta.id,
+      source: type === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.TEMPLATE,
+      title: 'Field Groups Test',
+      status,
+      envelopeItems: {
+        createMany: {
+          data: [
+            {
+              id: prefixedId('envelope_item'),
+              title: 'field-groups',
+              documentDataId: documentData.id,
+              order: 1,
+            },
+          ],
+        },
+      },
+      userId,
+      teamId,
+      recipients: {
+        create: {
+          name: recipientName,
+          email: recipientEmail,
+          token: nanoid(),
+          sendStatus: status === 'DRAFT' ? SendStatus.NOT_SENT : SendStatus.SENT,
+          signingStatus: status === 'COMPLETED' ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+          readStatus: status !== 'DRAFT' ? ReadStatus.OPENED : ReadStatus.NOT_OPENED,
+        },
+      },
+    },
+    include: {
+      recipients: true,
+      envelopeItems: true,
+    },
+  });
+
+  const { id, recipients, envelopeItems } = createdEnvelope;
+
+  const recipientId = recipients[0].id;
+  const envelopeItemId = envelopeItems[0].id;
+
+  await Promise.all(
+    FIELD_GROUPS_TEST_FIELDS.map(async (field) => {
+      // The seed bypasses API validation, so fill in the defaults the API would apply.
+      const fieldMeta = {
+        ...FIELD_META_DEFAULT_VALUES[field.type],
+        ...field.fieldMeta,
+      };
+
+      await prisma.field.create({
+        data: {
+          type: field.type,
+          page: field.page,
+          positionX: field.positionX,
+          positionY: field.positionY,
+          width: field.width,
+          height: field.height,
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          fieldMeta: fieldMeta as PrismaJson.FieldMeta,
+          groupId: field.groupId,
+          externalId: field.externalId,
+          customText: '',
+          inserted: false,
+          recipientId,
+          envelopeItemId,
+          envelopeId: id,
+        },
+      });
+    }),
+  );
+
+  return await prisma.envelope.findFirstOrThrow({
+    where: {
+      id: createdEnvelope.id,
+    },
+    include: {
+      recipients: true,
+      fields: true,
+    },
+  });
 };
 
 export const seedAlignmentTestDocument = async ({

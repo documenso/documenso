@@ -1,6 +1,8 @@
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
+import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { canFieldTypeBeGrouped } from '@documenso/lib/constants/field-groups';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import type { NormalizedFieldWithContext } from '@documenso/lib/server-only/ai/envelope/detect-fields/types';
 import {
@@ -18,9 +20,11 @@ import {
   type TTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
+import { validateFieldGroup } from '@documenso/lib/utils/field-groups';
 import { getOverlappingFieldPairs } from '@documenso/lib/utils/fields-overlap';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
+import type { FieldGroupAutoCompleteOption } from '@documenso/ui/components/field/field-group-autocomplete-input';
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -39,6 +43,10 @@ import { match } from 'ts-pattern';
 import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
 import { AiFieldDetectionDialog } from '~/components/dialogs/ai-field-detection-dialog';
 import { EnvelopeItemEditDialog } from '~/components/dialogs/envelope-item-edit-dialog';
+import {
+  EditorFieldAdvancedForm,
+  type EditorFieldAdvancedFormValue,
+} from '~/components/forms/editor/editor-field-advanced-form';
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
 import { EditorFieldDropdownForm } from '~/components/forms/editor/editor-field-dropdown-form';
@@ -97,6 +105,34 @@ export const EnvelopeEditorFieldsPage = () => {
   const selectedField = useMemo(() => structuredClone(editorFields.selectedField), [editorFields.selectedField]);
 
   /**
+   * The settings form is uncontrolled, so it must be remounted whenever the selected
+   * field's meta is changed from outside the form, such as when the field adopts the meta
+   * of a group it joins or a group's validation rule is removed.
+   *
+   * Changes emitted by the form itself are tracked so they don't cause a remount.
+   */
+  const lastEmittedFieldMetaRef = useRef<{ formId: string; fieldMeta: TFieldMetaSchema } | null>(null);
+  const [externalFieldMetaVersion, setExternalFieldMetaVersion] = useState(0);
+
+  useEffect(() => {
+    if (!selectedField) {
+      lastEmittedFieldMetaRef.current = null;
+      return;
+    }
+
+    const lastEmitted = lastEmittedFieldMetaRef.current;
+
+    const isSameField = lastEmitted?.formId === selectedField.formId;
+    const isExternalChange = isSameField && !isDeepEqual(lastEmitted.fieldMeta, selectedField.fieldMeta);
+
+    lastEmittedFieldMetaRef.current = { formId: selectedField.formId, fieldMeta: selectedField.fieldMeta };
+
+    if (isExternalChange) {
+      setExternalFieldMetaVersion((version) => version + 1);
+    }
+  }, [selectedField?.formId, selectedField?.fieldMeta]);
+
+  /**
    * Debounce the fields used for overlap detection so we don't recompute on every
    * small drag/resize movement, which is expensive on large field counts and can
    * bog down lower-end devices.
@@ -150,12 +186,86 @@ export const EnvelopeEditorFieldsPage = () => {
 
     const isMetaSame = isDeepEqual(selectedField.fieldMeta, fieldMeta);
 
-    if (!isMetaSame) {
-      editorFields.updateFieldByFormId(selectedField.formId, {
-        fieldMeta,
-      });
+    if (isMetaSame) {
+      return;
     }
+
+    lastEmittedFieldMetaRef.current = { formId: selectedField.formId, fieldMeta };
+
+    // Group reconciliation (syncing shared meta to siblings) is handled by the editor fields hook.
+    editorFields.updateFieldByFormId(selectedField.formId, { fieldMeta });
   };
+
+  const updateSelectedFieldAdvanced = ({ groupId, externalId }: EditorFieldAdvancedFormValue) => {
+    if (!selectedField) {
+      return;
+    }
+
+    const isGroupIdSame = (selectedField.groupId ?? null) === groupId;
+    const isExternalIdSame = (selectedField.externalId ?? null) === externalId;
+
+    if (isGroupIdSame && isExternalIdSame) {
+      return;
+    }
+
+    // Group reconciliation (adopting the new group's meta, keeping the old group valid)
+    // is handled by the editor fields hook.
+    editorFields.updateFieldByFormId(selectedField.formId, { groupId, externalId });
+  };
+
+  /**
+   * Everything the group UI needs for the selected field, derived from the local fields.
+   */
+  const selectedFieldGroups = useMemo(() => {
+    const allGroupIds = new Set<string>();
+    const joinableMemberCountByGroupId = new Map<string, number>();
+    const conflictingGroupIds = new Set<string>();
+    const members: TLocalField[] = [];
+
+    for (const field of editorFields.localFields) {
+      if (!field.groupId) {
+        continue;
+      }
+
+      allGroupIds.add(field.groupId);
+
+      if (!selectedField) {
+        continue;
+      }
+
+      const isSameRecipientAndType =
+        field.recipientId === selectedField.recipientId && field.type === selectedField.type;
+
+      if (!isSameRecipientAndType) {
+        conflictingGroupIds.add(field.groupId);
+        continue;
+      }
+
+      if (field.groupId === selectedField.groupId) {
+        members.push(field);
+        continue;
+      }
+
+      joinableMemberCountByGroupId.set(field.groupId, (joinableMemberCountByGroupId.get(field.groupId) ?? 0) + 1);
+    }
+
+    const errors = selectedField?.groupId ? validateFieldGroup(selectedField.groupId, members) : [];
+
+    return {
+      allGroupIds: Array.from(allGroupIds),
+      conflictingGroupIds: Array.from(conflictingGroupIds),
+      options: Array.from(joinableMemberCountByGroupId.entries()).map(
+        ([groupId, memberCount]): FieldGroupAutoCompleteOption => ({ groupId, memberCount }),
+      ),
+      errors,
+    };
+  }, [
+    selectedField?.formId,
+    selectedField?.groupId,
+    selectedField?.recipientId,
+    selectedField?.type,
+    editorFields.localFields,
+  ]);
 
   const onFieldDetectionComplete = (fields: NormalizedFieldWithContext[]) => {
     for (const field of fields) {
@@ -447,68 +557,99 @@ export const EnvelopeEditorFieldsPage = () => {
                 <div className="px-4 [&_label]:text-foreground/70 [&_label]:text-xs">
                   <h3 className="font-semibold text-sm">{_(FieldSettingsTypeTranslations[selectedField.type])}</h3>
 
-                  {match(selectedField.type)
-                    .with(FieldType.SIGNATURE, () => (
-                      <EditorFieldSignatureForm
-                        value={selectedField?.fieldMeta as TSignatureFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.CHECKBOX, () => (
-                      <EditorFieldCheckboxForm
-                        value={selectedField?.fieldMeta as TCheckboxFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.DATE, () => (
-                      <EditorFieldDateForm
-                        value={selectedField?.fieldMeta as TDateFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.DROPDOWN, () => (
-                      <EditorFieldDropdownForm
-                        value={selectedField?.fieldMeta as TDropdownFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.EMAIL, () => (
-                      <EditorFieldEmailForm
-                        value={selectedField?.fieldMeta as TEmailFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.INITIALS, () => (
-                      <EditorFieldInitialsForm
-                        value={selectedField?.fieldMeta as TInitialsFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.NAME, () => (
-                      <EditorFieldNameForm
-                        value={selectedField?.fieldMeta as TNameFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.NUMBER, () => (
-                      <EditorFieldNumberForm
-                        value={selectedField?.fieldMeta as TNumberFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.RADIO, () => (
-                      <EditorFieldRadioForm
-                        value={selectedField?.fieldMeta as TRadioFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .with(FieldType.TEXT, () => (
-                      <EditorFieldTextForm
-                        value={selectedField?.fieldMeta as TTextFieldMeta | undefined}
-                        onValueChange={(value) => updateSelectedFieldMeta(value)}
-                      />
-                    ))
-                    .otherwise(() => null)}
+                  <div key={externalFieldMetaVersion}>
+                    {match(selectedField.type)
+                      .with(FieldType.SIGNATURE, () => (
+                        <EditorFieldSignatureForm
+                          value={selectedField?.fieldMeta as TSignatureFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.CHECKBOX, () => (
+                        <EditorFieldCheckboxForm
+                          value={selectedField?.fieldMeta as TCheckboxFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.DATE, () => (
+                        <EditorFieldDateForm
+                          value={selectedField?.fieldMeta as TDateFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.DROPDOWN, () => (
+                        <EditorFieldDropdownForm
+                          value={selectedField?.fieldMeta as TDropdownFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.EMAIL, () => (
+                        <EditorFieldEmailForm
+                          value={selectedField?.fieldMeta as TEmailFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.INITIALS, () => (
+                        <EditorFieldInitialsForm
+                          value={selectedField?.fieldMeta as TInitialsFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.NAME, () => (
+                        <EditorFieldNameForm
+                          value={selectedField?.fieldMeta as TNameFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.NUMBER, () => (
+                        <EditorFieldNumberForm
+                          value={selectedField?.fieldMeta as TNumberFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.RADIO, () => (
+                        <EditorFieldRadioForm
+                          value={selectedField?.fieldMeta as TRadioFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .with(FieldType.TEXT, () => (
+                        <EditorFieldTextForm
+                          value={selectedField?.fieldMeta as TTextFieldMeta | undefined}
+                          onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        />
+                      ))
+                      .otherwise(() => null)}
+                  </div>
+
+                  <Separator className="-mx-4 my-4 w-auto" />
+
+                  <EditorFieldAdvancedForm
+                    value={{
+                      groupId: selectedField.groupId ?? null,
+                      externalId: selectedField.externalId ?? null,
+                    }}
+                    onValueChange={updateSelectedFieldAdvanced}
+                    isGroupable={canFieldTypeBeGrouped(selectedField.type)}
+                    groupOptions={selectedFieldGroups.options}
+                    conflictingGroupIds={selectedFieldGroups.conflictingGroupIds}
+                    allGroupIds={selectedFieldGroups.allGroupIds}
+                  />
+
+                  {selectedFieldGroups.errors.length > 0 && (
+                    <Alert variant="destructive" className="mt-3" data-testid="field-form-group-errors">
+                      <AlertTitle>
+                        <Trans>Invalid field group</Trans>
+                      </AlertTitle>
+                      <AlertDescription>
+                        <ul className="list-disc pl-4">
+                          {selectedFieldGroups.errors.map((error) => (
+                            <li key={error}>{error}</li>
+                          ))}
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  )}
                 </div>
               </section>
             )}

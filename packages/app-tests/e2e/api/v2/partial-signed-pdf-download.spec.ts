@@ -46,11 +46,15 @@ const signAndCompleteRecipient = async ({
 }) => {
   await trpcMutation(request, 'envelope.field.sign', {
     token,
-    fieldId,
-    fieldValue: {
-      type: FieldType.SIGNATURE,
-      value: 'Signature',
-    },
+    fieldValues: [
+      {
+        fieldId,
+        fieldValue: {
+          type: FieldType.SIGNATURE,
+          value: 'Signature',
+        },
+      },
+    ],
   });
 
   await trpcMutation(request, 'recipient.completeDocumentWithToken', {

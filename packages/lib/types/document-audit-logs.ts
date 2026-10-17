@@ -86,7 +86,7 @@ export const ZDocumentMetaDiffTypeSchema = z.enum([
   'EMAIL_SETTINGS',
 ]);
 
-export const ZFieldDiffTypeSchema = z.enum(['DIMENSION', 'POSITION']);
+export const ZFieldDiffTypeSchema = z.enum(['DIMENSION', 'POSITION', 'GROUP_ID', 'EXTERNAL_ID', 'FIELD_META']);
 export const ZRecipientDiffTypeSchema = z.enum(['NAME', 'ROLE', 'EMAIL', 'ACCESS_AUTH', 'ACTION_AUTH']);
 
 export const DOCUMENT_AUDIT_LOG_TYPE = ZDocumentAuditLogTypeSchema.Enum;
@@ -121,6 +121,24 @@ export const ZFieldDiffPositionSchema = z.object({
   }),
 });
 
+export const ZFieldDiffGroupIdSchema = z.object({
+  type: z.literal(FIELD_DIFF_TYPE.GROUP_ID),
+  from: z.string().nullable(),
+  to: z.string().nullable(),
+});
+
+export const ZFieldDiffExternalIdSchema = z.object({
+  type: z.literal(FIELD_DIFF_TYPE.EXTERNAL_ID),
+  from: z.string().nullable(),
+  to: z.string().nullable(),
+});
+
+export const ZFieldDiffFieldMetaSchema = z.object({
+  type: z.literal(FIELD_DIFF_TYPE.FIELD_META),
+  from: z.unknown().nullable(),
+  to: z.unknown().nullable(),
+});
+
 export const ZDocumentAuditLogDocumentMetaSchema = z.union([
   z.object({
     type: z.union([
@@ -141,7 +159,13 @@ export const ZDocumentAuditLogDocumentMetaSchema = z.union([
   }),
 ]);
 
-export const ZDocumentAuditLogFieldDiffSchema = z.union([ZFieldDiffDimensionSchema, ZFieldDiffPositionSchema]);
+export const ZDocumentAuditLogFieldDiffSchema = z.union([
+  ZFieldDiffDimensionSchema,
+  ZFieldDiffPositionSchema,
+  ZFieldDiffGroupIdSchema,
+  ZFieldDiffExternalIdSchema,
+  ZFieldDiffFieldMetaSchema,
+]);
 
 export const ZGenericFromToSchema = z.object({
   from: z.union([z.string(), z.array(z.string())]).nullable(),

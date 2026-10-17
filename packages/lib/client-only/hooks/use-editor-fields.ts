@@ -7,7 +7,16 @@ import type { Field } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { isDeepEqual } from 'remeda';
 import { z } from 'zod';
+
+import {
+  applyEditorFieldUpdate,
+  type EditorFieldChanges,
+  type EditorFieldUpdate,
+  resolveEditorFieldGroupChanges,
+  restrictFieldPosValues,
+} from '../editor-field-group-changes';
 
 export const ZLocalFieldSchema = z.object({
   // This is the actual ID of the field if created.
@@ -24,6 +33,8 @@ export const ZLocalFieldSchema = z.object({
   width: z.number().min(0),
   height: z.number().min(0),
   fieldMeta: ZFieldMetaSchema,
+  groupId: z.string().max(255).nullish(),
+  externalId: z.string().max(255).nullish(),
 });
 
 export type TLocalField = z.infer<typeof ZLocalFieldSchema>;
@@ -37,6 +48,11 @@ export type TEditorFieldsFormSchema = z.infer<typeof ZEditorFieldsFormSchema>;
 type EditorFieldsProps = {
   envelope: TEditorEnvelope;
   handleFieldsUpdate: (fields: TLocalField[]) => unknown;
+  /**
+   * Called when a change caused the validation rule of a group to be removed, because
+   * the group would otherwise have become invalid.
+   */
+  onFieldGroupValidationRemoved?: (groupIds: string[]) => void;
 };
 
 type UseEditorFieldsResponse = {
@@ -51,6 +67,7 @@ type UseEditorFieldsResponse = {
   setFieldId: (formId: string, id: number) => void;
   removeFieldsByFormId: (formIds: string[]) => void;
   updateFieldByFormId: (formId: string, updates: Partial<TLocalField>) => void;
+  updateFieldsByFormId: (fieldUpdates: EditorFieldUpdate[]) => void;
   duplicateField: (field: TLocalField, recipientId?: number) => TLocalField;
   duplicateFieldToAllPages: (field: TLocalField, recipientId?: number) => TLocalField[];
 
@@ -65,7 +82,11 @@ type UseEditorFieldsResponse = {
   resetForm: (fields?: Field[]) => void;
 };
 
-export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsProps): UseEditorFieldsResponse => {
+export const useEditorFields = ({
+  envelope,
+  handleFieldsUpdate,
+  onFieldGroupValidationRemoved,
+}: EditorFieldsProps): UseEditorFieldsResponse => {
   const [selectedFieldFormId, setSelectedFieldFormId] = useState<string | null>(null);
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
 
@@ -83,6 +104,8 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
         height: Number(field.height),
         recipientId: field.recipientId,
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+        groupId: field.groupId,
+        externalId: field.externalId,
       }),
     );
 
@@ -148,18 +171,85 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     [append, triggerFieldsUpdate, setSelectedField],
   );
 
-  const removeFieldsByFormId = useCallback(
-    (formIds: string[]) => {
-      const indexes = formIds
-        .map((formId) => localFields.findIndex((field) => field.formId === formId))
+  /**
+   * Applies a set of changes to the local fields while keeping every affected group
+   * valid and in sync. This is the single entry point for all field writes.
+   *
+   * Returns the fields as they are after the change.
+   */
+  const applyFieldChanges = useCallback(
+    ({ fieldUpdates = [], newFields = [], removedFormIds = [] }: EditorFieldChanges): TLocalField[] => {
+      const previousFields = form.getValues().fields;
+
+      const previousFormIds = new Set(previousFields.map((field) => field.formId));
+
+      const fieldUpdatesByFormId = new Map(
+        fieldUpdates.filter(({ formId }) => previousFormIds.has(formId)).map((update) => [update.formId, update]),
+      );
+
+      const removedFormIdSet = new Set(removedFormIds.filter((formId) => previousFormIds.has(formId)));
+
+      const hasChanges = fieldUpdatesByFormId.size > 0 || newFields.length > 0 || removedFormIdSet.size > 0;
+
+      if (!hasChanges) {
+        return previousFields;
+      }
+
+      const changedFormIds = new Set([...fieldUpdatesByFormId.keys(), ...newFields.map(({ formId }) => formId)]);
+
+      const nextFields = previousFields
+        .filter((field) => !removedFormIdSet.has(field.formId))
+        .map((field) => {
+          const fieldUpdate = fieldUpdatesByFormId.get(field.formId);
+
+          return fieldUpdate ? applyEditorFieldUpdate(field, fieldUpdate.updates) : field;
+        })
+        .concat(newFields);
+
+      const { reconciledFields, validationRemovedGroupIds } = resolveEditorFieldGroupChanges({
+        previousFields,
+        nextFields,
+        changedFormIds,
+      });
+
+      // Only touch the form entries which actually changed.
+      reconciledFields.forEach((reconciledField) => {
+        const index = previousFields.findIndex((field) => field.formId === reconciledField.formId);
+
+        if (index === -1) {
+          append(reconciledField);
+          return;
+        }
+
+        if (!isDeepEqual(previousFields[index], reconciledField)) {
+          update(index, reconciledField);
+        }
+      });
+
+      const removedIndexes = previousFields
+        .map((field, index) => (removedFormIdSet.has(field.formId) ? index : -1))
         .filter((index) => index !== -1);
 
-      if (indexes.length > 0) {
-        remove(indexes);
-        triggerFieldsUpdate();
+      if (removedIndexes.length > 0) {
+        remove(removedIndexes);
       }
+
+      triggerFieldsUpdate();
+
+      if (validationRemovedGroupIds.length > 0) {
+        onFieldGroupValidationRemoved?.(validationRemovedGroupIds);
+      }
+
+      return reconciledFields;
     },
-    [localFields, remove, triggerFieldsUpdate],
+    [form, append, update, remove, triggerFieldsUpdate, onFieldGroupValidationRemoved],
+  );
+
+  const removeFieldsByFormId = useCallback(
+    (formIds: string[]) => {
+      applyFieldChanges({ removedFormIds: formIds });
+    },
+    [applyFieldChanges],
   );
 
   const setFieldId = (formId: string, id: number) => {
@@ -175,24 +265,18 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     }
   };
 
+  const updateFieldsByFormId = useCallback(
+    (fieldUpdates: EditorFieldUpdate[]) => {
+      applyFieldChanges({ fieldUpdates });
+    },
+    [applyFieldChanges],
+  );
+
   const updateFieldByFormId = useCallback(
     (formId: string, updates: Partial<TLocalField>) => {
-      const index = localFields.findIndex((field) => field.formId === formId);
-
-      if (index !== -1) {
-        const updatedField = {
-          ...localFields[index],
-          ...updates,
-        };
-
-        update(index, {
-          ...updatedField,
-          ...restrictFieldPosValues(updatedField),
-        });
-        triggerFieldsUpdate();
-      }
+      updateFieldsByFormId([{ formId, updates }]);
     },
-    [localFields, update, triggerFieldsUpdate],
+    [updateFieldsByFormId],
   );
 
   const duplicateField = useCallback(
@@ -206,11 +290,11 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
         positionY: field.positionY + 3,
       };
 
-      append(newField);
-      triggerFieldsUpdate();
-      return newField;
+      const reconciledFields = applyFieldChanges({ newFields: [newField] });
+
+      return reconciledFields.find((reconciledField) => reconciledField.formId === newField.formId) ?? newField;
     },
-    [append, triggerFieldsUpdate],
+    [applyFieldChanges],
   );
 
   const duplicateFieldToAllPages = useCallback(
@@ -227,21 +311,21 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
           continue;
         }
 
-        const newField: TLocalField = {
+        newFields.push({
           ...structuredClone(field),
           id: undefined,
           formId: nanoid(12),
           page: pageNumber,
-        };
-
-        append(newField);
-        newFields.push(newField);
+        });
       }
 
-      triggerFieldsUpdate();
-      return newFields;
+      const newFormIds = new Set(newFields.map((newField) => newField.formId));
+
+      const reconciledFields = applyFieldChanges({ newFields });
+
+      return reconciledFields.filter((reconciledField) => newFormIds.has(reconciledField.formId));
     },
-    [append, triggerFieldsUpdate],
+    [applyFieldChanges],
   );
 
   const getFieldByFormId = useCallback(
@@ -293,6 +377,7 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     setFieldId,
     removeFieldsByFormId,
     updateFieldByFormId,
+    updateFieldsByFormId,
     duplicateField,
     duplicateFieldToAllPages,
 
@@ -309,14 +394,5 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     setSelectedRecipient,
 
     resetForm,
-  };
-};
-
-const restrictFieldPosValues = (field: Pick<TLocalField, 'positionX' | 'positionY' | 'width' | 'height'>) => {
-  return {
-    positionX: Math.max(0, Math.min(100, field.positionX)),
-    positionY: Math.max(0, Math.min(100, field.positionY)),
-    width: Math.max(0, Math.min(100, field.width)),
-    height: Math.max(0, Math.min(100, field.height)),
   };
 };

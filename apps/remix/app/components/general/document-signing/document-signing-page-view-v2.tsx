@@ -1,6 +1,7 @@
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { getSigningItems } from '@documenso/lib/utils/signing-items';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -20,7 +21,6 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
-import { SignFieldCheckboxDialog } from '~/components/dialogs/sign-field-checkbox-dialog';
 import { SignFieldDropdownDialog } from '~/components/dialogs/sign-field-dropdown-dialog';
 import { SignFieldEmailDialog } from '~/components/dialogs/sign-field-email-dialog';
 import { SignFieldInitialsDialog } from '~/components/dialogs/sign-field-initials-dialog';
@@ -53,7 +53,7 @@ export const DocumentSigningPageViewV2 = () => {
     recipient,
     recipientFields,
     recipientFieldsRemaining,
-    requiredRecipientFields,
+    requiredRecipientSigningItems,
     selectedAssistantRecipientFields,
   } = useRequiredEnvelopeSigningContext();
 
@@ -68,17 +68,16 @@ export const DocumentSigningPageViewV2 = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   /**
-   * The total remaining fields remaining for the current recipient or selected assistant recipient.
+   * The signing items which have not been inserted for the current recipient or selected
+   * assistant recipient, with fields in a group counted as one item.
    *
-   * Includes both optional and required fields.
+   * Includes both optional and required items.
    */
-  const remainingFields = useMemo(() => {
-    if (recipient.role === RecipientRole.ASSISTANT) {
-      return selectedAssistantRecipientFields.filter((field) => !field.inserted);
-    }
+  const uninsertedSigningItems = useMemo(() => {
+    const fields = recipient.role === RecipientRole.ASSISTANT ? selectedAssistantRecipientFields : recipientFields;
 
-    return recipientFields.filter((field) => !field.inserted);
-  }, [recipientFieldsRemaining, selectedAssistantRecipientFields, currentEnvelopeItem]);
+    return getSigningItems(fields).filter((item) => !item.isInserted);
+  }, [recipient.role, recipientFields, selectedAssistantRecipientFields]);
 
   return (
     <div className="min-h-screen w-screen bg-gray-50 dark:bg-background">
@@ -89,7 +88,6 @@ export const DocumentSigningPageViewV2 = () => {
       <SignFieldInitialsDialog.Root />
       <SignFieldDropdownDialog.Root />
       <SignFieldSignatureDialog.Root />
-      <SignFieldCheckboxDialog.Root />
 
       <EnvelopeSignerHeader />
 
@@ -151,7 +149,7 @@ export const DocumentSigningPageViewV2 = () => {
                   layoutId="document-flow-container-step"
                   className="absolute inset-y-0 left-0 bg-primary"
                   style={{
-                    width: `${requiredRecipientFields.length === 0 ? 100 : 100 - (100 / requiredRecipientFields.length) * (recipientFieldsRemaining.length ?? 0)}%`,
+                    width: `${requiredRecipientSigningItems.length === 0 ? 100 : 100 - (100 / requiredRecipientSigningItems.length) * (recipientFieldsRemaining.length ?? 0)}%`,
                   }}
                 />
               </div>
@@ -252,7 +250,9 @@ export const DocumentSigningPageViewV2 = () => {
                       <Plural
                         one="1 Field"
                         other="# Fields"
-                        value={remainingFields.filter((field) => field.envelopeItemId === doc.id).length}
+                        value={
+                          uninsertedSigningItems.filter((item) => item.primaryField.envelopeItemId === doc.id).length
+                        }
                       />
                     }
                     isSelected={currentEnvelopeItem?.id === doc.id}

@@ -303,6 +303,43 @@ export const EditorGenericReadOnlyField = ({
   );
 };
 
+/**
+ * Toggle to hide the text next to each option of a checkbox or radio field.
+ */
+export const EditorGenericHideLabelField = ({
+  formControl,
+  className,
+}: {
+  formControl: FormControlType;
+  className?: string;
+}) => {
+  return (
+    <FormField
+      control={formControl}
+      name="hideLabel"
+      render={({ field }) => (
+        <FormItem className={cn('flex items-center space-x-2', className)}>
+          <FormControl>
+            <div className="flex items-center">
+              <Checkbox
+                data-testid="field-form-hideLabel"
+                id="field-hide-label"
+                checked={field.value ?? false}
+                onCheckedChange={field.onChange}
+              />
+
+              <label className="ml-2 text-muted-foreground text-sm" htmlFor="field-hide-label">
+                <Trans>Hide Option Labels</Trans>
+              </label>
+            </div>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
 export const EditorGenericLabelField = ({
   formControl,
   className,
