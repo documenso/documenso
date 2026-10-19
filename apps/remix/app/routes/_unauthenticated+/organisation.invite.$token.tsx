@@ -265,7 +265,9 @@ const PendingInvitation = ({
           </p>
 
           <Button asChild>
-            <Link to={`/signup#email=${encodeURIComponent(email)}`}>
+            <Link
+              to={`/signup?returnTo=${encodeURIComponent(`/organisation/invite/${token}`)}#email=${encodeURIComponent(email)}`}
+            >
               <Trans>Create account</Trans>
             </Link>
           </Button>
