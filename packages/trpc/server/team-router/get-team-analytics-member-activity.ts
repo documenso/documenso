@@ -1,6 +1,7 @@
 import { getTeamAnalyticsMemberActivity } from '@documenso/lib/server-only/team/get-team-analytics-member-activity';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZGetTeamAnalyticsMemberActivityRequestSchema,
   ZGetTeamAnalyticsMemberActivityResponseSchema,
@@ -9,6 +10,7 @@ import {
 export const getTeamAnalyticsMemberActivityRoute = authenticatedProcedure
   .input(ZGetTeamAnalyticsMemberActivityRequestSchema)
   .output(ZGetTeamAnalyticsMemberActivityResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .query(async ({ input, ctx }) => {
     const { teamId, range, from, to, timezone } = input;
 

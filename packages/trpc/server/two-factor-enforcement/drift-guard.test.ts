@@ -111,10 +111,15 @@ const REMEDIATION_ALLOW_LIST = [
 ].sort();
 
 /**
- * The session bootstrap (`twoFactorBootstrap()`): a blocked client must be
- * able to discover its own enforcement state. Exempt from BOTH asserts.
+ * Exempt from BOTH asserts (`twoFactorBootstrap()`):
+ *
+ * - the session bootstrap: a blocked client must be able to discover its own
+ *   enforcement state;
+ * - `auth.getAuthMethods`: serves only the signing-link re-auth dialog, which
+ *   is exempt by design (signing someone else's document is never blocked),
+ *   and has no token input to skip on conditionally.
  */
-const BOOTSTRAP_ALLOW_LIST = ['organisation.internal.getOrganisationSession'].sort();
+const BOOTSTRAP_ALLOW_LIST = ['auth.getAuthMethods', 'organisation.internal.getOrganisationSession'].sort();
 
 describe('2FA enforcement drift guard', () => {
   it('every session-reachable procedure carries exactly one enforcement middleware', () => {

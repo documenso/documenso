@@ -2,6 +2,7 @@ import { findTemplates } from '@documenso/lib/server-only/template/find-template
 import { mapEnvelopeToTemplateMany } from '@documenso/lib/utils/templates';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import {
   ZFindTemplatesInternalRequestSchema,
   ZFindTemplatesInternalResponseSchema,
@@ -10,6 +11,7 @@ import {
 export const findTemplatesInternalRoute = authenticatedProcedure
   .input(ZFindTemplatesInternalRequestSchema)
   .output(ZFindTemplatesInternalResponseSchema)
+  .use(twoFactorScopeFromCtx())
   .query(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
 

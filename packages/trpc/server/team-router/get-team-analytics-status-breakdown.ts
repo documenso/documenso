@@ -1,6 +1,7 @@
 import { getTeamAnalyticsStatusBreakdown } from '@documenso/lib/server-only/team/get-team-analytics-status-breakdown';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZGetTeamAnalyticsStatusBreakdownRequestSchema,
   ZGetTeamAnalyticsStatusBreakdownResponseSchema,
@@ -9,6 +10,7 @@ import {
 export const getTeamAnalyticsStatusBreakdownRoute = authenticatedProcedure
   .input(ZGetTeamAnalyticsStatusBreakdownRequestSchema)
   .output(ZGetTeamAnalyticsStatusBreakdownResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .query(async ({ input, ctx }) => {
     const { teamId, range, from, to, timezone } = input;
 
