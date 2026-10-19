@@ -32,11 +32,8 @@ export const setupTwoFactorAuthentication = async ({ user }: SetupTwoFactorAuthe
   const uri = createTOTPKeyURI(ISSUER, accountName, secret);
   const encodedSecret = base32.encode(new Uint8Array(secret));
 
-  // Conditional update rather than a read-then-write pre-check: the write
-  // itself asserts 2FA is not enabled, so a concurrent enable can never be
-  // silently clobbered by a secret/backup-code rotation. Users with 2FA
-  // enabled must disable it (which requires a valid code) before re-running
-  // setup.
+  // The write itself asserts 2FA is not enabled so a concurrent enable can
+  // never be clobbered by a secret rotation.
   const { count } = await prisma.user.updateMany({
     where: {
       id: user.id,

@@ -29,14 +29,12 @@ export const filesRoute = new Hono<HonoEnv>()
    */
   .post('/upload-pdf', sValidator('form', ZUploadPdfRequestSchema), async (c) => {
     try {
-      // 2FA enforcement applies only when the request is session
-      // authenticated — presign-token access (embedding) is machine access
-      // and stays exempt. `resolveFileUploadUserId` prefers the session, so
-      // asserting on the session here cannot be bypassed by a session user.
+      // Presign-token (machine) access is exempt from 2FA enforcement.
+      // `resolveFileUploadUserId` prefers the session, so asserting on the
+      // session here cannot be bypassed by a session user.
       const { user: sessionUser, session } = await getOptionalNonEmbedSession(c);
 
       if (sessionUser && session) {
-        // No organisation scope: the upload creates unattached document data.
         await assertTwoFactorEnforcementForSession({ user: sessionUser, session });
       }
 
@@ -88,8 +86,7 @@ export const filesRoute = new Hono<HonoEnv>()
 
       let userId = session.user?.id;
 
-      // Presign-token access (embedding) is machine access and exempt from
-      // 2FA enforcement; the assert below only applies to session auth.
+      // Presign-token (machine) access is exempt from 2FA enforcement.
       const isPresignTokenAccess = Boolean(token);
 
       if (token) {
@@ -129,8 +126,6 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'Envelope not found' }, 404);
       }
 
-      // 2FA enforcement (session auth only): instance assert + the owning
-      // organisation's policy for the envelope being accessed.
       if (!isPresignTokenAccess && session.user && session.session) {
         try {
           await assertTwoFactorEnforcementForSession({
@@ -226,9 +221,6 @@ export const filesRoute = new Hono<HonoEnv>()
           return c.json({ error: 'Envelope not found' }, 404);
         }
 
-        // 2FA enforcement: this route is session-only, so both the instance
-        // assert and the owning organisation's policy apply. The thrown
-        // AppError is mapped to a 403 by the catch below.
         await assertTwoFactorEnforcementForSession({
           user: session.user,
           session: session.session,

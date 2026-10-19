@@ -7,7 +7,6 @@ import { ZUpdatePasskeyRequestSchema, ZUpdatePasskeyResponseSchema } from './upd
 export const updatePasskeyRoute = authenticatedProcedure
   .input(ZUpdatePasskeyRequestSchema)
   .output(ZUpdatePasskeyResponseSchema)
-  // 2FA enforcement: user-level passkey credential management; no organisation scope. Instance assert still applies.
   .use(twoFactorInstanceOnly())
   .mutation(async ({ ctx, input }) => {
     const { passkeyId, name } = input;

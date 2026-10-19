@@ -28,27 +28,15 @@ export const resetTwoFactorRoute = adminProcedure
 export type ResetTwoFactorOptions = {
   userId: number;
 
-  /**
-   * The acting admin. Self-reset is forbidden — an admin who loses their
-   * authenticator goes through the normal recovery paths instead of quietly
-   * restarting their own grace window.
-   */
   actorUserId: number;
 
   requestMetadata?: RequestMetadata;
 };
 
 /**
- * Admin reset of a user's 2FA configuration.
- *
- * Also restarts the user's grace window (`twoFactorGraceStartedAt = now`) —
- * for BOTH instance and organisation enforcement, since the org deadline
- * anchors on this field too. Without the restart, a reset under active
- * enforcement would instantly block the user.
- *
- * Because a reset silently extends org grace across a trust boundary
- * (instance admin → org policy), it is made traceable via a
- * `AUTH_2FA_ADMIN_RESET` security audit log entry.
+ * Self-reset is forbidden so an admin cannot quietly restart their own grace
+ * window. A reset also extends org grace across a trust boundary (instance
+ * admin → org policy), hence the `AUTH_2FA_ADMIN_RESET` audit log entry.
  */
 export const resetTwoFactor = async ({ userId, actorUserId, requestMetadata }: ResetTwoFactorOptions) => {
   if (userId === actorUserId) {
@@ -76,8 +64,8 @@ export const resetTwoFactor = async ({ userId, actorUserId, requestMetadata }: R
         twoFactorEnabled: false,
         twoFactorBackupCodes: null,
         twoFactorSecret: null,
-        // Restart the grace window: anchors both the instance deadline and,
-        // through the org deadline's max-of-anchors, every org deadline.
+        // Without restarting the grace window a reset under active enforcement
+        // would instantly block the user.
         twoFactorGraceStartedAt: new Date(),
       },
     });

@@ -8,9 +8,6 @@ import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 
 type GraceBannerCandidate = {
-  /**
-   * Dismissal scope: `instance` or `org:<organisationId>`.
-   */
   scope: string;
   deadline: Date;
   isSessionUnverified: boolean;
@@ -24,9 +21,6 @@ const toCandidate = (
   scope: string,
   isSessionUnverified: boolean,
 ): GraceBannerCandidate | null => {
-  // Banner territory is the grace window only: required, not yet satisfied,
-  // not yet expired. Expiry is handled by the org 403 screen (and, for
-  // instance enforcement, the onboarding redirect).
   if (!status.required || status.isSatisfied || status.isDeadlineExpired) {
     return null;
   }
@@ -39,12 +33,8 @@ const toCandidate = (
 };
 
 /**
- * Shared grace-period banner for 2FA enforcement.
- *
- * Shows the NEAREST applicable deadline between instance enforcement and the
- * current organisation's enforcement. Dismissal is stored in `sessionStorage`
- * keyed by userId + scope + deadline, so a changed deadline re-shows the
- * banner.
+ * Dismissal is keyed by userId + scope + deadline so a changed deadline re-shows
+ * the banner.
  */
 export const TwoFactorGraceBanner = () => {
   const { i18n } = useLingui();

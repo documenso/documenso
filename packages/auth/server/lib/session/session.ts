@@ -46,15 +46,7 @@ export const generateSessionToken = (): string => {
 };
 
 export type CreateSessionOptions = {
-  /**
-   * The method used to authenticate this session.
-   */
   authMethod: TSessionAuthMethod;
-
-  /**
-   * Whether a second factor was passed during sign-in (TOTP/backup challenge
-   * or UV passkey).
-   */
   twoFactorVerified: boolean;
 
   isEmbed?: boolean;

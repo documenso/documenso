@@ -13,8 +13,6 @@ import {
 export const signingStatusEnvelopeRoute = maybeAuthenticatedProcedure
   .input(ZSigningStatusEnvelopeRequestSchema)
   .output(ZSigningStatusEnvelopeResponseSchema)
-  // Token-authorized: the signing token is the authorization. An empty token
-  // carries no organisation scope either way (instance assert only).
   .use(twoFactorScope((input) => (input.token ? TWO_FACTOR_SKIP : {})))
   .query(async ({ input, ctx }) => {
     const { token } = input;

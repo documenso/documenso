@@ -11,7 +11,7 @@ export const getOrganisationMemberInvitesRoute = authenticatedProcedure
   //   .meta(getOrganisationMemberInvitesMeta)
   .input(ZGetOrganisationMemberInvitesRequestSchema)
   .output(ZGetOrganisationMemberInvitesResponseSchema)
-  // 2FA enforcement: lists the current user's own pending invites (keyed by their email) so they can accept/decline — required for remediation. Instance assert still applies.
+  // The user's own pending invites, needed to accept/decline while blocked.
   .use(twoFactorInstanceOnly())
   .query(async ({ input, ctx }) => {
     const { user } = ctx;

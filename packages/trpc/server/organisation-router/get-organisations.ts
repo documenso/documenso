@@ -9,7 +9,8 @@ export const getOrganisationsRoute = authenticatedProcedure
   //   .meta(getOrganisationsMeta)
   .input(ZGetOrganisationsRequestSchema)
   .output(ZGetOrganisationsResponseSchema)
-  // 2FA enforcement: organisation listing for the org switcher; exposes the same surface as the 'bootstrap' session payload a blocked client already receives. Instance assert still applies.
+  // Same surface as the bootstrap session payload a blocked client already
+  // receives.
   .use(twoFactorInstanceOnly())
   .query(async ({ ctx }) => {
     const { user } = ctx;

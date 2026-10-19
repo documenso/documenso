@@ -16,8 +16,6 @@ import {
 export const updateOrganisationBrandingLogoRoute = authenticatedProcedure
   .input(ZUpdateOrganisationBrandingLogoRequestSchema)
   .output(ZUpdateOrganisationBrandingLogoResponseSchema)
-  // Multipart route: the resolver runs on the PARSED zfd input, so the
-  // organisation ID comes from the structured `payload` object.
   .use(twoFactorScope((input) => ({ organisation: input.payload.organisationId })))
   .mutation(async ({ ctx, input }) => {
     const { user } = ctx;

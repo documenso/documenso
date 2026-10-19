@@ -14,9 +14,6 @@ export const findAttachmentsRoute = maybeAuthenticatedProcedure
   .meta(findAttachmentsMeta)
   .input(ZFindAttachmentsRequestSchema)
   .output(ZFindAttachmentsResponseSchema)
-  // Mirrors the handler's own branch: with a token the call is
-  // token-authorized, without one it asserts against the envelope's
-  // organisation.
   .use(twoFactorScope((input) => (input.token ? TWO_FACTOR_SKIP : { envelope: input.envelopeId })))
   .query(async ({ input, ctx }) => {
     const { envelopeId, token } = input;

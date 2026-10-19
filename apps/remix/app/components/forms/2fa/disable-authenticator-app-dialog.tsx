@@ -69,10 +69,6 @@ export const DisableAuthenticatorAppDialog = () => {
 
   const { isSubmitting: isDisable2FASubmitting } = disable2FAForm.formState;
 
-  // Todo: (2FA enforcement, step 5) Once org enforcement state is available
-  // client-side, warn BEFORE disabling that org/team access will block at the
-  // org 2FA deadline. Until then the warning is shown after the fact based on
-  // the server response.
   const onDisable2FAFormSubmit = async ({ totpCode, backupCode }: TDisable2FAForm) => {
     try {
       const { orgEnforcementApplies } = await authClient.twoFactor.disable({ totpCode, backupCode });

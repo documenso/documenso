@@ -56,8 +56,6 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
 
   // Directly log in user if account already exists.
   if (existingAccount) {
-    // A 2FA-enabled user must pass a TOTP/backup challenge before any session
-    // exists — primary (org OIDC) auth alone only earns a pending challenge.
     if (existingAccount.user.twoFactorEnabled) {
       await createTwoFactorChallenge(c, {
         userId: existingAccount.user.id,
@@ -118,9 +116,6 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
     });
   }
 
-  // Note: only the provider subject crosses into the verification token
-  // metadata — access/ID tokens are deliberately not persisted (see
-  // ZOrganisationAccountLinkMetadataSchema).
   await sendOrganisationAccountLinkConfirmationEmail({
     type: userToLink.emailVerified ? 'link' : 'create',
     userId: userToLink.id,

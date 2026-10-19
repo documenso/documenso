@@ -9,17 +9,7 @@ import { sweepPendingTwoFactorChallenge } from './two-factor-challenge';
 
 type AuthorizeUser = {
   userId: number;
-
-  /**
-   * The method the user authenticated with. Every sign-in route must pass
-   * this explicitly.
-   */
   authMethod: TSessionAuthMethod;
-
-  /**
-   * Whether a second factor was passed during this sign-in (inline TOTP on
-   * email/password login, or a UV passkey).
-   */
   twoFactorVerified: boolean;
 };
 
@@ -34,10 +24,7 @@ type AuthorizeUser = {
 export const onAuthorize = async (user: AuthorizeUser, c: Context<HonoAuthContext>) => {
   await assertUserNotDisabledById({ userId: user.userId });
 
-  // Any successful sign-in clears a pending 2FA challenge — an abandoned
-  // challenge must not outlive a login via another route. The challenge
-  // endpoint consumes its own token before calling `onAuthorize`, so this
-  // sweep finds nothing there (no recursion, no double-consumption).
+  // An abandoned challenge must not outlive a login via another route.
   await sweepPendingTwoFactorChallenge(c);
 
   const metadata = c.get('requestMetadata');

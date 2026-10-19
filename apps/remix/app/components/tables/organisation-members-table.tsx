@@ -102,9 +102,6 @@ export const OrganisationMembersDataTable = () => {
         cell: ({ row }) => row.original.groups.filter((group) => group.type === OrganisationGroupType.CUSTOM).length,
       },
       {
-        // Per-member 2FA compliance indicator: enrolment is the durable half
-        // of the satisfaction rule, so org admins can see who has and hasn't
-        // enrolled (non-compliant members still consume seats).
         header: _(msg`2FA`),
         accessorKey: 'twoFactorEnabled',
         cell: ({ row }) =>

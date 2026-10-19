@@ -130,9 +130,8 @@ const redeemAuthHandoffById = async ({
       }
 
       // The handoff must not outlive the top-level session that produced it.
-      // The embed session inherits the originating session's auth method and
-      // 2FA verification state — it must never be more (or less) trusted than
-      // the session that minted it.
+      // The embed session must never be more (or less) trusted than the session
+      // that minted it.
       const originatingSession = await prisma.session.findFirst({
         where: {
           id: payload.sessionId,
@@ -197,8 +196,6 @@ const redeemAuthHandoffById = async ({
           payload.userId,
           { ipAddress, userAgent },
           {
-            // `Session.authMethod` is a plain string column; rows predating
-            // the column read back as the `unknown` default.
             authMethod: ZSessionAuthMethodSchema.catch('unknown').parse(originatingSession.authMethod),
             twoFactorVerified: originatingSession.twoFactorVerified,
             isEmbed: true,

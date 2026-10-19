@@ -632,12 +632,8 @@ export const templateRouter = router({
     // })
     .input(ZCreateDocumentFromDirectTemplateRequestSchema)
     .output(ZCreateDocumentFromDirectTemplateResponseSchema)
-    // Token-authorized: authorization derives from the direct-template token
-    // (the session is incidental — an instance-blocked signed-in user must
-    // still be able to use someone else's direct template), so both asserts
-    // are skipped when the token is present — mirroring the handler, which
-    // authorizes via the token alone. The schema requires a non-empty token,
-    // so the fallback (instance assert only) is unreachable in practice.
+    // An instance-blocked signed-in user must still be able to use someone
+    // else's direct template.
     .use(twoFactorScope((input) => (input.directTemplateToken ? TWO_FACTOR_SKIP : {})))
     .mutation(async ({ input, ctx }) => {
       const {

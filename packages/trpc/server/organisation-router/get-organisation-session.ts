@@ -12,13 +12,10 @@ import { ZGetOrganisationSessionResponseSchema } from './get-organisation-sessio
 /**
  * Get all the organisations and teams a user belongs to.
  *
- * Carries the enforcement `bootstrap` exemption: a 2FA-blocked client must
- * still be able to discover its own enforcement state (this payload carries
- * the per-organisation status the layouts render the 403/banner from), so it
- * is exempt from both the instance and organisation asserts.
+ * Exempt from 2FA enforcement: a blocked client must still be able to discover
+ * its own enforcement state from this payload.
  */
 export const getOrganisationSessionRoute = authenticatedProcedure
-  // 2FA enforcement: BOOTSTRAP — see the docblock above.
   .use(twoFactorBootstrap())
   .output(ZGetOrganisationSessionResponseSchema)
   .query(async ({ ctx }) => {
@@ -32,17 +29,7 @@ export const getOrganisationSessionRoute = authenticatedProcedure
 export type GetOrganisationSessionOptions = {
   userId: number;
 
-  /**
-   * 2FA fields of the user, used to derive the per-organisation enforcement
-   * status.
-   */
   user: Pick<User, 'twoFactorEnabled' | 'twoFactorGraceStartedAt'>;
-
-  /**
-   * The current session, or null for contexts that carry no session (e.g.
-   * API access), which never count as 2FA-verified. Machine access is exempt
-   * from enforcement anyway — this only keeps the derived shape honest.
-   */
   session: Pick<Session, 'twoFactorVerified'> | null;
 };
 
@@ -112,9 +99,8 @@ export const getOrganisationSession = async ({
   });
 
   return organisations.map((organisation) => {
-    // `members` is destructured OUT of the payload: it exists only to derive
-    // the enforcement status below (root.tsx serialises this return value
-    // directly without passing through the output schema).
+    // `members` must not leak into the payload: root.tsx serialises this return
+    // value directly without passing through the output schema.
     const { organisationGlobalSettings, members, ...organisationPayload } = organisation;
 
     const [member] = members;
@@ -123,7 +109,6 @@ export const getOrganisationSession = async ({
       ...organisationPayload,
       twoFactorEnforcement: computeOrganisationTwoFactorEnforcementStatus({
         organisationSettings: organisationGlobalSettings,
-        // Defensive fallback: the membership filter guarantees a member row.
         memberCreatedAt: member?.createdAt ?? organisation.createdAt,
         userTwoFactorEnabled: user.twoFactorEnabled,
         userTwoFactorGraceStartedAt: user.twoFactorGraceStartedAt,

@@ -125,10 +125,6 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
       requestMetadata,
     });
 
-    // `orgEnforcementApplies` lets the client warn that org/team context
-    // access will block at the org 2FA deadline (immediately if already
-    // past). The disable itself is allowed — only instance enforcement
-    // refuses it server-side.
     return c.json(
       {
         success: true,
@@ -175,17 +171,11 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
   })
 
   /**
-   * Lightweight pending-challenge validity check for the /2fa-challenge page.
-   *
-   * Unauthenticated by design — the signed challenge cookie is the proof that
-   * primary authentication passed. Resolving the challenge also garbage
-   * collects expired/exhausted tokens, so an invalid state reports `false`
-   * and the page sends the user back to sign-in.
+   * Check whether a pending 2FA challenge exists.
    */
   .get('/challenge', async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    // IP-based limit before any challenge resolution.
     const ipLimitResult = await twoFactorChallengeIpRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
     });
@@ -206,27 +196,19 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
   })
 
   /**
-   * Verify the second factor for a pending 2FA challenge (OAuth/OIDC
-   * sign-ins where the code arrives in a later request than primary auth).
+   * Verify the second factor for a pending 2FA challenge (OAuth/OIDC sign-ins).
    *
    * Unauthenticated by design: no session may exist before the code is
-   * verified, so the signed HttpOnly challenge cookie is the proof of primary
-   * authentication. The pending token is NOT a second factor itself — it only
-   * carries "primary auth passed for user X" across the OAuth redirect; the
-   * code is verified against the user's stored TOTP secret / backup codes via
-   * `validateTwoFactorAuthentication`, identical to email/password login.
-   *
-   * No captcha here: this is the continuation of a sign-in that already
-   * passed the provider's and our own abuse controls at the primary auth
-   * step.
+   * verified, the signed HttpOnly challenge cookie is the proof of primary
+   * authentication. No captcha since primary auth already passed abuse controls.
    */
   .post('/challenge', sValidator('json', ZVerifyTwoFactorChallengeRequestSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
     const { totpCode, backupCode, csrfToken } = c.req.valid('json');
 
-    // IP-based limit BEFORE challenge resolution so hammering without a valid
-    // cookie never reaches the database token lookup.
+    // IP limit before challenge resolution so hammering without a valid cookie
+    // never reaches the database.
     const ipLimitResult = await twoFactorChallengeIpRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
     });
@@ -257,7 +239,6 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    // Per-user limit only after the cookie resolved to a user.
     const userLimitResult = await twoFactorChallengeUserRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
       identifier: `user:${challenge.userId}`,
@@ -285,8 +266,6 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
       },
     });
 
-    // The challenge is moot if the user disappeared or no longer has 2FA
-    // enabled — consume it and force a fresh sign-in.
     if (!user || !user.twoFactorEnabled) {
       await prisma.verificationToken.deleteMany({
         where: {
@@ -302,11 +281,8 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    // A rejected sign-in must never mutate the account, so a disabled user is
-    // refused BEFORE code validation — otherwise a valid backup code would
-    // run the recovery reset (stripping 2FA) even though `onAuthorize` would
-    // refuse the session afterwards. The challenge is consumed so it cannot
-    // be retried.
+    // Must be refused before code validation, otherwise a valid backup code
+    // would strip 2FA from a disabled account.
     if (user.disabled) {
       await prisma.verificationToken.deleteMany({
         where: {
@@ -329,10 +305,6 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
     });
 
     if (!validationResult.isValid) {
-      // Failed codes do not consume the token but atomically increment its
-      // attempt counter (audit-logged). The rate limiter fails open on DB
-      // errors, so the counter is the hard bound — exhaustion consumes the
-      // challenge.
       const { isExhausted } = await recordTwoFactorChallengeFailure(c, {
         challenge,
         requestMetadata,
@@ -353,9 +325,8 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
 
     const isBackupCodeRecovery = validationResult.method === 'backup';
 
-    // Token consumption, the deferred link action (if any) and the
-    // backup-code recovery reset all commit atomically — a concurrent replay
-    // of the same challenge fails the consumption count check cleanly.
+    // Consumption, the deferred link action and the recovery reset commit
+    // atomically so a concurrent replay fails cleanly.
     await prisma.$transaction(async (tx) => {
       await consumeTwoFactorChallenge(tx, challenge.id);
 
@@ -367,8 +338,7 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
         });
       }
 
-      // Backup codes are recovery, not sign-in: a successful backup-code
-      // challenge atomically resets 2FA so the user re-enrols.
+      // Backup codes are recovery, not sign-in.
       if (isBackupCodeRecovery) {
         await resetTwoFactorAfterBackupCodeUse({
           user,
@@ -378,8 +348,6 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
       }
     });
 
-    // The session is created with the primary auth method stored at challenge
-    // creation, and counts as second-factor verified.
     await onAuthorize(
       {
         userId: challenge.userId,
@@ -391,8 +359,6 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
 
     clearTwoFactorChallengeCookie(c);
 
-    // A backup-code recovery lands on the re-enrolment page, carrying the
-    // original destination as its returnTo.
     const redirectPath = isBackupCodeRecovery
       ? `/onboarding/2fa?returnTo=${encodeURIComponent(challenge.metadata.redirectPath)}`
       : challenge.metadata.redirectPath;

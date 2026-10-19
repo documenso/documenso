@@ -10,7 +10,7 @@ import { ZLeaveOrganisationRequestSchema, ZLeaveOrganisationResponseSchema } fro
 export const leaveOrganisationRoute = authenticatedProcedure
   .input(ZLeaveOrganisationRequestSchema)
   .output(ZLeaveOrganisationResponseSchema)
-  // 2FA enforcement: REMEDIATION — a blocked member must always be able to leave the organisation. Instance assert still applies.
+  // A blocked member must always be able to leave.
   .use(twoFactorRemediation())
   .mutation(async ({ ctx, input }) => {
     const { organisationId } = input;

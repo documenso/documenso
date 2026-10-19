@@ -77,8 +77,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     },
   });
 
-  // Non-blocking notice data: joining always succeeds, but the member's 2FA
-  // grace window starts at join when the organisation requires 2FA.
   const twoFactorSettings = organisationMemberInvite.organisation.organisationGlobalSettings;
 
   return {
@@ -307,8 +305,6 @@ const PendingInvitation = ({
           </Trans>
         </p>
 
-        {/* Non-blocking notice: accepting always succeeds; access to the
-            organisation blocks only after the grace period expires. */}
         {organisationTwoFactorRequired && !actionIsDecline && (
           <p className="mt-2 mb-4 text-muted-foreground text-sm">
             {organisationTwoFactorGracePeriodDays > 0 ? (

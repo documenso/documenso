@@ -78,7 +78,6 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
 
   const { user: currentUser } = useSession();
 
-  // Self-reset is forbidden server-side; hide the affordance entirely.
   const canResetTwoFactor = user.twoFactorEnabled && user.id !== currentUser.id;
 
   const roles = user.roles ?? [];

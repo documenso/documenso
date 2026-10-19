@@ -18,7 +18,6 @@ import {
 export const profileRouter = router({
   findUserSecurityAuditLogs: authenticatedProcedure
     .input(ZFindUserSecurityAuditLogsSchema)
-    // 2FA enforcement: user-level security audit log; no organisation scope. Instance assert still applies.
     .use(twoFactorInstanceOnly())
     .query(async ({ input, ctx }) => {
       return await findUserSecurityAuditLogs({
@@ -29,7 +28,6 @@ export const profileRouter = router({
 
   updateProfile: authenticatedProcedure
     .input(ZUpdateProfileMutationSchema)
-    // 2FA enforcement: user-level profile update; no organisation scope. Instance assert still applies.
     .use(twoFactorInstanceOnly())
     .mutation(async ({ input, ctx }) => {
       const { name, signature } = input;
@@ -43,7 +41,7 @@ export const profileRouter = router({
     }),
 
   deleteAccount: authenticatedProcedure
-    // 2FA enforcement: user-level account deletion; a blocked user must be able to delete their own account. Instance assert still applies.
+    // A blocked user must still be able to delete their own account.
     .use(twoFactorInstanceOnly())
     .mutation(async ({ ctx }) => {
       ctx.logger.info({
@@ -105,9 +103,7 @@ export const profileRouter = router({
     .input(ZSubmitSupportTicketMutationSchema)
     .use(
       twoFactorScope((input) => {
-        // The legacy string team ID is only in scope when it parses to a real
-        // ID — mirroring the handler's own validation branch; a malformed
-        // value is rejected by the handler, not resolved here.
+        // A malformed legacy team ID is rejected by the handler, not here.
         const teamId = input.teamId ? Number(input.teamId) : null;
 
         return {

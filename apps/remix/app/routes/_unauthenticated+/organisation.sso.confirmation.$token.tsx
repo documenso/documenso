@@ -113,8 +113,6 @@ export async function loader({ params }: Route.LoaderArgs) {
       name: organisation.name,
       url: organisation.url,
       avatar: organisation.avatarImageId,
-      // Non-blocking notice data: SSO membership creation always succeeds;
-      // the 2FA grace window starts at join.
       twoFactorRequired: organisation.organisationGlobalSettings.twoFactorRequired,
       twoFactorGracePeriodDays: organisation.organisationGlobalSettings.twoFactorGracePeriodDays,
     },
@@ -276,8 +274,6 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
             </div>
           </div>
 
-          {/* Non-blocking notice: confirming always succeeds; organisation
-              access blocks only after the grace period expires. */}
           {organisation.twoFactorRequired && (
             <Alert variant="neutral">
               <AlertDescription>

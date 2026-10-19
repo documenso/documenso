@@ -28,8 +28,6 @@ export function meta() {
 export async function loader({ request }: Route.LoaderArgs) {
   const { isAuthenticated } = await getOptionalSession(request);
 
-  // A signed-in user has no pending challenge to complete (any successful
-  // sign-in clears it server-side).
   if (isAuthenticated) {
     throw redirect('/');
   }
@@ -105,7 +103,6 @@ export default function TwoFactorChallenge() {
 
   const onFormSubmit = async ({ totpCode, backupCode }: TTwoFactorChallengeFormSchema) => {
     try {
-      // On success this navigates to the server-provided redirect path.
       await authClient.twoFactor.verifyChallenge(
         twoFactorAuthenticationMethod === 'totp' ? { totpCode } : { backupCode },
       );

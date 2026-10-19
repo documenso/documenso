@@ -16,8 +16,6 @@ import {
 test('[ORGANISATIONS]: joining succeeds then org context is blocked at 0-day grace', async ({ page }) => {
   const { user: owner, organisation, team } = await seedUser({ isPersonalOrganisation: false });
 
-  // The owner must satisfy the policy themselves to use the org settings
-  // pages while enforcement is active with a 0-day grace period.
   const { secret: ownerSecret } = await seedUserTwoFactorAuthentication({ userId: owner.id });
 
   await seedOrganisationTwoFactorEnforcement({
@@ -36,7 +34,6 @@ test('[ORGANISATIONS]: joining succeeds then org context is blocked at 0-day gra
     redirectPath: `/o/${organisation.url}/settings/members`,
   });
 
-  // Invite the member while the 0-day enforcement policy is already active.
   await page.getByRole('button', { name: 'Invite member' }).click();
   await page.getByRole('textbox', { name: 'Email address *' }).fill(member.email);
   await page.getByRole('button', { name: 'Invite' }).click();
@@ -44,7 +41,6 @@ test('[ORGANISATIONS]: joining succeeds then org context is blocked at 0-day gra
   await page.getByRole('tab', { name: 'Pending' }).click();
   await expect(page.getByText(member.email)).toBeVisible();
 
-  // Joining is never blocked: the member accepts the invite without 2FA.
   await apiSignout({ page });
   await apiSignin({ page, email: member.email, redirectPath: `/settings/organisations` });
 
@@ -61,8 +57,6 @@ test('[ORGANISATIONS]: joining succeeds then org context is blocked at 0-day gra
 
   expect(membership).not.toBeNull();
 
-  // Access, however, is blocked immediately (0-day grace): the org context
-  // renders the 403 screen linking to forced enrolment.
   await page.goto(`/o/${organisation.url}`);
   await expect(page.getByRole('heading', { name: 'Two-factor authentication required' })).toBeVisible();
   await expect(page.getByText('403 Forbidden')).toBeVisible();
@@ -71,11 +65,9 @@ test('[ORGANISATIONS]: joining succeeds then org context is blocked at 0-day gra
   await expect(enrolmentLink).toBeVisible();
   await expect(enrolmentLink).toHaveAttribute('href', /\/onboarding\/2fa\?returnTo=/);
 
-  // Team contexts resolve to the owning organisation and are blocked too.
   await page.goto(`/t/${team.url}/documents`);
   await expect(page.getByRole('heading', { name: 'Two-factor authentication required' })).toBeVisible();
 
-  // The security boundary: a blocked org-scoped tRPC call returns 403.
   const blockedResponse = await page
     .context()
     .request.get(
@@ -86,8 +78,6 @@ test('[ORGANISATIONS]: joining succeeds then org context is blocked at 0-day gra
 
   expect(blockedResponse.status()).toBe(403);
 
-  // The rest of the app stays usable: the member's own organisation is
-  // unaffected.
   await page.goto(`/settings/organisations`);
   await expect(page.getByText('Two-factor authentication required')).not.toBeVisible();
 });
@@ -117,8 +107,6 @@ test('[ORGANISATIONS]: member with satisfied 2FA is unaffected by enforcement', 
 
   await waitForStableTotpWindow();
 
-  // Signing in with a valid TOTP code marks the session as second-factor
-  // verified, which satisfies enforcement.
   await apiSignin({
     page,
     email: memberEmail,
@@ -170,11 +158,8 @@ test('[ORGANISATIONS]: blocked member can leave the organisation', async ({ page
     redirectPath: `/o/${organisation.url}`,
   });
 
-  // Confirm the member is blocked from the organisation context.
   await expect(page.getByRole('heading', { name: 'Two-factor authentication required' })).toBeVisible();
 
-  // A member must always be able to walk away: `organisation.leave` is on
-  // the remediation allow-list, so leaving works while blocked.
   await page.goto('/settings/organisations');
   await page.getByRole('button', { name: 'Leave' }).click();
   await page.getByRole('button', { name: 'Leave' }).click();
@@ -217,7 +202,6 @@ test('[ORGANISATIONS]: admin with satisfied 2FA can enable and persist enforceme
 
   await expect(page.getByText('Two-factor enforcement settings updated').first()).toBeVisible();
 
-  // Roundtrip: values persist across a reload.
   await page.reload();
 
   await expect(page.getByRole('switch', { name: 'Require two-factor authentication' })).toBeChecked();
@@ -253,8 +237,6 @@ test('[ORGANISATIONS]: admin without 2FA cannot enable enforcement', async ({ pa
   await requireSwitch.click();
   await page.getByRole('button', { name: 'Update' }).click();
 
-  // Enable-time guard: the acting admin must already satisfy the policy
-  // being enabled.
   await expect(
     page.getByText('You must have two-factor authentication enabled and verified on this session').first(),
   ).toBeVisible();

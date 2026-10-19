@@ -1,24 +1,7 @@
 /**
- * 2FA enforcement drift guard.
- *
- * Static, import-only structural test (no queries are executed): every
- * procedure built on a session-reachable base (authenticated / admin /
- * maybeAuthenticated — identified via the `trpcAuthType` marker set on the
- * base procedures) MUST carry EXACTLY ONE inline enforcement middleware
- * (`twoFactorScope` / `twoFactorScopeFromCtx` / `twoFactorInstanceOnly` /
- * `twoFactorRemediation` / `twoFactorBootstrap`), detected by its `_type`
- * tag while walking `_def.middlewares`.
- *
- * CONTRACT (see `./enforce.ts` and the session middlewares in `../trpc.ts`):
- * the session middlewares run NO enforcement of their own — the runtime is
- * FAIL-OPEN for a procedure without an inline enforcement middleware. THIS
- * TEST is the enforcement net: the coverage assertion below fails any
- * session-reachable procedure without one. Do not weaken it.
- *
- * The `instanceOnly`, `remediation` and `bootstrap` variants are explicit,
- * justified allow-lists — their exact membership is asserted below so
- * additions are always deliberate and reviewed. Every allow-listed call site
- * must carry a justification comment.
+ * The session middlewares in `../trpc.ts` run no 2FA enforcement of their own,
+ * so the runtime is FAIL-OPEN for a procedure without an inline enforcement
+ * middleware. This test is the enforcement net. Do not weaken it.
  */
 import { describe, expect, it } from 'vitest';
 
@@ -70,16 +53,9 @@ const proceduresWithVariant = (variant: TwoFactorInlineVariant) =>
     .map((procedure) => procedure.path)
     .sort();
 
-/**
- * Non-admin procedures with `twoFactorInstanceOnly()` — no organisation
- * scope; the instance assert still applies. Every entry must carry a
- * justification comment at its call site. Additions must be deliberate —
- * organisation-scope resolution is always preferred over instance-only.
- *
- * The admin router is excluded here because ALL admin procedures inherit
- * `twoFactorInstanceOnly()` from the `adminProcedure` base (instance-admin
- * context, not organisation-member access) — asserted separately below.
- */
+// Admin procedures are excluded here since they all inherit
+// `twoFactorInstanceOnly()` from the `adminProcedure` base, asserted separately
+// below.
 const INSTANCE_ONLY_ALLOW_LIST = [
   'auth.passkey.create',
   'auth.passkey.createAuthenticationOptions',
@@ -99,33 +75,16 @@ const INSTANCE_ONLY_ALLOW_LIST = [
   'team.email.get',
 ].sort();
 
-/**
- * Org-assert exemptions for remediation (`twoFactorRemediation()`): a
- * blocked member must always be able to walk away (leave / decline) or join
- * (accept — joining is never blocked). The instance assert still applies.
- */
 const REMEDIATION_ALLOW_LIST = [
   'organisation.leave',
   'organisation.member.invite.accept',
   'organisation.member.invite.decline',
 ].sort();
 
-/**
- * Exempt from BOTH asserts (`twoFactorBootstrap()`):
- *
- * - the session bootstrap: a blocked client must be able to discover its own
- *   enforcement state;
- * - `auth.getAuthMethods`: serves only the signing-link re-auth dialog, which
- *   is exempt by design (signing someone else's document is never blocked),
- *   and has no token input to skip on conditionally.
- */
 const BOOTSTRAP_ALLOW_LIST = ['auth.getAuthMethods', 'organisation.internal.getOrganisationSession'].sort();
 
 describe('2FA enforcement drift guard', () => {
   it('every session-reachable procedure carries exactly one enforcement middleware', () => {
-    // THE enforcement net. The session middlewares run no enforcement of
-    // their own, so a procedure without an inline enforcement middleware
-    // slips through at runtime — it must fail here instead.
     const uncovered = sessionReachableProcedures()
       .filter((procedure) => procedure.variants.length === 0)
       .map((procedure) => procedure.path);
@@ -135,8 +94,6 @@ describe('2FA enforcement drift guard', () => {
       `No 2FA enforcement middleware (twoFactorScope / twoFactorScopeFromCtx / a named variant) on: ${uncovered.join(', ')}`,
     ).toEqual([]);
 
-    // Duplicates would assert twice with potentially conflicting scopes —
-    // exactly one middleware must own each route.
     const duplicated = sessionReachableProcedures()
       .filter((procedure) => procedure.variants.length > 1)
       .map((procedure) => `${procedure.path} (${procedure.variants.join(' + ')})`);
@@ -145,15 +102,12 @@ describe('2FA enforcement drift guard', () => {
   });
 
   it('the appRouter contains session-reachable procedures (sanity check)', () => {
-    // Guards against the marker meta being silently dropped, which would make
-    // the coverage assertion above vacuously pass.
+    // A silently dropped marker meta would make the coverage assertion
+    // vacuously pass.
     expect(sessionReachableProcedures().length).toBeGreaterThan(150);
   });
 
   it('enforcement middlewares are detectable (sanity floor)', () => {
-    // Guards against the `_type` tag being silently dropped — which would
-    // make the coverage assertion fail loudly, but this pins the expected
-    // scale explicitly so a partial regression cannot hide.
     const covered = sessionReachableProcedures().filter((procedure) => procedure.variants.length > 0);
 
     expect(covered.length).toBeGreaterThan(150);
@@ -181,10 +135,6 @@ describe('2FA enforcement drift guard', () => {
   });
 
   it('a middleware carrying only the _type tag does not count as coverage (spoof hardening)', () => {
-    // `createInlineMiddleware` always sets BOTH tags. A hand-written
-    // middleware that only sets `_type` must not satisfy the coverage
-    // assertion — it would tag a procedure as enforced without running any
-    // enforcement logic.
     expect(getTwoFactorInlineMiddlewareVariant({ _type: TWO_FACTOR_INLINE_MIDDLEWARE_TYPE })).toBeNull();
 
     expect(

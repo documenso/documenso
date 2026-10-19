@@ -214,12 +214,9 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
 };
 
 /**
- * Settings keys that exist only on `OrganisationGlobalSettings` and have no
- * counterpart column on `TeamGlobalSettings`.
- *
- * These must be skipped when deriving team settings, otherwise
- * `teamSettings[key]` resolves to `undefined` (not `null`) and overwrites the
- * organisation value.
+ * Keys with no counterpart column on `TeamGlobalSettings`. Must be skipped when
+ * deriving team settings, otherwise `teamSettings[key]` resolves to `undefined`
+ * (not `null`) and overwrites the organisation value.
  */
 const ORGANISATION_ONLY_SETTINGS_KEYS = [
   'twoFactorRequired',

@@ -32,18 +32,6 @@ const ZTwoFactorEnforcementFormSchema = z.object({
 
 type TTwoFactorEnforcementFormSchema = z.infer<typeof ZTwoFactorEnforcementFormSchema>;
 
-/**
- * Instance-wide 2FA enforcement settings for the admin site-settings page.
- *
- * License-gated states:
- *
- * - Licensed: full form.
- * - Unlicensed + unconfigured: section visible but disabled with a "requires
- *   license" note.
- * - Unlicensed + configured ("configured but inactive", e.g. license lapsed):
- *   stored values shown read-only with a disable-only affordance — the only
- *   permitted unlicensed update is turning the stored policy off.
- */
 export const AdminTwoFactorEnforcementSection = () => {
   const { _, i18n } = useLingui();
   const { toast } = useToast();
@@ -69,10 +57,8 @@ export const AdminTwoFactorEnforcementSection = () => {
   const isLicensed = enforcementConfig?.isLicensed ?? false;
   const isConfiguredButInactive = !isLicensed && (enforcementConfig?.enabled ?? false);
 
-  // Client-side mirror of the server's grace-reduction detection so we can
-  // surface the acknowledgement checkbox before submitting. The server resets
-  // `enforcedFrom` to now on an off→on transition, hence the `new Date()`
-  // anchor when the stored policy is currently disabled.
+  // The server resets `enforcedFrom` to now on an off→on transition, hence the
+  // `new Date()` anchor when the stored policy is currently disabled.
   const isGraceReduction =
     enforcementConfig !== undefined &&
     isTwoFactorGracePeriodReduction({
@@ -149,9 +135,8 @@ export const AdminTwoFactorEnforcementSection = () => {
     await onUpdate(data);
   };
 
-  // Disable-only affordance for the "configured but inactive" state: submits
-  // an enabled→disabled transition with the stored values unchanged, which is
-  // the only unlicensed update the server accepts.
+  // Stored values must be unchanged: disabling is the only unlicensed update the
+  // server accepts.
   const onDisableOnly = async () => {
     if (!enforcementConfig) {
       return;

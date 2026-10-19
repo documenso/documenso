@@ -74,8 +74,6 @@ export async function loader({ context, request }: Route.LoaderArgs) {
         user: session.user,
         session: session.session,
       }),
-      // Instance 2FA enforcement status is part of the session payload so
-      // layouts can derive banners/redirects client-side without new queries.
       getTwoFactorEnforcementStatus({ user: session.user, session: session.session }),
     ]);
   }

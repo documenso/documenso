@@ -13,40 +13,15 @@ import type { TwoFactorEnforcementResourceIds } from './scope';
 import { assertScopeBudget } from './scope';
 
 /**
- * Shared resolution machinery for the inline 2FA enforcement path
- * (`twoFactorScope` / `twoFactorScopeFromCtx` and the named exemption
- * variants in `./enforce.ts`, running post-`.input()` as route-level
- * middlewares).
- *
- * Holds the per-request cache, the membership-qualified resource → org batch
- * lookups, the budget caps and the instance-status cache. Policy decisions
- * (which asserts apply, skip semantics) live with the callers.
- */
-
-/**
- * Per-request enforcement cache, keyed by the underlying `Request` object so
- * batched tRPC calls within one HTTP request share lookups. `WeakMap` keeps
- * this leak-free without touching the context type.
+ * Keyed by the underlying `Request` object so batched tRPC calls within one HTTP
+ * request share lookups. `WeakMap` keeps this leak-free without touching the
+ * context type.
  */
 export type RequestEnforcementCache = {
   instanceStatusPromise?: ReturnType<typeof getTwoFactorEnforcementStatus>;
   allOrgScopesPromise?: Promise<OrganisationTwoFactorScope[]>;
-
-  /**
-   * Organisation ID → enforcement scope (or null when the user is not a
-   * member / the organisation does not exist).
-   */
   orgScopeCache: Map<string, OrganisationTwoFactorScope | null>;
-
-  /**
-   * `${kind}:${id}` → resolved organisation IDs for a resource.
-   */
   resourceOrgIdCache: Map<string, string[]>;
-
-  /**
-   * Budget tracking: unique resource IDs + organisation IDs touched by this
-   * request. Exceeding the cap rejects the request.
-   */
   uniqueScopeKeys: Set<string>;
 };
 
@@ -97,12 +72,8 @@ const buildOrgMemberQualifier = (userId: number): OrgMemberQualifier => ({
 });
 
 /**
- * Maps extracted resource IDs to the owning organisation IDs with a single
- * membership-qualified batch query per resource kind.
- *
  * IDs that do not resolve (nonexistent, or not accessible to the user) simply
- * contribute no scope — the handler's own authorization rejects those
- * requests, and enforcement only concerns organisations the user can access.
+ * contribute no scope; the handler's own authorization rejects those requests.
  */
 const resolveResourceOrganisationIds = async (
   userId: number,
@@ -460,9 +431,8 @@ export const resolveResourceOrgIdsCached = async (
     return cachedOrgIds;
   }
 
-  // Partial cache hits are rare (identical calls within a batch are the
-  // common case), so on any miss we resolve the full set in one batch query
-  // and cache the combined result under every key.
+  // Partial cache hits are rare, so on any miss resolve the full set in one
+  // batch query and cache the combined result under every key.
   const organisationIds = await resolveResourceOrganisationIds(userId, resourceIds);
 
   for (const key of cacheKeys) {
@@ -472,10 +442,6 @@ export const resolveResourceOrgIdsCached = async (
   return organisationIds;
 };
 
-/**
- * Instance-wide enforcement status, cached per request so batched calls share
- * the setting lookup.
- */
 export const getInstanceStatusCached = async (
   cache: RequestEnforcementCache,
   user: EnforcementUser,

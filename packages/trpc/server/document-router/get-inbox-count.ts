@@ -8,7 +8,7 @@ import { ZGetInboxCountRequestSchema, ZGetInboxCountResponseSchema } from './get
 export const getInboxCountRoute = authenticatedProcedure
   .input(ZGetInboxCountRequestSchema)
   .output(ZGetInboxCountResponseSchema)
-  // 2FA enforcement: recipient-perspective inbox count; see find-inbox. Instance assert still applies.
+  // Recipient perspective, see find-inbox.
   .use(twoFactorInstanceOnly())
   .query(async ({ input, ctx }) => {
     const { readStatus } = input ?? {};

@@ -8,7 +8,6 @@ import { ZCreatePasskeyRequestSchema, ZCreatePasskeyResponseSchema } from './cre
 export const createPasskeyRoute = authenticatedProcedure
   .input(ZCreatePasskeyRequestSchema)
   .output(ZCreatePasskeyResponseSchema)
-  // 2FA enforcement: user-level passkey credential management; no organisation scope. Instance assert still applies.
   .use(twoFactorInstanceOnly())
   .mutation(async ({ ctx, input }) => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

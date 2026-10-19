@@ -11,24 +11,14 @@ import {
 export type TInstanceTwoFactorEnforcementConfig = InstanceTwoFactorEnforcementStoredConfig & {
   isLicensed: boolean;
 
-  /**
-   * Whether enforcement is currently active (enabled AND licensed) — the same
-   * activation decision the policy getter applies.
-   */
   isActive: boolean;
 };
 
 /**
- * Returns the raw stored instance 2FA enforcement configuration (schema
- * defaults when the row is absent or malformed) together with the license and
- * activation state.
- *
- * FOR ADMIN SETTINGS ONLY — never use this from enforcement code. Enforcement
- * reads `getInstanceTwoFactorEnforcementSetting()`, which returns `null`
- * unless the policy is actually active. This getter deliberately exposes the
- * stored values that the policy getter hides so the admin UI can render the
- * "configured but inactive" (e.g. license lapsed) state with a disable-only
- * affordance.
+ * For admin settings only, never use this from enforcement code. Enforcement
+ * reads `getInstanceTwoFactorEnforcementSetting()`, which returns `null` unless
+ * the policy is actually active; this exposes the stored values regardless so
+ * the admin UI can render the "configured but inactive" state.
  */
 export const getInstanceTwoFactorEnforcementConfig = async (): Promise<TInstanceTwoFactorEnforcementConfig> => {
   const settingRow = await prisma.siteSettings.findFirst({
@@ -37,8 +27,6 @@ export const getInstanceTwoFactorEnforcementConfig = async (): Promise<TInstance
     },
   });
 
-  // A missing or malformed row is presented as the unconfigured defaults,
-  // mirroring how the policy getter treats it as unconfigured.
   const parsedSetting = settingRow ? ZSiteSettingsTwoFactorEnforcementSchema.safeParse(settingRow) : null;
 
   const storedConfig: InstanceTwoFactorEnforcementStoredConfig = parsedSetting?.success

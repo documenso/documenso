@@ -474,7 +474,6 @@ describe('evaluateInstanceTwoFactorEnforcementUpdate', () => {
 
   const storedDisabled = { enabled: false, gracePeriodDays: 7, enforcedFrom: null };
 
-  // Enabled with an active grace window: enforcedFrom 1 day ago + 30 days.
   const storedEnabledActiveGrace = {
     enabled: true,
     gracePeriodDays: 30,
@@ -535,8 +534,7 @@ describe('evaluateInstanceTwoFactorEnforcementUpdate', () => {
         stored: storedEnabledActiveGrace,
         update: { enabled: false, gracePeriodDays: storedEnabledActiveGrace.gracePeriodDays },
         isLicensed: false,
-        // Even an unenrolled admin may disable — walking the policy back must
-        // never be gated on satisfying it.
+        // Walking the policy back must never be gated on satisfying it.
         actor: unsatisfiedActor,
         now,
       });

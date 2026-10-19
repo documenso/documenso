@@ -15,7 +15,6 @@ export const createOrganisationRoute = authenticatedProcedure
   // .meta(createOrganisationMeta)
   .input(ZCreateOrganisationRequestSchema)
   .output(ZCreateOrganisationResponseSchema)
-  // 2FA enforcement: creates a brand-new organisation; there is no existing organisation scope to enforce. Instance assert still applies.
   .use(twoFactorInstanceOnly())
   .mutation(async ({ input, ctx }) => {
     const { name, priceId } = input;

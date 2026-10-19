@@ -43,8 +43,7 @@ route.get(
 
     let userId = session.user?.id;
 
-    // Presign-token access (embedding) is machine access and exempt from 2FA
-    // enforcement; the assert below only applies to session auth.
+    // Presign-token (machine) access is exempt from 2FA enforcement.
     const isPresignTokenAccess = Boolean(presignToken);
 
     // Check presignToken if provided
@@ -89,8 +88,6 @@ route.get(
       return c.json({ error: 'Not found' }, 404);
     }
 
-    // 2FA enforcement (session auth only): instance assert + the owning
-    // organisation's policy for the envelope being accessed.
     if (!isPresignTokenAccess && session.user && session.session) {
       try {
         await assertTwoFactorEnforcementForSession({

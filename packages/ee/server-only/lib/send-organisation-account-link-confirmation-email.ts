@@ -69,8 +69,6 @@ export const sendOrganisationAccountLinkConfirmationEmail = async ({
         type,
         userId,
         organisationId,
-        // The address this confirmation is being sent to — asserted unchanged
-        // at confirmation time.
         email: user.email,
         oauthConfig,
       } satisfies TOrganisationAccountLinkMetadata,

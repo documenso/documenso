@@ -137,8 +137,7 @@ export default function AuthoringLayout() {
     teams: [team],
     subscription: null,
     currentOrganisationRole: OrganisationMemberRole.MEMBER,
-    // Hardcoded non-enforcing status: embed authoring is presign-token
-    // authorized (machine access), which is exempt from 2FA enforcement.
+    // Presign-token (machine) access is exempt from 2FA enforcement.
     twoFactorEnforcement: { required: false },
   };
 

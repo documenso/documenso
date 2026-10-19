@@ -11,10 +11,8 @@ type EnableTwoFactorAuthenticationOptions = {
   code: string;
 
   /**
-   * The session the enable request arrived on. A valid enable code proves
-   * possession of the second factor, so this session is marked
-   * `twoFactorVerified`. Other sessions of the same user intentionally stay
-   * unverified — they must re-login to verify.
+   * Marked `twoFactorVerified` on success. Other sessions of the same user
+   * intentionally stay unverified and must re-login.
    */
   sessionId: string;
 
@@ -44,10 +42,9 @@ export const enableTwoFactorAuthentication = async ({
   let recoveryCodes: string[] = [];
 
   await prisma.$transaction(async (tx) => {
-    // Conditional update: the write itself asserts 2FA is still disabled AND
-    // the stored secret is the one the code was just verified against, so a
-    // concurrent enable or setup-time secret rotation loses the race cleanly
-    // instead of enabling 2FA with an unverified secret.
+    // The write asserts the stored secret is the one the code was verified
+    // against, so a concurrent setup-time secret rotation cannot enable 2FA with
+    // an unverified secret.
     const { count } = await tx.user.updateMany({
       where: {
         id: user.id,
@@ -83,9 +80,6 @@ export const enableTwoFactorAuthentication = async ({
       throw new AppError('MISSING_BACKUP_CODE');
     }
 
-    // `updateMany` so a session that expired mid-request is a noop rather
-    // than a thrown P2025. The user filter guards against marking a session
-    // that does not belong to this user.
     await tx.session.updateMany({
       where: {
         id: sessionId,

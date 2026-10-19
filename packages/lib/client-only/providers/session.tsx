@@ -15,11 +15,6 @@ export type AppSession = {
   user: SessionUser;
   organisations: TGetOrganisationSessionResponse;
 
-  /**
-   * Instance-wide 2FA enforcement status for the current user + session,
-   * computed server-side. Layout components read this to derive banners and
-   * the enforcement redirect client-side without extra queries.
-   */
   twoFactorEnforcement: TTwoFactorEnforcementStatus;
 };
 

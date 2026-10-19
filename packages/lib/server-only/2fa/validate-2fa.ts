@@ -12,10 +12,6 @@ type ValidateTwoFactorAuthenticationOptions = {
 
 export type TTwoFactorAuthenticationMethod = 'totp' | 'backup';
 
-/**
- * Discriminates which second factor matched so callers can treat backup codes
- * as recovery (which resets 2FA) rather than a regular sign-in factor.
- */
 export type TValidateTwoFactorAuthenticationResult =
   | { isValid: true; method: TTwoFactorAuthenticationMethod }
   | { isValid: false; method: null };

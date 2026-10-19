@@ -4,11 +4,9 @@ import { ZSiteSettingsTelemetrySchema } from '@documenso/lib/server-only/site-se
 import { z } from 'zod';
 
 /**
- * Write union for the generic site-setting update route. Deliberately
- * EXCLUDES `ZSiteSettingsTwoFactorEnforcementSchema` (which remains in the
- * read union): the 2FA enforcement setting is only writable via its dedicated
- * admin procedure, which carries the license assert, the enable-time guard
- * and the grace-reduction acknowledgement.
+ * Deliberately excludes `ZSiteSettingsTwoFactorEnforcementSchema`, which is only
+ * writable via its dedicated admin procedure (license assert, enable-time guard
+ * and grace-reduction acknowledgement).
  */
 export const ZUpdateSiteSettingRequestSchema = z.union([
   ZSiteSettingsBannerSchema,

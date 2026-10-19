@@ -22,9 +22,6 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
     const { user } = ctx;
     const { organisationId, data, acknowledgeGracePeriodReduction } = input;
 
-    // Explicitly asserted local: `ctx.session` is null for API-token callers.
-    // The assertion (rather than an annotation) avoids control-flow narrowing
-    // differences between workspace tsconfigs.
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const requestSession = ctx.session as Pick<Session, 'twoFactorVerified'> | null;
 
@@ -80,9 +77,6 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
 
     const isTouchingTwoFactorSettings = twoFactorRequired !== undefined || twoFactorGracePeriodDays !== undefined;
 
-    // Touching the 2FA enforcement fields requires the stricter
-    // MANAGE_ORGANISATION_SECURITY permission (ADMIN only). All other fields
-    // keep MANAGE_ORGANISATION.
     const requiredRoles = isTouchingTwoFactorSettings
       ? ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION_SECURITY']
       : ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'];
@@ -106,8 +100,6 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
 
     const currentSettings = organisation.organisationGlobalSettings;
 
-    // Server-side `twoFactorEnforcedFrom` handling: set on each off→on
-    // transition of the require flag, preserved otherwise.
     const isEnablingTwoFactorRequired = twoFactorRequired === true && !currentSettings.twoFactorRequired;
 
     let twoFactorEnforcedFrom: Date | undefined;
@@ -119,13 +111,10 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
         twoFactorEnforcedFrom = now;
       }
 
-      // Enable-time guard: enabling enforcement requires the acting user to
-      // already satisfy the policy being enabled. This prevents self-lockout
-      // (a 0-day grace would instantly block the actor from the very settings
-      // route that undoes it) and removes the instant-DoS lever of enabling a
-      // policy the actor themselves cannot pass. API-token callers carry no
-      // session and can never prove a verified second factor, so they cannot
-      // enable enforcement either.
+      // Enabling requires the actor to already satisfy the policy. Prevents
+      // self-lockout (a 0-day grace would instantly block the actor from the
+      // very settings route that undoes it) and removes the instant-DoS lever.
+      // API-token callers carry no session so can never enable enforcement.
       if (isEnablingTwoFactorRequired) {
         const isActingUserSatisfied = isTwoFactorSatisfied({
           userTwoFactorEnabled: user.twoFactorEnabled,
@@ -141,8 +130,6 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
         }
       }
 
-      // Grace-reduction acknowledgement: when the change shortens an active
-      // grace window, require an explicit acknowledgement from the client.
       const nextTwoFactorRequired = twoFactorRequired ?? currentSettings.twoFactorRequired;
       const nextGracePeriodDays = twoFactorGracePeriodDays ?? currentSettings.twoFactorGracePeriodDays;
       const nextEnforcedFrom = twoFactorEnforcedFrom ?? currentSettings.twoFactorEnforcedFrom;
@@ -275,8 +262,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             // AI features settings.
             aiFeaturesEnabled,
 
-            // 2FA enforcement settings. `twoFactorEnforcedFrom` is only set
-            // on an off→on transition (undefined preserves the stored value).
+            // 2FA enforcement settings.
             twoFactorRequired,
             twoFactorGracePeriodDays,
             twoFactorEnforcedFrom,

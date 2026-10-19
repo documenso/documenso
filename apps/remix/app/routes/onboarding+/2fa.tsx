@@ -42,10 +42,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect(`/signin?returnTo=${encodeURIComponent(`${url.pathname}${url.search}`)}`);
   }
 
-  // Auto-redirect ONLY when enforcement is already satisfied on arrival.
-  // Every other state (including "not required") renders the page — a user
-  // landing here after a backup-code recovery gets an explicit skip link
-  // instead of being bounced away.
+  // Only redirect when already satisfied. "Not required" still renders the page
+  // so a user landing here after a backup-code recovery can re-enrol or skip.
   if (
     isTwoFactorSatisfied({
       userTwoFactorEnabled: session.user.twoFactorEnabled,
@@ -84,12 +82,10 @@ export default function OnboardingTwoFactorPage() {
   const navigate = useNavigate();
   const { revalidate } = useRevalidator();
 
-  // The whole page renders from the loader snapshot + local state, never from
-  // the live session context. The session provider refreshes in the
-  // background (and `twoFactorEnabled` flips the moment 2FA is enabled), but
-  // navigation is controlled exclusively by this page's state machine —
-  // recovery codes are shown exactly once and must stay on screen until the
-  // user explicitly acknowledges saving them.
+  // Renders from the loader snapshot, never the live session context: the
+  // session provider flips `twoFactorEnabled` the moment 2FA is enabled, but the
+  // recovery codes are shown exactly once and must stay on screen until
+  // acknowledged.
   const [setupData, setSetupData] = useState<{ uri: string; secret: string } | null>(null);
   const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
   const [hasSetupFailed, setHasSetupFailed] = useState(false);
@@ -99,9 +95,8 @@ export default function OnboardingTwoFactorPage() {
   const isBlocked = twoFactorEnforcement.required && twoFactorEnforcement.isBlocked;
   const canSkip = !isBlocked;
 
-  // State (b): enrolled, but this session was created before 2FA was enabled
-  // so it never passed a second factor. Setup would rightly refuse
-  // (already enabled), so the only remediation is a fresh sign-in.
+  // Enrolled but this session never passed a second factor, so setup would
+  // refuse and the only remediation is a fresh sign-in.
   const requiresRelogin = isTwoFactorEnabled && !isSessionTwoFactorVerified;
 
   const form = useForm<TEnableTwoFactorFormSchema>({
@@ -113,9 +108,8 @@ export default function OnboardingTwoFactorPage() {
 
   const { isSubmitting: isEnabling } = form.formState;
 
-  // Enrolment goes through the auth routes (`authClient.twoFactor.*`), NOT
-  // tRPC: while the user is blocked by instance enforcement, session tRPC
-  // procedures respond 403 — the remediation page must not depend on them.
+  // Must go through the auth routes, not tRPC: session tRPC procedures respond
+  // 403 while the user is blocked by instance enforcement.
   const setupTwoFactor = async () => {
     setHasSetupFailed(false);
 
@@ -126,10 +120,8 @@ export default function OnboardingTwoFactorPage() {
     } catch (err) {
       const error = AppError.parseError(err);
 
-      // The user enrolled concurrently (e.g. in another tab). Re-run the
-      // loader instead of dead-ending on a retry that would refuse forever:
-      // it auto-redirects when this session became verified by the
-      // concurrent enable, or renders the sign-out-and-re-login prompt.
+      // Enrolled concurrently (e.g. another tab). Re-run the loader rather than
+      // dead-ending on a retry that would refuse forever.
       if (error.code === 'TWO_FACTOR_ALREADY_ENABLED') {
         await revalidate();
 
@@ -161,15 +153,12 @@ export default function OnboardingTwoFactorPage() {
     try {
       const data = await authClient.twoFactor.enable({ code: token });
 
-      // Phase one complete. Do NOT navigate — show the recovery codes and
-      // wait for the explicit acknowledgement below.
       setRecoveryCodes(data.recoveryCodes);
     } catch (err) {
       const error = AppError.parseError(err);
 
-      // Enabled concurrently (e.g. another tab) between setup and enable —
-      // the recovery codes were shown there. Re-run the loader to land on
-      // the correct state instead of claiming the code was wrong.
+      // Enabled concurrently (e.g. another tab); the recovery codes were shown
+      // there.
       if (error.code === 'TWO_FACTOR_ALREADY_ENABLED') {
         toast({
           title: _(msg`Two-factor authentication is already enabled`),
@@ -206,7 +195,6 @@ export default function OnboardingTwoFactorPage() {
     });
   };
 
-  // Phase two: only the explicit acknowledgement navigates away.
   const onRecoveryCodesAcknowledged = async () => {
     await navigate(returnTo);
   };

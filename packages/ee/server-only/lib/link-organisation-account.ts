@@ -24,9 +24,8 @@ export const linkOrganisationAccount = async ({ token, requestMeta }: LinkOrgani
     });
   }
 
-  // Read WITHOUT consuming: the token must stay retryable until membership
-  // creation succeeds. Consumption happens atomically with the membership
-  // creation below.
+  // Read without consuming: the token must stay retryable until membership
+  // creation succeeds.
   const verificationToken = await prisma.verificationToken.findFirst({
     where: {
       token,
@@ -72,15 +71,12 @@ export const linkOrganisationAccount = async ({ token, requestMeta }: LinkOrgani
 
   const user = verificationToken.user;
 
-  // Never link into (or activate membership for) a disabled account.
   if (user.disabled) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'Account is disabled',
     });
   }
 
-  // The confirmation is only valid for the email address it was sent to. An
-  // email change between token issuance and confirmation invalidates it.
   if (user.email.toLowerCase() !== tokenMetadata.data.email.toLowerCase()) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Verification token not found, used or expired',
@@ -94,9 +90,8 @@ export const linkOrganisationAccount = async ({ token, requestMeta }: LinkOrgani
 
   const { providerAccountId } = tokenMetadata.data.oauthConfig;
 
-  // Ownership conflict check: the provider subject must not already belong to
-  // a different user. `createMany skipDuplicates` below would silently skip
-  // in that case, which would confirm a link that never happened.
+  // `createMany skipDuplicates` below would silently skip a subject owned by
+  // another user, confirming a link that never happened.
   const existingProviderAccount = await prisma.account.findFirst({
     where: {
       provider: clientOptions.id,
@@ -122,12 +117,8 @@ export const linkOrganisationAccount = async ({ token, requestMeta }: LinkOrgani
 
   const isProviderAccountLinked = existingProviderAccount !== null;
 
-  // Link the provider account idempotently. `createMany` + `skipDuplicates`
-  // (unique on provider + providerAccountId) can never clobber an existing
-  // row and is safe under concurrent confirmation attempts. The account row
-  // is intentionally created WITHOUT access/ID tokens — they are never stored
-  // in the token metadata, and the portal re-authenticates against the IdP on
-  // every sign-in.
+  // Intentionally created without access/ID tokens: the portal re-authenticates
+  // against the IdP on every sign-in.
   if (!isProviderAccountLinked) {
     await prisma.$transaction(async (tx) => {
       const createdAccounts = await tx.account.createMany({
@@ -142,8 +133,7 @@ export const linkOrganisationAccount = async ({ token, requestMeta }: LinkOrgani
         skipDuplicates: true,
       });
 
-      // A concurrent confirmation created the row first — nothing to do, and
-      // the audit/verification side effects below belong to that request.
+      // A concurrent confirmation created the row first.
       if (createdAccounts.count === 0) {
         return;
       }
@@ -176,10 +166,9 @@ export const linkOrganisationAccount = async ({ token, requestMeta }: LinkOrgani
     });
   }
 
-  // Create the membership and consume the verification token ATOMICALLY. The
-  // `deleteMany` count check means a concurrent confirmation loses cleanly
-  // (no double membership, no P2025 500), while any failure before commit
-  // leaves the token intact and retryable.
+  // The `deleteMany` count check means a concurrent confirmation loses cleanly
+  // (no double membership), while any failure before commit leaves the token
+  // retryable.
   await prisma.$transaction(async (tx) => {
     const deletedTokens = await tx.verificationToken.deleteMany({
       where: {
@@ -222,8 +211,6 @@ export const linkOrganisationAccount = async ({ token, requestMeta }: LinkOrgani
     });
   });
 
-  // Best-effort notification AFTER the confirmation is committed — a failing
-  // email job must not fail (or roll back) the confirmation itself.
   if (!organisationMember) {
     try {
       await jobs.triggerJob({

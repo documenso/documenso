@@ -21,16 +21,9 @@ import { AuthenticationErrorCode } from '../errors/error-codes';
 import { getAuthSecret, sessionCookieOptions } from '../session/session-cookies';
 
 /**
- * Pending 2FA challenge plumbing for sign-in flows where the second factor
- * arrives in a later request than primary authentication (OAuth/OIDC
- * callbacks).
- *
- * The challenge is a random token stored in `VerificationToken` plus a signed
- * HttpOnly cookie carrying that token. The token is NOT a second factor — it
- * only carries "primary auth passed for user X" across the redirect, since no
- * session may exist before the TOTP/backup code is verified. Code
- * verification itself is the same `validateTwoFactorAuthentication` used by
- * the email/password flow.
+ * The challenge token is NOT a second factor, it only carries "primary auth
+ * passed for user X" across the OAuth redirect. No session may exist before the
+ * TOTP/backup code is verified.
  */
 
 const twoFactorChallengeCookieName = formatSecureCookieName('twoFactorChallenge');
@@ -47,14 +40,6 @@ export type CreateTwoFactorChallengeOptions = {
   metadata: TTwoFactorChallengeMetadata;
 };
 
-/**
- * Issue a pending 2FA challenge for a user whose primary authentication has
- * succeeded, and attach the signed challenge cookie to the response.
- *
- * The metadata is round-tripped through the strict schema so an invalid
- * redirect path or a payload carrying unexpected keys (e.g. provider tokens)
- * can never be persisted.
- */
 export const createTwoFactorChallenge = async (c: Context, options: CreateTwoFactorChallengeOptions): Promise<void> => {
   const metadata = ZTwoFactorChallengeMetadataSchema.parse(options.metadata);
 
@@ -80,13 +65,6 @@ export const clearTwoFactorChallengeCookie = (c: Context): void => {
   deleteCookie(c, twoFactorChallengeCookieName, sessionCookieOptions);
 };
 
-/**
- * Resolve the pending challenge for the current request, if any.
- *
- * Expired, exhausted, or malformed challenges are consumed and the cookie is
- * cleared — callers uniformly receive `null` and should tell the client to
- * restart sign-in.
- */
 export const getPendingTwoFactorChallenge = async (c: Context): Promise<PendingTwoFactorChallenge | null> => {
   const token = await getSignedCookie(c, getAuthSecret(), twoFactorChallengeCookieName);
 
@@ -141,19 +119,14 @@ export type RecordTwoFactorChallengeFailureOptions = {
 };
 
 /**
- * Record a failed code attempt against a pending challenge.
- *
- * Failed codes do not consume the token but atomically increment its attempt
- * counter. The rate limiter fails open on DB errors, so this counter is the
- * hard bound on guesses per challenge — once it reaches the cap the challenge
- * is consumed and sign-in must restart.
+ * The rate limiter fails open on DB errors, so this counter is the hard bound
+ * on guesses per challenge.
  */
 export const recordTwoFactorChallengeFailure = async (
   c: Context,
   { challenge, requestMetadata }: RecordTwoFactorChallengeFailureOptions,
 ): Promise<{ isExhausted: boolean }> => {
-  // Conditional increment: only counts while under the cap so the counter
-  // cannot be raced past it.
+  // Only increments while under the cap so the counter cannot be raced past it.
   const { count } = await prisma.verificationToken.updateMany({
     where: {
       id: challenge.id,
@@ -178,7 +151,6 @@ export const recordTwoFactorChallengeFailure = async (
   });
 
   if (count === 0) {
-    // Already at the cap (or deleted) via concurrent requests.
     await prisma.verificationToken.deleteMany({
       where: {
         id: challenge.id,
@@ -215,10 +187,8 @@ export const recordTwoFactorChallengeFailure = async (
 };
 
 /**
- * Consume a pending challenge on success.
- *
- * Uses `deleteMany` + count check so a concurrent replay of the same
- * challenge errors cleanly instead of surfacing a P2025 as a 500.
+ * `deleteMany` + count check so a concurrent replay of the same challenge
+ * errors cleanly instead of surfacing a P2025 as a 500.
  */
 export const consumeTwoFactorChallenge = async (tx: Prisma.TransactionClient, challengeId: number): Promise<void> => {
   const { count } = await tx.verificationToken.deleteMany({
@@ -242,12 +212,8 @@ export type ExecuteTwoFactorChallengeActionOptions = {
 };
 
 /**
- * Execute the deferred OAuth account-link action after the code verified.
- *
- * The invariant this preserves: NO account mutation happens before the second
- * factor passes. The entire link transaction the OAuth callback would have
- * run inline (account row, email-verification/password clearing, link audit
- * log) is recreated here, in the same transaction as token consumption,
+ * Invariant: no account mutation happens before the second factor passes. The
+ * link transaction the OAuth callback would have run inline is recreated here,
  * re-validating that the world has not changed since the callback.
  */
 export const executeTwoFactorChallengeAction = async (
@@ -266,7 +232,6 @@ export const executeTwoFactorChallengeAction = async (
     },
   });
 
-  // Re-validate: the target user must still exist and must not be disabled.
   if (!user || user.disabled) {
     throw new AppError(AuthenticationErrorCode.AccountDisabled, {
       message: 'Account is not eligible for linking.',
@@ -274,8 +239,7 @@ export const executeTwoFactorChallengeAction = async (
     });
   }
 
-  // Re-validate: the email must be unchanged since the OAuth callback — a
-  // changed email means the provider account may no longer belong to this
+  // A changed email means the provider account may no longer belong to this
   // user.
   if (user.email !== action.email) {
     throw new AppError(AuthenticationErrorCode.InvalidRequest, {
@@ -294,9 +258,6 @@ export const executeTwoFactorChallengeAction = async (
     },
   });
 
-  // Re-validate: the provider account must not already be linked. Linked to
-  // the same user is an idempotent no-op; linked to another user is a
-  // conflict.
   if (existingAccount) {
     if (existingAccount.userId !== user.id) {
       throw new AppError(AuthenticationErrorCode.InvalidRequest, {
@@ -308,10 +269,8 @@ export const executeTwoFactorChallengeAction = async (
     return;
   }
 
-  // The deferred account row is created WITHOUT access/ID tokens — they are
-  // intentionally never stored in challenge metadata, so they are not
-  // available here. This is deliberate: challenge metadata sits in the
-  // database on the strength of primary auth alone.
+  // Deliberately created without access/ID tokens: challenge metadata sits in
+  // the database on the strength of primary auth alone.
   await tx.account.create({
     data: {
       type: 'oauth',
@@ -330,9 +289,8 @@ export const executeTwoFactorChallengeAction = async (
     },
   });
 
-  // Mirrors the inline OAuth link path: if the user was unverified, the OAuth
-  // provider has now verified the email, and the password is removed since we
-  // cannot confirm it was set by the real owner of the email.
+  // Mirrors the inline OAuth link path: the password is removed since we cannot
+  // confirm it was set by the real owner of the email.
   if (!user.emailVerified) {
     await tx.user.update({
       where: {
@@ -346,15 +304,6 @@ export const executeTwoFactorChallengeAction = async (
   }
 };
 
-/**
- * Best-effort cleanup used by `onAuthorize`: any successful sign-in clears a
- * pending challenge cookie and deletes its token — an abandoned challenge
- * must not outlive a login via another route.
- *
- * The challenge endpoint itself consumes its own token BEFORE calling
- * `onAuthorize`, so this sweep finds nothing to delete there and only clears
- * the (already superseded) cookie.
- */
 export const sweepPendingTwoFactorChallenge = async (c: Context): Promise<void> => {
   try {
     const token = await getSignedCookie(c, getAuthSecret(), twoFactorChallengeCookieName);

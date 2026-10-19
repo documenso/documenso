@@ -181,26 +181,16 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    // A rejected sign-in must never strip 2FA, so every sign-in guard runs
-    // before the recovery reset below: the disabled check here (onAuthorize
-    // re-checks it as defence in depth) and the unverified-email guard above.
+    // A rejected sign-in must never strip 2FA, so every sign-in guard must run
+    // before the recovery reset below.
     assertUserNotDisabled(user);
 
-    // Backup codes are recovery, not sign-in: a successful backup-code
-    // sign-in atomically resets the user's 2FA configuration (conditional
-    // update — concurrent uses cannot double-spend) and the client is told to
-    // land on the re-enrolment page.
+    // Backup codes are recovery, not sign-in: using one resets the user's 2FA
+    // configuration and sends them to re-enrol.
     if (isBackupCodeRecovery) {
       await resetTwoFactorAfterBackupCodeUse({ user, requestMetadata });
     }
 
-    // The disabled check now lives inside `onAuthorize` so every sign-in path
-    // (password, passkey, OAuth, OIDC) shares the same enforcement.
-    //
-    // If 2FA is enabled we only reach this point after the inline TOTP/backup
-    // validation above has passed, so the session counts as second-factor
-    // verified. A backup code IS a second factor, so recovery sign-ins are
-    // verified too.
     await onAuthorize(
       {
         userId: user.id,
@@ -212,9 +202,6 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     return c.json(
       {
-        // Non-null when the server needs the client to land somewhere
-        // specific instead of its own redirect path. Currently only the
-        // post-recovery re-enrolment page.
         redirectPath: isBackupCodeRecovery ? '/onboarding/2fa' : null,
       },
       201,
@@ -505,7 +492,3 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     return c.text('OK', 201);
   });
-
-// Note: The duplicated `/2fa/*` endpoints previously mounted here have been
-// consolidated into the `/two-factor` route (`./two-factor.ts`), which is the
-// only set of 2FA endpoints the auth client calls.

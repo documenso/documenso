@@ -34,15 +34,6 @@ const ZTwoFactorEnforcementFormSchema = z.object({
 
 type TTwoFactorEnforcementFormSchema = z.infer<typeof ZTwoFactorEnforcementFormSchema>;
 
-/**
- * Organisation 2FA enforcement settings (require toggle + grace period).
- *
- * Rendered only for MANAGE_ORGANISATION_SECURITY holders (ADMIN). When
- * instance-wide enforcement is active the fields are shown disabled — not
- * hidden — with a banner explaining that the instance policy takes
- * precedence, so a configured organisation policy stays visible instead of
- * resurfacing already-expired later.
- */
 export const OrganisationTwoFactorEnforcementForm = () => {
   const { _, i18n } = useLingui();
   const { toast } = useToast();
@@ -73,8 +64,6 @@ export const OrganisationTwoFactorEnforcementForm = () => {
 
   const watchedValues = form.watch();
 
-  // Client-side mirror of the server's grace-reduction detection so we can
-  // surface the acknowledgement checkbox before submitting.
   const isGraceReduction =
     settings !== undefined &&
     isTwoFactorGracePeriodReduction({

@@ -30,9 +30,6 @@ import type { Route } from './+types/_layout';
  * Don't revalidate (run the loader on sequential navigations)
  *
  * Update values via providers.
- *
- * The auth gate and the instance 2FA enforcement redirect live in middleware
- * (not this loader), so they still run on every child loader fetch.
  */
 export const shouldRevalidate = () => false;
 
@@ -56,10 +53,8 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Client-side counterpart of `twoFactorEnforcementMiddleware`: a grace
-  // deadline can pass while the app is open without any server round trip. The session provider refreshes
-  // the enforcement status on navigation/focus; the timer covers a deadline
-  // crossing while the tab sits idle.
+  // A grace deadline can pass while the tab sits idle without any server round
+  // trip, so a timer covers the deadline crossing.
   const isInstanceTwoFactorBlocked = twoFactorEnforcement.required && twoFactorEnforcement.isBlocked;
 
   useEffect(() => {
@@ -77,9 +72,7 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
       return;
     }
 
-    // Within grace: fire at the deadline instant. A `null` delay means the
-    // deadline is beyond `setTimeout` range (~24.8 days) — no timer needed,
-    // the status is re-evaluated long before then.
+    // `null` means the deadline is beyond `setTimeout` range (~24.8 days).
     const timerDelay = calculateTwoFactorDeadlineTimerDelay({
       deadline: twoFactorEnforcement.deadline,
       now: new Date(),
@@ -129,22 +122,16 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
       match?.id === 'routes/_authenticated+/t.$teamUrl+/templates.$id.edit',
   );
 
-  // Per-organisation 2FA enforcement: when the current org/team context's
-  // organisation blocks the user, render a 403 screen (NOT a redirect — the
-  // rest of the app stays usable) linking to the enrolment page. Derived
-  // client-side from the session provider's bootstrap payload, which stays
-  // readable while blocked. This is UX only — the security boundary is the
-  // tRPC/Hono asserts.
+  // Org blocks render a 403 screen rather than redirecting so the rest of the
+  // app stays usable. UX only, the security boundary is the tRPC/Hono asserts.
   const isCurrentOrganisationTwoFactorBlocked =
     Boolean(orgUrl || teamUrl) &&
     Boolean(currentOrganisation?.twoFactorEnforcement.required && currentOrganisation.twoFactorEnforcement.isBlocked);
 
-  // State (b): enrolled, but this session never passed a second factor —
-  // enrolment would rightly refuse, so the remediation is a fresh sign-in.
+  // Enrolled but this session never passed a second factor, so enrolment would
+  // refuse and the only remediation is a fresh sign-in.
   const requiresRelogin = user.twoFactorEnabled && !session.twoFactorVerified;
 
-  // Instance enforcement takes precedence over the org 403 below: render
-  // nothing while the effect above navigates to forced enrolment.
   if (isInstanceTwoFactorBlocked) {
     return null;
   }

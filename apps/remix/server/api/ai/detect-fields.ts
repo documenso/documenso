@@ -42,8 +42,6 @@ export const detectFieldsRoute = new Hono<HonoEnv>().post(
         });
       }
 
-      // 2FA enforcement: session-authenticated endpoint — instance assert +
-      // the owning organisation's policy for the envelope's team.
       await assertTwoFactorEnforcementForSession({
         user: session.user,
         session: session.session,

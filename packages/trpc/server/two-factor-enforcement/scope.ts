@@ -1,33 +1,10 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 
-/**
- * Pure (I/O free) building blocks for the inline (`.use()`-based) 2FA
- * enforcement path: the scope descriptor a route-level resolver returns, the
- * sentinels for the non-resource outcomes, the normalizer that maps a
- * resolver result onto the shared resource-resolution machinery, and the
- * request budget caps.
- *
- * Everything here is unit-testable without a database.
- */
-
-/**
- * Maximum number of IDs a single bulk array may contain before the request is
- * rejected (not truncated).
- */
 export const TWO_FACTOR_ENFORCEMENT_MAX_BULK_IDS = 100;
 
-/**
- * Maximum number of cumulative unique organisation scopes a single request
- * (including batched tRPC calls) may resolve before being rejected.
- */
+// Cumulative across batched tRPC calls within a single request.
 export const TWO_FACTOR_ENFORCEMENT_MAX_UNIQUE_SCOPES = 200;
 
-/**
- * The resource-ID sets consumed by the shared organisation resolution
- * machinery (`./resolution.ts`). Each variant maps to a single
- * membership-qualified batch lookup resolving the IDs to their owning
- * organisation(s).
- */
 export type TwoFactorEnforcementResourceIds =
   | { kind: 'organisation'; organisationIds: string[] }
   | { kind: 'organisationReference'; references: string[] }
@@ -47,10 +24,6 @@ export type TwoFactorEnforcementResourceIds =
   | { kind: 'organisationEmail'; emailIds: string[] }
   | { kind: 'organisationEmailDomain'; emailDomainIds: string[] };
 
-/**
- * Tracks the cumulative number of unique organisation scopes resolved within
- * a single request and rejects when the budget is exceeded.
- */
 export const assertScopeBudget = (uniqueScopeCount: number): void => {
   if (uniqueScopeCount > TWO_FACTOR_ENFORCEMENT_MAX_UNIQUE_SCOPES) {
     throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -61,31 +34,20 @@ export const assertScopeBudget = (uniqueScopeCount: number): void => {
 };
 
 /**
- * Sentinel: the call is token-authorized — authorization derives from a token
- * in the input and the session cookie is incidental, so BOTH the instance and
- * organisation asserts are skipped (an instance-blocked user must still be
- * able to open someone else's signing link while signed in).
+ * Token-authorized call, skip both asserts: an instance-blocked user must still
+ * be able to open someone else's signing link while signed in.
  */
 export const TWO_FACTOR_SKIP = Symbol('TWO_FACTOR_SKIP');
 
 /**
- * Sentinel: the procedure operates in the team context derived from
- * `ctx.teamId` (the `x-team-id` header). When no team header is present the
- * procedure is treated as a cross-organisation query and every organisation
- * the user belongs to is in scope (conservative).
+ * Scope to `ctx.teamId`. Without a team header every organisation the user
+ * belongs to is in scope.
  */
 export const TWO_FACTOR_CTX_TEAM = Symbol('TWO_FACTOR_CTX_TEAM');
 
 /**
- * Organisation scope declared as a function of the parsed input. Each key is
- * a resource kind, each value the ID (or IDs) whose owning organisation(s)
- * are in scope for the request.
- *
- * An empty descriptor (`{}`) means "no organisation scope" — the instance
- * assert still applies.
- *
- * The reference kinds (`organisationReference` / `teamReference`) accept an
- * ID or a URL slug and resolve via a membership-qualified OR lookup.
+ * `{}` means no organisation scope, the instance assert still applies. The
+ * reference kinds accept either an ID or a URL slug.
  */
 export type TwoFactorScopeDescriptor = {
   organisation?: string | string[];
@@ -126,10 +88,6 @@ const toArray = <T>(value: T | T[] | undefined): T[] => {
   return Array.isArray(value) ? value : [value];
 };
 
-/**
- * The bulk cap applied to the already-parsed IDs a resolver returns. Rejects
- * rather than truncates.
- */
 const assertBulkCap = (ids: unknown[]): void => {
   if (ids.length > TWO_FACTOR_ENFORCEMENT_MAX_BULK_IDS) {
     throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -140,9 +98,6 @@ const assertBulkCap = (ids: unknown[]): void => {
 };
 
 /**
- * Normalizes a resolver result into either a sentinel outcome or the
- * resource-ID sets consumed by the shared organisation resolution machinery.
- *
  * Descriptors are merged per kind so a multi-descriptor result still resolves
  * with a single batch query per resource kind.
  */

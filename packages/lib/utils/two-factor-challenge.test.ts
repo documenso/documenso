@@ -104,8 +104,6 @@ describe('ZTwoFactorChallengeMetadataSchema', () => {
   });
 });
 
-// The `>=` boundary matters: an off-by-one here would grant one extra guess
-// per challenge (or one extra valid moment past expiry).
 describe('challenge consumption boundaries', () => {
   it('consumes the challenge at exactly the maximum attempts, not before', () => {
     expect(shouldConsumeChallengeAfterFailure(TWO_FACTOR_CHALLENGE_MAX_ATTEMPTS - 1)).toBe(false);

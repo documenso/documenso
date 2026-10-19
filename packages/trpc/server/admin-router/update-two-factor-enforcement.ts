@@ -11,29 +11,12 @@ import {
   ZUpdateTwoFactorEnforcementResponseSchema,
 } from './update-two-factor-enforcement.types';
 
-/**
- * Dedicated write route for the `site.two-factor-enforcement` setting. The
- * generic `admin.updateSiteSetting` deliberately excludes this setting from
- * its write union — this route carries the license assert, the enable-time
- * guard and the grace-reduction acknowledgement.
- *
- * The full policy decision (license gate incl. the unlicensed disable-only
- * exception, enable-time guard, grace-reduction acknowledgement, server-side
- * `enforcedFrom` reset on off→on) lives in the pure
- * `evaluateInstanceTwoFactorEnforcementUpdate` helper so it is unit-testable.
- *
- * 2FA enforcement metadata: inherits `'none'` from the admin base — admin
- * procedures carry no organisation scope, while the INSTANCE assert still
- * applies via `adminMiddleware`.
- */
 export const updateTwoFactorEnforcementRoute = adminProcedure
   .input(ZUpdateTwoFactorEnforcementRequestSchema)
   .output(ZUpdateTwoFactorEnforcementResponseSchema)
   .mutation(async ({ ctx, input }) => {
     const { enabled, gracePeriodDays, acknowledgeGracePeriodReduction } = input;
 
-    // Explicitly asserted local, mirroring `update-organisation-settings`:
-    // avoids control-flow narrowing differences between workspace tsconfigs.
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const requestSession = ctx.session as Pick<Session, 'twoFactorVerified'> | null;
 

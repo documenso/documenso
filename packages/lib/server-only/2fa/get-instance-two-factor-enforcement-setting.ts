@@ -9,16 +9,8 @@ import {
 } from '../site-settings/schemas/two-factor-enforcement';
 
 /**
- * Returns the instance-wide 2FA enforcement setting, or `null` when
- * enforcement is not active.
- *
- * Enforcement is only active when the `site.two-factor-enforcement` row
- * exists, parses, is enabled, AND the license grants
- * `instanceTwoFactorEnforcement` — a manually inserted row on an unlicensed
- * instance is a silent noop.
- *
- * Enforcement code must read only this getter. Admin settings UI which needs
- * the raw "configured but inactive" values uses its own config getter.
+ * Returns `null` unless the setting is enabled AND licensed, so a manually
+ * inserted row on an unlicensed instance is a silent noop.
  */
 export const getInstanceTwoFactorEnforcementSetting =
   async (): Promise<TSiteSettingsTwoFactorEnforcementSchema | null> => {
@@ -32,8 +24,7 @@ export const getInstanceTwoFactorEnforcementSetting =
       return null;
     }
 
-    // A malformed row is treated as unconfigured rather than throwing, so a
-    // bad manual insert cannot break every enforcement check.
+    // A malformed row must not break every enforcement check.
     const parsedSetting = ZSiteSettingsTwoFactorEnforcementSchema.safeParse(settingRow);
 
     if (!parsedSetting.success) {

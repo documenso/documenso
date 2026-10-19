@@ -30,7 +30,6 @@ type TEmailPasswordSignin = InferRequestType<AuthClientType['email-password']['a
   redirectPath?: string;
 };
 
-// `redirectPath` is part of the request schema and validated server-side.
 type TPasskeySignin = InferRequestType<AuthClientType['passkey']['authorize']['$post']>['json'];
 
 type TEmbedAuthStart = InferRequestType<AuthClientType['embed']['start']['$post']>['json'];
@@ -161,10 +160,8 @@ export class AuthClient {
 
       const result = await response.json();
 
-      // The server overrides the redirect when the sign-in requires a
-      // follow-up page, e.g. a backup-code sign-in resets 2FA and lands on
-      // the re-enrolment page. The caller's redirect path is preserved as
-      // `returnTo` (validated by the target page before use).
+      // Server-provided redirect for follow-up pages, e.g. re-enrolment after a
+      // backup-code sign-in reset 2FA.
       if (result.redirectPath) {
         const returnTo = data.redirectPath ? `?returnTo=${encodeURIComponent(data.redirectPath)}` : '';
 
@@ -287,10 +284,6 @@ export class AuthClient {
       return response.json();
     },
 
-    /**
-     * Check whether a pending 2FA challenge exists for this browser, so the
-     * /2fa-challenge page can bounce back to sign-in when there is none.
-     */
     getChallenge: async () => {
       const response = await this.client['two-factor'].challenge.$get();
 
@@ -303,11 +296,6 @@ export class AuthClient {
       return response.json();
     },
 
-    /**
-     * Verify the second factor for a pending 2FA challenge. Fetches a fresh
-     * CSRF token first since the challenge page is reached via a 302
-     * redirect, not the sign-in form.
-     */
     verifyChallenge: async (data: Omit<TVerifyTwoFactorChallengeRequestSchema, 'csrfToken'>) => {
       const { csrfToken } = await this.client.csrf.$get().then(async (res) => res.json());
 
@@ -326,9 +314,6 @@ export class AuthClient {
 
       const result = await response.json();
 
-      // The server returns the validated redirect path stored when the
-      // challenge was created (or the re-enrolment page after a backup-code
-      // recovery). Navigation goes through the same-origin redirect helper.
       handleSignInRedirect(result.redirectPath);
     },
   };
@@ -345,8 +330,6 @@ export class AuthClient {
 
       const result = await response.json();
 
-      // The server validates the requested redirect path and echoes back a
-      // safe same-origin path (falling back to `/`).
       handleSignInRedirect(result.url);
     },
   };

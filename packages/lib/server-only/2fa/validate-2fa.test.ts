@@ -6,10 +6,8 @@ import { describe, expect, it } from 'vitest';
 import { AppError } from '../../errors/app-error';
 import { symmetricEncrypt } from '../../universal/crypto';
 
-// `DOCUMENSO_ENCRYPTION_KEY` is captured at module load, so the env var must
-// be set before `validate-2fa` (via `verify-2fa-token`/`verify-backup-code`)
-// is imported. This is real environment configuration, not a mock — the code
-// under test performs no I/O.
+// `DOCUMENSO_ENCRYPTION_KEY` is captured at module load, so this must be set
+// before `validate-2fa` is imported.
 process.env.NEXT_PRIVATE_ENCRYPTION_KEY ??= 'test-encryption-key';
 
 const ENCRYPTION_KEY = process.env.NEXT_PRIVATE_ENCRYPTION_KEY ?? 'test-encryption-key';

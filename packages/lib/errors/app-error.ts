@@ -30,10 +30,6 @@ export enum AppErrorCode {
   NO_PASSWORD = 'NO_PASSWORD',
   INCORRECT_PASSWORD = 'INCORRECT_PASSWORD',
   SAME_PASSWORD = 'SAME_PASSWORD',
-  /**
-   * The user is blocked by 2FA enforcement (instance-wide or per-organisation)
-   * and must enrol/verify a second factor before accessing the resource.
-   */
   TWO_FACTOR_REQUIRED = 'TWO_FACTOR_REQUIRED',
   WEBHOOK_INVALID_REQUEST = 'WEBHOOK_INVALID_REQUEST',
   ENVELOPE_DRAFT = 'ENVELOPE_DRAFT',
@@ -125,8 +121,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.SCHEMA_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
   [AppErrorCode.TOO_MANY_REQUESTS]: { code: 'TOO_MANY_REQUESTS', status: 429 },
   [AppErrorCode.TWO_FACTOR_AUTH_FAILED]: { code: 'UNAUTHORIZED', status: 401 },
-  // 403, not 401: the session is valid — the account is forbidden from the
-  // resource until 2FA enforcement is satisfied.
+  // 403, not 401: the session itself is valid.
   [AppErrorCode.TWO_FACTOR_REQUIRED]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.ENVELOPE_DRAFT]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_COMPLETED]: { code: 'BAD_REQUEST', status: 400 },

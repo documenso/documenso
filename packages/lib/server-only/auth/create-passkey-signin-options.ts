@@ -13,15 +13,9 @@ export const createPasskeySigninOptions = async ({ sessionId }: CreatePasskeySig
 
   const options = await generateAuthenticationOptions({
     rpID: rpId,
-    // A passkey sign-in counts as a trusted second factor (the session is
-    // created `twoFactorVerified: true`), so user verification (PIN or
-    // biometric) is mandatory — possession of the authenticator alone is a
-    // single factor.
-    //
-    // Release note: authenticators that cannot perform user verification
-    // (e.g. some older U2F-style security keys) can no longer be used to sign
-    // in; affected users should sign in via another method and register a
-    // UV-capable passkey.
+    // A passkey sign-in creates a `twoFactorVerified` session, so user
+    // verification (PIN/biometric) is mandatory. Possession alone is a single
+    // factor.
     userVerification: 'required',
     timeout,
   });

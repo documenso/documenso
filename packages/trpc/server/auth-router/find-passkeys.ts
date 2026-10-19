@@ -8,7 +8,6 @@ export const findPasskeysRoute = authenticatedProcedure
   .meta({ allowEmbedSession: true })
   .input(ZFindPasskeysRequestSchema)
   .output(ZFindPasskeysResponseSchema)
-  // 2FA enforcement: user-level passkey credential management; no organisation scope. Instance assert still applies.
   .use(twoFactorInstanceOnly())
   .query(async ({ input, ctx }) => {
     const { page, perPage, orderBy } = input;

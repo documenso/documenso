@@ -105,8 +105,6 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
 
   // Directly log in user if account already exists.
   if (existingAccount) {
-    // A 2FA-enabled user must pass a TOTP/backup challenge before any session
-    // exists — primary (OAuth) auth alone only earns a pending challenge.
     if (existingAccount.user.twoFactorEnabled) {
       await createTwoFactorChallenge(c, {
         userId: existingAccount.user.id,
@@ -137,13 +135,9 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
 
   // Handle existing user but no account.
   if (userWithSameEmail) {
-    // Deferred account linking: when the target user has 2FA enabled, NO
-    // account mutation may happen before the code verifies. The entire link
-    // transaction below is deferred into the challenge metadata `action` and
-    // executed atomically with token consumption after the code passes.
-    //
-    // Access/ID tokens are intentionally NOT stored in the metadata — the
-    // deferred account row is created without them.
+    // No account mutation may happen before the second factor verifies, so the
+    // link is deferred into the challenge metadata and executed on verification.
+    // Access/ID tokens are intentionally not stored in the metadata.
     if (userWithSameEmail.twoFactorEnabled) {
       await createTwoFactorChallenge(c, {
         userId: userWithSameEmail.id,

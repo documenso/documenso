@@ -71,9 +71,7 @@ export const teamRouter = router({
   // Todo: Refactor into routes.
   email: {
     get: authenticatedProcedure
-      // 2FA enforcement: 'none' — looks up the team email record keyed by the
-      // caller's own email address; no organisation resource identifier is
-      // present. The instance assert still applies.
+      // Keyed by the caller's own email, no organisation identifier is present.
       .use(twoFactorInstanceOnly())
       .query(async ({ ctx }) => {
         const teamEmail = await prisma.teamEmail.findUnique({

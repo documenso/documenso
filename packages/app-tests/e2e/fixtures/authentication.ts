@@ -12,10 +12,6 @@ type LoginOptions = {
   email?: string;
   password?: string;
 
-  /**
-   * TOTP code for accounts with 2FA enabled. Sign-ins that pass a valid code
-   * create a session with `twoFactorVerified: true`.
-   */
   totpCode?: string;
 
   /**

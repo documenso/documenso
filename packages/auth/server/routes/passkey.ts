@@ -105,11 +105,8 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
       expectedChallenge: challengeToken.token,
       expectedOrigin: origin,
       expectedRPID: rpId,
-      // The library defaults this to true — stated explicitly because the
-      // resulting session counts as second-factor verified, which is only
-      // sound if the authenticator performed user verification (PIN or
-      // biometric). See the matching `userVerification: 'required'` in
-      // `create-passkey-signin-options.ts`.
+      // The resulting session counts as second-factor verified, which is only
+      // sound if the authenticator performed user verification (PIN/biometric).
       requireUserVerification: true,
       credential: {
         id: isoBase64URL.fromBuffer(passkey.credentialId),
@@ -141,12 +138,8 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
       },
     });
 
-    // A passkey is a trusted second factor (user verification enforced
-    // above), so the session counts as second-factor verified.
     await onAuthorize({ userId: user.id, authMethod: 'passkey', twoFactorVerified: true }, c);
 
-    // Honor the client's redirect path only when it is a valid same-origin
-    // path.
     const url = isValidReturnTo(redirectPath) ? (normalizeReturnTo(redirectPath) ?? '/') : '/';
 
     return c.json(

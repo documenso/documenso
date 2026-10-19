@@ -2,10 +2,8 @@ import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import { Outlet } from 'react-router';
 
 /**
- * Onboarding routes require a session (each route's own loader asserts it)
- * but deliberately live OUTSIDE the `_authenticated+` layout: that layout is
- * the UX chokepoint for 2FA enforcement redirects, and remediation pages such
- * as `/onboarding/2fa` must be exempt from it or the redirect would loop.
+ * Deliberately outside the `_authenticated+` layout: `/onboarding/2fa` is the
+ * target of that layout's 2FA enforcement redirect and would otherwise loop.
  */
 export default function Layout() {
   return (

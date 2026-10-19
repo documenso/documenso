@@ -10,7 +10,7 @@ import {
 export const acceptOrganisationMemberInviteRoute = maybeAuthenticatedProcedure
   .input(ZAcceptOrganisationMemberInviteRequestSchema)
   .output(ZAcceptOrganisationMemberInviteResponseSchema)
-  // 2FA enforcement: REMEDIATION — joining is never blocked, access is; a blocked user must be able to accept an invite (org grace starts at join). Instance assert still applies.
+  // Joining is never blocked, only access is.
   .use(twoFactorRemediation())
   .mutation(async ({ input }) => {
     const { token } = input;

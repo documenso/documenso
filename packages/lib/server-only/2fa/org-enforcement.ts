@@ -10,10 +10,6 @@ export type EnforcementUser = Pick<User, 'id' | 'twoFactorEnabled' | 'twoFactorG
 
 export type EnforcementSession = Pick<Session, 'twoFactorVerified'> | null;
 
-/**
- * The minimal data required to evaluate a user's 2FA enforcement status for a
- * single organisation.
- */
 export type OrganisationTwoFactorScope = {
   organisationId: string;
   memberCreatedAt: Date;
@@ -22,21 +18,15 @@ export type OrganisationTwoFactorScope = {
 
 export type LoadOrganisationTwoFactorScopesOptions = {
   userId: number;
-
   /**
-   * The organisations to load. `undefined` loads every organisation the user
-   * is a member of (used for cross-organisation queries where the data scope
-   * is "all my organisations").
+   * `undefined` loads every organisation the user is a member of.
    */
   organisationIds?: string[];
 };
 
 /**
- * Membership-qualified lookup of the per-organisation 2FA enforcement inputs.
- *
- * Organisations the user is not a member of are silently dropped — the
- * underlying handler's own authorization will reject those anyway, and
- * enforcement only applies to organisations the user can actually access.
+ * Organisations the user is not a member of are silently dropped; the handler's
+ * own authorization rejects those anyway.
  */
 export const loadOrganisationTwoFactorScopes = async (
   options: LoadOrganisationTwoFactorScopesOptions,
@@ -80,7 +70,6 @@ export const loadOrganisationTwoFactorScopes = async (
   return organisations.flatMap((organisation) => {
     const [member] = organisation.members;
 
-    // Defensive: the membership filter above guarantees a member row exists.
     if (!member) {
       return [];
     }
@@ -110,10 +99,6 @@ export type AssertOrganisationScopesTwoFactorEnforcementOptions = {
   now?: Date;
 };
 
-/**
- * Throws `AppError(TWO_FACTOR_REQUIRED)` when the user is blocked by ANY of
- * the provided organisation scopes.
- */
 export const assertOrganisationScopesTwoFactorEnforcement = (
   options: AssertOrganisationScopesTwoFactorEnforcementOptions,
 ): void => {
@@ -140,29 +125,16 @@ export type AssertTwoFactorEnforcementForSessionOptions = {
   session: EnforcementSession;
 
   /**
-   * Organisations whose enforcement policy applies to this request.
    * `undefined` skips the organisation assert entirely (instance assert only).
    */
   organisationIds?: string[];
 };
 
-/**
- * Shared 2FA enforcement assert for session-authenticated endpoints outside
- * of tRPC (e.g. the Hono file/AI routes).
- *
- * - Satisfied users (enrolled + verified session) can never be blocked at
- *   either level, so they early-out without any queries.
- * - Instance enforcement blocks everything for the user.
- * - Organisation enforcement blocks when any of the provided organisations'
- *   policies block the user.
- */
 export const assertTwoFactorEnforcementForSession = async (
   options: AssertTwoFactorEnforcementForSessionOptions,
 ): Promise<void> => {
   const { user, session, organisationIds } = options;
 
-  // Cheap early-out: a satisfied user cannot be blocked by instance or
-  // organisation enforcement (isBlocked requires !isSatisfied).
   if (
     isTwoFactorSatisfied({
       userTwoFactorEnabled: user.twoFactorEnabled,

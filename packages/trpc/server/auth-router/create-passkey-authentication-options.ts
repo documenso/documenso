@@ -11,7 +11,6 @@ export const createPasskeyAuthenticationOptionsRoute = authenticatedProcedure
   .meta({ allowEmbedSession: true })
   .input(ZCreatePasskeyAuthenticationOptionsRequestSchema)
   .output(ZCreatePasskeyAuthenticationOptionsResponseSchema)
-  // 2FA enforcement: user-level passkey credential management; no organisation scope. Instance assert still applies.
   .use(twoFactorInstanceOnly())
   .mutation(async ({ ctx, input }) => {
     return await createPasskeyAuthenticationOptions({

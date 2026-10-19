@@ -24,9 +24,8 @@ export const disableTwoFactorAuthentication = async ({
     throw new AppError(AppErrorCode.INVALID_REQUEST);
   }
 
-  // Disabling always breaks enforcement satisfaction (a passkey sign-in never
-  // substitutes for enrolment), so while instance-wide enforcement is active
-  // disabling is a straight path to being blocked — refuse it outright.
+  // Disabling under active instance enforcement is a straight path to being
+  // blocked, so refuse it outright.
   const instanceEnforcementSetting = await getInstanceTwoFactorEnforcementSetting();
 
   if (instanceEnforcementSetting !== null) {
@@ -42,9 +41,8 @@ export const disableTwoFactorAuthentication = async ({
     throw new AppError(AppErrorCode.INCORRECT_TWO_FACTOR_CODE);
   }
 
-  // Org-only enforcement allows the disable (the rest of the app stays
-  // usable) but the caller should warn that org/team context access blocks at
-  // the org deadline — immediately if it is already past.
+  // Org-only enforcement allows the disable since the rest of the app stays
+  // usable, but the caller should warn.
   const orgEnforcementCount = await prisma.organisationMember.count({
     where: {
       userId: user.id,

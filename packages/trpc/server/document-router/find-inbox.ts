@@ -11,7 +11,8 @@ import { type TInboxStatus, ZFindInboxRequestSchema, ZFindInboxResponseSchema } 
 export const findInboxRoute = authenticatedProcedure
   .input(ZFindInboxRequestSchema)
   .output(ZFindInboxResponseSchema)
-  // 2FA enforcement: recipient-perspective inbox (documents where the user is a signer); signing access is token-authorized by design, not organisation-member access. Instance assert still applies.
+  // Recipient perspective: signing access is token-authorized, not organisation
+  // membership.
   .use(twoFactorInstanceOnly())
   .query(async ({ input, ctx }) => {
     const { page, perPage, query, status } = input;

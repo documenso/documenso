@@ -9,10 +9,7 @@ export const ZSiteSettingsTwoFactorEnforcementSchema = ZSiteSettingsBaseSchema.e
   data: z
     .object({
       gracePeriodDays: z.number().int().min(0).max(365),
-      /**
-       * Set server-side on each off→on transition of `enabled`, preserved
-       * otherwise. ISO datetime string, or null when never enabled.
-       */
+      // Set server-side on each off→on transition of `enabled`.
       enforcedFrom: z.string().datetime().nullable(),
     })
     .optional()

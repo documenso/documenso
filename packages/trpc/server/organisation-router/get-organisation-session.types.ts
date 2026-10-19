@@ -5,11 +5,6 @@ import { TeamEmailSchema } from '@documenso/prisma/generated/zod/modelSchema/Tea
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { z } from 'zod';
 
-/**
- * The shared 2FA enforcement status shape (`TTwoFactorEnforcementStatus` from
- * `@documenso/lib/utils/two-factor`) expressed as a zod schema so it can ride
- * along in the organisation session output.
- */
 export const ZTwoFactorEnforcementStatusSchema = z.union([
   z.object({
     required: z.literal(false),
@@ -43,11 +38,6 @@ export const ZGetOrganisationSessionResponseSchema = ZOrganisationSchema.extend(
   subscription: SubscriptionSchema.nullable(),
   currentOrganisationRole: z.nativeEnum(OrganisationMemberRole),
 
-  /**
-   * Per-organisation 2FA enforcement status for the current user + session,
-   * computed server-side. Client layouts derive the org 403 screen and grace
-   * banner from this without extra queries.
-   */
   twoFactorEnforcement: ZTwoFactorEnforcementStatusSchema,
 }).array();
 
