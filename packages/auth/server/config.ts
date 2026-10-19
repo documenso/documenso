@@ -6,6 +6,10 @@ import { env } from '@documenso/lib/utils/env';
  */
 export const AUTH_SESSION_LIFETIME = 1000 * 60 * 60 * 24 * 30; // 30 days.
 
+// Short and non-sliding: embed sessions live in a third-party partition outside
+// the user's normal sign-out path and only need to outlast a signing session.
+export const AUTH_EMBED_SESSION_LIFETIME = 1000 * 60 * 60 * 12; // 12 hours.
+
 export type OAuthClientOptions = {
   id: string;
   scope: string[];

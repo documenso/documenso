@@ -31,6 +31,8 @@ type FilterPillCommonProps = {
   enableSearch?: boolean;
   searchPlaceholder?: string;
   loading?: boolean;
+  /** Whether the selection can be removed. Defaults to true. */
+  clearable?: boolean;
   testId?: string;
 };
 
@@ -61,7 +63,7 @@ export type FilterPillProps = FilterPillSingleProps | FilterPillMultipleProps;
  * selections followed by a "+N more" chip.
  */
 export const FilterPill = (props: FilterPillProps) => {
-  const { icon: Icon, label, options, enableSearch, searchPlaceholder, loading, testId } = props;
+  const { icon: Icon, label, options, enableSearch, searchPlaceholder, loading, clearable = true, testId } = props;
 
   const [open, setOpen] = useState(false);
 
@@ -84,7 +86,7 @@ export const FilterPill = (props: FilterPillProps) => {
       return;
     }
 
-    props.onChange(nextValue === props.value ? null : nextValue);
+    props.onChange(nextValue === props.value && clearable ? null : nextValue);
     setOpen(false);
   };
 
@@ -168,7 +170,7 @@ export const FilterPill = (props: FilterPillProps) => {
               ))}
             </CommandGroup>
 
-            {hasSelection && (
+            {hasSelection && clearable && (
               <>
                 <CommandSeparator />
                 <CommandGroup>

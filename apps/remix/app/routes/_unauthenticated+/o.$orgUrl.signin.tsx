@@ -44,7 +44,10 @@ export function ErrorBoundary() {
 }
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { isAuthenticated, user } = await getOptionalSession(request);
+  const { session, user } = await getOptionalSession(request);
+
+  // Embed sessions are rejected by the authenticated tree, so treat them as signed out here.
+  const isAuthenticated = session !== null && !session.isEmbed;
 
   const orgUrl = params.orgUrl;
 

@@ -1,5 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { reportSenderRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limits';
+import { disableReportedSender } from '@documenso/lib/server-only/user/disable-reported-sender';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { currentMonthlyPeriod } from '@documenso/lib/universal/monthly-period';
 import { prisma } from '@documenso/prisma';
@@ -91,5 +92,14 @@ export const reportRecipientRoute = procedure
 
     ctx.logger.info({
       msg: `Email reported. Recipient: ${recipient.id}. Envelope: ${recipient.envelopeId}.`,
+    });
+
+    // Fail soft so the recipient still sees their report as accepted.
+    await disableReportedSender({ envelopeId: recipient.envelopeId }).catch((error) => {
+      ctx.logger.error({
+        msg: 'Failed to disable reported sender',
+        envelopeId: recipient.envelopeId,
+        error,
+      });
     });
   });

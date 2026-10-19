@@ -3,7 +3,6 @@ import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-en
 import { base64 } from '@documenso/lib/universal/base64';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
-import { LocalTime } from '@documenso/ui/components/common/local-time';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -21,7 +20,7 @@ import { AdminDocumentDeleteDialog } from '~/components/dialogs/admin-document-d
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { AdminDocumentJobsTable } from '~/components/tables/admin-document-jobs-table';
 import { AdminDocumentLogsTable } from '~/components/tables/admin-document-logs-table';
-import { AdminDocumentRecipientItemTable } from '~/components/tables/admin-document-recipient-item-table';
+import { AdminDocumentRecipientsTable } from '~/components/tables/admin-document-recipients-table';
 
 import type { Route } from './+types/documents.$id';
 
@@ -166,59 +165,11 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
       </h2>
 
       <div className="mt-4">
-        <Accordion type="multiple" className="space-y-4">
-          {envelope.recipients.map((recipient) => (
-            <AccordionItem key={recipient.id} value={recipient.id.toString()} className="rounded-lg border">
-              <AccordionTrigger className="px-4">
-                <div className="flex items-center gap-x-4">
-                  <h4 className="font-semibold">{recipient.name}</h4>
-                  <Badge size="small" variant="neutral">
-                    {recipient.email}
-                  </Badge>
-                  <Badge size="small" variant="secondary">
-                    {recipient.role}
-                  </Badge>
-                </div>
-              </AccordionTrigger>
-
-              <AccordionContent className="border-t px-4 pt-4">
-                <div className="mb-4 grid grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">
-                      <Trans>Send Status</Trans>
-                    </span>
-                    <p className="font-medium">{recipient.sendStatus}</p>
-                  </div>
-
-                  <div>
-                    <span className="text-muted-foreground">
-                      <Trans>Read Status</Trans>
-                    </span>
-                    <p className="font-medium">{recipient.readStatus}</p>
-                  </div>
-
-                  <div>
-                    <span className="text-muted-foreground">
-                      <Trans>Signing Status</Trans>
-                    </span>
-                    <p className="font-medium">{recipient.signingStatus}</p>
-                  </div>
-
-                  <div>
-                    <span className="text-muted-foreground">
-                      <Trans>Completed At</Trans>
-                    </span>
-                    <p className="font-medium">{recipient.signedAt ? <LocalTime date={recipient.signedAt} /> : '-'}</p>
-                  </div>
-                </div>
-
-                <hr className="mb-4" />
-
-                <AdminDocumentRecipientItemTable recipient={recipient} />
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <AdminDocumentRecipientsTable
+          envelopeId={envelope.id}
+          isDocumentCompleted={Boolean(envelope.completedAt)}
+          recipients={envelope.recipients}
+        />
       </div>
 
       <hr className="my-4" />

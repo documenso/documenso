@@ -299,7 +299,7 @@ export const EnvelopesBulkDownloadDialog = ({
           </Alert>
         )}
 
-        <fieldset disabled={isDownloading} className="space-y-4">
+        <fieldset disabled={isDownloading} className="min-w-0 space-y-4">
           <div className="-mx-3 max-h-96 overflow-y-auto px-3">
             <div className="divide-y divide-border rounded-lg border border-border">
               {envelopes.map((envelope) => {
