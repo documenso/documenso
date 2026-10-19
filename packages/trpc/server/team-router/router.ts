@@ -16,6 +16,11 @@ import { findTeamGroupsRoute } from './find-team-groups';
 import { findTeamMembersRoute } from './find-team-members';
 import { findTeamsRoute } from './find-teams';
 import { getTeamRoute } from './get-team';
+import { getTeamAnalyticsDocumentsOverTimeRoute } from './get-team-analytics-documents-over-time';
+import { getTeamAnalyticsMemberActivityRoute } from './get-team-analytics-member-activity';
+import { getTeamAnalyticsOverviewRoute } from './get-team-analytics-overview';
+import { getTeamAnalyticsStatusBreakdownRoute } from './get-team-analytics-status-breakdown';
+import { getTeamAnalyticsTemplateUsageRoute } from './get-team-analytics-template-usage';
 import { getTeamMembersRoute } from './get-team-members';
 import {
   ZCreateTeamEmailVerificationMutationSchema,
@@ -36,6 +41,13 @@ export const teamRouter = router({
   create: createTeamRoute,
   update: updateTeamRoute,
   delete: deleteTeamRoute,
+  analytics: {
+    getOverview: getTeamAnalyticsOverviewRoute,
+    getDocumentsOverTime: getTeamAnalyticsDocumentsOverTimeRoute,
+    getStatusBreakdown: getTeamAnalyticsStatusBreakdownRoute,
+    getTemplateUsage: getTeamAnalyticsTemplateUsageRoute,
+    getMemberActivity: getTeamAnalyticsMemberActivityRoute,
+  },
   member: {
     find: findTeamMembersRoute,
     getMany: getTeamMembersRoute,

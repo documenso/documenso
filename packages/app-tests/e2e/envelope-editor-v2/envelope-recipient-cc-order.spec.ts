@@ -11,7 +11,7 @@ import {
   assertRecipientRole,
   getRecipientEmailInputs,
   getRecipientRows,
-  getSigningOrderInputs,
+  getRecipientStepCards,
   openDocumentEnvelopeEditor,
   setRecipientEmail,
   setRecipientName,
@@ -34,14 +34,14 @@ const assertCcDisplayedLastWithNoOrderInput = async (root: Page) => {
   await assertRecipientRole(root, 1, 'Needs to sign');
   await assertRecipientRole(root, 2, 'Receives copy');
 
-  // Only the two signers have signing order inputs, showing 1 and 2.
-  await expect(getSigningOrderInputs(root)).toHaveCount(2);
-  await expect(getSigningOrderInputs(root).nth(0)).toHaveValue('1');
-  await expect(getSigningOrderInputs(root).nth(1)).toHaveValue('2');
+  // Only the two signers render as ordered group cards, showing groups 1 and 2.
+  await expect(getRecipientStepCards(root)).toHaveCount(2);
+  await expect(root.getByText('Group 1', { exact: true })).toBeVisible();
+  await expect(root.getByText('Group 2', { exact: true })).toBeVisible();
 
-  // The CC row itself renders no signing order input (placeholder div instead).
+  // The CC row itself renders outside the group cards with no drag handle.
   const ccRow = getRecipientRows(root).nth(2);
-  await expect(ccRow.locator('[data-testid="signing-order-input"]')).toHaveCount(0);
+  await expect(ccRow.locator('[data-testid="recipient-row-drag-handle"]')).toHaveCount(0);
 };
 
 test.describe('document editor', () => {
@@ -61,8 +61,8 @@ test.describe('document editor', () => {
     await setRecipientName(root, 1, CC_RECIPIENT.name);
     await setRecipientRole(root, 1, 'Receives copy');
 
-    // Once the row becomes CC, its signing order input disappears.
-    await expect(getSigningOrderInputs(root)).toHaveCount(1);
+    // Once the row becomes CC, it drops out of the ordered group cards.
+    await expect(getRecipientStepCards(root)).toHaveCount(1);
 
     // Add signer B third. The new row is inserted before the CC recipient,
     // which is kept last by the client-side sorting.

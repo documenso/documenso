@@ -65,12 +65,14 @@ export const PASSKEY_TIMEOUT = 60000;
  */
 export const MAXIMUM_PASSKEYS = 50;
 
-export const useSecureCookies =
-  env('NODE_ENV') === 'production' && String(NEXT_PUBLIC_WEBAPP_URL()).startsWith('https://');
+// Keyed off the scheme only: browsers reject `Secure`/`Partitioned`/`__Host-`
+// over plain http (Safari even on localhost), including local https dev.
+export const shouldUseSecureCookies = () => String(NEXT_PUBLIC_WEBAPP_URL()).startsWith('https://');
 
-const secureCookiePrefix = useSecureCookies ? '__Secure-' : '';
+export const formatSecureCookieName = (name: string) => (shouldUseSecureCookies() ? `__Secure-${name}` : name);
 
-export const formatSecureCookieName = (name: string) => `${secureCookiePrefix}${name}`;
+// `__Host-` requires `Secure`, `Path=/` and no `Domain`, so a subdomain cannot set it.
+export const formatHostCookieName = (name: string) => (shouldUseSecureCookies() ? `__Host-${name}` : name);
 
 export const getCookieDomain = () => {
   const url = new URL(NEXT_PUBLIC_WEBAPP_URL());
@@ -182,12 +184,16 @@ export const isSignupEnabledForProvider = (provider: 'email' | 'google' | 'micro
   return env(flagMap[provider]) !== 'true';
 };
 
+export const isSigninDisabledGlobally = (): boolean => {
+  return env('NEXT_PUBLIC_DISABLE_SIGNIN') === 'true';
+};
+
 /**
  * Check if signin is enabled for the given provider.
  * The master switch takes precedence over the per-provider flags.
  */
 export const isSigninEnabledForProvider = (provider: 'email' | 'google' | 'microsoft' | 'oidc'): boolean => {
-  if (env('NEXT_PUBLIC_DISABLE_SIGNIN') === 'true') {
+  if (isSigninDisabledGlobally()) {
     return false;
   }
 

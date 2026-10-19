@@ -1,6 +1,6 @@
 import type { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import type { Organisation, OrganisationGlobalSettings, Prisma } from '@prisma/client';
-import { DocumentVisibility, type OrganisationGroup, type OrganisationMemberRole } from '@prisma/client';
+import { DocumentVisibility, type OrganisationGroup, OrganisationMemberRole } from '@prisma/client';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../constants/date-formats';
 import { DEFAULT_ENVELOPE_EXPIRATION_PERIOD } from '../constants/envelope-expiration';
@@ -28,6 +28,18 @@ export const canExecuteOrganisationAction = (
   role: keyof typeof ORGANISATION_MEMBER_ROLE_MAP,
 ) => {
   return ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP[action].some((i) => i === role);
+};
+
+/**
+ * Organisation analytics are restricted to organisation admins, unlike organisation
+ * settings which managers can also access.
+ */
+export const canAccessOrganisationAnalytics = (role: keyof typeof ORGANISATION_MEMBER_ROLE_MAP) => {
+  return role === OrganisationMemberRole.ADMIN;
+};
+
+export const formatOrganisationAnalyticsPath = (organisationUrl: string) => {
+  return `/o/${organisationUrl}/analytics`;
 };
 
 /**
