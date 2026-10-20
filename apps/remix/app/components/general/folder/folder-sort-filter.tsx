@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/react/macro';
 import { ArrowUpDownIcon } from 'lucide-react';
-import { useSearchParams } from 'react-router';
+import { parseAsStringLiteral, useQueryState } from 'nuqs';
 
 import { FilterPill } from '~/components/general/filter-pill';
 
@@ -29,26 +29,14 @@ export const FolderSortFilter = () => {
 };
 
 export const useFolderSort = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  // Goes through nuqs, like the document filters, so updates are applied on
+  // top of the latest URL instead of overwriting params nuqs has just set.
+  const [folderSort, setFolderSortQuery] = useQueryState(FOLDER_SORT_SEARCH_PARAM, folderSortSearchParam);
 
-  const folderSort = parseFolderSortValue(searchParams.get(FOLDER_SORT_SEARCH_PARAM));
   const isDefaultFolderSort = folderSort === DEFAULT_FOLDER_SORT;
 
   const setFolderSort = (value: TFolderSortValue) => {
-    setSearchParams(
-      (previous) => {
-        const params = new URLSearchParams(previous);
-
-        if (value === DEFAULT_FOLDER_SORT) {
-          params.delete(FOLDER_SORT_SEARCH_PARAM);
-        } else {
-          params.set(FOLDER_SORT_SEARCH_PARAM, value);
-        }
-
-        return params;
-      },
-      { preventScrollReset: true },
-    );
+    void setFolderSortQuery(value);
   };
 
   /**
@@ -73,12 +61,7 @@ export const useFolderSort = () => {
 };
 
 const parseFolderSortValue = (value: string | null): TFolderSortValue => {
-  if (value && Object.hasOwn(FOLDER_SORT_COMPARATORS, value)) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    return value as TFolderSortValue;
-  }
-
-  return DEFAULT_FOLDER_SORT;
+  return FOLDER_SORT_VALUES.find((sortValue) => sortValue === value) ?? DEFAULT_FOLDER_SORT;
 };
 
 const compareByName = (a: TSortableFolder, b: TSortableFolder) =>
@@ -87,16 +70,22 @@ const compareByName = (a: TSortableFolder, b: TSortableFolder) =>
 const compareByCreatedAt = (a: TSortableFolder, b: TSortableFolder) =>
   new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
 
-const FOLDER_SORT_COMPARATORS = {
-  'createdAt-desc': (a: TSortableFolder, b: TSortableFolder) => compareByCreatedAt(b, a),
+const FOLDER_SORT_VALUES = ['createdAt-desc', 'createdAt-asc', 'name-asc', 'name-desc'] as const;
+
+const FOLDER_SORT_COMPARATORS: Record<TFolderSortValue, (a: TSortableFolder, b: TSortableFolder) => number> = {
+  'createdAt-desc': (a, b) => compareByCreatedAt(b, a),
   'createdAt-asc': compareByCreatedAt,
   'name-asc': compareByName,
-  'name-desc': (a: TSortableFolder, b: TSortableFolder) => compareByName(b, a),
+  'name-desc': (a, b) => compareByName(b, a),
 };
 
 const DEFAULT_FOLDER_SORT: TFolderSortValue = 'createdAt-desc';
 
-type TFolderSortValue = keyof typeof FOLDER_SORT_COMPARATORS;
+const folderSortSearchParam = parseAsStringLiteral(FOLDER_SORT_VALUES)
+  .withDefault(DEFAULT_FOLDER_SORT)
+  .withOptions({ history: 'push', clearOnDefault: true });
+
+type TFolderSortValue = (typeof FOLDER_SORT_VALUES)[number];
 
 type TSortableFolder = {
   name: string;
