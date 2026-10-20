@@ -15,6 +15,7 @@ import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderUpdateDialog } from '~/components/dialogs/folder-update-dialog';
 import { DocumentUploadButtonLegacy } from '~/components/general/document/document-upload-button-legacy';
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
+import { FolderSortFilter, useFolderSort } from '~/components/general/folder/folder-sort-filter';
 import { useCurrentTeam } from '~/providers/team';
 
 import { EnvelopeUploadButton } from '../envelope/envelope-upload-button';
@@ -35,6 +36,8 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
   const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
 
+  const { sortFolders, withFolderSort } = useFolderSort();
+
   const { data: foldersData, isPending } = trpc.folder.getFolders.useQuery({
     type,
     parentId,
@@ -43,25 +46,29 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   const formatBreadCrumbPath = (folderId: string) => {
     const rootPath = type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
-    return `${rootPath}/f/${folderId}`;
+    return withFolderSort(`${rootPath}/f/${folderId}`);
   };
 
   const formatViewAllFoldersPath = () => {
     const rootPath = type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
     if (parentId) {
-      return `${rootPath}/folders?parentId=${parentId}`;
+      return withFolderSort(`${rootPath}/folders?parentId=${parentId}`);
     }
 
-    return `${rootPath}/folders`;
+    return withFolderSort(`${rootPath}/folders`);
   };
 
   const formatRootPath = () => {
-    return type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
+    const rootPath = type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
+
+    return withFolderSort(rootPath);
   };
 
-  const pinnedFolders = foldersData?.folders.filter((folder) => folder.pinned) || [];
-  const unpinnedFolders = foldersData?.folders.filter((folder) => !folder.pinned) || [];
+  const sortedFolders = sortFolders(foldersData?.folders ?? []);
+  const pinnedFolders = sortedFolders.filter((folder) => folder.pinned);
+  const unpinnedFolders = sortedFolders.filter((folder) => !folder.pinned);
+  const hasMultipleFolders = sortedFolders.length > 1;
 
   return (
     <div>
@@ -95,6 +102,8 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         </div>
 
         <div className="flex gap-4 sm:flex-row sm:justify-end">
+          {hasMultipleFolders && <FolderSortFilter />}
+
           <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
 
           {/* If you delete this, delete the component as well. */}
