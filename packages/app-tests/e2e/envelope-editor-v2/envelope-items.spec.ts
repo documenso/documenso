@@ -491,28 +491,28 @@ test.describe('pending envelope title editing', () => {
     expect(updatedEnvelope.envelopeItems[0].title).toBe(pendingDocument.title);
   });
 
-  test('skip the rename prompt when the click that ends the edit opens a dialog', async ({ page }) => {
+  test('show the rename prompt after a dialog opened by the click that ends the edit closes', async ({ page }) => {
     await openPendingDocumentEditor(page);
 
     await page.locator('[data-testid="envelope-title-input"]').fill('Title Before Settings');
     await openSettingsDialog(page);
 
-    // The settings dialog hides the rest of the page from the accessibility tree.
-    const matchTitlePrompt = page.getByRole('dialog', { name: 'Rename the file too?', includeHidden: true });
-    await expect(matchTitlePrompt).toBeHidden();
-
+    // Escape closes the dialog on top, and the prompt underneath stays open.
     await page.keyboard.press('Escape');
     await expect(page.getByRole('heading', { name: 'Document Settings' })).toBeHidden();
-    await expect(matchTitlePrompt).toBeHidden();
+    await expect(page.getByRole('dialog', { name: 'Rename the file too?' })).toBeVisible();
   });
 
-  test('show the rename prompt when the click that ends the edit opens a popover', async ({ page }) => {
+  test('keep focus on the field clicked to end the title edit', async ({ page }) => {
     await openPendingDocumentEditor(page);
 
-    await page.locator('[data-testid="envelope-title-input"]').fill('Title Before Attachments');
-    await page.getByRole('button', { name: 'Attachments' }).click();
+    await page.locator('[data-testid="envelope-title-input"]').fill('Title Before Item Edit');
+
+    const itemTitleInput = getEnvelopeItemTitleInputs(page).first();
+    await itemTitleInput.click();
 
     await expect(page.getByRole('dialog', { name: 'Rename the file too?' })).toBeVisible();
+    await expect(itemTitleInput).toBeFocused();
   });
 
   test('the click that ends the envelope title edit still goes through', async ({ page }) => {
@@ -520,7 +520,7 @@ test.describe('pending envelope title editing', () => {
 
     await page.locator('[data-testid="envelope-title-input"]').fill('Title Before Step Change');
 
-    // The step click blurs the title, and the step still changes before the prompt opens.
+    // The step click ends the title edit, and the step still changes with the prompt open.
     await clickEnvelopeEditorStep(page, 'addFields');
     await expect(page.getByText('Selected Recipient')).toBeVisible();
 

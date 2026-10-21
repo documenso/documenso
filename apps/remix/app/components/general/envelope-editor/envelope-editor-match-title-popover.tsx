@@ -15,8 +15,7 @@ export type EnvelopeItemMatchTitlePrompt = {
 
 export type EnvelopeItemMatchTitlePopoverProps = {
   prompt: EnvelopeItemMatchTitlePrompt | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   children: React.ReactNode;
 };
 
@@ -26,12 +25,7 @@ export type EnvelopeItemMatchTitlePopoverProps = {
  * Stays open while the user works elsewhere until it's answered, dismissed with Escape,
  * or the title is edited again.
  */
-export const EnvelopeItemMatchTitlePopover = ({
-  prompt,
-  open,
-  onOpenChange,
-  children,
-}: EnvelopeItemMatchTitlePopoverProps) => {
+export const EnvelopeItemMatchTitlePopover = ({ prompt, onClose, children }: EnvelopeItemMatchTitlePopoverProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -39,6 +33,7 @@ export const EnvelopeItemMatchTitlePopover = ({
 
   const titleId = useId();
   const anchorRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const [isRenaming, setIsRenaming] = useState(false);
 
@@ -52,7 +47,7 @@ export const EnvelopeItemMatchTitlePopover = ({
     try {
       await updateEnvelopeItemTitle(prompt.envelopeItemId, prompt.newTitle);
 
-      onOpenChange(false);
+      onClose();
     } catch (err) {
       console.error(err);
 
@@ -67,7 +62,14 @@ export const EnvelopeItemMatchTitlePopover = ({
   };
 
   return (
-    <Popover open={open && prompt !== null} onOpenChange={(value) => !isRenaming && onOpenChange(value)}>
+    <Popover
+      open={prompt !== null}
+      onOpenChange={(open) => {
+        if (!open && !isRenaming) {
+          onClose();
+        }
+      }}
+    >
       <PopoverAnchor asChild>
         <div ref={anchorRef} className="min-w-0 max-w-full shrink">
           {children}
@@ -76,17 +78,22 @@ export const EnvelopeItemMatchTitlePopover = ({
 
       {prompt && (
         <PopoverContent
+          ref={contentRef}
           align="start"
           sideOffset={8}
           className="w-80"
           aria-labelledby={titleId}
           onOpenAutoFocus={(event) => {
-            // Leave focus on whatever the user clicked or tabbed to.
-            if (document.activeElement && document.activeElement !== document.body) {
-              event.preventDefault();
-            }
+            event.preventDefault();
+
+            // The prompt opens while focus is still moving to whatever was clicked or tabbed to,
+            // so only take focus once nothing else has it (e.g. after pressing Enter).
+            requestAnimationFrame(() => {
+              if (!document.activeElement || document.activeElement === document.body) {
+                contentRef.current?.focus();
+              }
+            });
           }}
-          onCloseAutoFocus={(event) => event.preventDefault()}
           onInteractOutside={(event) => {
             if (!(event.target instanceof Node) || !anchorRef.current?.contains(event.target)) {
               event.preventDefault();
@@ -108,13 +115,7 @@ export const EnvelopeItemMatchTitlePopover = ({
           </div>
 
           <div className="mt-3 flex justify-end gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              disabled={isRenaming}
-              onClick={() => onOpenChange(false)}
-            >
+            <Button type="button" size="sm" variant="secondary" disabled={isRenaming} onClick={onClose}>
               <Trans>Keep file name</Trans>
             </Button>
 

@@ -64,20 +64,13 @@ export default function EnvelopeEditorHeader() {
   );
 
   const [matchTitlePrompt, setMatchTitlePrompt] = useState<EnvelopeItemMatchTitlePrompt | null>(null);
-  const [isMatchTitlePromptOpen, setIsMatchTitlePromptOpen] = useState(false);
 
   /**
    * Downloads and emails are named after the envelope item, so offer to rename a single item
    * whenever the envelope title changes.
    */
   const onEnvelopeTitleCommit = (title: string) => {
-    // The click that ended the edit may have opened a dialog, which would cover the prompt.
-    // Popovers also use the dialog role but don't cover it, so they're excluded.
-    const isDialogOpen =
-      document.querySelector('[role="dialog"][data-state="open"]:not([data-radix-popper-content-wrapper] > *)') !==
-      null;
-
-    if (isDialogOpen || envelope.envelopeItems.length !== 1 || !editorConfig.envelopeItems?.allowConfigureTitle) {
+    if (envelope.envelopeItems.length !== 1 || !editorConfig.envelopeItems?.allowConfigureTitle) {
       return;
     }
 
@@ -91,7 +84,6 @@ export default function EnvelopeEditorHeader() {
     }
 
     setMatchTitlePrompt({ envelopeItemId: envelopeItem.id, currentTitle: envelopeItem.title, newTitle });
-    setIsMatchTitlePromptOpen(true);
   };
 
   const handleCreateEmbeddedEnvelope = async () => {
@@ -120,11 +112,7 @@ export default function EnvelopeEditorHeader() {
           <Separator orientation="vertical" className="h-6 shrink-0" />
 
           <div className="flex min-w-0 items-center space-x-2">
-            <EnvelopeItemMatchTitlePopover
-              prompt={matchTitlePrompt}
-              open={isMatchTitlePromptOpen}
-              onOpenChange={setIsMatchTitlePromptOpen}
-            >
+            <EnvelopeItemMatchTitlePopover prompt={matchTitlePrompt} onClose={() => setMatchTitlePrompt(null)}>
               <EnvelopeItemTitleInput
                 dataTestId="envelope-title-input"
                 disabled={!envelopeItemPermissions.canTitleBeChanged || !allowConfigureEnvelopeTitle}

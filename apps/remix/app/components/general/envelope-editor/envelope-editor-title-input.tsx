@@ -10,7 +10,7 @@ export type EnvelopeItemTitleInputProps = {
   onChange: (value: string) => void;
   /**
    * Called when the user finishes editing (blur or Enter) with a valid title that differs from the
-   * last committed one. Runs after any click that moved focus away has been handled.
+   * last committed one.
    */
   onCommit?: (value: string) => void;
   className?: string;
@@ -36,12 +36,6 @@ export const EnvelopeItemTitleInput = ({
   const measureRef = useRef<HTMLSpanElement>(null);
 
   const committedTitleRef = useRef(value);
-  const isPointerDownRef = useRef(false);
-
-  const onCommitRef = useRef(onCommit);
-  onCommitRef.current = onCommit;
-
-  const isCommitEnabled = onCommit !== undefined;
 
   // Reflect external value changes, but never while the user is typing.
   useEffect(() => {
@@ -53,30 +47,6 @@ export const EnvelopeItemTitleInput = ({
     setIsError(false);
     committedTitleRef.current = value;
   }, [value]);
-
-  useEffect(() => {
-    if (!isCommitEnabled) {
-      return;
-    }
-
-    const onPointerDown = () => {
-      isPointerDownRef.current = true;
-    };
-
-    const onPointerUp = () => {
-      isPointerDownRef.current = false;
-    };
-
-    window.addEventListener('pointerdown', onPointerDown, true);
-    window.addEventListener('pointerup', onPointerUp, true);
-    window.addEventListener('pointercancel', onPointerUp, true);
-
-    return () => {
-      window.removeEventListener('pointerdown', onPointerDown, true);
-      window.removeEventListener('pointerup', onPointerUp, true);
-      window.removeEventListener('pointercancel', onPointerUp, true);
-    };
-  }, [isCommitEnabled]);
 
   useEffect(() => {
     if (measureRef.current) {
@@ -108,7 +78,7 @@ export const EnvelopeItemTitleInput = ({
 
   const handleBlur = () => {
     // Switching to another window blurs the input without ending the edit.
-    if (!onCommitRef.current || !document.hasFocus()) {
+    if (!onCommit || !document.hasFocus()) {
       return;
     }
 
@@ -118,26 +88,16 @@ export const EnvelopeItemTitleInput = ({
       return;
     }
 
-    const title = parsedTitle.data;
+    committedTitleRef.current = parsedTitle.data;
 
-    committedTitleRef.current = title;
-
-    // A dialog opened mid-click would swallow the click that moved focus away.
-    if (isPointerDownRef.current) {
-      runAfterPointerRelease(() => onCommitRef.current?.(title));
-      return;
-    }
-
-    onCommitRef.current(title);
+    onCommit(parsedTitle.data);
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (!isCommitEnabled || event.key !== 'Enter' || event.nativeEvent.isComposing) {
+    if (!onCommit || event.key !== 'Enter' || event.nativeEvent.isComposing) {
       return;
     }
 
-    // Stops the rest of this key press from activating a button in whatever the commit opens.
-    event.preventDefault();
     event.currentTarget.blur();
   };
 
@@ -174,19 +134,4 @@ export const EnvelopeItemTitleInput = ({
       />
     </div>
   );
-};
-
-/**
- * Runs the callback once the current pointer press is released and the resulting click has been handled.
- */
-const runAfterPointerRelease = (callback: () => void) => {
-  const onRelease = () => {
-    window.removeEventListener('pointerup', onRelease, true);
-    window.removeEventListener('pointercancel', onRelease, true);
-
-    setTimeout(callback, 0);
-  };
-
-  window.addEventListener('pointerup', onRelease, true);
-  window.addEventListener('pointercancel', onRelease, true);
 };
