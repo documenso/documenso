@@ -7,7 +7,9 @@ import {
   CONTENT_TEXT_META_DEFAULT_VALUES,
   EnvelopeContentType,
 } from '../types/envelope-content-meta';
+import type { EnvelopeContentSnapshot } from './envelope-content';
 import {
+  areEnvelopeContentsEqual,
   assertEnvelopeContentLimits,
   assertEnvelopeContentSaveWithinLimits,
   buildEnvelopeContentCopyData,
@@ -373,5 +375,63 @@ describe('buildEnvelopeContentCopyData', () => {
 
     expect(build).toThrow(AppError);
     expect(build).toThrow('item_orphan');
+  });
+});
+
+describe('areEnvelopeContentsEqual', () => {
+  const snapshot = (overrides: Partial<EnvelopeContentSnapshot> = {}): EnvelopeContentSnapshot => ({
+    id: 'content_a',
+    envelopeItemId: 'item_a',
+    contentMeta: { ...CONTENT_TEXT_META_DEFAULT_VALUES, text: 'Approved' },
+    dataContentId: null,
+    ...overrides,
+  });
+
+  it('is equal for the same contents regardless of order', () => {
+    const a = snapshot({ id: 'content_a' });
+    const b = snapshot({ id: 'content_b' });
+
+    expect(areEnvelopeContentsEqual([a, b], [b, a])).toBe(true);
+  });
+
+  it('is equal for two empty sets', () => {
+    expect(areEnvelopeContentsEqual([], [])).toBe(true);
+  });
+
+  it('ignores key order within the content meta', () => {
+    const { text, ...rest } = snapshot().contentMeta as typeof CONTENT_TEXT_META_DEFAULT_VALUES;
+
+    expect(areEnvelopeContentsEqual([snapshot()], [snapshot({ contentMeta: { ...rest, text } })])).toBe(true);
+  });
+
+  it('differs when a content was added', () => {
+    expect(areEnvelopeContentsEqual([snapshot()], [snapshot(), snapshot({ id: 'content_b' })])).toBe(false);
+  });
+
+  it('differs when a content was removed', () => {
+    expect(areEnvelopeContentsEqual([snapshot(), snapshot({ id: 'content_b' })], [snapshot()])).toBe(false);
+  });
+
+  it('differs when a content was replaced by another with the same shape', () => {
+    expect(areEnvelopeContentsEqual([snapshot({ id: 'content_a' })], [snapshot({ id: 'content_b' })])).toBe(false);
+  });
+
+  it('differs when the content meta changed', () => {
+    const changed = snapshot({ contentMeta: { ...CONTENT_TEXT_META_DEFAULT_VALUES, text: 'Rejected' } });
+
+    expect(areEnvelopeContentsEqual([snapshot()], [changed])).toBe(false);
+  });
+
+  it('differs when the attached data content changed', () => {
+    const image = snapshot({ contentMeta: CONTENT_IMAGE_META_DEFAULT_VALUES, dataContentId: 'data_a' });
+    const swapped = { ...image, dataContentId: 'data_b' };
+    const detached = { ...image, dataContentId: null };
+
+    expect(areEnvelopeContentsEqual([image], [swapped])).toBe(false);
+    expect(areEnvelopeContentsEqual([image], [detached])).toBe(false);
+  });
+
+  it('differs when a content moved to another item', () => {
+    expect(areEnvelopeContentsEqual([snapshot()], [snapshot({ envelopeItemId: 'item_b' })])).toBe(false);
   });
 });

@@ -240,13 +240,12 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
 
   if (envelope.status === DocumentStatus.DRAFT) {
     const results = await Promise.all(
-      envelope.envelopeItems
-        .filter((envelopeItem) => {
-          const foundContents = envelope.contents.filter((content) => content.envelopeItemId === envelopeItem.id);
-
-          return foundContents.length > 0;
-        })
-        .map(async (envelopeItem) => renderContentsIntoEnvelopeItem({ envelopeItemId: envelopeItem.id })),
+      envelope.envelopeItems.map(async (envelopeItem) =>
+        renderContentsIntoEnvelopeItem({
+          envelopeItemId: envelopeItem.id,
+          contents: envelope.contents.filter((content) => content.envelopeItemId === envelopeItem.id),
+        }),
+      ),
     );
 
     renderedEnvelopeItems = results.filter((result): result is RenderedEnvelopeItem => result !== null);
@@ -261,7 +260,11 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     // since there's no-one left to act on the envelope.
     if (envelope.status === DocumentStatus.DRAFT) {
       await prisma.$transaction(async (tx) => {
-        await commitRenderedEnvelopeItems(tx, renderedEnvelopeItems);
+        await commitRenderedEnvelopeItems(tx, {
+          envelopeId: envelope.id,
+          contents: envelope.contents,
+          renderedEnvelopeItems,
+        });
 
         await tx.envelope.update({
           where: {
@@ -328,7 +331,11 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
 
   const updatedEnvelope = await prisma.$transaction(async (tx) => {
     if (envelope.status === DocumentStatus.DRAFT) {
-      await commitRenderedEnvelopeItems(tx, renderedEnvelopeItems);
+      await commitRenderedEnvelopeItems(tx, {
+        envelopeId: envelope.id,
+        contents: envelope.contents,
+        renderedEnvelopeItems,
+      });
 
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({

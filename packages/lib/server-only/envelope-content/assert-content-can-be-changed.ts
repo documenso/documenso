@@ -1,4 +1,4 @@
-import type { Envelope, Prisma } from '@prisma/client';
+import type { DocumentStatus, Envelope, Prisma } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canContentBeChanged } from '../../utils/envelope';
@@ -15,24 +15,38 @@ import { canContentBeChanged } from '../../utils/envelope';
  *
  * 1. Outside the transaction, which checks the pre-fetched status to fail
  *    fast without a round trip.
- * 2. Inside the transaction with `tx`, which re-reads the status under the
- *    transaction so a `sendDocument` committing DRAFT → PENDING between the
- *    first read and the write cannot slip a change in after the render.
+ * 2. Inside the transaction with `tx`, which locks the envelope row and
+ *    re-reads the status under that lock.
+ *
+ * The lock is what makes the second check sound. `sendDocument` takes the
+ * same lock in the transaction which commits the rendered PDF (see
+ * `assertEnvelopeContentsUnchanged`), so one of the two always observes the
+ * other's committed state: either this sees PENDING and refuses, or the send
+ * sees the changed contents and aborts. Without the lock both could read
+ * before either commits and the rows would end up disagreeing with the PDF.
  */
 export const assertContentCanBeChanged = async (
   envelope: Pick<Envelope, 'id' | 'status'>,
   tx?: Prisma.TransactionClient,
 ) => {
-  const current = tx
-    ? await tx.envelope.findFirstOrThrow({
-        where: {
-          id: envelope.id,
-        },
-        select: {
-          status: true,
-        },
-      })
-    : envelope;
+  let current: Pick<Envelope, 'status'> = envelope;
+
+  // Lock the envelope row if a transaction is provided and re-read its status.
+  if (tx) {
+    const rows = await tx.$queryRaw<
+      { status: DocumentStatus }[]
+    >`SELECT "status" FROM "Envelope" WHERE "id" = ${envelope.id} FOR UPDATE`;
+
+    const row = rows[0];
+
+    if (!row) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Envelope not found',
+      });
+    }
+
+    current = row;
+  }
 
   if (canContentBeChanged(current)) {
     return;

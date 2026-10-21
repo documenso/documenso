@@ -1,5 +1,5 @@
 import type { EnvelopeContent, OrganisationClaim, Prisma } from '@prisma/client';
-import { firstBy, isNonNullish, sortBy, unique } from 'remeda';
+import { firstBy, isDeepEqual, isNonNullish, sortBy, unique } from 'remeda';
 
 import { AppError, AppErrorCode } from '../errors/app-error';
 import {
@@ -129,6 +129,40 @@ export const assertEnvelopeContentSaveWithinLimits = ({
       statusCode: 400,
     });
   }
+};
+
+/**
+ * Everything about a content which affects what it renders as, and where.
+ *
+ * Used to detect whether an envelope's contents have changed between being
+ * rendered into its PDF and that render being committed.
+ */
+export type EnvelopeContentSnapshot = Pick<EnvelopeContent, 'id' | 'envelopeItemId' | 'contentMeta' | 'dataContentId'>;
+
+/**
+ * Whether two sets of contents describe the same rendered output: the same
+ * contents, on the same items, with the same meta and attached data.
+ *
+ * Order is ignored since the sets come from separate reads.
+ */
+export const areEnvelopeContentsEqual = (a: EnvelopeContentSnapshot[], b: EnvelopeContentSnapshot[]) => {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  const sortedA = sortBy(a, (content) => content.id);
+  const sortedB = sortBy(b, (content) => content.id);
+
+  return sortedA.every((contentA, i) => {
+    const contentB = sortedB[i];
+
+    return (
+      contentA.id === contentB.id &&
+      contentA.envelopeItemId === contentB.envelopeItemId &&
+      contentA.dataContentId === contentB.dataContentId &&
+      isDeepEqual(contentA.contentMeta, contentB.contentMeta)
+    );
+  });
 };
 
 type OrderedContent = {

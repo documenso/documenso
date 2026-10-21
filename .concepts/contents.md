@@ -15,7 +15,7 @@ An example of a content would be:
 - Not available on V1 envelopes.
 - No public API support for initial implementation
 - Not editable once the envelope has been sent. Contents are frozen on leaving DRAFT, since the PDF will have had the contents inserted
-- Not fully serialising content writes against a concurrent send. The status is rechecked inside the write transaction, at least the guarantee the field and recipient routes have, and the remaining window is accepted.
+- Not locking the envelope in the field and recipient routes.
 - Not giving content images an owner. `DataContent` is an ownerless blob store like `DocumentData`, so duplicating an envelope or using a template shares the image rather than copying it, and access is enforced through the content rows which reference it.
 - Not cleaning up a content's image when it is replaced, removed or deleted, or when a later step fails after the upload. `DataContent` rows are shared by templates and the documents made from them, and orphaned storage is accepted for now.
 - Not storing geometry at more than five decimal places. The editor rounds everything it saves and the API rejects anything finer, so float noise never reaches the database.

@@ -7,12 +7,13 @@ import { prisma } from '@documenso/prisma';
 import { type Envelope, type EnvelopeContent, EnvelopeType, type Field, type Recipient } from '@prisma/client';
 
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
+import { assertContentCanBeChanged } from '../envelope-content/assert-content-can-be-changed';
 import { convertPlaceholdersToFieldInputs, extractPdfPlaceholders } from '../pdf/auto-place-fields';
 import { findRecipientByPlaceholder } from '../pdf/helpers';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 
 type UnsafeReplaceEnvelopeItemPdfOptions = {
-  envelope: Pick<Envelope, 'id' | 'type' | 'formValues'>;
+  envelope: Pick<Envelope, 'id' | 'type' | 'status' | 'formValues'>;
 
   /**
    * Recipients used to resolve placeholder field assignments.
@@ -106,6 +107,8 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
   let didContentsChange = false;
 
   const updatedEnvelopeItem = await prisma.$transaction(async (tx) => {
+    await assertContentCanBeChanged(envelope, tx);
+
     await assertEnvelopeMutable(envelope, tx);
 
     const updatedItem = await tx.envelopeItem.update({

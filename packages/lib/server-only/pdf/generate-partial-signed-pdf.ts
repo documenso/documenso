@@ -1,14 +1,14 @@
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { PDF } from '@libpdf/core';
-import type { EnvelopeContent } from '@prisma/client';
 
 import { loadContentImages } from '../data-content/load-content-images';
+import type { OverlayContent } from './insert-field-in-pdf-v2';
 import { insertPageOverlays } from './insert-page-overlay';
 
 type GeneratePartialSignedPdfOptions = {
   pdfData: Uint8Array;
   fields: FieldWithSignature[];
-  contents?: EnvelopeContent[];
+  contents?: OverlayContent[];
 };
 
 /**
