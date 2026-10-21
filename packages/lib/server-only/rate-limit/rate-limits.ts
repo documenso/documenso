@@ -98,6 +98,15 @@ export const reportSenderRateLimit = createRateLimit({
   window: '7d',
 });
 
+// ---- Embedding ----
+
+export const persistEmbedSignatureRateLimit = createRateLimit({
+  action: 'embed.persist-signature',
+  max: 10,
+  globalMax: 30,
+  window: '1m',
+});
+
 // ---- Billing ----
 
 export const syncSubscriptionRateLimit = createRateLimit({
