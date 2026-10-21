@@ -315,6 +315,110 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   }
 });
 
+test('[TEMPLATE]: should give the file the custom document name when using a custom document', async ({ page }) => {
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+  });
+
+  await page.getByLabel('Title').fill('TEMPLATE_WITH_CUSTOM_NAME');
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
+
+  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
+  await page.getByPlaceholder('Name').fill('Recipient');
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Save template' }).click();
+
+  await page.waitForURL(`/t/${team.url}/templates`);
+  await page.getByRole('button', { name: 'Use Template' }).click();
+
+  await page.getByLabel('Upload custom document').check();
+
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.locator(`#template-use-dialog-file-input-${template.envelopeItems[0].id}`).evaluate((e) => {
+      if (e instanceof HTMLInputElement) {
+        e.click();
+      }
+    }),
+  ]);
+
+  await fileChooser.setFiles(FIELD_ALIGNMENT_TEST_PDF_PATH);
+  await expect(page.getByText('Remove')).toBeVisible();
+
+  await page.getByLabel('Enter custom document name').click();
+  await page.getByRole('textbox', { name: 'Custom document name' }).fill('Wilson Agreement');
+
+  await page.getByRole('button', { name: 'Create as draft' }).click();
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
+
+  const document = await prisma.envelope.findFirstOrThrow({
+    where: { id: page.url().split('/').pop() },
+    include: { envelopeItems: true },
+  });
+
+  expect(document.title).toEqual('Wilson Agreement');
+  expect(document.envelopeItems[0].title).toEqual('Wilson Agreement');
+});
+
+test('[TEMPLATE]: should give the file the custom document name without a custom document', async ({ page }) => {
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+  });
+
+  await page.getByLabel('Title').fill('TEMPLATE_WITHOUT_CUSTOM_DOC');
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
+
+  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
+  await page.getByPlaceholder('Name').fill('Recipient');
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Save template' }).click();
+
+  await page.waitForURL(`/t/${team.url}/templates`);
+  await page.getByRole('button', { name: 'Use Template' }).click();
+
+  await page.getByLabel('Enter custom document name').click();
+  await page.getByRole('textbox', { name: 'Custom document name' }).fill('Wilson Agreement');
+
+  await page.getByRole('button', { name: 'Create as draft' }).click();
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
+
+  const document = await prisma.envelope.findFirstOrThrow({
+    where: { id: page.url().split('/').pop() },
+    include: { envelopeItems: { include: { documentData: true } } },
+  });
+
+  const templateWithData = await prisma.envelope.findFirstOrThrow({
+    where: { id: template.id },
+    include: { envelopeItems: { include: { documentData: true } } },
+  });
+
+  expect(document.title).toEqual('Wilson Agreement');
+  expect(document.envelopeItems[0].title).toEqual('Wilson Agreement');
+  expect(document.envelopeItems[0].documentData.initialData).toEqual(
+    templateWithData.envelopeItems[0].documentData.data,
+  );
+});
+
 /**
  * This test verifies that we can create a team document from a template using a custom document
  * instead of the template's default document.
