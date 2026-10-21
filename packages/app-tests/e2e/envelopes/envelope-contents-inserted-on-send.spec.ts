@@ -13,7 +13,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Page, test } from '@playwright/test';
 import { type DocumentDataType, DocumentStatus, FieldType } from '@prisma/client';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 import { getKonvaElementCountForPage } from '../fixtures/konva';
 import { channelAtOpacity, samplePixelAtBoxCentre } from '../fixtures/pdf-pixels';
 
@@ -94,7 +94,7 @@ const setContents = async (
   contents: { envelopeItemId: string; contentMeta: TEnvelopeContentMetaInput }[],
 ) =>
   await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.content.set`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': teamId.toString() },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json', 'x-team-id': teamId.toString() },
     data: JSON.stringify({
       json: {
         envelopeId,
@@ -135,7 +135,7 @@ const addSecondEnvelopeItem = async (
 
 const sendDocument = async (page: Page, teamId: number, envelopeId: string) =>
   await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.distribute`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': teamId.toString() },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json', 'x-team-id': teamId.toString() },
     data: JSON.stringify({ json: { envelopeId } }),
   });
 

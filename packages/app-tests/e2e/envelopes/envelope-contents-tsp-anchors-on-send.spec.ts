@@ -15,7 +15,7 @@ import { PDF } from '@libpdf/core';
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, FieldType } from '@prisma/client';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 import { samplePixelAtBoxCentre } from '../fixtures/pdf-pixels';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
@@ -86,7 +86,7 @@ test('sending an AES envelope puts the contents and the tsp anchors into the sam
   });
 
   const contentsSet = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.content.set`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': team.id.toString() },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json', 'x-team-id': team.id.toString() },
     data: JSON.stringify({
       json: {
         envelopeId: envelope.id,
@@ -98,7 +98,7 @@ test('sending an AES envelope puts the contents and the tsp anchors into the sam
   expect(contentsSet.ok()).toBeTruthy();
 
   const sent = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.distribute`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': team.id.toString() },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json', 'x-team-id': team.id.toString() },
     data: JSON.stringify({ json: { envelopeId: envelope.id } }),
   });
 

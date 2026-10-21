@@ -9,7 +9,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { createCanvas } from '@napi-rs/canvas';
 import { expect, type Page, test } from '@playwright/test';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -88,7 +88,7 @@ const createDocumentFromTemplate = async (
   recipient: { id: number; email: string; name: string },
 ) => {
   const res = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/template.createDocumentFromTemplate`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': teamId.toString() },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json', 'x-team-id': teamId.toString() },
     data: JSON.stringify({
       json: {
         templateId: mapSecondaryIdToTemplateId(templateSecondaryId),
@@ -128,7 +128,7 @@ test('removing a content leaves the shared data content in place', async ({ page
 
   // Save the document with no contents, removing the copied one.
   const removed = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.content.set`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': teamId.toString() },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json', 'x-team-id': teamId.toString() },
     data: JSON.stringify({ json: { envelopeId: documentId, contents: [] } }),
   });
 

@@ -12,7 +12,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Page, test } from '@playwright/test';
 import { DocumentStatus, RecipientRole } from '@prisma/client';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 import { channelAtOpacity, samplePixelAtBoxCentre } from '../fixtures/pdf-pixels';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
@@ -59,7 +59,7 @@ const setupEnvelopeWithContent = async (page: Page) => {
   const envelopeItem = envelope.envelopeItems[0];
 
   const addContent = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.content.set`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': team.id.toString() },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json', 'x-team-id': team.id.toString() },
     data: JSON.stringify({
       json: {
         envelopeId: envelope.id,
@@ -89,7 +89,7 @@ test('sealing does not draw the contents a second time', async ({ page }) => {
   const { envelope, envelopeItem, teamId } = await setupEnvelopeWithContent(page);
 
   const sent = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.distribute`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': teamId.toString() },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json', 'x-team-id': teamId.toString() },
     data: JSON.stringify({ json: { envelopeId: envelope.id } }),
   });
 

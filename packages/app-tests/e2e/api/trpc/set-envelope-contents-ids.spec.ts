@@ -5,7 +5,7 @@ import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Page, test } from '@playwright/test';
 
-import { apiSignin } from '../../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -38,7 +38,7 @@ type SetContentInput = {
 
 const setContents = async (page: Page, teamId: number, envelopeId: string, contents: SetContentInput[]) =>
   await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.content.set`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': teamId.toString() },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json', 'x-team-id': teamId.toString() },
     data: JSON.stringify({
       json: { envelopeId, contents: contents.map((content) => ({ dataContentId: null, ...content })) },
     }),
