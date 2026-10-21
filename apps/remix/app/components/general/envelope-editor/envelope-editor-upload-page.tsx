@@ -22,7 +22,7 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { msg, plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { FileWarningIcon, GripVerticalIcon, Loader2Icon, PencilIcon, XIcon } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
 
 import { EnvelopeItemDeleteDialog } from '~/components/dialogs/envelope-item-delete-dialog';
@@ -407,24 +407,21 @@ export const EnvelopeEditorUploadPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onEnvelopeItemTitleChange = (envelopeItemId: string, title: string) => {
-    const newLocalFilesValue = localFiles.map((uploadingFile) =>
-      uploadingFile.envelopeItemId === envelopeItemId ? { ...uploadingFile, title } : uploadingFile,
-    );
+  const onEnvelopeItemTitleChange = useCallback(
+    (envelopeItemId: string, title: string) => {
+      const newLocalFilesValue = localFiles.map((uploadingFile) =>
+        uploadingFile.envelopeItemId === envelopeItemId ? { ...uploadingFile, title } : uploadingFile,
+      );
 
-    setLocalFiles(newLocalFilesValue);
-    debouncedUpdateEnvelopeItems(newLocalFilesValue);
-  };
-
-  const onEnvelopeItemTitleChangeRef = useRef(onEnvelopeItemTitleChange);
-  onEnvelopeItemTitleChangeRef.current = onEnvelopeItemTitleChange;
+      setLocalFiles(newLocalFilesValue);
+      debouncedUpdateEnvelopeItems(newLocalFilesValue);
+    },
+    [localFiles, debouncedUpdateEnvelopeItems],
+  );
 
   useEffect(
-    () =>
-      registerEnvelopeItemTitleHandler((envelopeItemId, title) =>
-        onEnvelopeItemTitleChangeRef.current(envelopeItemId, title),
-      ),
-    [registerEnvelopeItemTitleHandler],
+    () => registerEnvelopeItemTitleHandler(onEnvelopeItemTitleChange),
+    [registerEnvelopeItemTitleHandler, onEnvelopeItemTitleChange],
   );
 
   const dropzoneDisabledMessage = useMemo(() => {
