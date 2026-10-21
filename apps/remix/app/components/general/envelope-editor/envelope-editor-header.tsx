@@ -77,13 +77,14 @@ export default function EnvelopeEditorHeader() {
     const [envelopeItem] = envelope.envelopeItems;
 
     // Uploaded envelopes keep `.pdf` in their title, and emails add it back to the file name.
+    const currentTitle = removePdfExtension(envelopeItem.title);
     const newTitle = removePdfExtension(title).trim();
 
-    if (newTitle.length === 0 || removePdfExtension(envelopeItem.title) === newTitle) {
+    if (newTitle.length === 0 || currentTitle === newTitle) {
       return;
     }
 
-    setMatchTitlePrompt({ envelopeItemId: envelopeItem.id, currentTitle: envelopeItem.title, newTitle });
+    setMatchTitlePrompt({ envelopeItemId: envelopeItem.id, currentTitle, newTitle });
   };
 
   const handleCreateEmbeddedEnvelope = async () => {

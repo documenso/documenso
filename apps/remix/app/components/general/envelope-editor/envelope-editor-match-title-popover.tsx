@@ -1,5 +1,4 @@
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { removePdfExtension } from '@documenso/lib/utils/envelope';
 import { Button } from '@documenso/ui/primitives/button';
 import { Popover, PopoverAnchor, PopoverContent } from '@documenso/ui/primitives/popover';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -109,9 +108,9 @@ export const EnvelopeItemMatchTitlePopover = ({ prompt, onClose, children }: Env
           </p>
 
           <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md bg-muted/60 px-3 py-2 text-xs">
-            <span className="break-all text-muted-foreground">{toFileName(prompt.currentTitle)}</span>
+            <span className="break-all text-muted-foreground">{`${prompt.currentTitle}.pdf`}</span>
             <ArrowRightIcon className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
-            <span className="break-all font-medium">{toFileName(prompt.newTitle)}</span>
+            <span className="break-all font-medium">{`${prompt.newTitle}.pdf`}</span>
           </div>
 
           <div className="mt-3 flex justify-end gap-2">
@@ -128,5 +127,3 @@ export const EnvelopeItemMatchTitlePopover = ({ prompt, onClose, children }: Env
     </Popover>
   );
 };
-
-const toFileName = (title: string) => `${removePdfExtension(title)}.pdf`;

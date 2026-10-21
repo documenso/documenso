@@ -5,6 +5,7 @@ import { generatePartialSignedPdf } from '@documenso/lib/server-only/pdf/generat
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+import { removePdfExtension } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import {
   type DocumentDataType,
@@ -251,7 +252,7 @@ const handlePendingFileRequest = async ({
   c.header('Cache-Control', 'no-store, private');
   c.header('ETag', etag);
 
-  const baseTitle = title.replace(/\.pdf$/i, '');
+  const baseTitle = removePdfExtension(title);
   const filename = `${baseTitle}_pending.pdf`;
 
   c.header('Content-Disposition', contentDisposition(filename));

@@ -175,11 +175,13 @@ export const useEnvelopeRoute = authenticatedProcedure
  * Returns undefined to keep the template envelope item title.
  */
 const getUploadedFileTitle = (fileName: string) => {
-  if (!/\.pdf$/i.test(fileName)) {
+  const title = removePdfExtension(fileName);
+
+  if (title === fileName) {
     return undefined;
   }
 
-  const parsedTitle = ZDocumentTitleSchema.safeParse(removePdfExtension(fileName));
+  const parsedTitle = ZDocumentTitleSchema.safeParse(title);
 
   return parsedTitle.success ? parsedTitle.data : undefined;
 };

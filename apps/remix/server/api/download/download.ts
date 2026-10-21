@@ -5,6 +5,7 @@ import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-aud
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { removePdfExtension } from '@documenso/lib/utils/envelope';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 import { sValidator } from '@hono/standard-validator';
@@ -195,7 +196,7 @@ export const downloadRoute = new Hono<HonoEnv>()
 
         const result = await auditLogPdf.save();
 
-        const baseTitle = envelope.title.replace(/\.pdf$/i, '');
+        const baseTitle = removePdfExtension(envelope.title);
 
         c.header('Content-Type', 'application/pdf');
         c.header('Content-Disposition', contentDisposition(`${baseTitle}_audit-log.pdf`));
@@ -295,7 +296,7 @@ export const downloadRoute = new Hono<HonoEnv>()
 
         const result = await certificatePdf.save();
 
-        const baseTitle = envelope.title.replace(/\.pdf$/i, '');
+        const baseTitle = removePdfExtension(envelope.title);
 
         c.header('Content-Type', 'application/pdf');
         c.header('Content-Disposition', contentDisposition(`${baseTitle}_certificate.pdf`));

@@ -1,9 +1,9 @@
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
-import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
+import { seedBlankTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { DocumentDataType, TeamMemberRole } from '@prisma/client';
 import path from 'path';
 
@@ -315,31 +315,29 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   }
 });
 
-test('[TEMPLATE]: should give the file the custom document name when using a custom document', async ({ page }) => {
+const openUseTemplateDialog = async (page: Page) => {
   const { user, team } = await seedUser();
-  const template = await seedBlankTemplate(user, team.id);
+
+  const template = await seedTemplate({
+    title: 'Agency Agreement Template',
+    userId: user.id,
+    teamId: team.id,
+  });
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates`,
   });
 
-  await page.getByLabel('Title').fill('TEMPLATE_WITH_CUSTOM_NAME');
-
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
-
-  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
-  await page.getByPlaceholder('Name').fill('Recipient');
-
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
-
-  await page.getByRole('button', { name: 'Save template' }).click();
-
-  await page.waitForURL(`/t/${team.url}/templates`);
   await page.getByRole('button', { name: 'Use Template' }).click();
+  await expect(page.getByRole('heading', { name: 'Create document from template' })).toBeVisible();
+
+  return { team, template };
+};
+
+test('[TEMPLATE]: should give the file the custom document name when using a custom document', async ({ page }) => {
+  const { team, template } = await openUseTemplateDialog(page);
 
   await page.getByLabel('Upload custom document').check();
 
@@ -371,30 +369,7 @@ test('[TEMPLATE]: should give the file the custom document name when using a cus
 });
 
 test('[TEMPLATE]: should give the file the custom document name without a custom document', async ({ page }) => {
-  const { user, team } = await seedUser();
-  const template = await seedBlankTemplate(user, team.id);
-
-  await apiSignin({
-    page,
-    email: user.email,
-    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
-  });
-
-  await page.getByLabel('Title').fill('TEMPLATE_WITHOUT_CUSTOM_DOC');
-
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
-
-  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
-  await page.getByPlaceholder('Name').fill('Recipient');
-
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
-
-  await page.getByRole('button', { name: 'Save template' }).click();
-
-  await page.waitForURL(`/t/${team.url}/templates`);
-  await page.getByRole('button', { name: 'Use Template' }).click();
+  const { team, template } = await openUseTemplateDialog(page);
 
   await page.getByLabel('Enter custom document name').click();
   await page.getByRole('textbox', { name: 'Custom document name' }).fill('Wilson Agreement');
@@ -407,16 +382,9 @@ test('[TEMPLATE]: should give the file the custom document name without a custom
     include: { envelopeItems: { include: { documentData: true } } },
   });
 
-  const templateWithData = await prisma.envelope.findFirstOrThrow({
-    where: { id: template.id },
-    include: { envelopeItems: { include: { documentData: true } } },
-  });
-
   expect(document.title).toEqual('Wilson Agreement');
   expect(document.envelopeItems[0].title).toEqual('Wilson Agreement');
-  expect(document.envelopeItems[0].documentData.initialData).toEqual(
-    templateWithData.envelopeItems[0].documentData.data,
-  );
+  expect(document.envelopeItems[0].documentData.initialData).toEqual(template.envelopeItems[0].documentData.data);
 });
 
 /**
