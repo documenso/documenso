@@ -1,5 +1,9 @@
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { getEnvelopeItemPermissions, mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import {
+  getEnvelopeItemPermissions,
+  mapSecondaryIdToTemplateId,
+  removePdfExtension,
+} from '@documenso/lib/utils/envelope';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -14,12 +18,11 @@ import {
   SendIcon,
   SettingsIcon,
 } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { EnvelopeDistributeDialog } from '~/components/dialogs/envelope-distribute-dialog';
-import { EnvelopeItemMatchTitleDialog } from '~/components/dialogs/envelope-item-match-title-dialog';
 import { EnvelopeRedistributeDialog } from '~/components/dialogs/envelope-redistribute-dialog';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { BrandingLogo } from '~/components/general/branding-logo';
@@ -28,6 +31,10 @@ import { EmbeddedEditorAttachmentPopover } from '~/components/general/document/e
 import { EnvelopeEditorSettingsDialog } from '~/components/general/envelope-editor/envelope-editor-settings-dialog';
 
 import { TemplateDirectLinkBadge } from '../template/template-direct-link-badge';
+import {
+  EnvelopeItemMatchTitlePopover,
+  type EnvelopeItemMatchTitlePrompt,
+} from './envelope-editor-match-title-popover';
 import { EnvelopeItemTitleInput } from './envelope-editor-title-input';
 
 export default function EnvelopeEditorHeader() {
@@ -56,29 +63,35 @@ export default function EnvelopeEditorHeader() {
     [envelope, envelope.recipients],
   );
 
-  const [isMatchTitleDialogOpen, setIsMatchTitleDialogOpen] = useState(false);
-
-  const envelopeTitleOnFocusRef = useRef(envelope.title);
-
-  const singleEnvelopeItem = envelope.envelopeItems.length === 1 ? envelope.envelopeItems[0] : null;
+  const [matchTitlePrompt, setMatchTitlePrompt] = useState<EnvelopeItemMatchTitlePrompt | null>(null);
+  const [isMatchTitlePromptOpen, setIsMatchTitlePromptOpen] = useState(false);
 
   /**
-   * Offer to rename the only envelope item when the envelope title has changed,
-   * since downloads and emails are named after the item.
+   * Downloads and emails are named after the envelope item, so offer to rename a single item
+   * whenever the envelope title changes.
    */
-  const onEnvelopeTitleBlur = () => {
-    const hasTitleChanged = envelope.title !== envelopeTitleOnFocusRef.current;
+  const onEnvelopeTitleCommit = (title: string) => {
+    // The click that ended the edit may have opened a dialog, which would cover the prompt.
+    // Popovers also use the dialog role but don't cover it, so they're excluded.
+    const isDialogOpen =
+      document.querySelector('[role="dialog"][data-state="open"]:not([data-radix-popper-content-wrapper] > *)') !==
+      null;
 
-    if (
-      !hasTitleChanged ||
-      !singleEnvelopeItem ||
-      singleEnvelopeItem.title === envelope.title ||
-      !editorConfig.envelopeItems?.allowConfigureTitle
-    ) {
+    if (isDialogOpen || envelope.envelopeItems.length !== 1 || !editorConfig.envelopeItems?.allowConfigureTitle) {
       return;
     }
 
-    setIsMatchTitleDialogOpen(true);
+    const [envelopeItem] = envelope.envelopeItems;
+
+    // Uploaded envelopes keep `.pdf` in their title, and emails add it back to the file name.
+    const newTitle = removePdfExtension(title).trim();
+
+    if (newTitle.length === 0 || removePdfExtension(envelopeItem.title) === newTitle) {
+      return;
+    }
+
+    setMatchTitlePrompt({ envelopeItemId: envelopeItem.id, currentTitle: envelopeItem.title, newTitle });
+    setIsMatchTitlePromptOpen(true);
   };
 
   const handleCreateEmbeddedEnvelope = async () => {
@@ -107,31 +120,26 @@ export default function EnvelopeEditorHeader() {
           <Separator orientation="vertical" className="h-6 shrink-0" />
 
           <div className="flex min-w-0 items-center space-x-2">
-            <EnvelopeItemTitleInput
-              dataTestId="envelope-title-input"
-              disabled={!envelopeItemPermissions.canTitleBeChanged || !allowConfigureEnvelopeTitle}
-              value={envelope.title}
-              onChange={(title) => {
-                updateEnvelope({
-                  data: {
-                    title,
-                  },
-                });
-              }}
-              onFocus={() => {
-                envelopeTitleOnFocusRef.current = envelope.title;
-              }}
-              onBlur={onEnvelopeTitleBlur}
-              placeholder={t`Envelope Title`}
-            />
-
-            {singleEnvelopeItem && (
-              <EnvelopeItemMatchTitleDialog
-                envelopeItem={singleEnvelopeItem}
-                open={isMatchTitleDialogOpen}
-                onOpenChange={setIsMatchTitleDialogOpen}
+            <EnvelopeItemMatchTitlePopover
+              prompt={matchTitlePrompt}
+              open={isMatchTitlePromptOpen}
+              onOpenChange={setIsMatchTitlePromptOpen}
+            >
+              <EnvelopeItemTitleInput
+                dataTestId="envelope-title-input"
+                disabled={!envelopeItemPermissions.canTitleBeChanged || !allowConfigureEnvelopeTitle}
+                value={envelope.title}
+                onChange={(title) => {
+                  updateEnvelope({
+                    data: {
+                      title,
+                    },
+                  });
+                }}
+                onCommit={onEnvelopeTitleCommit}
+                placeholder={t`Envelope Title`}
               />
-            )}
+            </EnvelopeItemMatchTitlePopover>
 
             {envelope.type === EnvelopeType.TEMPLATE && (
               <>

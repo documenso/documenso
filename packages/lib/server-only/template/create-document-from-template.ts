@@ -46,7 +46,7 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { mapSecondaryIdToTemplateId, removePdfExtension } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -512,7 +512,7 @@ export const createDocumentFromTemplate = async ({
 
       return {
         id: newEnvelopeItemId,
-        title: titleToUse.endsWith('.pdf') ? titleToUse.slice(0, -4) : titleToUse,
+        title: removePdfExtension(titleToUse),
         documentDataId: newDocumentData.id,
         order: item.order !== undefined ? item.order : i + 1,
       };

@@ -57,6 +57,31 @@ const openSettingsDialog = async (root: Page) => {
   await expect(root.getByRole('heading', { name: 'Document Settings' })).toBeVisible();
 };
 
+const openPendingDocumentEditor = async (page: Page) => {
+  const recipientEmail = `recipient-${nanoid()}@test.documenso.com`;
+  const { user, team } = await seedUser();
+  const pendingDocument = await seedPendingDocument(user, team.id, [recipientEmail], {
+    internalVersion: 2,
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/t/${team.url}/documents/${pendingDocument.id}/edit`,
+  });
+
+  await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
+
+  return pendingDocument;
+};
+
+const getEnvelopeWithItems = async (envelopeId: string) => {
+  return await prisma.envelope.findFirstOrThrow({
+    where: { id: envelopeId },
+    include: { envelopeItems: true },
+  });
+};
+
 const updateExternalId = async (surface: TEnvelopeEditorSurface, externalId: string) => {
   await openSettingsDialog(surface.root);
   await surface.root.locator('input[name="externalId"]').fill(externalId);
@@ -335,11 +360,11 @@ test.describe('pending envelope title editing', () => {
     await envelopeTitleInput.fill('Updated Pending Title');
     await envelopeTitleInput.blur();
 
-    // Decline renaming the only envelope item to match the new envelope title.
-    const matchTitleDialog = page.getByRole('dialog');
-    await expect(matchTitleDialog.getByText('Update document title?')).toBeVisible();
-    await matchTitleDialog.getByRole('button', { name: 'Cancel' }).click();
-    await expect(matchTitleDialog).toBeHidden();
+    // Keep the item name when asked whether to rename it to match.
+    const matchTitlePrompt = page.getByRole('dialog', { name: 'Rename the file too?' });
+    await expect(matchTitlePrompt).toBeVisible();
+    await matchTitlePrompt.getByRole('button', { name: 'Keep file name' }).click();
+    await expect(matchTitlePrompt).toBeHidden();
 
     // Edit the envelope item title.
     const itemTitleInput = getEnvelopeItemTitleInputs(page).first();
@@ -383,44 +408,130 @@ test.describe('pending envelope title editing', () => {
     await expect(getEnvelopeItemDragHandles(page)).toHaveCount(1);
   });
 
-  test('rename the only envelope item to match the envelope title', async ({ page }) => {
-    const recipientEmail = `recipient-${nanoid()}@test.documenso.com`;
-    const { user, team } = await seedUser();
-    const pendingDocument = await seedPendingDocument(user, team.id, [recipientEmail], {
-      internalVersion: 2,
-    });
-
-    await apiSignin({
-      page,
-      email: user.email,
-      redirectPath: `/t/${team.url}/documents/${pendingDocument.id}/edit`,
-    });
-
-    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
+  test('rename the only envelope item after changing the envelope title', async ({ page }) => {
+    const pendingDocument = await openPendingDocumentEditor(page);
 
     const envelopeTitleInput = page.locator('[data-testid="envelope-title-input"]');
     await envelopeTitleInput.fill('Matched Title');
-    await envelopeTitleInput.blur();
+    await envelopeTitleInput.press('Enter');
 
-    const matchTitleDialog = page.getByRole('dialog');
-    await expect(matchTitleDialog.getByText('Update document title?')).toBeVisible();
-    await matchTitleDialog.getByRole('button', { name: 'Update' }).click();
-    await expect(matchTitleDialog).toBeHidden();
+    const matchTitlePrompt = page.getByRole('dialog', { name: 'Rename the file too?' });
+    await expect(matchTitlePrompt).toBeVisible();
+    await expect(matchTitlePrompt.getByText(`${pendingDocument.title}.pdf`)).toBeVisible();
+    await expect(matchTitlePrompt.getByText('Matched Title.pdf')).toBeVisible();
 
-    // The item title in the list reflects the rename without reloading.
-    await expect(getEnvelopeItemTitleInputs(page).first()).toHaveValue('Matched Title');
+    // The prompt stays open while working elsewhere in the editor.
+    const itemTitleInput = getEnvelopeItemTitleInputs(page).first();
+    await itemTitleInput.click();
+    await expect(matchTitlePrompt).toBeVisible();
 
-    const updatedEnvelope = await prisma.envelope.findFirstOrThrow({
-      where: { id: pendingDocument.id },
-      include: { envelopeItems: true },
-    });
+    await matchTitlePrompt.getByRole('button', { name: 'Rename file' }).click();
+    await expect(matchTitlePrompt).toBeHidden();
+
+    await expect(itemTitleInput).toHaveValue('Matched Title');
+
+    // Wait for debounced auto-save to persist by navigating away.
+    await clickEnvelopeEditorStep(page, 'addFields');
+    await expect(page.getByText('Selected Recipient')).toBeVisible();
+
+    const updatedEnvelope = await getEnvelopeWithItems(pendingDocument.id);
 
     expect(updatedEnvelope.title).toBe('Matched Title');
     expect(updatedEnvelope.envelopeItems[0].title).toBe('Matched Title');
+  });
 
-    // Blurring again without changing the title should not prompt.
+  test('rename the file without doubling its .pdf extension', async ({ page }) => {
+    const pendingDocument = await openPendingDocumentEditor(page);
+
+    const envelopeTitleInput = page.locator('[data-testid="envelope-title-input"]');
+    await envelopeTitleInput.fill('Renamed Contract.pdf');
+    await envelopeTitleInput.press('Enter');
+
+    const matchTitlePrompt = page.getByRole('dialog', { name: 'Rename the file too?' });
+    await expect(matchTitlePrompt.getByText('Renamed Contract.pdf')).toBeVisible();
+    await matchTitlePrompt.getByRole('button', { name: 'Rename file' }).click();
+    await expect(matchTitlePrompt).toBeHidden();
+
+    await expect(getEnvelopeItemTitleInputs(page).first()).toHaveValue('Renamed Contract');
+
+    // Wait for debounced auto-save to persist by navigating away.
+    await clickEnvelopeEditorStep(page, 'addFields');
+    await expect(page.getByText('Selected Recipient')).toBeVisible();
+
+    const updatedEnvelope = await getEnvelopeWithItems(pendingDocument.id);
+
+    expect(updatedEnvelope.title).toBe('Renamed Contract.pdf');
+    expect(updatedEnvelope.envelopeItems[0].title).toBe('Renamed Contract');
+  });
+
+  test('keep the envelope item name when declining the rename', async ({ page }) => {
+    const pendingDocument = await openPendingDocumentEditor(page);
+
+    const envelopeTitleInput = page.locator('[data-testid="envelope-title-input"]');
+    await envelopeTitleInput.fill('Declined Title');
+    await envelopeTitleInput.blur();
+
+    const matchTitlePrompt = page.getByRole('dialog', { name: 'Rename the file too?' });
+    await expect(matchTitlePrompt).toBeVisible();
+    await matchTitlePrompt.getByRole('button', { name: 'Keep file name' }).click();
+    await expect(matchTitlePrompt).toBeHidden();
+
+    await expect(getEnvelopeItemTitleInputs(page).first()).toHaveValue(pendingDocument.title);
+
+    // Blurring again without another change must not prompt again.
     await envelopeTitleInput.focus();
     await envelopeTitleInput.blur();
-    await expect(matchTitleDialog).toBeHidden();
+    await clickEnvelopeEditorStep(page, 'addFields');
+    await expect(page.getByText('Selected Recipient')).toBeVisible();
+    await expect(matchTitlePrompt).toBeHidden();
+
+    const updatedEnvelope = await getEnvelopeWithItems(pendingDocument.id);
+
+    expect(updatedEnvelope.title).toBe('Declined Title');
+    expect(updatedEnvelope.envelopeItems[0].title).toBe(pendingDocument.title);
+  });
+
+  test('skip the rename prompt when the click that ends the edit opens a dialog', async ({ page }) => {
+    await openPendingDocumentEditor(page);
+
+    await page.locator('[data-testid="envelope-title-input"]').fill('Title Before Settings');
+    await openSettingsDialog(page);
+
+    // The settings dialog hides the rest of the page from the accessibility tree.
+    const matchTitlePrompt = page.getByRole('dialog', { name: 'Rename the file too?', includeHidden: true });
+    await expect(matchTitlePrompt).toBeHidden();
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('heading', { name: 'Document Settings' })).toBeHidden();
+    await expect(matchTitlePrompt).toBeHidden();
+  });
+
+  test('show the rename prompt when the click that ends the edit opens a popover', async ({ page }) => {
+    await openPendingDocumentEditor(page);
+
+    await page.locator('[data-testid="envelope-title-input"]').fill('Title Before Attachments');
+    await page.getByRole('button', { name: 'Attachments' }).click();
+
+    await expect(page.getByRole('dialog', { name: 'Rename the file too?' })).toBeVisible();
+  });
+
+  test('the click that ends the envelope title edit still goes through', async ({ page }) => {
+    const pendingDocument = await openPendingDocumentEditor(page);
+
+    await page.locator('[data-testid="envelope-title-input"]').fill('Title Before Step Change');
+
+    // The step click blurs the title, and the step still changes before the prompt opens.
+    await clickEnvelopeEditorStep(page, 'addFields');
+    await expect(page.getByText('Selected Recipient')).toBeVisible();
+
+    const matchTitlePrompt = page.getByRole('dialog', { name: 'Rename the file too?' });
+    await expect(matchTitlePrompt).toBeVisible();
+    await matchTitlePrompt.getByRole('button', { name: 'Rename file' }).click();
+    await expect(matchTitlePrompt).toBeHidden();
+
+    const updatedEnvelope = await getEnvelopeWithItems(pendingDocument.id);
+
+    expect(updatedEnvelope.title).toBe('Title Before Step Change');
+    expect(updatedEnvelope.envelopeItems[0].title).toBe('Title Before Step Change');
   });
 });

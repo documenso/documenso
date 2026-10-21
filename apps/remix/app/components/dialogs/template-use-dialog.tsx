@@ -224,7 +224,6 @@ export function TemplateUseDialog({
           return {
             documentDataId: customDocumentData.id,
             envelopeItemId: item.envelopeItemId,
-            // Name the envelope item after the uploaded file instead of the template item.
             title: isUploadedFileNameUsable(item.data) ? getUploadedDocumentTitle(item.data) : undefined,
           };
         }),

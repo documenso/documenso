@@ -59,6 +59,7 @@ export const EnvelopeEditorUploadPage = () => {
     navigateToStep,
     registerExternalFlush,
     registerPendingMutation,
+    registerEnvelopeItemTitleHandler,
   } = useCurrentEnvelopeEditor();
 
   const { envelopeItems: uploadConfig } = editorConfig;
@@ -352,12 +353,7 @@ export const EnvelopeEditorUploadPage = () => {
     debouncedUpdateEnvelopeItems(items);
   };
 
-  const {
-    triggerSave: debouncedUpdateEnvelopeItems,
-    flush: flushUpdateEnvelopeItems,
-    isPending: isUpdateEnvelopeItemsPending,
-    isCommiting: isUpdateEnvelopeItemsCommiting,
-  } = useEnvelopeAutosave(
+  const { triggerSave: debouncedUpdateEnvelopeItems, flush: flushUpdateEnvelopeItems } = useEnvelopeAutosave(
     async (files: LocalFile[]) => {
       if (isEmbedded) {
         const nextEnvelopeItems = files
@@ -411,27 +407,6 @@ export const EnvelopeEditorUploadPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Adopt item titles changed outside this page, such as when the envelope title is
-  // applied to the only item from the header. Skipped while a save is pending so an
-  // in-flight response can't overwrite a title the user is still typing.
-  useEffect(() => {
-    if (isUpdateEnvelopeItemsPending || isUpdateEnvelopeItemsCommiting) {
-      return;
-    }
-
-    setLocalFiles((prev) => {
-      const next = prev.map((localFile) => {
-        const envelopeItem = envelope.envelopeItems.find((item) => item.id === localFile.envelopeItemId);
-
-        return envelopeItem && envelopeItem.title !== localFile.title
-          ? { ...localFile, title: envelopeItem.title }
-          : localFile;
-      });
-
-      return next.some((localFile, index) => localFile !== prev[index]) ? next : prev;
-    });
-  }, [envelope.envelopeItems, isUpdateEnvelopeItemsPending, isUpdateEnvelopeItemsCommiting]);
-
   const onEnvelopeItemTitleChange = (envelopeItemId: string, title: string) => {
     const newLocalFilesValue = localFiles.map((uploadingFile) =>
       uploadingFile.envelopeItemId === envelopeItemId ? { ...uploadingFile, title } : uploadingFile,
@@ -440,6 +415,17 @@ export const EnvelopeEditorUploadPage = () => {
     setLocalFiles(newLocalFilesValue);
     debouncedUpdateEnvelopeItems(newLocalFilesValue);
   };
+
+  const onEnvelopeItemTitleChangeRef = useRef(onEnvelopeItemTitleChange);
+  onEnvelopeItemTitleChangeRef.current = onEnvelopeItemTitleChange;
+
+  useEffect(
+    () =>
+      registerEnvelopeItemTitleHandler((envelopeItemId, title) =>
+        onEnvelopeItemTitleChangeRef.current(envelopeItemId, title),
+      ),
+    [registerEnvelopeItemTitleHandler],
+  );
 
   const dropzoneDisabledMessage = useMemo(() => {
     if (!envelopeItemPermissions.canFileBeChanged) {

@@ -4,10 +4,12 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { removePdfExtension } from '@documenso/lib/utils/envelope';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import { EnvelopeType } from '@prisma/client';
 import { match, P } from 'ts-pattern';
 
+import { ZDocumentTitleSchema } from '../document-router/schema';
 import { authenticatedProcedure } from '../trpc';
 import { useEnvelopeMeta, ZUseEnvelopeRequestSchema, ZUseEnvelopeResponseSchema } from './use-envelope.types';
 
@@ -65,21 +67,22 @@ export const useEnvelopeRoute = authenticatedProcedure
       });
     }
 
-    const filesToUpload = files.filter(
-      (file, index) =>
-        payload.customDocumentData &&
-        payload.customDocumentData.some((mapping) => mapping.identifier === file.name || mapping.identifier === index),
-    );
+    const filesToUpload = files
+      .map((file, index) => ({ file, index }))
+      .filter(({ file, index }) =>
+        customDocumentData.some((mapping) => mapping.identifier === file.name || mapping.identifier === index),
+      );
 
     // Process uploaded files and create document data for them
     const uploadedFiles = await Promise.all(
-      filesToUpload.map(async (file) => {
+      filesToUpload.map(async ({ file, index }) => {
         // We disable flattening here since `createDocumentFromTemplate` will handle it.
         const { id: documentDataId } = await putNormalizedPdfFileServerSide(file, {
           flattenForm: false,
         });
 
         return {
+          index,
           name: file.name,
           documentDataId,
         };
@@ -91,7 +94,7 @@ export const useEnvelopeRoute = authenticatedProcedure
       // Find the uploaded file by identifier
       const uploadedFile = match(mapping.identifier)
         .with(P.string, (name) => uploadedFiles.find((file) => file.name === name))
-        .with(P.number, (index) => uploadedFiles.at(index))
+        .with(P.number, (index) => uploadedFiles.find((file) => file.index === index))
         .exhaustive();
 
       if (!uploadedFile) {
@@ -109,11 +112,10 @@ export const useEnvelopeRoute = authenticatedProcedure
         });
       }
 
-      // Name the envelope item after the uploaded file instead of the template item.
       return {
         documentDataId: uploadedFile.documentDataId,
         envelopeItemId: mapping.envelopeItemId,
-        title: uploadedFile.name,
+        title: getUploadedFileTitle(uploadedFile.name),
       };
     });
 
@@ -166,3 +168,18 @@ export const useEnvelopeRoute = authenticatedProcedure
       })),
     };
   });
+
+/**
+ * Only `.pdf` file names are used, since nameless uploads are given the name `blob`.
+ *
+ * Returns undefined to keep the template envelope item title.
+ */
+const getUploadedFileTitle = (fileName: string) => {
+  if (!/\.pdf$/i.test(fileName)) {
+    return undefined;
+  }
+
+  const parsedTitle = ZDocumentTitleSchema.safeParse(removePdfExtension(fileName));
+
+  return parsedTitle.success ? parsedTitle.data : undefined;
+};
