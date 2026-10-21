@@ -1,3 +1,4 @@
+import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -42,6 +43,8 @@ export const removeSignedFieldWithToken = async ({
   if (!envelope) {
     throw new Error(`Document not found for field ${field.id}`);
   }
+
+  await assertSenderNotDisabled({ userId: envelope.userId });
 
   if (envelope.status !== DocumentStatus.PENDING) {
     throw new Error(`Document ${envelope.id} must be pending`);

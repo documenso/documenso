@@ -17,6 +17,7 @@ import { isRecipientTurnBySigningOrder } from '../../utils/recipient-groups';
 import { isRecipientExpired } from '../../utils/recipients';
 import { isRecipientAuthorized } from '../document/is-recipient-authorized';
 import { getTeamSettings } from '../team/get-team-settings';
+import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 
 export type GetRecipientEnvelopeByTokenOptions = {
   token: string;
@@ -229,6 +230,8 @@ export const getEnvelopeForRecipientSigning = async ({
       message: 'Envelope has no items',
     });
   }
+
+  await assertSenderNotDisabled({ userId: envelope.userId });
 
   const documentAccessValid = await isRecipientAuthorized({
     type: 'ACCESS',

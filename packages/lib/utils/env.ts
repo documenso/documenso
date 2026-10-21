@@ -60,4 +60,15 @@ export const createPublicEnv = () => ({
   // feature UI on a boolean.
   NEXT_PUBLIC_AI_FEATURES_ENABLED:
     process.env.GOOGLE_VERTEX_PROJECT_ID && process.env.GOOGLE_VERTEX_API_KEY ? 'true' : 'false',
+  NEXT_PUBLIC_GOOGLE_SSO_ENABLED:
+    process.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID && process.env.NEXT_PRIVATE_GOOGLE_CLIENT_SECRET ? 'true' : 'false',
+  NEXT_PUBLIC_MICROSOFT_SSO_ENABLED:
+    process.env.NEXT_PRIVATE_MICROSOFT_CLIENT_ID && process.env.NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET ? 'true' : 'false',
+  NEXT_PUBLIC_OIDC_SSO_ENABLED:
+    process.env.NEXT_PRIVATE_OIDC_WELL_KNOWN &&
+    process.env.NEXT_PRIVATE_OIDC_CLIENT_ID &&
+    process.env.NEXT_PRIVATE_OIDC_CLIENT_SECRET
+      ? 'true'
+      : 'false',
+  NEXT_PUBLIC_OIDC_PROVIDER_LABEL: process.env.NEXT_PRIVATE_OIDC_PROVIDER_LABEL ?? '',
 });

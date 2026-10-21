@@ -29,6 +29,7 @@ import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../ut
 import { getRecipientsInActiveSigningStep, isRecipientTurnBySigningOrder } from '../../utils/recipient-groups';
 import { assertRecipientNotExpired, isRecipientBefore } from '../../utils/recipients';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
+import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { isRecipientAuthorized } from './is-recipient-authorized';
 
@@ -89,6 +90,8 @@ export const completeDocumentWithToken = async ({
       statusCode: 404,
     });
   }
+
+  await assertSenderNotDisabled({ userId: envelope.userId });
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 

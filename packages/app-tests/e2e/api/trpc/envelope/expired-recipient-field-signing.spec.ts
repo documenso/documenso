@@ -6,6 +6,8 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { FieldType } from '@prisma/client';
 
+import { WEBAPP_ORIGIN_HEADERS } from '../../../fixtures/authentication';
+
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
 /**
@@ -16,7 +18,7 @@ const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
 const callSignEnvelopeField = async (page: Page, input: { token: string; fieldId: number; value: string }) => {
   return await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.field.sign`, {
-    headers: { 'content-type': 'application/json' },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
     data: JSON.stringify({
       json: {
         token: input.token,

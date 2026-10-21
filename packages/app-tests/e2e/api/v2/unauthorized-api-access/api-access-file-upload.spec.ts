@@ -6,6 +6,8 @@ import { createApiToken } from '@documenso/lib/server-only/public-api/create-api
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
 
+import { WEBAPP_ORIGIN_HEADERS } from '../../../fixtures/authentication';
+
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
 const examplePdf = fs.readFileSync(path.join(__dirname, '../../../../../../assets/example.pdf'));
@@ -37,6 +39,7 @@ const buildPdfFormData = () => {
 test.describe('File upload endpoint authorization', () => {
   test('rejects an unauthenticated upload-pdf request', async ({ request }) => {
     const res = await request.post(`${WEBAPP_BASE_URL}/api/files/upload-pdf`, {
+      headers: WEBAPP_ORIGIN_HEADERS,
       multipart: buildPdfFormData(),
     });
 
