@@ -38,7 +38,7 @@ export const downloadDocumentBetaRoute = authenticatedProcedure
     });
 
     // This error is done AFTER the get envelope so we can test access controls without S3.
-    if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+    if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3' && process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 'neon') {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Document downloads are only available when S3 storage is configured.',
       });
