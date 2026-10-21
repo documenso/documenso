@@ -75,6 +75,28 @@ const buildEmbedSrc = (host: string, token: string) => {
 
 A complete example can be found in the [Embeds repository](https://github.com/documenso/embeds/blob/main/packages/mitosis/src/sign-document.lite.tsx).
 
+#### Query parameters
+
+A small number of options are read **server side** and are therefore passed as regular query parameters rather than in the fragment.
+
+| Parameter | Applies to | Description |
+| --------- | ---------- | ----------- |
+| `clientUserId` | `/embed/sign/:token` | Opaque signer identifier used to prefill and persist the signer's signature across embeds. Platform Plan. See [Persisting Signatures](/docs/developers/embedding#persisting-signatures). |
+| `externalId` | `/embed/direct/:token` | Your reference ID, stored with the document created from the direct template. |
+
+```ts
+const src = new URL(`/embed/sign/${token}`, host);
+
+src.searchParams.set('clientUserId', 'usr_8f2c1b4e');
+
+return `${src.toString()}#${encodedOptions}`;
+```
+
+<Callout type="warn" title="Keep identifiers opaque">
+  Query parameters are part of the HTTP request and will appear in Documenso's request logs. Never put an email address
+  or other personally identifiable information in `clientUserId`; use an opaque ID instead.
+</Callout>
+
 <Callout type="info" title="Why use the URL fragment?">
   The fragment is **not sent to the server** as part of the HTTP request, but it is available to the embedded app in
   the browser. This makes it a convenient way to pass client-side configuration without changing the base embed URL.
