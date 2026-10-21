@@ -1,6 +1,5 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { Context } from 'hono';
-import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
+import { getSignedCookie, setSignedCookie } from 'hono/cookie';
 import { parseSigned, serialize } from 'hono/utils/cookie';
 import { z } from 'zod';
 
@@ -39,47 +38,38 @@ export const setCscBlockingErrorCookie = async (options: SetCscBlockingErrorCook
 };
 
 /**
- * Read + validate the blocking-error cookie. Returns `null` when absent or
- * signature-invalid; throws `INVALID_REQUEST` when signed-but-malformed
- * (tamper-shaped, mirroring `oauth-flow-cookie.ts`).
+ * The cookie is advisory (it only decides which error banner to show), so a
+ * malformed payload is treated the same as a missing one rather than failing
+ * the request.
+ */
+const parseCscBlockingErrorPayload = (raw: string | undefined | false): TCscBlockingErrorPayload | null => {
+  if (typeof raw !== 'string') {
+    return null;
+  }
+
+  try {
+    const result = ZCscBlockingErrorPayloadSchema.safeParse(JSON.parse(raw));
+
+    return result.success ? result.data : null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Hono reader. Returns `null` when the cookie is absent, signature-invalid or
+ * payload-malformed.
  */
 export const getCscBlockingErrorCookie = async (c: Context): Promise<TCscBlockingErrorPayload | null> => {
   const raw = await getSignedCookie(c, getCscCookieSecret(), CSC_BLOCKING_ERROR_COOKIE_NAME);
 
-  if (!raw) {
-    return null;
-  }
-
-  let parsedJson: unknown;
-
-  try {
-    parsedJson = JSON.parse(raw);
-  } catch {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'CSC blocking error cookie payload is not valid JSON.',
-    });
-  }
-
-  const result = ZCscBlockingErrorPayloadSchema.safeParse(parsedJson);
-
-  if (!result.success) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'CSC blocking error cookie payload failed schema validation.',
-    });
-  }
-
-  return result.data;
-};
-
-export const clearCscBlockingErrorCookie = (c: Context): void => {
-  deleteCookie(c, CSC_BLOCKING_ERROR_COOKIE_NAME, cscCookieBaseOptions);
+  return parseCscBlockingErrorPayload(raw);
 };
 
 /**
  * Remix-compatible reader: parses + HMAC-verifies the blocking-error cookie
- * from a raw `Cookie` header on a standard `Request`. Returns `null` when
- * absent, signature-invalid, or payload-malformed (no throw — the loader
- * only uses the cookie advisorily, so a bad cookie shouldn't break the page).
+ * from the raw `Cookie` header on a standard `Request`. Same `null` semantics
+ * as `getCscBlockingErrorCookie`.
  */
 export const readCscBlockingErrorFromRequest = async (request: Request): Promise<TCscBlockingErrorPayload | null> => {
   const cookieHeader = request.headers.get('cookie');
@@ -90,29 +80,15 @@ export const readCscBlockingErrorFromRequest = async (request: Request): Promise
 
   const parsed = await parseSigned(cookieHeader, getCscCookieSecret(), CSC_BLOCKING_ERROR_COOKIE_NAME);
 
-  const value = parsed[CSC_BLOCKING_ERROR_COOKIE_NAME];
-
-  if (typeof value !== 'string') {
-    return null;
-  }
-
-  try {
-    const json = JSON.parse(value);
-
-    const result = ZCscBlockingErrorPayloadSchema.safeParse(json);
-
-    return result.success ? result.data : null;
-  } catch {
-    return null;
-  }
+  return parseCscBlockingErrorPayload(parsed[CSC_BLOCKING_ERROR_COOKIE_NAME]);
 };
 
 /**
- * Serialised `Set-Cookie` header value that expires the cookie immediately.
- * Use in a Remix loader's response headers to clear the cookie after the
- * loader reads it once.
+ * `Set-Cookie` header value that expires the cookie immediately. Remix loaders
+ * attach it to the response after reading the cookie once, since they have no
+ * Hono context to call `deleteCookie` on.
  */
-export const buildClearCscBlockingErrorCookieHeader = (): string => {
+export const expiredCscBlockingErrorCookieHeader = (): string => {
   return serialize(CSC_BLOCKING_ERROR_COOKIE_NAME, '', {
     ...cscCookieBaseOptions,
     maxAge: 0,

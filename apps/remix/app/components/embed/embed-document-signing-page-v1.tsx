@@ -139,10 +139,31 @@ export const EmbedSignDocumentV1ClientPage = ({
         return;
       }
 
-      await completeDocumentWithToken({
+      const result = await completeDocumentWithToken({
         documentId,
         token,
       });
+
+      // TSP envelopes return a CSC authorize URL that only the v2 embed can run.
+      if (result.status === 'REDIRECT') {
+        if (window.parent) {
+          window.parent.postMessage(
+            {
+              action: 'document-error',
+              data: null,
+            },
+            '*',
+          );
+        }
+
+        toast({
+          title: _(msg`Unable to sign document`),
+          description: _(msg`Qualified electronic signatures are not supported in this embed.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
 
       if (window.parent) {
         window.parent.postMessage(

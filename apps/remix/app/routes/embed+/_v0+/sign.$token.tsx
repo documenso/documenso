@@ -1,4 +1,5 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { assertEmbedCscServiceSession } from '@documenso/ee/server-only/signing/csc/assert-embed-service-session';
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -13,6 +14,7 @@ import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organis
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
+import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
@@ -110,8 +112,7 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-authentication-required',
-        email: user?.email || recipient.email,
-        returnTo: `/embed/sign/${token}`,
+        email: recipient.email,
       },
       {
         status: 401,
@@ -137,6 +138,8 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     requestMetadata,
     recipientAccessAuth: derivedRecipientAccessAuth,
   });
+
+  await assertEmbedCscServiceSession({ request, token, envelope: document, isCompleted, isRejected });
 
   const allRecipients =
     recipient.role === RecipientRole.ASSISTANT
@@ -225,7 +228,6 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
       {
         type: 'embed-authentication-required',
         email: envelopeForSigning.recipientEmail,
-        returnTo: `/embed/sign/${token}`,
       },
       {
         status: 401,
@@ -233,7 +235,7 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
     );
   }
 
-  const { envelope, recipient, isRecipientsTurn, isExpired } = envelopeForSigning;
+  const { envelope, recipient, isRecipientsTurn, isExpired, isCompleted, isRejected } = envelopeForSigning;
 
   const organisationClaim = await getOrganisationClaimByTeamId({ teamId: envelope.teamId });
 
@@ -289,8 +291,7 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-authentication-required',
-        email: user?.email || recipient.email,
-        returnTo: `/embed/sign/${token}`,
+        email: recipient.email,
       },
       {
         status: 401,
@@ -303,6 +304,8 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
     requestMetadata,
     recipientAccessAuth: derivedRecipientAccessAuth,
   }).catch(() => null);
+
+  await assertEmbedCscServiceSession({ request, token, envelope, isCompleted, isRejected });
 
   fireAndForget(async () => {
     const team = await prisma.team.findFirst({
@@ -353,6 +356,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
       envelope: {
         select: {
           internalVersion: true,
+          userId: true,
         },
       },
     },
@@ -360,6 +364,23 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
 
   if (!foundRecipient) {
     throw new Response('Not Found', { status: 404 });
+  }
+
+  try {
+    await assertSenderNotDisabled({ userId: foundRecipient.envelope.userId });
+  } catch (e) {
+    if (AppError.parseError(e).code === AppErrorCode.SENDER_DISABLED) {
+      throw data(
+        {
+          type: 'embed-sender-disabled',
+        },
+        {
+          status: 403,
+        },
+      );
+    }
+
+    throw e;
   }
 
   if (foundRecipient.envelope.internalVersion === 2) {

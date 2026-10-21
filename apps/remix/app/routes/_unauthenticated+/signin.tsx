@@ -15,7 +15,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader2Icon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link, redirect, useSearchParams } from 'react-router';
 
 import { SignInForm } from '~/components/forms/signin';
@@ -29,7 +29,10 @@ export function meta() {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { isAuthenticated } = await getOptionalSession(request);
+  const { session } = await getOptionalSession(request);
+
+  // Embed sessions are rejected by the authenticated tree, so treat them as signed out here.
+  const isAuthenticated = session !== null && !session.isEmbed;
 
   // SSR env variables.
   const isEmailPasswordSigninEnabled = isSigninEnabledForProvider('email');
@@ -87,18 +90,9 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
   const { _ } = useLingui();
 
   const [searchParams] = useSearchParams();
-  const [isEmbeddedRedirect, setIsEmbeddedRedirect] = useState(false);
 
   const errorParam = searchParams.get('error');
   const signupError = errorParam ? SIGNUP_ERROR_MESSAGES[errorParam] : undefined;
-
-  useEffect(() => {
-    const hash = window.location.hash.slice(1);
-
-    const params = new URLSearchParams(hash);
-
-    setIsEmbeddedRedirect(params.get('embedded') === 'true');
-  }, []);
 
   useEffect(() => {
     if (!shouldAutoRedirectToOIDC) {
@@ -148,7 +142,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
           returnTo={returnTo}
         />
 
-        {!isEmbeddedRedirect && isSignupEnabled && (
+        {isSignupEnabled && (
           <p className="mt-6 text-center text-muted-foreground text-sm">
             <Trans>
               Don't have an account?{' '}
