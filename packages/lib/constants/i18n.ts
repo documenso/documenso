@@ -67,6 +67,10 @@ export const SUPPORTED_LANGUAGES: Record<string, SupportedLanguage> = {
     short: 'zh',
     full: msg`Chinese`,
   },
+  vi: {
+    short: 'vi',
+    full: msg`Vietnamese`,
+  },
 } satisfies Record<SupportedLanguageCodes, SupportedLanguage>;
 
 export const isValidLanguageCode = (code: unknown): code is SupportedLanguageCodes =>
