@@ -54,7 +54,7 @@ export const UNSAFE_createEnvelopeItems = async ({
       }
 
       const normalized = await normalizePdf(buffer, {
-        flattenForm: envelope.type !== 'TEMPLATE',
+        flattenForm: false,
       });
 
       const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
