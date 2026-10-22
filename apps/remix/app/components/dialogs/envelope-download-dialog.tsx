@@ -29,9 +29,9 @@ type EnvelopeDownloadDialogProps = {
    * button is hidden for them.
    *
    * Optional: omit it on call sites where the status can never be PENDING (DRAFT,
-   * COMPLETED, REJECTED) or when a recipient token is set, since the Partial button
-   * is also gated on those. Pass it from team-side call sites that can render the
-   * dialog for a PENDING envelope.
+   * COMPLETED, REJECTED) or that only render v2 envelopes, such as the v2 signing
+   * page. Pass it from call sites that can render the dialog for a PENDING
+   * envelope of either version.
    */
   isLegacy?: boolean;
   envelopeItems?: EnvelopeItemToDownload[];
@@ -67,12 +67,10 @@ export const EnvelopeDownloadDialog = ({
 
   // The dialog shows the original document alongside one of:
   //   - "Signed" (when the envelope is COMPLETED)
-  //   - "Partial" (when the envelope is PENDING, not legacy, and we are on the
-  //     team/owner side; recipients are intentionally not offered this since the
-  //     partial PDF carries no PKI signature and would create a leak vector for
-  //     half-executed contracts; legacy envelopes use a different rendering
-  //     pipeline that the partial-download helper does not implement)
-  //   - nothing (DRAFT, REJECTED, PENDING with recipient token, or legacy PENDING)
+  //   - "Partial" (when the envelope is PENDING and not legacy; legacy envelopes
+  //     use a different rendering pipeline that the partial-download helper does
+  //     not implement)
+  //   - nothing (DRAFT, REJECTED, or legacy PENDING)
   const secondaryDownload = useMemo<{ version: 'signed' | 'pending'; label: string } | null>(() => {
     if (envelopeStatus === DocumentStatus.COMPLETED) {
       return {
@@ -81,7 +79,7 @@ export const EnvelopeDownloadDialog = ({
       };
     }
 
-    if (envelopeStatus === DocumentStatus.PENDING && !token && !isLegacy) {
+    if (envelopeStatus === DocumentStatus.PENDING && !isLegacy) {
       return {
         version: 'pending',
         label: t({ message: 'Partial', context: 'Partially signed document (adjective)' }),
@@ -89,7 +87,7 @@ export const EnvelopeDownloadDialog = ({
     }
 
     return null;
-  }, [envelopeStatus, isLegacy, token, t]);
+  }, [envelopeStatus, isLegacy, t]);
 
   const { data: envelopeItemsPayload, isLoading: isLoadingEnvelopeItems } = trpc.envelope.item.getManyByToken.useQuery(
     {
