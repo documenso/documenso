@@ -5,7 +5,6 @@ import {
   BRANDING_LOGO_MAX_SIZE_MB,
 } from '@documenso/lib/constants/branding';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
-import type { ZodRawShape } from 'zod';
 import z from 'zod';
 import { zfd } from 'zod-form-data';
 
@@ -49,10 +48,10 @@ export const zfdBrandingImageFile = () => {
  * an error. This provides the same functionality as `zfd.formData()` but
  * can be considered somewhat safer.
  */
-export const zodFormData = <T extends ZodRawShape>(schema: T) => {
+export const zodFormData = <T extends Parameters<typeof z.object>[0]>(schema: T) => {
   return z.preprocess((data) => {
     if (data instanceof FormData) {
-      const formData: Record<string, unknown> = {};
+      const formData: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {};
 
       for (const key of data.keys()) {
         const values = data.getAll(key);
