@@ -353,8 +353,11 @@ const runAllFieldTypesFlow = async (surface: TEnvelopeEditorSurface): Promise<TA
   await root.locator('[data-testid="field-form-textAlign"]').click();
   await root.getByRole('option', { name: 'Right' }).click();
 
-  // 4. Initials: place and set fontSize to 16.
+  // 4. Initials: switch to handwriting, which bumps the default fontSize to 18, then set fontSize to 16.
   await placeFieldOnPdf(root, 'Initials', { x: 120, y: 200 });
+  await root.locator('[data-testid="field-form-fontFamily"]').click();
+  await root.getByRole('option', { name: 'Handwriting' }).click();
+  await expect(root.locator('[data-testid="field-form-fontSize"]')).toHaveValue('18');
   await root.locator('[data-testid="field-form-fontSize"]').fill('16');
 
   // 5. Date: place and set textAlign to center.
@@ -496,6 +499,7 @@ const assertAllFieldTypesPersistedInDatabase = async ({
   // INITIALS
   expect(meta(FieldType.INITIALS).type).toBe('initials');
   expect(meta(FieldType.INITIALS).fontSize).toBe(16);
+  expect(meta(FieldType.INITIALS).fontFamily).toBe('handwriting');
 
   // DATE
   expect(meta(FieldType.DATE).type).toBe('date');

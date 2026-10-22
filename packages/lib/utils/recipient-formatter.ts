@@ -7,6 +7,13 @@ export const extractInitials = (text: string) =>
     .slice(0, 2)
     .join('');
 
+export const extractFullInitials = (text: string) =>
+  text
+    .split(/\s+/)
+    .map((name) => name.match(/^\p{L}/u)?.[0].toUpperCase())
+    .filter(Boolean)
+    .join('');
+
 export const recipientAbbreviation = (recipient: Pick<Recipient, 'name' | 'email'>) => {
   return extractInitials(recipient.name) || recipient.email.slice(0, 1).toUpperCase();
 };
