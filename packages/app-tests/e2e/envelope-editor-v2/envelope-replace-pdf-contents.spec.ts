@@ -14,6 +14,7 @@ import {
   clickEnvelopeEditorStep,
   getEnvelopeItemReplaceButtons,
   openDocumentEnvelopeEditor,
+  type TEnvelopeEditorSurface,
 } from '../fixtures/envelope-editor';
 
 test.use({
@@ -60,21 +61,32 @@ const seedContent = async (envelopeId: string, envelopeItemId: string, page: num
 const countContents = async (envelopeId: string) => await prisma.envelopeContent.count({ where: { envelopeId } });
 
 /**
- * Replacing a PDF deletes the contents which sit on pages the new file does
- * not have. The editor keeps its own copy of the contents, so unless that copy
- * is resynced the next save posts the deleted content back and the server,
- * finding no content with that id, creates it again on a page which no longer
- * exists.
+ * Replace the current PDF through the edit dialog opened from the file tabs
+ * on the fields step, which is the second place a PDF can be replaced from.
  */
-test('does not recreate contents removed by a pdf replacement', async ({ page }) => {
-  const surface = await openDocumentEnvelopeEditor(page);
-  const { root, envelopeId } = surface;
+const replacePdfViaFieldsStepDialog = async (root: Page, buffer: Buffer, name: string) => {
+  // The pencil only shows on hover, so the click is forced.
+  await root.locator('[data-testid^="envelope-item-edit-button-"]').first().click({ force: true });
 
-  if (!envelopeId) {
-    throw new Error('Expected the document editor surface to have an envelopeId');
-  }
+  const dialog = root.getByRole('dialog');
+  await expect(dialog).toBeVisible();
 
-  // A three page PDF so a content can live on a page the replacement drops.
+  await root
+    .locator('[data-testid="envelope-item-edit-dropzone"] input[type="file"]')
+    .setInputFiles({ name, mimeType: 'application/pdf', buffer });
+
+  await expect(root.locator('[data-testid="envelope-item-edit-selected-file"]')).toBeVisible();
+
+  await root.locator('[data-testid="envelope-item-edit-update-button"]').click();
+
+  await expect(dialog).not.toBeVisible({ timeout: 15000 });
+};
+
+/**
+ * Put a three page PDF on the document, seed a content on pages 1 and 3, and
+ * load the editor with both in its local state.
+ */
+const setUpDocumentWithContentOnPageThree = async (root: Page, envelopeId: string) => {
   await replacePdf(root, multiPagePdfBuffer, 'multi-page.pdf');
 
   const envelope = await prisma.envelope.findFirstOrThrow({
@@ -95,6 +107,45 @@ test('does not recreate contents removed by a pdf replacement', async ({ page })
   await selectEditorTab(root, 'Contents');
 
   await expect.poll(async () => await getContentCountForPage(root, 1)).toBe(1);
+};
+
+/**
+ * After a replacement that dropped page 3, placing a content must only add
+ * that one content: nothing the editor was holding may come back.
+ */
+const assertNoContentResurrectedAfterPlacing = async (
+  root: Page,
+  surface: TEnvelopeEditorSurface,
+  envelopeId: string,
+) => {
+  await placeContentOnPdf(root, 'Text', { x: 200, y: 260 });
+
+  await waitForContentsAutosave(surface);
+
+  // The placed content, and nothing else.
+  expect(await countContents(envelopeId)).toBe(2);
+
+  const contents = await prisma.envelopeContent.findMany({ where: { envelopeId } });
+
+  expect(contents.every((content) => (content.contentMeta.page ?? 1) === 1)).toBe(true);
+};
+
+/**
+ * Replacing a PDF deletes the contents which sit on pages the new file does
+ * not have. The editor keeps its own copy of the contents, so unless that copy
+ * is resynced the next save posts the deleted content back and the server,
+ * finding no content with that id, creates it again on a page which no longer
+ * exists.
+ */
+test('does not recreate contents removed by a pdf replacement on the upload step', async ({ page }) => {
+  const surface = await openDocumentEnvelopeEditor(page);
+  const { root, envelopeId } = surface;
+
+  if (!envelopeId) {
+    throw new Error('Expected the document editor surface to have an envelopeId');
+  }
+
+  await setUpDocumentWithContentOnPageThree(root, envelopeId);
 
   // Replace with a single page PDF, dropping the content on page 3.
   await clickEnvelopeEditorStep(root, 'upload');
@@ -109,14 +160,32 @@ test('does not recreate contents removed by a pdf replacement', async ({ page })
   await clickEnvelopeEditorStep(root, 'addFields');
   await selectEditorTab(root, 'Contents');
 
-  await placeContentOnPdf(root, 'Text', { x: 200, y: 260 });
+  await assertNoContentResurrectedAfterPlacing(root, surface, envelopeId);
+});
 
-  await waitForContentsAutosave(surface);
+/**
+ * The fields step has its own replace entry point (the pencil on each file
+ * tab). Unlike the upload step it is reached without a step transition, so
+ * the editor's local contents are not flushed or reset around it and must be
+ * resynced from the replace response itself.
+ */
+test('does not recreate contents removed by a pdf replacement from the fields step dialog', async ({ page }) => {
+  const surface = await openDocumentEnvelopeEditor(page);
+  const { root, envelopeId } = surface;
 
-  // The placed content, and nothing else.
-  expect(await countContents(envelopeId)).toBe(2);
+  if (!envelopeId) {
+    throw new Error('Expected the document editor surface to have an envelopeId');
+  }
 
-  const pages = await prisma.envelopeContent.findMany({ where: { envelopeId } });
+  await setUpDocumentWithContentOnPageThree(root, envelopeId);
 
-  expect(pages.every((content) => (content.contentMeta.page ?? 1) === 1)).toBe(true);
+  // Replace from the fields step, staying on the contents tab throughout.
+  await replacePdfViaFieldsStepDialog(root, examplePdfBuffer, 'single-page.pdf');
+
+  await expect.poll(async () => await countContents(envelopeId)).toBe(1);
+
+  // The page 1 content is still drawn after the local resync.
+  await expect.poll(async () => await getContentCountForPage(root, 1)).toBe(1);
+
+  await assertNoContentResurrectedAfterPlacing(root, surface, envelopeId);
 });

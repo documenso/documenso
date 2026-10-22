@@ -755,6 +755,55 @@ test.describe('document editor', () => {
     await expect(page.getByRole('alert').filter({ hasText: 'Content cannot be changed' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Rectangle', exact: true })).toHaveCount(0);
   });
+
+  /**
+   * Sending a document bakes its contents into the PDF, so the editor must
+   * not draw the content rows on top of the page image again. The signing and
+   * view pages already skip them; this guards the editor doing the same.
+   */
+  test('contents are not drawn on the canvas once the document has been sent', async ({ page }) => {
+    const { user, team } = await seedUser();
+
+    const document = await seedPendingDocument(user, team.id, [user], { internalVersion: 2 });
+
+    const envelopeItem = await prisma.envelopeItem.findFirstOrThrow({ where: { envelopeId: document.id } });
+
+    await prisma.envelopeContent.create({
+      data: {
+        id: generateDatabaseId('envelope_content'),
+        envelopeId: document.id,
+        envelopeItemId: envelopeItem.id,
+        contentMeta: ZEnvelopeContentMetaSchema.parse({
+          type: EnvelopeContentType.HIGHLIGHT,
+          page: 1,
+          positionX: 10,
+          positionY: 10,
+          width: 40,
+          height: 8,
+        }),
+      },
+    });
+
+    await apiSignin({
+      page,
+      email: user.email,
+      redirectPath: `/t/${team.url}/documents/${document.id}/edit?step=addFields`,
+    });
+
+    await expect(getPageCanvas(page)).toBeVisible();
+
+    // The canvas has rendered its fields, so a zero content count below is
+    // the gate working rather than the page not having drawn anything yet.
+    await expect.poll(async () => await getFieldCountForPage(page, 1)).toBeGreaterThan(0);
+
+    expect(await getContentCountForPage(page, 1)).toBe(0);
+
+    // Opening the contents tab must not draw them either.
+    await selectEditorTab(page, 'Contents');
+    await expect(page.getByRole('alert').filter({ hasText: 'Content cannot be changed' })).toBeVisible();
+
+    expect(await getContentCountForPage(page, 1)).toBe(0);
+  });
 });
 
 test.describe('template editor', () => {
