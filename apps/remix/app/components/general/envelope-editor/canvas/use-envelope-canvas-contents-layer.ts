@@ -18,6 +18,7 @@ import {
   MIN_CONTENT_WIDTH_PX,
 } from '@documenso/lib/universal/content-renderer/content-renderer';
 import { renderContent } from '@documenso/lib/universal/content-renderer/render-content';
+import { areContentsImprinted } from '@documenso/lib/utils/envelope';
 import { getLocalContentOrderId, sortContentsForRender } from '@documenso/lib/utils/envelope-content';
 import { getClientSideContentTranslations } from '@documenso/lib/utils/envelope-content-translations';
 import type { PercentageBox } from '@documenso/lib/utils/geometry';
@@ -75,7 +76,7 @@ export const useEnvelopeCanvasContentsLayer = ({
   const { i18n } = useLingui();
   const analytics = useAnalytics();
   const { envelope, editorContents, selectedEditorTab } = useCurrentEnvelopeEditor();
-  const { currentEnvelopeItem, contentImages, setRenderError } = useCurrentEnvelopeRender();
+  const { version, envelopeStatus, currentEnvelopeItem, contentImages, setRenderError } = useCurrentEnvelopeRender();
 
   const { stage, pageLayer, scale, pageNumber, unscaledViewport } = canvas;
   const { contentGroups: selectedGroups } = selection;
@@ -86,22 +87,35 @@ export const useEnvelopeCanvasContentsLayer = ({
   const pending = useEnvelopeCanvasPendingCreation({ canvas, nodeName: PENDING_CONTENT_NODE_NAME });
 
   /**
+   * Once an envelope is sent its contents are inserted into the current PDF,
+   * so drawing them on the canvas again would double them up. This matches
+   * the signing and generic renderers.
+   */
+  const shouldRenderContents = !(version === 'current' && areContentsImprinted(envelopeStatus));
+
+  /**
    * The page's contents in stacking order, so rendering them in sequence
    * puts the last one on top. Local contents are ordered by their form ID as
    * the tiebreak, the same way persisted contents are ordered by their ID.
+   *
+   * Empty when the contents are already imprinted on the PDF, which keeps
+   * every consumer (rendering, reconciliation, line anchors, selection)
+   * from touching them.
    */
-  const localPageContents = useMemo(
-    () =>
-      sortContentsForRender(
-        editorContents.localContents
-          .filter(
-            (content) => content.contentMeta.page === pageNumber && content.envelopeItemId === currentEnvelopeItem?.id,
-          )
-          .map((content) => ({ ...content, id: getLocalContentOrderId(content) })),
-        (content) => content.contentMeta.zIndex,
-      ),
-    [editorContents.localContents, pageNumber, currentEnvelopeItem?.id],
-  );
+  const localPageContents = useMemo(() => {
+    if (!shouldRenderContents) {
+      return [];
+    }
+
+    return sortContentsForRender(
+      editorContents.localContents
+        .filter(
+          (content) => content.contentMeta.page === pageNumber && content.envelopeItemId === currentEnvelopeItem?.id,
+        )
+        .map((content) => ({ ...content, id: getLocalContentOrderId(content) })),
+      (content) => content.contentMeta.zIndex,
+    );
+  }, [editorContents.localContents, pageNumber, currentEnvelopeItem?.id, shouldRenderContents]);
 
   const isOnPage = (formId: string) => localPageContents.some((content) => content.formId === formId);
 

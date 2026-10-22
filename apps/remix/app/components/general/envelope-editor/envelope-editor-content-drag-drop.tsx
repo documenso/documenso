@@ -226,7 +226,7 @@ export const EnvelopeEditorContentDragDrop = ({ selectedEnvelopeItemId }: Envelo
 
   if (!canContentBeChanged(envelope)) {
     return (
-      <Alert variant="neutral" className="rounded-lg border border-border">
+      <Alert variant="warning">
         <AlertDescription className="text-sm">
           {match(envelope.status)
             .with(DocumentStatus.COMPLETED, () => (
@@ -248,7 +248,7 @@ export const EnvelopeEditorContentDragDrop = ({ selectedEnvelopeItemId }: Envelo
   // envelope which went over its limit can be brought back down.
   if (contentLimits.isContentLimitReached || contentLimits.isImageLimitReached) {
     return (
-      <Alert variant="neutral" className="rounded-lg border border-border" data-testid="content-limit-reached-alert">
+      <Alert variant="warning" data-testid="content-limit-reached-alert">
         <AlertDescription className="text-sm">
           {contentLimits.isContentLimitReached ? (
             <Plural
