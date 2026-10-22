@@ -54,6 +54,18 @@ export type GenericTextFieldTypeMetas =
   | TTextFieldMeta
   | TNumberFieldMeta;
 
+export const resolveFieldFontSize = (fieldMeta?: GenericTextFieldTypeMetas | null): number => {
+  if (fieldMeta?.fontSize !== undefined) {
+    return fieldMeta.fontSize;
+  }
+
+  if (fieldMeta?.type === 'initials' && fieldMeta.fontFamily === 'handwriting') {
+    return DEFAULT_HANDWRITING_INITIALS_FONT_SIZE;
+  }
+
+  return DEFAULT_FIELD_FONT_SIZE;
+};
+
 const ZFieldMetaLineHeight = z.coerce
   .number()
   .min(FIELD_MIN_LINE_HEIGHT)

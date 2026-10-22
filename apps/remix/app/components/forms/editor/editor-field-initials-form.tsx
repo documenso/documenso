@@ -3,6 +3,7 @@ import {
   DEFAULT_HANDWRITING_INITIALS_FONT_SIZE,
   FIELD_DEFAULT_GENERIC_ALIGN,
   type TInitialsFieldMeta as InitialsFieldMeta,
+  resolveFieldFontSize,
   ZInitialsFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
@@ -40,7 +41,7 @@ export const EditorFieldInitialsForm = ({
     resolver: zodResolver(ZInitialsFieldFormSchema),
     mode: 'onChange',
     defaultValues: {
-      fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+      fontSize: resolveFieldFontSize(value),
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
       fontFamily: value.fontFamily ?? 'sans-serif',
     },
