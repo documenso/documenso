@@ -222,7 +222,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       }
 
       // This error is done AFTER the get envelope so we can test access controls without S3.
-      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3' && process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 'neon') {
         return {
           status: 500,
           body: {
@@ -350,7 +350,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     const { body } = args;
 
     try {
-      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3' && process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 'neon') {
         return {
           status: 500,
           body: {
@@ -500,7 +500,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     } = body;
 
     try {
-      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3' && process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 'neon') {
         return {
           status: 500,
           body: {

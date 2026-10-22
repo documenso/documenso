@@ -7,16 +7,26 @@ import { ONE_HOUR, ONE_SECOND } from '../../../constants/time';
 import { alphaid } from '../../id';
 import type { PresignedUrl, StorageProvider, UploadFileInput, UploadFileResult } from './storage-provider';
 
+export type S3ProviderOptions = {
+  endpoint?: string;
+  forcePathStyle?: boolean;
+  region?: string;
+};
+
 export class S3Provider implements StorageProvider {
   private client: S3Client;
 
-  constructor() {
+  /**
+   * Options override the matching `NEXT_PRIVATE_UPLOAD_*` env vars, so S3-compatible
+   * providers with fixed requirements (such as Neon) can reuse this provider.
+   */
+  constructor(options: S3ProviderOptions = {}) {
     const hasCredentials = env('NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID') && env('NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY');
 
     this.client = new S3Client({
-      endpoint: env('NEXT_PRIVATE_UPLOAD_ENDPOINT') || undefined,
-      forcePathStyle: env('NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE') === 'true',
-      region: env('NEXT_PRIVATE_UPLOAD_REGION') || 'us-east-1',
+      endpoint: options.endpoint ?? (env('NEXT_PRIVATE_UPLOAD_ENDPOINT') || undefined),
+      forcePathStyle: options.forcePathStyle ?? env('NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE') === 'true',
+      region: options.region ?? (env('NEXT_PRIVATE_UPLOAD_REGION') || 'us-east-1'),
       // Since v3.729 the AWS SDK adds a CRC32 checksum to every request by default
       // (`requestChecksumCalculation: 'WHEN_SUPPORTED'`). Many S3-compatible providers
       // (GarageHQ, MinIO, Backblaze B2, etc.) reject those requests with an

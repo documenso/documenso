@@ -1,6 +1,6 @@
 ---
 title: Storage Configuration
-description: Configure file storage for uploaded documents and signed PDFs using database storage (default), S3-compatible object storage, or Azure Blob Storage.
+description: Configure file storage for uploaded documents and signed PDFs using database storage (default), S3-compatible object storage, Azure Blob Storage, or Neon Object Storage.
 ---
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
@@ -15,6 +15,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 | `database`   | Small deployments, simplicity           | Limited     | None required |
 | `s3`         | Production, large files, backups        | High        | Required      |
 | `azure-blob` | Production on Azure, native Blob access | High        | Required      |
+| `neon`       | Neon Postgres users, branchable storage | High        | Required      |
 
 Select the storage backend with the `NEXT_PUBLIC_UPLOAD_TRANSPORT` environment variable:
 
@@ -27,6 +28,9 @@ NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
 
 # Azure Blob Storage (native)
 NEXT_PUBLIC_UPLOAD_TRANSPORT=azure-blob
+
+# Neon Object Storage
+NEXT_PUBLIC_UPLOAD_TRANSPORT=neon
 ```
 
 ---
@@ -223,6 +227,119 @@ NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-wasabi-key
 NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-wasabi-secret
 NEXT_PRIVATE_UPLOAD_REGION=us-east-1
 ```
+
+### Neon Object Storage
+
+[Neon Object Storage](https://neon.com/docs/storage/overview) is S3-compatible storage that lives on a Neon branch. If your Documenso database already runs on Neon, documents can live in the same project, and they branch with the database: a child branch sees every object that existed on its parent at fork time, so preview and staging environments get both the `DocumentData` rows and the PDFs they point to.
+
+The `neon` transport uses the same S3 client as the `s3` transport, with Neon's requirements applied for you:
+
+- Path-style addressing is always on (Neon doesn't support virtual-hosted bucket URLs), so `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE` is ignored.
+- The signing region is read from the endpoint (`...storage.c-7.us-east-2.aws.neon.tech` signs as `us-east-2`), so `NEXT_PRIVATE_UPLOAD_REGION` is optional.
+
+Uploaded files are recorded as `S3_PATH` document data, the same as the `s3` transport.
+
+#### Required Variables
+
+| Variable                                | Description                                                         |
+| --------------------------------------- | ------------------------------------------------------------------- |
+| `NEXT_PUBLIC_UPLOAD_TRANSPORT`          | Set to `neon`                                                       |
+| `NEXT_PRIVATE_UPLOAD_ENDPOINT`          | Branch storage endpoint (`AWS_ENDPOINT_URL_S3` in the Neon Console) |
+| `NEXT_PRIVATE_UPLOAD_BUCKET`            | Bucket name                                                         |
+| `NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID`     | Credential `token_id` (`nak_live_...`)                              |
+| `NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY` | Credential `s3_secret_access_key` (`nsk_live_...`)                  |
+
+#### Optional Variables
+
+| Variable                     | Description                                  | Default                   |
+| ---------------------------- | -------------------------------------------- | ------------------------- |
+| `NEXT_PRIVATE_UPLOAD_REGION` | Override the signing region for the endpoint | Region read from endpoint |
+
+#### Neon Setup
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+#### Create a bucket
+
+Object Storage is available for Neon projects in `aws-us-east-1`, `aws-us-east-2`, `aws-eu-central-1` and `aws-ap-southeast-1`. Create a private bucket on the branch Documenso should use, from the Neon Console (**Storage** in the sidebar) or with the [Neon CLI](https://neon.com/docs/cli) in a directory linked to the project:
+
+```bash
+neon buckets create documenso
+```
+
+Keep the bucket private. Documenso hands out presigned URLs that expire after one hour, so documents never need to be publicly readable.
+
+</Step>
+<Step>
+#### Create a credential
+
+Create a credential with both storage scopes. Documenso uploads, downloads and deletes documents, so it needs read and write access:
+
+```bash
+neon credentials create --scope storage:read --scope storage:write --name documenso
+```
+
+The secret is printed once, so store it right away. A credential is valid on the branch it was created on and on every branch descended from it.
+
+</Step>
+<Step>
+#### Find the branch endpoint
+
+Open **Connect** > **Storage** in the Neon Console and copy `AWS_ENDPOINT_URL_S3`, or ask the API for the branch's storage settings:
+
+```bash
+curl "https://console.neon.tech/api/v2/projects/{project_id}/branches/{branch_id}/storage" \
+  -H "Authorization: Bearer $NEON_API_KEY"
+```
+
+```json
+{
+  "enabled": true,
+  "s3_endpoint": "https://br-cool-darkness-a1b2c3d4.storage.c-7.us-east-2.aws.neon.tech",
+  "region": "us-east-2",
+  "force_path_style": true
+}
+```
+
+</Step>
+<Step>
+#### Configure Environment Variables
+
+Map the Neon values onto Documenso's upload variables:
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=neon
+NEXT_PRIVATE_UPLOAD_ENDPOINT=https://br-cool-darkness-a1b2c3d4.storage.c-7.us-east-2.aws.neon.tech
+NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=nak_live_...
+NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=nsk_live_...
+```
+
+| Neon value                       | Documenso variable                      |
+| -------------------------------- | --------------------------------------- |
+| `AWS_ENDPOINT_URL_S3`            | `NEXT_PRIVATE_UPLOAD_ENDPOINT`          |
+| `AWS_ACCESS_KEY_ID` (`token_id`) | `NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID`     |
+| `AWS_SECRET_ACCESS_KEY`          | `NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY` |
+| `AWS_REGION` (optional)          | `NEXT_PRIVATE_UPLOAD_REGION`            |
+
+</Step>
+</Steps>
+
+#### CORS for API clients
+
+Documents uploaded in the Documenso UI are sent to the Documenso server, which writes them to the bucket, so the web app needs no CORS rules. If you build an integration that uploads to the presigned URLs returned by the API (`uploadedFile.url`) from a browser, allow your origin on the bucket. Neon supports `PutBucketCors` and answers preflight requests itself:
+
+```bash
+aws s3api put-bucket-cors \
+  --bucket documenso \
+  --endpoint-url "$NEXT_PRIVATE_UPLOAD_ENDPOINT" \
+  --cors-configuration '{"CORSRules":[{"AllowedOrigins":["https://your-app.example.com"],"AllowedMethods":["GET","PUT"],"AllowedHeaders":["*"],"ExposeHeaders":["ETag"],"MaxAgeSeconds":3600}]}'
+```
+
+#### Branches and preview environments
+
+Buckets and objects branch with the database. To give a preview deployment its own copy of production data, create a Neon branch and point the deployment at that branch's database URL and storage endpoint. The child branch can read every document that existed when it was created, and uploads or deletes on the child never touch the parent. The parent branch's credential keeps working on the child, so only `DATABASE_URL` and `NEXT_PRIVATE_UPLOAD_ENDPOINT` change.
 
 ---
 
@@ -469,7 +586,7 @@ This requires custom scripts and database modifications.
 During migration, Documenso can read from both backends. The `DocumentData.type` field indicates where each document is stored.
 
 - `BYTES_64`: Stored in database
-- `S3_PATH`: Stored in S3
+- `S3_PATH`: Stored in object storage (S3, Azure Blob or Neon)
 
 New uploads use the configured `NEXT_PUBLIC_UPLOAD_TRANSPORT` backend.
 
@@ -592,6 +709,20 @@ Default limit is 50MB per request.
     ```bash
     NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
     ```
+
+  </Accordion>
+  <Accordion title="Neon: 403 AccessDenied">
+    Causes:
+    - The credential is missing the `storage:read` or `storage:write` scope
+    - The credential was created on a branch outside the endpoint's lineage
+
+    Solutions:
+    - Create the credential with both `--scope storage:read --scope storage:write`
+    - Create the credential on the endpoint's branch or one of its ancestors
+
+  </Accordion>
+  <Accordion title="Neon: NEXT_PRIVATE_UPLOAD_ENDPOINT must be set">
+    The `neon` transport has no default endpoint. Set `NEXT_PRIVATE_UPLOAD_ENDPOINT` to the branch storage endpoint from **Connect** > **Storage** in the Neon Console.
 
   </Accordion>
   <Accordion title="CloudFront signed URL errors (Missing required key 'Key')">

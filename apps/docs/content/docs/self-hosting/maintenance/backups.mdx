@@ -159,6 +159,8 @@ Document the certificate passphrase (`NEXT_PRIVATE_SIGNING_PASSPHRASE`) in a sec
 
 If using S3 storage (`NEXT_PUBLIC_UPLOAD_TRANSPORT=s3`), back up your S3 bucket.
 
+The same applies to Neon Object Storage (`NEXT_PUBLIC_UPLOAD_TRANSPORT=neon`): use the S3-compatible commands below with your branch storage endpoint as `--endpoint-url`. Neon stores bucket versioning settings but doesn't enforce them, so rely on `aws s3 sync` copies rather than object versions.
+
 <Tabs items={['AWS S3', 'S3-Compatible']}>
 <Tab value="AWS S3">
 
