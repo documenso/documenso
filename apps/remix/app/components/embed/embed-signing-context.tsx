@@ -18,6 +18,7 @@ export type EmbedSigningContextValue = {
   onDocumentReady: () => void;
   onFieldSigned: (data: { fieldId?: number; value?: string; isBase64?: boolean }) => void;
   onFieldUnsigned: (data: { fieldId?: number }) => void;
+  onSignatureChanged: (signature: string | null) => void;
 };
 
 const EmbedSigningContext = createContext<EmbedSigningContextValue | null>(null);
@@ -53,6 +54,7 @@ export type EmbedSigningProviderProps = {
   onDocumentReady: () => void;
   onFieldSigned: (data: { fieldId?: number; value?: string; isBase64?: boolean }) => void;
   onFieldUnsigned: (data: { fieldId?: number }) => void;
+  onSignatureChanged: (signature: string | null) => void;
   children: React.ReactNode;
 };
 
@@ -67,6 +69,7 @@ export const EmbedSigningProvider = ({
   onDocumentReady,
   onFieldSigned,
   onFieldUnsigned,
+  onSignatureChanged,
   children,
 }: EmbedSigningProviderProps) => {
   return (
@@ -83,6 +86,7 @@ export const EmbedSigningProvider = ({
         onDocumentReady,
         onFieldSigned,
         onFieldUnsigned,
+        onSignatureChanged,
       }}
     >
       {children}
