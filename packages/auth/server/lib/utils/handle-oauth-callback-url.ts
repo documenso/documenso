@@ -298,7 +298,7 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
   }
 
   return {
-    email,
+    email: email.toLowerCase(),
     name,
     sub,
     accessToken,
