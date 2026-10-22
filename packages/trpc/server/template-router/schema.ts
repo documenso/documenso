@@ -101,6 +101,12 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
     .boolean()
     .describe('Whether to create the document as pending and distribute it to recipients.')
     .optional(),
+  includeContents: z
+    .boolean()
+    .describe(
+      'Whether to copy the contents (text, shapes, images, etc.) from the template to the created document. Defaults to true.',
+    )
+    .optional(),
   customDocumentDataId: z
     .string()
     .describe(

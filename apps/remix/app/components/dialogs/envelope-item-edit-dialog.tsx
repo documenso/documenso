@@ -1,6 +1,6 @@
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
-import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
+import { formatFileSize, megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { trpc } from '@documenso/trpc/react';
 import { ZDocumentTitleSchema } from '@documenso/trpc/server/document-router/schema';
 import type { TReplaceEnvelopeItemPdfPayload } from '@documenso/trpc/server/envelope-router/replace-envelope-item-pdf.types';
@@ -54,7 +54,15 @@ export const EnvelopeItemEditDialog = ({
   const { t, i18n } = useLingui();
   const { toast } = useToast();
 
-  const { envelope, editorFields, setLocalEnvelope, isEmbedded } = useCurrentEnvelopeEditor();
+  const {
+    envelope,
+    editorFields,
+    editorContents,
+    setLocalEnvelope,
+    isEmbedded,
+    flushAutosave,
+    registerPendingMutation,
+  } = useCurrentEnvelopeEditor();
 
   const [isOpen, setIsOpen] = useState(false);
   const [replacementFile, setReplacementFile] = useState<{ file: File; pageCount: number } | null>(null);
@@ -68,7 +76,7 @@ export const EnvelopeItemEditDialog = ({
   });
 
   const { mutateAsync: replaceEnvelopeItemPdf } = trpc.envelope.item.replacePdf.useMutation({
-    onSuccess: ({ data, fields }) => {
+    onSuccess: ({ data, fields, contents }) => {
       setLocalEnvelope({
         envelopeItems: envelope.envelopeItems.map((item) =>
           item.id === data.id ? { ...item, documentDataId: data.documentDataId, title: data.title } : item,
@@ -78,6 +86,14 @@ export const EnvelopeItemEditDialog = ({
       if (fields) {
         setLocalEnvelope({ fields });
         editorFields.resetForm(fields);
+      }
+
+      // The server deletes contents on pages the new PDF no longer has. The
+      // local list must follow, otherwise the next content autosave would send
+      // the deleted IDs and the server would recreate them on a missing page.
+      if (contents) {
+        setLocalEnvelope({ contents });
+        editorContents.resetForm(contents);
       }
     },
   });
@@ -155,14 +171,20 @@ export const EnvelopeItemEditDialog = ({
           (field) => field.envelopeItemId !== envelopeItem.id || field.page <= pageCount,
         );
 
+        const remainingContents = envelope.contents.filter(
+          (content) => content.envelopeItemId !== envelopeItem.id || content.contentMeta.page <= pageCount,
+        );
+
         setLocalEnvelope({
           envelopeItems: envelope.envelopeItems.map((item) =>
             item.id === envelopeItem.id ? { ...item, title: data.title, data: fileData } : item,
           ),
           fields: remainingFields,
+          contents: remainingContents,
         });
 
         editorFields.resetForm(remainingFields);
+        editorContents.resetForm(remainingContents);
       } else {
         const payload = {
           envelopeId: envelope.id,
@@ -174,7 +196,16 @@ export const EnvelopeItemEditDialog = ({
         formData.append('payload', JSON.stringify(payload));
         formData.append('file', file);
 
-        await replaceEnvelopeItemPdf(formData);
+        // This dialog is opened from the fields step, where a content or
+        // field save may be waiting on its debounce. Send it first so it
+        // cannot land after the replacement with items the server has since
+        // pruned, which would recreate them.
+        await flushAutosave();
+
+        const replacePromise = replaceEnvelopeItemPdf(formData);
+        registerPendingMutation(replacePromise);
+
+        await replacePromise;
       }
 
       setIsOpen(false);
@@ -194,18 +225,6 @@ export const EnvelopeItemEditDialog = ({
       setIsDropping(false);
     }
   }, [isOpen, form, envelopeItem.title]);
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) {
-      return `${bytes} B`;
-    }
-
-    if (bytes < 1024 * 1024) {
-      return `${(bytes / 1024).toFixed(1)} KB`;
-    }
-
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
 
   return (
     <Dialog {...props} open={isOpen} onOpenChange={(value) => !form.formState.isSubmitting && setIsOpen(value)}>

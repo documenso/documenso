@@ -237,7 +237,7 @@ export const templateRouter = router({
 
       const pdf = await convertToPdf(file, ctx.logger);
 
-      const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide(
+      const { documentData: templateDocumentData } = await putNormalizedPdfFileServerSide(
         {
           name: file.name,
           type: 'application/pdf',
@@ -263,7 +263,7 @@ export const templateRouter = router({
           title,
           envelopeItems: [
             {
-              documentDataId: templateDocumentDataId,
+              documentDataId: templateDocumentData.id,
             },
           ],
           folderId,
@@ -455,6 +455,7 @@ export const templateRouter = router({
           type: 'templateId',
           id: templateId,
         },
+        requestMetadata: ctx.metadata,
       });
 
       return mapEnvelopeToTemplateLite(duplicatedEnvelope.envelope);
@@ -523,6 +524,7 @@ export const templateRouter = router({
         templateId,
         recipients,
         distributeDocument,
+        includeContents,
         customDocumentDataId,
         folderId,
         prefillFields,
@@ -569,6 +571,7 @@ export const templateRouter = router({
         externalId,
         override,
         attachments,
+        includeContents,
         formValues,
       });
 

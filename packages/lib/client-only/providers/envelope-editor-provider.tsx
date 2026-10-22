@@ -22,14 +22,23 @@ import { createContext, useCallback, useContext, useMemo, useRef, useState, useS
 import { useSearchParams } from 'react-router';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import { PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX } from '../../utils/embed-config';
 import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
 import { useAnalytics } from '../hooks/use-analytics';
+import type { TLocalContent } from '../hooks/use-editor-contents';
+import { useEditorContents } from '../hooks/use-editor-contents';
 import type { TLocalField } from '../hooks/use-editor-fields';
 import { useEditorFields } from '../hooks/use-editor-fields';
 import { useEditorRecipients } from '../hooks/use-editor-recipients';
 import { useEnvelopeAutosave } from '../hooks/use-envelope-autosave';
 
 export type EnvelopeEditorStep = 'upload' | 'addFields' | 'preview';
+
+/**
+ * The active tab within the fields step of the editor, which determines
+ * whether fields or contents are currently being edited on the canvas.
+ */
+export type EnvelopeEditorTab = 'fields' | 'contents';
 
 type UpdateEnvelopePayload = Pick<TUpdateEnvelopeRequest, 'data' | 'meta'>;
 
@@ -65,7 +74,22 @@ type EnvelopeEditorProviderValue = {
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
 
   editorFields: ReturnType<typeof useEditorFields>;
+  editorContents: ReturnType<typeof useEditorContents>;
   editorRecipients: ReturnType<typeof useEditorRecipients>;
+
+  selectedEditorTab: EnvelopeEditorTab;
+  setSelectedEditorTab: (tab: EnvelopeEditorTab) => void;
+
+  /**
+   * Whether a field or content has been picked from the palette and is
+   * waiting to be placed on the page.
+   *
+   * The canvas drops its selection while this is set, so nothing floating
+   * over the page (the transformer, the action bar) sits under the
+   * placement click.
+   */
+  isPlacingItem: boolean;
+  setIsPlacingItem: (isPlacingItem: boolean) => void;
 
   isAutosaving: boolean;
   flushAutosave: () => Promise<TEditorEnvelope>;
@@ -155,6 +179,8 @@ export const EnvelopeEditorProvider = ({
 
   const [autosaveError, setAutosaveError] = useState<boolean>(false);
 
+  const [isPlacingItem, setIsPlacingItem] = useState(false);
+
   const isCscMode = IS_INSTANCE_CSC_MODE();
 
   /**
@@ -179,6 +205,8 @@ export const EnvelopeEditorProvider = ({
       },
     };
   }, [isCscMode, providedEditorConfig]);
+
+  const [selectedEditorTab, setSelectedEditorTab] = useState<EnvelopeEditorTab>('fields');
 
   const externalFlushCallbacksRef = useRef<Map<string, () => Promise<void>>>(new Map());
   const pendingMutationsRef = useRef<Set<Promise<unknown>>>(new Set());
@@ -238,7 +266,12 @@ export const EnvelopeEditorProvider = ({
 
   const editorFields = useEditorFields({
     envelope,
-    handleFieldsUpdate: (fields) => setFieldsDebounced(fields),
+    handleFieldsUpdate: (getFields) => setFieldsDebounced(getFields),
+  });
+
+  const editorContents = useEditorContents({
+    envelope,
+    handleContentsUpdate: (getContents) => setContentsDebounced(getContents),
   });
 
   const editorRecipients = useEditorRecipients({
@@ -247,6 +280,7 @@ export const EnvelopeEditorProvider = ({
 
   const setRecipientsMutation = trpc.envelope.recipient.set.useMutation();
   const setFieldsMutation = trpc.envelope.field.set.useMutation();
+  const setContentsMutation = trpc.envelope.content.set.useMutation();
   const updateEnvelopeMutation = trpc.envelope.update.useMutation();
 
   /**
@@ -383,6 +417,79 @@ export const EnvelopeEditorProvider = ({
   };
 
   /**
+   * Handles debouncing the content updates to the server.
+   *
+   * Will set the local envelope contents after the update is complete.
+   */
+  const {
+    triggerSave: setContentsDebounced,
+    flush: flushSetContents,
+    isPending: isContentsMutationPending,
+  } = useEnvelopeAutosave(async (localContents: TLocalContent[]) => {
+    try {
+      let contents: TEditorEnvelopeContentWithFormId[] = [];
+
+      const currentEnvelope = getEnvelope();
+
+      if (!isEmbedded) {
+        const response = await setContentsMutation.mutateAsync({
+          envelopeId: currentEnvelope.id,
+          contents: localContents.map((content) => ({
+            id: content.id,
+            formId: content.formId,
+            envelopeItemId: content.envelopeItemId,
+            contentMeta: content.contentMeta,
+            dataContentId: content.dataContentId,
+          })),
+        });
+
+        contents = response.data;
+      } else {
+        contents = mapLocalContentsToContents({ envelope: currentEnvelope, localContents });
+      }
+
+      setEnvelope((prev) => ({
+        ...prev,
+        contents,
+      }));
+
+      setAutosaveError(false);
+
+      // Insert the IDs into the local contents.
+      contents.forEach((content) => {
+        const localContent = localContents.find((localContent) => localContent.formId === content.formId);
+
+        if (!localContent) {
+          return;
+        }
+
+        editorContents.setContentPersistedIds(
+          localContent.formId,
+          { id: content.id, dataContentId: content.dataContentId },
+          localContent.dataContentId,
+        );
+      });
+    } catch (err) {
+      console.error(err);
+
+      analytics.captureException(err, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'autosave_contents',
+        envelopeId: envelope.id,
+      });
+
+      setAutosaveError(true);
+
+      toast({
+        title: t`Save failed`,
+        description: t`We encountered an error while attempting to save your changes. Your changes cannot be saved at this time.`,
+        variant: 'destructive',
+        duration: 7500,
+      });
+    }
+  }, 2000);
+
+  /**
    * Handles debouncing the envelope updates to the server.
    *
    * Will set the local envelope after the update is complete.
@@ -502,6 +609,7 @@ export const EnvelopeEditorProvider = ({
       });
 
       editorFields.resetForm(fetchedEnvelopeData.data.fields);
+      editorContents.resetForm(fetchedEnvelopeData.data.contents);
     }
   };
 
@@ -510,8 +618,10 @@ export const EnvelopeEditorProvider = ({
   };
 
   const isAutosaving = useMemo(() => {
-    return isFieldsMutationPending || isRecipientsMutationPending || isEnvelopeMutationPending;
-  }, [isFieldsMutationPending, isRecipientsMutationPending, isEnvelopeMutationPending]);
+    return (
+      isFieldsMutationPending || isContentsMutationPending || isRecipientsMutationPending || isEnvelopeMutationPending
+    );
+  }, [isFieldsMutationPending, isContentsMutationPending, isRecipientsMutationPending, isEnvelopeMutationPending]);
 
   const relativePath = useMemo(() => {
     let documentRootPath = formatDocumentsPath(envelope.team.url);
@@ -567,10 +677,11 @@ export const EnvelopeEditorProvider = ({
     });
 
     editorFields.resetForm(currentEnvelope.fields);
+    editorContents.resetForm(currentEnvelope.contents);
   };
 
   const flushAutosave = async (): Promise<TEditorEnvelope> => {
-    await Promise.all([flushSetFields(), flushSetRecipients(), flushUpdateEnvelope()]);
+    await Promise.all([flushSetFields(), flushSetContents(), flushSetRecipients(), flushUpdateEnvelope()]);
 
     // Flush all registered external flushes (e.g., upload page's debounced item updates).
     const externalFlushes = Array.from(externalFlushCallbacksRef.current.values());
@@ -601,7 +712,12 @@ export const EnvelopeEditorProvider = ({
         setRecipientsDebounced,
         setRecipientsAsync,
         editorFields,
+        editorContents,
         editorRecipients,
+        selectedEditorTab,
+        setSelectedEditorTab,
+        isPlacingItem,
+        setIsPlacingItem,
         autosaveError,
         flushAutosave,
         isAutosaving,
@@ -664,6 +780,38 @@ const mapLocalRecipientsToRecipients = ({
       sendStatus: foundRecipient?.sendStatus || SendStatus.NOT_SENT,
       expiresAt: foundRecipient?.expiresAt || null,
       expirationNotifiedAt: foundRecipient?.expirationNotifiedAt || null,
+    };
+  });
+};
+
+/**
+ * An envelope content, with the local ID of the content it was saved from.
+ */
+type TEditorEnvelopeContentWithFormId = TEditorEnvelope['contents'][number] & {
+  formId?: string;
+};
+
+type MapLocalContentsToContentsOptions = {
+  localContents: TLocalContent[];
+  envelope: TEditorEnvelope;
+};
+
+const mapLocalContentsToContents = ({
+  envelope,
+  localContents,
+}: MapLocalContentsToContentsOptions): TEditorEnvelopeContentWithFormId[] => {
+  return localContents.map((content) => {
+    return {
+      // New contents get a temporary ID, which is swapped for a real one when
+      // the embedded envelope is saved. It is written back to the local
+      // content (via `formId`) so it stays the same from then on.
+      id: content.id ?? `${PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX}${content.formId}`,
+      formId: content.formId,
+      envelopeId: envelope.id,
+      envelopeItemId: content.envelopeItemId,
+      contentMeta: content.contentMeta,
+      dataContentId: content.dataContentId,
+      data: content.data,
     };
   });
 };

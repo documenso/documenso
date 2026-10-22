@@ -17,7 +17,10 @@ import {
   ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileTokenRequestParamsSchema,
   ZUploadPdfRequestSchema,
+  ZUploadPdfResponseSchema,
 } from './files.types';
+import getDataContentImageRoute from './routes/get-data-content-image';
+import getDataContentImageByTokenRoute from './routes/get-data-content-image-by-token';
 import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
 import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
 
@@ -49,9 +52,11 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'File too large' }, 400);
       }
 
-      const result = await putNormalizedPdfFileServerSide(file);
+      const { documentData } = await putNormalizedPdfFileServerSide(file);
 
-      return c.json(result);
+      // Parsed so the response cannot drift from the shape `putPdfFile` reads
+      // on the client, and so the file bytes are stripped rather than sent back.
+      return c.json(ZUploadPdfResponseSchema.parse(documentData));
     } catch (error) {
       console.error('Upload failed:', error);
       return c.json({ error: 'Upload failed' }, 500);
@@ -342,3 +347,7 @@ export const filesRoute = new Hono<HonoEnv>()
 // Is different to the other file endpoints since it uses documentDataId for hard caching.
 filesRoute.route('/', getEnvelopeItemPdfRoute);
 filesRoute.route('/', getEnvelopeItemPdfByTokenRoute);
+
+// Content image routes for both tokens and auth based, hard cached by dataContentId.
+filesRoute.route('/', getDataContentImageRoute);
+filesRoute.route('/', getDataContentImageByTokenRoute);

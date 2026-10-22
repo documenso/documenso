@@ -6,9 +6,9 @@ import {
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION, SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { type TRecipientLite, ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { DOCUMENT_TITLE_MAX_LENGTH } from '@documenso/trpc/server/document-router/schema';
+import type { TUseEnvelopePayload } from '@documenso/trpc/server/envelope-router/use-envelope.types';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
@@ -66,6 +66,7 @@ const isUploadedFileNameUsable = (file?: File): file is File => {
 const ZAddRecipientsForNewDocumentSchema = z
   .object({
     distributeDocument: z.boolean(),
+    includeContents: z.boolean().default(true),
     useCustomDocument: z.boolean().default(false),
     documentNameSource: z.enum([
       DOCUMENT_NAME_SOURCE.TEMPLATE,
@@ -103,7 +104,6 @@ type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDoc
 
 export type TemplateUseDialogProps = {
   envelopeId: string;
-  templateId: number;
   templateSigningOrder?: DocumentSigningOrder | null;
   recipients: TRecipientLite[];
   documentDistributionMethod?: DocumentDistributionMethod;
@@ -116,7 +116,6 @@ export function TemplateUseDialog({
   documentDistributionMethod = DocumentDistributionMethod.EMAIL,
   documentRootPath,
   envelopeId,
-  templateId,
   templateSigningOrder,
   trigger,
 }: TemplateUseDialogProps) {
@@ -145,6 +144,7 @@ export function TemplateUseDialog({
   const generateDefaultFormValues = () => {
     return {
       distributeDocument: false,
+      includeContents: true,
       useCustomDocument: false,
       documentNameSource: DOCUMENT_NAME_SOURCE.TEMPLATE,
       customDocumentName: '',
@@ -180,7 +180,7 @@ export function TemplateUseDialog({
     name: 'customDocumentData',
   });
 
-  const { mutateAsync: createDocumentFromTemplate } = trpc.template.createDocumentFromTemplate.useMutation();
+  const { mutateAsync: createDocumentFromTemplate } = trpc.envelope.use.useMutation();
 
   /**
    * Track the most recently uploaded file so its name can be used as the document name.
@@ -217,24 +217,29 @@ export function TemplateUseDialog({
         (item): item is typeof item & { data: File } => item.data !== undefined,
       );
 
-      const customDocumentData = await Promise.all(
-        customFilesToUpload.map(async (item) => {
-          const customDocumentData = await putPdfFile(item.data);
-
-          return {
-            documentDataId: customDocumentData.id,
-            envelopeItemId: item.envelopeItemId,
-          };
-        }),
-      );
-
-      const { envelopeId } = await createDocumentFromTemplate({
-        templateId,
+      // The files are sent alongside the payload and mapped to their envelope
+      // items by index, which is robust against duplicate file names.
+      const payload: TUseEnvelopePayload = {
+        envelopeId,
         recipients: data.recipients,
         distributeDocument: data.distributeDocument,
-        customDocumentData,
+        includeContents: data.includeContents,
+        customDocumentData: customFilesToUpload.map((item, index) => ({
+          identifier: index,
+          envelopeItemId: item.envelopeItemId,
+        })),
         ...(documentTitle ? { override: { title: documentTitle } } : {}),
-      });
+      };
+
+      const formData = new FormData();
+
+      formData.append('payload', JSON.stringify(payload));
+
+      for (const item of customFilesToUpload) {
+        formData.append('files', item.data);
+      }
+
+      const { id: createdEnvelopeId } = await createDocumentFromTemplate(formData);
 
       toast({
         title: _(msg`Document created`),
@@ -242,7 +247,7 @@ export function TemplateUseDialog({
         duration: 5000,
       });
 
-      let documentPath = `${documentRootPath}/${envelopeId}`;
+      let documentPath = `${documentRootPath}/${createdEnvelopeId}`;
 
       if (data.distributeDocument && documentDistributionMethod === DocumentDistributionMethod.NONE) {
         documentPath += '?action=view-signing-links';
@@ -463,6 +468,46 @@ export function TemplateUseDialog({
                     />
                   </div>
                 )}
+
+                <FormField
+                  control={form.control}
+                  name="includeContents"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-row items-center">
+                        <Checkbox
+                          id="includeContents"
+                          className="h-5 w-5"
+                          checked={field.value}
+                          onCheckedChange={(checked) => field.onChange(checked === true)}
+                        />
+                        <label
+                          className="ml-2 flex items-center text-muted-foreground text-sm"
+                          htmlFor="includeContents"
+                        >
+                          <Trans>Include contents</Trans>
+                          <Tooltip>
+                            <TooltipTrigger type="button">
+                              <InfoIcon className="mx-1 h-4 w-4" />
+                            </TooltipTrigger>
+                            <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
+                              <p>
+                                <Trans>
+                                  Copy the text, shapes, images and other contents from the template onto the new
+                                  document.
+                                </Trans>
+                              </p>
+
+                              <p>
+                                <Trans>Uncheck this to create the document without them.</Trans>
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </label>
+                      </div>
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}

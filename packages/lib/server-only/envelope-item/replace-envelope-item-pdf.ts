@@ -4,15 +4,16 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { Envelope, Field, Recipient } from '@prisma/client';
+import { type Envelope, type EnvelopeContent, EnvelopeType, type Field, type Recipient } from '@prisma/client';
 
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
+import { assertContentCanBeChanged } from '../envelope-content/assert-content-can-be-changed';
 import { convertPlaceholdersToFieldInputs, extractPdfPlaceholders } from '../pdf/auto-place-fields';
 import { findRecipientByPlaceholder } from '../pdf/helpers';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 
 type UnsafeReplaceEnvelopeItemPdfOptions = {
-  envelope: Pick<Envelope, 'id' | 'type' | 'formValues'>;
+  envelope: Pick<Envelope, 'id' | 'type' | 'status' | 'formValues'>;
 
   /**
    * Recipients used to resolve placeholder field assignments.
@@ -64,6 +65,14 @@ type UnsafeReplaceEnvelopeItemPdfResult = {
    * otherwise `undefined`.
    */
   fields: Field[] | undefined;
+
+  /**
+   * The full list of contents for the envelope after the replacement.
+   *
+   * Only returned when contents were deleted during the replacement,
+   * otherwise `undefined`.
+   */
+  contents: EnvelopeContent[] | undefined;
 };
 
 export const UNSAFE_replaceEnvelopeItemPdf = async ({
@@ -81,7 +90,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
     buffer = await insertFormValuesInPdf({ pdf: buffer, formValues: envelope.formValues });
   }
 
-  const normalized = await normalizePdf(buffer, {
+  const { pdf: normalized } = await normalizePdf(buffer, {
     flattenForm: envelope.type !== 'TEMPLATE',
   });
 
@@ -95,8 +104,11 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
   });
 
   let didFieldsChange = false;
+  let didContentsChange = false;
 
   const updatedEnvelopeItem = await prisma.$transaction(async (tx) => {
+    await assertContentCanBeChanged(envelope, tx);
+
     await assertEnvelopeMutable(envelope, tx);
 
     const updatedItem = await tx.envelopeItem.update({
@@ -114,7 +126,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
     // Todo: Audit log if we're updating the title or order.
 
     // Delete fields that reference pages beyond the new PDF's page count.
-    const outOfBoundsFields = await tx.field.findMany({
+    const { count: deletedFieldCount } = await tx.field.deleteMany({
       where: {
         envelopeId: envelope.id,
         envelopeItemId,
@@ -122,23 +134,53 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
           gt: filePageCount,
         },
       },
+    });
+
+    if (deletedFieldCount > 0) {
+      didFieldsChange = true;
+    }
+
+    const itemContents = await tx.envelopeContent.findMany({
+      where: {
+        envelopeId: envelope.id,
+        envelopeItemId,
+      },
       select: {
         id: true,
+        contentMeta: true,
       },
     });
 
-    const deletedFieldIds = outOfBoundsFields.map((f) => f.id);
+    const outOfBoundsContents = itemContents.filter((content) => content.contentMeta.page > filePageCount);
 
-    if (deletedFieldIds.length > 0) {
-      await tx.field.deleteMany({
+    // Delete contents that reference pages beyond the new PDF's page count.
+    if (outOfBoundsContents.length > 0) {
+      await tx.envelopeContent.deleteMany({
         where: {
           id: {
-            in: deletedFieldIds,
+            in: outOfBoundsContents.map((content) => content.id),
           },
         },
       });
 
-      didFieldsChange = true;
+      if (envelope.type === EnvelopeType.DOCUMENT) {
+        await tx.documentAuditLog.createMany({
+          data: outOfBoundsContents.map((content) =>
+            createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.CONTENT_DELETED,
+              envelopeId: envelope.id,
+              metadata: apiRequestMetadata,
+              data: {
+                contentId: content.id,
+                contentType: content.contentMeta.type,
+                envelopeItemId,
+              },
+            }),
+          ),
+        });
+      }
+
+      didContentsChange = true;
     }
 
     if (recipients.length > 0 && placeholders.length > 0) {
@@ -223,8 +265,24 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
     }
   }
 
+  let contents: EnvelopeContent[] | undefined;
+
+  if (didContentsChange) {
+    try {
+      contents = await prisma.envelopeContent.findMany({
+        where: {
+          envelopeId: envelope.id,
+        },
+      });
+    } catch (err) {
+      // Do nothing.
+      console.error(err);
+    }
+  }
+
   return {
     updatedItem: updatedEnvelopeItem,
     fields,
+    contents,
   };
 };
