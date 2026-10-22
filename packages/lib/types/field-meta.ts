@@ -15,6 +15,7 @@ export const FIELD_MIN_LETTER_SPACING = 0;
 export const FIELD_MAX_LETTER_SPACING = 100;
 
 export const DEFAULT_FIELD_FONT_SIZE = 12;
+export const DEFAULT_HANDWRITING_INITIALS_FONT_SIZE = 18;
 
 export const DEFAULT_SIGNATURE_OVERFLOW_MODE = 'auto';
 export const DEFAULT_DATE_OVERFLOW_MODE = 'auto';
@@ -64,6 +65,9 @@ const ZFieldMetaLetterSpacing = z.coerce
   .max(FIELD_MAX_LETTER_SPACING)
   .describe('The spacing between each character');
 const ZFieldMetaVerticalAlign = z.enum(['top', 'middle', 'bottom']).describe('The vertical alignment of the text');
+const ZFieldMetaFontFamily = z
+  .enum(['sans-serif', 'handwriting'])
+  .describe('The font style of the text, handwriting uses a cursive font');
 
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
@@ -83,6 +87,7 @@ export type TFieldTextAlignSchema = z.infer<typeof ZFieldTextAlignSchema>;
 export const ZInitialsFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('initials'),
   textAlign: ZFieldTextAlignSchema.optional(),
+  fontFamily: ZFieldMetaFontFamily.optional(),
 });
 
 export type TInitialsFieldMeta = z.infer<typeof ZInitialsFieldMeta>;

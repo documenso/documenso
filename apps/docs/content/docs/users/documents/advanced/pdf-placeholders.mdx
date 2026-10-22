@@ -109,12 +109,19 @@ You can customize fields by adding options after the recipient identifier:
 | `maxValue`     | Number        | Maximum allowed value |
 | `numberFormat` | Format string | Number display format |
 
+### Initials Field Options
+
+| Option       | Values                      | Description                                        |
+| ------------ | --------------------------- | -------------------------------------------------- |
+| `fontFamily` | `sans-serif`, `handwriting` | Font style, `handwriting` defaults to font size 18 |
+
 ### Examples with Options
 
 ```
 {{text, r1, required=true, label=Company Name}}
 {{number, r1, minValue=0, maxValue=100, value=50}}
 {{name, r1, fontSize=14}}
+{{initials, r1, fontFamily=handwriting}}
 {{text, r2, readOnly=true, text=Contract #12345}}
 ```
 

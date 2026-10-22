@@ -1,11 +1,14 @@
 import {
   DEFAULT_FIELD_FONT_SIZE,
+  DEFAULT_HANDWRITING_INITIALS_FONT_SIZE,
   FIELD_DEFAULT_GENERIC_ALIGN,
   type TInitialsFieldMeta as InitialsFieldMeta,
   ZInitialsFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import { Form } from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
@@ -15,6 +18,7 @@ import { EditorGenericFontSizeField, EditorGenericTextAlignField } from './edito
 const ZInitialsFieldFormSchema = ZInitialsFieldMeta.pick({
   fontSize: true,
   textAlign: true,
+  fontFamily: true,
 });
 
 type TInitialsFieldFormSchema = z.infer<typeof ZInitialsFieldFormSchema>;
@@ -30,12 +34,15 @@ export const EditorFieldInitialsForm = ({
   },
   onValueChange,
 }: EditorFieldInitialsFormProps) => {
+  const { t } = useLingui();
+
   const form = useForm<TInitialsFieldFormSchema>({
     resolver: zodResolver(ZInitialsFieldFormSchema),
     mode: 'onChange',
     defaultValues: {
-      fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+      fontSize: value.fontSize || getDefaultFontSize(value.fontFamily),
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+      fontFamily: value.fontFamily ?? 'sans-serif',
     },
   });
 
@@ -63,9 +70,51 @@ export const EditorFieldInitialsForm = ({
         <fieldset className="flex flex-col gap-2">
           <EditorGenericFontSizeField formControl={form.control} />
 
+          <FormField
+            control={form.control}
+            name="fontFamily"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Font Style</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value}
+                    onValueChange={(fontFamily) => {
+                      const hasDefaultFontSize = form.getValues('fontSize') === getDefaultFontSize(field.value);
+
+                      if (hasDefaultFontSize) {
+                        form.setValue('fontSize', getDefaultFontSize(fontFamily));
+                      }
+
+                      field.onChange(fontFamily);
+                    }}
+                  >
+                    <SelectTrigger data-testid="field-form-fontFamily">
+                      <SelectValue placeholder={t`Select font style`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sans-serif">
+                        <Trans>Sans-Serif</Trans>
+                      </SelectItem>
+                      <SelectItem value="handwriting">
+                        <Trans>Handwriting</Trans>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <EditorGenericTextAlignField formControl={form.control} />
         </fieldset>
       </form>
     </Form>
   );
 };
+
+const getDefaultFontSize = (fontFamily?: string) =>
+  fontFamily === 'handwriting' ? DEFAULT_HANDWRITING_INITIALS_FONT_SIZE : DEFAULT_FIELD_FONT_SIZE;
