@@ -108,7 +108,7 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10 border border-solid">
                             {org.avatarImageId && <AvatarImage src={formatAvatarUrl(org.avatarImageId)} />}
-                            <AvatarFallback className="text-gray-400 text-sm">
+                            <AvatarFallback className="text-muted-foreground text-sm">
                               {org.name.slice(0, 1).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
@@ -182,7 +182,7 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10 border border-solid">
                               {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-                              <AvatarFallback className="text-gray-400 text-sm">
+                              <AvatarFallback className="text-muted-foreground text-sm">
                                 {team.name.slice(0, 1).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
