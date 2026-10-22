@@ -21,27 +21,22 @@ export const handleNumberFieldClick = async (
     });
   }
 
-  if (field.inserted) {
-    return {
-      type: FieldType.NUMBER,
-      value: null,
-    };
-  }
-
   let numberToInsert = number;
 
   if (!numberToInsert) {
     numberToInsert = await SignFieldNumberDialog.call({
       fieldMeta: field.fieldMeta,
+      defaultValue: field.inserted ? field.customText : undefined,
     });
   }
 
-  if (!numberToInsert) {
+  if (numberToInsert === null) {
     return null;
   }
 
+  // An empty value clears the field.
   return {
     type: FieldType.NUMBER,
-    value: numberToInsert,
+    value: numberToInsert || null,
   };
 };
