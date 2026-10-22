@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { useFolderSort } from '~/components/general/folder/folder-sort-filter';
+import { useFolderSort } from '~/components/general/folder/folder-sort-dropdown';
 import { useCurrentTeam } from '~/providers/team';
 
 export type FolderCardProps = {

@@ -15,7 +15,7 @@ import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderUpdateDialog } from '~/components/dialogs/folder-update-dialog';
 import { DocumentUploadButtonLegacy } from '~/components/general/document/document-upload-button-legacy';
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
-import { FolderSortFilter, useFolderSort } from '~/components/general/folder/folder-sort-filter';
+import { FolderSortDropdown, useFolderSort } from '~/components/general/folder/folder-sort-dropdown';
 import { useCurrentTeam } from '~/providers/team';
 
 import { EnvelopeUploadButton } from '../envelope/envelope-upload-button';
@@ -68,7 +68,6 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   const sortedFolders = sortFolders(foldersData?.folders ?? []);
   const pinnedFolders = sortedFolders.filter((folder) => folder.pinned);
   const unpinnedFolders = sortedFolders.filter((folder) => !folder.pinned);
-  const hasMultipleFolders = sortedFolders.length > 1;
 
   return (
     <div>
@@ -102,8 +101,6 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         </div>
 
         <div className="flex gap-4 sm:flex-row sm:justify-end">
-          {hasMultipleFolders && <FolderSortFilter />}
-
           <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
 
           {/* If you delete this, delete the component as well. */}
@@ -112,6 +109,17 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
           <FolderCreateDialog type={type} />
         </div>
       </div>
+
+      {!isPending && (
+        <div className="mt-10 mb-4 flex items-center justify-between gap-4">
+          <h2 className="flex items-baseline gap-2 font-semibold text-base">
+            <Trans>Folders</Trans>
+            <span className="font-normal text-muted-foreground text-sm">{sortedFolders.length}</span>
+          </h2>
+
+          <FolderSortDropdown />
+        </div>
+      )}
 
       {isPending ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

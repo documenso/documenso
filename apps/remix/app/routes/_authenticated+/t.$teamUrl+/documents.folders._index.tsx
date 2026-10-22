@@ -14,7 +14,7 @@ import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderUpdateDialog } from '~/components/dialogs/folder-update-dialog';
 import { FolderCard } from '~/components/general/folder/folder-card';
-import { FolderSortFilter, useFolderSort } from '~/components/general/folder/folder-sort-filter';
+import { FolderSortDropdown, useFolderSort } from '~/components/general/folder/folder-sort-dropdown';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
@@ -90,23 +90,23 @@ export default function DocumentsFoldersPage() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center">
-        <div className="relative w-full max-w-md">
-          <SearchIcon className="absolute top-3 left-2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t`Search folders...`}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8"
-          />
-        </div>
-
-        <FolderSortFilter />
+      <div className="relative w-full max-w-md py-6">
+        <SearchIcon className="absolute top-9 left-2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder={t`Search folders...`}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-8"
+        />
       </div>
 
-      <h1 className="mt-4 truncate font-semibold text-2xl md:text-3xl">
-        <Trans>All Folders</Trans>
-      </h1>
+      <div className="mt-4 flex items-center justify-between gap-4">
+        <h1 className="truncate font-semibold text-2xl md:text-3xl">
+          <Trans>Folders</Trans>
+        </h1>
+
+        <FolderSortDropdown />
+      </div>
 
       {isFoldersLoading ? (
         <div className="mt-6 flex justify-center">
