@@ -19,18 +19,25 @@
  */
 export const FIELD_OVERLAP_THRESHOLD = 0.4;
 
-type OverlapFieldInput = {
-  /**
-   * A stable identifier used to reference the field in the returned pairs.
-   * Use the client-side `formId` in the editor, or the database `id` elsewhere.
-   */
-  id: string | number;
+/**
+ * The position and size of a field on a page. Enough on its own to compare two
+ * fields geometrically, without needing them to be identifiable.
+ */
+type FieldGeometry = {
   envelopeItemId: string;
   page: number;
   positionX: number;
   positionY: number;
   width: number;
   height: number;
+};
+
+type OverlapFieldInput = FieldGeometry & {
+  /**
+   * A stable identifier used to reference the field in the returned pairs.
+   * Use the client-side `formId` in the editor, or the database `id` elsewhere.
+   */
+  id: string | number;
 };
 
 export type TFieldOverlapPair<T extends OverlapFieldInput> = {
@@ -47,7 +54,7 @@ export type TFieldOverlapPair<T extends OverlapFieldInput> = {
  *
  * Returns 0 when the fields do not intersect.
  */
-const getIntersectionArea = (fieldA: OverlapFieldInput, fieldB: OverlapFieldInput): number => {
+const getIntersectionArea = (fieldA: FieldGeometry, fieldB: FieldGeometry): number => {
   const overlapX = Math.max(
     0,
     Math.min(fieldA.positionX + fieldA.width, fieldB.positionX + fieldB.width) -
@@ -120,4 +127,65 @@ export const hasOverlappingFields = <T extends OverlapFieldInput>(
   threshold: number = FIELD_OVERLAP_THRESHOLD,
 ): boolean => {
   return getOverlappingFieldPairs(fields, threshold).length > 0;
+};
+
+/**
+ * The overlap ratio above which two fields of the same type, for the same recipient,
+ * are treated as the same field rather than two deliberately placed ones.
+ *
+ * Set high so that fields a sender has intentionally placed close together are not
+ * mistaken for duplicates.
+ */
+export const FIELD_DUPLICATE_THRESHOLD = 0.9;
+
+/**
+ * A field being compared for duplication. Deliberately does not require an `id`:
+ * a field being placed in the editor has no database id yet.
+ */
+type DuplicateFieldInput = FieldGeometry & {
+  recipientId: number;
+  type: string;
+};
+
+/**
+ * Finds an existing field that a candidate would effectively duplicate.
+ *
+ * Only fields of the same type, for the same recipient, on the same page of the same
+ * envelope item are considered, and only when they cover each other almost entirely.
+ * Such a pair is indistinguishable to a signer: only the field on top can be clicked,
+ * so the one underneath can never be filled in and the envelope can never complete.
+ *
+ * @param fields The existing fields. Positional values must be percentages (0-100).
+ * @param candidate The field about to be created.
+ * @param threshold The minimum overlap ratio (0-1). Defaults to {@link FIELD_DUPLICATE_THRESHOLD}.
+ */
+export const findDuplicateField = <T extends DuplicateFieldInput>(
+  fields: T[],
+  candidate: DuplicateFieldInput,
+  threshold: number = FIELD_DUPLICATE_THRESHOLD,
+): T | undefined => {
+  const candidateArea = candidate.width * candidate.height;
+
+  if (candidateArea <= 0) {
+    return undefined;
+  }
+
+  return fields.find((field) => {
+    if (
+      field.recipientId !== candidate.recipientId ||
+      field.type !== candidate.type ||
+      field.envelopeItemId !== candidate.envelopeItemId ||
+      field.page !== candidate.page
+    ) {
+      return false;
+    }
+
+    const fieldArea = field.width * field.height;
+
+    if (fieldArea <= 0) {
+      return false;
+    }
+
+    return getIntersectionArea(field, candidate) / Math.min(fieldArea, candidateArea) >= threshold;
+  });
 };

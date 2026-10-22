@@ -2,6 +2,7 @@ import { getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
 import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import { findDuplicateField } from '@documenso/lib/utils/fields-overlap';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { Field } from '@prisma/client';
 import { FieldType } from '@prisma/client';
@@ -140,12 +141,26 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
         ...restrictFieldPosValues(fieldData),
       };
 
+      // Three paths create fields: click to place, drag to draw, and AI
+      // detection. If two of them run for one action the same placement is
+      // written twice and the copies sit on top of each other.
+      //
+      // The signer cannot recover from that. They fill the field on top, the one
+      // underneath stays uninserted, and the envelope keeps asking for a field
+      // they cannot click because its twin covers it.
+      const duplicate = findDuplicateField(localFields, field);
+
+      if (duplicate) {
+        setSelectedField(duplicate.formId, true);
+        return duplicate;
+      }
+
       append(field);
       triggerFieldsUpdate();
       setSelectedField(field.formId, true);
       return field;
     },
-    [append, triggerFieldsUpdate, setSelectedField],
+    [append, triggerFieldsUpdate, setSelectedField, localFields],
   );
 
   const removeFieldsByFormId = useCallback(
