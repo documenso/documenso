@@ -40,7 +40,7 @@ export const EditorFieldInitialsForm = ({
     resolver: zodResolver(ZInitialsFieldFormSchema),
     mode: 'onChange',
     defaultValues: {
-      fontSize: value.fontSize || getDefaultFontSize(value.fontFamily),
+      fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
       fontFamily: value.fontFamily ?? 'sans-serif',
     },
@@ -82,10 +82,14 @@ export const EditorFieldInitialsForm = ({
                   <Select
                     value={field.value}
                     onValueChange={(fontFamily) => {
-                      const hasDefaultFontSize = form.getValues('fontSize') === getDefaultFontSize(field.value);
+                      const fontSize = form.getValues('fontSize');
 
-                      if (hasDefaultFontSize) {
-                        form.setValue('fontSize', getDefaultFontSize(fontFamily));
+                      if (fontFamily === 'handwriting' && fontSize === DEFAULT_FIELD_FONT_SIZE) {
+                        form.setValue('fontSize', DEFAULT_HANDWRITING_INITIALS_FONT_SIZE);
+                      }
+
+                      if (fontFamily === 'sans-serif' && fontSize === DEFAULT_HANDWRITING_INITIALS_FONT_SIZE) {
+                        form.setValue('fontSize', DEFAULT_FIELD_FONT_SIZE);
                       }
 
                       field.onChange(fontFamily);
@@ -115,6 +119,3 @@ export const EditorFieldInitialsForm = ({
     </Form>
   );
 };
-
-const getDefaultFontSize = (fontFamily?: string) =>
-  fontFamily === 'handwriting' ? DEFAULT_HANDWRITING_INITIALS_FONT_SIZE : DEFAULT_FIELD_FONT_SIZE;
