@@ -1,7 +1,6 @@
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { STATS_COUNT_CAP } from '@documenso/lib/constants/document';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
-import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/find-documents-internal.types';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { OrganisationType } from '@prisma/client';
@@ -15,16 +14,16 @@ import { documentsSearchParams } from '~/utils/documents-search-params';
 
 type DocumentsTableStatusFilterProps = {
   /**
-   * Per-status document counts, shown next to each option. When omitted no
-   * counts are rendered.
+   * Per-status document counts, shown next to each option. When omitted, or
+   * when a status has no count, no count is rendered.
    */
-  stats?: TFindDocumentsInternalResponse['stats'];
+  stats?: Partial<Record<ExtendedDocumentStatus, number>>;
 
   /**
    * The statuses available for selection. Defaults to every status that
    * makes sense for the documents page.
    */
-  statuses?: ExtendedDocumentStatus[];
+  statuses?: readonly ExtendedDocumentStatus[];
 };
 
 export const DocumentsTableStatusFilter = ({
@@ -78,7 +77,7 @@ export const DocumentsTableStatusFilter = ({
         options={selectableStatuses.map((value) => ({
           value,
           label: <DocumentStatus status={value} />,
-          trailing: stats ? formatStatsCount(stats[value]) : undefined,
+          trailing: formatStatsCount(stats?.[value]),
         }))}
         testId="documents-table-status-filter"
       />
@@ -108,6 +107,10 @@ const SELECTABLE_STATUSES: ExtendedDocumentStatus[] = [
   ExtendedDocumentStatus.EXPIRED,
 ];
 
-const formatStatsCount = (count: number) => {
+const formatStatsCount = (count: number | undefined) => {
+  if (count === undefined) {
+    return undefined;
+  }
+
   return count >= STATS_COUNT_CAP ? `${STATS_COUNT_CAP.toLocaleString()}+` : count.toString();
 };
