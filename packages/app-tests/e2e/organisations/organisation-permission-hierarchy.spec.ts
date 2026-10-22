@@ -6,7 +6,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Page, test } from '@playwright/test';
 import { OrganisationGroupType, type OrganisationMemberRole } from '@prisma/client';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -18,7 +18,7 @@ const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
  */
 const trpcMutation = async (page: Page, procedure: string, input: Record<string, unknown>) => {
   return await page.request.post(`${WEBAPP_BASE_URL}/api/trpc/${procedure}`, {
-    headers: { 'content-type': 'application/json' },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
     data: JSON.stringify({ json: input }),
   });
 };

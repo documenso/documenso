@@ -6,7 +6,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Page, test } from '@playwright/test';
 import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -26,7 +26,11 @@ const callTeamGroupMutation = (
   input: Record<string, unknown>,
 ) =>
   page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/${procedure}`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': teamId.toString() },
+    headers: {
+      ...WEBAPP_ORIGIN_HEADERS,
+      'content-type': 'application/json',
+      'x-team-id': teamId.toString(),
+    },
     data: JSON.stringify({ json: input }),
   });
 

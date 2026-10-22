@@ -37,7 +37,7 @@ import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import { AdminOrganisationDeleteDialog } from '~/components/dialogs/admin-organisation-delete-dialog';
 import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
@@ -563,11 +563,15 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
   );
 };
 
-const ZUpdateOrganisationBillingFormSchema = ZUpdateAdminOrganisationRequestSchema.shape.data.pick({
-  claims: true,
-  customerId: true,
-  originalSubscriptionClaimId: true,
-});
+const ZUpdateOrganisationBillingFormSchema = ZUpdateAdminOrganisationRequestSchema.shape.data
+  .pick({
+    claims: true,
+    customerId: true,
+    originalSubscriptionClaimId: true,
+  })
+  .extend({
+    notifyOrganisation: z.boolean(),
+  });
 
 type TUpdateOrganisationBillingFormSchema = z.infer<typeof ZUpdateOrganisationBillingFormSchema>;
 
@@ -614,19 +618,31 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
         emailTransportId: organisation.organisationClaim.emailTransportId ?? null,
       },
       originalSubscriptionClaimId: organisation.organisationClaim.originalSubscriptionClaimId || '',
+      notifyOrganisation: true,
     },
   });
 
-  const onSubmit = async (values: TUpdateOrganisationBillingFormSchema) => {
+  const onSubmit = async ({ notifyOrganisation, ...values }: TUpdateOrganisationBillingFormSchema) => {
     try {
-      await updateOrganisation({
+      const { isNotificationSent } = await updateOrganisation({
         organisationId: organisation.id,
         data: values,
+        notifyOrganisation,
       });
+
+      form.setValue('notifyOrganisation', false);
+
+      const description = match({ notifyOrganisation, isNotificationSent })
+        .with({ isNotificationSent: true }, () => t`Organisation has been updated and its owner has been notified`)
+        .with(
+          { notifyOrganisation: true },
+          () => t`Organisation has been updated. No limits changed, so no notification was sent`,
+        )
+        .otherwise(() => t`Organisation has been updated successfully`);
 
       toast({
         title: t`Success`,
-        description: t`Organisation has been updated successfully`,
+        description,
         duration: 5000,
       });
     } catch (err) {
@@ -913,6 +929,31 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
               </Select>
               <FormDescription>
                 <Trans>Organisations without a transport use the system default mailer.</Trans>
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="notifyOrganisation"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center">
+                <FormControl>
+                  <Checkbox id="notify-organisation" checked={field.value} onCheckedChange={field.onChange} />
+                </FormControl>
+
+                <label className="ml-2 text-muted-foreground text-sm" htmlFor="notify-organisation">
+                  <Trans>Notify the organisation about limit changes</Trans>
+                </label>
+              </div>
+              <FormDescription>
+                <Trans>
+                  Emails the organisation owner to let them know their limits have been updated. No email is sent if no
+                  limits changed.
+                </Trans>
               </FormDescription>
               <FormMessage />
             </FormItem>
