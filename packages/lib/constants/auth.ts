@@ -40,6 +40,7 @@ export const USER_SECURITY_AUDIT_LOG_MAP: Record<string, string> = {
   ORGANISATION_SSO_LINK: 'Linked account to organisation',
   ORGANISATION_SSO_UNLINK: 'Unlinked account from organisation',
   ACCOUNT_PROFILE_UPDATE: 'Profile updated',
+  AVATAR_UPDATED: 'Avatar updated',
   AUTH_2FA_DISABLE: '2FA Disabled',
   AUTH_2FA_ENABLE: '2FA Enabled',
   PASSKEY_CREATED: 'Passkey created',
