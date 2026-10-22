@@ -56,6 +56,7 @@ export const ZTemplateSchema = TemplateSchema.pick({
     drawSignatureEnabled: true,
     allowDictateNextSigner: true,
     distributionMethod: true,
+    includeAuditLog: true,
     redirectUrl: true,
     language: true,
     emailSettings: true,
@@ -149,6 +150,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   templateMeta: DocumentMetaSchema.pick({
     signingOrder: true,
     distributionMethod: true,
+    includeAuditLog: true,
   }).nullable(),
   directLink: LegacyTemplateDirectLinkSchema.pick({
     token: true,
