@@ -37,22 +37,24 @@ The Enterprise Edition is required when you:
 
 Enterprise licenses include the following features, which are not available in the Community Edition:
 
-| Feature                                                                                                 | What it does                                                                                                      |
-| ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| [Organisation Authentication Portal (SSO with SAML and OIDC)](/docs/users/organisations/single-sign-on) | Let members sign in through your identity provider                                                                |
-| [Document Action Reauthentication](/docs/users/documents/send#security-settings)                        | Recipient Authentication (Enterprise): require recipients to reauthenticate with a passkey or 2FA before signing. |
-| [CSC Signing (AES / QES)](/docs/self-hosting/configuration/signing-certificate/csc-qes)                 | Advanced and qualified signatures through an accredited Trust Service Provider                                    |
-| [21 CFR Part 11 Compliance](/docs/compliance/certifications#21-cfr-part-11)                             | Controls for FDA-regulated electronic records and signatures                                                      |
-| [HIPAA Compliance](/docs/compliance/certifications#hipaa)                                               | Controls for handling protected health information                                                                |
-| [Embed Editor](/docs/developers/embedding/editor)                                                       | Let users create and edit documents and templates inside your app                                                 |
-| Embed Editor White Label                                                                                | Remove Documenso branding from the embedded editor                                                                |
-| [Email Domains (custom sender addresses)](/docs/users/organisations/email-domains)                      | Send signing emails from your own domain                                                                          |
-| Stripe Billing Module                                                                                   | Built-in subscription billing powered by Stripe                                                                   |
-| Priority feature requests                                                                               | Priority consideration for your feature requests                                                                  |
+| Feature                                                                                                 | What it does                                                                   |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| [Organisation Authentication Portal (SSO with SAML and OIDC)](/docs/users/organisations/single-sign-on) | Let members sign in through your identity provider                             |
+| [Document Action Reauthentication](/docs/users/documents/send#security-settings)                        | Allow recipients to reauthenticate with a passkey or 2FA before signing        |
+| [CSC Signing (AES / QES)](/docs/self-hosting/configuration/signing-certificate/csc-qes)                 | Advanced and qualified signatures through an accredited Trust Service Provider |
+| [21 CFR Part 11 Compliance](/docs/compliance/certifications#21-cfr-part-11)                             | Controls for FDA-regulated electronic records and signatures                   |
+| [HIPAA Compliance](/docs/compliance/certifications#hipaa)                                               | HIPAA-compliant handling and storage of protected health information (PHI)     |
+| [Embed Editor](/docs/developers/embedding/editor)                                                       | Let users create and edit documents and templates inside your app              |
+| Embed Editor White Label                                                                                | Remove Documenso branding from the embedded editor                             |
+| [Email Domains (custom sender addresses)](/docs/users/organisations/email-domains)                      | Send signing emails from your own domain                                       |
+| Stripe Billing Module                                                                                   | Built-in subscription billing powered by Stripe                                |
+| Priority feature requests                                                                               | Priority consideration for your feature requests                               |
 
 <Callout type="info">
-  The canonical list of enterprise-gated features is maintained in the `packages/ee/FEATURES` file
-  in the codebase. Features in the `packages/ee/` directory require an active Enterprise license.
+  Features in the `packages/ee/` directory require an active Business or Enterprise license. The
+  list is also maintained in the
+  [`packages/ee/FEATURES`](https://github.com/documenso/documenso/blob/main/packages/ee/FEATURES)
+  file in the codebase.
 </Callout>
 
 ## Compare Editions
