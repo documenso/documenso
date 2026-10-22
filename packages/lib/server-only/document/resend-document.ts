@@ -28,6 +28,7 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { resolveBrandedInviter } from '../../utils/resolve-branded-inviter';
+import { shouldShowNewAccountWarning } from '../../utils/sender-trust';
 import { buildEnvelopeEmailHeaders } from '../email/build-envelope-email-headers';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
@@ -54,6 +55,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
       email: true,
       name: true,
       disabled: true,
+      createdAt: true,
     },
   });
 
@@ -200,6 +202,11 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     type: 'email',
   });
 
+  const isNewAccountSender = shouldShowNewAccountWarning({
+    userCreatedAt: user.createdAt,
+    organisationClaim: claims,
+  });
+
   await Promise.all(
     recipientsToRemind.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC || !isRecipientEmailValidForSending(recipient)) {
@@ -275,6 +282,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
         teamName: envelope.team?.name,
         includeSenderDetails: settings.includeSenderDetails,
         reportUrl,
+        newAccountWarningSenderEmail: isNewAccountSender && !selfSigner ? user.email : undefined,
       });
 
       const [html, text] = await Promise.all([

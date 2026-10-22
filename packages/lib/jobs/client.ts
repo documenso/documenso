@@ -1,4 +1,5 @@
 import { JobClient } from './client/client';
+import { SEND_ACCOUNT_DISABLED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-account-disabled-email';
 import { SEND_ADMIN_RECIPIENT_REMOVED_EMAILS_JOB_DEFINITION } from './definitions/emails/send-admin-recipient-removed-emails';
 import { SEND_ADMIN_USER_CREATED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-admin-user-created-email';
 import { SEND_CONFIRMATION_EMAIL_JOB_DEFINITION } from './definitions/emails/send-confirmation-email';
@@ -40,6 +41,7 @@ import { SYNC_ORGANISATION_SEATS_JOB_DEFINITION } from './definitions/internal/s
  * triggering jobs.
  */
 export const jobsClient = new JobClient([
+  SEND_ACCOUNT_DISABLED_EMAIL_JOB_DEFINITION,
   SEND_ADMIN_USER_CREATED_EMAIL_JOB_DEFINITION,
   SEND_SIGNING_EMAIL_JOB_DEFINITION,
   SEND_CONFIRMATION_EMAIL_JOB_DEFINITION,
