@@ -112,6 +112,9 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       z.object({
         documentDataId: z.string(),
         envelopeItemId: z.string(),
+        title: ZTemplateTitleSchema.optional().describe(
+          'The title for the created envelope item. Defaults to the template envelope item title.',
+        ),
       }),
     )
     .describe(

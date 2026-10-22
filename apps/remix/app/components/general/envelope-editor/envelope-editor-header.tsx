@@ -1,5 +1,9 @@
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { getEnvelopeItemPermissions, mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import {
+  getEnvelopeItemPermissions,
+  mapSecondaryIdToTemplateId,
+  removePdfExtension,
+} from '@documenso/lib/utils/envelope';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -14,7 +18,7 @@ import {
   SendIcon,
   SettingsIcon,
 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -27,6 +31,10 @@ import { EmbeddedEditorAttachmentPopover } from '~/components/general/document/e
 import { EnvelopeEditorSettingsDialog } from '~/components/general/envelope-editor/envelope-editor-settings-dialog';
 
 import { TemplateDirectLinkBadge } from '../template/template-direct-link-badge';
+import {
+  EnvelopeItemMatchTitlePopover,
+  type EnvelopeItemMatchTitlePrompt,
+} from './envelope-editor-match-title-popover';
 import { EnvelopeItemTitleInput } from './envelope-editor-title-input';
 
 export default function EnvelopeEditorHeader() {
@@ -55,6 +63,30 @@ export default function EnvelopeEditorHeader() {
     [envelope, envelope.recipients],
   );
 
+  const [matchTitlePrompt, setMatchTitlePrompt] = useState<EnvelopeItemMatchTitlePrompt | null>(null);
+
+  /**
+   * Downloads and emails are named after the envelope item, so offer to rename a single item
+   * whenever the envelope title changes.
+   */
+  const onEnvelopeTitleCommit = (title: string) => {
+    if (envelope.envelopeItems.length !== 1 || !editorConfig.envelopeItems?.allowConfigureTitle) {
+      return;
+    }
+
+    const [envelopeItem] = envelope.envelopeItems;
+
+    // Uploaded envelopes keep `.pdf` in their title, and emails add it back to the file name.
+    const currentTitle = removePdfExtension(envelopeItem.title);
+    const newTitle = removePdfExtension(title).trim();
+
+    if (newTitle.length === 0 || currentTitle === newTitle) {
+      return;
+    }
+
+    setMatchTitlePrompt({ envelopeItemId: envelopeItem.id, currentTitle, newTitle });
+  };
+
   const handleCreateEmbeddedEnvelope = async () => {
     const latestEnvelope = await flushAutosave();
 
@@ -81,19 +113,22 @@ export default function EnvelopeEditorHeader() {
           <Separator orientation="vertical" className="h-6 shrink-0" />
 
           <div className="flex min-w-0 items-center space-x-2">
-            <EnvelopeItemTitleInput
-              dataTestId="envelope-title-input"
-              disabled={!envelopeItemPermissions.canTitleBeChanged || !allowConfigureEnvelopeTitle}
-              value={envelope.title}
-              onChange={(title) => {
-                updateEnvelope({
-                  data: {
-                    title,
-                  },
-                });
-              }}
-              placeholder={t`Envelope Title`}
-            />
+            <EnvelopeItemMatchTitlePopover prompt={matchTitlePrompt} onClose={() => setMatchTitlePrompt(null)}>
+              <EnvelopeItemTitleInput
+                dataTestId="envelope-title-input"
+                disabled={!envelopeItemPermissions.canTitleBeChanged || !allowConfigureEnvelopeTitle}
+                value={envelope.title}
+                onChange={(title) => {
+                  updateEnvelope({
+                    data: {
+                      title,
+                    },
+                  });
+                }}
+                onCommit={onEnvelopeTitleCommit}
+                placeholder={t`Envelope Title`}
+              />
+            </EnvelopeItemMatchTitlePopover>
 
             {envelope.type === EnvelopeType.TEMPLATE && (
               <>
