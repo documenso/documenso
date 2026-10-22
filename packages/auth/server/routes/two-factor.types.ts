@@ -18,3 +18,11 @@ export const ZViewTwoFactorRecoveryCodesRequestSchema = z.object({
 });
 
 export type TViewTwoFactorRecoveryCodesRequestSchema = z.infer<typeof ZViewTwoFactorRecoveryCodesRequestSchema>;
+
+export const ZVerifyTwoFactorChallengeRequestSchema = z.object({
+  totpCode: z.string().trim().optional(),
+  backupCode: z.string().trim().optional(),
+  csrfToken: z.string().trim(),
+});
+
+export type TVerifyTwoFactorChallengeRequestSchema = z.infer<typeof ZVerifyTwoFactorChallengeRequestSchema>;

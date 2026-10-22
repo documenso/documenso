@@ -30,6 +30,7 @@ export enum AppErrorCode {
   NO_PASSWORD = 'NO_PASSWORD',
   INCORRECT_PASSWORD = 'INCORRECT_PASSWORD',
   SAME_PASSWORD = 'SAME_PASSWORD',
+  TWO_FACTOR_REQUIRED = 'TWO_FACTOR_REQUIRED',
   WEBHOOK_INVALID_REQUEST = 'WEBHOOK_INVALID_REQUEST',
   ENVELOPE_DRAFT = 'ENVELOPE_DRAFT',
   ENVELOPE_COMPLETED = 'ENVELOPE_COMPLETED',
@@ -120,6 +121,8 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.SCHEMA_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
   [AppErrorCode.TOO_MANY_REQUESTS]: { code: 'TOO_MANY_REQUESTS', status: 429 },
   [AppErrorCode.TWO_FACTOR_AUTH_FAILED]: { code: 'UNAUTHORIZED', status: 401 },
+  // 403, not 401: the session itself is valid.
+  [AppErrorCode.TWO_FACTOR_REQUIRED]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.ENVELOPE_DRAFT]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_COMPLETED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_REJECTED]: { code: 'BAD_REQUEST', status: 400 },
@@ -349,7 +352,13 @@ export class AppError extends Error {
         () => 400 as const,
       )
       .with(AppErrorCode.UNAUTHORIZED, () => 401 as const)
-      .with(AppErrorCode.FORBIDDEN, AppErrorCode.SENDER_DISABLED, AppErrorCode.CSC_UNLICENSED, () => 403 as const)
+      .with(
+        AppErrorCode.FORBIDDEN,
+        AppErrorCode.SENDER_DISABLED,
+        AppErrorCode.CSC_UNLICENSED,
+        AppErrorCode.TWO_FACTOR_REQUIRED,
+        () => 403 as const,
+      )
       .with(AppErrorCode.NOT_FOUND, () => 404 as const)
       .with(AppErrorCode.NOT_IMPLEMENTED, () => 501 as const)
       .otherwise(() => 500 as const);

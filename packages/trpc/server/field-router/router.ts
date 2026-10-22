@@ -12,6 +12,7 @@ import { EnvelopeType } from '@prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZCreateDocumentFieldRequestSchema,
   ZCreateDocumentFieldResponseSchema,
@@ -59,6 +60,7 @@ export const fieldRouter = router({
     })
     .input(ZGetFieldRequestSchema)
     .output(ZGetFieldResponseSchema)
+    .use(twoFactorScope((input) => ({ field: input.fieldId })))
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { fieldId } = input;
@@ -94,6 +96,7 @@ export const fieldRouter = router({
     })
     .input(ZCreateDocumentFieldRequestSchema)
     .output(ZCreateDocumentFieldResponseSchema)
+    .use(twoFactorScope((input) => ({ document: input.documentId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, field } = input;
@@ -142,6 +145,7 @@ export const fieldRouter = router({
     })
     .input(ZCreateDocumentFieldsRequestSchema)
     .output(ZCreateDocumentFieldsResponseSchema)
+    .use(twoFactorScope((input) => ({ document: input.documentId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, fields } = input;
@@ -186,6 +190,7 @@ export const fieldRouter = router({
     })
     .input(ZUpdateDocumentFieldRequestSchema)
     .output(ZUpdateDocumentFieldResponseSchema)
+    .use(twoFactorScope((input) => ({ document: input.documentId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, field } = input;
@@ -228,6 +233,7 @@ export const fieldRouter = router({
     })
     .input(ZUpdateDocumentFieldsRequestSchema)
     .output(ZUpdateDocumentFieldsResponseSchema)
+    .use(twoFactorScope((input) => ({ document: input.documentId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, fields } = input;
@@ -268,6 +274,7 @@ export const fieldRouter = router({
     })
     .input(ZDeleteDocumentFieldRequestSchema)
     .output(ZSuccessResponseSchema)
+    .use(twoFactorScope((input) => ({ field: input.fieldId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { fieldId } = input;
@@ -294,6 +301,7 @@ export const fieldRouter = router({
   setFieldsForDocument: authenticatedProcedure
     .input(ZSetDocumentFieldsRequestSchema)
     .output(ZSetDocumentFieldsResponseSchema)
+    .use(twoFactorScope((input) => ({ document: input.documentId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, fields } = input;
@@ -344,6 +352,7 @@ export const fieldRouter = router({
     })
     .input(ZCreateTemplateFieldRequestSchema)
     .output(ZCreateTemplateFieldResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, field } = input;
@@ -392,6 +401,7 @@ export const fieldRouter = router({
     })
     .input(ZGetFieldRequestSchema)
     .output(ZGetFieldResponseSchema)
+    .use(twoFactorScope((input) => ({ field: input.fieldId })))
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { fieldId } = input;
@@ -427,6 +437,7 @@ export const fieldRouter = router({
     })
     .input(ZCreateTemplateFieldsRequestSchema)
     .output(ZCreateTemplateFieldsResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, fields } = input;
@@ -471,6 +482,7 @@ export const fieldRouter = router({
     })
     .input(ZUpdateTemplateFieldRequestSchema)
     .output(ZUpdateTemplateFieldResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, field } = input;
@@ -513,6 +525,7 @@ export const fieldRouter = router({
     })
     .input(ZUpdateTemplateFieldsRequestSchema)
     .output(ZUpdateTemplateFieldsResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, fields } = input;
@@ -553,6 +566,7 @@ export const fieldRouter = router({
     })
     .input(ZDeleteTemplateFieldRequestSchema)
     .output(ZSuccessResponseSchema)
+    .use(twoFactorScope((input) => ({ field: input.fieldId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { fieldId } = input;
@@ -578,6 +592,7 @@ export const fieldRouter = router({
   setFieldsForTemplate: authenticatedProcedure
     .input(ZSetFieldsForTemplateRequestSchema)
     .output(ZSetFieldsForTemplateResponseSchema)
+    .use(twoFactorScope((input) => ({ template: input.templateId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, fields } = input;

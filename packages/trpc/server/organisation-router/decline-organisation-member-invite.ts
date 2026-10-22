@@ -3,6 +3,7 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 
 import { maybeAuthenticatedProcedure } from '../trpc';
+import { twoFactorRemediation } from '../two-factor-enforcement/enforce';
 import {
   ZDeclineOrganisationMemberInviteRequestSchema,
   ZDeclineOrganisationMemberInviteResponseSchema,
@@ -11,6 +12,7 @@ import {
 export const declineOrganisationMemberInviteRoute = maybeAuthenticatedProcedure
   .input(ZDeclineOrganisationMemberInviteRequestSchema)
   .output(ZDeclineOrganisationMemberInviteResponseSchema)
+  .use(twoFactorRemediation())
   .mutation(async ({ input }) => {
     const { token } = input;
 

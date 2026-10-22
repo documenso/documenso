@@ -59,6 +59,18 @@ export const passkeyRateLimit = createRateLimit({
   window: '15m',
 });
 
+export const twoFactorChallengeIpRateLimit = createRateLimit({
+  action: 'auth.2fa-challenge.ip',
+  max: 30,
+  window: '15m',
+});
+
+export const twoFactorChallengeUserRateLimit = createRateLimit({
+  action: 'auth.2fa-challenge.user',
+  max: 10,
+  window: '15m',
+});
+
 export const linkOrgAccountRateLimit = createRateLimit({
   action: 'auth.link-org-account',
   max: 5,

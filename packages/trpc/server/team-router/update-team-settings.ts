@@ -9,11 +9,13 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationType, Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZUpdateTeamSettingsRequestSchema, ZUpdateTeamSettingsResponseSchema } from './update-team-settings.types';
 
 export const updateTeamSettingsRoute = authenticatedProcedure
   .input(ZUpdateTeamSettingsRequestSchema)
   .output(ZUpdateTeamSettingsResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .mutation(async ({ ctx, input }) => {
     const { user } = ctx;
     const { teamId, data } = input;

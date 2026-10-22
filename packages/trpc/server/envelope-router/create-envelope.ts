@@ -12,6 +12,7 @@ import { match, P } from 'ts-pattern';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import type { TCreateEnvelopeRequest } from './create-envelope.types';
 import {
   createEnvelopeMeta,
@@ -23,6 +24,7 @@ export const createEnvelopeRoute = authenticatedProcedure
   .meta(createEnvelopeMeta)
   .input(ZCreateEnvelopeRequestSchema)
   .output(ZCreateEnvelopeResponseSchema)
+  .use(twoFactorScopeFromCtx())
   .mutation(async ({ input, ctx }) => {
     ctx.logger.info({
       input: {

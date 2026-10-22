@@ -30,6 +30,26 @@ jobs:
       - name: Build app
         run: npm run build
 
+  unit_tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: ./.github/actions/node-install
+
+      - name: Copy env
+        run: cp .env.example .env
+
+      # Includes the 2FA enforcement drift guard (packages/trpc), which is the
+      # only check that catches a session route without enforcement middleware.
+      - name: Run unit tests
+        run: npm run test -w @documenso/lib -w @documenso/trpc
+
   build_docker:
     name: Build Docker Image
     runs-on: ubuntu-latest

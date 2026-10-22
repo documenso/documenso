@@ -34,6 +34,8 @@ export const ZFindOrganisationMembersResponseSchema = ZFindResultResponse.extend
       email: z.string(),
       name: z.string(),
       avatarImageId: z.string().nullable(),
+
+      twoFactorEnabled: z.boolean(),
       currentOrganisationRole: OrganisationMemberRoleSchema,
       groups: z.array(
         OrganisationGroupSchema.pick({

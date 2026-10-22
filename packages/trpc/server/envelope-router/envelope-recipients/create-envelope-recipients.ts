@@ -1,6 +1,7 @@
 import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
 
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import {
   createEnvelopeRecipientsMeta,
   ZCreateEnvelopeRecipientsRequestSchema,
@@ -11,6 +12,7 @@ export const createEnvelopeRecipientsRoute = authenticatedProcedure
   .meta(createEnvelopeRecipientsMeta)
   .input(ZCreateEnvelopeRecipientsRequestSchema)
   .output(ZCreateEnvelopeRecipientsResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { user, teamId, metadata } = ctx;
     const { envelopeId, data: recipients } = input;

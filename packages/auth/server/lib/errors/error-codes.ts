@@ -18,6 +18,7 @@ export const AuthenticationErrorCode = {
   // TwoFactorMissingSecret: 'TWO_FACTOR_MISSING_SECRET',
   // TwoFactorMissingCredentials: 'TWO_FACTOR_MISSING_CREDENTIALS',
   InvalidTwoFactorCode: 'INVALID_TWO_FACTOR_CODE',
+  TwoFactorChallengeExpired: 'TWO_FACTOR_CHALLENGE_EXPIRED',
   SigninDisabled: 'SIGNIN_DISABLED',
   SignupDisabled: 'SIGNUP_DISABLED',
   SignupDisposableEmail: 'SIGNUP_DISPOSABLE_EMAIL',

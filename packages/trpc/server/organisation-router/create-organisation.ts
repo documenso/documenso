@@ -8,12 +8,14 @@ import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
 import { OrganisationType, SubscriptionStatus } from '@prisma/client';
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorInstanceOnly } from '../two-factor-enforcement/enforce';
 import { ZCreateOrganisationRequestSchema, ZCreateOrganisationResponseSchema } from './create-organisation.types';
 
 export const createOrganisationRoute = authenticatedProcedure
   // .meta(createOrganisationMeta)
   .input(ZCreateOrganisationRequestSchema)
   .output(ZCreateOrganisationResponseSchema)
+  .use(twoFactorInstanceOnly())
   .mutation(async ({ input, ctx }) => {
     const { name, priceId } = input;
     const { user } = ctx;

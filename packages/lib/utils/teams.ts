@@ -214,6 +214,22 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
 };
 
 /**
+ * Keys with no counterpart column on `TeamGlobalSettings`. Must be skipped when
+ * deriving team settings, otherwise `teamSettings[key]` resolves to `undefined`
+ * (not `null`) and overwrites the organisation value.
+ */
+const ORGANISATION_ONLY_SETTINGS_KEYS = [
+  'twoFactorRequired',
+  'twoFactorGracePeriodDays',
+  'twoFactorEnforcedFrom',
+] as const;
+
+type OrganisationOnlySettingsKey = (typeof ORGANISATION_ONLY_SETTINGS_KEYS)[number];
+
+const isOrganisationOnlySettingsKey = (key: PropertyKey): key is OrganisationOnlySettingsKey =>
+  ORGANISATION_ONLY_SETTINGS_KEYS.some((organisationOnlyKey) => organisationOnlyKey === key);
+
+/**
  * Derive the final settings for a team.
  *
  * @param organisationSettings The organisation settings to inherit values from
@@ -229,6 +245,10 @@ export const extractDerivedTeamSettings = (
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   for (const key of Object.keys(derivedSettings) as (keyof typeof derivedSettings)[]) {
+    if (isOrganisationOnlySettingsKey(key)) {
+      continue;
+    }
+
     const teamValue = teamSettings[key];
 
     if (teamValue !== null) {

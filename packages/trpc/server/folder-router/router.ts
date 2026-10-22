@@ -9,6 +9,7 @@ import { updateFolder } from '@documenso/lib/server-only/folder/update-folder';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, router } from '../trpc';
+import { twoFactorScope, twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import {
   ZCreateFolderRequestSchema,
   ZCreateFolderResponseSchema,
@@ -30,6 +31,7 @@ export const folderRouter = router({
   getFolders: authenticatedProcedure
     .input(ZGetFoldersSchema)
     .output(ZGetFoldersResponseSchema)
+    .use(twoFactorScopeFromCtx())
     .query(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { parentId, type } = input;
@@ -79,6 +81,7 @@ export const folderRouter = router({
     })
     .input(ZFindFoldersRequestSchema)
     .output(ZFindFoldersResponseSchema)
+    .use(twoFactorScopeFromCtx())
     .query(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { parentId, type, page, perPage } = input;
@@ -106,6 +109,7 @@ export const folderRouter = router({
   findFoldersInternal: authenticatedProcedure
     .input(ZFindFoldersInternalRequestSchema)
     .output(ZFindFoldersInternalResponseSchema)
+    .use(twoFactorScopeFromCtx())
     .query(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { parentId, type } = input;
@@ -155,6 +159,7 @@ export const folderRouter = router({
     })
     .input(ZCreateFolderRequestSchema)
     .output(ZCreateFolderResponseSchema)
+    .use(twoFactorScopeFromCtx())
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { name, parentId, type } = input;
@@ -207,6 +212,7 @@ export const folderRouter = router({
     })
     .input(ZUpdateFolderRequestSchema)
     .output(ZUpdateFolderResponseSchema)
+    .use(twoFactorScope((input) => ({ folder: input.folderId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { folderId, data } = input;
@@ -244,6 +250,7 @@ export const folderRouter = router({
     })
     .input(ZDeleteFolderRequestSchema)
     .output(ZSuccessResponseSchema)
+    .use(twoFactorScope((input) => ({ folder: input.folderId })))
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { folderId } = input;

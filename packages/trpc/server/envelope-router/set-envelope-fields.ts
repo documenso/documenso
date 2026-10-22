@@ -4,12 +4,14 @@ import { EnvelopeType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZSetEnvelopeFieldsRequestSchema, ZSetEnvelopeFieldsResponseSchema } from './set-envelope-fields.types';
 
 // Note: This is intended to always be an internal route.
 export const setEnvelopeFieldsRoute = authenticatedProcedure
   .input(ZSetEnvelopeFieldsRequestSchema)
   .output(ZSetEnvelopeFieldsResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { envelopeId, envelopeType, fields } = input;

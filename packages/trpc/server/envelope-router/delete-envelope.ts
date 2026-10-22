@@ -7,6 +7,7 @@ import { match } from 'ts-pattern';
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   deleteEnvelopeMeta,
   ZDeleteEnvelopeRequestSchema,
@@ -17,6 +18,7 @@ export const deleteEnvelopeRoute = authenticatedProcedure
   .meta(deleteEnvelopeMeta)
   .input(ZDeleteEnvelopeRequestSchema)
   .output(ZDeleteEnvelopeResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { envelopeId } = input;

@@ -86,6 +86,12 @@ export async function loader({ params }: Route.LoaderArgs) {
       name: true,
       url: true,
       avatarImageId: true,
+      organisationGlobalSettings: {
+        select: {
+          twoFactorRequired: true,
+          twoFactorGracePeriodDays: true,
+        },
+      },
     },
   });
 
@@ -107,6 +113,8 @@ export async function loader({ params }: Route.LoaderArgs) {
       name: organisation.name,
       url: organisation.url,
       avatar: organisation.avatarImageId,
+      twoFactorRequired: organisation.organisationGlobalSettings.twoFactorRequired,
+      twoFactorGracePeriodDays: organisation.organisationGlobalSettings.twoFactorGracePeriodDays,
     },
   } as const;
 }
@@ -265,6 +273,24 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
               </Alert>
             </div>
           </div>
+
+          {organisation.twoFactorRequired && (
+            <Alert variant="neutral">
+              <AlertDescription>
+                {organisation.twoFactorGracePeriodDays > 0 ? (
+                  <Trans>
+                    This organisation requires two-factor authentication. You will need to enable it within{' '}
+                    {organisation.twoFactorGracePeriodDays} days of joining to keep access to the organisation.
+                  </Trans>
+                ) : (
+                  <Trans>
+                    This organisation requires two-factor authentication. You will need to enable it immediately after
+                    joining to access the organisation.
+                  </Trans>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
 
           <div className="mb-4 flex items-center gap-x-2">
             <Checkbox
