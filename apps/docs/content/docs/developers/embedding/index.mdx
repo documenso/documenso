@@ -176,10 +176,44 @@ If you prefer not to use any SDK, you can embed signing using [Direct Links](/do
 | `host`                | `string`   | Documenso instance URL. Defaults to `https://app.documenso.com`. |
 | `name`                | `string`   | Pre-fill the signer's name.                                      |
 | `lockName`            | `boolean`  | Prevent the signer from changing their name.                     |
+| `clientUserId`        | `string`   | Opaque identifier for the signer used to persist their signature across embeds (Platform Plan). See [Persisting Signatures](#persisting-signatures). |
 | `language`            | `string`   | Set the UI language. See [Supported Languages](https://github.com/documenso/documenso/tree/main/packages/lib/constants/locales.ts). |
 | `onDocumentReady`     | `function` | Called when the document is loaded and ready.                    |
 | `onDocumentCompleted` | `function` | Called when signing is completed.                                |
 | `onDocumentError`     | `function` | Called when an error occurs.                                     |
+
+---
+
+## Persisting Signatures
+
+<Callout type="info">
+  Persisted signatures are available on the [Platform Plan](https://documen.so/platform-cta-pricing) and above.
+</Callout>
+
+By default a signer in an embed has no account, so every document they sign starts with an empty signature pad. If the same person signs through your embeds repeatedly you can pass a `clientUserId` and Documenso will remember the signature they used and prefill it next time.
+
+```jsx
+<EmbedSignDocument
+  token="recipient-signing-token"
+  clientUserId="usr_8f2c1b4e"
+/>
+```
+
+How it works:
+
+- The persisted signature is scoped to your organisation, the recipient's email address and the `clientUserId` you pass. The same `clientUserId` with a different recipient email is treated as a different signer.
+- When the embed loads with a `clientUserId` and a matching signature exists, the signature pad is prefilled with it. The signer can still clear it and sign differently.
+- Whenever the signer updates their signature inside the embed, the new signature is stored in the background. Storage is best effort and never blocks signing.
+- Only the signature pad value is stored. It's never applied to a document on the signer's behalf.
+
+<Callout type="warn" title="Do not use personal information as the identifier">
+  `clientUserId` is sent as a URL query parameter and will appear in Documenso's request logs. Those logs are rotated
+  and deleted, but only after a significant retention period. Always pass an **opaque identifier** (for example your
+  internal user ID or a random token you store against the user) rather than an email address, name, phone number or
+  any other personally identifiable information. Documenso only ever stores a one-way hash of the identifier.
+</Callout>
+
+Writes to persisted signatures are rate limited per recipient and per IP address. If the limit is exceeded the update is skipped and the signer's current session is unaffected.
 
 ---
 
