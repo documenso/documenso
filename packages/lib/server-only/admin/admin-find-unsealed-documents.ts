@@ -30,7 +30,13 @@ export const adminFindUnsealedDocuments = async ({
 
   const baseQuery = kyselyPrisma.$kysely
     .selectFrom('Envelope')
-    .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
+    // PENDING, or REJECTED but not sealed yet.
+    .where((eb) =>
+      eb.or([
+        eb('Envelope.status', '=', sql.lit(DocumentStatus.PENDING)),
+        eb.and([eb('Envelope.status', '=', sql.lit(DocumentStatus.REJECTED)), eb('Envelope.completedAt', 'is', null)]),
+      ]),
+    )
     .where('Envelope.type', '=', sql.lit(EnvelopeType.DOCUMENT))
     .where('Envelope.deletedAt', 'is', null)
     // Must have at least one recipient.
