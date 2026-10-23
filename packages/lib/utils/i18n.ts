@@ -20,18 +20,39 @@ export async function dynamicActivate(locale: string) {
   i18n.loadAndActivate({ locale, messages });
 }
 
-const parseLanguageFromLocale = (locale: string): SupportedLanguageCodes | null => {
-  const [language, _country] = locale.split('-');
-
-  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
-    (lang): lang is SupportedLanguageCodes => lang === language,
-  );
-
-  if (!foundSupportedLanguage) {
+export const parseLanguageFromLocale = (locale: string): SupportedLanguageCodes | null => {
+  const tag = locale.trim().split(';')[0].trim();
+  if (!tag) {
     return null;
   }
 
-  return foundSupportedLanguage;
+  // 1. Direct match (e.g. 'pt-BR', 'en', 'de', case-insensitive)
+  const exactMatch = APP_I18N_OPTIONS.supportedLangs.find(
+    (lang): lang is SupportedLanguageCodes => lang.toLowerCase() === tag.toLowerCase(),
+  );
+
+  if (exactMatch) {
+    return exactMatch;
+  }
+
+  const [language] = tag.split('-');
+  const baseLanguage = language.toLowerCase();
+
+  // 2. Base language matches a supported base language (e.g. 'en-US' -> 'en', 'de-DE' -> 'de')
+  const baseMatch = APP_I18N_OPTIONS.supportedLangs.find(
+    (lang): lang is SupportedLanguageCodes => lang.toLowerCase() === baseLanguage,
+  );
+
+  if (baseMatch) {
+    return baseMatch;
+  }
+
+  // 3. Regional match where supported language starts with the base language (e.g. 'pt' or 'pt-PT' -> 'pt-BR')
+  const regionalMatch = APP_I18N_OPTIONS.supportedLangs.find(
+    (lang): lang is SupportedLanguageCodes => lang.toLowerCase().split('-')[0] === baseLanguage,
+  );
+
+  return regionalMatch ?? null;
 };
 
 /**
