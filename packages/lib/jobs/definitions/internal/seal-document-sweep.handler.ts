@@ -12,7 +12,9 @@ export const run = async ({ io }: { payload: TSealDocumentSweepJobDefinition; io
   const fifteenMinutesAgo = now.minus({ minutes: 15 }).toJSDate();
   const sixHoursAgo = now.minus({ hours: 6 }).toJSDate();
 
-  // Find all PENDING envelopes that should have been sealed but weren't.
+  // Find all envelopes that should have been sealed but weren't: PENDING envelopes,
+  // and REJECTED envelopes without a `completedAt`. Rejection sets the status
+  // immediately, but only the seal job stamps the PDF and sets `completedAt`.
   //
   // A document is ready to seal when either:
   //   1. All recipients are SIGNED or have role CC (normal completion)
@@ -20,12 +22,17 @@ export const run = async ({ io }: { payload: TSealDocumentSweepJobDefinition; io
   //
   // We only look at documents where the last action was between 15 minutes
   // and 6 hours ago. The lower bound avoids racing with the normal seal-document
-  // job that fires on completion. The upper bound stops us from endlessly retrying
-  // documents that are stuck due to a deeper issue (e.g. corrupt PDF).
+  // job that fires on completion or rejection. The upper bound stops us from
+  // endlessly retrying documents that are stuck due to a deeper issue (e.g. corrupt PDF).
   const unsealedEnvelopes = await kyselyPrisma.$kysely
     .selectFrom('Envelope')
     .select(['Envelope.id', 'Envelope.secondaryId'])
-    .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
+    .where((eb) =>
+      eb.or([
+        eb('Envelope.status', '=', sql.lit(DocumentStatus.PENDING)),
+        eb.and([eb('Envelope.status', '=', sql.lit(DocumentStatus.REJECTED)), eb('Envelope.completedAt', 'is', null)]),
+      ]),
+    )
     .where('Envelope.type', '=', sql.lit(EnvelopeType.DOCUMENT))
     .where('Envelope.deletedAt', 'is', null)
     // Ensure there is at least one recipient.
