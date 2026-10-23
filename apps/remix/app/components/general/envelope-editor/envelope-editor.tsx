@@ -510,33 +510,36 @@ export const EnvelopeEditor = () => {
             )}
 
             {/* Auto-save toggle */}
-            <button
+            <Button
               type="button"
-              className={cn(
-                'flex w-full cursor-pointer items-center rounded-md px-2 py-1.5 transition-colors hover:bg-accent',
-                {
-                  'justify-center': minimizeLeftSidebar,
-                  'justify-between': !minimizeLeftSidebar,
-                },
-              )}
+              variant="ghost"
+              size="sm"
+              className={cn('w-full', {
+                'justify-center': minimizeLeftSidebar,
+                'justify-start': !minimizeLeftSidebar,
+              })}
               title={isAutoSaveEnabled ? t`Auto-save is on` : t`Auto-save is off`}
               onClick={() => setIsAutoSaveEnabled(!isAutoSaveEnabled)}
             >
-              {!minimizeLeftSidebar && (
-                <span className="text-muted-foreground text-sm">
-                  <Trans>Auto-save</Trans>
-                </span>
-              )}
+              <SaveIcon className="h-4 w-4 shrink-0" />
 
-              <Switch
-                checked={isAutoSaveEnabled}
-                onCheckedChange={setIsAutoSaveEnabled}
-                // Prevent the button click from double-firing
-                onClick={(e) => e.stopPropagation()}
-                className="pointer-events-none"
-                aria-label={isAutoSaveEnabled ? t`Auto-save is on` : t`Auto-save is off`}
-              />
-            </button>
+              {!minimizeLeftSidebar && (
+                <div className="ml-2 flex flex-1 items-center justify-between">
+                  <span>
+                    <Trans>Auto-save</Trans>
+                  </span>
+
+                  <Switch
+                    checked={isAutoSaveEnabled}
+                    onCheckedChange={setIsAutoSaveEnabled}
+                    // Prevent the button click from double-firing
+                    onClick={(e) => e.stopPropagation()}
+                    className="pointer-events-none"
+                    aria-label={isAutoSaveEnabled ? t`Auto-save is on` : t`Auto-save is off`}
+                  />
+                </div>
+              )}
+            </Button>
           </div>
 
           {/* Editor Tools — only shown on the Add Fields step */}
@@ -598,66 +601,36 @@ export const EnvelopeEditor = () => {
                 </Button>
 
                 {/* Snapping toggle */}
-                <button
+                <Button
                   type="button"
-                  className={cn(
-                    'flex w-full cursor-pointer items-center rounded-md px-2 py-1.5 transition-colors hover:bg-accent',
-                    {
-                      'justify-center': minimizeLeftSidebar,
-                      'justify-between': !minimizeLeftSidebar,
-                    },
-                  )}
+                  variant="ghost"
+                  size="sm"
+                  className={cn('w-full', {
+                    'justify-center': minimizeLeftSidebar,
+                    'justify-start': !minimizeLeftSidebar,
+                  })}
                   title={isSnappingEnabled ? t`Snapping is on` : t`Snapping is off`}
                   onClick={() => setIsSnappingEnabled(!isSnappingEnabled)}
                 >
-                  {!minimizeLeftSidebar && (
-                    <span className="flex items-center gap-2 text-muted-foreground text-sm">
-                      <MagnetIcon className="h-4 w-4" />
-                      <Trans>Snapping</Trans>
-                    </span>
-                  )}
-
-                  {minimizeLeftSidebar && <MagnetIcon className="h-4 w-4" />}
+                  <MagnetIcon className="h-4 w-4 shrink-0" />
 
                   {!minimizeLeftSidebar && (
-                    <Switch
-                      checked={isSnappingEnabled}
-                      onCheckedChange={setIsSnappingEnabled}
-                      onClick={(e) => e.stopPropagation()}
-                      className="pointer-events-none"
-                      aria-label={isSnappingEnabled ? t`Snapping is on` : t`Snapping is off`}
-                    />
-                  )}
-                </button>
+                    <div className="ml-2 flex flex-1 items-center justify-between">
+                      <span>
+                        <Trans>Snapping</Trans>
+                      </span>
 
-                {/* Auto-save toggle */}
-                <button
-                  type="button"
-                  className={cn(
-                    'flex w-full cursor-pointer items-center rounded-md px-2 py-1.5 transition-colors hover:bg-accent',
-                    {
-                      'justify-center': minimizeLeftSidebar,
-                      'justify-between': !minimizeLeftSidebar,
-                    },
+                      <Switch
+                        checked={isSnappingEnabled}
+                        onCheckedChange={setIsSnappingEnabled}
+                        // Prevent the button click from double-firing
+                        onClick={(e) => e.stopPropagation()}
+                        className="pointer-events-none"
+                        aria-label={isSnappingEnabled ? t`Snapping is on` : t`Snapping is off`}
+                      />
+                    </div>
                   )}
-                  title={isAutoSaveEnabled ? t`Auto-save is on` : t`Auto-save is off`}
-                  onClick={() => setIsAutoSaveEnabled(!isAutoSaveEnabled)}
-                >
-                  {!minimizeLeftSidebar && (
-                    <span className="flex items-center gap-2 text-muted-foreground text-sm">
-                      <SaveIcon className="h-4 w-4" />
-                      <Trans>Auto-save</Trans>
-                    </span>
-                  )}
-
-                  <Switch
-                    checked={isAutoSaveEnabled}
-                    onCheckedChange={setIsAutoSaveEnabled}
-                    onClick={(e) => e.stopPropagation()}
-                    className="pointer-events-none"
-                    aria-label={isAutoSaveEnabled ? t`Auto-save is on` : t`Auto-save is off`}
-                  />
-                </button>
+                </Button>
               </div>
             </>
           )}
