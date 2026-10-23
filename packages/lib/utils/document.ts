@@ -18,6 +18,18 @@ export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | Documen
 };
 
 /**
+ * Whether the envelope's stored PDF is the final sealed version. A rejection sets the
+ * status immediately, but the stamped PDF only exists once the seal job sets `completedAt`.
+ */
+export const isDocumentSealed = (envelope: Pick<Envelope, 'status' | 'completedAt'>) => {
+  if (envelope.status === DocumentStatus.REJECTED) {
+    return envelope.completedAt !== null;
+  }
+
+  return envelope.status === DocumentStatus.COMPLETED;
+};
+
+/**
  * Extracts the derived document meta which should be used when creating a document
  * from scratch, or from a template.
  *
