@@ -24,6 +24,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE, DOCUMENT_EMAIL_TYPE } from '../../../types/doc
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../../types/webhook-payload';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
+import { isRecipientEmailValidForSending } from '../../../utils/recipients';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { shouldShowNewAccountWarning } from '../../../utils/sender-trust';
@@ -95,6 +96,12 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
   // Skip if distribution method is NONE (manual link sharing, no emails).
   if (envelope.documentMeta.distributionMethod === DocumentDistributionMethod.NONE) {
     io.logger.info(`Envelope ${envelope.id} uses manual distribution, skipping email reminder`);
+    return;
+  }
+
+  // Recipients without a valid email (e.g. created without one) can't be emailed.
+  if (!isRecipientEmailValidForSending(recipient)) {
+    io.logger.info(`Recipient ${recipient.id} has no valid email address, skipping email reminder`);
     return;
   }
 
