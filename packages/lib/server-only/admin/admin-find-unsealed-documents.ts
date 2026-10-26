@@ -30,7 +30,6 @@ export const adminFindUnsealedDocuments = async ({
 
   const baseQuery = kyselyPrisma.$kysely
     .selectFrom('Envelope')
-    // PENDING, or REJECTED but not sealed yet.
     .where((eb) =>
       eb.or([
         eb('Envelope.status', '=', sql.lit(DocumentStatus.PENDING)),

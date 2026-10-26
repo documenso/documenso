@@ -22,8 +22,8 @@ export const run = async ({ io }: { payload: TSealDocumentSweepJobDefinition; io
   //
   // We only look at documents where the last action was between 15 minutes
   // and 6 hours ago. The lower bound avoids racing with the normal seal-document
-  // job that fires on completion or rejection. The upper bound stops us from
-  // endlessly retrying documents that are stuck due to a deeper issue (e.g. corrupt PDF).
+  // job that fires on completion. The upper bound stops us from endlessly retrying
+  // documents that are stuck due to a deeper issue (e.g. corrupt PDF).
   const unsealedEnvelopes = await kyselyPrisma.$kysely
     .selectFrom('Envelope')
     .select(['Envelope.id', 'Envelope.secondaryId'])
