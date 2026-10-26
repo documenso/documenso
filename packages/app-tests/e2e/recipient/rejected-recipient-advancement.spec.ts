@@ -6,18 +6,17 @@ import { expect, test } from '@playwright/test';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
 
 /**
- * Rejecting a document only marks the recipient; the envelope is moved to
- * REJECTED later, asynchronously, by the seal job. Until that lands the
- * envelope is still PENDING, so another recipient can complete and the
- * advancement logic runs with a REJECTED recipient in the list.
+ * Rejecting a document moves the envelope to REJECTED in the same transaction,
+ * but envelopes rejected by older versions can still be PENDING with a REJECTED
+ * recipient. In that state another recipient can complete, and the advancement
+ * logic runs with a REJECTED recipient in the list.
  *
  * That recipient must never be treated as the next signing group — doing so
  * re-marks them as sent and emails them a signing request for a document they
  * declined. Nor may the flow advance PAST them: the turn check treats a
  * rejection as blocking, so a recipient in a later step would receive a
  * signing request whose link redirects to /waiting and whose completion is
- * refused. (For rejected TSP envelopes the seal job always throws, so this
- * state is permanent rather than a narrow race.)
+ * refused.
  */
 
 const expectSigningRequestJobCount = async (recipientId: number, expected: number) => {
