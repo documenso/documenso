@@ -20,15 +20,61 @@ export const usePersistEmbedSignature = ({
   });
 
   const lastPersistedSignature = useRef(initialSignature || null);
+  const pendingSignature = useRef<string | null>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const flushPendingSignature = useCallback(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+      debounceTimer.current = null;
+    }
+
+    const nextSignature = pendingSignature.current;
+    if (!clientUserId || !nextSignature || nextSignature === lastPersistedSignature.current) {
+      pendingSignature.current = null;
+      return;
+    }
+
+    pendingSignature.current = null;
+    mutate(
+      {
+        token,
+        clientUserId,
+        signature: nextSignature,
+      },
+      {
+        onSuccess: () => {
+          lastPersistedSignature.current = nextSignature;
+        },
+        onError: () => null,
+      },
+    );
+  }, [token, clientUserId, mutate]);
+
   useEffect(() => {
-    return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
+    const handleVisibilityOrPageHide = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+        flushPendingSignature();
       }
     };
-  }, []);
+
+    const handlePageHide = () => {
+      flushPendingSignature();
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('pagehide', handlePageHide);
+      window.addEventListener('visibilitychange', handleVisibilityOrPageHide);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('pagehide', handlePageHide);
+        window.removeEventListener('visibilitychange', handleVisibilityOrPageHide);
+      }
+      flushPendingSignature();
+    };
+  }, [flushPendingSignature]);
 
   const persistSignature = useCallback(
     (signature: string | null | undefined) => {
@@ -39,32 +85,22 @@ export const usePersistEmbedSignature = ({
           clearTimeout(debounceTimer.current);
           debounceTimer.current = null;
         }
+        pendingSignature.current = null;
         return;
       }
+
+      pendingSignature.current = nextSignature;
 
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current);
       }
 
       debounceTimer.current = setTimeout(() => {
-        debounceTimer.current = null;
-        mutate(
-          {
-            token,
-            clientUserId,
-            signature: nextSignature,
-          },
-          {
-            onSuccess: () => {
-              lastPersistedSignature.current = nextSignature;
-            },
-            onError: () => null,
-          },
-        );
+        flushPendingSignature();
       }, debounceMs);
     },
-    [token, clientUserId, mutate, debounceMs],
+    [clientUserId, debounceMs, flushPendingSignature],
   );
 
-  return { persistSignature };
+  return { persistSignature, flush: flushPendingSignature };
 };

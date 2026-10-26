@@ -161,7 +161,7 @@ describe('usePersistEmbedSignature', () => {
     expect(mockMutate).not.toHaveBeenCalled();
   });
 
-  it('cancels pending debounce timer on unmount', () => {
+  it('flushes pending signature immediately on unmount so closing or navigating away preserves the last stroke', () => {
     const { current, unmount } = renderHook(() =>
       usePersistEmbedSignature({
         token: 'tok_123',
@@ -171,11 +171,56 @@ describe('usePersistEmbedSignature', () => {
       }),
     );
 
-    current.persistSignature('Partial Signature');
+    // User draws stroke
+    current.persistSignature('Last Drawn Stroke');
+
+    // User navigates away or closes tab after 100ms (within 500ms window)
+    vi.advanceTimersByTime(100);
+    expect(mockMutate).not.toHaveBeenCalled();
+
+    // Component unmounts
     unmount();
 
-    vi.advanceTimersByTime(1000);
+    // Pending signature should be flushed immediately
+    expect(mockMutate).toHaveBeenCalledTimes(1);
+    expect(mockMutate).toHaveBeenCalledWith(
+      {
+        token: 'tok_123',
+        clientUserId: 'usr_456',
+        signature: 'Last Drawn Stroke',
+      },
+      expect.any(Object),
+    );
+  });
+
+  it('flushes pending signature immediately when explicit flush() is called', () => {
+    const { current } = renderHook(() =>
+      usePersistEmbedSignature({
+        token: 'tok_123',
+        clientUserId: 'usr_456',
+        initialSignature: null,
+        debounceMs: 500,
+      }),
+    );
+
+    current.persistSignature('Instant Signature');
     expect(mockMutate).not.toHaveBeenCalled();
+
+    current.flush();
+
+    expect(mockMutate).toHaveBeenCalledTimes(1);
+    expect(mockMutate).toHaveBeenCalledWith(
+      {
+        token: 'tok_123',
+        clientUserId: 'usr_456',
+        signature: 'Instant Signature',
+      },
+      expect.any(Object),
+    );
+
+    // Advancing timers should not cause duplicate submission
+    vi.advanceTimersByTime(1000);
+    expect(mockMutate).toHaveBeenCalledTimes(1);
   });
 
   it('cancels pending timer if signature is restored to already persisted signature', () => {
