@@ -45,6 +45,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
       signingStatus: SigningStatus.NOT_SIGNED,
       sendStatus: SendStatus.SENT,
       role: { not: RecipientRole.CC },
+      email: { not: '' },
       OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
       envelope: {
         status: DocumentStatus.PENDING,
