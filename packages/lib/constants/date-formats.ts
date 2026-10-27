@@ -166,6 +166,15 @@ export const DATE_FORMATS = [
   value: (typeof VALID_DATE_FORMAT_VALUES)[number];
 }[];
 
+/**
+ * Persisted date formats use the date-fns/Java `XXX` offset token for ISO 8601,
+ * but every stamp is rendered with luxon, which prints unknown tokens literally.
+ * Map the token to its luxon equivalent (`ZZ`) before formatting.
+ */
+export const toLuxonDateFormat = (dateFormat: string): string => {
+  return dateFormat.replaceAll('XXX', 'ZZ');
+};
+
 export const convertToLocalSystemFormat = (
   customText: string,
   dateFormat: string | null = DEFAULT_DOCUMENT_DATE_FORMAT,
@@ -173,16 +182,26 @@ export const convertToLocalSystemFormat = (
 ): string => {
   const coalescedDateFormat = dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT;
   const coalescedTimeZone = timeZone ?? DEFAULT_DOCUMENT_TIME_ZONE;
+  const luxonDateFormat = toLuxonDateFormat(coalescedDateFormat);
 
-  const parsedDate = DateTime.fromFormat(customText, coalescedDateFormat, {
+  let parsedDate = DateTime.fromFormat(customText, luxonDateFormat, {
     zone: coalescedTimeZone,
   });
+
+  // Legacy stamps were written with the literal "XXX" token, which luxon cannot
+  // parse back. Drop the literal from the input and the offset from the format,
+  // then retry so they render instead of "Invalid date".
+  if (!parsedDate.isValid && customText.includes('XXX')) {
+    parsedDate = DateTime.fromFormat(customText.replace('XXX', ''), luxonDateFormat.replace('ZZ', ''), {
+      zone: coalescedTimeZone,
+    });
+  }
 
   if (!parsedDate.isValid) {
     return 'Invalid date';
   }
 
-  const formattedDate = parsedDate.toLocal().toFormat(coalescedDateFormat);
+  const formattedDate = parsedDate.toLocal().toFormat(luxonDateFormat);
 
   return formattedDate;
 };
