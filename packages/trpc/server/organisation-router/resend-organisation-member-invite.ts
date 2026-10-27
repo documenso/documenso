@@ -116,6 +116,7 @@ export const resendOrganisationMemberInvitation = async ({
   await sendOrganisationMemberInviteEmail({
     email: invitation.email,
     token: invitation.token,
+    senderUserId: userId,
     senderName: userName,
     organisation,
   });

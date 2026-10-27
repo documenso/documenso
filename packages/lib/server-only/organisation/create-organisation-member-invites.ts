@@ -16,6 +16,7 @@ import { generateDatabaseId } from '../../universal/id';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
+import { isEmailSuppressed } from '../email-suppression/is-email-suppressed';
 import { getMemberOrganisationRole } from '../team/get-member-roles';
 
 export type CreateOrganisationMemberInvitesOptions = {
@@ -119,6 +120,7 @@ export const createOrganisationMemberInvites = async ({
         email,
         token,
         organisation,
+        senderUserId: userId,
         senderName: userName,
       }),
     ),
@@ -140,6 +142,7 @@ export const createOrganisationMemberInvites = async ({
 
 type SendOrganisationMemberInviteEmailOptions = {
   email: string;
+  senderUserId: number;
   senderName: string;
   token: string;
   organisation: Pick<Organisation, 'id' | 'name'>;
@@ -150,6 +153,7 @@ type SendOrganisationMemberInviteEmailOptions = {
  */
 export const sendOrganisationMemberInviteEmail = async ({
   email,
+  senderUserId,
   senderName,
   token,
   organisation,
@@ -173,6 +177,18 @@ export const sendOrganisationMemberInviteEmail = async ({
   // Member invites can be sent to anyone, so block them when the organisation has email
   // sending disabled.
   if (emailsDisabled) {
+    return;
+  }
+
+  const isSuppressed = await isEmailSuppressed({
+    email,
+    sender: {
+      organisationId: organisation.id,
+      userId: senderUserId,
+    },
+  });
+
+  if (isSuppressed) {
     return;
   }
 

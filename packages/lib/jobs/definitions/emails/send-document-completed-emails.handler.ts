@@ -7,6 +7,7 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { excludeSuppressedRecipients } from '../../../server-only/email-suppression/is-email-suppressed';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
@@ -175,7 +176,15 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
     return;
   }
 
-  const recipientsToNotify = envelope.recipients.filter((recipient) => isRecipientEmailValidForSending(recipient));
+  const recipientsToNotify = await excludeSuppressedRecipients({
+    recipients: envelope.recipients.filter((recipient) => isRecipientEmailValidForSending(recipient)),
+    sender: {
+      organisationId,
+      teamId: envelope.teamId,
+      userId: owner.id,
+      userEmail: owner.email,
+    },
+  });
 
   await Promise.all(
     recipientsToNotify.map(async (recipient) => {

@@ -12,6 +12,7 @@ import {
   FileStack,
   LineChartIcon,
   MailIcon,
+  MailXIcon,
   Settings,
   Trophy,
   Users,
@@ -150,6 +151,20 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/email-domains">
               <MailIcon className="mr-2 h-5 w-5" />
               <Trans>Email Domains</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/email-suppressions') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/email-suppressions">
+              <MailXIcon className="mr-2 h-5 w-5" />
+              <Trans>Email Suppressions</Trans>
             </Link>
           </Button>
 

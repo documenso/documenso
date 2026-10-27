@@ -6,6 +6,7 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { isEmailSuppressed } from '../../../server-only/email-suppression/is-email-suppressed';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { isRecipientEmailValidForSending } from '../../../utils/recipients';
@@ -51,6 +52,19 @@ export const run = async ({ payload, io }: { payload: TSendRecipientRemovedEmail
 
   // Don't send the removal email if the organisation has email sending disabled.
   if (emailsDisabled) {
+    return;
+  }
+
+  const isSuppressed = await isEmailSuppressed({
+    email: recipientEmail,
+    sender: {
+      organisationId,
+      teamId: envelope.teamId,
+      userId: envelope.userId,
+    },
+  });
+
+  if (isSuppressed) {
     return;
   }
 

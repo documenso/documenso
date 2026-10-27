@@ -72,6 +72,7 @@ model User {
   webhooks           Webhook[]
   siteSettings       SiteSettings[]
   passkeys           Passkey[]
+  emailSuppressions  EmailSuppression[]
   avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
   @@index([email])
@@ -847,6 +848,7 @@ model Organisation {
 
   emailDomains       EmailDomain[]
   organisationEmails OrganisationEmail[]
+  emailSuppressions  EmailSuppression[]
 
   monthlyStats OrganisationMonthlyStat[]
 
@@ -1067,11 +1069,12 @@ model Team {
 
   profile TeamProfile?
 
-  envelopes  Envelope[]
-  folders    Folder[]
-  apiTokens  ApiToken[]
-  webhooks   Webhook[]
-  teamGroups TeamGroup[]
+  envelopes         Envelope[]
+  folders           Folder[]
+  apiTokens         ApiToken[]
+  webhooks          Webhook[]
+  teamGroups        TeamGroup[]
+  emailSuppressions EmailSuppression[]
 
   organisationId String
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
@@ -1256,6 +1259,45 @@ model EmailTransport {
 
   subscriptionClaims SubscriptionClaim[]
   organisationClaims OrganisationClaim[]
+}
+
+enum EmailSuppressionScope {
+  GLOBAL
+  ORGANISATION
+  TEAM
+  USER
+}
+
+enum EmailSuppressionSource {
+  RECIPIENT
+  ADMIN
+}
+
+/// Stops emails that a sender triggers, such as signing requests and invites, from being sent to `email`.
+/// Only the sender column matching `scope` is set, and none are set for GLOBAL.
+model EmailSuppression {
+  id        String   @id
+  createdAt DateTime @default(now())
+
+  /// Stored lowercased.
+  email  String
+  scope  EmailSuppressionScope
+  source EmailSuppressionSource
+  reason String?
+
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  teamId Int?
+  team   Team? @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([organisationId])
+  @@index([teamId])
+  @@index([userId])
 }
 
 model OrganisationAuthenticationPortal {

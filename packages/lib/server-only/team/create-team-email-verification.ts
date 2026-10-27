@@ -15,6 +15,7 @@ import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEmailContext } from '../email/get-email-context';
+import { isEmailSuppressed } from '../email-suppression/is-email-suppressed';
 
 export type CreateTeamEmailVerificationOptions = {
   userId: number;
@@ -116,13 +117,27 @@ export const sendTeamEmailVerificationEmail = async (email: string, token: strin
     token,
   });
 
-  const { branding, emailLanguage, senderEmail, emailTransport } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, organisationId, emailTransport } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'team',
       teamId: team.id,
     },
   });
+
+  // Unlike account verification emails this can be sent to any address the team enters,
+  // so the owner of that address may have opted out.
+  const isSuppressed = await isEmailSuppressed({
+    email,
+    sender: {
+      organisationId,
+      teamId: team.id,
+    },
+  });
+
+  if (isSuppressed) {
+    return;
+  }
 
   const [html, text] = await Promise.all([
     renderEmailWithI18N(template, { lang: emailLanguage, branding }),

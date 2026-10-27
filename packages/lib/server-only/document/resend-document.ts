@@ -30,6 +30,7 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { shouldShowNewAccountWarning } from '../../utils/sender-trust';
 import { buildEnvelopeEmailHeaders } from '../email/build-envelope-email-headers';
 import { getEmailContext } from '../email/get-email-context';
+import { excludeSuppressedRecipients } from '../email-suppression/is-email-suppressed';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { updateRecipientNextReminder } from '../recipient/update-recipient-next-reminder';
@@ -74,6 +75,11 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     include: {
       recipients: true,
       documentMeta: true,
+      user: {
+        select: {
+          email: true,
+        },
+      },
       team: {
         select: {
           teamEmail: true,
@@ -193,11 +199,21 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     return envelope;
   }
 
+  const recipientsToEmail = await excludeSuppressedRecipients({
+    recipients: recipientsToRemind,
+    sender: {
+      organisationId,
+      teamId: envelope.teamId,
+      userId: envelope.userId,
+      userEmail: envelope.user.email,
+    },
+  });
+
   // Assert that there is enough quota to send the emails.
   await assertOrganisationRatesAndLimits({
     organisationId,
     organisationClaim: claims,
-    count: recipientsToRemind.length,
+    count: recipientsToEmail.length,
     type: 'email',
   });
 
@@ -207,7 +223,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
   });
 
   await Promise.all(
-    recipientsToRemind.map(async (recipient) => {
+    recipientsToEmail.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC || !isRecipientEmailValidForSending(recipient)) {
         return;
       }

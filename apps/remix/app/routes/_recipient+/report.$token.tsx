@@ -1,11 +1,15 @@
 import { SUPPORT_EMAIL } from '@documenso/lib/constants/app';
+import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
+import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationType } from '@prisma/client';
 import { useState } from 'react';
 
+import { RecipientEmailSuppressionForm } from '~/components/forms/recipient-email-suppression-form';
 import type { Route } from './+types/report.$token';
 
 export async function loader({ params }: Route.LoaderArgs) {
@@ -20,21 +24,76 @@ export async function loader({ params }: Route.LoaderArgs) {
   // link scanner / prefetcher cannot register a report simply by fetching the URL.
   const recipient = await prisma.recipient.findFirst({
     where: { token },
-    select: { id: true },
+    select: {
+      email: true,
+      envelope: {
+        select: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          team: {
+            select: {
+              id: true,
+              name: true,
+              organisation: {
+                select: {
+                  name: true,
+                  type: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!recipient) {
     throw new Response('Not Found', { status: 404 });
   }
 
+  const { user, team } = recipient.envelope;
+
+  // Personal organisations and teams have generated names, so only the sender is meaningful there.
+  const isOrganisation = team.organisation.type === OrganisationType.ORGANISATION;
+
+  // Organisations can hide who sent an email, in which case the sender stays hidden here too.
+  const isSenderVisible = !isOrganisation || (await getTeamSettings({ teamId: team.id })).includeSenderDetails;
+
   return {
     token,
+    recipientEmail: isRecipientEmailValidForSending(recipient) ? recipient.email : null,
+    senderName: isSenderVisible ? user.name || user.email : null,
+    teamName: isOrganisation ? team.name : null,
+    organisationName: isOrganisation ? team.organisation.name : null,
   };
 }
 
 export default function ReportSenderPage({ loaderData }: Route.ComponentProps) {
-  const { token } = loaderData;
+  const { token, recipientEmail, senderName, teamName, organisationName } = loaderData;
 
+  return (
+    <div className="-mx-4 flex flex-col items-center px-4 pt-16 md:-mx-8 md:px-8 lg:pt-20 xl:pt-28">
+      <ReportSender token={token} />
+
+      {recipientEmail && (
+        <RecipientEmailSuppressionForm
+          className="mt-16 w-full max-w-lg border-border border-t pt-16"
+          token={token}
+          recipientEmail={recipientEmail}
+          senderName={senderName}
+          teamName={teamName}
+          organisationName={organisationName}
+        />
+      )}
+    </div>
+  );
+}
+
+const ReportSender = ({ token }: { token: string }) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -53,7 +112,7 @@ export default function ReportSenderPage({ loaderData }: Route.ComponentProps) {
 
   if (isReported) {
     return (
-      <div className="-mx-4 flex flex-col items-center px-4 pt-16 md:-mx-8 md:px-8 lg:pt-20 xl:pt-28">
+      <div className="flex flex-col items-center">
         <h1 className="max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl">
           <Trans>Sender reported</Trans>
         </h1>
@@ -73,7 +132,7 @@ export default function ReportSenderPage({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div className="-mx-4 flex flex-col items-center px-4 pt-16 md:-mx-8 md:px-8 lg:pt-20 xl:pt-28">
+    <div className="flex flex-col items-center">
       <h1 className="max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl">
         <Trans>Report this sender?</Trans>
       </h1>
@@ -89,4 +148,4 @@ export default function ReportSenderPage({ loaderData }: Route.ComponentProps) {
       </Button>
     </div>
   );
-}
+};

@@ -17,6 +17,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
 import { buildEnvelopeEmailHeaders } from '../../../server-only/email/build-envelope-email-headers';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { isEmailSuppressed } from '../../../server-only/email-suppression/is-email-suppressed';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
@@ -126,6 +127,21 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
   // has email sending disabled.
   if (envelope.user.disabled || emailsDisabled) {
     io.logger.info(`Envelope ${envelope.id} skipping reminder: owner disabled or organisation emails disabled`);
+    return;
+  }
+
+  const isSuppressed = await isEmailSuppressed({
+    email: recipient.email,
+    sender: {
+      organisationId,
+      teamId: envelope.teamId,
+      userId: envelope.userId,
+      userEmail: envelope.user.email,
+    },
+  });
+
+  if (isSuppressed) {
+    io.logger.info(`Envelope ${envelope.id} skipping reminder: recipient ${recipient.id} has suppressed these emails`);
     return;
   }
 

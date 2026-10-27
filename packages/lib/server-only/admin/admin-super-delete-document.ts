@@ -14,6 +14,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
+import { excludeSuppressedRecipients } from '../email-suppression/is-email-suppressed';
 
 export type AdminSuperDeleteDocumentOptions = {
   envelopeId: string;
@@ -44,7 +45,7 @@ export const adminSuperDeleteDocument = async ({ envelopeId, requestMetadata }: 
     });
   }
 
-  const { branding, settings, senderEmail, replyToEmail, emailTransport } = await getEmailContext({
+  const { branding, settings, senderEmail, replyToEmail, organisationId, emailTransport } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -57,7 +58,15 @@ export const adminSuperDeleteDocument = async ({ envelopeId, requestMetadata }: 
 
   const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).documentDeleted;
 
-  const recipientsToNotify = envelope.recipients.filter((recipient) => isRecipientEmailValidForSending(recipient));
+  const recipientsToNotify = await excludeSuppressedRecipients({
+    recipients: envelope.recipients.filter((recipient) => isRecipientEmailValidForSending(recipient)),
+    sender: {
+      organisationId,
+      teamId: envelope.teamId,
+      userId: user.id,
+      userEmail: user.email,
+    },
+  });
 
   // if the document is pending, send cancellation emails to all recipients
   if (status === DocumentStatus.PENDING && recipientsToNotify.length > 0 && isDocumentDeletedEmailEnabled) {

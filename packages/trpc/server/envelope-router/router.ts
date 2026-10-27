@@ -26,6 +26,7 @@ import { deleteEnvelopeRecipientRoute } from './envelope-recipients/delete-envel
 import { getEnvelopeRecipientRoute } from './envelope-recipients/get-envelope-recipient';
 import { rejectEnvelopeRecipientOnBehalfOfRoute } from './envelope-recipients/reject-envelope-recipient-on-behalf-of';
 import { reportRecipientRoute } from './envelope-recipients/report-recipient';
+import { suppressRecipientEmailsRoute } from './envelope-recipients/suppress-recipient-emails';
 import { updateEnvelopeRecipientsRoute } from './envelope-recipients/update-envelope-recipients';
 import { findEnvelopeAuditLogsRoute } from './find-envelope-audit-logs';
 import { findEnvelopesRoute } from './find-envelopes';
@@ -73,6 +74,7 @@ export const envelopeRouter = router({
     delete: deleteEnvelopeRecipientRoute,
     set: setEnvelopeRecipientsRoute,
     report: reportRecipientRoute,
+    suppressEmails: suppressRecipientEmailsRoute,
     rejectOnBehalfOf: rejectEnvelopeRecipientOnBehalfOfRoute,
   },
   field: {

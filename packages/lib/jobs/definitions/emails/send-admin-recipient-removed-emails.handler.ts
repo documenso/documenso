@@ -6,6 +6,7 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { isEmailSuppressed } from '../../../server-only/email-suppression/is-email-suppressed';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { isRecipientEmailValidForSending } from '../../../utils/recipients';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -46,7 +47,7 @@ export const run = async ({
   const shouldNotifyRecipient = notifyRecipient && isRecipientEmailValidForSending({ email: recipientEmail });
 
   // The document's `recipientRemoved` email preference is intentionally ignored
-  // for admin removals. Organisation email disabling and limits still apply.
+  // for admin removals. Organisation email disabling, suppressions and limits still apply.
   if (shouldNotifyRecipient) {
     const {
       branding,
@@ -66,9 +67,19 @@ export const run = async ({
       meta: envelope.documentMeta,
     });
 
-    let isWithinEmailLimits = !emailsDisabled;
+    const isSuppressed = await isEmailSuppressed({
+      email: recipientEmail,
+      sender: {
+        organisationId,
+        teamId: envelope.teamId,
+        userId: envelope.userId,
+        userEmail: envelope.user.email,
+      },
+    });
 
-    if (isWithinEmailLimits) {
+    let canEmailRecipient = !emailsDisabled && !isSuppressed;
+
+    if (canEmailRecipient) {
       try {
         await assertOrganisationRatesAndLimits({
           organisationId,
@@ -83,11 +94,11 @@ export const run = async ({
           envelopeId: envelope.id,
         });
 
-        isWithinEmailLimits = false;
+        canEmailRecipient = false;
       }
     }
 
-    if (isWithinEmailLimits) {
+    if (canEmailRecipient) {
       const template = createElement(RecipientRemovedByAdminEmailTemplate, {
         audience: 'recipient',
         documentName: envelope.title,

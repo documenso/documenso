@@ -5,26 +5,28 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { excludeSuppressedRecipients } from '../../../server-only/email-suppression/is-email-suppressed';
 import { isRecipientEmailValidForSending } from '../../../utils/recipients';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendDocumentDeletedEmailsJobDefinition } from './send-document-deleted-emails';
 
 export const run = async ({ payload, io }: { payload: TSendDocumentDeletedEmailsJobDefinition; io: JobRunIO }) => {
-  const { teamId, documentName, inviterName, inviterEmail, meta, recipients } = payload;
+  const { teamId, userId, documentName, inviterName, inviterEmail, meta, recipients } = payload;
 
   if (recipients.length === 0) {
     return;
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled, emailTransport } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId,
-    },
-    meta,
-  });
+  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, emailsDisabled, emailTransport } =
+    await getEmailContext({
+      emailType: 'RECIPIENT',
+      source: {
+        type: 'team',
+        teamId,
+      },
+      meta,
+    });
 
   // Don't send cancellation emails if the organisation has email sending
   // disabled. Re-checked here (not just at enqueue time) because the org can be
@@ -33,10 +35,19 @@ export const run = async ({ payload, io }: { payload: TSendDocumentDeletedEmails
     return;
   }
 
+  const recipientsToNotify = await excludeSuppressedRecipients({
+    recipients,
+    sender: {
+      organisationId,
+      teamId,
+      userId,
+    },
+  });
+
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
   const i18n = await getI18nInstance(emailLanguage);
 
-  for (const recipient of recipients) {
+  for (const recipient of recipientsToNotify) {
     await io.runTask(`send-document-deleted-emails-${recipient.email}`, async () => {
       if (!isRecipientEmailValidForSending(recipient)) {
         return;

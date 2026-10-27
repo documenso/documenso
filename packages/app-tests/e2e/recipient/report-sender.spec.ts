@@ -1,8 +1,10 @@
+import { nanoid } from '@documenso/lib/universal/id';
 import { currentMonthlyPeriod } from '@documenso/lib/universal/monthly-period';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Page, test } from '@playwright/test';
+import { EmailSuppressionScope, EmailSuppressionSource } from '@prisma/client';
 
 import { waitForHydration } from '../fixtures/hydration';
 
@@ -127,4 +129,60 @@ test('[REPORT_SENDER]: returns 404 for an invalid token', async ({ page }) => {
   const response = await page.goto('/report/not-a-real-token');
 
   expect(response?.status()).toBe(404);
+});
+
+test('[REPORT_SENDER]: stops emails from the chosen team without reporting the sender', async ({ page }) => {
+  const { user, team, organisation } = await seedUser();
+
+  const teamName = `Team ${nanoid(8)}`;
+
+  await prisma.team.update({ where: { id: team.id }, data: { name: teamName } });
+
+  const recipientEmail = `Recipient-${nanoid(8)}@Test.Documenso.com`;
+
+  const document = await seedPendingDocument(user, team.id, [recipientEmail]);
+
+  await page.goto(`/report/${document.recipients[0].token}`);
+  await waitForHydration(page, 'button[type="submit"]');
+
+  await page.getByRole('radio', { name: teamName }).click();
+  await page.getByRole('button', { name: 'Stop emails' }).click();
+  await expect(page.getByRole('heading', { name: 'Emails stopped' })).toBeVisible();
+
+  const suppressions = await prisma.emailSuppression.findMany({
+    where: { email: recipientEmail.toLowerCase() },
+  });
+
+  expect(suppressions).toEqual([
+    expect.objectContaining({
+      scope: EmailSuppressionScope.TEAM,
+      source: EmailSuppressionSource.RECIPIENT,
+      teamId: team.id,
+      organisationId: null,
+      userId: null,
+    }),
+  ]);
+
+  expect(await getEmailReports(organisation.id)).toBe(0);
+});
+
+test('[REPORT_SENDER]: does not reveal the sender when the organisation hides sender details', async ({ page }) => {
+  const senderName = `Sender ${nanoid(8)}`;
+
+  const { user, team, organisation } = await seedUser({ name: senderName });
+
+  const document = await seedPendingDocument(user, team.id, ['recipient@documenso.com']);
+  const reportUrl = `/report/${document.recipients[0].token}`;
+
+  await page.goto(reportUrl);
+  await expect(page.getByRole('radio', { name: senderName })).toBeVisible();
+
+  await prisma.organisationGlobalSettings.update({
+    where: { id: organisation.organisationGlobalSettingsId },
+    data: { includeSenderDetails: false },
+  });
+
+  await page.goto(reportUrl);
+  await expect(page.getByRole('radio', { name: 'All senders' })).toBeVisible();
+  await expect(page.getByText(senderName)).toHaveCount(0);
 });

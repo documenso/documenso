@@ -7,6 +7,7 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { isEmailSuppressed } from '../../../server-only/email-suppression/is-email-suppressed';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { isRecipientEmailValidForSending } from '../../../utils/recipients';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -39,14 +40,15 @@ export const run = async ({ payload }: { payload: TSendDocumentPendingEmailJobDe
     return;
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled, emailTransport } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId: envelope.teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, emailsDisabled, emailTransport } =
+    await getEmailContext({
+      emailType: 'RECIPIENT',
+      source: {
+        type: 'team',
+        teamId: envelope.teamId,
+      },
+      meta: envelope.documentMeta,
+    });
 
   // Don't send any emails if the organisation has email sending disabled.
   if (emailsDisabled) {
@@ -65,6 +67,19 @@ export const run = async ({ payload }: { payload: TSendDocumentPendingEmailJobDe
 
   // Skip sending email if recipient has no email address
   if (!isRecipientEmailValidForSending(recipient)) {
+    return;
+  }
+
+  const isSuppressed = await isEmailSuppressed({
+    email,
+    sender: {
+      organisationId,
+      teamId: envelope.teamId,
+      userId: envelope.userId,
+    },
+  });
+
+  if (isSuppressed) {
     return;
   }
 

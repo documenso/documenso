@@ -8,6 +8,7 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { excludeSuppressedRecipients } from '../../../server-only/email-suppression/is-email-suppressed';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
@@ -92,13 +93,21 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCancelledEmai
   // CC recipients are excluded because they were never actually emailed about the document
   // (CC recipients are created with sendStatus=SENT by default but never receive a signing
   // invitation), so notifying them about a cancellation they never knew about is unsolicited.
-  const recipientsToNotify = envelope.recipients.filter(
-    (recipient) =>
-      recipient.role !== RecipientRole.CC &&
-      (recipient.sendStatus === SendStatus.SENT || recipient.readStatus === ReadStatus.OPENED) &&
-      recipient.signingStatus !== SigningStatus.REJECTED &&
-      isRecipientEmailValidForSending(recipient),
-  );
+  const recipientsToNotify = await excludeSuppressedRecipients({
+    recipients: envelope.recipients.filter(
+      (recipient) =>
+        recipient.role !== RecipientRole.CC &&
+        (recipient.sendStatus === SendStatus.SENT || recipient.readStatus === ReadStatus.OPENED) &&
+        recipient.signingStatus !== SigningStatus.REJECTED &&
+        isRecipientEmailValidForSending(recipient),
+    ),
+    sender: {
+      organisationId,
+      teamId: envelope.teamId,
+      userId: documentOwner.id,
+      userEmail: documentOwner.email,
+    },
+  });
 
   await io.runTask('send-cancellation-emails', async () => {
     await Promise.all(

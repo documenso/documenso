@@ -17,6 +17,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
 import { buildEnvelopeEmailHeaders } from '../../../server-only/email/build-envelope-email-headers';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { isEmailSuppressed } from '../../../server-only/email-suppression/is-email-suppressed';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
@@ -59,6 +60,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
         documentMeta: true,
         user: {
           select: {
+            email: true,
             disabled: true,
           },
         },
@@ -113,6 +115,28 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
 
   // Don't send signing invitations if the organisation has email sending disabled or the owner is disabled (e.g. banned).
   if (envelope.user.disabled || emailsDisabled) {
+    return;
+  }
+
+  const isSuppressed = await isEmailSuppressed({
+    email: recipient.email,
+    sender: {
+      organisationId,
+      teamId: envelope.teamId,
+      userId: envelope.userId,
+      userEmail: envelope.user.email,
+    },
+  });
+
+  // Unlike an invalid email, return before the EMAIL_SENT audit log is written since it
+  // ends up on the signing certificate.
+  if (isSuppressed) {
+    io.logger.info({
+      msg: 'Recipient signing email suppressed',
+      recipientId: recipient.id,
+      envelopeId: envelope.id,
+    });
+
     return;
   }
 

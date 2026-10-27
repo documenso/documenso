@@ -220,6 +220,7 @@ const handleDocumentOwnerDelete = async ({ envelope, user, requestMetadata }: Ha
       name: 'send.document.deleted.emails',
       payload: {
         teamId: envelope.teamId,
+        userId: envelope.userId,
         documentName: envelope.title,
         inviterName: user.name || undefined,
         inviterEmail: user.email,

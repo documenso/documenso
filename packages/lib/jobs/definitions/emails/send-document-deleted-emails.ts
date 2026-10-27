@@ -6,6 +6,11 @@ const SEND_DOCUMENT_DELETED_EMAILS_JOB_DEFINITION_ID = 'send.document.deleted.em
 
 const SEND_DOCUMENT_DELETED_EMAILS_JOB_DEFINITION_SCHEMA = z.object({
   teamId: z.number(),
+  /**
+   * The document owner, used to apply their email suppressions. Optional because jobs
+   * queued before this field existed don't have it.
+   */
+  userId: z.number().optional(),
   documentName: z.string(),
   inviterName: z.string().optional(),
   inviterEmail: z.string(),

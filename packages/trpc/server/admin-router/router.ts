@@ -13,6 +13,9 @@ import { deleteAdminTeamMemberRoute } from './delete-team-member';
 import { deleteUserRoute } from './delete-user';
 import { disableUserRoute } from './disable-user';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
+import { createEmailSuppressionRoute } from './email-suppression/create-email-suppression';
+import { deleteEmailSuppressionRoute } from './email-suppression/delete-email-suppression';
+import { findEmailSuppressionsRoute } from './email-suppression/find-email-suppressions';
 import { createEmailTransportRoute } from './email-transport/create-email-transport';
 import { deleteEmailTransportRoute } from './email-transport/delete-email-transport';
 import { findEmailTransportsRoute } from './email-transport/find-email-transports';
@@ -107,6 +110,11 @@ export const adminRouter = router({
     find: findEmailDomainsRoute,
     get: getEmailDomainRoute,
     reregister: reregisterEmailDomainRoute,
+  },
+  emailSuppression: {
+    find: findEmailSuppressionsRoute,
+    create: createEmailSuppressionRoute,
+    delete: deleteEmailSuppressionRoute,
   },
   emailTransport: {
     find: findEmailTransportsRoute,
