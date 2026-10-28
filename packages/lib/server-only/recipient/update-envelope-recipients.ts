@@ -9,6 +9,7 @@ import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractLegacyIds } from '../../universal/id';
+import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientBeModified } from '../../utils/recipients';
@@ -72,7 +73,7 @@ export const updateEnvelopeRecipients = async ({
 
   assertEnvelopeMutable(envelope);
 
-  if (envelope.completedAt) {
+  if (isDocumentCompleted(envelope)) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Envelope already complete',
     });

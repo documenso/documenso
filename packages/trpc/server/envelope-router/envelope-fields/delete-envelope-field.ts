@@ -1,6 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
@@ -75,7 +76,7 @@ export const deleteEnvelopeFieldRoute = authenticatedProcedure
       });
     }
 
-    if (envelope.completedAt) {
+    if (isDocumentCompleted(envelope)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Envelope already complete',
       });

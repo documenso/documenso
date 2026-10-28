@@ -9,6 +9,7 @@ import { PDF } from '@libpdf/core';
 import { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
@@ -96,7 +97,7 @@ export const createEnvelopeFields = async ({
 
   assertEnvelopeMutable(envelope);
 
-  if (envelope.type === EnvelopeType.DOCUMENT && envelope.completedAt) {
+  if (envelope.type === EnvelopeType.DOCUMENT && isDocumentCompleted(envelope)) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Envelope already complete',
     });
