@@ -34,16 +34,21 @@ export type AccessAuth2FAFormProps = {
 };
 
 export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormProps) => {
-  const [step, setStep] = useState<FormStep>('method-selection');
-  const [selectedMethod, setSelectedMethod] = useState<TwoFactorMethod | null>(null);
+  const { user } = useRequiredDocumentSigningAuthContext();
+
+  // Email is always available, so without an authenticator there is no method to choose.
+  const hasAuthenticatorEnabled = user?.twoFactorEnabled === true;
+
+  const [step, setStep] = useState<FormStep>(hasAuthenticatorEnabled ? 'method-selection' : 'code-input');
+  const [selectedMethod, setSelectedMethod] = useState<TwoFactorMethod | null>(
+    hasAuthenticatorEnabled ? null : 'email',
+  );
 
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
   const [millisecondsRemaining, setMillisecondsRemaining] = useState<number | null>(null);
 
   const { _ } = useLingui();
   const { toast } = useToast();
-
-  const { user } = useRequiredDocumentSigningAuthContext();
 
   const { mutateAsync: request2FAEmail, isPending: isRequesting2FAEmail } =
     trpc.document.accessAuth.request2FAEmail.useMutation();
@@ -54,8 +59,6 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
       token: '',
     },
   });
-
-  const hasAuthenticatorEnabled = user?.twoFactorEnabled === true;
 
   const onMethodSelect = async (method: TwoFactorMethod) => {
     setSelectedMethod(method);
@@ -108,7 +111,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
     setMillisecondsRemaining(null);
   };
 
-  const onResendEmail = async () => {
+  const requestEmailCode = async () => {
     if (selectedMethod !== 'email') {
       return;
     }
@@ -141,8 +144,26 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
     return () => clearInterval(interval);
   }, [expiresAt]);
 
+  // Deferred so StrictMode's dev-only effect re-run cancels the first call. Calling it
+  // directly sends two emails, and a ref guard leaves isPending stuck on true.
+  useEffect(() => {
+    if (hasAuthenticatorEnabled) {
+      return;
+    }
+
+    const timeout = setTimeout(() => void requestEmailCode(), 0);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
-    <div className="py-4">
+    <div className="space-y-4 py-4">
+      {error && (
+        <Alert variant="destructive" padding="tight" className="text-sm">
+          {error}
+        </Alert>
+      )}
+
       {step === 'method-selection' && (
         <div className="space-y-4">
           <div>
@@ -153,12 +174,6 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
               <Trans>Please select how you'd like to receive your verification code.</Trans>
             </p>
           </div>
-
-          {error && (
-            <Alert variant="destructive" padding="tight" className="text-sm">
-              {error}
-            </Alert>
-          )}
 
           <div className="space-y-3">
             <Button
@@ -205,9 +220,11 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
       {step === 'code-input' && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <Button type="button" variant="ghost" size="sm" onClick={onGoBack}>
-              <ArrowLeftIcon className="h-4 w-4" />
-            </Button>
+            {hasAuthenticatorEnabled && (
+              <Button type="button" variant="ghost" size="sm" onClick={onGoBack}>
+                <ArrowLeftIcon className="h-4 w-4" />
+              </Button>
+            )}
 
             <h3 className="font-semibold text-lg">
               <Trans>Enter verification code</Trans>
@@ -283,7 +300,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
                       variant="ghost"
                       size="sm"
                       className="w-full"
-                      onClick={onResendEmail}
+                      onClick={requestEmailCode}
                       loading={isRequesting2FAEmail}
                     >
                       <Trans>Resend code</Trans>
