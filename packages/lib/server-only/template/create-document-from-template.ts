@@ -723,7 +723,7 @@ export const createDocumentFromTemplate = async ({
                 }
 
                 payload.customText = DateTime.fromJSDate(date).toFormat(
-                  template.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+                  documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
                 );
 
                 payload.inserted = true;
