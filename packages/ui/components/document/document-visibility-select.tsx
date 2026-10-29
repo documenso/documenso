@@ -71,17 +71,17 @@ export const DocumentVisibilityTooltip = () => {
         <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
           <li>
             <Trans>
-              <strong>Everyone</strong>: Visible to all team members.
+              <strong>Everyone</strong> - Visible to all team members.
             </Trans>
           </li>
           <li>
             <Trans>
-              <strong>Managers and above</strong>: Visible to team managers and admins.
+              <strong>Managers and above</strong> - Visible to team managers and admins.
             </Trans>
           </li>
           <li>
             <Trans>
-              <strong>Admins only</strong>: Visible to team admins.
+              <strong>Admins only</strong> - Visible to team admins.
             </Trans>
           </li>
         </ul>
