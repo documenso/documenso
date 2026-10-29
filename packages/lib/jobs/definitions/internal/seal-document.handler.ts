@@ -2,6 +2,7 @@ import path from 'node:path';
 import { PDFDocument } from '@cantoo/pdf-lib';
 import { finalizeTspEnvelopeCompletion } from '@documenso/ee/server-only/signing/csc/finalize-tsp-completion';
 import { addRejectionStampToPdf } from '@documenso/lib/server-only/pdf/add-rejection-stamp-to-pdf';
+import { bakeAnnotationAppearances } from '@documenso/lib/server-only/pdf/bake-annotation-appearances';
 import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-audit-log-pdf';
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
 import { getLastPageDimensions } from '@documenso/lib/server-only/pdf/get-page-size';
@@ -381,7 +382,14 @@ const decorateAndSignPdf = async ({
   certificateDoc,
   auditLogDoc,
 }: DecorateAndSignPdfOptions) => {
-  let pdfDoc = await PDF.load(pdfData);
+  // Some tools (pypdf, Stirling PDF, and most scripted annotators) add text as
+  // /FreeText annotations without an appearance stream. flattenAll() below
+  // deletes any annotation it cannot produce an appearance for, so that text
+  // would vanish from the sealed PDF. Give those annotations an appearance
+  // first; flattenAll() then bakes them into the page content instead.
+  const preparedPdfData = await bakeAnnotationAppearances(pdfData);
+
+  let pdfDoc = await PDF.load(preparedPdfData);
 
   // Normalize and flatten layers that could cause issues with the signature
   pdfDoc.flattenAll();
