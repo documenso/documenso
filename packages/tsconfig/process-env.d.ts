@@ -15,6 +15,7 @@ declare namespace NodeJS {
     NEXT_PRIVATE_OIDC_CLIENT_SECRET?: string;
     NEXT_PRIVATE_OIDC_PROVIDER_LABEL?: string;
     NEXT_PRIVATE_OIDC_SKIP_VERIFY?: string;
+    NEXT_PRIVATE_OIDC_DEFAULT_ORGANISATION_ID?: string;
 
     // Derived in `createPublicEnv()`; do not set manually.
     NEXT_PUBLIC_GOOGLE_SSO_ENABLED?: 'true' | 'false';
