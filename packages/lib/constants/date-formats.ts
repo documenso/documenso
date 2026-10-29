@@ -166,6 +166,16 @@ export const DATE_FORMATS = [
   value: (typeof VALID_DATE_FORMAT_VALUES)[number];
 }[];
 
+/**
+ * Translates stored date-fns / ISO format tokens into Luxon-compatible tokens.
+ * Specifically converts `XXX` timezone offset tokens into Luxon's `ZZ` token,
+ * preventing Luxon from printing the literal string 'XXX' on stamped dates.
+ */
+export const toLuxonDateFormat = (formatStr: string): string => {
+  if (!formatStr) return formatStr;
+  return formatStr.replace(/XXX$/, 'ZZ').replace(/XX$/, 'ZZ').replace(/X$/, 'Z');
+};
+
 export const convertToLocalSystemFormat = (
   customText: string,
   dateFormat: string | null = DEFAULT_DOCUMENT_DATE_FORMAT,
@@ -173,16 +183,29 @@ export const convertToLocalSystemFormat = (
 ): string => {
   const coalescedDateFormat = dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT;
   const coalescedTimeZone = timeZone ?? DEFAULT_DOCUMENT_TIME_ZONE;
+  const luxonFormat = toLuxonDateFormat(coalescedDateFormat);
 
-  const parsedDate = DateTime.fromFormat(customText, coalescedDateFormat, {
-    zone: coalescedTimeZone,
-  });
+  // Gracefully handle legacy corrupted timestamps ending in literal 'XXX'
+  let sanitizedText = customText;
+  if (sanitizedText.endsWith('XXX')) {
+    sanitizedText = sanitizedText.slice(0, -3);
+  }
+
+  const parsedDate = DateTime.fromFormat(
+    sanitizedText,
+    sanitizedText === customText ? luxonFormat : toLuxonDateFormat(coalescedDateFormat.replace(/XXX$/, '')),
+    { zone: coalescedTimeZone }
+  );
 
   if (!parsedDate.isValid) {
+    const isoFallback = DateTime.fromISO(sanitizedText, { zone: coalescedTimeZone });
+    if (isoFallback.isValid) {
+      return isoFallback.toLocal().toFormat(luxonFormat);
+    }
     return 'Invalid date';
   }
 
-  const formattedDate = parsedDate.toLocal().toFormat(coalescedDateFormat);
+  const formattedDate = parsedDate.toLocal().toFormat(luxonFormat);
 
   return formattedDate;
 };
