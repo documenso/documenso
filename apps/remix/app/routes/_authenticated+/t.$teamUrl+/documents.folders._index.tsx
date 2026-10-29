@@ -14,6 +14,7 @@ import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderUpdateDialog } from '~/components/dialogs/folder-update-dialog';
 import { FolderCard } from '~/components/general/folder/folder-card';
+import { FolderSortDropdown, useFolderSort } from '~/components/general/folder/folder-sort-dropdown';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
@@ -37,6 +38,8 @@ export default function DocumentsFoldersPage() {
   const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const { sortFolders, withFolderSort } = useFolderSort();
+
   const { data: foldersData, isLoading: isFoldersLoading } = trpc.folder.getFolders.useQuery({
     type: FolderType.DOCUMENT,
     parentId: parentId,
@@ -47,7 +50,7 @@ export default function DocumentsFoldersPage() {
   const isFolderMatchingSearch = (folder: TFolderWithSubfolders) =>
     folder.name.toLowerCase().includes(normalizedSearchTerm);
 
-  const filteredFolders = foldersData?.folders.filter(isFolderMatchingSearch) ?? [];
+  const filteredFolders = sortFolders(foldersData?.folders.filter(isFolderMatchingSearch) ?? []);
   const pinnedFolders = filteredFolders.filter((folder) => folder.pinned);
   const unpinnedFolders = filteredFolders.filter((folder) => !folder.pinned);
   const hasFolders = (foldersData?.folders.length ?? 0) > 0;
@@ -56,14 +59,17 @@ export default function DocumentsFoldersPage() {
   const formatBreadcrumbPath = (folderId: string) => {
     const documentsPath = formatDocumentsPath(team.url);
 
-    return `${documentsPath}/f/${folderId}`;
+    return withFolderSort(`${documentsPath}/f/${folderId}`);
   };
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <div className="flex w-full items-center justify-between">
         <div className="flex flex-1 items-center font-medium text-muted-foreground text-sm">
-          <Link to={formatDocumentsPath(team.url)} className="flex items-center hover:text-muted-foreground/80">
+          <Link
+            to={withFolderSort(formatDocumentsPath(team.url))}
+            className="flex items-center hover:text-muted-foreground/80"
+          >
             <HomeIcon className="mr-2 h-4 w-4" />
             <Trans>Home</Trans>
           </Link>
@@ -94,9 +100,13 @@ export default function DocumentsFoldersPage() {
         />
       </div>
 
-      <h1 className="mt-4 truncate font-semibold text-2xl md:text-3xl">
-        <Trans>All Folders</Trans>
-      </h1>
+      <div className="mt-4 flex items-center justify-between gap-4">
+        <h1 className="truncate font-semibold text-2xl md:text-3xl">
+          <Trans>Folders</Trans>
+        </h1>
+
+        <FolderSortDropdown />
+      </div>
 
       {isFoldersLoading ? (
         <div className="mt-6 flex justify-center">

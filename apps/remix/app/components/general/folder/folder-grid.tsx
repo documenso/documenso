@@ -15,6 +15,7 @@ import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderUpdateDialog } from '~/components/dialogs/folder-update-dialog';
 import { DocumentUploadButtonLegacy } from '~/components/general/document/document-upload-button-legacy';
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
+import { FolderSortDropdown, useFolderSort } from '~/components/general/folder/folder-sort-dropdown';
 import { useCurrentTeam } from '~/providers/team';
 
 import { EnvelopeUploadButton } from '../envelope/envelope-upload-button';
@@ -35,6 +36,8 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
   const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
 
+  const { sortFolders, withFolderSort } = useFolderSort();
+
   const { data: foldersData, isPending } = trpc.folder.getFolders.useQuery({
     type,
     parentId,
@@ -43,25 +46,28 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   const formatBreadCrumbPath = (folderId: string) => {
     const rootPath = type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
-    return `${rootPath}/f/${folderId}`;
+    return withFolderSort(`${rootPath}/f/${folderId}`);
   };
 
   const formatViewAllFoldersPath = () => {
     const rootPath = type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
     if (parentId) {
-      return `${rootPath}/folders?parentId=${parentId}`;
+      return withFolderSort(`${rootPath}/folders?parentId=${parentId}`);
     }
 
-    return `${rootPath}/folders`;
+    return withFolderSort(`${rootPath}/folders`);
   };
 
   const formatRootPath = () => {
-    return type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
+    const rootPath = type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
+
+    return withFolderSort(rootPath);
   };
 
-  const pinnedFolders = foldersData?.folders.filter((folder) => folder.pinned) || [];
-  const unpinnedFolders = foldersData?.folders.filter((folder) => !folder.pinned) || [];
+  const sortedFolders = sortFolders(foldersData?.folders ?? []);
+  const pinnedFolders = sortedFolders.filter((folder) => folder.pinned);
+  const unpinnedFolders = sortedFolders.filter((folder) => !folder.pinned);
 
   return (
     <div>
@@ -103,6 +109,17 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
           <FolderCreateDialog type={type} />
         </div>
       </div>
+
+      {!isPending && (
+        <div className="mt-10 mb-4 flex items-center justify-between gap-4">
+          <h2 className="flex items-baseline gap-2 font-semibold text-base">
+            <Trans>Folders</Trans>
+            <span className="font-normal text-muted-foreground text-sm">{sortedFolders.length}</span>
+          </h2>
+
+          <FolderSortDropdown />
+        </div>
+      )}
 
       {isPending ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
