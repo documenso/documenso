@@ -1,6 +1,6 @@
 import { ZDocumentTitleSchema } from '@documenso/trpc/server/document-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
-import { useEffect, useRef, useState } from 'react';
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 const MIN_INPUT_WIDTH = 100;
 const INPUT_WIDTH_PADDING = 16;
@@ -8,6 +8,11 @@ const INPUT_WIDTH_PADDING = 16;
 export type EnvelopeItemTitleInputProps = {
   value: string;
   onChange: (value: string) => void;
+  /**
+   * Called when the user finishes editing (blur or Enter) with a valid title that differs from the
+   * last committed one.
+   */
+  onCommit?: (value: string) => void;
   className?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -17,6 +22,7 @@ export type EnvelopeItemTitleInputProps = {
 export const EnvelopeItemTitleInput = ({
   value,
   onChange,
+  onCommit,
   className,
   placeholder,
   disabled,
@@ -28,6 +34,19 @@ export const EnvelopeItemTitleInput = ({
   const [inputWidth, setInputWidth] = useState(200);
   const inputRef = useRef<HTMLInputElement>(null);
   const measureRef = useRef<HTMLSpanElement>(null);
+
+  const committedTitleRef = useRef(value);
+
+  // Reflect external value changes, but never while the user is typing.
+  useEffect(() => {
+    if (document.activeElement === inputRef.current) {
+      return;
+    }
+
+    setEnvelopeItemTitle(value);
+    setIsError(false);
+    committedTitleRef.current = value;
+  }, [value]);
 
   useEffect(() => {
     if (measureRef.current) {
@@ -57,6 +76,31 @@ export const EnvelopeItemTitleInput = ({
     onChange(parsedTitle.data);
   };
 
+  const handleBlur = () => {
+    // Switching to another window blurs the input without ending the edit.
+    if (!onCommit || !document.hasFocus()) {
+      return;
+    }
+
+    const parsedTitle = ZDocumentTitleSchema.safeParse(envelopeItemTitle);
+
+    if (!parsedTitle.success || parsedTitle.data === committedTitleRef.current) {
+      return;
+    }
+
+    committedTitleRef.current = parsedTitle.data;
+
+    onCommit(parsedTitle.data);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (!onCommit || event.key !== 'Enter' || event.nativeEvent.isComposing) {
+      return;
+    }
+
+    event.currentTarget.blur();
+  };
+
   return (
     <div className="relative min-w-0 max-w-full shrink">
       {/* Hidden span to measure text width */}
@@ -75,6 +119,8 @@ export const EnvelopeItemTitleInput = ({
         type="text"
         value={envelopeItemTitle}
         onChange={(e) => handleTitleChange(e.target.value)}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
         disabled={disabled}
         style={{ width: `${inputWidth}px`, maxWidth: '100%' }}
         className={cn(

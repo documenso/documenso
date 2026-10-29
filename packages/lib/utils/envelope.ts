@@ -287,3 +287,10 @@ export const getEnvelopeItemPermissions = (
     }))
     .exhaustive();
 };
+
+/**
+ * Removes a trailing `.pdf` extension regardless of case, e.g. `Contract.PDF` becomes `Contract`.
+ */
+export const removePdfExtension = (fileName: string) => {
+  return fileName.replace(/\.pdf$/i, '');
+};

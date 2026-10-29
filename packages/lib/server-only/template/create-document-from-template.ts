@@ -46,7 +46,7 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { mapSecondaryIdToTemplateId, removePdfExtension } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -88,6 +88,13 @@ export type CreateDocumentFromTemplateOptions = {
      * If undefined, will use the first envelope item. This is done for backwards compatibility reasons.
      */
     envelopeItemId?: string;
+
+    /**
+     * The title to use for the created envelope item, typically the uploaded file name.
+     *
+     * If undefined, the template envelope item title is used.
+     */
+    title?: string;
   }[];
 
   attachments?: Array<{
@@ -475,7 +482,7 @@ export const createDocumentFromTemplate = async ({
 
       let buffer = await getFileServerSide(documentDataToDuplicate);
 
-      const titleToUse = item.title || finalEnvelopeTitle;
+      const titleToUse = foundCustomDocumentData?.title || item.title || finalEnvelopeTitle;
 
       if (formValues) {
         // eslint-disable-next-line require-atomic-updates
@@ -505,7 +512,7 @@ export const createDocumentFromTemplate = async ({
 
       return {
         id: newEnvelopeItemId,
-        title: titleToUse.endsWith('.pdf') ? titleToUse.slice(0, -4) : titleToUse,
+        title: removePdfExtension(titleToUse),
         documentDataId: newDocumentData.id,
         order: item.order !== undefined ? item.order : i + 1,
       };
