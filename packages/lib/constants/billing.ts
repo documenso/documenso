@@ -10,8 +10,6 @@ export enum STRIPE_PLAN_TYPE {
   ENTERPRISE = 'enterprise',
 }
 
-export const FREE_TIER_DOCUMENT_QUOTA = 5;
-
 export const SUBSCRIPTION_STATUS_MAP = {
   [SubscriptionStatus.ACTIVE]: msg({
     message: 'Active',

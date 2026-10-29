@@ -34,22 +34,6 @@ const parseLanguageFromLocale = (locale: string): SupportedLanguageCodes | null 
   return foundSupportedLanguage;
 };
 
-/**
- * Extracts the language from the `accept-language` header.
- */
-export const extractLocaleDataFromHeaders = (
-  headers: Headers,
-): { lang: SupportedLanguageCodes | null; locales: string[] } => {
-  const headerLocales = (headers.get('accept-language') ?? '').split(',');
-
-  const language = parseLanguageFromLocale(headerLocales[0]);
-
-  return {
-    lang: language,
-    locales: [headerLocales[0]],
-  };
-};
-
 type ExtractLocaleDataOptions = {
   headers: Headers;
 };

@@ -1,8 +1,5 @@
 import { DocumentVisibility, OrganisationGroupType, TeamMemberRole } from '@prisma/client';
 
-export const TEAM_URL_ROOT_REGEX = /^\/t\/[^/]+\/?$/;
-export const TEAM_URL_REGEX = /^\/t\/[^/]+/;
-
 export const LOWEST_TEAM_ROLE = TeamMemberRole.MEMBER;
 
 export const ALLOWED_TEAM_GROUP_TYPES: OrganisationGroupType[] = [

@@ -9,13 +9,6 @@ import type { TRecipientLite } from '../types/recipient';
 import { extractLegacyIds } from '../universal/id';
 import { zEmail } from './zod';
 
-/**
- * Roles that require fields to be assigned before a document can be distributed.
- *
- * Currently only SIGNER requires a signature field.
- */
-export const RECIPIENT_ROLES_THAT_REQUIRE_FIELDS = [RecipientRole.SIGNER] as const;
-
 // signingOrder isn't required when submitting the recipient form (Zod: z.number().optional())
 type RecipientWithSigningOrder = Pick<Recipient, 'role'> & PositionedRecipient;
 

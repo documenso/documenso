@@ -25,7 +25,3 @@ export const uploadS3File = async (file: File) => {
   });
   return { key };
 };
-
-export const deleteS3File = async (key: string) => {
-  return getStorageProvider().deleteFile(key);
-};
