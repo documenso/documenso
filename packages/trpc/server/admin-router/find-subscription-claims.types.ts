@@ -14,6 +14,8 @@ export const ZFindSubscriptionClaimsResponseSchema = ZFindResultResponse.extend(
     memberCount: true,
     envelopeItemCount: true,
     recipientCount: true,
+    envelopeContentCount: true,
+    envelopeContentImageCount: true,
     locked: true,
     flags: true,
     documentRateLimits: true,

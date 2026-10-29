@@ -1,13 +1,12 @@
-import { getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
 import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { nanoid } from '@documenso/lib/universal/id';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { clampPercentageBox } from '@documenso/lib/utils/geometry';
 import type { Field } from '@prisma/client';
 import { FieldType } from '@prisma/client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
+import { EDITOR_DUPLICATE_ITEM_OFFSET } from '../../constants/envelope-editor';
+import { createLocalFormId, getOtherPageNumbers, useEditorFormArray } from './use-editor-form-array';
 
 export const ZLocalFieldSchema = z.object({
   // This is the actual ID of the field if created.
@@ -28,15 +27,14 @@ export const ZLocalFieldSchema = z.object({
 
 export type TLocalField = z.infer<typeof ZLocalFieldSchema>;
 
-const ZEditorFieldsFormSchema = z.object({
-  fields: z.array(ZLocalFieldSchema),
-});
-
-export type TEditorFieldsFormSchema = z.infer<typeof ZEditorFieldsFormSchema>;
-
 type EditorFieldsProps = {
   envelope: TEditorEnvelope;
-  handleFieldsUpdate: (fields: TLocalField[]) => unknown;
+
+  /**
+   * Receives a getter rather than the fields so the values are read when the
+   * save is sent, not when it was queued.
+   */
+  handleFieldsUpdate: (getFields: () => TLocalField[]) => unknown;
 };
 
 type UseEditorFieldsResponse = {
@@ -51,12 +49,11 @@ type UseEditorFieldsResponse = {
   setFieldId: (formId: string, id: number) => void;
   removeFieldsByFormId: (formIds: string[]) => void;
   updateFieldByFormId: (formId: string, updates: Partial<TLocalField>) => void;
-  duplicateField: (field: TLocalField, recipientId?: number) => TLocalField;
-  duplicateFieldToAllPages: (field: TLocalField, recipientId?: number) => TLocalField[];
+  duplicateField: (field: TLocalField) => TLocalField;
+  duplicateFieldToAllPages: (field: TLocalField) => TLocalField[];
 
   // Field utilities
   getFieldByFormId: (formId: string) => TLocalField | undefined;
-  getFieldsByRecipient: (recipientId: number) => TLocalField[];
 
   // Selected recipient
   selectedRecipient: TEditorEnvelope['recipients'][number] | null;
@@ -66,133 +63,79 @@ type UseEditorFieldsResponse = {
 };
 
 export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsProps): UseEditorFieldsResponse => {
-  const [selectedFieldFormId, setSelectedFieldFormId] = useState<string | null>(null);
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
 
-  const generateDefaultValues = (fields?: Field[]) => {
-    const formFields = (fields || envelope.fields).map(
-      (field): TLocalField => ({
-        id: field.id,
-        formId: nanoid(),
-        envelopeItemId: field.envelopeItemId,
-        page: field.page,
-        type: field.type,
-        positionX: Number(field.positionX),
-        positionY: Number(field.positionY),
-        width: Number(field.width),
-        height: Number(field.height),
-        recipientId: field.recipientId,
-        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
-      }),
-    );
-
-    return {
-      fields: formFields,
-    };
-  };
-
-  const form = useForm<TEditorFieldsFormSchema>({
-    defaultValues: generateDefaultValues(),
-    resolver: zodResolver(ZEditorFieldsFormSchema),
+  const fieldsArray = useEditorFormArray<TLocalField, Field>({
+    schema: ZLocalFieldSchema,
+    sources: envelope.fields,
+    mapSource: (field) => ({
+      id: field.id,
+      envelopeItemId: field.envelopeItemId,
+      page: field.page,
+      type: field.type,
+      positionX: Number(field.positionX),
+      positionY: Number(field.positionY),
+      width: Number(field.width),
+      height: Number(field.height),
+      recipientId: field.recipientId,
+      fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+    }),
+    onChange: handleFieldsUpdate,
   });
 
-  const {
-    append,
-    remove,
-    update,
-    fields: localFields,
-  } = useFieldArray({
-    control: form.control,
-    name: 'fields',
-    keyName: 'react-hook-form-id',
-  });
+  const setSelectedRecipient = useCallback(
+    (recipientId: number | null) => {
+      const foundRecipient = envelope.recipients.find((recipient) => recipient.id === recipientId);
 
-  const triggerFieldsUpdate = () => {
-    void handleFieldsUpdate(form.getValues().fields);
-  };
+      setSelectedRecipientId(foundRecipient?.id ?? null);
+    },
+    [envelope.recipients],
+  );
 
-  const setSelectedField = (formId: string | null, bypassCheck = false) => {
-    if (!formId) {
-      setSelectedFieldFormId(null);
-      return;
-    }
+  /**
+   * Selecting a field also selects its recipient.
+   */
+  const setSelectedField = useCallback(
+    (formId: string | null, bypassCheck = false) => {
+      const foundField = formId ? fieldsArray.findItem(formId) : undefined;
 
-    const foundField = localFields.find((field) => field.formId === formId);
-    const recipient = envelope.recipients.find((recipient) => recipient.id === foundField?.recipientId);
+      if (foundField) {
+        setSelectedRecipient(foundField.recipientId);
+      }
 
-    if (recipient) {
-      setSelectedRecipient(recipient.id);
-    }
-
-    if (bypassCheck) {
-      setSelectedFieldFormId(formId);
-      return;
-    }
-
-    setSelectedFieldFormId(foundField?.formId ?? null);
-  };
+      fieldsArray.setSelected(formId, bypassCheck);
+    },
+    [fieldsArray.findItem, fieldsArray.setSelected, setSelectedRecipient],
+  );
 
   const addField = useCallback(
     (fieldData: Omit<TLocalField, 'formId'>): TLocalField => {
-      const field: TLocalField = {
+      const field: TLocalField = clampPercentageBox({
         ...fieldData,
-        formId: nanoid(12),
-        ...restrictFieldPosValues(fieldData),
-      };
+        formId: createLocalFormId(),
+      });
 
-      append(field);
-      triggerFieldsUpdate();
+      fieldsArray.appendItems([field]);
       setSelectedField(field.formId, true);
+
       return field;
     },
-    [append, triggerFieldsUpdate, setSelectedField],
+    [fieldsArray.appendItems, setSelectedField],
   );
 
-  const removeFieldsByFormId = useCallback(
-    (formIds: string[]) => {
-      const indexes = formIds
-        .map((formId) => localFields.findIndex((field) => field.formId === formId))
-        .filter((index) => index !== -1);
-
-      if (indexes.length > 0) {
-        remove(indexes);
-        triggerFieldsUpdate();
-      }
-    },
-    [localFields, remove, triggerFieldsUpdate],
-  );
-
+  /**
+   * Adopt the ID assigned by the server after a save, without triggering
+   * another save.
+   */
   const setFieldId = (formId: string, id: number) => {
-    const { fields } = form.getValues();
-
-    const index = fields.findIndex((field) => field.formId === formId);
-
-    if (index !== -1) {
-      update(index, {
-        ...fields[index],
-        id,
-      });
-    }
+    fieldsArray.updateByFormId(formId, (field) => ({ ...field, id }), { shouldTriggerChange: false });
   };
 
   const updateFieldByFormId = useCallback(
     (formId: string, updates: Partial<TLocalField>) => {
-      const index = localFields.findIndex((field) => field.formId === formId);
-
-      if (index !== -1) {
-        const updatedField = {
-          ...localFields[index],
-          ...updates,
-        };
-
-        update(index, {
-          ...updatedField,
-          ...restrictFieldPosValues(updatedField),
-        });
-        triggerFieldsUpdate();
-      }
+      fieldsArray.updateByFormId(formId, (field) => clampPercentageBox({ ...field, ...updates }));
     },
-    [localFields, update, triggerFieldsUpdate],
+    [fieldsArray.updateByFormId],
   );
 
   const duplicateField = useCallback(
@@ -200,123 +143,65 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
       const newField: TLocalField = {
         ...structuredClone(field),
         id: undefined,
-        formId: nanoid(12),
-        recipientId: field.recipientId,
-        positionX: field.positionX + 3,
-        positionY: field.positionY + 3,
+        formId: createLocalFormId(),
+        positionX: field.positionX + EDITOR_DUPLICATE_ITEM_OFFSET,
+        positionY: field.positionY + EDITOR_DUPLICATE_ITEM_OFFSET,
       };
 
-      append(newField);
-      triggerFieldsUpdate();
+      fieldsArray.appendItems([newField]);
+
       return newField;
     },
-    [append, triggerFieldsUpdate],
+    [fieldsArray.appendItems],
   );
 
   const duplicateFieldToAllPages = useCallback(
     (field: TLocalField): TLocalField[] => {
-      const totalPages = getPdfPagesCount();
-      const newFields: TLocalField[] = [];
-
-      if (totalPages < 1) {
-        return newFields;
-      }
-
-      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
-        if (pageNumber === field.page) {
-          continue;
-        }
-
-        const newField: TLocalField = {
+      const newFields = getOtherPageNumbers(field.page).map(
+        (page): TLocalField => ({
           ...structuredClone(field),
           id: undefined,
-          formId: nanoid(12),
-          page: pageNumber,
-        };
+          formId: createLocalFormId(),
+          page,
+        }),
+      );
 
-        append(newField);
-        newFields.push(newField);
+      if (newFields.length > 0) {
+        fieldsArray.appendItems(newFields);
       }
 
-      triggerFieldsUpdate();
       return newFields;
     },
-    [append, triggerFieldsUpdate],
-  );
-
-  const getFieldByFormId = useCallback(
-    (formId: string): TLocalField | undefined => {
-      return localFields.find((field) => field.formId === formId) as TLocalField | undefined;
-    },
-    [localFields],
-  );
-
-  const getFieldsByRecipient = useCallback(
-    (recipientId: number): TLocalField[] => {
-      return localFields.filter((field) => field.recipientId === recipientId);
-    },
-    [localFields],
+    [fieldsArray.appendItems],
   );
 
   const selectedRecipient = useMemo(() => {
     return envelope.recipients.find((recipient) => recipient.id === selectedRecipientId) || null;
   }, [selectedRecipientId, envelope.recipients]);
 
-  const selectedField = useMemo(() => {
-    return localFields.find((field) => field.formId === selectedFieldFormId);
-  }, [selectedFieldFormId, localFields]);
-
-  /**
-   * Keep the selected field form ID in sync with the local fields.
-   */
-  useEffect(() => {
-    const foundField = localFields.find((field) => field.formId === selectedFieldFormId);
-    setSelectedFieldFormId(foundField?.formId ?? null);
-  }, [selectedFieldFormId, localFields]);
-
-  const setSelectedRecipient = (recipientId: number | null) => {
-    const foundRecipient = envelope.recipients.find((recipient) => recipient.id === recipientId);
-
-    setSelectedRecipientId(foundRecipient?.id ?? null);
-  };
-
-  const resetForm = (fields?: Field[]) => {
-    form.reset(generateDefaultValues(fields));
-  };
-
   return {
     // Core state
-    localFields,
+    localFields: fieldsArray.items,
 
     // Field operations
     addField,
     setFieldId,
-    removeFieldsByFormId,
+    removeFieldsByFormId: fieldsArray.removeByFormId,
     updateFieldByFormId,
     duplicateField,
     duplicateFieldToAllPages,
 
     // Field utilities
-    getFieldByFormId,
-    getFieldsByRecipient,
+    getFieldByFormId: fieldsArray.findItem,
 
     // Selected field
-    selectedField,
+    selectedField: fieldsArray.selectedItem,
     setSelectedField,
 
     // Selected recipient
     selectedRecipient,
     setSelectedRecipient,
 
-    resetForm,
-  };
-};
-
-const restrictFieldPosValues = (field: Pick<TLocalField, 'positionX' | 'positionY' | 'width' | 'height'>) => {
-  return {
-    positionX: Math.max(0, Math.min(100, field.positionX)),
-    positionY: Math.max(0, Math.min(100, field.positionY)),
-    width: Math.max(0, Math.min(100, field.width)),
-    height: Math.max(0, Math.min(100, field.height)),
+    resetForm: fieldsArray.resetForm,
   };
 };

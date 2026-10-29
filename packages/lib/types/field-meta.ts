@@ -53,17 +53,21 @@ export type GenericTextFieldTypeMetas =
   | TTextFieldMeta
   | TNumberFieldMeta;
 
-const ZFieldMetaLineHeight = z.coerce
+export const ZFieldMetaLineHeight = z.coerce
   .number()
   .min(FIELD_MIN_LINE_HEIGHT)
   .max(FIELD_MAX_LINE_HEIGHT)
   .describe('The line height of the text');
-const ZFieldMetaLetterSpacing = z.coerce
+
+export const ZFieldMetaLetterSpacing = z.coerce
   .number()
   .min(FIELD_MIN_LETTER_SPACING)
   .max(FIELD_MAX_LETTER_SPACING)
   .describe('The spacing between each character');
-const ZFieldMetaVerticalAlign = z.enum(['top', 'middle', 'bottom']).describe('The vertical alignment of the text');
+
+export const ZFieldMetaVerticalAlign = z
+  .enum(['top', 'middle', 'bottom'])
+  .describe('The vertical alignment of the text');
 
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),

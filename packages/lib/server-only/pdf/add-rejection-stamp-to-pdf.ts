@@ -2,12 +2,27 @@ import { type PDF, rgb } from '@libpdf/core';
 
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 
+type AddRejectionStampToPdfOptions = {
+  /**
+   * The number of pages to stamp, counted from the start of the document.
+   *
+   * Do not include the certificate and audit log pages.
+   *
+   * Defaults to every page.
+   */
+  pageCount?: number;
+};
+
 /**
  * Adds a rejection stamp to each page of a PDF document.
  * The stamp is placed in the center of the page.
  */
-export async function addRejectionStampToPdf(pdf: PDF, reason: string): Promise<PDF> {
-  const pages = pdf.getPages();
+export async function addRejectionStampToPdf(
+  pdf: PDF,
+  reason: string,
+  { pageCount }: AddRejectionStampToPdfOptions = {},
+): Promise<PDF> {
+  const pages = pdf.getPages().slice(0, pageCount);
 
   const fontBytes = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) =>
     res.arrayBuffer(),

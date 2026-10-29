@@ -234,9 +234,16 @@ const handlePendingFileRequest = async ({
     return c.json({ error: 'File not found' }, 404);
   }
 
+  const contents = await prisma.envelopeContent.findMany({
+    where: {
+      envelopeItemId,
+    },
+  });
+
   const pdf = await generatePartialSignedPdf({
     pdfData: file,
     fields,
+    contents,
   });
 
   c.get('logger').info({

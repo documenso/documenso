@@ -67,6 +67,7 @@ export default function EmbedPlaygroundPage() {
   });
 
   const [actionsFeatures, setActionsFeatures] = useState({
+    allowContents: true,
     allowAttachments: true,
     allowDistributing: false,
     allowDirectLink: false,
