@@ -2,9 +2,17 @@ import type { Recipient } from '@prisma/client';
 
 export const extractInitials = (text: string) =>
   text
-    .split(' ')
+    .trim()
+    .split(/\s+/)
     .map((name: string) => name.slice(0, 1).toUpperCase())
     .slice(0, 2)
+    .join('');
+
+export const extractFullInitials = (text: string) =>
+  text
+    .split(/\s+/)
+    .map((name) => name.match(/^\p{L}/u)?.[0].toUpperCase())
+    .filter(Boolean)
     .join('');
 
 export const recipientAbbreviation = (recipient: Pick<Recipient, 'name' | 'email'>) => {
