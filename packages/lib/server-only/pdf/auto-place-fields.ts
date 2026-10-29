@@ -1,8 +1,10 @@
+import { AppError } from '@documenso/lib/errors/app-error';
 import { type TFieldAndMeta, ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { PDF, rgb } from '@libpdf/core';
 import type { FieldType, Recipient } from '@prisma/client';
 
 import { parseFieldMetaFromPlaceholder, parseFieldTypeFromPlaceholder } from './helpers';
+import { splitPlaceholderProperties } from './placeholder-options';
 
 const PLACEHOLDER_REGEX = /\{\{([^}]+)\}\}/g;
 const DEFAULT_FIELD_HEIGHT_PERCENT = 2;
@@ -85,7 +87,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
         continue;
       }
 
-      const placeholderData = innerMatch[1].split(',').map((property) => property.trim());
+      const placeholderData = splitPlaceholderProperties(innerMatch[1]);
       const [fieldTypeString, recipientOrMeta, ...fieldMetaData] = placeholderData;
 
       let fieldType: FieldType;
@@ -109,9 +111,32 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
       const recipient = recipientOrMeta;
 
-      const rawFieldMeta = Object.fromEntries(fieldMetaData.map((property) => property.split('=')));
+      // Split on the first '=' only, so values like `values=a=1|b=2` stay intact.
+      const rawFieldMeta = Object.fromEntries(
+        fieldMetaData.map((property) => {
+          const separatorIndex = property.indexOf('=');
 
-      const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
+          if (separatorIndex === -1) {
+            return [property];
+          }
+
+          return [property.slice(0, separatorIndex).trim(), property.slice(separatorIndex + 1).trim()];
+        }),
+      );
+
+      let parsedFieldMeta: Record<string, unknown> | undefined;
+
+      try {
+        parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
+      } catch (error) {
+        if (error instanceof AppError) {
+          throw new AppError(error.code, {
+            message: `Invalid placeholder ${placeholder} on page ${page.index + 1}: ${error.message}`,
+          });
+        }
+
+        throw error;
+      }
 
       const fieldAndMeta: TFieldAndMeta = ZEnvelopeFieldAndMetaSchema.parse({
         type: fieldType,
