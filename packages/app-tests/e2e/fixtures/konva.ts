@@ -48,3 +48,22 @@ export const getKonvaTransformerNodeCountForPage = async (page: Page, pageNumber
     { pageNumber },
   );
 };
+
+/**
+ * Returns the text a field renders on the page's canvas: its inserted value once
+ * signed, otherwise its label or field type name.
+ */
+export const getKonvaFieldTextForPage = async (page: Page, pageNumber: number, fieldId: number) => {
+  await page.locator('.konva-container canvas').first().waitFor({ state: 'visible' });
+
+  return await page.evaluate(
+    ({ pageNumber, fieldId }) => {
+      const konva: typeof Konva = (window as unknown as { Konva: typeof Konva }).Konva;
+
+      const stage = konva.stages.find((stage) => stage.attrs.id === `page-${pageNumber}`);
+
+      return stage?.findOne<Konva.Text>(`#${fieldId}-text`)?.text() ?? null;
+    },
+    { pageNumber, fieldId },
+  );
+};
