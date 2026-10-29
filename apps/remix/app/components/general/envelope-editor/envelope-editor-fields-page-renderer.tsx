@@ -41,6 +41,13 @@ import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector'
 /** How far past a resize handle you can still grab it, in screen pixels. */
 const TRANSFORMER_ANCHOR_HIT_STROKE_PX = 24;
 
+const ARROW_KEY_DELTAS: Record<string, [number, number] | undefined> = {
+  ArrowLeft: [-1, 0],
+  ArrowRight: [1, 0],
+  ArrowUp: [0, -1],
+  ArrowDown: [0, 1],
+};
+
 export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
   const analytics = useAnalytics();
@@ -596,6 +603,44 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       fieldGroup.moveToTop();
     }
   };
+
+  // Arrow keys nudge selected fields by 1 screen px (10 with Shift).
+  useEffect(() => {
+    if (selectedKonvaFieldGroups.length === 0) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      const delta = ARROW_KEY_DELTAS[event.key];
+      const isTyping =
+        event.target instanceof Element && event.target.closest('input, textarea, select, [role="dialog"]');
+
+      if (!delta || isTyping || event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const step = event.shiftKey ? 10 : 1;
+      const dx = ((delta[0] * step) / scaledViewport.width) * 100;
+      const dy = ((delta[1] * step) / scaledViewport.height) * 100;
+
+      for (const group of selectedKonvaFieldGroups) {
+        const field = editorFields.getFieldByFormId(group.id());
+
+        if (field) {
+          editorFields.updateFieldByFormId(field.formId, {
+            positionX: Math.min(Math.max(field.positionX + dx, 0), 100 - field.width),
+            positionY: Math.min(Math.max(field.positionY + dy, 0), 100 - field.height),
+          });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedKonvaFieldGroups, scaledViewport.width, scaledViewport.height, editorFields]);
 
   const deletedSelectedFields = () => {
     const fieldFormids = selectedKonvaFieldGroups.map((field) => field.id()).filter((field) => field !== undefined);
