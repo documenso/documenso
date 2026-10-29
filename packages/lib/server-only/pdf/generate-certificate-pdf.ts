@@ -113,6 +113,7 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
         authLevel = match(accessAuthMethod)
           .with('ACCOUNT', () => i18n._(msg`Account Authentication`))
           .with('TWO_FACTOR_AUTH', () => i18n._(msg`Two-Factor Authentication`))
+          .with('EXTERNAL_TWO_FACTOR_AUTH', () => i18n._(msg`External Two-Factor Authentication`))
           .with(undefined, () => i18n._(msg`Email`))
           .exhaustive();
       }
