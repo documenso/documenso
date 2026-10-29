@@ -2,7 +2,7 @@ import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validatio
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { DEFAULT_DOCUMENT_DATE_FORMAT, toLuxonDateFormat } from '@documenso/lib/constants/date-formats';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -89,7 +89,7 @@ export const extractFieldInsertionValues = ({
       return {
         customText: DateTime.now()
           .setZone(documentMeta.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
-          .toFormat(documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT),
+          .toFormat(toLuxonDateFormat(documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT)),
         inserted: true,
       };
     })
