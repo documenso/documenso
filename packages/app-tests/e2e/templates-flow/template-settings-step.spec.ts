@@ -53,8 +53,8 @@ test('[TEMPLATE_FLOW] add document visibility settings', async ({ page }) => {
 
   // Set document visibility.
   await page.getByTestId('documentVisibilitySelectValue').click();
-  await page.getByLabel('Managers & admins').click();
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers & admins');
+  await page.getByLabel('Managers and above').click();
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers and above');
 
   // Save the settings by going to the next step.
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -64,7 +64,7 @@ test('[TEMPLATE_FLOW] add document visibility settings', async ({ page }) => {
   await page.goto(`/t/${team.url}/templates/${template.id}/edit`);
 
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers & admins');
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers and above');
 });
 
 test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
@@ -97,8 +97,8 @@ test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
 
   // Manager should be able to set visibility to managers and above
   await page.getByTestId('documentVisibilitySelectValue').click();
-  await page.getByLabel('Managers & admins').click();
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers & admins');
+  await page.getByLabel('Managers and above').click();
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers and above');
   await expect(page.getByText('Admins only')).toBeDisabled();
 
   // Save and verify
@@ -130,5 +130,5 @@ test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
 
   // Regular member should be able to see but not modify visibility
   await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('All members');
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Everyone');
 });

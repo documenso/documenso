@@ -506,8 +506,8 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   // Set template title and visibility
   await page.getByLabel('Title').fill('TEMPLATE_WITH_VISIBILITY');
   await page.getByTestId('documentVisibilitySelectValue').click();
-  await page.getByLabel('Managers & admins').click();
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers & admins');
+  await page.getByLabel('Managers and above').click();
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers and above');
 
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();

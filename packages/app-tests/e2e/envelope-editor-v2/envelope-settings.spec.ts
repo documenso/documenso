@@ -38,7 +38,7 @@ const TEST_SETTINGS_VALUES = {
   reminderRepeatUnit: 'Days',
   accessAuth: 'Require account',
   actionAuth: 'Require password',
-  visibility: 'Managers & admins',
+  visibility: 'Managers and above',
 };
 
 const DB_EXPECTED_VALUES = {
