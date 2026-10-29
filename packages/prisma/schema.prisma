@@ -74,6 +74,10 @@ model User {
   passkeys           Passkey[]
   avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
+  adminRuleMatches AdminRuleMatch[]
+  adminTags        AdminTag[]       @relation("AdminTagSubject")
+  createdAdminTags AdminTag[]       @relation("AdminTagCreator")
+
   @@index([email])
 }
 
@@ -849,6 +853,7 @@ model Organisation {
   organisationEmails OrganisationEmail[]
 
   monthlyStats OrganisationMonthlyStat[]
+  adminTags    AdminTag[]
 
   embedSignatures EmbedSignature[]
 
@@ -1309,4 +1314,83 @@ model RateLimit {
 
   @@id([key, action, bucket])
   @@index([createdAt])
+}
+
+enum AdminRuleMode {
+  ENFORCE
+  MONITOR
+  DISABLED
+}
+
+/// @zod.import(["import { ZAdminRuleDefinitionSchema, ZAdminRuleTriggerSchema } from '@documenso/lib/types/admin-rules';"])
+model AdminRule {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  description String?
+  mode        AdminRuleMode
+  trigger     String /// [AdminRuleTrigger] @zod.custom.use(ZAdminRuleTriggerSchema)
+  definition  Json /// [AdminRuleDefinition] @zod.custom.use(ZAdminRuleDefinitionSchema)
+  priority    Int
+  stopOnMatch Boolean
+
+  /// Escape hatch: organisations this rule is skipped for. Only meaningful on triggers that have an
+  /// organisation
+  exemptOrganisationIds String[] @default([])
+
+  matches   AdminRuleMatch[]
+  adminTags AdminTag[]
+
+  @@index([trigger, mode, priority])
+}
+
+/// @zod.import(["import { ZAdminRuleContextSchema, ZAdminRuleActionRunsSchema, ZAdminRuleTriggerSchema } from '@documenso/lib/types/admin-rules';"])
+model AdminRuleMatch {
+  id        String   @id
+  createdAt DateTime @default(now())
+
+  mode           AdminRuleMode
+  trigger        String /// [AdminRuleTrigger] @zod.custom.use(ZAdminRuleTriggerSchema)
+  organisationId String?
+  envelopeId     String?
+  eventSnapshot  Json /// [AdminRuleContext] @zod.custom.use(ZAdminRuleContextSchema)
+  actionsRun     Json /// [AdminRuleActionRuns] @zod.custom.use(ZAdminRuleActionRunsSchema)
+
+  ruleId String
+  rule   AdminRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  actorUserId Int?
+  actorUser   User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([ruleId, createdAt])
+  @@index([createdAt])
+}
+
+/// @zod.import(["import { ZAdminTagTypeSchema } from '@documenso/lib/types/admin-tags';"])
+model AdminTag {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type        String /// [AdminTagType] @zod.custom.use(ZAdminTagTypeSchema)
+  description String
+
+  // If this is unset, then organisationId must be set.
+  userId Int?
+  user   User? @relation("AdminTagSubject", fields: [userId], references: [id], onDelete: Cascade)
+
+  // If this is unset, then userId must be set.
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  createdByUserId Int?
+  createdByUser   User? @relation("AdminTagCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  adminRuleId String?
+  adminRule   AdminRule? @relation(fields: [adminRuleId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([organisationId])
 }

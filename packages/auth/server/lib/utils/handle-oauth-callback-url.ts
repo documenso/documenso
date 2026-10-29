@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import { formatPath, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import {
   isDisposableEmail,
@@ -12,6 +13,7 @@ import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/serv
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { logger } from '@documenso/lib/utils/logger';
+import { OAUTH_PROVIDER_AUTH_METHODS } from '@documenso/lib/utils/user-auth-methods';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { decodeIdToken, OAuth2Client } from 'arctic';
@@ -211,6 +213,14 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
   await onCreateUserHook(createdUser).catch((err) => {
     // Todo: (RR7) Add logging.
     console.error(err);
+  });
+
+  const adminRuleEngine = new AdminRuleEngine({ requestMetadata: requestMeta });
+
+  await adminRuleEngine.run({
+    trigger: 'USER_SIGNED_UP',
+    user: createdUser,
+    signupMethod: OAUTH_PROVIDER_AUTH_METHODS[clientOptions.id],
   });
 
   await onAuthorize({ userId: createdUser.id }, c);
