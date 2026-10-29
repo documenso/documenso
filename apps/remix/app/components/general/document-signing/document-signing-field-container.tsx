@@ -155,7 +155,7 @@ export const DocumentSigningFieldContainer = ({
       {(field.type === FieldType.RADIO || field.type === FieldType.CHECKBOX) && field.fieldMeta?.label && (
         <div
           className={cn(
-            'absolute -top-16 right-0 left-0 rounded-md p-2 text-center text-gray-700 text-xs',
+            'absolute -top-16 right-0 left-0 rounded-md p-2 text-center text-foreground text-xs',
             {
               'border border-border bg-foreground/5': !field.inserted,
             },
