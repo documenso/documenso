@@ -16,10 +16,10 @@ export const DOCUMENT_VISIBILITY: Record<string, DocumentVisibilityTypeData> = {
   },
   [DocumentVisibility.EVERYONE]: {
     key: DocumentVisibility.EVERYONE,
-    value: msg`Everyone`,
+    value: msg`All members`,
   },
   [DocumentVisibility.MANAGER_AND_ABOVE]: {
     key: DocumentVisibility.MANAGER_AND_ABOVE,
-    value: msg`Managers and above`,
+    value: msg`Managers & admins`,
   },
 } satisfies Record<TDocumentVisibility, DocumentVisibilityTypeData>;

@@ -708,7 +708,7 @@ test('[TEAMS]: check that MEMBER role cannot change visibility of EVERYONE docum
     redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Everyone');
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('All members');
   await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
 });
 
@@ -732,7 +732,7 @@ test('[TEAMS]: check that MEMBER role cannot change visibility of MANAGER_AND_AB
     redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Managers and above');
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Managers & admins');
   await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
 });
 

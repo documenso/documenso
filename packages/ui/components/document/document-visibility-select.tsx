@@ -28,7 +28,7 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
     return (
       <Select {...props} disabled={!canEdit || disabled}>
         <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
-          <SelectValue data-testid="documentVisibilitySelectValue" placeholder={t`Everyone`} />
+          <SelectValue data-testid="documentVisibilitySelectValue" placeholder={t`All members`} />
         </SelectTrigger>
 
         <SelectContent position="popper">
@@ -62,23 +62,26 @@ export const DocumentVisibilityTooltip = () => {
         </h2>
 
         <p>
-          <Trans>The visibility of the document to the recipient.</Trans>
+          <Trans>
+            Controls which team members can view and access this document. The document owner and assigned recipients
+            will always have access.
+          </Trans>
         </p>
 
         <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
           <li>
             <Trans>
-              <strong>Everyone</strong> - Everyone can access and view the document
+              <strong>All members</strong>: Visible to all team members.
             </Trans>
           </li>
           <li>
             <Trans>
-              <strong>Managers and above</strong> - Only managers and above can access and view the document
+              <strong>Managers & admins</strong>: Visible to team managers and admins.
             </Trans>
           </li>
           <li>
             <Trans>
-              <strong>Admins only</strong> - Only admins can access and view the document
+              <strong>Admins only</strong>: Visible to team admins.
             </Trans>
           </li>
         </ul>
