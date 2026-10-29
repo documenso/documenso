@@ -5,7 +5,7 @@ import { nanoid } from '@documenso/lib/universal/id';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { Field } from '@prisma/client';
 import { FieldType } from '@prisma/client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -42,9 +42,11 @@ type EditorFieldsProps = {
 type UseEditorFieldsResponse = {
   localFields: TLocalField[];
 
-  // Selected field
+  // Selected fields. `selectedField` is set only when exactly one field is selected.
+  selectedFields: TLocalField[];
   selectedField: TLocalField | undefined;
   setSelectedField: (formId: string | null) => void;
+  setSelectedFields: (formIds: string[]) => void;
 
   // Field operations
   addField: (field: Omit<TLocalField, 'formId'>) => TLocalField;
@@ -66,7 +68,7 @@ type UseEditorFieldsResponse = {
 };
 
 export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsProps): UseEditorFieldsResponse => {
-  const [selectedFieldFormId, setSelectedFieldFormId] = useState<string | null>(null);
+  const [selectedFieldFormIds, setSelectedFieldFormIds] = useState<string[]>([]);
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
 
   const generateDefaultValues = (fields?: Field[]) => {
@@ -113,7 +115,7 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
 
   const setSelectedField = (formId: string | null, bypassCheck = false) => {
     if (!formId) {
-      setSelectedFieldFormId(null);
+      setSelectedFieldFormIds([]);
       return;
     }
 
@@ -125,11 +127,20 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     }
 
     if (bypassCheck) {
-      setSelectedFieldFormId(formId);
+      setSelectedFieldFormIds([formId]);
       return;
     }
 
-    setSelectedFieldFormId(foundField?.formId ?? null);
+    setSelectedFieldFormIds(foundField ? [foundField.formId] : []);
+  };
+
+  const setSelectedFields = (formIds: string[]) => {
+    if (formIds.length === 1) {
+      setSelectedField(formIds[0]);
+      return;
+    }
+
+    setSelectedFieldFormIds(formIds);
   };
 
   const addField = useCallback(
@@ -262,17 +273,12 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     return envelope.recipients.find((recipient) => recipient.id === selectedRecipientId) || null;
   }, [selectedRecipientId, envelope.recipients]);
 
-  const selectedField = useMemo(() => {
-    return localFields.find((field) => field.formId === selectedFieldFormId);
-  }, [selectedFieldFormId, localFields]);
+  const selectedFields = useMemo(
+    () => localFields.filter((field) => selectedFieldFormIds.includes(field.formId)),
+    [selectedFieldFormIds, localFields],
+  );
 
-  /**
-   * Keep the selected field form ID in sync with the local fields.
-   */
-  useEffect(() => {
-    const foundField = localFields.find((field) => field.formId === selectedFieldFormId);
-    setSelectedFieldFormId(foundField?.formId ?? null);
-  }, [selectedFieldFormId, localFields]);
+  const selectedField = selectedFieldFormIds.length === 1 ? selectedFields[0] : undefined;
 
   const setSelectedRecipient = (recipientId: number | null) => {
     const foundRecipient = envelope.recipients.find((recipient) => recipient.id === recipientId);
@@ -300,9 +306,11 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     getFieldByFormId,
     getFieldsByRecipient,
 
-    // Selected field
+    // Selected fields
+    selectedFields,
     selectedField,
     setSelectedField,
+    setSelectedFields,
 
     // Selected recipient
     selectedRecipient,
