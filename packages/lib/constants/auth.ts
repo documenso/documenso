@@ -5,13 +5,6 @@ import { NEXT_PUBLIC_WEBAPP_URL } from './app';
 
 export const SALT_ROUNDS = 12;
 
-export const IDENTITY_PROVIDER_NAME: Record<string, string> = {
-  DOCUMENSO: 'Documenso',
-  GOOGLE: 'Google',
-  MICROSOFT: 'Microsoft',
-  OIDC: 'OIDC',
-};
-
 export const IS_GOOGLE_SSO_ENABLED = Boolean(
   env('NEXT_PRIVATE_GOOGLE_CLIENT_ID') && env('NEXT_PRIVATE_GOOGLE_CLIENT_SECRET'),
 );

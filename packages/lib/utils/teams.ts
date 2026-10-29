@@ -243,7 +243,3 @@ export const extractDerivedTeamSettings = (
 export const isMemberManagerOrAbove = (role: TeamMemberRole) => {
   return role === TeamMemberRole.ADMIN || role === TeamMemberRole.MANAGER;
 };
-
-export const isMemberAdmin = (role: TeamMemberRole) => {
-  return role === TeamMemberRole.ADMIN;
-};
