@@ -1,6 +1,7 @@
 import { getTeamAnalyticsDocumentsOverTime } from '@documenso/lib/server-only/team/get-team-analytics-documents-over-time';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZGetTeamAnalyticsDocumentsOverTimeRequestSchema,
   ZGetTeamAnalyticsDocumentsOverTimeResponseSchema,
@@ -9,6 +10,7 @@ import {
 export const getTeamAnalyticsDocumentsOverTimeRoute = authenticatedProcedure
   .input(ZGetTeamAnalyticsDocumentsOverTimeRequestSchema)
   .output(ZGetTeamAnalyticsDocumentsOverTimeResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .query(async ({ input, ctx }) => {
     const { teamId, range, from, to, timezone } = input;
 

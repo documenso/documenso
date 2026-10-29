@@ -5,6 +5,7 @@ import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import {
   rejectEnvelopeRecipientOnBehalfOfMeta,
   ZRejectEnvelopeRecipientOnBehalfOfRequestSchema,
@@ -15,6 +16,7 @@ export const rejectEnvelopeRecipientOnBehalfOfRoute = authenticatedProcedure
   .meta(rejectEnvelopeRecipientOnBehalfOfMeta)
   .input(ZRejectEnvelopeRecipientOnBehalfOfRequestSchema)
   .output(ZRejectEnvelopeRecipientOnBehalfOfResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { envelopeId, recipientId, reason, actAsEmail } = input;

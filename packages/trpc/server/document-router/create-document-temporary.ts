@@ -8,6 +8,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import {
   createDocumentTemporaryMeta,
   ZCreateDocumentTemporaryRequestSchema,
@@ -24,6 +25,7 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
   .meta(createDocumentTemporaryMeta)
   .input(ZCreateDocumentTemporaryRequestSchema)
   .output(ZCreateDocumentTemporaryResponseSchema)
+  .use(twoFactorScopeFromCtx())
   .mutation(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
 

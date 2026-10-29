@@ -1,6 +1,7 @@
 import { getOrganisationAnalyticsOverview } from '@documenso/lib/server-only/organisation/get-organisation-analytics-overview';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZGetOrganisationAnalyticsOverviewRequestSchema,
   ZGetOrganisationAnalyticsOverviewResponseSchema,
@@ -9,6 +10,7 @@ import {
 export const getOrganisationAnalyticsOverviewRoute = authenticatedProcedure
   .input(ZGetOrganisationAnalyticsOverviewRequestSchema)
   .output(ZGetOrganisationAnalyticsOverviewResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ input, ctx }) => {
     const { organisationId, range, from, to, timezone } = input;
 

@@ -137,6 +137,8 @@ export default function AuthoringLayout() {
     teams: [team],
     subscription: null,
     currentOrganisationRole: OrganisationMemberRole.MEMBER,
+    // Presign-token (machine) access is exempt from 2FA enforcement.
+    twoFactorEnforcement: { required: false },
   };
 
   return (

@@ -44,15 +44,18 @@ export const ZOrganisationLiteSchema = OrganisationSchema.pick({
  */
 export const ZOrganisationManySchema = ZOrganisationLiteSchema;
 
+/**
+ * Intentionally never stores access/ID tokens: the portal re-authenticates
+ * against the IdP on every sign-in, so persisting them would only widen the
+ * blast radius of a database leak.
+ */
 export const ZOrganisationAccountLinkMetadataSchema = z.object({
   type: z.enum(['link', 'create']),
   userId: z.number(),
   organisationId: z.string(),
+  email: z.string().email(),
   oauthConfig: z.object({
     providerAccountId: z.string(),
-    accessToken: z.string(),
-    expiresAt: z.number(),
-    idToken: z.string(),
   }),
 });
 

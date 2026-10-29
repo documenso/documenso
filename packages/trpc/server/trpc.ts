@@ -11,9 +11,17 @@ import type { AnyZodObject } from 'zod';
 
 import { dataTransformer } from '../utils/data-transformer';
 import type { TrpcContext } from './context';
+import { twoFactorInstanceOnly } from './two-factor-enforcement/enforce';
+
+export type TrpcAuthType = 'authenticated' | 'maybeAuthenticated' | 'admin';
 
 // Can't import type from trpc-to-openapi because it breaks build, not sure why.
 export type TrpcRouteMeta = {
+  /**
+   * Set by the base procedures so the 2FA drift guard can identify
+   * session-reachable routes. Do not set this on individual routes.
+   */
+  trpcAuthType?: TrpcAuthType;
   openapi?: {
     enabled?: boolean;
     method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
@@ -160,6 +168,10 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path, me
   if (!meta?.allowEmbedSession) {
     assertNotEmbedSession(ctx.session);
   }
+
+  // 2FA enforcement deliberately does not run here, it is owned by the
+  // route-level `twoFactorScope` middlewares. The drift guard test fails CI for
+  // any session-reachable procedure without one.
 
   // Recreate the logger with a sub request ID to differentiate between batched
   // requests, as well as identifying attributes so every subsequent log line
@@ -406,7 +418,15 @@ export const procedureMiddleware = t.middleware(async ({ ctx, next, path }) => {
  */
 export const router = t.router;
 export const procedure = t.procedure.use(procedureMiddleware);
-export const authenticatedProcedure = t.procedure.use(authenticatedMiddleware);
+
+export const authenticatedProcedure = t.procedure.meta({ trpcAuthType: 'authenticated' }).use(authenticatedMiddleware);
 // While this is functionally the same as `procedure`, it's useful for indicating purpose
-export const maybeAuthenticatedProcedure = t.procedure.use(maybeAuthenticatedMiddleware);
-export const adminProcedure = t.procedure.use(adminMiddleware);
+export const maybeAuthenticatedProcedure = t.procedure
+  .meta({ trpcAuthType: 'maybeAuthenticated' })
+  .use(maybeAuthenticatedMiddleware);
+export const adminProcedure = t.procedure
+  .meta({ trpcAuthType: 'admin' })
+  .use(adminMiddleware)
+  // Admins act in the instance context, not as organisation members, so only the
+  // instance assert applies. Individual admin routes must not attach their own.
+  .use(twoFactorInstanceOnly());

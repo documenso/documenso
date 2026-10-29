@@ -1,4 +1,6 @@
 import { getOptionalNonEmbedSession } from '@documenso/auth/server/lib/session/embed-session-restrictions';
+import { AppError } from '@documenso/lib/errors/app-error';
+import { assertTwoFactorEnforcementForSession } from '@documenso/lib/server-only/2fa/org-enforcement';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import type { DocumentDataVersion } from '@documenso/lib/types/document';
 import { sha256 } from '@documenso/lib/universal/crypto';
@@ -41,6 +43,9 @@ route.get(
 
     let userId = session.user?.id;
 
+    // Presign-token (machine) access is exempt from 2FA enforcement.
+    const isPresignTokenAccess = Boolean(presignToken);
+
     // Check presignToken if provided
     if (presignToken) {
       const verifiedToken = await verifyEmbeddingPresignToken({
@@ -69,6 +74,11 @@ route.get(
             type: true,
             teamId: true,
             templateType: true,
+            team: {
+              select: {
+                organisationId: true,
+              },
+            },
           },
         },
       },
@@ -76,6 +86,24 @@ route.get(
 
     if (!envelopeItem) {
       return c.json({ error: 'Not found' }, 404);
+    }
+
+    if (!isPresignTokenAccess && session.user && session.session) {
+      try {
+        await assertTwoFactorEnforcementForSession({
+          user: session.user,
+          session: session.session,
+          organisationIds: [envelopeItem.envelope.team.organisationId],
+        });
+      } catch (error) {
+        if (error instanceof AppError) {
+          const { status, body } = AppError.toRestAPIError(error);
+
+          return c.json({ error: body.message, code: error.code }, status);
+        }
+
+        throw error;
+      }
     }
 
     // Check whether the user has access to the document.

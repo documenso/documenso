@@ -1,12 +1,16 @@
 import { assertUserNotDisabledById } from '@documenso/lib/server-only/user/assert-user-not-disabled';
+import type { TSessionAuthMethod } from '@documenso/lib/types/session-auth-method';
 import type { Context } from 'hono';
 
 import type { HonoAuthContext } from '../../types/context';
 import { createSession, generateSessionToken } from '../session/session';
 import { setSessionCookie } from '../session/session-cookies';
+import { sweepPendingTwoFactorChallenge } from './two-factor-challenge';
 
 type AuthorizeUser = {
   userId: number;
+  authMethod: TSessionAuthMethod;
+  twoFactorVerified: boolean;
 };
 
 /**
@@ -20,11 +24,17 @@ type AuthorizeUser = {
 export const onAuthorize = async (user: AuthorizeUser, c: Context<HonoAuthContext>) => {
   await assertUserNotDisabledById({ userId: user.userId });
 
+  // An abandoned challenge must not outlive a login via another route.
+  await sweepPendingTwoFactorChallenge(c);
+
   const metadata = c.get('requestMetadata');
 
   const sessionToken = generateSessionToken();
 
-  await createSession(sessionToken, user.userId, metadata);
+  await createSession(sessionToken, user.userId, metadata, {
+    authMethod: user.authMethod,
+    twoFactorVerified: user.twoFactorVerified,
+  });
 
   await setSessionCookie(c, sessionToken);
 };

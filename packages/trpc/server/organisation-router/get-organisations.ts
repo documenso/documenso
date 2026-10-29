@@ -2,12 +2,16 @@ import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisa
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorInstanceOnly } from '../two-factor-enforcement/enforce';
 import { ZGetOrganisationsRequestSchema, ZGetOrganisationsResponseSchema } from './get-organisations.types';
 
 export const getOrganisationsRoute = authenticatedProcedure
   //   .meta(getOrganisationsMeta)
   .input(ZGetOrganisationsRequestSchema)
   .output(ZGetOrganisationsResponseSchema)
+  // Same surface as the bootstrap session payload a blocked client already
+  // receives.
+  .use(twoFactorInstanceOnly())
   .query(async ({ ctx }) => {
     const { user } = ctx;
 

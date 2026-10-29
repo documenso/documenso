@@ -1,6 +1,7 @@
 import { getOptionalNonEmbedSession } from '@documenso/auth/server/lib/session/embed-session-restrictions';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { assertTwoFactorEnforcementForSession } from '@documenso/lib/server-only/2fa/org-enforcement';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { prisma } from '@documenso/prisma';
@@ -28,6 +29,15 @@ export const filesRoute = new Hono<HonoEnv>()
    */
   .post('/upload-pdf', sValidator('form', ZUploadPdfRequestSchema), async (c) => {
     try {
+      // Presign-token (machine) access is exempt from 2FA enforcement.
+      // `resolveFileUploadUserId` prefers the session, so asserting on the
+      // session here cannot be bypassed by a session user.
+      const { user: sessionUser, session } = await getOptionalNonEmbedSession(c);
+
+      if (sessionUser && session) {
+        await assertTwoFactorEnforcementForSession({ user: sessionUser, session });
+      }
+
       const userId = await resolveFileUploadUserId(c);
 
       if (!userId) {
@@ -54,6 +64,13 @@ export const filesRoute = new Hono<HonoEnv>()
       return c.json(result);
     } catch (error) {
       console.error('Upload failed:', error);
+
+      if (error instanceof AppError) {
+        const { status, body } = AppError.toRestAPIError(error);
+
+        return c.json({ error: body.message, code: error.code }, status);
+      }
+
       return c.json({ error: 'Upload failed' }, 500);
     }
   })
@@ -68,6 +85,9 @@ export const filesRoute = new Hono<HonoEnv>()
       const session = await getOptionalNonEmbedSession(c);
 
       let userId = session.user?.id;
+
+      // Presign-token (machine) access is exempt from 2FA enforcement.
+      const isPresignTokenAccess = Boolean(token);
 
       if (token) {
         const presignToken = await verifyEmbeddingPresignToken({
@@ -86,6 +106,11 @@ export const filesRoute = new Hono<HonoEnv>()
           id: envelopeId,
         },
         include: {
+          team: {
+            select: {
+              organisationId: true,
+            },
+          },
           envelopeItems: {
             where: {
               id: envelopeItemId,
@@ -99,6 +124,24 @@ export const filesRoute = new Hono<HonoEnv>()
 
       if (!envelope) {
         return c.json({ error: 'Envelope not found' }, 404);
+      }
+
+      if (!isPresignTokenAccess && session.user && session.session) {
+        try {
+          await assertTwoFactorEnforcementForSession({
+            user: session.user,
+            session: session.session,
+            organisationIds: [envelope.team.organisationId],
+          });
+        } catch (error) {
+          if (error instanceof AppError) {
+            const { status, body } = AppError.toRestAPIError(error);
+
+            return c.json({ error: body.message, code: error.code }, status);
+          }
+
+          throw error;
+        }
       }
 
       const [envelopeItem] = envelope.envelopeItems;
@@ -152,6 +195,11 @@ export const filesRoute = new Hono<HonoEnv>()
             id: envelopeId,
           },
           include: {
+            team: {
+              select: {
+                organisationId: true,
+              },
+            },
             envelopeItems: {
               where: {
                 id: envelopeItemId,
@@ -172,6 +220,12 @@ export const filesRoute = new Hono<HonoEnv>()
         if (!envelope) {
           return c.json({ error: 'Envelope not found' }, 404);
         }
+
+        await assertTwoFactorEnforcementForSession({
+          user: session.user,
+          session: session.session,
+          organisationIds: [envelope.team.organisationId],
+        });
 
         const [envelopeItem] = envelope.envelopeItems;
 
