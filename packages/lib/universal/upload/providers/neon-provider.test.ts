@@ -11,10 +11,14 @@ describe('getNeonStorageRegion', () => {
     expect(getNeonStorageRegion('https://br-x.storage.c-12.eu-central-1.aws.neon.tech/')).toBe('eu-central-1');
   });
 
-  it('returns undefined for other endpoints', () => {
+  it('returns undefined for valid URLs that are not Neon storage endpoints', () => {
     expect(getNeonStorageRegion('http://localhost:9000')).toBeUndefined();
     expect(getNeonStorageRegion('https://s3.us-east-1.amazonaws.com')).toBeUndefined();
-    expect(getNeonStorageRegion('not a url')).toBeUndefined();
+  });
+
+  it('throws for endpoints that are not valid URLs', () => {
+    expect(() => getNeonStorageRegion('not a url')).toThrow(/not a valid URL: "not a url"/);
+    expect(() => getNeonStorageRegion('br-x.storage.c-7.us-east-2.aws.neon.tech')).toThrow(/not a valid URL/);
   });
 });
 
@@ -39,6 +43,16 @@ describe('NeonProvider', () => {
     expect(() => new NeonProvider()).toThrow(/NEXT_PRIVATE_UPLOAD_ENDPOINT/);
   });
 
+  it('rejects an endpoint that is not a valid URL', () => {
+    vi.stubEnv('NEXT_PRIVATE_UPLOAD_ENDPOINT', 'br-x.storage.c-7.us-east-2.aws.neon.tech');
+
+    expect(() => new NeonProvider()).toThrow(/not a valid URL/);
+
+    vi.stubEnv('NEXT_PRIVATE_UPLOAD_REGION', 'us-east-2');
+
+    expect(() => new NeonProvider()).toThrow(/not a valid URL/);
+  });
+
   it('signs path-style URLs with the region from the endpoint', async () => {
     const { url, key } = await new NeonProvider().getPresignGetUrl('abc/contract.pdf');
     const signed = new URL(url);
@@ -55,6 +69,14 @@ describe('NeonProvider', () => {
     const { url } = await new NeonProvider().getPresignGetUrl('abc/contract.pdf');
 
     expect(new URL(url).searchParams.get('X-Amz-Credential')).toContain('/eu-central-1/s3/');
+  });
+
+  it('falls back to us-east-1 for endpoints it cannot read a region from', async () => {
+    vi.stubEnv('NEXT_PRIVATE_UPLOAD_ENDPOINT', 'https://storage.example.com');
+
+    const { url } = await new NeonProvider().getPresignGetUrl('abc/contract.pdf');
+
+    expect(new URL(url).searchParams.get('X-Amz-Credential')).toContain('/us-east-1/s3/');
   });
 
   it('presigns uploads without a checksum so real bodies are accepted', async () => {

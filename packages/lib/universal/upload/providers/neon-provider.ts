@@ -7,13 +7,22 @@ const NEON_STORAGE_ENDPOINT_REGEX = /\.storage\.c-\d+\.([a-z0-9-]+)\.aws\.neon\.
 /**
  * Derive the signing region from a Neon branch storage endpoint, for example
  * `https://br-cool-darkness-a1b2c3d4.storage.c-7.us-east-2.aws.neon.tech` -> `us-east-2`.
+ *
+ * Throws when the endpoint is not a valid URL, and returns `undefined` when it is
+ * a valid URL that is not a Neon branch storage endpoint.
  */
 export const getNeonStorageRegion = (endpoint: string): string | undefined => {
+  let hostname: string;
+
   try {
-    return new URL(endpoint).hostname.match(NEON_STORAGE_ENDPOINT_REGEX)?.[1];
+    hostname = new URL(endpoint).hostname;
   } catch {
-    return undefined;
+    throw new Error(
+      `NEXT_PRIVATE_UPLOAD_ENDPOINT is not a valid URL: "${endpoint}". Expected a Neon branch storage endpoint such as https://br-xxx.storage.c-7.us-east-2.aws.neon.tech.`,
+    );
   }
+
+  return hostname.match(NEON_STORAGE_ENDPOINT_REGEX)?.[1];
 };
 
 /**
@@ -31,10 +40,16 @@ export class NeonProvider extends S3Provider {
       );
     }
 
+    // Always parse the endpoint so a malformed URL fails here even when the region is overridden.
+    const endpointRegion = getNeonStorageRegion(endpoint);
+
+    // Neon verifies the signature but not the region in its credential scope, so the
+    // `us-east-1` fallback for unrecognised endpoints still signs valid requests.
+
     super({
       endpoint,
       forcePathStyle: true,
-      region: env('NEXT_PRIVATE_UPLOAD_REGION') || getNeonStorageRegion(endpoint) || 'us-east-1',
+      region: env('NEXT_PRIVATE_UPLOAD_REGION') || endpointRegion || 'us-east-1',
     });
   }
 }

@@ -235,7 +235,8 @@ NEXT_PRIVATE_UPLOAD_REGION=us-east-1
 The `neon` transport uses the same S3 client as the `s3` transport, with Neon's requirements applied for you:
 
 - Path-style addressing is always on (Neon doesn't support virtual-hosted bucket URLs), so `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE` is ignored.
-- The signing region is read from the endpoint (`...storage.c-7.us-east-2.aws.neon.tech` signs as `us-east-2`), so `NEXT_PRIVATE_UPLOAD_REGION` is optional.
+- The signing region is read from the endpoint (`...storage.c-7.us-east-2.aws.neon.tech` signs as `us-east-2`), falling back to `us-east-1`. Neon doesn't check the signing region, so `NEXT_PRIVATE_UPLOAD_REGION` is optional.
+- `NEXT_PRIVATE_UPLOAD_ENDPOINT` must be a full URL including `https://`. Otherwise the first upload or download fails with a `not a valid URL` error.
 
 Uploaded files are recorded as `S3_PATH` document data, the same as the `s3` transport.
 
