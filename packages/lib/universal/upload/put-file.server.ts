@@ -79,6 +79,7 @@ export const putFileServerSide = async (file: File) => {
   return await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
     .with('s3', async () => putFileInObjectStorage(file))
     .with('azure-blob', async () => putFileInObjectStorage(file))
+    .with('neon', async () => putFileInObjectStorage(file))
     .otherwise(async () => putFileInDatabase(file));
 };
 
