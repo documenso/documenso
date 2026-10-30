@@ -7,9 +7,10 @@ import { getMostRecentEmailVerificationToken } from './get-most-recent-email-ver
 
 export type VerifyEmailProps = {
   token: string;
+  returnTo?: string;
 };
 
-export const verifyEmail = async ({ token }: VerifyEmailProps) => {
+export const verifyEmail = async ({ token, returnTo }: VerifyEmailProps) => {
   const verificationToken = await prisma.verificationToken.findFirst({
     include: {
       user: {
@@ -47,6 +48,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
         name: 'send.signup.confirmation.email',
         payload: {
           email: verificationToken.user.email,
+          returnTo,
         },
       });
     }

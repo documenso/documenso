@@ -10,7 +10,7 @@ import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settin
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
-import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
+import { getValidReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { logger } from '@documenso/lib/utils/logger';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@prisma/client';
@@ -244,21 +244,13 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
     });
   }
 
-  // eslint-disable-next-line prefer-const
-  let [redirectState, redirectPath] = storedRedirectPath.split(' ');
+  const [redirectState, storedPath] = storedRedirectPath.split(' ');
 
-  // The sub-path aware root, e.g. "/" or "/ESign/".
-  const defaultRedirectPath = formatPath('/');
+  const storedReturnTo = redirectState === storedState ? storedPath : undefined;
 
-  if (redirectState !== storedState || !redirectPath) {
-    redirectPath = defaultRedirectPath;
-  }
-
-  if (!isValidReturnTo(redirectPath)) {
-    redirectPath = defaultRedirectPath;
-  }
-
-  redirectPath = normalizeReturnTo(redirectPath) || defaultRedirectPath;
+  // The embed flow completes through `/api/auth/embed/complete`, so API routes are allowed here.
+  // `c.redirect` sends the path verbatim, so re-apply the sub-path the validator stripped.
+  const redirectPath = formatPath(getValidReturnTo(storedReturnTo, { allowApiRoutes: true }) ?? '/');
 
   const tokens = await oAuthClient.validateAuthorizationCode(token_endpoint, code, storedCodeVerifier);
 

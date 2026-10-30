@@ -2,6 +2,7 @@ import { authClient } from '@documenso/auth/client';
 import { useIsFramed } from '@documenso/lib/client-only/hooks/use-is-framed';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { formatPath } from '@documenso/lib/constants/app';
+import { withReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { DialogFooter } from '@documenso/ui/primitives/dialog';
@@ -56,7 +57,7 @@ export const DocumentSigningAuthAccount = ({
       const emailHash = isDirectTemplate ? '' : `#email=${encodeURIComponent(email)}`;
 
       await authClient.signOut({
-        redirectPath: formatPath(`/signin?returnTo=${encodeURIComponent(currentPath)}${emailHash}`),
+        redirectPath: formatPath(`${withReturnTo('/signin', currentPath)}${emailHash}`),
       });
     } catch {
       setIsSigningOut(false);

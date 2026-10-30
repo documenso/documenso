@@ -9,6 +9,7 @@ import {
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { ZNameSchema } from '@documenso/lib/types/name';
 import { env } from '@documenso/lib/utils/env';
+import { withReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
@@ -139,10 +140,11 @@ export const SignUpForm = ({
         email,
         password,
         signature,
+        returnTo,
         captchaToken: token ?? undefined,
       });
 
-      await navigate(returnTo ? returnTo : '/unverified-account');
+      await navigate(withReturnTo('/unverified-account', returnTo));
 
       toast({
         title: _(msg`Registration Successful`),
@@ -174,7 +176,7 @@ export const SignUpForm = ({
 
   const onSignUpWithGoogleClick = async () => {
     try {
-      await authClient.google.signIn();
+      await authClient.google.signIn({ redirectPath: returnTo });
     } catch {
       toast({
         title: _(msg`An unknown error occurred`),
@@ -186,7 +188,7 @@ export const SignUpForm = ({
 
   const onSignUpWithMicrosoftClick = async () => {
     try {
-      await authClient.microsoft.signIn();
+      await authClient.microsoft.signIn({ redirectPath: returnTo });
     } catch {
       toast({
         title: _(msg`An unknown error occurred`),
@@ -198,7 +200,7 @@ export const SignUpForm = ({
 
   const onSignUpWithOIDCClick = async () => {
     try {
-      await authClient.oidc.signIn();
+      await authClient.oidc.signIn({ redirectPath: returnTo });
     } catch {
       toast({
         title: _(msg`An unknown error occurred`),
@@ -406,7 +408,10 @@ export const SignUpForm = ({
               <p className="mt-4 text-muted-foreground text-sm">
                 <Trans>
                   Already have an account?{' '}
-                  <Link to="/signin" className="text-documenso-700 duration-200 hover:opacity-70">
+                  <Link
+                    to={withReturnTo('/signin', returnTo)}
+                    className="text-documenso-700 duration-200 hover:opacity-70"
+                  >
                     Sign in instead
                   </Link>
                 </Trans>

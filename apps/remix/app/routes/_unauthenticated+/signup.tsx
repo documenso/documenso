@@ -4,7 +4,7 @@ import {
   IS_OIDC_SSO_ENABLED,
   isSignupEnabledForProvider,
 } from '@documenso/lib/constants/auth';
-import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
+import { getReturnToFromRequest } from '@documenso/lib/utils/is-valid-return-to';
 import { msg } from '@lingui/core/macro';
 import { redirect } from 'react-router';
 
@@ -30,9 +30,7 @@ export function loader({ request }: Route.LoaderArgs) {
     throw redirect('/signin');
   }
 
-  let returnTo = new URL(request.url).searchParams.get('returnTo') ?? undefined;
-
-  returnTo = isValidReturnTo(returnTo) ? normalizeReturnTo(returnTo) : undefined;
+  const returnTo = getReturnToFromRequest(request);
 
   return {
     isEmailPasswordSignupEnabled,

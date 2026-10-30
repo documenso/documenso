@@ -7,13 +7,18 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DOCUMENSO_INTERNAL_EMAIL, USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER } from '../../constants/email';
+import { getValidReturnTo } from '../../utils/is-valid-return-to';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
-export interface SendConfirmationEmailProps {
+export type SendConfirmationEmailProps = {
   userId: number;
-}
+  /**
+   * Where the verification page sends the user afterwards.
+   */
+  returnTo?: string;
+};
 
-export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailProps) => {
+export const sendConfirmationEmail = async ({ userId, returnTo }: SendConfirmationEmailProps) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -38,11 +43,17 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
   }
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-  const confirmationLink = `${assetBaseUrl}/verify-email/${verificationToken.token}`;
+  const confirmationUrl = new URL(`${assetBaseUrl}/verify-email/${verificationToken.token}`);
+
+  const validReturnTo = getValidReturnTo(returnTo);
+
+  if (validReturnTo) {
+    confirmationUrl.searchParams.set('returnTo', validReturnTo);
+  }
 
   const confirmationTemplate = createElement(ConfirmEmailTemplate, {
     assetBaseUrl,
-    confirmationLink,
+    confirmationLink: confirmationUrl.toString(),
   });
 
   const [html, text] = await Promise.all([

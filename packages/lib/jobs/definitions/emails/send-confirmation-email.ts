@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZReturnToSchema } from '../../../utils/is-valid-return-to';
 import { zEmail } from '../../../utils/zod';
 import type { JobDefinition } from '../../client/_internal/job';
 
@@ -8,6 +9,7 @@ const SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_ID = 'send.signup.confirmation.emai
 const SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   email: zEmail(),
   force: z.boolean().optional(),
+  returnTo: ZReturnToSchema,
 });
 
 export type TSendConfirmationEmailJobDefinition = z.infer<typeof SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_SCHEMA>;

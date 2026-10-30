@@ -1,4 +1,5 @@
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
@@ -20,6 +21,7 @@ import { Plural, Trans } from '@lingui/react/macro';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { AnimatePresence } from 'framer-motion';
 import { BellIcon } from 'lucide-react';
+import { match } from 'ts-pattern';
 
 export const OrganisationInvitations = ({ className }: { className?: string }) => {
   const { data, isLoading } = trpc.organisation.member.invite.getMany.useQuery({
@@ -132,10 +134,16 @@ const AcceptOrganisationInvitationButton = ({ token }: { token: string }) => {
         duration: 5000,
       });
     },
-    onError: () => {
+    onError: (err) => {
+      const error = AppError.parseError(err);
+
+      const description = match(error.code)
+        .with(AppErrorCode.UNVERIFIED_EMAIL, () => msg`Verify your email address before accepting this invitation.`)
+        .otherwise(() => msg`Unable to join this organisation at this time.`);
+
       toast({
         title: _(msg`Something went wrong`),
-        description: _(msg`Unable to join this organisation at this time.`),
+        description: _(description),
         variant: 'destructive',
         duration: 10000,
       });
