@@ -9,7 +9,7 @@ import {
   isSignupEnabledForProvider,
   OIDC_PROVIDER_LABEL,
 } from '@documenso/lib/constants/auth';
-import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
+import { getReturnToFromRequest, withReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -55,9 +55,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     (IS_MICROSOFT_SSO_ENABLED && isSignupEnabledForProvider('microsoft')) ||
     (IS_OIDC_SSO_ENABLED && isSignupEnabledForProvider('oidc'));
 
-  let returnTo = new URL(request.url).searchParams.get('returnTo') ?? undefined;
-
-  returnTo = isValidReturnTo(returnTo) ? normalizeReturnTo(returnTo) : undefined;
+  const returnTo = getReturnToFromRequest(request);
 
   if (isAuthenticated) {
     throw redirect(returnTo || '/');
@@ -146,10 +144,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
           <p className="mt-6 text-center text-muted-foreground text-sm">
             <Trans>
               Don't have an account?{' '}
-              <Link
-                to={returnTo ? `/signup?returnTo=${encodeURIComponent(returnTo)}` : '/signup'}
-                className="text-documenso-700 duration-200 hover:opacity-70"
-              >
+              <Link to={withReturnTo('/signup', returnTo)} className="text-documenso-700 duration-200 hover:opacity-70">
                 Sign up
               </Link>
             </Trans>

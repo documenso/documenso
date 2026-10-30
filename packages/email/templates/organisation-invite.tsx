@@ -1,3 +1,4 @@
+import { formatOrganisationInvitePath } from '@documenso/lib/utils/organisations';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -62,7 +63,7 @@ export const OrganisationInviteEmailTemplate = ({
               <Section className="mt-6 mb-6 text-center">
                 <Button
                   className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-center font-medium text-primary-foreground text-sm no-underline"
-                  href={`${baseUrl}/organisation/invite/${token}`}
+                  href={`${baseUrl}${formatOrganisationInvitePath(token)}`}
                 >
                   <Trans>Accept</Trans>
                 </Button>

@@ -1,6 +1,8 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { withReturnTo } from '@documenso/lib/utils/is-valid-return-to';
+import { formatOrganisationInvitePath } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -8,7 +10,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { Link, redirect } from 'react-router';
 import { match } from 'ts-pattern';
 
 import type { Route } from './+types/organisation.invite.$token';
@@ -17,6 +19,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const session = await getOptionalSession(request);
 
   const { token } = params;
+  const isDeclineAction = new URL(request.url).searchParams.get('action') === 'decline';
 
   if (!token) {
     return {
@@ -68,14 +71,22 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     },
     select: {
       id: true,
+      emailVerified: true,
     },
   });
+
+  // Accepting requires a verified account, so send unverified users to confirm
+  // their email first and bring them back here. Declining never needs an account.
+  if (user && !user.emailVerified && !isDeclineAction) {
+    throw redirect(withReturnTo('/unverified-account', formatOrganisationInvitePath(token)));
+  }
 
   return {
     state: 'Pending',
     token: organisationMemberInvite.token,
     email: organisationMemberInvite.email,
     organisationName,
+    isDeclineAction,
     userExists: user !== null,
     isSessionUserTheInvitedUser: user !== null && user.id === session.user?.id,
   } as const;
@@ -139,6 +150,7 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
       token={data.token}
       email={data.email}
       organisationName={data.organisationName}
+      isDeclineAction={data.isDeclineAction}
       userExists={data.userExists}
       isSessionUserTheInvitedUser={data.isSessionUserTheInvitedUser}
     />
@@ -149,6 +161,7 @@ type PendingInvitationProps = {
   token: string;
   email: string;
   organisationName: string;
+  isDeclineAction: boolean;
   userExists: boolean;
   isSessionUserTheInvitedUser: boolean;
 };
@@ -161,15 +174,13 @@ const PendingInvitation = ({
   token,
   email,
   organisationName,
+  isDeclineAction,
   userExists,
   isSessionUserTheInvitedUser,
 }: PendingInvitationProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
   const { refreshSession } = useOptionalSession();
-
-  const [searchParams] = useSearchParams();
-  const actionIsDecline = searchParams.get('action') === 'decline';
 
   const [result, setResult] = useState<InvitationResult>('idle');
   const [acceptFailureReason, setAcceptFailureReason] = useState<AcceptFailureReason | null>(null);
@@ -246,7 +257,7 @@ const PendingInvitation = ({
 
   // Accepting requires an account (acceptance keys off the invited email).
   // Declining does not, so we only gate account creation on the accept flow.
-  if (!actionIsDecline && !userExists) {
+  if (!isDeclineAction && !userExists) {
     return (
       <div className="w-screen max-w-lg px-4">
         <div className="w-full">
@@ -265,7 +276,9 @@ const PendingInvitation = ({
           </p>
 
           <Button asChild>
-            <Link to={`/signup#email=${encodeURIComponent(email)}`}>
+            <Link
+              to={`${withReturnTo('/signup', formatOrganisationInvitePath(token))}#email=${encodeURIComponent(email)}`}
+            >
               <Trans>Create account</Trans>
             </Link>
           </Button>
@@ -324,7 +337,7 @@ const PendingInvitation = ({
             <Trans>Decline</Trans>
           </Button>
 
-          {!actionIsDecline && (
+          {!isDeclineAction && (
             <Button
               onClick={async () => acceptInvitation.mutateAsync({ token })}
               loading={acceptInvitation.isPending}

@@ -56,12 +56,19 @@ export const acceptOrganisationInvitation = async ({ token }: AcceptOrganisation
     },
     select: {
       id: true,
+      emailVerified: true,
     },
   });
 
   if (!user) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'User must exist to accept an organisation invitation',
+    });
+  }
+
+  if (!user.emailVerified) {
+    throw new AppError(AppErrorCode.UNVERIFIED_EMAIL, {
+      message: 'Verify your email before accepting an organisation invitation',
     });
   }
 
