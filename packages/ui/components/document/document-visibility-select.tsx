@@ -88,12 +88,12 @@ export const DocumentVisibilityTooltip = () => {
 
         <p>
           <a
-            href="https://docs.documenso.com/docs/users/documents/advanced/document-visibility"
+            href="https://docs.documenso.com/docs/users/documents/advanced/document-visibility#examples"
             target="_blank"
             rel="noreferrer"
             className="text-documenso-700 hover:text-documenso-600 hover:underline"
           >
-            <Trans>Learn more</Trans>
+            <Trans>Examples</Trans>
           </a>
         </p>
       </TooltipContent>
