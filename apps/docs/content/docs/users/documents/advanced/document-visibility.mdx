@@ -76,39 +76,39 @@ Each example uses the same team: **Alice** (Admin), **Mark** (Manager), and thre
 
 Sam uploads a document and sets visibility to **Everyone**.
 
-| Person | Role    | Can see it?   | Why                                   |
-| ------ | ------- | ------------- | ------------------------------------- |
-| Alice  | Admin   | <Included />  | Everyone on the team can see it       |
-| Mark   | Manager | <Included />  | Everyone on the team can see it       |
-| Mia    | Member  | <Included />  | Everyone on the team can see it       |
-| Sam    | Member  | <Included />  | He created it, and everyone can see it |
-| Leo    | Member  | <Included />  | Everyone on the team can see it       |
+| Person | Role    | <span className="block text-left w-full">Can view it?</span> | Why                                    |
+| ------ | ------- | :-----------------------------------------------------------: | -------------------------------------- |
+| Alice  | Admin   |                         <Included />                          | Everyone on the team can see it        |
+| Mark   | Manager |                         <Included />                          | Everyone on the team can see it        |
+| Mia    | Member  |                         <Included />                          | Everyone on the team can see it        |
+| Sam    | Member  |                         <Included />                          | He created it, and everyone can see it |
+| Leo    | Member  |                         <Included />                          | Everyone on the team can see it        |
 
 </Tab>
 <Tab value="Managers and above">
 
 Mark creates a document, sets visibility to **Managers and above**, and adds Mia as a recipient.
 
-| Person | Role    | Can see it?     | Why                                          |
-| ------ | ------- | --------------- | -------------------------------------------- |
-| Alice  | Admin   | <Included />    | Admins can see "Managers and above" documents |
-| Mark   | Manager | <Included />    | He created it                                |
-| Mia    | Member  | <Included />    | She is a recipient, so her role doesn't matter |
-| Sam    | Member  | <NotIncluded /> | Members can't see it, and he isn't a recipient |
-| Leo    | Member  | <NotIncluded /> | Members can't see it, and he isn't a recipient |
+| Person | Role    | <span className="block text-left w-full">Can view it?</span> | Why                                          |
+| ------ | ------- | :-----------------------------------------------------------: | -------------------------------------------- |
+| Alice  | Admin   |                         <Included />                          | Admins can see "Managers and above" documents |
+| Mark   | Manager |                         <Included />                          | He created it                                |
+| Mia    | Member  |                         <Included />                          | She is a recipient, so her role doesn't matter |
+| Sam    | Member  |                        <NotIncluded />                        | Members can't see it, and he isn't a recipient |
+| Leo    | Member  |                        <NotIncluded />                        | Members can't see it, and he isn't a recipient |
 
 </Tab>
 <Tab value="Admins only">
 
 Mia creates a document and adds Leo as a recipient. The team's default visibility is **Admins only**.
 
-| Person | Role    | Can see it?     | Why                                             |
-| ------ | ------- | --------------- | ----------------------------------------------- |
-| Alice  | Admin   | <Included />    | Admins can see every document                   |
-| Mark   | Manager | <NotIncluded /> | Managers can't see "Admins only" documents      |
-| Mia    | Member  | <Included />    | She created it, so her role doesn't matter      |
-| Sam    | Member  | <NotIncluded /> | Members can't see it, and he isn't a recipient  |
-| Leo    | Member  | <Included />    | He is a recipient, so his role doesn't matter   |
+| Person | Role    | <span className="block text-left w-full">Can view it?</span> | Why                                             |
+| ------ | ------- | :-----------------------------------------------------------: | ----------------------------------------------- |
+| Alice  | Admin   |                         <Included />                          | Admins can see every document                   |
+| Mark   | Manager |                        <NotIncluded />                        | Managers can't see "Admins only" documents      |
+| Mia    | Member  |                         <Included />                          | She created it, so her role doesn't matter      |
+| Sam    | Member  |                        <NotIncluded />                        | Members can't see it, and he isn't a recipient  |
+| Leo    | Member  |                         <Included />                          | He is a recipient, so his role doesn't matter   |
 
 </Tab>
 </Tabs>
