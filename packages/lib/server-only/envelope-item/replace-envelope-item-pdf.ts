@@ -85,7 +85,10 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
     flattenForm: envelope.type !== 'TEMPLATE',
   });
 
-  const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
+  const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized, {
+    envelopeId: envelope.id,
+    fileName: data.file.name,
+  });
 
   // Upload the new PDF and get a new DocumentData record.
   const { documentData: newDocumentData, filePageCount } = await putPdfFileServerSide({
