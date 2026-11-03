@@ -62,26 +62,40 @@ export const DocumentVisibilityTooltip = () => {
         </h2>
 
         <p>
-          <Trans>The visibility of the document to the recipient.</Trans>
+          <Trans>
+            Controls which team members can view and access this document. The document owner and assigned recipients
+            will always have access.
+          </Trans>
         </p>
 
         <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
           <li>
             <Trans>
-              <strong>Everyone</strong> - Everyone can access and view the document
+              <strong>Everyone</strong> - Visible to you and all team members.
             </Trans>
           </li>
           <li>
             <Trans>
-              <strong>Managers and above</strong> - Only managers and above can access and view the document
+              <strong>Managers and above</strong> - Visible to you and team managers and admins.
             </Trans>
           </li>
           <li>
             <Trans>
-              <strong>Admins only</strong> - Only admins can access and view the document
+              <strong>Admins only</strong> - Visible to you and team admins.
             </Trans>
           </li>
         </ul>
+
+        <p>
+          <a
+            href="https://docs.documenso.com/docs/users/documents/advanced/document-visibility#examples"
+            target="_blank"
+            rel="noreferrer"
+            className="text-documenso-700 hover:text-documenso-600 hover:underline"
+          >
+            <Trans>Examples</Trans>
+          </a>
+        </p>
       </TooltipContent>
     </Tooltip>
   );
