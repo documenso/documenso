@@ -7,7 +7,7 @@ import { cn } from '../lib/utils';
 const badgeVariants = cva('inline-flex items-center rounded-md text-xs font-medium ring-1 ring-inset w-fit', {
   variants: {
     variant: {
-      neutral: 'bg-gray-50 text-gray-600 ring-gray-500/10 dark:bg-gray-400/10 dark:text-gray-400 dark:ring-gray-400/20',
+      neutral: 'bg-muted text-muted-foreground ring-border',
       destructive: 'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20',
       warning:
         'bg-yellow-50 text-yellow-800 ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20',
