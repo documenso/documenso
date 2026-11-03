@@ -21,6 +21,7 @@ import { deleteEnvelopeFieldRoute } from './envelope-fields/delete-envelope-fiel
 import { getEnvelopeFieldRoute } from './envelope-fields/get-envelope-field';
 import { getEnvelopeFieldSignaturesRoute } from './envelope-fields/get-envelope-field-signatures';
 import { updateEnvelopeFieldsRoute } from './envelope-fields/update-envelope-fields';
+import { createEnvelopeRecipient2FACodeRoute } from './envelope-recipients/create-envelope-recipient-2fa-code';
 import { createEnvelopeRecipientsRoute } from './envelope-recipients/create-envelope-recipients';
 import { deleteEnvelopeRecipientRoute } from './envelope-recipients/delete-envelope-recipient';
 import { getEnvelopeRecipientRoute } from './envelope-recipients/get-envelope-recipient';
@@ -74,6 +75,7 @@ export const envelopeRouter = router({
     set: setEnvelopeRecipientsRoute,
     report: reportRecipientRoute,
     rejectOnBehalfOf: rejectEnvelopeRecipientOnBehalfOfRoute,
+    create2FACode: createEnvelopeRecipient2FACodeRoute,
   },
   field: {
     get: getEnvelopeFieldRoute,

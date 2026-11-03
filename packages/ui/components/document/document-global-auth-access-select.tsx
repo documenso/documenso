@@ -95,6 +95,12 @@ export const DocumentGlobalAuthAccessTooltip = () => (
         </li>
         <li>
           <Trans>
+            <strong>Require external 2FA</strong> - The recipient must enter a code that you get through the API and
+            send to them, for example by SMS
+          </Trans>
+        </li>
+        <li>
+          <Trans>
             <strong>No restrictions</strong> - The document can be accessed directly by the URL sent to the recipient
           </Trans>
         </li>

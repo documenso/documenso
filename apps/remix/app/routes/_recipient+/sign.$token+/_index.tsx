@@ -121,7 +121,7 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
   const isAccessAuthValid = derivedRecipientAccessAuth.every((accesssAuth) =>
     match(accesssAuth)
       .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
-      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true) // Allow without account requirement
+      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, DocumentAccessAuth.EXTERNAL_TWO_FACTOR_AUTH, () => true) // Allow without account requirement
       .exhaustive(),
   );
 
@@ -235,7 +235,7 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
   const isAccessAuthValid = derivedRecipientAccessAuth.every((accesssAuth) =>
     match(accesssAuth)
       .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
-      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true) // Allow without account requirement
+      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, DocumentAccessAuth.EXTERNAL_TWO_FACTOR_AUTH, () => true) // Allow without account requirement
       .exhaustive(),
   );
 

@@ -295,7 +295,9 @@ export const DocumentSigningPageViewV1 = ({
                           fields={fields}
                           fieldsValidated={fieldsValidated}
                           disabled={!isRecipientsTurn}
-                          onSignatureComplete={async (nextSigner) => completeDocument({ nextSigner })}
+                          onSignatureComplete={async (nextSigner, accessAuthOptions) =>
+                            completeDocument({ nextSigner, accessAuthOptions })
+                          }
                           recipient={recipient}
                           allowDictateNextSigner={nextRecipient && documentMeta?.allowDictateNextSigner}
                           defaultNextSigner={
