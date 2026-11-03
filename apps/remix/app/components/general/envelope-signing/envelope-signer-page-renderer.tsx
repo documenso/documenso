@@ -18,7 +18,7 @@ import { createSpinner } from '@documenso/lib/universal/field-renderer/field-gen
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
+import { extractFullInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { EnvelopeRecipientFieldTooltip } from '@documenso/ui/components/document/envelope-recipient-field-tooltip';
 import { EnvelopeFieldToolTip } from '@documenso/ui/components/field/envelope-field-tooltip';
@@ -315,7 +315,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
          * INITIALS FIELD.
          */
         .with({ type: FieldType.INITIALS }, (field) => {
-          const initials = localFullName ? extractInitials(localFullName) : null;
+          const initials = localFullName ? extractFullInitials(localFullName) : null;
 
           void handleInitialsFieldClick({ field, initials })
             .then(async (payload) => {
