@@ -77,7 +77,7 @@ export const EditorFieldInitialsForm = ({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  <Trans>Font Style</Trans>
+                  <Trans>Font Family</Trans>
                 </FormLabel>
                 <FormControl>
                   <Select
@@ -97,7 +97,7 @@ export const EditorFieldInitialsForm = ({
                     }}
                   >
                     <SelectTrigger data-testid="field-form-fontFamily">
-                      <SelectValue placeholder={t`Select font style`} />
+                      <SelectValue placeholder={t`Select font family`} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="sans-serif">

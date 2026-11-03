@@ -79,7 +79,9 @@ const ZFieldMetaLetterSpacing = z.coerce
 const ZFieldMetaVerticalAlign = z.enum(['top', 'middle', 'bottom']).describe('The vertical alignment of the text');
 const ZFieldMetaFontFamily = z
   .enum(['sans-serif', 'handwriting'])
-  .describe('The font style of the text, handwriting uses a cursive font');
+  .describe(
+    'The font family of the text, handwriting uses a cursive font. Only applied on envelopes, legacy documents ignore this value.',
+  );
 
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
