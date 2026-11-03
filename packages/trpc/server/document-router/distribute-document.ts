@@ -37,6 +37,7 @@ export const distributeDocumentRoute = authenticatedProcedure
         timezone: meta.timezone,
         redirectUrl: meta.redirectUrl,
         distributionMethod: meta.distributionMethod,
+        includeAuditLog: meta.includeAuditLog,
         emailSettings: meta.emailSettings ?? undefined,
         language: meta.language,
         emailId: meta.emailId,

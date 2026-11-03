@@ -206,7 +206,7 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
     const usePlaywrightPdf = NEXT_PRIVATE_USE_PLAYWRIGHT_PDF();
 
     const needsCertificate = settings.includeSigningCertificate;
-    const needsAuditLog = settings.includeAuditLog;
+    const needsAuditLog = envelope.documentMeta.includeAuditLog;
 
     const newDocumentData: Array<{ oldDocumentDataId: string; newDocumentDataId: string }> = [];
 
