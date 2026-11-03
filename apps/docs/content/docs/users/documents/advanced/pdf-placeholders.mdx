@@ -109,6 +109,39 @@ You can customize fields by adding options after the recipient identifier:
 | `maxValue`     | Number        | Maximum allowed value |
 | `numberFormat` | Format string | Number display format |
 
+### Checkbox, Radio, and Dropdown Options
+
+| Option             | Values                                    | Description                                     |
+| ------------------ | ----------------------------------------- | ----------------------------------------------- |
+| `values`           | Options separated by `\|`                 | The choices shown in the field                  |
+| `options`          | Same as `values`                          | Alias for `values`. Use one or the other        |
+| `default`          | One of the options                        | Pre-selected option(s)                          |
+| `direction`        | `vertical`, `horizontal`                  | Layout of checkbox and radio options            |
+| `validationRule`   | `Select at least`, `Select exactly`, `Select at most` | Checkbox only: how many options to pick |
+| `validationLength` | Number                                    | Checkbox only: the number used by the rule      |
+
+```
+{{checkbox, r1, values=Option A|Option B|Option C, label=Select all that apply}}
+{{checkbox, r1, values=Email|Phone|Post, default=Email|Phone}}
+{{radio, r1, values=Yes|No, default=No, required=true}}
+{{dropdown, r1, values=Red|Green|Blue, default=Green}}
+```
+
+Each placeholder creates **one** field. A checkbox field contains one checkbox per option, a radio field
+lets the signer pick one option, and a dropdown lists the options. Checkbox `default` can list several
+options; radio and dropdown accept one.
+
+- **Commas:** quote the whole list when an option contains a comma, e.g. `values="Option A, detailed|Option B"`. Quoting individual options (`values="A"|"B"`) is not supported.
+- **Pipes:** write `\|` for a literal `|` inside an option, e.g. `values=Either\|Or|Neither`.
+- **Percent signs:** `\%` is read as `%`, so placeholders from LaTeX (`values=100\%|200\%`) work as written.
+- **Single-select checkboxes:** use `validationRule=Select at most, validationLength=1`, or use a radio field.
+
+<Callout type="warning">
+  The upload fails if an option list is empty, contains an empty or duplicated option, has an unclosed
+  quote, or has a `default` that is not one of the options. The error names the placeholder and its
+  page.
+</Callout>
+
 ### Examples with Options
 
 ```

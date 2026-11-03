@@ -5,6 +5,8 @@ import type { Recipient } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
+import { isOptionFieldType, parseOptionFieldMetaFromPlaceholder } from './placeholder-options';
+
 /**
  * Ensure all required fonts are registered in the skia-canvas FontLibrary.
  *
@@ -91,7 +93,7 @@ export const parseFieldMetaFromPlaceholder = (
 
   const fieldTypeString = String(fieldType).toLowerCase();
 
-  const parsedFieldMeta: Record<string, boolean | number | string> = {
+  const parsedFieldMeta: Record<string, unknown> = {
     type: fieldTypeString,
   };
 
@@ -104,13 +106,19 @@ export const parseFieldMetaFromPlaceholder = (
   const rawFieldMetaEntries = Object.entries(rawFieldMeta);
 
   for (const [property, value] of rawFieldMetaEntries) {
+    if (isOptionFieldType(fieldType) && (property === 'values' || property === 'options' || property === 'default')) {
+      // Parsed into the option list below.
+      continue;
+    }
+
     if (property === 'readOnly' || property === 'required') {
       parsedFieldMeta[property] = value === 'true';
     } else if (
       property === 'fontSize' ||
       property === 'maxValue' ||
       property === 'minValue' ||
-      property === 'characterLimit'
+      property === 'characterLimit' ||
+      property === 'validationLength'
     ) {
       const numValue = Number(value);
 
@@ -120,6 +128,10 @@ export const parseFieldMetaFromPlaceholder = (
     } else {
       parsedFieldMeta[property] = value;
     }
+  }
+
+  if (isOptionFieldType(fieldType)) {
+    Object.assign(parsedFieldMeta, parseOptionFieldMetaFromPlaceholder(rawFieldMeta, fieldType));
   }
 
   return parsedFieldMeta;
