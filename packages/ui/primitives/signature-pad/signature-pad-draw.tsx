@@ -6,7 +6,7 @@ import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
 import type { MouseEvent, PointerEvent, TouchEvent } from 'react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { cn } from '../../lib/utils';
 import { checkSignatureValidity, getSvgPathFromStroke } from './helper';
@@ -26,6 +26,7 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
 
   const $imageData = useRef<ImageData | null>(null);
   const $fileInput = useRef<HTMLInputElement>(null);
+  const $hasPressStartedOnPad = useRef(false);
 
   const [isPressed, setIsPressed] = useState(false);
   const [lines, setLines] = useState<Point[][]>([]);
@@ -58,6 +59,17 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
     const point = Point.fromEvent(event, SIGNATURE_CANVAS_DPI, $el.current);
 
     setCurrentLine([point]);
+  };
+
+  const onPointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
+    // Right and middle clicks can open a context menu that swallows pointerup, leaving the stroke stuck.
+    if (!event.isPrimary || event.button !== 0) {
+      return;
+    }
+
+    $hasPressStartedOnPad.current = true;
+
+    onMouseDown(event);
   };
 
   const onMouseMove = (event: MouseEvent | PointerEvent | TouchEvent) => {
@@ -147,7 +159,9 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
       event.preventDefault();
     }
 
-    if ('buttons' in event && event.buttons === 1) {
+    // A press can already be held when the pad mounts (e.g. the one that opened it), so only
+    // resume strokes that started on the pad.
+    if ($hasPressStartedOnPad.current && 'buttons' in event && event.buttons === 1) {
       onMouseDown(event);
     }
   };
@@ -181,6 +195,7 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
     setLines([]);
     setCurrentLine([]);
     setIsPressed(false);
+    setIsSignatureValid(null);
   };
 
   const onUndoClick = () => {
@@ -205,8 +220,25 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
       ctx?.fill(pathData);
     });
 
-    onChange?.($el.current.toDataURL());
+    const isValidSignature = checkSignatureValidity($el);
+    const isEmptySignature = newLines.length === 0 && !$imageData.current;
+
+    setIsSignatureValid(isEmptySignature ? null : isValidSignature);
+    onChange(isValidSignature ? $el.current.toDataURL() : '');
   };
+
+  useEffect(() => {
+    // Releasing outside the pad never reaches the canvas.
+    const onWindowPointerUp = () => {
+      $hasPressStartedOnPad.current = false;
+    };
+
+    window.addEventListener('pointerup', onWindowPointerUp);
+
+    return () => {
+      window.removeEventListener('pointerup', onWindowPointerUp);
+    };
+  }, []);
 
   unsafe_useEffectOnce(() => {
     if ($el.current) {
@@ -243,7 +275,7 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
         })}
         style={{ touchAction: 'none' }}
         onPointerMove={(event) => onMouseMove(event)}
-        onPointerDown={(event) => onMouseDown(event)}
+        onPointerDown={(event) => onPointerDown(event)}
         onPointerUp={(event) => onMouseUp(event)}
         onPointerLeave={(event) => onMouseLeave(event)}
         onPointerEnter={(event) => onMouseEnter(event)}
@@ -272,24 +304,12 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
         </button>
       </div>
 
-      {isSignatureValid === false && (
-        <div
-          className={cn('absolute bottom-4 left-4 flex gap-2 transition-opacity duration-100', {
-            'pointer-events-none opacity-0': isPressed,
-          })}
-        >
-          <span className="text-destructive text-xs">
-            <Trans>Signature is too small</Trans>
-          </span>
-        </div>
-      )}
-
-      {isSignatureValid && lines.length > 0 && (
-        <div
-          className={cn('absolute bottom-4 left-4 flex gap-2 transition-opacity duration-100', {
-            'pointer-events-none opacity-0': isPressed,
-          })}
-        >
+      <div
+        className={cn('absolute bottom-4 left-4 flex items-center gap-2 transition-opacity duration-100', {
+          'pointer-events-none opacity-0': isPressed,
+        })}
+      >
+        {lines.length > 0 && (
           <button
             type="button"
             title={t`Undo`}
@@ -301,8 +321,14 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
               <Trans>Undo</Trans>
             </span>
           </button>
-        </div>
-      )}
+        )}
+
+        {isSignatureValid === false && (
+          <span className="text-destructive text-xs">
+            <Trans>Signature is too small</Trans>
+          </span>
+        )}
+      </div>
     </div>
   );
 };
