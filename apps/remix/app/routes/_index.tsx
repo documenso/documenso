@@ -11,7 +11,8 @@ import type { Route } from './+types/_index';
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getOptionalSession(request);
 
-  if (session.isAuthenticated) {
+  // Embed sessions are rejected by the authenticated tree, so treat them as signed out here.
+  if (session.isAuthenticated && !session.session.isEmbed) {
     const teamUrlCookie = extractCookieFromHeaders(PREFERRED_TEAM_URL_COOKIE, request.headers);
 
     // const referrer = request.headers.get('referer');

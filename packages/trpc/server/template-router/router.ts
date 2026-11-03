@@ -608,6 +608,8 @@ export const templateRouter = router({
    * @private
    */
   createDocumentFromDirectTemplate: maybeAuthenticatedProcedure
+    // Embed direct-template signing relies on the session for `ACCOUNT` access auth.
+    .meta({ allowEmbedSession: true })
     // .meta({
     //   openapi: {
     //     method: 'POST',

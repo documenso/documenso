@@ -372,10 +372,24 @@ model Session {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  isEmbed Boolean @default(false)
+
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([sessionToken])
+}
+
+// Short-lived, nonce-keyed relay of a secret between two browsing contexts.
+// `id` is sha256(nonce), `type` is AUTH_HANDOFF_TYPE, `payload` is encrypted JSON.
+model AuthHandoff {
+  id        String   @id
+  type      String
+  payload   String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([expiresAt])
 }
 
 enum DocumentStatus {
@@ -836,6 +850,8 @@ model Organisation {
 
   monthlyStats OrganisationMonthlyStat[]
 
+  embedSignatures EmbedSignature[]
+
   avatarImage AvatarImage? @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
   ownerUserId Int
@@ -1261,6 +1277,26 @@ model OrganisationAuthenticationPortal {
 model Counter {
   id    String @id
   value Int
+}
+
+/// `key` is sha256(organisationId:lower(recipientEmail):clientUserId) so neither
+/// the recipient email nor the embedder's identifier is stored in plaintext.
+model EmbedSignature {
+  key       String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  /// Last writer. Not a relation so the row survives document deletion and
+  /// remains useful for abuse tracing.
+  recipientId Int
+
+  signature String
+
+  @@index([organisationId])
+  @@index([recipientId])
 }
 
 model RateLimit {

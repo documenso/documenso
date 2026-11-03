@@ -73,14 +73,19 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
     data,
     isLoading: isLogsLoading,
     isLoadingError: isLogsLoadingError,
-  } = trpc.webhook.calls.find.useQuery({
-    webhookId: params.id,
-    page: parsedSearchParams.page,
-    perPage: parsedSearchParams.perPage,
-    status: parsedSearchParams.status,
-    events: parsedSearchParams.events,
-    query: parsedSearchParams.query,
-  });
+  } = trpc.webhook.calls.find.useQuery(
+    {
+      webhookId: params.id,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+      status: parsedSearchParams.status,
+      events: parsedSearchParams.events,
+      query: parsedSearchParams.query,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({

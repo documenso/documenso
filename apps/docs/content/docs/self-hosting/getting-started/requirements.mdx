@@ -91,10 +91,11 @@ These services are not required but improve functionality or scalability:
 By default, Documenso stores documents in the PostgreSQL database. For production deployments with significant document volume, use S3-compatible storage:
 
 - Amazon S3
-- MinIO
 - Cloudflare R2
 - DigitalOcean Spaces
 - Any S3-compatible provider
+
+For self-hosted object storage, [SeaweedFS](https://github.com/seaweedfs/seaweedfs) and [RustFS](https://docs.rustfs.com/en/installation/container) are optional S3-compatible alternatives to evaluate. They are not bundled with Documenso; see [Self-Hosted Providers](/docs/self-hosting/configuration/storage#self-hosted-providers) for compatibility considerations.
 
 See [Storage Configuration](/docs/self-hosting/configuration/storage) for setup details.
 

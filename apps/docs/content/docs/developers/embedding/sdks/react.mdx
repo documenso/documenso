@@ -57,6 +57,16 @@ const SigningPage = ({ token }: { token: string }) => {
 };
 ```
 
+### Remembering a signer's signature (Platform Plan)
+
+Pass an opaque `clientUserId` to prefill and persist the signer's signature across your embeds. Never use an email
+address or other personal information here, it appears in request logs. See
+[Persisting Signatures](/docs/developers/embedding#persisting-signatures).
+
+```tsx
+<EmbedSignDocument token={token} clientUserId={user.id} />
+```
+
 ---
 
 ## Styling (Platform Plan)

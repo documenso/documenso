@@ -13,7 +13,6 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
     include: {
       apiTokens: true,
       webhooks: true,
-      passkeys: true,
       verificationTokens: true,
       passwordResetTokens: true,
     },
@@ -56,10 +55,6 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
         data: {
           expiry: new Date(),
         },
-      });
-
-      await tx.passkey.deleteMany({
-        where: { userId: id },
       });
     });
   } catch (error) {

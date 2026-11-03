@@ -7,11 +7,20 @@ declare namespace NodeJS {
     NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;
 
+    NEXT_PRIVATE_MICROSOFT_CLIENT_ID?: string;
+    NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET?: string;
+
     NEXT_PRIVATE_OIDC_WELL_KNOWN?: string;
     NEXT_PRIVATE_OIDC_CLIENT_ID?: string;
     NEXT_PRIVATE_OIDC_CLIENT_SECRET?: string;
     NEXT_PRIVATE_OIDC_PROVIDER_LABEL?: string;
     NEXT_PRIVATE_OIDC_SKIP_VERIFY?: string;
+
+    // Derived in `createPublicEnv()`; do not set manually.
+    NEXT_PUBLIC_GOOGLE_SSO_ENABLED?: 'true' | 'false';
+    NEXT_PUBLIC_MICROSOFT_SSO_ENABLED?: 'true' | 'false';
+    NEXT_PUBLIC_OIDC_SSO_ENABLED?: 'true' | 'false';
+    NEXT_PUBLIC_OIDC_PROVIDER_LABEL?: string;
 
     NEXT_PRIVATE_DATABASE_URL: string;
     NEXT_PRIVATE_ENCRYPTION_KEY: string;

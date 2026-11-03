@@ -26,6 +26,7 @@ import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
+import { shouldShowNewAccountWarning } from '../../../utils/sender-trust';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TProcessSigningReminderJobDefinition } from './process-signing-reminder';
 
@@ -185,6 +186,13 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
       `Sending signing reminder for envelope ${envelope.id} to recipient ${recipient.id} (${recipient.email})`,
     );
 
+    const showNewAccountWarning =
+      recipient.email !== envelope.user.email &&
+      shouldShowNewAccountWarning({
+        userCreatedAt: envelope.user.createdAt,
+        organisationClaim: claims,
+      });
+
     const template = createElement(DocumentReminderEmailTemplate, {
       recipientName: recipient.name,
       documentName: envelope.title,
@@ -193,6 +201,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
       customBody: emailMessage,
       role: recipient.role,
       reportUrl,
+      newAccountWarningSenderEmail: showNewAccountWarning ? envelope.user.email : undefined,
     });
 
     const [html, text] = await Promise.all([
