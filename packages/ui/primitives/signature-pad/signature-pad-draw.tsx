@@ -181,6 +181,7 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
     setLines([]);
     setCurrentLine([]);
     setIsPressed(false);
+    setIsSignatureValid(null);
   };
 
   const onUndoClick = () => {
@@ -205,7 +206,11 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
       ctx?.fill(pathData);
     });
 
-    onChange?.($el.current.toDataURL());
+    const isValidSignature = checkSignatureValidity($el);
+    const isEmptySignature = newLines.length === 0 && !$imageData.current;
+
+    setIsSignatureValid(isEmptySignature ? null : isValidSignature);
+    onChange(isValidSignature ? $el.current.toDataURL() : '');
   };
 
   unsafe_useEffectOnce(() => {
@@ -272,24 +277,12 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
         </button>
       </div>
 
-      {isSignatureValid === false && (
-        <div
-          className={cn('absolute bottom-4 left-4 flex gap-2 transition-opacity duration-100', {
-            'pointer-events-none opacity-0': isPressed,
-          })}
-        >
-          <span className="text-destructive text-xs">
-            <Trans>Signature is too small</Trans>
-          </span>
-        </div>
-      )}
-
-      {isSignatureValid && lines.length > 0 && (
-        <div
-          className={cn('absolute bottom-4 left-4 flex gap-2 transition-opacity duration-100', {
-            'pointer-events-none opacity-0': isPressed,
-          })}
-        >
+      <div
+        className={cn('absolute bottom-4 left-4 flex items-center gap-2 transition-opacity duration-100', {
+          'pointer-events-none opacity-0': isPressed,
+        })}
+      >
+        {lines.length > 0 && (
           <button
             type="button"
             title={t`Undo`}
@@ -301,8 +294,14 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
               <Trans>Undo</Trans>
             </span>
           </button>
-        </div>
-      )}
+        )}
+
+        {isSignatureValid === false && (
+          <span className="text-destructive text-xs">
+            <Trans>Signature is too small</Trans>
+          </span>
+        )}
+      </div>
     </div>
   );
 };
