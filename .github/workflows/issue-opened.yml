@@ -6,6 +6,8 @@ on:
 
 jobs:
   label_issues:
+    # The roadmap App opens issues for the public roadmap. These issues do not need triage.
+    if: github.event.issue.user.login != 'documenso-roadmap-sync[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
