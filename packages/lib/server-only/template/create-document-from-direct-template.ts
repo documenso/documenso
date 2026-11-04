@@ -1,7 +1,8 @@
+import type { AdminRuleEventTeam } from '@documenso/ee/server-only/admin-rules/admin-rule-event';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
-import type { Field, Signature } from '@prisma/client';
+import type { DocumentMeta, Envelope, Field, Recipient, Signature } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentSource,
@@ -41,19 +42,20 @@ import {
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
+import type { PositionedRecipient } from '../../utils/recipients';
 import {
   getRecipientsWithMissingFields,
   isRecipientBefore,
   sortRecipientsBySigningPosition,
 } from '../../utils/recipients';
-import { sendDocument } from '../document/send-document';
+import { assertAdminRulesAllowSend, getSigningRequestRecipients, sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { assignOmittedRecipientSigningOrders } from '../recipient/assign-omitted-recipient-signing-orders';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
-import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
+import { assertUserNotDisabled } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentFromDirectTemplateOptions = {
@@ -124,16 +126,24 @@ export const createDocumentFromDirectTemplate = async ({
           id: true,
           email: true,
           name: true,
+          createdAt: true,
+          twoFactorEnabled: true,
+          disabled: true,
         },
       },
       team: {
         select: {
+          id: true,
+          url: true,
           organisationId: true,
           organisation: {
             select: {
+              id: true,
+              type: true,
               organisationClaim: {
                 select: {
                   recipientCount: true,
+                  originalSubscriptionClaimId: true,
                 },
               },
             },
@@ -147,7 +157,9 @@ export const createDocumentFromDirectTemplate = async ({
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Invalid or missing template' });
   }
 
-  await assertSenderNotDisabled({ userId: directTemplateEnvelope.userId });
+  // Mirrors the check in `sendDocument`, which runs too late here: its errors are swallowed once the
+  // document has been created.
+  assertUserNotDisabled(directTemplateEnvelope.user);
 
   if (
     nextSigner &&
@@ -341,6 +353,31 @@ export const createDocumentFromDirectTemplate = async ({
 
   const directTemplateSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature !== null);
 
+  const envelopeId = prefixedId('envelope');
+
+  // Build a temporary envelope for admin rules checking before the actual document creation.
+  const temporaryEnvelopeForRules = buildEnvelopeForRules({
+    envelopeId,
+    directTemplateEnvelope,
+    signatureLevel,
+    derivedDocumentMeta,
+    nonDirectTemplateRecipients,
+    directTemplateRecipient,
+    directRecipientEmail,
+    nextSigner,
+    resolveSigningOrder,
+  });
+
+  // Checked before anything is created: `sendDocument` only runs once the document exists, and its
+  // errors are swallowed below. Also before the quota is reserved, since a reservation is never
+  // released and a blocked submission creates no document.
+  await assertAdminRulesAllowSend({
+    envelope: temporaryEnvelopeForRules,
+    sender: directTemplateEnvelope.user,
+    recipientsToNotify: getSigningRequestRecipients({ envelope: temporaryEnvelopeForRules }),
+    requestMetadata,
+  });
+
   // Enforce the organisation document-creation limit before creating the document.
   await assertOrganisationRatesAndLimits({
     organisationId: directTemplateEnvelope.team.organisationId,
@@ -390,7 +427,7 @@ export const createDocumentFromDirectTemplate = async ({
     // Create the envelope and non direct template recipients.
     const createdEnvelope = await tx.envelope.create({
       data: {
-        id: prefixedId('envelope'),
+        id: envelopeId,
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
         internalVersion: directTemplateEnvelope.internalVersion,
@@ -714,18 +751,7 @@ export const createDocumentFromDirectTemplate = async ({
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       });
 
-      const nextRecipients = getRecipientsInActiveSigningStep(pendingRecipients);
-
-      // The direct recipient can share a step with other recipients (a signing
-      // group). Those peers are still pending, so without this check they would
-      // look like the "next" step and be dictated over — dictation may only
-      // affect a strictly later step.
-      const hasCompletedCurrentStep = nextRecipients.every((pendingRecipient) =>
-        isRecipientBefore(createdDirectRecipient, pendingRecipient),
-      );
-
-      // Dictation can only apply when the next step is a single recipient.
-      const nextRecipient = hasCompletedCurrentStep && nextRecipients.length === 1 ? nextRecipients[0] : null;
+      const nextRecipient = getDictatableNextRecipient(pendingRecipients, createdDirectRecipient);
 
       if (nextRecipient && documentMeta.allowDictateNextSigner) {
         auditLogsToCreate.push(
@@ -817,6 +843,8 @@ export const createDocumentFromDirectTemplate = async ({
       },
       userId: createdEnvelope.userId,
       teamId: createdEnvelope.teamId,
+      // The admin rules were checked before the document was created.
+      bypassAdminRules: true,
       requestMetadata,
     });
 
@@ -850,4 +878,91 @@ export const createDocumentFromDirectTemplate = async ({
     documentId: incrementedDocumentId.documentId,
     recipientId,
   };
+};
+
+type BuildEnvelopeForRulesOptions = {
+  envelopeId: string;
+  directTemplateEnvelope: Pick<Envelope, 'title'> & {
+    team: AdminRuleEventTeam;
+  };
+  signatureLevel: Envelope['signatureLevel'];
+  derivedDocumentMeta: Pick<
+    DocumentMeta,
+    'subject' | 'message' | 'signingOrder' | 'emailSettings' | 'distributionMethod' | 'allowDictateNextSigner'
+  >;
+  nonDirectTemplateRecipients: Pick<Recipient, 'id' | 'email' | 'role'>[];
+  directTemplateRecipient: Pick<Recipient, 'id' | 'role'>;
+  directRecipientEmail: string;
+  nextSigner?: Pick<Recipient, 'email'>;
+  resolveSigningOrder: (templateRecipientId: number) => number | null;
+};
+
+/**
+ * The document a direct-link submission will create, as the admin rules see it. Built before anything
+ * is created, so the rules can block the submission first.
+ */
+const buildEnvelopeForRules = ({
+  envelopeId,
+  directTemplateEnvelope,
+  signatureLevel,
+  derivedDocumentMeta,
+  nonDirectTemplateRecipients,
+  directTemplateRecipient,
+  directRecipientEmail,
+  nextSigner,
+  resolveSigningOrder,
+}: BuildEnvelopeForRulesOptions) => {
+  const otherRecipients = nonDirectTemplateRecipients.map((recipient) => ({
+    email: recipient.email,
+    role: recipient.role,
+    signingOrder: resolveSigningOrder(recipient.id),
+    signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+    sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
+  }));
+
+  const directRecipient = {
+    email: directRecipientEmail,
+    role: directTemplateRecipient.role,
+    signingOrder: resolveSigningOrder(directTemplateRecipient.id),
+    signingStatus: SigningStatus.SIGNED,
+    sendStatus: SendStatus.SENT,
+  };
+
+  // If the visitor dictates the next signer, that recipient ends up with the email they entered.
+  if (nextSigner && derivedDocumentMeta.allowDictateNextSigner) {
+    const dictatedRecipient = getDictatableNextRecipient(otherRecipients, directRecipient);
+
+    if (dictatedRecipient) {
+      dictatedRecipient.email = nextSigner.email;
+    }
+  }
+
+  return {
+    id: envelopeId,
+    title: directTemplateEnvelope.title,
+    source: DocumentSource.TEMPLATE_DIRECT_LINK,
+    signatureLevel,
+    documentMeta: derivedDocumentMeta,
+    recipients: [...otherRecipients, directRecipient],
+    team: directTemplateEnvelope.team,
+  };
+};
+
+/**
+ * The recipient the direct recipient may dictate: the only recipient in the next signing step.
+ */
+const getDictatableNextRecipient = <T extends Pick<Recipient, 'role' | 'signingStatus'> & PositionedRecipient>(
+  recipients: T[],
+  directRecipient: PositionedRecipient,
+) => {
+  const nextRecipients = getRecipientsInActiveSigningStep(recipients);
+
+  // The direct recipient can share a step with other recipients (a signing
+  // group). Those peers are still pending, so without this check they would
+  // look like the "next" step and be dictated over — dictation may only
+  // affect a strictly later step.
+  const hasCompletedCurrentStep = nextRecipients.every((recipient) => isRecipientBefore(directRecipient, recipient));
+
+  // Dictation can only apply when the next step is a single recipient.
+  return hasCompletedCurrentStep && nextRecipients.length === 1 ? nextRecipients[0] : null;
 };

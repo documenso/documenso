@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import DocumentInviteEmailTemplate from '@documenso/email/templates/document-invite';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
@@ -42,6 +43,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
         email: true,
         name: true,
         createdAt: true,
+        twoFactorEnabled: true,
       },
     }),
     prisma.envelope.findFirstOrThrow({
@@ -64,6 +66,8 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
         },
         team: {
           select: {
+            id: true,
+            url: true,
             teamEmail: true,
             name: true,
           },
@@ -114,6 +118,56 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
   // Don't send signing invitations if the organisation has email sending disabled or the owner is disabled (e.g. banned).
   if (envelope.user.disabled || emailsDisabled) {
     return;
+  }
+
+  // Every email that goes out is checked against what's sent now, even when the send that queued it
+  // checked it already, since the recipient or the document can change in between.
+  if (isRecipientEmailValidForSending(recipient)) {
+    // Keyed by the address, so a retry reuses the result unless the address changed in between.
+    const adminRuleResult = await io.runTask(`check-admin-rules-${recipient.email}`, async () => {
+      const recipients = await prisma.recipient.findMany({
+        where: {
+          envelopeId: envelope.id,
+        },
+        select: {
+          email: true,
+        },
+      });
+
+      const adminRuleEngine = new AdminRuleEngine();
+
+      const result = await adminRuleEngine.run({
+        trigger: 'EMAIL_SENT',
+        envelope: {
+          ...envelope,
+          recipients,
+          team: {
+            id: team.id,
+            url: team.url,
+            organisation: {
+              id: organisationId,
+              type: organisationType,
+              organisationClaim: claims,
+            },
+          },
+        },
+        sender: user,
+        emailType: 'signing_request',
+        recipients: [recipient],
+      });
+
+      return {
+        isBlocked: result.isBlocked,
+        hasDisabledEmails: result.hasDisabledEmails,
+      };
+    });
+
+    // A rule that turns off the organisation's emails stops this email too, as if they were already off.
+    if (adminRuleResult.isBlocked || adminRuleResult.hasDisabledEmails) {
+      io.logger.info(`Signing email for recipient ${recipient.id} stopped by an admin rule`);
+
+      return;
+    }
   }
 
   const customEmail = envelope?.documentMeta;

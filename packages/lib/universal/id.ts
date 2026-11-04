@@ -32,7 +32,10 @@ type DatabaseIdPrefix =
   | 'member_invite'
   | 'group_member'
   | 'team_group'
-  | 'team_setting';
+  | 'team_setting'
+  | 'admin_rule'
+  | 'admin_rule_match'
+  | 'admin_tag';
 
 export const generateDatabaseId = (prefix: DatabaseIdPrefix) => prefixedId(prefix, 16);
 

@@ -178,18 +178,6 @@ export const adminDeleteRecipient = async ({ recipientId, reason, requestMetadat
     return deletedRecipient;
   }
 
-  await prisma.recipient.updateMany({
-    where: {
-      id: {
-        in: recipientsToSend.map((recipient) => recipient.id),
-      },
-    },
-    data: {
-      sendStatus: SendStatus.SENT,
-      sentAt: new Date(),
-    },
-  });
-
   await Promise.allSettled(
     recipientsToSend.map(async (recipient) =>
       jobs.triggerJob({

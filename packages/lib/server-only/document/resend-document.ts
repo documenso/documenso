@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -18,7 +19,6 @@ import {
   WebhookTriggerEvents,
 } from '@prisma/client';
 import { createElement } from 'react';
-
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
@@ -55,6 +55,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
       name: true,
       disabled: true,
       createdAt: true,
+      twoFactorEnabled: true,
     },
   });
 
@@ -76,13 +77,18 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
       documentMeta: true,
       team: {
         select: {
+          id: true,
+          url: true,
           teamEmail: true,
           name: true,
           organisation: {
             select: {
+              id: true,
+              type: true,
               organisationClaim: {
                 select: {
                   recipientCount: true,
+                  originalSubscriptionClaimId: true,
                 },
               },
             },
@@ -130,6 +136,45 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
       recipient.role !== RecipientRole.CC,
   );
 
+  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+    envelope.documentMeta,
+  ).recipientSigningRequest;
+
+  const emailContext = isRecipientSigningRequestEmailEnabled
+    ? await getEmailContext({
+        emailType: 'RECIPIENT',
+        source: {
+          type: 'team',
+          teamId: envelope.teamId,
+        },
+        meta: envelope.documentMeta,
+      })
+    : null;
+
+  // Don't resend any emails if signing request emails are off or the organisation has email sending disabled.
+  const shouldSendEmails = emailContext !== null && !user.disabled && !emailContext.emailsDisabled;
+
+  // Recipients without an email address aren't emailed, so the "Email sent" rules leave them out.
+  const validRecipients = recipientsToRemind.filter((recipient) => isRecipientEmailValidForSending(recipient));
+
+  const adminRuleEngine = new AdminRuleEngine({
+    requestMetadata: requestMetadata.requestMetadata,
+    requestSource: requestMetadata.source,
+  });
+
+  // Rules run before anything is written, so a blocked resend leaves the signing links, the
+  // reminder cycle and the email quota untouched.
+  const adminRuleResult =
+    shouldSendEmails && validRecipients.length > 0
+      ? await adminRuleEngine.runAndAssert({
+          trigger: 'EMAIL_SENT',
+          envelope,
+          sender: user,
+          emailType: 'reminder',
+          recipients: validRecipients,
+        })
+      : null;
+
   if (expiresAt && recipientsToRemind.length > 0) {
     await prisma.recipient.updateMany({
       where: {
@@ -160,11 +205,8 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     ),
   );
 
-  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).recipientSigningRequest;
-
-  if (!isRecipientSigningRequestEmailEnabled) {
+  // A rule that turns off the organisation's emails stops these emails too, as if they were already off.
+  if (!shouldSendEmails || adminRuleResult?.hasDisabledEmails) {
     return envelope;
   }
 
@@ -177,21 +219,8 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     replyToEmail,
     organisationId,
     claims,
-    emailsDisabled,
     emailTransport,
-  } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId: envelope.teamId,
-    },
-    meta: envelope.documentMeta,
-  });
-
-  // Don't resend any emails if the organisation has email sending disabled.
-  if (user.disabled || emailsDisabled) {
-    return envelope;
-  }
+  } = emailContext;
 
   // Assert that there is enough quota to send the emails.
   await assertOrganisationRatesAndLimits({

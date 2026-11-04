@@ -1,4 +1,5 @@
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { ZNameSchema } from '@documenso/lib/types/name';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -63,6 +64,18 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
         duration: 5000,
       });
     } catch (err) {
+      const error = AppError.parseError(err);
+
+      if (error.code === 'ADMIN_RULE_BLOCKED') {
+        toast({
+          title: _(msg`Profile update blocked`),
+          description: _(msg`This change is blocked. Please contact support if you believe this is a mistake.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
+
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(

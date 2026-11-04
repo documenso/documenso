@@ -16,7 +16,6 @@ import {
   type DocumentDataType,
   EnvelopeType,
   RecipientRole,
-  SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
@@ -485,14 +484,6 @@ export const executeTspSign = async (opts: ExecuteTspSignOptions): Promise<Execu
     // fires when pending recipients exist. No `nextSigner` dictation path
     // — `prepareCscRecipientSigning` doesn't accept one.
     const [nextRecipient] = pendingRecipients;
-
-    await prisma.recipient.update({
-      where: { id: nextRecipient.id },
-      data: {
-        sendStatus: SendStatus.SENT,
-        sentAt: new Date(),
-      },
-    });
 
     await jobs.triggerJob({
       name: 'send.signing.requested.email',

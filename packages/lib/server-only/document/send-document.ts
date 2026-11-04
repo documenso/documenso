@@ -1,3 +1,8 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
+import type {
+  AdminRuleEventEnvelope,
+  AdminRuleEventUser,
+} from '@documenso/ee/server-only/admin-rules/admin-rule-event';
 import { materializeTspAnchorsForEnvelope } from '@documenso/ee/server-only/signing/csc/materialize-anchors';
 import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -5,7 +10,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
-import type { DocumentData, Envelope, EnvelopeItem, Field, Recipient } from '@prisma/client';
+import type { DocumentData, DocumentMeta, Envelope, EnvelopeItem, Field, Recipient } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentStatus,
@@ -42,7 +47,7 @@ import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
-import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
+import { assertUserNotDisabled } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type SendDocumentOptions = {
@@ -50,14 +55,48 @@ export type SendDocumentOptions = {
   userId: number;
   teamId: number;
   sendEmail?: boolean;
+  /**
+   * Skips the admin rules here, for callers that already ran them for this document, as direct links
+   * do. The signing email jobs still check each email when they send it.
+   */
+  bypassAdminRules?: boolean;
   requestMetadata: ApiRequestMetadata;
 };
 
-export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetadata }: SendDocumentOptions) => {
+export const sendDocument = async ({
+  id,
+  userId,
+  teamId,
+  sendEmail,
+  bypassAdminRules,
+  requestMetadata,
+}: SendDocumentOptions) => {
+  // One lookup for both the disabled check and the sender the admin rules see.
+  const sender = await prisma.user.findFirst({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      createdAt: true,
+      twoFactorEnabled: true,
+      disabled: true,
+    },
+  });
+
+  if (!sender) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'User not found',
+      statusCode: 404,
+    });
+  }
+
   // Refuse to send on behalf of a disabled account. Guards distribute /
   // redistribute / template-use routes, the bulk-send job, and direct
   // templates that auto-send on creation.
-  await assertUserNotDisabledById({ userId });
+  assertUserNotDisabled(sender);
 
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
@@ -89,11 +128,16 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
       },
       team: {
         select: {
+          id: true,
+          url: true,
           organisation: {
             select: {
+              id: true,
+              type: true,
               organisationClaim: {
                 select: {
                   recipientCount: true,
+                  originalSubscriptionClaimId: true,
                 },
               },
             },
@@ -127,7 +171,7 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
-  let signingOrder = envelope.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
+  const signingOrder = envelope.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
   if (isTspEnvelope(envelope) && signingOrder === DocumentSigningOrder.PARALLEL && envelope.documentMeta) {
     console.warn(
@@ -143,17 +187,7 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
       },
     });
 
-    signingOrder = DocumentSigningOrder.SEQUENTIAL;
-
     envelope.documentMeta.signingOrder = DocumentSigningOrder.SEQUENTIAL;
-  }
-
-  let recipientsToNotify = envelope.recipients;
-
-  if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-    recipientsToNotify = getRecipientsInActiveSigningStep(envelope.recipients, {
-      strictlySequential: isTspEnvelope(envelope),
-    });
   }
 
   if (envelope.envelopeItems.length === 0) {
@@ -197,6 +231,12 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     throw new AppError(AppErrorCode.MISSING_SIGNATURE_FIELD, {
       message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
     });
+  }
+
+  const recipientsToNotify = getSigningRequestRecipients({ envelope, sendEmail });
+
+  if (!bypassAdminRules) {
+    await assertAdminRulesAllowSend({ envelope, sender, recipientsToNotify, requestMetadata });
   }
 
   const allRecipientsHaveNoActionToTake = envelope.recipients.every(
@@ -332,32 +372,19 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     });
   });
 
-  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).recipientSigningRequest;
-
-  // Only send email if one of the following is true:
-  // - It is explicitly set
-  // - The email is enabled for signing requests AND sendEmail is undefined
-  if (sendEmail || (isRecipientSigningRequestEmailEnabled && sendEmail === undefined)) {
-    await Promise.all(
-      recipientsToNotify.map(async (recipient) => {
-        if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
-          return;
-        }
-
-        await jobs.triggerJob({
-          name: 'send.signing.requested.email',
-          payload: {
-            userId,
-            documentId: legacyDocumentId,
-            recipientId: recipient.id,
-            requestMetadata: requestMetadata?.requestMetadata,
-          },
-        });
-      }),
-    );
-  }
+  await Promise.all(
+    recipientsToNotify.map(async (recipient) => {
+      await jobs.triggerJob({
+        name: 'send.signing.requested.email',
+        payload: {
+          userId,
+          documentId: legacyDocumentId,
+          recipientId: recipient.id,
+          requestMetadata: requestMetadata?.requestMetadata,
+        },
+      });
+    }),
+  );
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SENT,
@@ -367,6 +394,90 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
   });
 
   return updatedEnvelope;
+};
+
+type SigningRequestRecipient = Pick<Recipient, 'role' | 'signingOrder' | 'signingStatus' | 'sendStatus'>;
+
+type GetSigningRequestRecipientsOptions<T extends SigningRequestRecipient> = {
+  envelope: Pick<Envelope, 'signatureLevel'> & {
+    recipients: T[];
+    documentMeta: Pick<DocumentMeta, 'signingOrder' | 'emailSettings' | 'distributionMethod'> | null;
+  };
+  sendEmail?: boolean;
+};
+
+/**
+ * The recipients `sendDocument` emails a signing request to: those in the active signing step who
+ * haven't been sent one. Empty when signing request emails are off.
+ */
+export const getSigningRequestRecipients = <T extends SigningRequestRecipient>({
+  envelope,
+  sendEmail,
+}: GetSigningRequestRecipientsOptions<T>) => {
+  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+    envelope.documentMeta,
+  ).recipientSigningRequest;
+
+  // Only send email if one of the following is true:
+  // - It is explicitly set
+  // - The email is enabled for signing requests AND sendEmail is undefined
+  const shouldSendEmails = sendEmail || (isRecipientSigningRequestEmailEnabled && sendEmail === undefined);
+
+  if (!shouldSendEmails) {
+    return [];
+  }
+
+  const recipientsInActiveStep =
+    envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL
+      ? getRecipientsInActiveSigningStep(envelope.recipients, {
+          strictlySequential: isTspEnvelope(envelope),
+        })
+      : envelope.recipients;
+
+  return recipientsInActiveStep.filter(
+    (recipient) => recipient.sendStatus !== SendStatus.SENT && recipient.role !== RecipientRole.CC,
+  );
+};
+
+type AssertAdminRulesAllowSendOptions = {
+  envelope: AdminRuleEventEnvelope;
+  sender: AdminRuleEventUser;
+  recipientsToNotify: Pick<Recipient, 'email'>[];
+  requestMetadata: ApiRequestMetadata;
+};
+
+/**
+ * Runs the "Document sent" rules, then the "Email sent" rules for the signing requests about to go
+ * out, and throws `ADMIN_RULE_BLOCKED` if either blocks. A rule that turns off the organisation's
+ * emails needs no handling here: the signing email jobs check that setting when they run.
+ */
+export const assertAdminRulesAllowSend = async ({
+  envelope,
+  sender,
+  recipientsToNotify,
+  requestMetadata,
+}: AssertAdminRulesAllowSendOptions) => {
+  const adminRuleEngine = new AdminRuleEngine({
+    requestMetadata: requestMetadata.requestMetadata,
+    requestSource: requestMetadata.source,
+  });
+
+  await adminRuleEngine.runAndAssert({ trigger: 'DOCUMENT_SENT', envelope, sender });
+
+  // Recipients without an email address aren't emailed, so the "Email sent" rules leave them out.
+  const recipientsToEmail = recipientsToNotify.filter((recipient) => isRecipientEmailValidForSending(recipient));
+
+  if (recipientsToEmail.length === 0) {
+    return;
+  }
+
+  await adminRuleEngine.runAndAssert({
+    trigger: 'EMAIL_SENT',
+    envelope,
+    sender,
+    emailType: 'signing_request',
+    recipients: recipientsToEmail,
+  });
 };
 
 const injectFormValuesIntoDocument = async (

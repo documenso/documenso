@@ -25,6 +25,30 @@ const expectSigningRequestJobCount = async (recipientId: number, expected: numbe
   expect(jobs.length).toBe(expected);
 };
 
+// The signing email job marks the recipient as sent once it has run on the app server.
+const expectRecipientToBeSent = async (recipientId: number) => {
+  await expect
+    .poll(
+      async () => {
+        const recipient = await prisma.recipient.findUniqueOrThrow({
+          where: {
+            id: recipientId,
+          },
+        });
+
+        return {
+          sendStatus: recipient.sendStatus,
+          hasSentAt: recipient.sentAt !== null,
+        };
+      },
+      { timeout: 15_000 },
+    )
+    .toEqual({
+      sendStatus: SendStatus.SENT,
+      hasSentAt: true,
+    });
+};
+
 const seedLegacySequentialDocument = async (options: {
   signingOrders: Array<number | null>;
   signatureLevel?: string;
@@ -69,11 +93,14 @@ test('[LEGACY_UNORDERED]: unordered recipients take turns by id and are invited 
     id: { type: 'envelopeId', id: first.envelopeId },
   });
 
-  const secondAfter = await prisma.recipient.findUniqueOrThrow({ where: { id: second.id } });
-  const thirdAfter = await prisma.recipient.findUniqueOrThrow({ where: { id: third.id } });
-
-  expect(secondAfter.sendStatus).toBe(SendStatus.SENT);
   await expectSigningRequestJobCount(second.id, 1);
+  await expectRecipientToBeSent(second.id);
+
+  const thirdAfter = await prisma.recipient.findUniqueOrThrow({
+    where: {
+      id: third.id,
+    },
+  });
 
   expect(thirdAfter.sendStatus).toBe(SendStatus.NOT_SENT);
   await expectSigningRequestJobCount(third.id, 0);
@@ -121,9 +148,7 @@ test('[LEGACY_UNORDERED]: an AES envelope sequences a legacy duplicate order one
     id: { type: 'envelopeId', id: first.envelopeId },
   });
 
-  const secondAfter = await prisma.recipient.findUniqueOrThrow({ where: { id: second.id } });
-
-  expect(secondAfter.sendStatus).toBe(SendStatus.SENT);
   await expectSigningRequestJobCount(second.id, 1);
+  await expectRecipientToBeSent(second.id);
   expect(await getIsRecipientsTurnToSign({ token: second.token })).toBe(true);
 });

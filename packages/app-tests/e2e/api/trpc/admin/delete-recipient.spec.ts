@@ -344,10 +344,28 @@ test('[ADMIN][TRPC][DELETE_RECIPIENT]: sequential signing advances to the next r
 
   expect(res.ok()).toBeTruthy();
 
-  const updatedSecond = await prisma.recipient.findUniqueOrThrow({ where: { id: second.id } });
-  expect(updatedSecond.sendStatus).toBe(SendStatus.SENT);
+  // The signing email job marks the next recipient as sent once it has run on the app server.
+  await expect
+    .poll(
+      async () => {
+        const updatedSecond = await prisma.recipient.findUniqueOrThrow({
+          where: {
+            id: second.id,
+          },
+        });
 
-  const updatedThird = await prisma.recipient.findUniqueOrThrow({ where: { id: third.id } });
+        return updatedSecond.sendStatus;
+      },
+      { timeout: 15_000 },
+    )
+    .toBe(SendStatus.SENT);
+
+  const updatedThird = await prisma.recipient.findUniqueOrThrow({
+    where: {
+      id: third.id,
+    },
+  });
+
   expect(updatedThird.sendStatus).toBe(SendStatus.NOT_SENT);
 
   const signingJob = await prisma.backgroundJob.findFirst({

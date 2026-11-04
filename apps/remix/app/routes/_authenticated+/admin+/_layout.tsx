@@ -1,4 +1,5 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { IS_DOCUMENSO_CLOUD } from '@documenso/lib/constants/app';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { cn } from '@documenso/ui/lib/utils';
@@ -16,6 +17,7 @@ import {
   Trophy,
   Users,
   Wallet2,
+  WorkflowIcon,
 } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 
@@ -180,6 +182,19 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
               <Trans>Organisation Stats</Trans>
             </Link>
           </Button>
+
+          {IS_DOCUMENSO_CLOUD() && (
+            <Button
+              variant="ghost"
+              className={cn('justify-start md:w-full', pathname?.startsWith('/admin/rules') && 'bg-secondary')}
+              asChild
+            >
+              <Link to="/admin/rules">
+                <WorkflowIcon className="mr-2 h-5 w-5" />
+                <Trans>Rules</Trans>
+              </Link>
+            </Button>
+          )}
 
           <Button
             variant="ghost"
