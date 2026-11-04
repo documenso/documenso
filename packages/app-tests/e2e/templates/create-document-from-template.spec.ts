@@ -1,9 +1,9 @@
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
-import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
+import { seedBlankTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { DocumentDataType, TeamMemberRole } from '@prisma/client';
 import path from 'path';
 
@@ -300,6 +300,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
     process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3' ? DocumentDataType.S3_PATH : DocumentDataType.BYTES_64;
 
   expect(document.title).toEqual('TEMPLATE_WITH_CUSTOM_DOC');
+  expect(document.envelopeItems[0].title).toEqual('field-font-alignment');
   expect(firstDocumentData.type).toEqual(expectedDocumentDataType);
 
   if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
@@ -312,6 +313,78 @@ test('[TEMPLATE]: should create a document from a template with custom document'
     expect(firstDocumentData.data).toBeTruthy();
     expect(firstDocumentData.initialData).toBeTruthy();
   }
+});
+
+const openUseTemplateDialog = async (page: Page) => {
+  const { user, team } = await seedUser();
+
+  const template = await seedTemplate({
+    title: 'Agency Agreement Template',
+    userId: user.id,
+    teamId: team.id,
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/t/${team.url}/templates`,
+  });
+
+  await page.getByRole('button', { name: 'Use Template' }).click();
+  await expect(page.getByRole('heading', { name: 'Create document from template' })).toBeVisible();
+
+  return { team, template };
+};
+
+test('[TEMPLATE]: should give the file the custom document name when using a custom document', async ({ page }) => {
+  const { team, template } = await openUseTemplateDialog(page);
+
+  await page.getByLabel('Upload custom document').check();
+
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.locator(`#template-use-dialog-file-input-${template.envelopeItems[0].id}`).evaluate((e) => {
+      if (e instanceof HTMLInputElement) {
+        e.click();
+      }
+    }),
+  ]);
+
+  await fileChooser.setFiles(FIELD_ALIGNMENT_TEST_PDF_PATH);
+  await expect(page.getByText('Remove')).toBeVisible();
+
+  await page.getByLabel('Enter custom document name').click();
+  await page.getByRole('textbox', { name: 'Custom document name' }).fill('Wilson Agreement');
+
+  await page.getByRole('button', { name: 'Create as draft' }).click();
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
+
+  const document = await prisma.envelope.findFirstOrThrow({
+    where: { id: page.url().split('/').pop() },
+    include: { envelopeItems: true },
+  });
+
+  expect(document.title).toEqual('Wilson Agreement');
+  expect(document.envelopeItems[0].title).toEqual('Wilson Agreement');
+});
+
+test('[TEMPLATE]: should give the file the custom document name without a custom document', async ({ page }) => {
+  const { team, template } = await openUseTemplateDialog(page);
+
+  await page.getByLabel('Enter custom document name').click();
+  await page.getByRole('textbox', { name: 'Custom document name' }).fill('Wilson Agreement');
+
+  await page.getByRole('button', { name: 'Create as draft' }).click();
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
+
+  const document = await prisma.envelope.findFirstOrThrow({
+    where: { id: page.url().split('/').pop() },
+    include: { envelopeItems: { include: { documentData: true } } },
+  });
+
+  expect(document.title).toEqual('Wilson Agreement');
+  expect(document.envelopeItems[0].title).toEqual('Wilson Agreement');
+  expect(document.envelopeItems[0].documentData.initialData).toEqual(template.envelopeItems[0].documentData.data);
 });
 
 /**
@@ -396,6 +469,7 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
 
   expect(document.teamId).toEqual(team.id);
   expect(document.title).toEqual('TEAM_TEMPLATE_WITH_CUSTOM_DOC');
+  expect(document.envelopeItems[0].title).toEqual('field-font-alignment');
   expect(firstDocumentData.type).toEqual(expectedDocumentDataType);
 
   if (expectedDocumentDataType === DocumentDataType.BYTES_64) {

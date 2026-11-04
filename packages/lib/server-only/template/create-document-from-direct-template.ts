@@ -39,7 +39,7 @@ import {
   createRecipientAuthOptions,
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
-import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { mapSecondaryIdToTemplateId, removePdfExtension } from '../../utils/envelope';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import {
   getRecipientsWithMissingFields,
@@ -373,7 +373,7 @@ export const createDocumentFromDirectTemplate = async ({
 
       return {
         id: newEnvelopeItemId,
-        title: titleToUse.endsWith('.pdf') ? titleToUse.slice(0, -4) : titleToUse,
+        title: removePdfExtension(titleToUse),
         documentDataId: newDocumentData.id,
         order: item.order !== undefined ? item.order : i + 1,
       };

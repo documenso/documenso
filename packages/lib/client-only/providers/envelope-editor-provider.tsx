@@ -33,6 +33,8 @@ export type EnvelopeEditorStep = 'upload' | 'addFields' | 'preview';
 
 type UpdateEnvelopePayload = Pick<TUpdateEnvelopeRequest, 'data' | 'meta'>;
 
+type EnvelopeItemTitleHandler = (envelopeItemId: string, title: string) => void;
+
 type SetRecipientsPayload = (TSetEnvelopeRecipientsRequest['recipients'][number] & {
   /**
    * Stable client-side key for the signer row, echoed to the server as
@@ -85,6 +87,13 @@ type EnvelopeEditorProviderValue = {
 
   registerExternalFlush: (key: string, flush: () => Promise<void>) => () => void;
   registerPendingMutation: (promise: Promise<unknown>) => void;
+
+  /**
+   * Renames an envelope item. While the upload step is mounted it keeps its own copy of the item
+   * titles, so the rename goes through its handler and autosave instead of being saved directly.
+   */
+  updateEnvelopeItemTitle: (envelopeItemId: string, title: string) => Promise<void>;
+  registerEnvelopeItemTitleHandler: (handler: EnvelopeItemTitleHandler) => () => void;
 
   organisationEmails?: { id: string; email: string }[];
 };
@@ -234,6 +243,18 @@ export const EnvelopeEditorProvider = ({
     });
   }, []);
 
+  const envelopeItemTitleHandlerRef = useRef<EnvelopeItemTitleHandler | null>(null);
+
+  const registerEnvelopeItemTitleHandler = useCallback((handler: EnvelopeItemTitleHandler) => {
+    envelopeItemTitleHandlerRef.current = handler;
+
+    return () => {
+      if (envelopeItemTitleHandlerRef.current === handler) {
+        envelopeItemTitleHandlerRef.current = null;
+      }
+    };
+  }, []);
+
   const isEmbedded = editorConfig.embedded !== undefined;
 
   const editorFields = useEditorFields({
@@ -248,6 +269,7 @@ export const EnvelopeEditorProvider = ({
   const setRecipientsMutation = trpc.envelope.recipient.set.useMutation();
   const setFieldsMutation = trpc.envelope.field.set.useMutation();
   const updateEnvelopeMutation = trpc.envelope.update.useMutation();
+  const updateEnvelopeItemsMutation = trpc.envelope.item.updateMany.useMutation();
 
   /**
    * Handles debouncing the recipients updates to the server.
@@ -585,6 +607,28 @@ export const EnvelopeEditorProvider = ({
     return getEnvelope();
   };
 
+  const updateEnvelopeItemTitle = async (envelopeItemId: string, title: string) => {
+    const handler = envelopeItemTitleHandlerRef.current;
+
+    if (handler) {
+      handler(envelopeItemId, title);
+    } else {
+      const latestEnvelope = await flushAutosave();
+
+      if (!isEmbedded) {
+        await updateEnvelopeItemsMutation.mutateAsync({
+          envelopeId: latestEnvelope.id,
+          data: [{ envelopeItemId, title }],
+        });
+      }
+    }
+
+    setEnvelope((prev) => ({
+      ...prev,
+      envelopeItems: prev.envelopeItems.map((item) => (item.id === envelopeItemId ? { ...item, title } : item)),
+    }));
+  };
+
   return (
     <EnvelopeEditorContext.Provider
       value={{
@@ -611,6 +655,8 @@ export const EnvelopeEditorProvider = ({
         resetForms,
         registerExternalFlush,
         registerPendingMutation,
+        updateEnvelopeItemTitle,
+        registerEnvelopeItemTitleHandler,
         organisationEmails,
       }}
     >

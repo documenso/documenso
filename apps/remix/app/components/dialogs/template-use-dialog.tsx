@@ -217,6 +217,12 @@ export function TemplateUseDialog({
         (item): item is typeof item & { data: File } => item.data !== undefined,
       );
 
+      // With a single file, a custom document name names the file too.
+      const customFileTitle =
+        data.documentNameSource === DOCUMENT_NAME_SOURCE.CUSTOM && envelopeItems.length === 1
+          ? documentTitle
+          : undefined;
+
       const customDocumentData = await Promise.all(
         customFilesToUpload.map(async (item) => {
           const customDocumentData = await putPdfFile(item.data);
@@ -224,9 +230,23 @@ export function TemplateUseDialog({
           return {
             documentDataId: customDocumentData.id,
             envelopeItemId: item.envelopeItemId,
+            title:
+              customFileTitle ??
+              (isUploadedFileNameUsable(item.data) ? getUploadedDocumentTitle(item.data) : undefined),
           };
         }),
       );
+
+      // Without a replacement PDF, send the template's own PDF so the file still gets the custom name.
+      if (customFileTitle && customDocumentData.length === 0) {
+        const [templateItem] = envelopeItems;
+
+        customDocumentData.push({
+          documentDataId: templateItem.documentData.id,
+          envelopeItemId: templateItem.id,
+          title: customFileTitle,
+        });
+      }
 
       const { envelopeId } = await createDocumentFromTemplate({
         templateId,

@@ -60,6 +60,8 @@ Each `customDocumentData` entry maps an uploaded file to a template item:
 | `identifier`     | string \| number | Yes      | Uploaded filename or zero-based file index                      |
 | `envelopeItemId` | string           | Yes      | Template envelope item whose PDF the uploaded file replaces     |
 
+The created envelope item is named after the uploaded file, without its `.pdf` extension. Files whose name doesn't end in `.pdf`, such as a `Blob` appended without a filename, keep the template envelope item's title.
+
 ### Code Examples
 
 <Tabs items={['curl', 'TypeScript']}>
