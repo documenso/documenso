@@ -32,12 +32,14 @@ GOOGLE_VERTEX_PROJECT_ID="<your-gcp-project-id>"
 GOOGLE_VERTEX_API_KEY="<your-vertex-api-key>"
 # Optional, defaults to "global"
 GOOGLE_VERTEX_LOCATION="global"
+# Optional, defaults to "gemini-3-flash-preview"
+GOOGLE_VERTEX_MODEL="gemini-3-flash-preview"
 ```
 
 <Callout type="info">
   Use a region close to your users if you need data residency considerations (e.g. `europe-west1`).
   If you omit the location, Documenso uses `global`. Not all models are available in every region;
-  if a model is unavailable, switch to a supported region.
+  if a model is unavailable, switch to a supported region or configure a regional GA model via `GOOGLE_VERTEX_MODEL`.
 </Callout>
 
 ## Deploy with the Published Container
