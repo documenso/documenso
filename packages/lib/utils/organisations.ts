@@ -151,5 +151,9 @@ export const generateDefaultOrganisationSettings = (): Omit<OrganisationGlobalSe
     reminderSettings: DEFAULT_ENVELOPE_REMINDER_SETTINGS,
 
     aiFeaturesEnabled: false,
+
+    twoFactorRequired: false,
+    twoFactorGracePeriodDays: 7,
+    twoFactorEnforcedFrom: null,
   };
 };

@@ -8,6 +8,7 @@ import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import {
   createDocumentMeta,
   ZCreateDocumentRequestSchema,
@@ -18,6 +19,7 @@ export const createDocumentRoute = authenticatedProcedure
   .meta(createDocumentMeta)
   .input(ZCreateDocumentRequestSchema)
   .output(ZCreateDocumentResponseSchema)
+  .use(twoFactorScopeFromCtx())
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
 

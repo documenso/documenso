@@ -8,12 +8,14 @@ import { OrganisationGroupType, TeamMemberRole } from '@documenso/prisma/generat
 import { match } from 'ts-pattern';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZUpdateTeamMemberRequestSchema, ZUpdateTeamMemberResponseSchema } from './update-team-member.types';
 
 export const updateTeamMemberRoute = authenticatedProcedure
   //   .meta(updateTeamMemberMeta)
   .input(ZUpdateTeamMemberRequestSchema)
   .output(ZUpdateTeamMemberResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .mutation(async ({ ctx, input }) => {
     const { teamId, memberId, data } = input;
     const userId = ctx.user.id;

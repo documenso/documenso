@@ -1,6 +1,7 @@
 import { createPasskeyRegistrationOptions } from '@documenso/lib/server-only/auth/create-passkey-registration-options';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorInstanceOnly } from '../two-factor-enforcement/enforce';
 import {
   ZCreatePasskeyRegistrationOptionsRequestSchema,
   ZCreatePasskeyRegistrationOptionsResponseSchema,
@@ -9,6 +10,7 @@ import {
 export const createPasskeyRegistrationOptionsRoute = authenticatedProcedure
   .input(ZCreatePasskeyRegistrationOptionsRequestSchema)
   .output(ZCreatePasskeyRegistrationOptionsResponseSchema)
+  .use(twoFactorInstanceOnly())
   .mutation(async ({ ctx }) => {
     return await createPasskeyRegistrationOptions({
       userId: ctx.user.id,

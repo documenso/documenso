@@ -1,6 +1,7 @@
 import { getOrganisationAnalyticsDocumentsOverTime } from '@documenso/lib/server-only/organisation/get-organisation-analytics-documents-over-time';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZGetOrganisationAnalyticsDocumentsOverTimeRequestSchema,
   ZGetOrganisationAnalyticsDocumentsOverTimeResponseSchema,
@@ -9,6 +10,7 @@ import {
 export const getOrganisationAnalyticsDocumentsOverTimeRoute = authenticatedProcedure
   .input(ZGetOrganisationAnalyticsDocumentsOverTimeRequestSchema)
   .output(ZGetOrganisationAnalyticsDocumentsOverTimeResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ input, ctx }) => {
     const { organisationId, range, from, to, timezone } = input;
 

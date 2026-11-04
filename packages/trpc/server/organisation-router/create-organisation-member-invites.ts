@@ -1,6 +1,7 @@
 import { createOrganisationMemberInvites } from '@documenso/lib/server-only/organisation/create-organisation-member-invites';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZCreateOrganisationMemberInvitesRequestSchema,
   ZCreateOrganisationMemberInvitesResponseSchema,
@@ -9,6 +10,7 @@ import {
 export const createOrganisationMemberInvitesRoute = authenticatedProcedure
   .input(ZCreateOrganisationMemberInvitesRequestSchema)
   .output(ZCreateOrganisationMemberInvitesResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .mutation(async ({ ctx, input }) => {
     const { organisationId, invitations } = input;
     const userId = ctx.user.id;

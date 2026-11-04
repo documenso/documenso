@@ -5,6 +5,19 @@ import { TeamEmailSchema } from '@documenso/prisma/generated/zod/modelSchema/Tea
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { z } from 'zod';
 
+export const ZTwoFactorEnforcementStatusSchema = z.union([
+  z.object({
+    required: z.literal(false),
+  }),
+  z.object({
+    required: z.literal(true),
+    deadline: z.date(),
+    isDeadlineExpired: z.boolean(),
+    isSatisfied: z.boolean(),
+    isBlocked: z.boolean(),
+  }),
+]);
+
 export const ZGetOrganisationSessionResponseSchema = ZOrganisationSchema.extend({
   teams: z.array(
     TeamSchema.pick({
@@ -24,6 +37,8 @@ export const ZGetOrganisationSessionResponseSchema = ZOrganisationSchema.extend(
   ),
   subscription: SubscriptionSchema.nullable(),
   currentOrganisationRole: z.nativeEnum(OrganisationMemberRole),
+
+  twoFactorEnforcement: ZTwoFactorEnforcementStatusSchema,
 }).array();
 
 export type TGetOrganisationSessionResponse = z.infer<typeof ZGetOrganisationSessionResponseSchema>;

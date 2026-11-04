@@ -7,6 +7,7 @@ import { Trans } from '@lingui/react/macro';
 
 import { OrganisationDeleteDialog } from '~/components/dialogs/organisation-delete-dialog';
 import { AvatarImageForm } from '~/components/forms/avatar-image';
+import { OrganisationTwoFactorEnforcementForm } from '~/components/forms/organisation-two-factor-enforcement-form';
 import { OrganisationUpdateForm } from '~/components/forms/organisation-update-form';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
@@ -28,6 +29,19 @@ export default function OrganisationSettingsGeneral() {
         <AvatarImageForm organisation={organisation} />
         <OrganisationUpdateForm />
       </div>
+
+      {canExecuteOrganisationAction('MANAGE_ORGANISATION_SECURITY', organisation.currentOrganisationRole) && (
+        <>
+          <hr className="my-6" />
+
+          <SettingsHeader
+            title={_(msg`Two-factor authentication`)}
+            subtitle={_(msg`Require members of this organisation to use two-factor authentication.`)}
+          />
+
+          <OrganisationTwoFactorEnforcementForm />
+        </>
+      )}
 
       {canExecuteOrganisationAction('DELETE_ORGANISATION', organisation.currentOrganisationRole) && (
         <Alert className="flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">

@@ -13,7 +13,10 @@ export const createPasskeySigninOptions = async ({ sessionId }: CreatePasskeySig
 
   const options = await generateAuthenticationOptions({
     rpID: rpId,
-    userVerification: 'preferred',
+    // A passkey sign-in creates a `twoFactorVerified` session, so user
+    // verification (PIN/biometric) is mandatory. Possession alone is a single
+    // factor.
+    userVerification: 'required',
     timeout,
   });
 

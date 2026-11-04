@@ -6,12 +6,14 @@ import { Prisma } from '@prisma/client';
 import { unique } from 'remeda';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZFindTeamGroupsRequestSchema, ZFindTeamGroupsResponseSchema } from './find-team-groups.types';
 
 export const findTeamGroupsRoute = authenticatedProcedure
   // .meta(getTeamGroupsMeta)
   .input(ZFindTeamGroupsRequestSchema)
   .output(ZFindTeamGroupsResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .query(async ({ input, ctx }) => {
     const { teamId, types, query, page, perPage, teamGroupId, organisationRoles } = input;
     const { user } = ctx;

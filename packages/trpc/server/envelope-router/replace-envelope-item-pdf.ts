@@ -6,6 +6,7 @@ import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZReplaceEnvelopeItemPdfRequestSchema,
   ZReplaceEnvelopeItemPdfResponseSchema,
@@ -20,6 +21,7 @@ import {
 export const replaceEnvelopeItemPdfRoute = authenticatedProcedure
   .input(ZReplaceEnvelopeItemPdfRequestSchema)
   .output(ZReplaceEnvelopeItemPdfResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.payload.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { user, teamId, metadata } = ctx;
     const { payload, file } = input;

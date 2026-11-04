@@ -60,6 +60,8 @@ export const getActiveSessions = async (c: Context | Request): Promise<ActiveSes
       ipAddress: true,
       userAgent: true,
       isEmbed: true,
+      authMethod: true,
+      twoFactorVerified: true,
     },
   });
 };

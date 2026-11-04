@@ -6,12 +6,14 @@ import { EnvelopeType } from '@prisma/client';
 import pMap from 'p-map';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZBulkDeleteEnvelopesRequestSchema, ZBulkDeleteEnvelopesResponseSchema } from './bulk-delete-envelopes.types';
 
 export const bulkDeleteEnvelopesRoute = authenticatedProcedure
   // .meta(bulkDeleteEnvelopesMeta) // Keeping this as a private API for a little while until we're sure it's stable and the request/response schemas are finalized.
   .input(ZBulkDeleteEnvelopesRequestSchema)
   .output(ZBulkDeleteEnvelopesResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeIds })))
   .mutation(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { envelopeIds } = input;

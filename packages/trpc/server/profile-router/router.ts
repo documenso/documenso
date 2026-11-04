@@ -7,6 +7,7 @@ import { submitSupportTicket } from '@documenso/lib/server-only/user/submit-supp
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
 import { authenticatedProcedure, router } from '../trpc';
+import { twoFactorInstanceOnly, twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZFindUserSecurityAuditLogsSchema,
   ZSetProfileImageMutationSchema,
@@ -17,6 +18,7 @@ import {
 export const profileRouter = router({
   findUserSecurityAuditLogs: authenticatedProcedure
     .input(ZFindUserSecurityAuditLogsSchema)
+    .use(twoFactorInstanceOnly())
     .query(async ({ input, ctx }) => {
       return await findUserSecurityAuditLogs({
         userId: ctx.user.id,
@@ -24,67 +26,92 @@ export const profileRouter = router({
       });
     }),
 
-  updateProfile: authenticatedProcedure.input(ZUpdateProfileMutationSchema).mutation(async ({ input, ctx }) => {
-    const { name, signature } = input;
+  updateProfile: authenticatedProcedure
+    .input(ZUpdateProfileMutationSchema)
+    .use(twoFactorInstanceOnly())
+    .mutation(async ({ input, ctx }) => {
+      const { name, signature } = input;
 
-    await updateProfile({
-      userId: ctx.user.id,
-      name,
-      signature,
-      requestMetadata: ctx.metadata.requestMetadata,
-    });
-  }),
-
-  deleteAccount: authenticatedProcedure.mutation(async ({ ctx }) => {
-    ctx.logger.info({
-      input: {
+      await updateProfile({
         userId: ctx.user.id,
-      },
-    });
+        name,
+        signature,
+        requestMetadata: ctx.metadata.requestMetadata,
+      });
+    }),
 
-    await deleteUser({
-      id: ctx.user.id,
-    });
-  }),
+  deleteAccount: authenticatedProcedure
+    // A blocked user must still be able to delete their own account.
+    .use(twoFactorInstanceOnly())
+    .mutation(async ({ ctx }) => {
+      ctx.logger.info({
+        input: {
+          userId: ctx.user.id,
+        },
+      });
 
-  setProfileImage: authenticatedProcedure.input(ZSetProfileImageMutationSchema).mutation(async ({ input, ctx }) => {
-    const { bytes, teamId, organisationId } = input;
+      await deleteUser({
+        id: ctx.user.id,
+      });
+    }),
 
-    ctx.logger.info({
-      input: {
-        teamId,
-        organisationId,
-      },
-    });
+  setProfileImage: authenticatedProcedure
+    .input(ZSetProfileImageMutationSchema)
+    .use(
+      twoFactorScope((input) => ({
+        organisation: input.organisationId ?? undefined,
+        team: input.teamId ?? undefined,
+      })),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { bytes, teamId, organisationId } = input;
 
-    let target: SetAvatarImageOptions['target'] = {
-      type: 'user',
-    };
+      ctx.logger.info({
+        input: {
+          teamId,
+          organisationId,
+        },
+      });
 
-    if (teamId) {
-      target = {
-        type: 'team',
-        teamId,
+      let target: SetAvatarImageOptions['target'] = {
+        type: 'user',
       };
-    }
 
-    if (organisationId) {
-      target = {
-        type: 'organisation',
-        organisationId,
-      };
-    }
+      if (teamId) {
+        target = {
+          type: 'team',
+          teamId,
+        };
+      }
 
-    return await setAvatarImage({
-      userId: ctx.user.id,
-      target,
-      bytes,
-      requestMetadata: ctx.metadata,
-    });
-  }),
+      if (organisationId) {
+        target = {
+          type: 'organisation',
+          organisationId,
+        };
+      }
+
+      return await setAvatarImage({
+        userId: ctx.user.id,
+        target,
+        bytes,
+        requestMetadata: ctx.metadata,
+      });
+    }),
 
   submitSupportTicket: authenticatedProcedure
     .input(ZSubmitSupportTicketMutationSchema)
+    .use(
+      twoFactorScope((input) => {
+        // A malformed legacy team ID is rejected by the handler, not here.
+        const teamId = input.teamId ? Number(input.teamId) : null;
+
+        return {
+          organisation: input.organisationId,
+          team: teamId !== null && Number.isInteger(teamId) && teamId > 0 ? teamId : undefined,
+        };
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
       const { subject, message, organisationId, teamId } = input;
 

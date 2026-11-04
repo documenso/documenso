@@ -14,7 +14,7 @@ import crypto from 'crypto';
 import { DateTime } from 'luxon';
 import { createElement } from 'react';
 
-export type SendOrganisationAccountLinkConfirmationEmailProps = TOrganisationAccountLinkMetadata & {
+export type SendOrganisationAccountLinkConfirmationEmailProps = Omit<TOrganisationAccountLinkMetadata, 'email'> & {
   organisationName: string;
 };
 
@@ -69,6 +69,7 @@ export const sendOrganisationAccountLinkConfirmationEmail = async ({
         type,
         userId,
         organisationId,
+        email: user.email,
         oauthConfig,
       } satisfies TOrganisationAccountLinkMetadata,
       userId,

@@ -3,10 +3,12 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizeBrandingColors } from '@documenso/lib/utils/normalize-branding-colors';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { type SanitizeBrandingCssWarning, sanitizeBrandingCss } from '@documenso/lib/utils/sanitize-branding-css';
+import { isTwoFactorGracePeriodReduction, isTwoFactorSatisfied } from '@documenso/lib/utils/two-factor';
 import { prisma } from '@documenso/prisma';
-import { OrganisationType, Prisma } from '@prisma/client';
+import { OrganisationType, Prisma, type Session } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZUpdateOrganisationSettingsRequestSchema,
   ZUpdateOrganisationSettingsResponseSchema,
@@ -15,9 +17,13 @@ import {
 export const updateOrganisationSettingsRoute = authenticatedProcedure
   .input(ZUpdateOrganisationSettingsRequestSchema)
   .output(ZUpdateOrganisationSettingsResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .mutation(async ({ ctx, input }) => {
     const { user } = ctx;
-    const { organisationId, data } = input;
+    const { organisationId, data, acknowledgeGracePeriodReduction } = input;
+
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const requestSession = ctx.session as Pick<Session, 'twoFactorVerified'> | null;
 
     ctx.logger.info({
       input: {
@@ -57,6 +63,10 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
 
       // AI features settings.
       aiFeaturesEnabled,
+
+      // 2FA enforcement settings.
+      twoFactorRequired,
+      twoFactorGracePeriodDays,
     } = data;
 
     if (Object.values(data).length === 0) {
@@ -65,11 +75,17 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       });
     }
 
+    const isTouchingTwoFactorSettings = twoFactorRequired !== undefined || twoFactorGracePeriodDays !== undefined;
+
+    const requiredRoles = isTouchingTwoFactorSettings
+      ? ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION_SECURITY']
+      : ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'];
+
     const organisation = await prisma.organisation.findFirst({
       where: buildOrganisationWhereQuery({
         organisationId,
         userId: user.id,
-        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+        roles: requiredRoles,
       }),
       include: {
         organisationGlobalSettings: true,
@@ -80,6 +96,66 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
         message: 'You do not have permission to update this organisation.',
       });
+    }
+
+    const currentSettings = organisation.organisationGlobalSettings;
+
+    const isEnablingTwoFactorRequired = twoFactorRequired === true && !currentSettings.twoFactorRequired;
+
+    let twoFactorEnforcedFrom: Date | undefined;
+
+    if (isTouchingTwoFactorSettings) {
+      const now = new Date();
+
+      if (isEnablingTwoFactorRequired) {
+        twoFactorEnforcedFrom = now;
+      }
+
+      // Enabling requires the actor to already satisfy the policy. Prevents
+      // self-lockout (a 0-day grace would instantly block the actor from the
+      // very settings route that undoes it) and removes the instant-DoS lever.
+      // API-token callers carry no session so can never enable enforcement.
+      if (isEnablingTwoFactorRequired) {
+        const isActingUserSatisfied = isTwoFactorSatisfied({
+          userTwoFactorEnabled: user.twoFactorEnabled,
+          sessionTwoFactorVerified: requestSession?.twoFactorVerified ?? false,
+        });
+
+        if (!isActingUserSatisfied) {
+          throw new AppError(AppErrorCode.TWO_FACTOR_REQUIRED, {
+            message:
+              'You must have two-factor authentication enabled and verified on this session before requiring it for the organisation.',
+            statusCode: 403,
+          });
+        }
+      }
+
+      const nextTwoFactorRequired = twoFactorRequired ?? currentSettings.twoFactorRequired;
+      const nextGracePeriodDays = twoFactorGracePeriodDays ?? currentSettings.twoFactorGracePeriodDays;
+      const nextEnforcedFrom = twoFactorEnforcedFrom ?? currentSettings.twoFactorEnforcedFrom;
+
+      const isGraceReduction = isTwoFactorGracePeriodReduction({
+        previous: currentSettings.twoFactorRequired
+          ? {
+              anchors: [currentSettings.twoFactorEnforcedFrom],
+              gracePeriodDays: currentSettings.twoFactorGracePeriodDays,
+            }
+          : null,
+        next: nextTwoFactorRequired
+          ? {
+              anchors: [nextEnforcedFrom],
+              gracePeriodDays: nextGracePeriodDays,
+            }
+          : null,
+        now,
+      });
+
+      if (isGraceReduction && acknowledgeGracePeriodReduction !== true) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message:
+            'This change reduces the active two-factor authentication grace period and must be explicitly acknowledged.',
+        });
+      }
     }
 
     // Validate that the email ID belongs to the organisation.
@@ -185,6 +261,11 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
 
             // AI features settings.
             aiFeaturesEnabled,
+
+            // 2FA enforcement settings.
+            twoFactorRequired,
+            twoFactorGracePeriodDays,
+            twoFactorEnforcedFrom,
           },
         },
       },

@@ -8,11 +8,13 @@ import { OrganisationGroupType, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZCreateTeamMembersRequestSchema, ZCreateTeamMembersResponseSchema } from './create-team-members.types';
 
 export const createTeamMembersRoute = authenticatedProcedure
   .input(ZCreateTeamMembersRequestSchema)
   .output(ZCreateTeamMembersResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId, organisationMembers } = input;
     const { user } = ctx;

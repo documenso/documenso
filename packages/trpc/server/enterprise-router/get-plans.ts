@@ -3,8 +3,9 @@ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorInstanceOnly } from '../two-factor-enforcement/enforce';
 
-export const getPlansRoute = authenticatedProcedure.query(async ({ ctx }) => {
+export const getPlansRoute = authenticatedProcedure.use(twoFactorInstanceOnly()).query(async ({ ctx }) => {
   const userId = ctx.user.id;
 
   const plans = await getInternalClaimPlans();

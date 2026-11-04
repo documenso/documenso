@@ -7,6 +7,7 @@ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZUpdateTeamBrandingLogoRequestSchema,
   ZUpdateTeamBrandingLogoResponseSchema,
@@ -15,6 +16,7 @@ import {
 export const updateTeamBrandingLogoRoute = authenticatedProcedure
   .input(ZUpdateTeamBrandingLogoRequestSchema)
   .output(ZUpdateTeamBrandingLogoResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.payload.teamId })))
   .mutation(async ({ ctx, input }) => {
     const { user } = ctx;
     const { payload, brandingLogo } = input;

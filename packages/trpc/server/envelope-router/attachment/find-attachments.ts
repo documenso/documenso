@@ -3,6 +3,7 @@ import { findAttachmentsByEnvelopeId } from '@documenso/lib/server-only/envelope
 import { findAttachmentsByToken } from '@documenso/lib/server-only/envelope-attachment/find-attachments-by-token';
 
 import { maybeAuthenticatedProcedure } from '../../trpc';
+import { TWO_FACTOR_SKIP, twoFactorScope } from '../../two-factor-enforcement/enforce';
 import {
   findAttachmentsMeta,
   ZFindAttachmentsRequestSchema,
@@ -13,6 +14,7 @@ export const findAttachmentsRoute = maybeAuthenticatedProcedure
   .meta(findAttachmentsMeta)
   .input(ZFindAttachmentsRequestSchema)
   .output(ZFindAttachmentsResponseSchema)
+  .use(twoFactorScope((input) => (input.token ? TWO_FACTOR_SKIP : { envelope: input.envelopeId })))
   .query(async ({ input, ctx }) => {
     const { envelopeId, token } = input;
 

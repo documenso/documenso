@@ -1,12 +1,14 @@
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { getEnvelopeMeta, ZGetEnvelopeRequestSchema, ZGetEnvelopeResponseSchema } from './get-envelope.types';
 
 export const getEnvelopeRoute = authenticatedProcedure
   .meta(getEnvelopeMeta)
   .input(ZGetEnvelopeRequestSchema)
   .output(ZGetEnvelopeResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .query(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { envelopeId } = input;

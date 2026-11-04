@@ -7,12 +7,14 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZUpdateOrganisationRequestSchema, ZUpdateOrganisationResponseSchema } from './update-organisation.types';
 
 export const updateOrganisationRoute = authenticatedProcedure
   //   .meta(updateOrganisationMeta)
   .input(ZUpdateOrganisationRequestSchema)
   .output(ZUpdateOrganisationResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .mutation(async ({ input, ctx }) => {
     const { organisationId, data } = input;
     const userId = ctx.user.id;

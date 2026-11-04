@@ -2,12 +2,14 @@ import { updateTeam } from '@documenso/lib/server-only/team/update-team';
 import { updateTeamPublicProfile } from '@documenso/lib/server-only/team/update-team-public-profile';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZUpdateTeamRequestSchema, ZUpdateTeamResponseSchema } from './update-team.types';
 
 export const updateTeamRoute = authenticatedProcedure
   //   .meta(updateTeamMeta)
   .input(ZUpdateTeamRequestSchema)
   .output(ZUpdateTeamResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId, data } = input;
 

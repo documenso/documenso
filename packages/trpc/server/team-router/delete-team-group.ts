@@ -6,12 +6,14 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationGroupType, OrganisationMemberRole } from '@documenso/prisma/generated/types';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZDeleteTeamGroupRequestSchema, ZDeleteTeamGroupResponseSchema } from './delete-team-group.types';
 
 export const deleteTeamGroupRoute = authenticatedProcedure
   // .meta(deleteTeamGroupMeta)
   .input(ZDeleteTeamGroupRequestSchema)
   .output(ZDeleteTeamGroupResponseSchema)
+  .use(twoFactorScope((input) => ({ team: input.teamId })))
   .mutation(async ({ input, ctx }) => {
     const { teamGroupId, teamId } = input;
     const { user } = ctx;

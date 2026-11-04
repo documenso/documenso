@@ -6,11 +6,13 @@ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZResendWebhookCallRequestSchema, ZResendWebhookCallResponseSchema } from './resend-webhook-call.types';
 
 export const resendWebhookCallRoute = authenticatedProcedure
   .input(ZResendWebhookCallRequestSchema)
   .output(ZResendWebhookCallResponseSchema)
+  .use(twoFactorScope((input) => ({ webhook: input.webhookId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { webhookId, webhookCallId } = input;

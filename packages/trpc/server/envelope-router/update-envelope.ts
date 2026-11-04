@@ -1,6 +1,7 @@
 import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   updateEnvelopeMeta,
   ZUpdateEnvelopeRequestSchema,
@@ -11,6 +12,7 @@ export const updateEnvelopeRoute = authenticatedProcedure
   .meta(updateEnvelopeMeta)
   .input(ZUpdateEnvelopeRequestSchema)
   .output(ZUpdateEnvelopeResponseSchema)
+  .use(twoFactorScope((input) => ({ envelope: input.envelopeId })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const { envelopeId, data, meta = {} } = input;

@@ -5,6 +5,7 @@ import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
 import { maybeAuthenticatedProcedure } from '../trpc';
+import { TWO_FACTOR_SKIP, twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZGetEnvelopeItemsByTokenRequestSchema,
   ZGetEnvelopeItemsByTokenResponseSchema,
@@ -15,6 +16,9 @@ import {
 export const getEnvelopeItemsByTokenRoute = maybeAuthenticatedProcedure
   .input(ZGetEnvelopeItemsByTokenRequestSchema)
   .output(ZGetEnvelopeItemsByTokenResponseSchema)
+  .use(
+    twoFactorScope((input) => (input.access.type === 'recipient' ? TWO_FACTOR_SKIP : { envelope: input.envelopeId })),
+  )
   .query(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
 

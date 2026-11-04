@@ -6,6 +6,7 @@ import { useLingui } from '@lingui/react';
 
 import { AdminEmailBlocklistSection } from '~/components/general/admin-email-blocklist-section';
 import { AdminSiteBannerSection } from '~/components/general/admin-site-banner-section';
+import { AdminTwoFactorEnforcementSection } from '~/components/general/admin-two-factor-enforcement-section';
 import { SettingsHeader } from '~/components/general/settings-header';
 import type { Route } from './+types/site-settings';
 
@@ -31,6 +32,8 @@ export default function AdminSiteSettingsPage({ loaderData }: Route.ComponentPro
         <AdminSiteBannerSection banner={banner} />
 
         <AdminEmailBlocklistSection emailBlocklist={emailBlocklist} />
+
+        <AdminTwoFactorEnforcementSection />
       </div>
     </div>
   );

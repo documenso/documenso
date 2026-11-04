@@ -13,6 +13,8 @@ import { z } from 'zod';
 
 export const ZUpdateOrganisationSettingsRequestSchema = z.object({
   organisationId: z.string(),
+
+  acknowledgeGracePeriodReduction: z.boolean().optional(),
   data: z.object({
     // Document related settings.
     documentVisibility: z.nativeEnum(DocumentVisibility).optional(),
@@ -45,6 +47,10 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
 
     // AI features settings.
     aiFeaturesEnabled: z.boolean().optional(),
+
+    // 2FA enforcement settings. Requires MANAGE_ORGANISATION_SECURITY (ADMIN only).
+    twoFactorRequired: z.boolean().optional(),
+    twoFactorGracePeriodDays: z.number().int().min(0).max(365).optional(),
   }),
 });
 

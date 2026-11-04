@@ -6,6 +6,7 @@ import type { EmailDomainStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZFindOrganisationEmailDomainsRequestSchema,
   ZFindOrganisationEmailDomainsResponseSchema,
@@ -14,6 +15,7 @@ import {
 export const findOrganisationEmailDomainsRoute = authenticatedProcedure
   .input(ZFindOrganisationEmailDomainsRequestSchema)
   .output(ZFindOrganisationEmailDomainsResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ input, ctx }) => {
     const { organisationId, emailDomainId, statuses, query, page, perPage } = input;
     const { user } = ctx;

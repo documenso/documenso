@@ -1,12 +1,14 @@
 import { findEnvelopes } from '@documenso/lib/server-only/envelope/find-envelopes';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScopeFromCtx } from '../two-factor-enforcement/enforce';
 import { findEnvelopesMeta, ZFindEnvelopesRequestSchema, ZFindEnvelopesResponseSchema } from './find-envelopes.types';
 
 export const findEnvelopesRoute = authenticatedProcedure
   .meta(findEnvelopesMeta)
   .input(ZFindEnvelopesRequestSchema)
   .output(ZFindEnvelopesResponseSchema)
+  .use(twoFactorScopeFromCtx())
   .query(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
 

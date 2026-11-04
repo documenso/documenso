@@ -13,6 +13,7 @@ export const ZLicenseClaimSchema = z.object({
   billing: z.boolean().optional(),
   instanceCscSigning: z.boolean().optional(),
   cscQesSigning: z.boolean().optional(),
+  instanceTwoFactorEnforcement: z.boolean().optional(),
 });
 
 /**

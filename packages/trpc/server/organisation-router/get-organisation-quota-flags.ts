@@ -4,6 +4,7 @@ import { currentMonthlyPeriod } from '@documenso/lib/universal/monthly-period';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZGetOrganisationQuotaFlagsRequestSchema,
   ZGetOrganisationQuotaFlagsResponseSchema,
@@ -12,6 +13,7 @@ import {
 export const getOrganisationQuotaFlagsRoute = authenticatedProcedure
   .input(ZGetOrganisationQuotaFlagsRequestSchema)
   .output(ZGetOrganisationQuotaFlagsResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ input, ctx }) => {
     const { organisationId } = input;
     const userId = ctx.user.id;

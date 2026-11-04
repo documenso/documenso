@@ -5,11 +5,15 @@ import type { Envelope, Prisma } from '@prisma/client';
 import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorInstanceOnly } from '../two-factor-enforcement/enforce';
 import { type TInboxStatus, ZFindInboxRequestSchema, ZFindInboxResponseSchema } from './find-inbox.types';
 
 export const findInboxRoute = authenticatedProcedure
   .input(ZFindInboxRequestSchema)
   .output(ZFindInboxResponseSchema)
+  // Recipient perspective: signing access is token-authorized, not organisation
+  // membership.
+  .use(twoFactorInstanceOnly())
   .query(async ({ input, ctx }) => {
     const { page, perPage, query, status } = input;
 

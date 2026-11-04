@@ -1,4 +1,5 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { TSessionAuthMethod } from '@documenso/lib/types/session-auth-method';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 import { sha256 } from '@oslojs/crypto/sha2';
@@ -14,7 +15,16 @@ import { AUTH_EMBED_SESSION_LIFETIME, AUTH_SESSION_LIFETIME } from '../../config
  */
 export type SessionUser = Pick<
   User,
-  'id' | 'name' | 'email' | 'emailVerified' | 'avatarImageId' | 'twoFactorEnabled' | 'roles' | 'signature' | 'disabled'
+  | 'id'
+  | 'name'
+  | 'email'
+  | 'emailVerified'
+  | 'avatarImageId'
+  | 'twoFactorEnabled'
+  | 'twoFactorGraceStartedAt'
+  | 'roles'
+  | 'signature'
+  | 'disabled'
 >;
 
 export type SessionValidationResult =
@@ -36,6 +46,9 @@ export const generateSessionToken = (): string => {
 };
 
 export type CreateSessionOptions = {
+  authMethod: TSessionAuthMethod;
+  twoFactorVerified: boolean;
+
   isEmbed?: boolean;
   tx?: Prisma.TransactionClient;
 };
@@ -44,7 +57,7 @@ export const createSession = async (
   token: string,
   userId: number,
   metadata: RequestMetadata,
-  { isEmbed = false, tx = prisma }: CreateSessionOptions = {},
+  { authMethod, twoFactorVerified, isEmbed = false, tx = prisma }: CreateSessionOptions,
 ): Promise<Session> => {
   const hashedSessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
@@ -58,6 +71,8 @@ export const createSession = async (
     ipAddress: metadata.ipAddress ?? null,
     userAgent: metadata.userAgent ?? null,
     isEmbed,
+    authMethod,
+    twoFactorVerified,
   };
 
   await tx.session.create({
@@ -95,6 +110,7 @@ export const validateSessionToken = async (token: string): Promise<SessionValida
           emailVerified: true,
           avatarImageId: true,
           twoFactorEnabled: true,
+          twoFactorGraceStartedAt: true,
           roles: true,
           signature: true,
           disabled: true,

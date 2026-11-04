@@ -2,11 +2,14 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorInstanceOnly } from '../two-factor-enforcement/enforce';
 import { ZGetInboxCountRequestSchema, ZGetInboxCountResponseSchema } from './get-inbox-count.types';
 
 export const getInboxCountRoute = authenticatedProcedure
   .input(ZGetInboxCountRequestSchema)
   .output(ZGetInboxCountResponseSchema)
+  // Recipient perspective, see find-inbox.
+  .use(twoFactorInstanceOnly())
   .query(async ({ input, ctx }) => {
     const { readStatus } = input ?? {};
 

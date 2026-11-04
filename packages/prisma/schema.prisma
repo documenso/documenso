@@ -63,6 +63,9 @@ model User {
   twoFactorEnabled     Boolean @default(false)
   twoFactorBackupCodes String?
 
+  // Anchor for 2FA enforcement grace periods, reset by an admin 2FA reset.
+  twoFactorGraceStartedAt DateTime @default(now())
+
   folders   Folder[]
   envelopes Envelope[]
 
@@ -94,6 +97,7 @@ enum UserSecurityAuditLogType {
   ORGANISATION_SSO_UNLINK
   AUTH_2FA_DISABLE
   AUTH_2FA_ENABLE
+  AUTH_2FA_ADMIN_RESET
   PASSKEY_CREATED
   PASSKEY_DELETED
   PASSKEY_UPDATED
@@ -160,8 +164,13 @@ model VerificationToken {
   expires     DateTime
   createdAt   DateTime @default(now())
   metadata    Json?
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Failed-attempt counter for tokens that accept guessable input (2FA
+  // challenge codes).
+  attempts Int @default(0)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum WebhookTriggerEvents {
@@ -373,6 +382,13 @@ model Session {
   updatedAt DateTime @updatedAt
 
   isEmbed Boolean @default(false)
+
+  // Plain string, not a PG enum. Validated by `ZSessionAuthMethodSchema`.
+  authMethod String @default("unknown")
+
+  // Whether a second factor was passed at sign-in or 2FA was enabled
+  // mid-session. Sessions predating this column must re-login to qualify.
+  twoFactorVerified Boolean @default(false)
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1009,6 +1025,13 @@ model OrganisationGlobalSettings {
 
   // AI features settings.
   aiFeaturesEnabled Boolean @default(false)
+
+  // Org-level only, deliberately not mirrored in TeamGlobalSettings.
+  // `extractDerivedTeamSettings` must skip these keys.
+  twoFactorRequired        Boolean   @default(false)
+  twoFactorGracePeriodDays Int       @default(7)
+  // Set server-side on each off→on transition of `twoFactorRequired`.
+  twoFactorEnforcedFrom    DateTime?
 }
 
 /// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';", "import { ZEnvelopeReminderSettings as ZEnvelopeReminderSettingsSchema } from '@documenso/lib/constants/envelope-reminder';", "import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';"])

@@ -3,11 +3,13 @@ import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { TWO_FACTOR_SKIP, twoFactorScope } from '../two-factor-enforcement/enforce';
 import { ZGetDocumentByTokenRequestSchema, ZGetDocumentByTokenResponseSchema } from './get-document-by-token.types';
 
 export const getDocumentByTokenRoute = authenticatedProcedure
   .input(ZGetDocumentByTokenRequestSchema)
   .output(ZGetDocumentByTokenResponseSchema)
+  .use(twoFactorScope((input) => (input.token ? TWO_FACTOR_SKIP : {})))
   .query(async ({ input, ctx }) => {
     const { token } = input;
 

@@ -2,6 +2,7 @@ import { updateAttachment } from '@documenso/lib/server-only/envelope-attachment
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import { ZUpdateAttachmentRequestSchema, ZUpdateAttachmentResponseSchema } from './update-attachment.types';
 
 export const updateAttachmentRoute = authenticatedProcedure
@@ -18,6 +19,7 @@ export const updateAttachmentRoute = authenticatedProcedure
   })
   .input(ZUpdateAttachmentRequestSchema)
   .output(ZUpdateAttachmentResponseSchema)
+  .use(twoFactorScope((input) => ({ attachment: input.id })))
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
     const userId = ctx.user.id;

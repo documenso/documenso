@@ -3,6 +3,7 @@ import type {
   TAuthHandoffEmbedCscSadPayload,
 } from '@documenso/lib/constants/auth-handoff';
 import { AUTH_HANDOFF_TYPE, ZAuthHandoffStoredSchema } from '@documenso/lib/constants/auth-handoff';
+import { ZSessionAuthMethodSchema } from '@documenso/lib/types/session-auth-method';
 import { prisma } from '@documenso/prisma';
 import { match } from 'ts-pattern';
 
@@ -129,6 +130,8 @@ const redeemAuthHandoffById = async ({
       }
 
       // The handoff must not outlive the top-level session that produced it.
+      // The embed session must never be more (or less) trusted than the session
+      // that minted it.
       const originatingSession = await prisma.session.findFirst({
         where: {
           id: payload.sessionId,
@@ -138,6 +141,8 @@ const redeemAuthHandoffById = async ({
         },
         select: {
           id: true,
+          authMethod: true,
+          twoFactorVerified: true,
         },
       });
 
@@ -186,7 +191,17 @@ const redeemAuthHandoffById = async ({
           return false;
         }
 
-        await createSession(sessionToken, payload.userId, { ipAddress, userAgent }, { isEmbed: true, tx });
+        await createSession(
+          sessionToken,
+          payload.userId,
+          { ipAddress, userAgent },
+          {
+            authMethod: ZSessionAuthMethodSchema.catch('unknown').parse(originatingSession.authMethod),
+            twoFactorVerified: originatingSession.twoFactorVerified,
+            isEmbed: true,
+            tx,
+          },
+        );
 
         return true;
       });

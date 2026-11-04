@@ -4,6 +4,7 @@ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../../trpc';
+import { twoFactorScope } from '../../two-factor-enforcement/enforce';
 import {
   getEnvelopeRecipientMeta,
   ZGetEnvelopeRecipientRequestSchema,
@@ -14,6 +15,7 @@ export const getEnvelopeRecipientRoute = authenticatedProcedure
   .meta(getEnvelopeRecipientMeta)
   .input(ZGetEnvelopeRecipientRequestSchema)
   .output(ZGetEnvelopeRecipientResponseSchema)
+  .use(twoFactorScope((input) => ({ recipient: input.recipientId })))
   .query(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
     const { recipientId } = input;

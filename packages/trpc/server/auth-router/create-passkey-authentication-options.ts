@@ -1,6 +1,7 @@
 import { createPasskeyAuthenticationOptions } from '@documenso/lib/server-only/auth/create-passkey-authentication-options';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorInstanceOnly } from '../two-factor-enforcement/enforce';
 import {
   ZCreatePasskeyAuthenticationOptionsRequestSchema,
   ZCreatePasskeyAuthenticationOptionsResponseSchema,
@@ -10,6 +11,7 @@ export const createPasskeyAuthenticationOptionsRoute = authenticatedProcedure
   .meta({ allowEmbedSession: true })
   .input(ZCreatePasskeyAuthenticationOptionsRequestSchema)
   .output(ZCreatePasskeyAuthenticationOptionsResponseSchema)
+  .use(twoFactorInstanceOnly())
   .mutation(async ({ ctx, input }) => {
     return await createPasskeyAuthenticationOptions({
       userId: ctx.user.id,

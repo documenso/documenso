@@ -12,6 +12,8 @@ type LoginOptions = {
   email?: string;
   password?: string;
 
+  totpCode?: string;
+
   /**
    * Where to navigate after login.
    */
@@ -22,6 +24,7 @@ export const apiSignin = async ({
   page,
   email = 'example@documenso.com',
   password = 'password',
+  totpCode,
   redirectPath = '/',
 }: LoginOptions) => {
   const { request } = page.context();
@@ -33,6 +36,7 @@ export const apiSignin = async ({
     data: {
       email,
       password,
+      totpCode,
       csrfToken,
     },
   });

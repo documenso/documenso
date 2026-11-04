@@ -5,13 +5,14 @@ import { hc } from 'hono/client';
 import superjson from 'superjson';
 
 import type { AuthAppType } from '../server';
-import type { SessionValidationResult } from '../server/lib/session/session';
 import type { PartialAccount } from '../server/lib/utils/get-accounts';
 import type { ActiveSession } from '../server/lib/utils/get-session';
 import { handleSignInRedirect } from '../server/lib/utils/redirect';
+import type { TSessionJsonResponse } from '../server/routes/session';
 import type {
   TDisableTwoFactorRequestSchema,
   TEnableTwoFactorRequestSchema,
+  TVerifyTwoFactorChallengeRequestSchema,
   TViewTwoFactorRecoveryCodesRequestSchema,
 } from '../server/routes/two-factor.types';
 import type {
@@ -29,9 +30,7 @@ type TEmailPasswordSignin = InferRequestType<AuthClientType['email-password']['a
   redirectPath?: string;
 };
 
-type TPasskeySignin = InferRequestType<AuthClientType['passkey']['authorize']['$post']>['json'] & {
-  redirectPath?: string;
-};
+type TPasskeySignin = InferRequestType<AuthClientType['passkey']['authorize']['$post']>['json'];
 
 type TEmbedAuthStart = InferRequestType<AuthClientType['embed']['start']['$post']>['json'];
 
@@ -84,7 +83,7 @@ export class AuthClient {
 
     const result = await response.json();
 
-    return superjson.deserialize<SessionValidationResult>(result);
+    return superjson.deserialize<TSessionJsonResponse>(result);
   }
 
   public async getSessions() {
@@ -157,6 +156,18 @@ export class AuthClient {
         const error = await response.json();
 
         throw AppError.parseError(error);
+      }
+
+      const result = await response.json();
+
+      // Server-provided redirect for follow-up pages, e.g. re-enrolment after a
+      // backup-code sign-in reset 2FA.
+      if (result.redirectPath) {
+        const returnTo = data.redirectPath ? `?returnTo=${encodeURIComponent(data.redirectPath)}` : '';
+
+        handleSignInRedirect(`${result.redirectPath}${returnTo}`);
+
+        return;
       }
 
       handleSignInRedirect(data.redirectPath);
@@ -258,6 +269,8 @@ export class AuthClient {
 
         throw AppError.parseError(error);
       }
+
+      return response.json();
     },
     viewRecoveryCodes: async (data: TViewTwoFactorRecoveryCodesRequestSchema) => {
       const response = await this.client['two-factor']['view-recovery-codes'].$post({ json: data });
@@ -269,6 +282,39 @@ export class AuthClient {
       }
 
       return response.json();
+    },
+
+    getChallenge: async () => {
+      const response = await this.client['two-factor'].challenge.$get();
+
+      if (!response.ok) {
+        const error = await response.json();
+
+        throw AppError.parseError(error);
+      }
+
+      return response.json();
+    },
+
+    verifyChallenge: async (data: Omit<TVerifyTwoFactorChallengeRequestSchema, 'csrfToken'>) => {
+      const { csrfToken } = await this.client.csrf.$get().then(async (res) => res.json());
+
+      const response = await this.client['two-factor'].challenge.$post({
+        json: {
+          ...data,
+          csrfToken,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+
+        throw AppError.parseError(error);
+      }
+
+      const result = await response.json();
+
+      handleSignInRedirect(result.redirectPath);
     },
   };
 
@@ -282,7 +328,9 @@ export class AuthClient {
         throw AppError.parseError(error);
       }
 
-      handleSignInRedirect(data.redirectPath);
+      const result = await response.json();
+
+      handleSignInRedirect(result.url);
     },
   };
 
@@ -340,7 +388,7 @@ export class AuthClient {
 
       const result = await response.json();
 
-      return superjson.deserialize<SessionValidationResult>(result);
+      return superjson.deserialize<TSessionJsonResponse>(result);
     },
   };
 

@@ -6,6 +6,7 @@ import type { OrganisationGroupType, OrganisationMemberRole } from '@prisma/clie
 import { Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
+import { twoFactorScope } from '../two-factor-enforcement/enforce';
 import {
   ZFindOrganisationGroupsRequestSchema,
   ZFindOrganisationGroupsResponseSchema,
@@ -15,6 +16,7 @@ export const findOrganisationGroupsRoute = authenticatedProcedure
   // .meta(findOrganisationGroupsMeta)
   .input(ZFindOrganisationGroupsRequestSchema)
   .output(ZFindOrganisationGroupsResponseSchema)
+  .use(twoFactorScope((input) => ({ organisation: input.organisationId })))
   .query(async ({ input, ctx }) => {
     const { organisationId, types, query, page, perPage, organisationGroupId, organisationRoles, excludeTeamId } =
       input;

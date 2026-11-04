@@ -1,8 +1,14 @@
+import { getTwoFactorEnforcementStatus } from '@documenso/lib/server-only/2fa/get-two-factor-enforcement-status';
+import type { TTwoFactorEnforcementStatus } from '@documenso/lib/utils/two-factor';
 import { Hono } from 'hono';
 import superjson from 'superjson';
 
 import type { SessionValidationResult } from '../lib/session/session';
 import { getActiveSessions, getOptionalSession } from '../lib/utils/get-session';
+
+export type TSessionJsonResponse = SessionValidationResult & {
+  twoFactorEnforcement: TTwoFactorEnforcementStatus;
+};
 
 export const sessionRoute = new Hono()
   .get('/session', async (c) => {
@@ -18,5 +24,11 @@ export const sessionRoute = new Hono()
   .get('/session-json', async (c) => {
     const session: SessionValidationResult = await getOptionalSession(c);
 
-    return c.json(superjson.serialize(session));
+    const twoFactorEnforcement: TTwoFactorEnforcementStatus = session.isAuthenticated
+      ? await getTwoFactorEnforcementStatus({ user: session.user, session: session.session })
+      : { required: false };
+
+    const response: TSessionJsonResponse = { ...session, twoFactorEnforcement };
+
+    return c.json(superjson.serialize(response));
   });

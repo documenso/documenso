@@ -31,6 +31,9 @@ export const ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP = {
   MANAGE_BILLING: [OrganisationMemberRole.ADMIN],
   DELETE_ORGANISATION_TRANSFER_REQUEST: [OrganisationMemberRole.ADMIN],
   MANAGE_ORGANISATION: [OrganisationMemberRole.ADMIN, OrganisationMemberRole.MANAGER],
+  // ADMIN only: managers must not be able to lock members out via enforcement
+  // policy.
+  MANAGE_ORGANISATION_SECURITY: [OrganisationMemberRole.ADMIN],
 } satisfies Record<string, OrganisationMemberRole[]>;
 
 /**
