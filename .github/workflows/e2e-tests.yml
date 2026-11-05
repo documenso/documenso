@@ -33,14 +33,30 @@ jobs:
           if-no-files-found: error
 
   e2e_tests:
-    name: 'E2E Tests (${{ matrix.shard }}/${{ strategy.job-total }})'
+    name: 'E2E Tests (${{ matrix.name }})'
     timeout-minutes: 30
     runs-on: warp-ubuntu-2204-x64-8x
     needs: build
     strategy:
       fail-fast: false
+      # API tests run ~10x faster than UI tests, so Playwright's count-based sharding
+      # leaves the UI tests piled into the last shards. Shard the UI project on its own.
       matrix:
-        shard: [1, 2, 3, 4]
+        include:
+          - name: api
+            args: --project=api --project=license
+          - name: ui-1
+            args: --project=ui --shard=1/6
+          - name: ui-2
+            args: --project=ui --shard=2/6
+          - name: ui-3
+            args: --project=ui --shard=3/6
+          - name: ui-4
+            args: --project=ui --shard=4/6
+          - name: ui-5
+            args: --project=ui --shard=5/6
+          - name: ui-6
+            args: --project=ui --shard=6/6
     steps:
       - uses: actions/checkout@v4
 
@@ -68,7 +84,7 @@ jobs:
       - name: Run Playwright tests
         run: npm run test:e2e -w @documenso/app-tests
         env:
-          E2E_SHARD: ${{ matrix.shard }}/${{ strategy.job-total }}
+          E2E_PLAYWRIGHT_ARGS: ${{ matrix.args }}
           # Needed since we use next start which will set the NODE_ENV to production
           NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: './example/cert.p12'
           DANGEROUS_BYPASS_RATE_LIMITS: 'true'
@@ -76,7 +92,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results-${{ matrix.shard }}
+          name: test-results-${{ matrix.name }}
           path: 'packages/app-tests/**/test-results/*'
           retention-days: 7
 
