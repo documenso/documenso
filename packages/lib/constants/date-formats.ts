@@ -166,6 +166,14 @@ export const DATE_FORMATS = [
   value: (typeof VALID_DATE_FORMAT_VALUES)[number];
 }[];
 
+/**
+ * Determines whether a given Luxon/date format string represents only date components
+ * without any time of day (hours, minutes, seconds).
+ */
+export const isDateOnlyFormat = (format: string): boolean => {
+  return !/[Hhms]/.test(format);
+};
+
 export const convertToLocalSystemFormat = (
   customText: string,
   dateFormat: string | null = DEFAULT_DOCUMENT_DATE_FORMAT,
@@ -182,7 +190,11 @@ export const convertToLocalSystemFormat = (
     return 'Invalid date';
   }
 
-  const formattedDate = parsedDate.toLocal().toFormat(coalescedDateFormat);
+  // Date-only formats represent a calendar date without a time of day.
+  // Converting midnight to a local timezone west of the document timezone shifts the date to the prior day.
+  const targetDate = isDateOnlyFormat(coalescedDateFormat) ? parsedDate : parsedDate.toLocal();
+
+  const formattedDate = targetDate.toFormat(coalescedDateFormat);
 
   return formattedDate;
 };
