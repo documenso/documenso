@@ -1,5 +1,6 @@
 import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentMetaUpdateSchema } from '@documenso/lib/types/document-meta';
+import { ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';
 import {
   ZClampedFieldHeightSchema,
   ZClampedFieldPositionXSchema,
@@ -10,10 +11,11 @@ import {
 import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { EnvelopeAttachmentSchema } from '@documenso/prisma/generated/zod/modelSchema/EnvelopeAttachmentSchema';
 import { ZSetEnvelopeRecipientSchema } from '@documenso/trpc/server/envelope-router/set-envelope-recipients.types';
+import { unique } from 'remeda';
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
-import { zfdFile, zodFormData } from '../../utils/zod-form-data';
+import { zfdContentImageFile, zfdFile, zodFormData } from '../../utils/zod-form-data';
 import { ZDocumentExternalIdSchema, ZDocumentTitleSchema, ZDocumentVisibilitySchema } from '../document-router/schema';
 
 export const ZUpdateEmbeddingEnvelopePayloadSchema = z.object({
@@ -25,6 +27,34 @@ export const ZUpdateEmbeddingEnvelopePayloadSchema = z.object({
     globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
     globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
     folderId: z.string().nullish(),
+
+    /**
+     * Contents missing from the list are deleted. When omitted the contents are
+     * left untouched.
+     */
+    contents: z
+      .object({
+        /** New contents use a temporary id starting with `PRESIGNED_`. */
+        id: z.string(),
+
+        envelopeItemId: z.string(),
+
+        contentMeta: ZEnvelopeContentMetaSchema,
+
+        /** Must already be attached to a content of this envelope; new images use `imageIndex`. */
+        dataContentId: z.string().nullable(),
+
+        imageIndex: z.number().int().min(0).optional(),
+      })
+      .refine((content) => !(content.dataContentId && content.imageIndex !== undefined), {
+        message: 'Cannot provide both dataContentId and imageIndex on the same content',
+        path: ['imageIndex'],
+      })
+      .array()
+      .refine((contents) => unique(contents.map((content) => content.id)).length === contents.length, {
+        message: 'Content IDs must be unique, no duplicate values allowed',
+      })
+      .optional(),
 
     /**
      * The list of envelope items that are part of the envelope.
@@ -105,6 +135,7 @@ export const ZUpdateEmbeddingEnvelopePayloadSchema = z.object({
 export const ZUpdateEmbeddingEnvelopeRequestSchema = zodFormData({
   payload: zfd.json(ZUpdateEmbeddingEnvelopePayloadSchema),
   files: zfd.repeatableOfType(zfdFile()),
+  contentImages: zfd.repeatableOfType(zfdContentImageFile()),
 });
 
 export const ZUpdateEmbeddingEnvelopeResponseSchema = z.void();

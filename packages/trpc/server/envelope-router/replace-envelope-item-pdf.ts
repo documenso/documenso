@@ -84,7 +84,7 @@ export const replaceEnvelopeItemPdfRoute = authenticatedProcedure
       });
     }
 
-    const { updatedItem, fields } = await UNSAFE_replaceEnvelopeItemPdf({
+    const { updatedItem, fields, contents } = await UNSAFE_replaceEnvelopeItemPdf({
       envelope,
       recipients: envelope.recipients,
       envelopeItemId,
@@ -104,5 +104,6 @@ export const replaceEnvelopeItemPdfRoute = authenticatedProcedure
     return {
       data: updatedItem,
       fields,
+      contents,
     };
   });
