@@ -15,6 +15,7 @@ export const FIELD_MIN_LETTER_SPACING = 0;
 export const FIELD_MAX_LETTER_SPACING = 100;
 
 export const DEFAULT_FIELD_FONT_SIZE = 12;
+export const DEFAULT_HANDWRITING_INITIALS_FONT_SIZE = 18;
 
 export const DEFAULT_SIGNATURE_OVERFLOW_MODE = 'auto';
 export const DEFAULT_DATE_OVERFLOW_MODE = 'auto';
@@ -53,7 +54,19 @@ export type GenericTextFieldTypeMetas =
   | TTextFieldMeta
   | TNumberFieldMeta;
 
-export const ZFieldMetaLineHeight = z.coerce
+export const resolveFieldFontSize = (fieldMeta?: GenericTextFieldTypeMetas | null): number => {
+  if (fieldMeta?.fontSize !== undefined) {
+    return fieldMeta.fontSize;
+  }
+
+  if (fieldMeta?.type === 'initials' && fieldMeta.fontFamily === 'handwriting') {
+    return DEFAULT_HANDWRITING_INITIALS_FONT_SIZE;
+  }
+
+  return DEFAULT_FIELD_FONT_SIZE;
+};
+
+const ZFieldMetaLineHeight = z.coerce
   .number()
   .min(FIELD_MIN_LINE_HEIGHT)
   .max(FIELD_MAX_LINE_HEIGHT)
@@ -65,9 +78,13 @@ export const ZFieldMetaLetterSpacing = z.coerce
   .max(FIELD_MAX_LETTER_SPACING)
   .describe('The spacing between each character');
 
-export const ZFieldMetaVerticalAlign = z
-  .enum(['top', 'middle', 'bottom'])
-  .describe('The vertical alignment of the text');
+const ZFieldMetaVerticalAlign = z.enum(['top', 'middle', 'bottom']).describe('The vertical alignment of the text');
+
+const ZFieldMetaFontFamily = z
+  .enum(['sans-serif', 'handwriting'])
+  .describe(
+    'The font family of the text, handwriting uses a cursive font. Only applied on envelopes, legacy documents ignore this value.',
+  );
 
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
@@ -87,6 +104,7 @@ export type TFieldTextAlignSchema = z.infer<typeof ZFieldTextAlignSchema>;
 export const ZInitialsFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('initials'),
   textAlign: ZFieldTextAlignSchema.optional(),
+  fontFamily: ZFieldMetaFontFamily.optional(),
 });
 
 export type TInitialsFieldMeta = z.infer<typeof ZInitialsFieldMeta>;

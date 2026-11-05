@@ -52,12 +52,18 @@ The initials field captures abbreviated signatures, typically used to acknowledg
 
 ### Configuration Options
 
-| Option         | Description                            |
-| -------------- | -------------------------------------- |
-| Required       | Whether the field must be completed    |
-| Read-only      | Lock the field with a pre-filled value |
-| Label          | Display text shown above the field     |
-| Text alignment | Left, center, or right alignment       |
+| Option         | Description                                                      |
+| -------------- | ---------------------------------------------------------------- |
+| Required       | Whether the field must be completed                              |
+| Read-only      | Lock the field with a pre-filled value                           |
+| Label          | Display text shown above the field                               |
+| Font family    | Sans-serif (default) or handwriting (cursive, 18px default size) |
+| Text alignment | Left, center, or right alignment                                 |
+
+<Callout type="info">
+  Font family is only available on envelopes. Legacy documents ignore the setting and always render
+  initials in sans-serif, even if the value is configured.
+</Callout>
 
 ### Common Use Cases
 
