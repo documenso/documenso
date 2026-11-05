@@ -437,6 +437,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
           dateFormat: 'yyyy-MM-dd hh:mm a',
           redirectUrl: '',
           emailSettings: {
+            attachDocument: true,
             documentDeleted: true,
             documentPending: true,
             recipientSigned: true,

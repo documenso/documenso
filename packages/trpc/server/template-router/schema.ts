@@ -1,7 +1,7 @@
 import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import { ZDocumentSchema } from '@documenso/lib/types/document';
 import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentEmailSettingsInputSchema } from '@documenso/lib/types/document-email';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import {
   ZDocumentMetaDateFormatSchema,
@@ -60,7 +60,7 @@ export const ZTemplateMetaUpsertSchema = z.object({
   distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
   emailId: z.string().nullish(),
   emailReplyTo: zEmail().nullish(),
-  emailSettings: ZDocumentEmailSettingsSchema.optional(),
+  emailSettings: ZDocumentEmailSettingsInputSchema.optional(),
   redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
   language: ZDocumentMetaLanguageSchema.optional(),
   typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
@@ -142,7 +142,7 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       dateFormat: ZDocumentMetaDateFormatSchema.optional(),
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
-      emailSettings: ZDocumentEmailSettingsSchema.optional(),
+      emailSettings: ZDocumentEmailSettingsInputSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
