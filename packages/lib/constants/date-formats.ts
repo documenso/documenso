@@ -166,6 +166,10 @@ export const DATE_FORMATS = [
   value: (typeof VALID_DATE_FORMAT_VALUES)[number];
 }[];
 
+export const isDateOnlyFormat = (dateFormat: string): boolean => {
+  return !/[hHmsa]/.test(dateFormat);
+};
+
 export const convertToLocalSystemFormat = (
   customText: string,
   dateFormat: string | null = DEFAULT_DOCUMENT_DATE_FORMAT,
@@ -182,7 +186,11 @@ export const convertToLocalSystemFormat = (
     return 'Invalid date';
   }
 
-  const formattedDate = parsedDate.toLocal().toFormat(coalescedDateFormat);
+  // Date-only formats represent a calendar date without a time of day.
+  // Converting date-only midnight to local time shifts the calendar day back by 1 for viewers west of document timezone.
+  const formattedDate = isDateOnlyFormat(coalescedDateFormat)
+    ? parsedDate.toFormat(coalescedDateFormat)
+    : parsedDate.toLocal().toFormat(coalescedDateFormat);
 
   return formattedDate;
 };
