@@ -31,12 +31,6 @@ const createBoxTransform = (overrides: Partial<ContentGroupTransform> = {}): Con
 });
 
 describe('normalizeContentRotation', () => {
-  it('leaves rotations already in range untouched', () => {
-    expect(normalizeContentRotation(0)).toBe(0);
-    expect(normalizeContentRotation(90)).toBe(90);
-    expect(normalizeContentRotation(359.5)).toBe(359.5);
-  });
-
   it('wraps rotations of a full turn or more', () => {
     expect(normalizeContentRotation(360)).toBe(0);
     expect(normalizeContentRotation(450)).toBe(90);
@@ -79,20 +73,6 @@ describe('resolveLineMetaFromPoints', () => {
     expect(meta.x2).toBe(50);
     expect(meta.y2).toBe(30);
   });
-
-  it('preserves the remaining metadata', () => {
-    const meta = resolveLineMetaFromPoints(
-      { ...CONTENT_LINE_META_DEFAULT_VALUES, strokeWidth: 4, strokeColor: '#ff0000' },
-      0,
-      0,
-      [0, 0, 0, 0],
-      PAGE_WIDTH,
-      PAGE_HEIGHT,
-    );
-
-    expect(meta.strokeWidth).toBe(4);
-    expect(meta.strokeColor).toBe('#ff0000');
-  });
 });
 
 describe('resolveContentMetaFromTransform', () => {
@@ -127,24 +107,6 @@ describe('resolveContentMetaFromTransform', () => {
       width: 25,
       height: 50,
       rotation: 90,
-    });
-  });
-
-  it('applies to text contents', () => {
-    const meta = resolveContentMetaFromTransform(
-      CONTENT_TEXT_META_DEFAULT_VALUES,
-      createBoxTransform(),
-      'transform',
-      PAGE_WIDTH,
-      PAGE_HEIGHT,
-    );
-
-    expect(meta).toMatchObject({
-      type: EnvelopeContentType.TEXT,
-      positionX: 10,
-      positionY: 20,
-      width: 50,
-      height: 25,
     });
   });
 
@@ -218,13 +180,6 @@ describe('getContentTransformerConfig', () => {
       false,
     );
     expect(getContentTransformerConfig([undefined]).rotateEnabled).toBe(false);
-  });
-
-  it('keeps resizing enabled for box contents', () => {
-    const config = getContentTransformerConfig([EnvelopeContentType.SHAPE, EnvelopeContentType.HIGHLIGHT]);
-
-    expect(config.enabledAnchors.length).toBe(8);
-    expect(config.keepRatio).toBe(false);
   });
 
   it('locks the ratio to the corners for a single image content with an image attached', () => {

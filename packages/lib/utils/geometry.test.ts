@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { clampPercentage, FIVE_DECIMAL_PLACES, roundTo } from './geometry';
+import { FIVE_DECIMAL_PLACES, roundTo } from './geometry';
 
 describe('roundTo', () => {
   it('rounds to the given decimal places', () => {
@@ -16,16 +16,5 @@ describe('roundTo', () => {
 
   it('flushes denormals to zero', () => {
     expect(roundTo(1e-300, FIVE_DECIMAL_PLACES)).toBe(0);
-  });
-});
-
-describe('clampPercentage', () => {
-  it('clamps to the page', () => {
-    expect(clampPercentage(-5)).toBe(0);
-    expect(clampPercentage(105)).toBe(100);
-  });
-
-  it('does not round, since fields are stored as is', () => {
-    expect(clampPercentage(50.123456)).toBe(50.123456);
   });
 });

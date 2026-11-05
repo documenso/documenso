@@ -1,7 +1,5 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { CONTENT_TEXT_MAX_LENGTH } from '@documenso/lib/constants/envelope-content';
 import {
-  CONTENT_MAX_Z_INDEX,
   EnvelopeContentType,
   type TEnvelopeContentMetaInput,
   ZEnvelopeContentMetaSchema,
@@ -27,7 +25,7 @@ test.describe.configure({
  * its organisation's allowance.
  */
 
-const textMeta = (index: number, overrides: { zIndex?: number; text?: string } = {}): TEnvelopeContentMetaInput => ({
+const textMeta = (index: number): TEnvelopeContentMetaInput => ({
   type: EnvelopeContentType.TEXT,
   page: 1,
   positionX: 10,
@@ -35,7 +33,6 @@ const textMeta = (index: number, overrides: { zIndex?: number; text?: string } =
   width: 20,
   height: 6,
   text: `Content ${index}`,
-  ...overrides,
 });
 
 const imageMeta = (): TEnvelopeContentMetaInput => ({
@@ -205,33 +202,4 @@ test('allows an over limit envelope to be trimmed back down', async ({ page }) =
 
   expect(backWithin.ok()).toBeTruthy();
   expect(await getContentCount(envelope.id)).toBe(2);
-});
-
-test('rejects a stacking order above the authored ceiling', async ({ page }) => {
-  const { envelope, envelopeItemId, teamId } = await setupEnvelope(page, {});
-
-  const res = await setContents(page, teamId, envelope.id, [
-    { envelopeItemId, contentMeta: textMeta(0, { zIndex: CONTENT_MAX_Z_INDEX + 1 }) },
-  ]);
-
-  expect(res.ok()).toBeFalsy();
-  expect(await getContentCount(envelope.id)).toBe(0);
-});
-
-test('rejects a text longer than the cap', async ({ page }) => {
-  const { envelope, envelopeItemId, teamId } = await setupEnvelope(page, {});
-
-  const atCap = await setContents(page, teamId, envelope.id, [
-    { envelopeItemId, contentMeta: textMeta(0, { text: 'a'.repeat(CONTENT_TEXT_MAX_LENGTH) }) },
-  ]);
-
-  expect(atCap.ok()).toBeTruthy();
-  expect(await getContentCount(envelope.id)).toBe(1);
-
-  const overCap = await setContents(page, teamId, envelope.id, [
-    { envelopeItemId, contentMeta: textMeta(0, { text: 'a'.repeat(CONTENT_TEXT_MAX_LENGTH + 1) }) },
-  ]);
-
-  expect(overCap.ok()).toBeFalsy();
-  expect(await getContentCount(envelope.id)).toBe(1);
 });

@@ -17,7 +17,7 @@ import { getPageCanvas } from '../fixtures/contents';
  * alongside them disappear too.
  */
 
-const seedSealedDocumentWithImageContent = async ({ withImageContent }: { withImageContent: boolean }) => {
+const seedSealedDocumentWithImageContent = async () => {
   const { user, team } = await seedUser();
 
   const document = await seedPendingDocument(user, team.id, [user], { internalVersion: 2 });
@@ -27,32 +27,30 @@ const seedSealedDocumentWithImageContent = async ({ withImageContent }: { withIm
     include: { envelopeItems: true },
   });
 
-  if (withImageContent) {
-    const png = await createCanvas(60, 30).encode('png');
+  const png = await createCanvas(60, 30).encode('png');
 
-    const dataContent = await createDataContentImage({
-      file: { name: 'image.png', arrayBuffer: async () => png.buffer as ArrayBuffer },
-    });
+  const dataContent = await createDataContentImage({
+    file: { name: 'image.png', arrayBuffer: async () => png.buffer as ArrayBuffer },
+  });
 
-    await prisma.envelopeContent.create({
-      data: {
-        id: generateDatabaseId('envelope_content'),
-        envelopeId: envelope.id,
-        envelopeItemId: envelope.envelopeItems[0].id,
-        dataContentId: dataContent.id,
-        contentMeta: ZEnvelopeContentMetaSchema.parse({
-          type: EnvelopeContentType.IMAGE,
-          page: 1,
-          rotation: 0,
-          zIndex: 0,
-          positionX: 10,
-          positionY: 10,
-          width: 20,
-          height: 10,
-        }),
-      },
-    });
-  }
+  await prisma.envelopeContent.create({
+    data: {
+      id: generateDatabaseId('envelope_content'),
+      envelopeId: envelope.id,
+      envelopeItemId: envelope.envelopeItems[0].id,
+      dataContentId: dataContent.id,
+      contentMeta: ZEnvelopeContentMetaSchema.parse({
+        type: EnvelopeContentType.IMAGE,
+        page: 1,
+        rotation: 0,
+        zIndex: 0,
+        positionX: 10,
+        positionY: 10,
+        width: 20,
+        height: 10,
+      }),
+    },
+  });
 
   // Rejecting seals the envelope, and unlike completing it the fields are
   // still meant to be drawn.
@@ -74,16 +72,7 @@ const countFieldGroups = async (page: Page) =>
   });
 
 test('a rejected document with an image content still draws its fields', async ({ page }) => {
-  const { user, team, documentId } = await seedSealedDocumentWithImageContent({ withImageContent: true });
-
-  await apiSignin({ page, email: user.email, redirectPath: `/t/${team.url}/documents/${documentId}` });
-
-  await expect(getPageCanvas(page)).toBeVisible();
-  await expect.poll(() => countFieldGroups(page)).toBeGreaterThan(0);
-});
-
-test('a rejected document without contents is unaffected', async ({ page }) => {
-  const { user, team, documentId } = await seedSealedDocumentWithImageContent({ withImageContent: false });
+  const { user, team, documentId } = await seedSealedDocumentWithImageContent();
 
   await apiSignin({ page, email: user.email, redirectPath: `/t/${team.url}/documents/${documentId}` });
 

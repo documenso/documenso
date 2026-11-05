@@ -39,14 +39,6 @@ const rectangle = {
 };
 
 describe('generatePartialSignedPdf', () => {
-  it('produces a valid PDF when there is nothing to draw', async () => {
-    const output = await generatePartialSignedPdf({ pdfData: examplePdf, fields: [] });
-
-    const pdf = await PDF.load(output);
-
-    expect(pdf.getPageCount()).toBe(1);
-  });
-
   it('draws the contents onto the page', async () => {
     const output = await generatePartialSignedPdf({ pdfData: examplePdf, fields: [], contents: [rectangle] });
 

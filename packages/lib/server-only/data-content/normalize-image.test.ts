@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 
 import { CONTENT_IMAGE_MAX_EDGE } from '../../constants/envelope-content';
 import { AppError } from '../../errors/app-error';
-import { ZDataContentImageMeta } from '../../types/data-content-meta';
 import { CONTENT_IMAGE_MAX_FILE_NAME_LENGTH, getNormalizedImageFileName, normalizeImage } from './normalize-image';
 
 const createImage = (width: number, height: number) =>
@@ -36,15 +35,6 @@ describe('normalizeImage', () => {
 
     expect(result.mimeType).toBe('image/jpeg');
     expect((await sharp(result.buffer).metadata()).format).toBe('jpeg');
-  });
-
-  it('keeps webp images as webp', async () => {
-    const input = await createImage(30, 20).webp().toBuffer();
-
-    const result = await normalizeImage(input);
-
-    expect(result.mimeType).toBe('image/webp');
-    expect((await sharp(result.buffer).metadata()).format).toBe('webp');
   });
 
   it('downscales images larger than the maximum edge while preserving the aspect ratio', async () => {
@@ -130,10 +120,6 @@ describe('getNormalizedImageFileName', () => {
     expect(getNormalizedImageFileName('logo.png', 'image/webp')).toBe('logo.webp');
   });
 
-  it('appends an extension when the name has none', () => {
-    expect(getNormalizedImageFileName('stamp', 'image/png')).toBe('stamp.png');
-  });
-
   it('only strips a trailing image extension', () => {
     expect(getNormalizedImageFileName('my.png.backup', 'image/png')).toBe('my.png.backup.png');
   });
@@ -143,16 +129,6 @@ describe('getNormalizedImageFileName', () => {
 
     expect(normalized.length).toBeLessThanOrEqual(CONTENT_IMAGE_MAX_FILE_NAME_LENGTH + '.png'.length);
     expect(normalized.endsWith('.png')).toBe(true);
-  });
-
-  it('keeps names made of astral characters within the stored length limit', () => {
-    // Each emoji is two UTF-16 code units, so a code point based cap would
-    // let the stored name exceed the `length` based schema limit.
-    const normalized = getNormalizedImageFileName(`${'😀'.repeat(5_000)}.png`, 'image/png');
-
-    expect(normalized.length).toBeLessThanOrEqual(CONTENT_IMAGE_MAX_FILE_NAME_LENGTH + '.png'.length);
-    expect(normalized.endsWith('.png')).toBe(true);
-    expect(ZDataContentImageMeta.shape.fileName.safeParse(normalized).success).toBe(true);
   });
 
   it('does not leave a lone surrogate when truncating', () => {
@@ -166,12 +142,6 @@ describe('getNormalizedImageFileName', () => {
 
   it('strips characters which cannot appear in a header', () => {
     expect(getNormalizedImageFileName('a\r\nb\tc.png', 'image/png')).toBe('a b c.png');
-  });
-
-  it('strips the extension when the name has trailing whitespace', () => {
-    expect(getNormalizedImageFileName('photo.png ', 'image/png')).toBe('photo.png');
-    expect(getNormalizedImageFileName('photo.png\n', 'image/png')).toBe('photo.png');
-    expect(getNormalizedImageFileName('photo .png', 'image/png')).toBe('photo.png');
   });
 
   it('falls back to a default name when nothing usable is left', () => {

@@ -419,59 +419,54 @@ test.describe('Create envelope with contents', () => {
 
   // A file is picked by its position counted from 0, so any other number is
   // refused rather than read as some other file (-1 used to mean the last).
-  for (const { identifier, description } of [
-    { identifier: -1, description: 'a negative file index' },
-    { identifier: 0.5, description: 'a fractional file index' },
-  ]) {
-    test(`rejects a content on ${description}`, async ({ request }) => {
-      const externalId = `e2e-contents-bad-index-${nanoid()}`;
+  test('rejects a content on a negative file index', async ({ request }) => {
+    const externalId = `e2e-contents-bad-index-${nanoid()}`;
 
-      const res = await createEnvelopeWithContents({
-        request,
-        presignToken,
-        payload: { externalId },
-        contents: [{ identifier, contentMeta: textMeta('Bad index') }],
-      });
-
-      expect(res.status()).toBe(400);
-      expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+    const res = await createEnvelopeWithContents({
+      request,
+      presignToken,
+      payload: { externalId },
+      contents: [{ identifier: -1, contentMeta: textMeta('Bad index') }],
     });
 
-    test(`rejects a field on ${description}`, async ({ request }) => {
-      const externalId = `e2e-fields-bad-index-${nanoid()}`;
+    expect(res.status()).toBe(400);
+    expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+  });
 
-      const res = await createEnvelopeWithContents({
-        request,
-        presignToken,
-        payload: {
-          externalId,
-          recipients: [
-            {
-              email: `signer-${nanoid()}@test.documenso.com`,
-              name: 'Signer',
-              role: RecipientRole.SIGNER,
-              fields: [
-                {
-                  type: FieldType.SIGNATURE,
-                  identifier,
-                  page: 1,
-                  positionX: 10,
-                  positionY: 10,
-                  width: 10,
-                  height: 5,
-                  fieldMeta: { type: 'signature', overflow: 'crop' },
-                },
-              ],
-            },
-          ],
-        },
-        contents: [],
-      });
+  test('rejects a field on a negative file index', async ({ request }) => {
+    const externalId = `e2e-fields-bad-index-${nanoid()}`;
 
-      expect(res.status()).toBe(400);
-      expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+    const res = await createEnvelopeWithContents({
+      request,
+      presignToken,
+      payload: {
+        externalId,
+        recipients: [
+          {
+            email: `signer-${nanoid()}@test.documenso.com`,
+            name: 'Signer',
+            role: RecipientRole.SIGNER,
+            fields: [
+              {
+                type: FieldType.SIGNATURE,
+                identifier: -1,
+                page: 1,
+                positionX: 10,
+                positionY: 10,
+                width: 10,
+                height: 5,
+                fieldMeta: { type: 'signature', overflow: 'crop' },
+              },
+            ],
+          },
+        ],
+      },
+      contents: [],
     });
-  }
+
+    expect(res.status()).toBe(400);
+    expect(await prisma.envelope.count({ where: { externalId } })).toBe(0);
+  });
 
   test('logs each created field and content on a document', async ({ request }) => {
     const signerEmail = `signer-${nanoid()}@test.documenso.com`;

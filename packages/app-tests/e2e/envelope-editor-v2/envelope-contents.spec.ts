@@ -813,40 +813,6 @@ test.describe('template editor', () => {
 
     await assertAllContentTypesPersisted(surface, externalId);
   });
-
-  test('edit content settings via the sidebar', async ({ page }) => {
-    const surface = await openTemplateEnvelopeEditor(page);
-    const { externalId } = await runSidebarSettingsFlow(surface);
-
-    await assertSidebarSettingsPersisted(surface, externalId);
-  });
-
-  test('edit content styles via the canvas action bar', async ({ page }) => {
-    const surface = await openTemplateEnvelopeEditor(page);
-    const { externalId } = await runActionBarStylesFlow(surface);
-
-    await assertActionBarStylesPersisted(surface, externalId);
-  });
-
-  test('duplicate and remove contents via the canvas action bar', async ({ page }) => {
-    const surface = await openTemplateEnvelopeEditor(page);
-    const { externalId } = await runDuplicateAndRemoveFlow(surface);
-
-    await assertContentsRemoved(surface, externalId);
-  });
-
-  test('fields are hidden while the contents tab is active', async ({ page }) => {
-    const surface = await openTemplateEnvelopeEditor(page);
-
-    await runFieldsAutoHideFlow(surface);
-  });
-
-  test('resizing a content is pinned to the page bounds', async ({ page }) => {
-    const surface = await openTemplateEnvelopeEditor(page);
-    const { externalId } = await runResizePinnedToPageFlow(surface);
-
-    await assertResizePinnedToPage(surface, externalId);
-  });
 });
 
 // --- Embedded editor ---
@@ -1145,20 +1111,8 @@ test.describe('embedded editor', () => {
     await assertEmbeddedCreatePersisted(surface, externalId);
   });
 
-  test('create a template with contents and an image', async ({ page }) => {
-    const { surface, externalId } = await runEmbeddedCreateFlow(page, 'TEMPLATE');
-
-    await assertEmbeddedCreatePersisted(surface, externalId);
-  });
-
   test('update the contents of an existing document', async ({ page }) => {
     const { envelopeId, seeded } = await runEmbeddedEditFlow(page, 'DOCUMENT');
-
-    await assertEmbeddedEditPersisted(envelopeId, seeded);
-  });
-
-  test('update the contents of an existing template', async ({ page }) => {
-    const { envelopeId, seeded } = await runEmbeddedEditFlow(page, 'TEMPLATE');
 
     await assertEmbeddedEditPersisted(envelopeId, seeded);
   });

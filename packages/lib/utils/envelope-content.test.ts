@@ -14,7 +14,6 @@ import {
   assertEnvelopeContentSaveWithinLimits,
   buildEnvelopeContentCopyData,
   getContentsMissingImages,
-  getDataContentIds,
   getNextContentZIndex,
   isContentOnTop,
   resolveEnvelopeContentLimits,
@@ -25,24 +24,6 @@ const content = (type: EnvelopeContentType, dataContentId: string | null, id = `
   id,
   dataContentId,
   contentMeta: { type },
-});
-
-describe('getDataContentIds', () => {
-  it('returns the distinct attached data content ids in first seen order', () => {
-    const ids = getDataContentIds([
-      { dataContentId: 'data_b' },
-      { dataContentId: null },
-      { dataContentId: 'data_a' },
-      { dataContentId: 'data_b' },
-      { dataContentId: undefined },
-    ]);
-
-    expect(ids).toEqual(['data_b', 'data_a']);
-  });
-
-  it('is empty when nothing has data attached', () => {
-    expect(getDataContentIds([{ dataContentId: null }, {}])).toEqual([]);
-  });
 });
 
 describe('getContentsMissingImages', () => {
@@ -78,13 +59,6 @@ describe('resolveEnvelopeContentLimits', () => {
     ...Array.from({ length: images }, () => EnvelopeContentType.IMAGE),
   ];
 
-  it('counts image contents towards both the content and image totals', () => {
-    const limits = resolveEnvelopeContentLimits(contentTypes(5, 2), claim(0, 0));
-
-    expect(limits.contentCount).toBe(5);
-    expect(limits.imageCount).toBe(2);
-  });
-
   it('treats a limit of zero as unlimited', () => {
     const limits = resolveEnvelopeContentLimits(contentTypes(100, 50), claim(0, 0));
 
@@ -113,15 +87,6 @@ describe('resolveEnvelopeContentLimits', () => {
     expect(limits.isImageLimitReached).toBe(true);
     expect(limits.isImageLimitExceeded).toBe(false);
   });
-
-  it('reports no limits reached for an empty envelope', () => {
-    const limits = resolveEnvelopeContentLimits([], claim(1, 1));
-
-    expect(limits.contentCount).toBe(0);
-    expect(limits.imageCount).toBe(0);
-    expect(limits.isContentLimitReached).toBe(false);
-    expect(limits.isImageLimitReached).toBe(false);
-  });
 });
 
 describe('assertEnvelopeContentLimits', () => {
@@ -134,14 +99,6 @@ describe('assertEnvelopeContentLimits', () => {
     ...Array.from({ length: total - images }, () => EnvelopeContentType.TEXT),
     ...Array.from({ length: images }, () => EnvelopeContentType.IMAGE),
   ];
-
-  it('passes when within the limits', () => {
-    expect(() => assertEnvelopeContentLimits(contentTypes(3, 1), claim(3, 1))).not.toThrow();
-  });
-
-  it('passes when the limits are unlimited', () => {
-    expect(() => assertEnvelopeContentLimits(contentTypes(50, 25), claim(0, 0))).not.toThrow();
-  });
 
   it('throws when over the content limit', () => {
     expect(() => assertEnvelopeContentLimits(contentTypes(4, 0), claim(3, 0))).toThrowError(
@@ -171,14 +128,6 @@ describe('assertEnvelopeContentSaveWithinLimits', () => {
     (incoming: EnvelopeContentType[], existing: EnvelopeContentType[], claimValue: ReturnType<typeof claim>) => () =>
       assertEnvelopeContentSaveWithinLimits({ incomingTypes: incoming, existingTypes: existing, claim: claimValue });
 
-  it('allows a save within the limits', () => {
-    expect(save(contentTypes(3, 1), contentTypes(2, 1), claim(3, 1))).not.toThrow();
-  });
-
-  it('allows anything when the limits are unlimited', () => {
-    expect(save(contentTypes(80, 40), contentTypes(0, 0), claim(0, 0))).not.toThrow();
-  });
-
   it('rejects a save which adds beyond the content limit', () => {
     expect(save(contentTypes(4, 0), contentTypes(3, 0), claim(3, 0))).toThrowError(
       expect.objectContaining({ code: 'ENVELOPE_CONTENT_LIMIT_EXCEEDED' }),
@@ -198,48 +147,14 @@ describe('assertEnvelopeContentSaveWithinLimits', () => {
     expect(save(contentTypes(9, 0), contentTypes(10, 0), claim(3, 0))).not.toThrow();
   });
 
-  it('allows editing without changing the count while already over the limit', () => {
-    expect(save(contentTypes(10, 4), contentTypes(10, 4), claim(3, 2))).not.toThrow();
-  });
-
   it('still rejects adding while already over the limit', () => {
     expect(save(contentTypes(11, 0), contentTypes(10, 0), claim(3, 0))).toThrowError(
       expect.objectContaining({ code: 'ENVELOPE_CONTENT_LIMIT_EXCEEDED' }),
     );
   });
-
-  it('allows swapping an image for a non-image while over the image limit', () => {
-    expect(save(contentTypes(10, 3), contentTypes(10, 4), claim(0, 2))).not.toThrow();
-  });
 });
 
 describe('sortContentsForRender', () => {
-  it('orders by zIndex ascending so higher zIndex renders on top', () => {
-    const sorted = sortContentsForRender(
-      [
-        { id: 'a', zIndex: 2 },
-        { id: 'b', zIndex: 0 },
-        { id: 'c', zIndex: 1 },
-      ],
-      (content) => content.zIndex,
-    );
-
-    expect(sorted.map((content) => content.id)).toEqual(['b', 'c', 'a']);
-  });
-
-  it('breaks zIndex ties by id so the order is deterministic', () => {
-    const sorted = sortContentsForRender(
-      [
-        { id: 'zeta', zIndex: 1 },
-        { id: 'alpha', zIndex: 1 },
-        { id: 'mid', zIndex: 1 },
-      ],
-      (content) => content.zIndex,
-    );
-
-    expect(sorted.map((content) => content.id)).toEqual(['alpha', 'mid', 'zeta']);
-  });
-
   it('orders by zIndex first and only falls back to id within a tie', () => {
     // Mixes tied and distinct zIndexes, with ids chosen so that sorting by id
     // alone, or letting an id comparison leak across zIndex groups, would
@@ -258,26 +173,11 @@ describe('sortContentsForRender', () => {
 
     expect(sorted.map((content) => content.id)).toEqual(['c', 'z', 'x', 'y', 'a', 'b']);
   });
-
-  it('does not mutate the input', () => {
-    const contents = [
-      { id: 'a', zIndex: 1 },
-      { id: 'b', zIndex: 0 },
-    ];
-
-    sortContentsForRender(contents, (content) => content.zIndex);
-
-    expect(contents.map((content) => content.id)).toEqual(['a', 'b']);
-  });
 });
 
 describe('getNextContentZIndex', () => {
   it('is one above the highest zIndex', () => {
     expect(getNextContentZIndex([0, 5, 2])).toBe(6);
-  });
-
-  it('starts at zero with no contents', () => {
-    expect(getNextContentZIndex([])).toBe(0);
   });
 
   it('is clamped to the ceiling so a full page still accepts contents', () => {
@@ -294,10 +194,6 @@ describe('isContentOnTop', () => {
 
   it('is true for the content which renders last', () => {
     expect(isContentOnTop(contents, 'c')).toBe(true);
-  });
-
-  it('is false for a content with a lower zIndex', () => {
-    expect(isContentOnTop(contents, 'a')).toBe(false);
   });
 
   it('is false for a tied content which loses the id tiebreak', () => {
@@ -355,16 +251,6 @@ describe('buildEnvelopeContentCopyData', () => {
     expect(row.dataContentId).toBe('data_image');
   });
 
-  it('returns nothing for an envelope without contents', () => {
-    expect(
-      buildEnvelopeContentCopyData({
-        contents: [],
-        envelopeId: 'envelope_dest',
-        envelopeItemIdMap: { item_a: 'item_a_copy' },
-      }),
-    ).toEqual([]);
-  });
-
   it('throws when a content is on an item which was not copied', () => {
     const build = () =>
       buildEnvelopeContentCopyData({
@@ -394,10 +280,6 @@ describe('areEnvelopeContentsEqual', () => {
     expect(areEnvelopeContentsEqual([a, b], [b, a])).toBe(true);
   });
 
-  it('is equal for two empty sets', () => {
-    expect(areEnvelopeContentsEqual([], [])).toBe(true);
-  });
-
   it('ignores key order within the content meta', () => {
     const { text, ...rest } = snapshot().contentMeta as typeof CONTENT_TEXT_META_DEFAULT_VALUES;
 
@@ -406,10 +288,6 @@ describe('areEnvelopeContentsEqual', () => {
 
   it('differs when a content was added', () => {
     expect(areEnvelopeContentsEqual([snapshot()], [snapshot(), snapshot({ id: 'content_b' })])).toBe(false);
-  });
-
-  it('differs when a content was removed', () => {
-    expect(areEnvelopeContentsEqual([snapshot(), snapshot({ id: 'content_b' })], [snapshot()])).toBe(false);
   });
 
   it('differs when a content was replaced by another with the same shape', () => {

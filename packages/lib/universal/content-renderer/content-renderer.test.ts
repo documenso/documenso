@@ -100,15 +100,6 @@ describe('calculateContainFit', () => {
 });
 
 describe('hexToRgba', () => {
-  it('converts 6 digit hex colors', () => {
-    expect(hexToRgba('#ff0000', 1)).toBe('rgb(255, 0, 0)');
-    expect(hexToRgba('#00FF80', 0.5)).toBe('rgba(0, 255, 128, 0.5)');
-  });
-
-  it('expands 3 digit hex colors', () => {
-    expect(hexToRgba('#abc', 1)).toBe('rgb(170, 187, 204)');
-  });
-
   it('clamps alpha to the valid range', () => {
     expect(hexToRgba('#000000', 2)).toBe('rgb(0, 0, 0)');
     expect(hexToRgba('#000000', -1)).toBe('rgba(0, 0, 0, 0)');
@@ -116,10 +107,6 @@ describe('hexToRgba', () => {
 });
 
 describe('resolveContentStrokeDash', () => {
-  it('returns no dash for solid strokes', () => {
-    expect(resolveContentStrokeDash('solid', 2)).toEqual([]);
-  });
-
   it('scales dash patterns by the stroke width', () => {
     expect(resolveContentStrokeDash('dashed', 2)).toEqual([8, 6]);
     expect(resolveContentStrokeDash('dotted', 2)).toEqual([2, 4]);

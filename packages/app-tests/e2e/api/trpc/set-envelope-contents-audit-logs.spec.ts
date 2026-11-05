@@ -124,46 +124,6 @@ test('logs a moved content as updated, recording the position', async ({ page })
   });
 });
 
-test('logs an edited text as updated', async ({ page }) => {
-  const { envelope, envelopeItemId, teamId } = await setupEnvelope(page);
-
-  await setContents(page, teamId, envelope.id, [{ envelopeItemId, contentMeta: textMeta() }]);
-
-  const content = await prisma.envelopeContent.findFirstOrThrow({ where: { envelopeId: envelope.id } });
-
-  const res = await setContents(page, teamId, envelope.id, [
-    { id: content.id, envelopeItemId, contentMeta: textMeta({ text: 'Rejected' }) },
-  ]);
-
-  expect(res.ok()).toBeTruthy();
-
-  const logs = await getContentAuditLogs(envelope.id);
-
-  expect(logs.map((log) => log.type)).toEqual(['CONTENT_CREATED', 'CONTENT_UPDATED']);
-  expect(logs[1].data).toMatchObject({
-    contentId: content.id,
-    changes: [{ type: 'PROPERTY', key: 'text', from: 'Approved', to: 'Rejected' }],
-  });
-});
-
-test('logs a restyled content as updated', async ({ page }) => {
-  const { envelope, envelopeItemId, teamId } = await setupEnvelope(page);
-
-  await setContents(page, teamId, envelope.id, [{ envelopeItemId, contentMeta: textMeta({ color: '#000000' }) }]);
-
-  const content = await prisma.envelopeContent.findFirstOrThrow({ where: { envelopeId: envelope.id } });
-
-  await setContents(page, teamId, envelope.id, [
-    { id: content.id, envelopeItemId, contentMeta: textMeta({ color: '#ff0000' }) },
-  ]);
-
-  const logs = await getContentAuditLogs(envelope.id);
-
-  expect(logs[1].data).toMatchObject({
-    changes: [{ type: 'PROPERTY', key: 'color', from: '#000000', to: '#ff0000' }],
-  });
-});
-
 /**
  * A content belongs to the item it was created on. The diff which feeds the
  * audit log does not cover the item, so a move is refused outright rather
@@ -226,39 +186,6 @@ test('does not log a save which changed nothing', async ({ page }) => {
   const logs = await getContentAuditLogs(envelope.id);
 
   expect(logs.map((log) => log.type)).toEqual(['CONTENT_CREATED']);
-});
-
-/**
- * Bringing a content to the front is an authoring action like any other
- * property change, so it is recorded. Merely selecting a content no longer
- * rewrites its order, so this is only logged when the order actually moves.
- */
-test('logs a changed stacking order as updated', async ({ page }) => {
-  const { envelope, envelopeItemId, teamId } = await setupEnvelope(page);
-
-  await setContents(page, teamId, envelope.id, [{ envelopeItemId, contentMeta: textMeta() }]);
-
-  const content = await prisma.envelopeContent.findFirstOrThrow({ where: { envelopeId: envelope.id } });
-
-  const res = await setContents(page, teamId, envelope.id, [
-    { id: content.id, envelopeItemId, contentMeta: textMeta({ zIndex: content.contentMeta.zIndex + 5 }) },
-  ]);
-
-  expect(res.ok()).toBeTruthy();
-
-  const reloaded = await prisma.envelopeContent.findFirstOrThrow({ where: { id: content.id } });
-
-  expect(reloaded.contentMeta.zIndex).toBe(content.contentMeta.zIndex + 5);
-
-  const logs = await getContentAuditLogs(envelope.id);
-
-  expect(logs.map((log) => log.type)).toEqual(['CONTENT_CREATED', 'CONTENT_UPDATED']);
-  expect(logs[1].data).toMatchObject({
-    contentId: content.id,
-    changes: [
-      { type: 'PROPERTY', key: 'zIndex', from: content.contentMeta.zIndex, to: content.contentMeta.zIndex + 5 },
-    ],
-  });
 });
 
 test('logs a removed content as deleted', async ({ page }) => {

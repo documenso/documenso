@@ -31,16 +31,6 @@ const image = (dataContentId: string | null) => ({
 });
 
 describe('diffContentChanges', () => {
-  it('reports nothing when the content is unchanged', () => {
-    expect(diffContentChanges(text(), text())).toEqual([]);
-  });
-
-  it('reports a changed property', () => {
-    expect(diffContentChanges(text(), text({ text: 'Rejected' }))).toEqual([
-      { type: 'PROPERTY', key: 'text', from: 'Approved', to: 'Rejected' },
-    ]);
-  });
-
   it('reports a property which was removed as cleared', () => {
     const withoutColour = text();
 

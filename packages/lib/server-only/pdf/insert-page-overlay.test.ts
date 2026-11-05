@@ -331,8 +331,16 @@ describe('insertPageOverlays', () => {
     expectAligned(await roundtrip({ rotation: 90, inherit: true }));
   }, 60000);
 
-  it.each([90, 180, 270] as const)('aligns with the client on a page rotated %d degrees', async (rotation) => {
-    expectAligned(await roundtrip({ rotation }));
+  it('aligns with the client on a page rotated 90 degrees', async () => {
+    expectAligned(await roundtrip({ rotation: 90 }));
+  }, 60000);
+
+  it('aligns with the client on a page rotated 180 degrees', async () => {
+    expectAligned(await roundtrip({ rotation: 180 }));
+  }, 60000);
+
+  it('aligns with the client on a page rotated 270 degrees', async () => {
+    expectAligned(await roundtrip({ rotation: 270 }));
   }, 60000);
 
   it.skip('aligns with the client on a rotated page with an offset crop box', async () => {

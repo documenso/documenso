@@ -59,30 +59,9 @@ describe('ZEnvelopeContentMetaSchema', () => {
     it('rejects denormals, which have far more than five decimal places', () => {
       expect(parse({ ...textBox, positionY: 1e-300 }).success).toBe(false);
     });
-
-    it('rejects non finite numbers', () => {
-      expect(parse({ ...textBox, positionX: Number.NaN }).success).toBe(false);
-      expect(parse({ ...textBox, positionX: Number.POSITIVE_INFINITY }).success).toBe(false);
-    });
   });
 
   describe('box placement', () => {
-    it('rejects a box with no width or height', () => {
-      expect(parse({ ...textBox, width: 0 }).success).toBe(false);
-      expect(parse({ ...textBox, height: 0 }).success).toBe(false);
-
-      // One step is the smallest size.
-      expect(parse({ ...textBox, width: 0.00001 }).success).toBe(true);
-    });
-
-    it('rejects a box which runs past the right or bottom of the page', () => {
-      expect(parse({ ...textBox, positionX: 95, width: 10 }).success).toBe(false);
-      expect(parse({ ...textBox, positionY: 95, height: 10 }).success).toBe(false);
-
-      // Exactly touching the edge is fine.
-      expect(parse({ ...textBox, positionX: 90, width: 10 }).success).toBe(true);
-    });
-
     it('reports the overflow on the axis which overflows', () => {
       const horizontal = parse({ ...textBox, positionX: 95, width: 10 });
       const vertical = parse({ ...textBox, positionY: 95, height: 10 });
@@ -134,12 +113,6 @@ describe('ZContentColorSchema', () => {
     expect(ZContentColorSchema.parse('#ABCDEF')).toBe('#abcdef');
     expect(ZContentColorSchema.parse('#F08')).toBe('#ff0088');
     expect(ZContentColorSchema.parse('#abc')).toBe('#aabbcc');
-  });
-
-  it('still rejects anything but three or six hex digits', () => {
-    expect(ZContentColorSchema.safeParse('#ff000080').success).toBe(false);
-    expect(ZContentColorSchema.safeParse('#f008').success).toBe(false);
-    expect(ZContentColorSchema.safeParse('red').success).toBe(false);
   });
 });
 

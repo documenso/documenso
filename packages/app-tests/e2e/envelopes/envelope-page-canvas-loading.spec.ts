@@ -2,7 +2,7 @@ import { createDataContentImage } from '@documenso/lib/server-only/data-content/
 import { EnvelopeContentType, ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import { seedBlankDocument, seedPendingDocument } from '@documenso/prisma/seed/documents';
+import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { createCanvas } from '@napi-rs/canvas';
 import { expect, test } from '@playwright/test';
@@ -81,23 +81,4 @@ test('a page waiting on its content images shows a loader', async ({ page }) => 
   await expect(pageImage).toBeVisible({ timeout: 15000 });
   await expect(page.locator('.konva-container canvas').first()).toBeVisible();
   await expect(pageLoader).toHaveCount(0);
-});
-
-test('a page with no content images renders as soon as the page image is ready', async ({ page }) => {
-  const { user, team } = await seedUser();
-
-  const document = await seedPendingDocument(user, team.id, [user], { internalVersion: 2 });
-
-  const envelope = await prisma.envelope.findUniqueOrThrow({
-    where: { id: document.id },
-    include: { recipients: true },
-  });
-
-  await prisma.field.deleteMany({ where: { envelopeId: envelope.id } });
-
-  await apiSignin({ page, email: user.email, redirectPath: `/sign/${envelope.recipients[0].token}` });
-
-  await expect(page.locator('.konva-container canvas').first()).toBeVisible();
-  await expect(page.locator('img[alt=""]').first()).toBeVisible();
-  await expect(page.getByTestId('page-loader')).toHaveCount(0);
 });

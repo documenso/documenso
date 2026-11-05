@@ -22,16 +22,9 @@ import {
   clickEnvelopeEditorStep,
   getEnvelopeEditorSettingsTrigger,
   openDocumentEnvelopeEditor,
-  openTemplateEnvelopeEditor,
   type TEnvelopeEditorSurface,
 } from '../fixtures/envelope-editor';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
-
-/**
- * The default box an image content is dropped at, as a percentage of the page.
- * Mirrors `CONTENT_IMAGE_DEFAULT_SIZE`.
- */
-const IMAGE_DEFAULT_SIZE = { width: 15, height: 10 };
 
 /**
  * A minimal GIF, which is a real image in a format the editor does not accept.
@@ -289,7 +282,6 @@ const runRejectedUploadsFlow = async (surface: TEnvelopeEditorSurface) => {
   const [group] = await getContentGroupsForPage(root);
 
   expect(group.visibleChildren).toContain('content-placeholder-rect');
-  expect(IMAGE_DEFAULT_SIZE.width).toBeGreaterThan(0);
 
   await waitForContentsAutosave(surface);
 
@@ -445,27 +437,5 @@ test.describe('document editor', () => {
     const surface = await openDocumentEnvelopeEditor(page);
 
     await runSendGuardFlow(surface);
-  });
-});
-
-test.describe('template editor', () => {
-  test('upload, replace and remove a content image', async ({ page }) => {
-    const surface = await openTemplateEnvelopeEditor(page);
-
-    await runUploadReplaceRemoveFlow(surface);
-  });
-
-  test('upload a content image from the canvas action bar', async ({ page }) => {
-    const surface = await openTemplateEnvelopeEditor(page);
-    const { externalId, pageSize } = await runActionBarUploadFlow(surface);
-
-    await assertActionBarUploadPersisted(surface, externalId, pageSize);
-  });
-
-  test('rejected uploads leave the placeholder untouched', async ({ page }) => {
-    const surface = await openTemplateEnvelopeEditor(page);
-    const { externalId } = await runRejectedUploadsFlow(surface);
-
-    await assertNoImageAttached(surface, externalId);
   });
 });

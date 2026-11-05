@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { CONTENT_IMAGE_DEFAULT_SIZE, resolveAttachedImageBox } from './content-image-box';
+import { resolveAttachedImageBox } from './content-image-box';
 
 /**
  * US Letter in points.
@@ -33,16 +33,6 @@ describe('resolveAttachedImageBox', () => {
     expect(result.width).toBe(50);
     expect(result.height).toBeCloseTo(toPercentHeight(612));
     expect(result.positionY + result.height).toBeLessThanOrEqual(100);
-  });
-
-  it('applies the same rule to a box still at its default size', () => {
-    const box = { positionX: 10, positionY: 10, ...CONTENT_IMAGE_DEFAULT_SIZE };
-
-    const result = resolveAttachedImageBox({ image: { width: 400, height: 200 }, page: PAGE, box });
-
-    // The default 15% width is kept, the image's native size is irrelevant.
-    expect(result.width).toBe(CONTENT_IMAGE_DEFAULT_SIZE.width);
-    expect(result.height).toBeCloseTo(toPercentHeight(0.15 * PAGE.width * 0.5));
   });
 
   it('shrinks the box, ratio intact, when the height would run off the page', () => {

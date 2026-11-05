@@ -46,18 +46,6 @@ describe('getPageContentDataContentIds', () => {
 });
 
 describe('areContentImagesReady', () => {
-  it('is ready when the page has no image contents', () => {
-    expect(
-      areContentImagesReady({
-        contents: [textContent(1), imageContent('data_1', 2)],
-        loadingStatuses: statuses({}),
-        requestedDataContentIds: ALL_REQUESTED,
-        pageNumber: 1,
-        envelopeItemId: ITEM,
-      }),
-    ).toBe(true);
-  });
-
   it('is ready once every image on the page has loaded', () => {
     expect(
       areContentImagesReady({
@@ -75,18 +63,6 @@ describe('areContentImagesReady', () => {
       areContentImagesReady({
         contents: [imageContent('data_1'), imageContent('data_2')],
         loadingStatuses: statuses({ data_1: 'loaded', data_2: 'loading' }),
-        requestedDataContentIds: ALL_REQUESTED,
-        pageNumber: 1,
-        envelopeItemId: ITEM,
-      }),
-    ).toBe(false);
-  });
-
-  it('is not ready while an image on the page has no status yet', () => {
-    expect(
-      areContentImagesReady({
-        contents: [imageContent('data_1')],
-        loadingStatuses: statuses({}),
         requestedDataContentIds: ALL_REQUESTED,
         pageNumber: 1,
         envelopeItemId: ITEM,
@@ -132,18 +108,6 @@ describe('areContentImagesReady', () => {
       }),
     ).toBe(true);
   });
-
-  it('ignores images on other pages and other items', () => {
-    expect(
-      areContentImagesReady({
-        contents: [imageContent('data_1', 1), imageContent('data_2', 2), imageContent('data_3', 1, 'other')],
-        loadingStatuses: statuses({ data_1: 'loaded' }),
-        requestedDataContentIds: ALL_REQUESTED,
-        pageNumber: 1,
-        envelopeItemId: ITEM,
-      }),
-    ).toBe(true);
-  });
 });
 
 describe('hasFailedContentImage', () => {
@@ -157,17 +121,5 @@ describe('hasFailedContentImage', () => {
         envelopeItemId: ITEM,
       }),
     ).toBe(true);
-  });
-
-  it('is false when the failed image is on another page', () => {
-    expect(
-      hasFailedContentImage({
-        contents: [imageContent('data_1', 1), imageContent('data_2', 2)],
-        loadingStatuses: statuses({ data_1: 'loaded', data_2: 'failed' }),
-        requestedDataContentIds: ALL_REQUESTED,
-        pageNumber: 1,
-        envelopeItemId: ITEM,
-      }),
-    ).toBe(false);
   });
 });

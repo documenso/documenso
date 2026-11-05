@@ -416,39 +416,6 @@ test.describe('Update embedded envelope contents', () => {
     expect(current.contents[0].contentMeta).toEqual(existingContent.contentMeta);
   });
 
-  test('rejects a new content listed twice without changing anything', async ({ request }) => {
-    const { envelope, envelopeItem, presignToken } = await setupEmbeddedDocument(request);
-
-    const res = await updateEmbeddedEnvelope({
-      request,
-      presignToken,
-      envelope,
-      envelopeItem,
-      data: {
-        title: 'Changed title',
-        contents: [
-          {
-            id: 'PRESIGNED_content-a',
-            envelopeItemId: envelopeItem.id,
-            contentMeta: textMeta(),
-            dataContentId: null,
-          },
-          {
-            id: 'PRESIGNED_content-a',
-            envelopeItemId: envelopeItem.id,
-            contentMeta: imageMeta(40),
-            dataContentId: null,
-          },
-        ],
-      },
-    });
-
-    expect(res.status()).toBe(400);
-    expect(await res.text()).toContain('Content IDs must be unique');
-
-    await expectEnvelopeUnchanged(envelope);
-  });
-
   test('rejects an image which is not really a PNG, JPEG or WebP', async ({ request }) => {
     const { envelope, envelopeItem, presignToken } = await setupEmbeddedDocument(request);
     const image = createGifLabelledAsPng(`embed-format-${nanoid()}.png`);

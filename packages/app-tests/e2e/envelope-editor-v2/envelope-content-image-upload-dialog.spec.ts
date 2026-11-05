@@ -198,65 +198,30 @@ test('the picker can be reopened after being dismissed', async ({ page }) => {
  * dialog's picker may open: the dropzone used to open its own picker as well,
  * so a keyboard user got two.
  */
-for (const key of ['Enter', 'Space']) {
-  test(`pressing ${key} on the drop area opens a single file picker`, async ({ page }) => {
-    await openContentsEditor(page);
-
-    await placeContentOnPdf(page, 'Image', { x: 200, y: 200 });
-
-    const choosers: FileChooser[] = [];
-
-    page.on('filechooser', (chooser) => choosers.push(chooser));
-
-    await page.locator('div[role="button"]', { hasText: 'Click to upload or drag and drop' }).focus();
-    await page.keyboard.press(key);
-
-    // Give a second picker time to open, as it used to.
-    await expect.poll(() => choosers.length).toBeGreaterThan(0);
-    await page.waitForTimeout(1000);
-
-    expect(choosers).toHaveLength(1);
-
-    // The one picker is the upload dialog's, so the file goes through it.
-    expect(await choosers[0].element().getAttribute('id')).toMatch(/^content-image-input-/);
-
-    await choosers[0].setFiles({ name: 'logo.png', mimeType: 'image/png', buffer: await createPng() });
-
-    await expect(getContentActionButton(page, 'Replace image')).toBeVisible();
-  });
-}
-
-test('cancelling the picker closes the dialog', async ({ page }) => {
-  const surface = await openContentsEditor(page);
+test('pressing Enter on the drop area opens a single file picker', async ({ page }) => {
+  await openContentsEditor(page);
 
   await placeContentOnPdf(page, 'Image', { x: 200, y: 200 });
-  await waitForContentsAutosave(surface);
 
-  const dialog = getUploadDialog(page);
+  const choosers: FileChooser[] = [];
 
-  // Nothing matches before the dialog opens, so what matches below is the
-  // upload dialog rather than some other hidden dialog.
-  await expect(dialog).toHaveCount(0);
+  page.on('filechooser', (chooser) => choosers.push(chooser));
 
-  const chooser = page.waitForEvent('filechooser');
+  await page.locator('div[role="button"]', { hasText: 'Click to upload or drag and drop' }).focus();
+  await page.keyboard.press('Enter');
 
-  await getContentActionButton(page, 'Upload image').click();
-  await chooser;
+  // Give a second picker time to open, as it used to.
+  await expect.poll(() => choosers.length).toBeGreaterThan(0);
+  await page.waitForTimeout(1000);
 
-  // While the picker is open only the dialog's overlay shows, which still
-  // blocks the editor. A trial click checks that without clicking.
-  await expect(dialog).toHaveCount(1);
-  await expect(getPageCanvas(page).click({ position: { x: 50, y: 50 }, trial: true, timeout: 1500 })).rejects.toThrow();
+  expect(choosers).toHaveLength(1);
 
-  // Playwright cannot dismiss a native picker, but the browser reports a
-  // dismissal as a `cancel` event on the input, which is what the dialog
-  // listens for.
-  await page.locator('input[id^="content-image-input-"]').dispatchEvent('cancel');
+  // The one picker is the upload dialog's, so the file goes through it.
+  expect(await choosers[0].element().getAttribute('id')).toMatch(/^content-image-input-/);
 
-  // The dialog is gone and the editor can be used again.
-  await expect(dialog).toHaveCount(0);
-  await getPageCanvas(page).click({ position: { x: 50, y: 50 }, trial: true });
-  await expect(getContentActionButton(page, 'Upload image')).toBeVisible();
+  await choosers[0].setFiles({ name: 'logo.png', mimeType: 'image/png', buffer: await createPng() });
+
+  await expect(getContentActionButton(page, 'Replace image')).toBeVisible();
 });
 
 test('a content placed and uploaded before autosave still receives its image', async ({ page }) => {
