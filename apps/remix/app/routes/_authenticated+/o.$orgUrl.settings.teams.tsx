@@ -1,6 +1,6 @@
 import { Input } from '@documenso/ui/primitives/input';
 import { useLingui } from '@lingui/react/macro';
-import { debounce, parseAsString, useQueryState } from 'nuqs';
+import { debounce, parseAsInteger, parseAsString, useQueryState } from 'nuqs';
 
 import { TeamCreateDialog } from '~/components/dialogs/team-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
@@ -13,6 +13,7 @@ export default function OrganisationSettingsTeamsPage() {
     'query',
     parseAsString.withDefault('').withOptions({ shallow: false, limitUrlUpdates: debounce(500) }),
   );
+  const [, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
 
   return (
     <div>
@@ -22,7 +23,10 @@ export default function OrganisationSettingsTeamsPage() {
 
       <Input
         value={searchQuery}
-        onChange={(e) => void setSearchQuery(e.target.value || null)}
+        onChange={(e) => {
+          void setSearchQuery(e.target.value || null);
+          void setPage(null);
+        }}
         placeholder={t`Search`}
         className="mb-4"
       />
