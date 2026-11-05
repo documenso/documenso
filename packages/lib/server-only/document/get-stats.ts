@@ -256,16 +256,18 @@ export const getStats = async ({ userId, teamId, period, search = '', folderId, 
 
   // EXPIRED: docs visible to the team/user with at least one expired, unsigned recipient.
   // Access control mirrors the EXPIRED branch in findDocuments so the count matches the listing.
-  const expiredQuery = buildBaseQuery().where((eb) => {
-    const accessBranches = [eb('Envelope.teamId', '=', team.id)];
+  const expiredQuery = buildBaseQuery()
+    .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
+    .where((eb) => {
+      const accessBranches = [eb('Envelope.teamId', '=', team.id)];
 
-    if (teamEmail) {
-      accessBranches.push(senderEmailIs(eb, teamEmail));
-      accessBranches.push(recipientExists(eb, teamEmail));
-    }
+      if (teamEmail) {
+        accessBranches.push(senderEmailIs(eb, teamEmail));
+        accessBranches.push(recipientExists(eb, teamEmail));
+      }
 
-    return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), hasExpiredRecipient(eb), eb.or(accessBranches)]);
-  });
+      return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), hasExpiredRecipient(eb), eb.or(accessBranches)]);
+    });
 
   // INBOX: non-draft docs where team email is a NOT_SIGNED, non-CC recipient
   // Returns 0 if the team has no team email.

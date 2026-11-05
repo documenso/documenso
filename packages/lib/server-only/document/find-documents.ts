@@ -318,13 +318,15 @@ export const findDocuments = async ({
           ),
       )
       .with(ExtendedDocumentStatus.EXPIRED, () =>
-        qb.where((eb) =>
-          eb.and([
-            personalDeletedFilter(eb),
-            hasExpiredRecipient(eb),
-            eb.or([eb('Envelope.userId', '=', user.id), recipientExists(eb, user.email)]),
-          ]),
-        ),
+        qb
+          .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
+          .where((eb) =>
+            eb.and([
+              personalDeletedFilter(eb),
+              hasExpiredRecipient(eb),
+              eb.or([eb('Envelope.userId', '=', user.id), recipientExists(eb, user.email)]),
+            ]),
+          ),
       )
       .exhaustive();
   };
@@ -477,16 +479,18 @@ export const findDocuments = async ({
         }),
       )
       .with(ExtendedDocumentStatus.EXPIRED, () =>
-        qb.where((eb) => {
-          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+        qb
+          .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
+          .where((eb) => {
+            const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
 
-          if (teamEmail) {
-            accessBranches.push(senderEmailIs(eb, teamEmail));
-            accessBranches.push(recipientExists(eb, teamEmail));
-          }
+            if (teamEmail) {
+              accessBranches.push(senderEmailIs(eb, teamEmail));
+              accessBranches.push(recipientExists(eb, teamEmail));
+            }
 
-          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), hasExpiredRecipient(eb), eb.or(accessBranches)]);
-        }),
+            return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), hasExpiredRecipient(eb), eb.or(accessBranches)]);
+          }),
       )
       .exhaustive();
   };
