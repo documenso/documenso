@@ -17,13 +17,6 @@ type EditorContentImageSettingsProps = {
   dataContentId?: string | null;
 };
 
-/**
- * Settings for image contents: the image itself.
- *
- * Uploads go through the shared upload dialog. This panel only offers the
- * ways to start one (drop, click, replace) and to remove the current image.
- * Geometry (page, position, size and rotation) is managed on the canvas.
- */
 export const EditorContentImageSettings = ({ formId, dataContentId }: EditorContentImageSettingsProps) => {
   const { t } = useLingui();
   const { editorContents } = useCurrentEnvelopeEditor();
@@ -36,8 +29,7 @@ export const EditorContentImageSettings = ({ formId, dataContentId }: EditorCont
     accept: Object.fromEntries(APP_CONTENT_IMAGE_MIME_TYPES.map((mimeType) => [mimeType, []])),
     multiple: false,
     maxSize: megabytesToBytes(APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT),
-    // A dropped file goes straight to the dialog; a click opens the picker
-    // through it instead of the dropzone's own input.
+    // Clicks open the picker through the dialog, not the dropzone's own input.
     noClick: true,
     onDrop: (acceptedFiles) => {
       const [file] = acceptedFiles;
@@ -46,9 +38,6 @@ export const EditorContentImageSettings = ({ formId, dataContentId }: EditorCont
         void ContentImageUploadDialog.call({ formId, file });
       }
     },
-    // A file which is too large or not a supported image goes to the dialog
-    // as well, which shows why it cannot be used. When several files were
-    // dropped, the first is used.
     onDropRejected: (fileRejections) => {
       const [rejection] = fileRejections;
 
@@ -114,9 +103,7 @@ export const EditorContentImageSettings = ({ formId, dataContentId }: EditorCont
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
 
-            // The dropzone runs its own handler after this one unless the
-            // event is stopped, and that would open its own picker as well
-            // as the dialog's.
+            // Otherwise the dropzone's own key handler opens a second picker.
             event.stopPropagation();
 
             void ContentImageUploadDialog.call({ formId });

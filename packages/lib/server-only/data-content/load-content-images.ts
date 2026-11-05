@@ -8,12 +8,6 @@ import type { ContentImageMap, ContentImageSource } from '../../universal/conten
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { getDataContentIds } from '../../utils/envelope-content';
 
-/**
- * Load and decode the images attached to the given contents, keyed by data
- * content ID, ready for the content renderer to draw on the server.
- *
- * Data contents which are not images are skipped.
- */
 export const loadContentImages = async (
   contents: Pick<EnvelopeContent, 'dataContentId'>[],
 ): Promise<ContentImageMap> => {

@@ -10,15 +10,9 @@ import {
   EditorContentStrokeWidthField,
 } from './editor-content-generic-field-forms';
 
-/**
- * Settings form for line contents, bound to the selected content's settings
- * form. Only the presentational settings are editable here; geometry (page
- * and endpoints) is managed on the canvas.
- */
 export const EditorContentLineForm = () => {
   const { form, isReady } = useContentSettingsForm<TContentLineFormSchema>();
 
-  // Mount the inputs only once the form holds this content's values.
   if (!isReady) {
     return null;
   }

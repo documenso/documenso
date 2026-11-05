@@ -399,8 +399,7 @@ const decorateAndSignPdf = async ({
   // Upgrade to PDF 1.7 for better compatibility with signing
   pdfDoc.upgradeVersion('1.7');
 
-  // The pages of the original document, before the certificate and audit log
-  // pages are appended, so the rejection stamp is only applied to those.
+  // Taken before the certificate and audit log pages are appended.
   const documentPageCount = pdfDoc.getPageCount();
 
   if (certificateDoc) {
@@ -450,8 +449,7 @@ const decorateAndSignPdf = async ({
     });
   }
 
-  // Add the rejection stamp after the fields and contents have been inserted
-  // so it is drawn on top of them, rather than being hidden by opaque contents.
+  // Stamped after the fields and contents so opaque contents cannot hide it.
   if (isRejected) {
     await addRejectionStampToPdf(pdfDoc, rejectionReason, { pageCount: documentPageCount });
   }

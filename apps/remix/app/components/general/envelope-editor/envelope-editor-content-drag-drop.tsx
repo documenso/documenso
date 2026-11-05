@@ -96,8 +96,7 @@ export const EnvelopeEditorContentDragDrop = ({ selectedEnvelopeItemId }: Envelo
 
   const [selectedContent, setSelectedContent] = useState<ContentDragDropItem | null>(null);
 
-  // Let the canvas know a content is being placed, so it can get its selection
-  // out of the way of the placement click.
+  // Lets the canvas get its selection out of the way of the placement click.
   useEffect(() => {
     setIsPlacingItem(selectedContent !== null);
 
@@ -153,15 +152,12 @@ export const EnvelopeEditorContentDragDrop = ({ selectedEnvelopeItemId }: Envelo
 
       const pageNumber = parseInt($page.getAttribute('data-page-number') ?? '1', 10);
 
-      // Calculate x and y as a percentage of the page width and height
       let pageX = ((event.pageX - left) / width) * 100;
       let pageY = ((event.pageY - top) / height) * 100;
 
-      // Get the bounds as a percentage of the page width and height
       const contentPageWidth = (contentBounds.current.width / width) * 100;
       const contentPageHeight = (contentBounds.current.height / height) * 100;
 
-      // And center it based on the bounds
       pageX -= contentPageWidth / 2;
       pageY -= contentPageHeight / 2;
 
@@ -243,9 +239,8 @@ export const EnvelopeEditorContentDragDrop = ({ selectedEnvelopeItemId }: Envelo
     );
   }
 
-  // The organisation's plan caps how much content an envelope may hold. Only
-  // adding is blocked: existing contents stay editable and removable so an
-  // envelope which went over its limit can be brought back down.
+  // Only adding is blocked: existing contents stay editable and removable so an
+  // envelope which went over its plan limit can be brought back down.
   if (contentLimits.isContentLimitReached || contentLimits.isImageLimitReached) {
     return (
       <Alert variant="warning" data-testid="content-limit-reached-alert">
@@ -292,8 +287,6 @@ export const EnvelopeEditorContentDragDrop = ({ selectedEnvelopeItemId }: Envelo
         <div
           className={cn(
             'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white font-noto text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted',
-            // Match the brand green used for the first recipient's fields and
-            // the rest of the content editor's selection affordances.
             getRecipientColorStyles('green').base,
             {
               '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isContentWithinBounds,
@@ -323,19 +316,8 @@ type BuildContentMetaOptions = {
   height: number;
 };
 
-/**
- * Build the content meta for a newly dropped content, merging the drop
- * geometry into the default values for the given content type.
- *
- * Geometry is handled per content type since it differs, e.g. lines use
- * start/end coordinates instead of a position and size.
- */
-/**
- * The screen size of the drag preview for a content type.
- *
- * Image contents preview at their page relative default size so the preview
- * matches the box which gets created, the rest use a fixed screen size.
- */
+// Image contents preview at their page relative default size so the preview
+// matches the box which gets created.
 const resolveDragBounds = (item: ContentDragDropItem | null, $page: Element) => {
   if (item !== null && CONTENT_TYPE_DATA_CONTENT_TYPE[item.type] !== undefined) {
     const { width, height } = getBoundingClientRect($page);
@@ -366,7 +348,6 @@ const buildContentMeta = ({
     .with(EnvelopeContentType.LINE, () => ({
       ...structuredClone(CONTENT_LINE_META_DEFAULT_VALUES),
       page,
-      // Lines are placed horizontally across the drop area, centered vertically.
       x1: positionX,
       x2: positionX + width,
       y1: positionY + height / 2,
@@ -375,9 +356,8 @@ const buildContentMeta = ({
     .with(EnvelopeContentType.IMAGE, () => ({
       ...structuredClone(CONTENT_IMAGE_META_DEFAULT_VALUES),
       page,
-      // Image contents use a page relative default size, so whether the
-      // author has resized the box can be told when an image is attached.
-      // Centered on the drop point like the other contents.
+      // A fixed page relative default size, so whether the author has resized
+      // the box can be told when an image is attached.
       positionX: positionX + width / 2 - CONTENT_IMAGE_DEFAULT_SIZE.width / 2,
       positionY: positionY + height / 2 - CONTENT_IMAGE_DEFAULT_SIZE.height / 2,
       ...CONTENT_IMAGE_DEFAULT_SIZE,

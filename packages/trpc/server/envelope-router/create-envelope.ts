@@ -53,10 +53,8 @@ type CreateEnvelopeRouteOptions = {
   teamId: number;
 
   /**
-   * This function is used by both embeds and normal flows.
-   *
-   * Since embeds also allow setting contents, we need to remap the type to allow
-   * undefined contents for normal flows.
+   * Shared by embeds and normal flows; only embeds send content images, so they
+   * are optional here.
    */
   input: Omit<TCreateEmbeddingEnvelopeRequest, 'contentImages'> & {
     contentImages?: File[];
@@ -166,10 +164,6 @@ export const createEnvelopeRouteCaller = async ({
     }),
   );
 
-  /**
-   * The document data of the uploaded file an identifier (file name or index)
-   * points to, the first file when there is no identifier.
-   */
   const getDocumentDataId = (identifier: string | number | undefined) => {
     const documentDataId = match(identifier)
       .with(P.string, (title) => envelopeItems.find((item) => item.title === title)?.documentDataId)
@@ -199,8 +193,6 @@ export const createEnvelopeRouteCaller = async ({
     })),
   }));
 
-  // Resolve the file of every content, and check the content is on a page
-  // that file has, before storing any of their images.
   const contentsWithDocumentData = contents.map((content) => {
     const documentDataId = getDocumentDataId(content.identifier);
     const envelopeItem = envelopeItems.find((item) => item.documentDataId === documentDataId);

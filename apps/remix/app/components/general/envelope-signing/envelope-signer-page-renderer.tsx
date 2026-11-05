@@ -538,11 +538,8 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
     }
   };
 
-  /**
-   * Render the contents when required.
-   *
-   * Since contents are imprinted on sent, we still need to render them for direct templates.
-   */
+  // Direct templates are signed without being sent, so their contents are not
+  // imprinted in the PDF yet and must still be rendered.
   const renderContents = () => {
     if (!pageLayer.current || areContentsImprinted(envelope.status)) {
       return;

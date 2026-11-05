@@ -470,14 +470,7 @@ export const seedAlignmentTestDocument = async ({
   });
 };
 
-/**
- * Seed a document with the content alignment PDF and one of every content
- * variant placed on its labelled grid, used for the content visual regression
- * test and for eyeballing content rendering in the editor.
- *
- * A single signature field sits in a spare cell so the document can be
- * signed and sealed.
- */
+/** The single signature field exists so the document can be signed and sealed. */
 export const seedContentAlignmentTestDocument = async ({
   userId,
   teamId,
@@ -552,7 +545,6 @@ export const seedContentAlignmentTestDocument = async ({
   const recipientId = recipients[0].id;
   const envelopeItemId = envelopeItems[0].id;
 
-  // The one field, in the free row below the text page's grid.
   await prisma.field.create({
     data: {
       type: 'SIGNATURE',
@@ -567,14 +559,12 @@ export const seedContentAlignmentTestDocument = async ({
     },
   });
 
-  // Contents sharing a zIndex are stacked by id, and ids are random. Hand the
-  // ids out in sorted order so the listed order of the fixture is also the
-  // stacking order, which keeps the equal zIndex case deterministic.
+  // Contents sharing a zIndex are stacked by id, so sorted ids make the fixture's
+  // listed order the stacking order and keep the equal zIndex case deterministic.
   const contentIds = CONTENT_ALIGNMENT_TEST_CONTENTS.map(() => prefixedId('envelope_content')).sort();
 
   // Images go through the real upload normalization so the stored bytes and
-  // content meta match what the editor would produce. One data content per
-  // content, since each content owns its data.
+  // content meta match what the editor would produce.
   for (const [index, content] of CONTENT_ALIGNMENT_TEST_CONTENTS.entries()) {
     let dataContentId: string | null = null;
 

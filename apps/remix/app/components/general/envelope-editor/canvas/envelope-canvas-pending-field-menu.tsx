@@ -7,10 +7,6 @@ type EnvelopeCanvasPendingFieldMenuProps = {
   onSelectType: (type: FieldType) => void;
 };
 
-/**
- * The field type picker shown after drawing a marquee on an empty area of the
- * page, to create a field of that size.
- */
 export const EnvelopeCanvasPendingFieldMenu = ({ onSelectType }: EnvelopeCanvasPendingFieldMenuProps) => {
   const { t } = useLingui();
 

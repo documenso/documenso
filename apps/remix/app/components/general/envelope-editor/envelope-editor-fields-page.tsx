@@ -118,13 +118,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const { _ } = useLingui();
 
-  /**
-   * Switching tabs resets which items are shown to the default for that tab:
-   * both on the fields tab, and only contents on the contents tab so the page
-   * reads as the document itself. This drives the same toggles as the viewer
-   * toolbar, so the user can still override them for the current tab, but any
-   * override is discarded on the next switch.
-   */
+  // Fields are hidden on the contents tab so the page reads as the document itself.
   const onEditorTabChange = (tab: EnvelopeEditorTab) => {
     setSelectedEditorTab(tab);
     viewerControls.setFieldsVisibility(tab === 'contents' ? 'hidden' : 'visible');
@@ -237,11 +231,6 @@ export const EnvelopeEditorFieldsPage = () => {
     editorFields.setSelectedRecipient(firstSelectableRecipient?.id ?? null);
   }, []);
 
-  /**
-   * Deselect a field or content which is not on the current envelope item
-   * when the item changes, otherwise its settings stay open in the sidebar for
-   * something which is no longer on screen.
-   */
   useEffect(() => {
     if (editorFields.selectedField && editorFields.selectedField.envelopeItemId !== currentEnvelopeItem?.id) {
       editorFields.setSelectedField(null);
@@ -276,11 +265,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
   return (
     <>
-      {/*
-        The settings form of the selected content is shared by the sidebar and
-        the canvas action bar, so it wraps both. Never keyed: remounting it
-        would remount the PDF viewer beneath it.
-      */}
+      {/* Never keyed: remounting it would remount the PDF viewer beneath it. */}
       <ContentSettingsFormProvider content={selectedContent ?? null}>
         <div className="relative flex h-full">
           <div

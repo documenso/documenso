@@ -13,20 +13,13 @@ export type CreateDataContentImageOptions = {
   normalizeOptions?: NormalizeImageOptions;
 };
 
-/**
- * Normalize an uploaded image, store it and create the data content record
- * describing it.
- *
- * The record is created unlinked. It is attached to an envelope content via
- * `setEnvelopeContents`.
- */
 export const createDataContentImage = async ({ file, normalizeOptions }: CreateDataContentImageOptions) => {
   const normalized = await normalizeImage(Buffer.from(await file.arrayBuffer()), normalizeOptions);
 
   const fileName = getNormalizedImageFileName(file.name, normalized.mimeType);
 
-  // Validate the metadata before anything is written to storage so a bad
-  // name or dimension cannot leave behind an orphaned object.
+  // Validated before anything is written to storage so a bad name or dimension
+  // cannot leave behind an orphaned object.
   const parsedMetadata = ZDataContentMetaSchema.safeParse({
     type: DataContentType.IMAGE,
     width: normalized.width,

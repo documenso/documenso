@@ -34,10 +34,6 @@ import { useEnvelopeAutosave } from '../hooks/use-envelope-autosave';
 
 export type EnvelopeEditorStep = 'upload' | 'addFields' | 'preview';
 
-/**
- * The active tab within the fields step of the editor, which determines
- * whether fields or contents are currently being edited on the canvas.
- */
 export type EnvelopeEditorTab = 'fields' | 'contents';
 
 type UpdateEnvelopePayload = Pick<TUpdateEnvelopeRequest, 'data' | 'meta'>;
@@ -81,9 +77,6 @@ type EnvelopeEditorProviderValue = {
   setSelectedEditorTab: (tab: EnvelopeEditorTab) => void;
 
   /**
-   * Whether a field or content has been picked from the palette and is
-   * waiting to be placed on the page.
-   *
    * The canvas drops its selection while this is set, so nothing floating
    * over the page (the transformer, the action bar) sits under the
    * placement click.
@@ -416,11 +409,6 @@ export const EnvelopeEditorProvider = ({
     await flushSetFields();
   };
 
-  /**
-   * Handles debouncing the content updates to the server.
-   *
-   * Will set the local envelope contents after the update is complete.
-   */
   const {
     triggerSave: setContentsDebounced,
     flush: flushSetContents,
@@ -455,7 +443,6 @@ export const EnvelopeEditorProvider = ({
 
       setAutosaveError(false);
 
-      // Insert the IDs into the local contents.
       contents.forEach((content) => {
         const localContent = localContents.find((localContent) => localContent.formId === content.formId);
 
@@ -784,9 +771,6 @@ const mapLocalRecipientsToRecipients = ({
   });
 };
 
-/**
- * An envelope content, with the local ID of the content it was saved from.
- */
 type TEditorEnvelopeContentWithFormId = TEditorEnvelope['contents'][number] & {
   formId?: string;
 };
@@ -802,9 +786,6 @@ const mapLocalContentsToContents = ({
 }: MapLocalContentsToContentsOptions): TEditorEnvelopeContentWithFormId[] => {
   return localContents.map((content) => {
     return {
-      // New contents get a temporary ID, which is swapped for a real one when
-      // the embedded envelope is saved. It is written back to the local
-      // content (via `formId`) so it stays the same from then on.
       id: content.id ?? `${PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX}${content.formId}`,
       formId: content.formId,
       envelopeId: envelope.id,

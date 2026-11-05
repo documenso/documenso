@@ -15,9 +15,6 @@ import type { EnvelopeCanvasSelectionApi } from './use-envelope-canvas-selection
 
 const LINE_ANCHOR_NODE_NAME = 'content-line-anchor';
 
-/**
- * The screen size radius of the line endpoint anchors.
- */
 const LINE_ANCHOR_RADIUS = 5;
 
 type UseEnvelopeCanvasLineAnchorsOptions = {
@@ -28,11 +25,8 @@ type UseEnvelopeCanvasLineAnchorsOptions = {
 };
 
 /**
- * Draggable endpoint anchors for a single selected line content.
- *
  * Lines are move-only within the shared transformer, so the endpoints are
- * edited through these custom anchors instead. Anchors are hidden while the
- * line body itself is being dragged, and recreated afterwards.
+ * edited through these custom anchors instead.
  */
 export const useEnvelopeCanvasLineAnchors = ({
   canvas,
@@ -46,17 +40,12 @@ export const useEnvelopeCanvasLineAnchors = ({
   const { contentGroups: selectedGroups, isTransforming } = selection;
 
   /**
-   * Whether an anchor is being dragged.
-   *
    * Tracked separately from the selection's `isTransforming` since that would
    * destroy the anchors mid drag (this effect depends on it), whereas this only
    * needs to hide the floating action bar.
    */
   const [isDragging, setIsDragging] = useState(false);
 
-  /**
-   * The selected line content, if exactly one line content is selected.
-   */
   const selectedLineContent = useMemo((): TLocalContent | null => {
     if (selectedGroups.length !== 1) {
       return null;
@@ -123,13 +112,10 @@ export const useEnvelopeCanvasLineAnchors = ({
         // screen size, mirroring the transformer anchors.
         radius: LINE_ANCHOR_RADIUS / scale,
         fill: '#ffffff',
-        // Matches the transformer anchors, themed to the brand green.
         stroke: getRecipientColorStyles('green').baseRing,
         strokeWidth: 1.5,
         strokeScaleEnabled: false,
         draggable: true,
-        // Keep the anchor within the page bounds. Positions are in scaled
-        // stage coordinates.
         dragBoundFunc: (pos) => ({
           x: Math.max(0, Math.min(scaledViewport.width, pos.x)),
           y: Math.max(0, Math.min(scaledViewport.height, pos.y)),
@@ -138,7 +124,6 @@ export const useEnvelopeCanvasLineAnchors = ({
 
       anchor.on('dragstart', () => setIsDragging(true));
 
-      // Live preview while dragging the anchor.
       anchor.on('dragmove', () => {
         const lineNodes = findLineNodes();
 
@@ -156,8 +141,7 @@ export const useEnvelopeCanvasLineAnchors = ({
         layer.batchDraw();
       });
 
-      // Write the new endpoint positions back into the content meta. The
-      // reconcile effect re-renders the normalized geometry and recreates
+      // The reconcile effect re-renders the normalized geometry and recreates
       // the anchors.
       anchor.on('dragend', () => {
         setIsDragging(false);

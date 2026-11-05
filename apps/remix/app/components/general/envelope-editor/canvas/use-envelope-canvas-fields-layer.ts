@@ -36,12 +36,6 @@ type UseEnvelopeCanvasFieldsLayerOptions = {
   applyPageItemsVisibility: () => void;
 };
 
-/**
- * Renders and manages the fields of the current page on the canvas.
- *
- * Owns field rendering, overlap highlighting, geometry write back, the
- * marquee-to-create flow and the selection actions for fields.
- */
 export const useEnvelopeCanvasFieldsLayer = ({
   canvas,
   selection,
@@ -56,9 +50,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
   const { stage, pageLayer, scale, pageNumber, unscaledViewport, scaledViewport } = canvas;
   const { fieldGroups: selectedGroups, isTransforming } = selection;
 
-  /**
-   * The rectangle drawn via the marquee which is pending a field type choice.
-   */
   const pending = useEnvelopeCanvasPendingCreation({ canvas, nodeName: PENDING_FIELD_NODE_NAME });
 
   const localPageFields = useMemo(
@@ -71,11 +62,8 @@ export const useEnvelopeCanvasFieldsLayer = ({
 
   const isOnPage = (formId: string) => localPageFields.some((field) => field.formId === formId);
 
-  /**
-   * Debounce the fields used for overlap highlighting so we don't recompute on every
-   * small drag/resize tick. Overlaps only occur within the same page and envelope
-   * item, so computing from this page's fields alone is sufficient.
-   */
+  // Debounced so overlaps aren't recomputed on every drag/resize tick. Overlaps
+  // only occur within the same page and envelope item, so this page's fields suffice.
   const debouncedPageFields = useDebouncedValue(localPageFields, 300);
 
   const overlappingFieldFormIds = useMemo(() => {
@@ -101,9 +89,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
     return formIds;
   }, [debouncedPageFields]);
 
-  /**
-   * Write the new geometry of a field back after a drag or resize gesture.
-   */
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
     const isDragEvent = event.type === 'dragend';
 
@@ -124,11 +109,9 @@ export const useEnvelopeCanvasFieldsLayer = ({
     const pageHeight = scaledViewport.height;
     const pageWidth = scaledViewport.width;
 
-    // Calculate x and y as a percentage of the page width and height
     const positionPercentX = (fieldX / pageWidth) * 100;
     const positionPercentY = (fieldY / pageHeight) * 100;
 
-    // Get the bounds as a percentage of the page width and height
     const fieldPageWidth = (fieldPixelWidth / pageWidth) * 100;
     const fieldPageHeight = (fieldPixelHeight / pageHeight) * 100;
 
@@ -147,7 +130,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
 
     editorFields.updateFieldByFormId(fieldFormId, fieldUpdates);
 
-    // Select the field if it is not already selected.
     if (isDragEvent && !selection.isSelected(fieldGroup)) {
       selection.select('field', [fieldGroup]);
     }
@@ -156,10 +138,9 @@ export const useEnvelopeCanvasFieldsLayer = ({
   };
 
   /**
-   * Draws (or removes) a dashed warning outline over a field that significantly
-   * overlaps another field. The highlight is a child of the field group so it moves
-   * and resizes with the field, and sits on top of the field's own rect (which is
-   * re-styled on every render and would otherwise clobber a direct stroke change).
+   * The highlight is a child of the field group so it moves and resizes with
+   * the field, and sits on top of the field's own rect (which is re-styled on
+   * every render and would otherwise clobber a direct stroke change).
    */
   const syncOverlapHighlight = (fieldGroup: Konva.Group, isOverlapping: boolean) => {
     const existingHighlight = fieldGroup.findOne('.field-overlap-highlight');
@@ -211,8 +192,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
       return;
     }
 
-    // Muted fields are rendered with the read-only styling and cannot be
-    // edited, mirroring how other recipients' fields look during signing.
     const isMuted = fieldsVisibility === 'muted';
 
     const recipient = envelope.recipients.find((r) => r.id === field.recipientId);
@@ -248,8 +227,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
     fieldGroup.off('transformend');
     fieldGroup.off('dragend');
 
-    // A plain click selects just this field, shift + click toggles it in/out
-    // of the current selection.
     fieldGroup.on('click', (event) => {
       pending.clearPending();
 
@@ -282,19 +259,12 @@ export const useEnvelopeCanvasFieldsLayer = ({
     }
   };
 
-  /**
-   * Render every field on the page. Called when the page canvas is created.
-   */
   const renderAll = () => {
     for (const field of localPageFields) {
       renderFieldOnLayer(field);
     }
   };
 
-  /**
-   * Resolve a marquee selection box into a field selection, or into a pending
-   * field creation when nothing was selected and the box is large enough.
-   */
   const selectInBox = (box: EnvelopeCanvasBox) => {
     const currentStage = stage.current;
 
@@ -302,7 +272,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
       return;
     }
 
-    // While fields are hidden they cannot be selected or created.
     if (fieldsVisibility !== 'visible') {
       return;
     }
@@ -314,7 +283,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
     const unscaledBoxWidth = box.width / scale;
     const unscaledBoxHeight = box.height / scale;
 
-    // Create a field if no items are selected or the size is too small.
     if (
       groupsInBox.length === 0 &&
       unscaledBoxWidth > MIN_FIELD_WIDTH_PX &&
@@ -326,9 +294,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
     }
   };
 
-  /**
-   * Create a field of the given type from the pending creation rectangle.
-   */
   const createFromPending = (type: FieldType) => {
     const box = pending.getPendingBox();
 
@@ -351,9 +316,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
     });
   };
 
-  /**
-   * Render fields when they are added, removed or updated.
-   */
   useEffect(() => {
     const layer = pageLayer.current;
 
@@ -369,7 +331,6 @@ export const useEnvelopeCanvasFieldsLayer = ({
       render: renderFieldOnLayer,
     });
 
-    // Reconcile selection state with live field nodes after flush/sync updates.
     const liveSelectedGroups = getLiveEnvelopeCanvasGroups(selectedGroups, isOnPage);
 
     if (liveSelectedGroups.length !== selectedGroups.length) {
@@ -400,11 +361,7 @@ export const useEnvelopeCanvasFieldsLayer = ({
     fieldsVisibility,
   ]);
 
-  /**
-   * Clear any active selection and pending field creation when fields are no
-   * longer visible, since the transformer and floating toolbars would
-   * otherwise remain anchored to hidden fields.
-   */
+  // Otherwise the transformer and floating toolbars would remain anchored to hidden fields.
   useEffect(() => {
     if (fieldsVisibility !== 'visible' && (selectedGroups.length > 0 || pending.pendingCreation)) {
       pending.clearPending();

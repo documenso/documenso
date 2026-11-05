@@ -7,21 +7,12 @@ import { clamp } from 'remeda';
 import type { EnvelopeCanvasBox } from './envelope-canvas-types';
 
 type UseEnvelopeCanvasMarqueeOptions = {
-  /**
-   * Called when a marquee drag ends, with the selection box in scaled stage
-   * coordinates. The caller decides what the box selects.
-   */
   onSelect: (box: EnvelopeCanvasBox) => void;
 
-  /**
-   * Called when an empty area of the stage is clicked without dragging.
-   */
   onEmptyClick: () => void;
 };
 
 /**
- * Drag-to-select marquee on an empty area of the stage.
- *
  * The callbacks are read through refs, so the once-bound stage handlers always
  * delegate to the latest render's logic.
  */
@@ -29,9 +20,6 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
   const onSelectRef = useLatestRef(onSelect);
   const onEmptyClickRef = useLatestRef(onEmptyClick);
 
-  /**
-   * Bind the marquee to a stage. Called once when the page canvas is created.
-   */
   const bind = useCallback((stage: Konva.Stage, layer: Konva.Layer) => {
     const selectionRectangle = new Konva.Rect({
       name: 'marquee-selection',
@@ -45,8 +33,6 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
     let y1 = 0;
 
     /**
-     * The pointer in layer coordinates, pinned to the page.
-     *
      * Pointer positions are in scaled stage coordinates, while the rectangle
      * lives on the scaled layer, so positions are divided by the stage scale.
      *
@@ -78,8 +64,7 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
         return;
       }
 
-      // The stage cannot see the pointer once it is outside the container, so
-      // register its position from the window event.
+      // The stage cannot see the pointer once it is outside the container.
       stage.setPointersPositions(evt);
 
       const pointer = getPointer();
@@ -98,10 +83,6 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
       });
     };
 
-    /**
-     * Whether the pointer was actually dragged, as opposed to a plain click
-     * which leaves the rectangle without an area.
-     */
     const isMarqueeDrawn = () => {
       return selectionRectangle.visible() && selectionRectangle.width() > 0 && selectionRectangle.height() > 0;
     };
@@ -119,10 +100,9 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
         selectionRectangle.visible(false);
       });
 
-      // A plain click is not a selection, the click handler below deals with
-      // it. Selecting here would also match anything whose bounding box merely
-      // contains the point (e.g. a diagonal line), and since this runs after
-      // other window listeners it would override e.g. a content being placed.
+      // Selecting on a plain click here would match anything whose bounding box
+      // merely contains the point (e.g. a diagonal line), and since this runs
+      // after other window listeners it would override e.g. a content being placed.
       if (!isMarqueeDrawn()) {
         return;
       }
@@ -146,19 +126,14 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
       window.removeEventListener('touchcancel', onWindowPointerUp);
     };
 
-    /**
-     * Whether the current press started on an empty area of the stage.
-     *
-     * Releasing a resize handle without dragging it reaches the stage as a
-     * click on the stage itself. Only a press which started on the empty page
-     * makes an empty click, otherwise that release would deselect the item.
-     */
+    // Releasing a resize handle without dragging it reaches the stage as a
+    // click on the stage itself. Only a press which started on the empty page
+    // makes an empty click, otherwise that release would deselect the item.
     let isPressOnEmptyStage = false;
 
     stage.on('mousedown.marquee touchstart.marquee', (e) => {
       isPressOnEmptyStage = e.target === stage;
 
-      // Do nothing if the pointer is down on a shape.
       if (!isPressOnEmptyStage) {
         return;
       }
@@ -184,7 +159,6 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
     });
 
     stage.on('click.marquee tap.marquee', (e) => {
-      // A marquee drag just finished, the selection was handled on mouse up.
       if (isMarqueeDrawn()) {
         return;
       }
@@ -198,10 +172,6 @@ export const useEnvelopeCanvasMarquee = ({ onSelect, onEmptyClick }: UseEnvelope
   return { bind };
 };
 
-/**
- * Find the groups of a given name which intersect a box, excluding groups
- * which are not draggable (i.e. not currently editable).
- */
 export const findEnvelopeCanvasGroupsInBox = (stage: Konva.Stage, groupName: string, box: EnvelopeCanvasBox) => {
   return stage
     .find(`.${groupName}`)

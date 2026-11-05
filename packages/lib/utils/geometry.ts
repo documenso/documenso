@@ -1,13 +1,5 @@
 import { clamp } from 'remeda';
 
-/**
- * Shared geometry primitives for anything positioned on a page, i.e. fields
- * and contents, in both the editor canvas and the PDF export.
- *
- * Positions and sizes are stored as percentages of the page and converted to
- * pixels (or points) for the surface being drawn on.
- */
-
 export type Size = {
   width: number;
   height: number;
@@ -20,9 +12,6 @@ export type Rect = {
   height: number;
 };
 
-/**
- * A box stored as percentages of the page.
- */
 export type PercentageBox = {
   positionX: number;
   positionY: number;
@@ -31,19 +20,12 @@ export type PercentageBox = {
 };
 
 /**
- * The precision content geometry is stored at. Five decimal places is far
- * below a pixel at any page size and zoom while still keeping float noise
- * from the canvas (e.g. `33.300000000000004`) out of the stored values and
- * their diffs.
- *
- * Only contents are rounded, see `use-editor-contents`. Fields are stored as
- * is.
+ * Five decimal places is far below a pixel at any page size and zoom while
+ * still keeping float noise from the canvas (e.g. `33.300000000000004`) out of
+ * the stored values and their diffs. Only contents are rounded; fields are stored as is.
  */
 export const FIVE_DECIMAL_PLACES = 5;
 
-/**
- * Round to a fixed number of decimal places, normalising `-0` to `0`.
- */
 export const roundTo = (value: number, decimals: number) => {
   const factor = 10 ** decimals;
 
@@ -53,19 +35,10 @@ export const roundTo = (value: number, decimals: number) => {
 
 export const clampPercentage = (value: number) => clamp(value, { min: 0, max: 100 });
 
-/**
- * A percentage of `total`, in the same unit as `total`.
- */
 export const toPixels = (percentage: number, total: number) => (percentage / 100) * total;
 
-/**
- * The percentage of `total` that `pixels` represents.
- */
 export const toPercentage = (pixels: number, total: number) => (pixels / total) * 100;
 
-/**
- * Convert a percentage box into the page's unit.
- */
 export const toPixelRect = (box: PercentageBox, page: Size): Rect => ({
   x: toPixels(box.positionX, page.width),
   y: toPixels(box.positionY, page.height),
@@ -73,9 +46,6 @@ export const toPixelRect = (box: PercentageBox, page: Size): Rect => ({
   height: toPixels(box.height, page.height),
 });
 
-/**
- * Convert a rect in the page's unit into a percentage box.
- */
 export const toPercentageBox = (rect: Rect, page: Size): PercentageBox => ({
   positionX: toPercentage(rect.x, page.width),
   positionY: toPercentage(rect.y, page.height),
@@ -83,9 +53,6 @@ export const toPercentageBox = (rect: Rect, page: Size): PercentageBox => ({
   height: toPercentage(rect.height, page.height),
 });
 
-/**
- * Clamp every side of a percentage box to the page.
- */
 export const clampPercentageBox = <T extends PercentageBox>(box: T): T => ({
   ...box,
   positionX: clampPercentage(box.positionX),

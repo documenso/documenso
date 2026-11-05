@@ -7,15 +7,9 @@ import { z } from 'zod';
 
 import { useLatestRef } from './use-latest-ref';
 
-/**
- * The length of the client side IDs given to items created in the editor.
- */
 const LOCAL_FORM_ID_LENGTH = 12;
 
 type EditorItem = {
-  /**
-   * The local client side ID of the item, stable for its editor lifetime.
-   */
   formId: string;
 };
 
@@ -31,29 +25,19 @@ type EditorFormArrayValues = {
 type UseEditorFormArrayOptions<TItem extends EditorItem, TSource> = {
   schema: z.ZodType<TItem, z.ZodTypeDef, unknown>;
 
-  /**
-   * The persisted items the local list starts from and is reset to.
-   */
   sources: TSource[];
 
-  /**
-   * Map a persisted item to its local shape. The form ID is assigned by the
-   * hook.
-   */
   mapSource: (source: TSource) => Omit<TItem, 'formId'>;
 
   /**
-   * Called after any change which needs saving. Receives a getter so the
-   * values are read when the save is sent, not when it was queued, which
-   * matters when a save in flight corrects the local items (e.g. assigns
-   * server IDs).
+   * Receives a getter so the values are read when the save is sent, not when
+   * it was queued, which matters when a save in flight corrects the local
+   * items (e.g. assigns server IDs).
    */
   onChange: (getItems: () => TItem[]) => unknown;
 };
 
 /**
- * The local, autosaved list backing an editor surface (fields, contents).
- *
  * All lookups and writes go through the live form values rather than the
  * render captured list. Callers can be arbitrarily far behind the list, e.g.
  * a Konva handler bound at render time or an upload finishing after its item
@@ -68,9 +52,8 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
 }: UseEditorFormArrayOptions<TItem, TSource>) => {
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
 
-  // The callers pass these as inline functions, so they are read through refs
-  // to keep every operation below referentially stable. Long lived callbacks
-  // (e.g. Konva handlers) capture those operations and must not go stale.
+  // Keeps every operation below referentially stable for the long lived Konva
+  // handlers which capture them.
   const mapSourceRef = useLatestRef(mapSource);
   const onChangeRef = useLatestRef(onChange);
 
@@ -81,7 +64,6 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
     [],
   );
 
-  // Only read on mount, so compute it once rather than on every render.
   const [initialValues] = useState(() => toDefaultValues(sources));
 
   const form = useForm<EditorFormArrayValues>({
@@ -96,14 +78,12 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
     keyName: 'react-hook-form-id',
   });
 
-  // `useFieldArray` merges its own key into each item, which the callers do
-  // not want to see.
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const items = fields as unknown as TItem[];
 
   /**
-   * The live items. This is the form's own array, so callers must treat the
-   * items as read only and replace rather than mutate them.
+   * This is the form's own array, so callers must treat the items as read
+   * only and replace rather than mutate them.
    */
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const getItems = useCallback(() => form.getValues().items as TItem[], [form]);
@@ -119,10 +99,6 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
     void onChangeRef.current(getItems);
   }, [getItems]);
 
-  /**
-   * Select an item by form ID. Unless bypassed, an ID which is not in the
-   * list clears the selection.
-   */
   const setSelected = useCallback(
     (formId: string | null, bypassCheck = false) => {
       if (!formId || bypassCheck) {
@@ -141,7 +117,6 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
         return;
       }
 
-      // A single append so the list updates once however many items there are.
       append(newItems);
       triggerChange();
     },
@@ -162,10 +137,6 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
     [findIndex, remove, triggerChange],
   );
 
-  /**
-   * Replace an item with the result of `updater`. Returning the same item
-   * (by reference) leaves the list untouched and does not trigger a save.
-   */
   const updateByFormId = useCallback(
     (formId: string, updater: (current: TItem) => TItem, { shouldTriggerChange = true } = {}) => {
       const index = findIndex(formId);
@@ -192,7 +163,6 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
 
   const selectedItem = useMemo(() => items.find((item) => item.formId === selectedFormId), [items, selectedFormId]);
 
-  // Drop the selection once its item leaves the list.
   useEffect(() => {
     if (selectedFormId && !items.some((item) => item.formId === selectedFormId)) {
       setSelectedFormId(null);
@@ -221,15 +191,8 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
   };
 };
 
-/**
- * A fresh local ID for an item created in the editor.
- */
 export const createLocalFormId = () => nanoid(LOCAL_FORM_ID_LENGTH);
 
-/**
- * Every page of the current document except the given one, for duplicating
- * an item across pages.
- */
 export const getOtherPageNumbers = (currentPage: number) => {
   const totalPages = getPdfPagesCount();
 

@@ -29,36 +29,21 @@ export const ZUpdateEmbeddingEnvelopePayloadSchema = z.object({
     folderId: z.string().nullish(),
 
     /**
-     * The contents of the envelope.
-     *
-     * This is a set command: contents missing from the list are deleted. When
-     * omitted the contents are left untouched.
+     * Contents missing from the list are deleted. When omitted the contents are
+     * left untouched.
      */
     contents: z
       .object({
-        /**
-         * This is not necessarily a real id, new contents use a temporary id
-         * starting with `PRESIGNED_`.
-         */
+        /** New contents use a temporary id starting with `PRESIGNED_`. */
         id: z.string(),
 
-        /**
-         * The envelope item to place the content on, either a real ID or the
-         * temporary ID of an envelope item created in this request.
-         */
         envelopeItemId: z.string(),
 
         contentMeta: ZEnvelopeContentMetaSchema,
 
-        /**
-         * The ID of an image already attached to a content of this envelope,
-         * or null for none. A new image is referenced by `imageIndex` instead.
-         */
+        /** Must already be attached to a content of this envelope; new images use `imageIndex`. */
         dataContentId: z.string().nullable(),
 
-        /**
-         * The index of a new image in `contentImages` for the content to show.
-         */
         imageIndex: z.number().int().min(0).optional(),
       })
       .refine((content) => !(content.dataContentId && content.imageIndex !== undefined), {

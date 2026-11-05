@@ -163,16 +163,10 @@ export const EnvelopeDistributeDialog = ({
     [envelope.fields],
   );
 
-  /**
-   * Image related contents without an image render nothing once sent.
-   */
   const contentsMissingImages = useMemo(() => getContentsMissingImages(envelope.contents), [envelope.contents]);
 
-  /**
-   * An envelope can hold more contents than the organisation's plan allows,
-   * e.g. after the plan was lowered or a template was copied, so this is
-   * reported here rather than letting the send fail.
-   */
+  // An envelope can exceed the plan's content limit without being edited, e.g.
+  // after the plan was lowered, so it is reported here rather than failing the send.
   const contentLimits = useMemo(
     () =>
       resolveEnvelopeContentLimits(

@@ -46,26 +46,13 @@ type UseEnvelopeCanvasContentsLayerOptions = {
   canvas: EnvelopeCanvas;
   selection: EnvelopeCanvasSelectionApi;
 
-  /**
-   * Whether contents can currently be edited on the canvas.
-   */
   isEditable: boolean;
 
-  /**
-   * Whether the envelope has used up the organisation's content allowance,
-   * in which case no further contents can be created from the canvas.
-   */
   isContentLimitReached: boolean;
 
   applyPageItemsVisibility: () => void;
 };
 
-/**
- * Renders and manages the contents of the current page on the canvas.
- *
- * Owns content rendering, z-ordering relative to fields, geometry write back,
- * the marquee-to-create flow and the selection actions for contents.
- */
 export const useEnvelopeCanvasContentsLayer = ({
   canvas,
   selection,
@@ -81,27 +68,14 @@ export const useEnvelopeCanvasContentsLayer = ({
   const { stage, pageLayer, scale, pageNumber, unscaledViewport } = canvas;
   const { contentGroups: selectedGroups } = selection;
 
-  /**
-   * The rectangle drawn via the marquee which is pending a content type choice.
-   */
   const pending = useEnvelopeCanvasPendingCreation({ canvas, nodeName: PENDING_CONTENT_NODE_NAME });
 
   /**
    * Once an envelope is sent its contents are inserted into the current PDF,
-   * so drawing them on the canvas again would double them up. This matches
-   * the signing and generic renderers.
+   * so drawing them on the canvas again would double them up.
    */
   const shouldRenderContents = !(version === 'current' && areContentsImprinted(envelopeStatus));
 
-  /**
-   * The page's contents in stacking order, so rendering them in sequence
-   * puts the last one on top. Local contents are ordered by their form ID as
-   * the tiebreak, the same way persisted contents are ordered by their ID.
-   *
-   * Empty when the contents are already imprinted on the PDF, which keeps
-   * every consumer (rendering, reconciliation, line anchors, selection)
-   * from touching them.
-   */
   const localPageContents = useMemo(() => {
     if (!shouldRenderContents) {
       return [];
@@ -119,10 +93,6 @@ export const useEnvelopeCanvasContentsLayer = ({
 
   const isOnPage = (formId: string) => localPageContents.some((content) => content.formId === formId);
 
-  /**
-   * Write the new geometry of a content back into its content meta after a drag
-   * or resize/rotate gesture.
-   */
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
     const isDragEvent = event.type === 'dragend';
 
@@ -145,7 +115,6 @@ export const useEnvelopeCanvasContentsLayer = ({
       ),
     });
 
-    // Select the content if it is not already selected.
     if (isDragEvent && !selection.isSelected(contentGroup)) {
       selection.select('content', [contentGroup]);
     }
@@ -178,8 +147,7 @@ export const useEnvelopeCanvasContentsLayer = ({
     );
 
     // Contents are inert while the fields tab is active so they behave as part
-    // of the document. Their stacking relative to the fields is applied to
-    // all of them together afterwards, see `applyContentsStacking`.
+    // of the document.
     contentGroup.listening(isEditable);
 
     if (!isEditable) {
@@ -190,8 +158,6 @@ export const useEnvelopeCanvasContentsLayer = ({
     contentGroup.off('transformend');
     contentGroup.off('dragend');
 
-    // A plain click selects just this content, shift + click toggles it
-    // in/out of the current selection.
     contentGroup.on('click', (event) => {
       if (event.evt.shiftKey) {
         selection.toggle('content', contentGroup);
@@ -223,10 +189,9 @@ export const useEnvelopeCanvasContentsLayer = ({
   };
 
   /**
-   * Place the contents as a band relative to the fields, keeping their
-   * stacking order intact: above the muted fields while the contents tab is
-   * active so they are fully visible and clickable, beneath the fields
-   * otherwise as part of the document.
+   * Contents always sit beneath fields as part of the document, except while
+   * the contents tab is active, where they go above the muted fields so they
+   * are fully visible and clickable.
    *
    * Konva stacks by child order, so the band is moved one group at a time.
    * Sending to the bottom iterates in reverse so the last content stays on
@@ -264,11 +229,6 @@ export const useEnvelopeCanvasContentsLayer = ({
     applyContentsStacking();
   };
 
-  /**
-   * Resolve a marquee selection box into a content selection, or into a
-   * pending content creation when nothing was selected and the box is large
-   * enough.
-   */
   const selectInBox = (box: EnvelopeCanvasBox) => {
     const currentStage = stage.current;
 
@@ -283,7 +243,6 @@ export const useEnvelopeCanvasContentsLayer = ({
     const unscaledBoxWidth = box.width / scale;
     const unscaledBoxHeight = box.height / scale;
 
-    // Create a content if no items are selected or the size is too small.
     if (
       groupsInBox.length === 0 &&
       !isContentLimitReached &&
@@ -294,13 +253,6 @@ export const useEnvelopeCanvasContentsLayer = ({
     }
   };
 
-  /**
-   * Create a content of the given palette item from the pending creation
-   * rectangle.
-   *
-   * Unlike a palette drop, which places a content at its default size, the
-   * content is fitted to the box the author drew.
-   */
   const createFromPending = (item: ContentDragDropItem) => {
     const box = pending.getPendingBox();
 
@@ -316,11 +268,7 @@ export const useEnvelopeCanvasContentsLayer = ({
     });
   };
 
-  /**
-   * Render contents when they are added, removed or updated, and when an
-   * image arrives after the page was created (a failed image simply keeps
-   * its placeholder so the author can re-upload).
-   */
+  // A failed image keeps its placeholder so the author can re-upload.
   useEffect(() => {
     const layer = pageLayer.current;
 
@@ -338,7 +286,6 @@ export const useEnvelopeCanvasContentsLayer = ({
 
     applyContentsStacking();
 
-    // Reconcile selection state with live content nodes after flush/sync updates.
     const liveSelectedGroups = getLiveEnvelopeCanvasGroups(selectedGroups, isOnPage);
 
     if (liveSelectedGroups.length !== selectedGroups.length) {
@@ -373,21 +320,13 @@ export const useEnvelopeCanvasContentsLayer = ({
     contentImages.images,
   ]);
 
-  /**
-   * Selecting a single content brings it to the front of its page, so the
-   * content being worked on is never hidden behind another.
-   */
+  // So the content being worked on is never hidden behind another.
   useEffect(() => {
     if (isEditable && selectedGroups.length === 1) {
       editorContents.bringContentToFront(selectedGroups[0].id());
     }
   }, [isEditable, selectedGroups]);
 
-  /**
-   * Clear any active content selection and pending content creation when
-   * contents are no longer editable, e.g. when switching back to the fields
-   * tab or hiding contents via the viewer toolbar.
-   */
   useEffect(() => {
     if (!isEditable && (selectedGroups.length > 0 || pending.pendingCreation)) {
       pending.clearPending();
@@ -425,16 +364,7 @@ export const useEnvelopeCanvasContentsLayer = ({
   };
 };
 
-/**
- * Build the meta of a content created from a box drawn on the page, merging
- * the box into the default values of the item.
- *
- * Box contents take the box as their bounds. Lines have no box of their own,
- * so they run horizontally along its top edge, from the top left to the top
- * right corner.
- */
 const buildContentMetaFromBox = (item: ContentDragDropItem, page: number, box: PercentageBox): TEnvelopeContentMeta => {
-  // Shapes share a content type and are told apart by `shape`.
   const defaultMeta =
     item.type === EnvelopeContentType.SHAPE
       ? CONTENT_SHAPE_META_DEFAULT_VALUES_BY_SHAPE[item.shape ?? EnvelopeContentShapeType.RECTANGLE]

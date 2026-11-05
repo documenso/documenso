@@ -35,15 +35,6 @@ export const ZReplaceEnvelopeItemPdfResponseSchema = z.object({
    * Done this way to reduce number of queries.
    */
   fields: ZEnvelopeFieldSchema.array().optional(),
-
-  /**
-   * The full list of contents for the envelope after the replacement.
-   *
-   * This is only populated if contents have been deleted. It will return
-   * undefined otherwise.
-   *
-   * Done this way to reduce number of queries.
-   */
   contents: ZEnvelopeContentSchema.array().optional(),
 });
 

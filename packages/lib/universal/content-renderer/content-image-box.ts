@@ -1,42 +1,18 @@
 import type { PercentageBox, Size } from '../../utils/geometry';
 import { toPercentage, toPixels } from '../../utils/geometry';
 
-/**
- * The size of an image content when dropped from the palette, as a
- * percentage of the page.
- */
 export const CONTENT_IMAGE_DEFAULT_SIZE = { width: 15, height: 10 } as const;
 
-/**
- * A box content's geometry as a percentage of the page.
- */
 type ContentBox = PercentageBox;
 
 type ResolveAttachedImageBoxOptions = {
-  /**
-   * The intrinsic image size in pixels.
-   */
   image: Size;
 
-  /**
-   * The unscaled page size in points.
-   */
   page: Size;
 
-  /**
-   * The content's current box.
-   */
   box: ContentBox;
 };
 
-/**
- * The box an image content takes when an image is attached to it, so the box
- * has the image's shape.
- *
- * The box keeps its width and its top left corner, and its height follows the
- * image's ratio. If that runs past the right or bottom of the page, the box
- * is shrunk (ratio intact) until it fits.
- */
 export const resolveAttachedImageBox = ({ image, page, box }: ResolveAttachedImageBoxOptions): ContentBox => {
   if (image.width <= 0 || image.height <= 0 || page.width <= 0 || page.height <= 0 || box.width <= 0) {
     return box;

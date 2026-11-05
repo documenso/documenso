@@ -29,14 +29,8 @@ const LOW_RENDER_RESOLUTION = 1;
 const HIGH_RENDER_RESOLUTION = 2;
 const IDLE_RENDER_DELAY = 200;
 
-/**
- * The additional height of each virtual page item on top of the scaled page
- * height.
- *
- * 32px for the page number text and margins (my-2 = 8px * 2 + text height ~16px)
- * plus 2px so the page outline ring (drawn outside the page box) does not touch
- * the neighbouring items.
- */
+// 32px for the page number text and margins (my-2 = 8px * 2 + ~16px text) plus 2px
+// so the page outline ring (drawn outside the page box) does not touch neighbouring items.
 const PAGE_ITEM_EXTRA_HEIGHT = 34;
 
 export type PDFViewerProps = {
@@ -63,20 +57,11 @@ export type PDFViewerProps = {
   onDocumentLoad?: () => void;
 
   /**
-   * The zoom factor to render the pages at.
-   *
-   * The rendered page width is `min(containerWidth, maxPageWidth) * zoom`,
-   * derived in the same render pass as the layout so zoom changes apply in a
-   * single paint without any intermediate layout shift.
-   *
    * Values above 1 can overflow the container horizontally, so the scroll
    * parent should allow horizontal scrolling.
    */
   zoom?: number;
 
-  /**
-   * The maximum base width of a page before the zoom is applied.
-   */
   maxPageWidth?: number;
 
   /**
@@ -283,24 +268,14 @@ const VirtualizedPageList = ({
     overscan: 5,
   });
 
-  /**
-   * The width the pages are rendered at.
-   *
-   * Derived from the measured available width in the same render pass as the
-   * zoom, so zoom changes update the page layout and page sizes within a
-   * single commit, avoiding intermediate layout shifts.
-   */
   const displayWidth = getDisplayWidth(constraintWidth, zoom, maxPageWidth);
 
   useScrollToPage(contentRef, scrollToItem);
 
   const previousDisplayWidthRef = useRef(displayWidth);
 
-  /**
-   * Anchor the scroll position to the bottom center when the rendered page width
-   * changes (zoom or container resize) so zooming feels centered on the middle of the visible
-   * area instead of the top left of the content.
-   */
+  // Keeps the viewport's center point stable across zoom, otherwise zooming
+  // anchors to the top left of the content.
   useLayoutEffect(() => {
     const previousDisplayWidth = previousDisplayWidthRef.current;
     previousDisplayWidthRef.current = displayWidth;
@@ -318,7 +293,6 @@ const VirtualizedPageList = ({
 
     const viewportHeight = scrollParentRef === 'window' ? window.innerHeight : scrollEl.clientHeight;
 
-    // The offset of the content element from the top of the scrollable content.
     // Only depends on the content above the page list, which is unaffected by zoom.
     const contentOffsetTop =
       contentEl.getBoundingClientRect().top -
@@ -328,13 +302,11 @@ const VirtualizedPageList = ({
     const oldMetrics = computePageMetrics(pages, previousDisplayWidth);
     const newMetrics = computePageMetrics(pages, displayWidth);
 
-    // The content-space Y coordinate currently at the vertical center of the viewport.
     const oldCenterY = Math.min(
       Math.max(0, scrollEl.scrollTop + viewportHeight / 2 - contentOffsetTop),
       oldMetrics.totalSize,
     );
 
-    // Locate which page the center point is on, and how far through it.
     let pageIndex = 0;
 
     for (let i = 0; i < pages.length; i += 1) {
@@ -363,9 +335,7 @@ const VirtualizedPageList = ({
       style={{
         height: `${totalSize}px`,
         width: displayWidth > 0 ? `${displayWidth}px` : '100%',
-        // Center the pages when they fit within the container, while safely
-        // falling back to a start alignment when they overflow so the scroll
-        // container can reach all of the content.
+        // Not flex centering: overflowing pages must stay reachable by scrolling.
         margin: '0 auto',
         position: 'relative',
       }}
@@ -421,10 +391,6 @@ const VirtualizedPageList = ({
   );
 };
 
-/**
- * The width pages are rendered at for a given available width, zoom and
- * maximum base page width.
- */
 const getDisplayWidth = (constraintWidth: number, zoom: number, maxPageWidth?: number) => {
   if (constraintWidth === 0) {
     return 0;
@@ -435,23 +401,13 @@ const getDisplayWidth = (constraintWidth: number, zoom: number, maxPageWidth?: n
   return Math.floor(baseWidth * zoom);
 };
 
-/**
- * The height of a single virtual list item for a page rendered at the given
- * width: the page height scaled to that width plus the page number footer.
- *
- * Single source of truth for both the virtual list `itemSize` and
- * `computePageMetrics`, so the two can never drift apart.
- */
+// Shared by the virtual list `itemSize` and `computePageMetrics` so the two cannot drift apart.
 const getPageItemSize = (pageMeta: PageMeta, displayWidth: number) => {
   const aspectRatio = pageMeta.height / pageMeta.width;
 
   return displayWidth * aspectRatio + PAGE_ITEM_EXTRA_HEIGHT;
 };
 
-/**
- * Compute the virtual list offsets and sizes of every page for a given
- * rendered page width.
- */
 const computePageMetrics = (pages: PageMeta[], displayWidth: number) => {
   const offsets: number[] = [];
   const sizes: number[] = [];
@@ -500,11 +456,8 @@ const PdfViewerPage = ({
     scale,
   });
 
-  /**
-   * A custom page renderer may have to load things of its own before the page
-   * can be drawn, which it can only begin once the page image is ready. The
-   * page image is held back until then so both appear at once.
-   */
+  // The page image is held back until the custom renderer has loaded its own
+  // dependencies so both appear at once.
   const [isCustomRendererReady, setIsCustomRendererReady] = useState(false);
 
   const isPageReady = imageLoadingState === 'loaded' && (!CustomPageRenderer || isCustomRendererReady);

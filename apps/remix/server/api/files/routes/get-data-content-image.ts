@@ -23,9 +23,6 @@ const ZGetDataContentImageRequestQuerySchema = z.object({
   presignToken: z.string().optional(),
 });
 
-/**
- * Returns the image of a data content attached to a content of the envelope.
- */
 route.get(
   '/envelope/:envelopeId/dataContent/:dataContentId/image',
   sValidator('param', ZGetDataContentImageRequestParamsSchema),
@@ -39,7 +36,6 @@ route.get(
 
     let userId = session.user?.id;
 
-    // Check presignToken if provided
     if (presignToken) {
       const verifiedToken = await verifyEmbeddingPresignToken({
         token: presignToken,
@@ -75,7 +71,6 @@ route.get(
 
     const { dataContent, envelope } = envelopeContent;
 
-    // Check whether the user has access to this content via the envelope.
     const hasAccess = await checkEnvelopeFileAccess({
       userId,
       teamId: envelope.teamId,
@@ -100,21 +95,14 @@ type HandleDataContentImageRequestOptions = {
   dataContent: DataContent;
 
   /**
-   * The type of cache strategy to use.
-   *
-   * For access via tokens, we can use a public cache to allow the CDN to cache it.
-   *
-   * For access via session, we must use a private cache.
+   * Token access may be cached publicly by the CDN; session access must be private.
    */
   cacheStrategy: 'private' | 'public';
 };
 
 /**
- * Serve the bytes of an image data content.
- *
- * Data contents are immutable, so the response is hard cached like envelope
- * item PDFs. The content type comes from the stored metadata and is never
- * sniffed from the bytes.
+ * Data contents are immutable, so the response is hard cached like envelope item
+ * PDFs. The content type comes from the stored metadata and is never sniffed.
  */
 export const handleDataContentImageRequest = async ({
   c,

@@ -2,6 +2,7 @@ import { prisma } from '@documenso/prisma';
 import type { DocumentData, Prisma } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import type { ContentImageMap } from '../../universal/content-renderer/content-renderer';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import type { EnvelopeContentSnapshot } from '../../utils/envelope-content';
@@ -9,74 +10,59 @@ import { areEnvelopeContentsEqual } from '../../utils/envelope-content';
 import { generatePartialSignedPdf } from '../pdf/generate-partial-signed-pdf';
 import type { OverlayContent } from '../pdf/insert-field-in-pdf-v2';
 
+/**
+ * Each render holds the item's PDF several times over (bytes, parsed document,
+ * saved output, upload copy), so memory scales with how many items render at
+ * once. Two keeps the S3 round trips overlapped without that.
+ */
+export const RENDER_CONTENTS_CONCURRENCY = 2;
+
 type RenderContentsOntoPdfOptions = {
   pdfData: Uint8Array;
   contents: OverlayContent[];
+  images?: ContentImageMap;
 };
 
 /**
- * Draw the given contents onto a PDF and return the new bytes.
- *
- * Throws `MISSING_CONTENT_IMAGE` if an image content's image cannot be
- * loaded, since exporting it would silently drop it from the document.
+ * Throws `MISSING_CONTENT_IMAGE` if an image content's image cannot be loaded,
+ * since exporting it would silently drop it from the document.
  */
-export const renderContentsOntoPdf = async ({ pdfData, contents }: RenderContentsOntoPdfOptions) => {
+export const renderContentsOntoPdf = async ({ pdfData, contents, images }: RenderContentsOntoPdfOptions) => {
   if (contents.length === 0) {
     return pdfData;
   }
 
-  return await generatePartialSignedPdf({ pdfData, fields: [], contents });
+  return await generatePartialSignedPdf({ pdfData, fields: [], contents, images });
 };
 
-/**
- * An envelope item's PDF with its contents rendered in, which the item does
- * not point at yet. See `renderContentsIntoEnvelopeItem`.
- */
 export type RenderedEnvelopeItem = {
   envelopeItemId: string;
-
-  /**
-   * The document data the item pointed at when the contents were rendered.
-   */
   previousDocumentDataId: string;
-
-  /**
-   * The new document data holding the rendered PDF.
-   */
   documentData: DocumentData;
 };
 
 type RenderContentsIntoEnvelopeItemOptions = {
   envelopeItemId: string;
-
-  /**
-   * The item's contents to render.
-   */
   contents: OverlayContent[];
+  images?: ContentImageMap;
 };
 
 /**
- * Render an envelope item's contents into a new copy of its PDF so that
- * everything after DRAFT (signing, CSC/TSP, downloads) works from bytes which
- * already contain them.
- *
  * The item is deliberately NOT pointed at the new copy here. Sending renders
  * every item first and then switches them all together with
  * `commitRenderedEnvelopeItems`, inside the transaction that moves the
- * envelope on from DRAFT. A failure anywhere in between therefore leaves every
- * item on its original file rather than some on a rendered one, which a later
- * send would render onto a second time.
+ * envelope on from DRAFT, so a failure anywhere in between leaves every item
+ * on its original file rather than some on a rendered one which a later send
+ * would render onto a second time.
  *
- * The item's `DocumentData.initialData` is carried over untouched so the
- * original upload remains downloadable and a reseal, which starts over from
- * `initialData` and reinserts the contents itself, produces a single copy of
- * each content.
- *
- * Returns `null` when the item has no contents to render.
+ * `initialData` is carried over untouched so the original upload remains
+ * downloadable and a reseal, which starts over from `initialData` and
+ * reinserts the contents itself, produces a single copy of each content.
  */
 export const renderContentsIntoEnvelopeItem = async ({
   envelopeItemId,
   contents,
+  images,
 }: RenderContentsIntoEnvelopeItemOptions): Promise<RenderedEnvelopeItem | null> => {
   if (contents.length === 0) {
     return null;
@@ -102,6 +88,7 @@ export const renderContentsIntoEnvelopeItem = async ({
   const renderedPdf = await renderContentsOntoPdf({
     pdfData: currentPdf,
     contents,
+    images,
   });
 
   const { documentData: renderedDocumentData } = await putPdfFileServerSide(
@@ -110,7 +97,6 @@ export const renderContentsIntoEnvelopeItem = async ({
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(renderedPdf),
     },
-    // Preserve the original document bytes.
     envelopeItem.documentData.initialData,
   );
 
@@ -123,34 +109,24 @@ export const renderContentsIntoEnvelopeItem = async ({
 
 type CommitRenderedEnvelopeItemsOptions = {
   envelopeId: string;
-
-  /**
-   * The envelope's contents as they were when rendered.
-   */
   contents: EnvelopeContentSnapshot[];
-
   renderedEnvelopeItems: RenderedEnvelopeItem[];
 };
 
 /**
- * Point each envelope item at its rendered PDF, after verifying the contents
- * which were rendered are still the envelope's contents.
- *
  * Must run inside the transaction which moves the envelope on from DRAFT so
  * either every item switches or none does.
  *
  * Rendering happens outside that transaction, since it is slow, so a content
  * write can land in between. The write's own status check
  * (`assertContentCanBeChanged`) only catches the case where the send has
- * already committed; the check here catches the other order, where the write
- * committed first and the PDF was rendered from contents which no longer
- * exist. Both sides take the same `FOR UPDATE` lock on the envelope row, so
- * whichever gets it second sees the other's committed state and fails.
+ * already committed; the check here catches the other order. Both sides take
+ * the same `FOR UPDATE` lock on the envelope row, so whichever gets it second
+ * sees the other's committed state and fails.
  *
  * Each switch is guarded by the document data the item pointed at when it was
- * rendered. If that has changed since, for example because a concurrent send
- * already switched it, the transaction is aborted rather than the item being
- * pointed at a render of a file which is no longer its current one.
+ * rendered, so a concurrent send which already switched it aborts the
+ * transaction rather than pointing the item at a render of a stale file.
  */
 export const commitRenderedEnvelopeItems = async (
   tx: Prisma.TransactionClient,
@@ -182,9 +158,6 @@ type AssertEnvelopeContentsUnchangedOptions = {
   contents: EnvelopeContentSnapshot[];
 };
 
-/**
- * Lock the envelope and verify its contents still match the given snapshot.
- */
 const assertEnvelopeContentsUnchanged = async (
   tx: Prisma.TransactionClient,
   { envelopeId, contents }: AssertEnvelopeContentsUnchangedOptions,

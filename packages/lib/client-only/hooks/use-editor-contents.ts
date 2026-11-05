@@ -15,26 +15,14 @@ import { z } from 'zod';
 import { EDITOR_DUPLICATE_ITEM_OFFSET } from '../../constants/envelope-editor';
 import { createLocalFormId, useEditorFormArray } from './use-editor-form-array';
 
-/**
- * The local editor representation of an envelope content.
- *
- * Note: Unlike fields, geometry (page, position, size and stacking order) is
- * stored within the content meta since it differs per content type, e.g.
- * lines use start/end coordinates instead of a position and size.
- */
 export const ZLocalContentSchema = z.object({
-  // This is the actual ID of the envelope content if created.
   id: z.string().optional(),
-  // This is the local client side ID of the content.
   formId: z.string().min(1),
-  // This is the ID of the envelope item to put the content on.
   envelopeItemId: z.string(),
   contentMeta: ZEnvelopeContentMetaSchema,
-  // This is the ID of the uploaded data content (e.g. an image) attached to
-  // the content, or null for none.
   dataContentId: z.string().nullable(),
-  // The file of an image which has not been uploaded yet, referenced by a
-  // temporary `dataContentId`. Only used for embedded.
+  // Embedded only: an image not uploaded yet, referenced by a temporary
+  // `dataContentId` until the envelope is saved.
   data: z.instanceof(File).optional(),
 });
 
@@ -43,24 +31,15 @@ export type TLocalContent = z.infer<typeof ZLocalContentSchema>;
 type EditorContentsProps = {
   envelope: TEditorEnvelope;
 
-  /**
-   * Receives a getter rather than the contents so the values are read when
-   * the save is sent, not when it was queued.
-   */
   handleContentsUpdate: (getContents: () => TLocalContent[]) => unknown;
 };
 
 type UseEditorContentsResponse = {
   localContents: TLocalContent[];
 
-  // Selected content
   selectedContent: TLocalContent | undefined;
   setSelectedContent: (formId: string | null) => void;
 
-  // Content operations
-  /**
-   * Add a content. It is placed above every other content on its page.
-   */
   addContent: (content: Omit<TLocalContent, 'formId' | 'dataContentId'>) => TLocalContent;
   setContentPersistedIds: (
     formId: string,
@@ -71,8 +50,6 @@ type UseEditorContentsResponse = {
   updateContentByFormId: (formId: string, updates: Partial<TLocalContent>) => void;
 
   /**
-   * Merge a partial meta onto a content's current meta.
-   *
    * The settings form provider is the single writer of a content's
    * presentational meta. Anything else which edits those keys must go through
    * the form (e.g. `form.setValue`) rather than calling this directly, so the
@@ -82,13 +59,8 @@ type UseEditorContentsResponse = {
 
   duplicateContent: (content: TLocalContent) => TLocalContent;
 
-  // Content utilities
   getContentByFormId: (formId: string) => TLocalContent | undefined;
 
-  /**
-   * Place the content above every other content on its page, unless it is
-   * already on top.
-   */
   bringContentToFront: (formId: string) => void;
 
   resetForm: (contents?: TEditorEnvelope['contents']) => void;
@@ -111,10 +83,6 @@ export const useEditorContents = ({
     onChange: handleContentsUpdate,
   });
 
-  /**
-   * The contents sharing a page with the given content, read live from the
-   * form so this is safe to call from long lived callbacks.
-   */
   const getPageSiblings = (content: Pick<TLocalContent, 'envelopeItemId' | 'contentMeta'>, excludeFormId?: string) =>
     contentsArray
       .getItems()
@@ -125,9 +93,6 @@ export const useEditorContents = ({
           candidate.contentMeta.page === content.contentMeta.page,
       );
 
-  /**
-   * The zIndex which places a content above every other content on its page.
-   */
   const getTopZIndex = (content: Pick<TLocalContent, 'envelopeItemId' | 'contentMeta'>, excludeFormId?: string) =>
     getNextContentZIndex(getPageSiblings(content, excludeFormId).map((sibling) => sibling.contentMeta.zIndex));
 
@@ -139,7 +104,6 @@ export const useEditorContents = ({
         dataContentId: null,
         contentMeta: {
           ...restrictContentMetaPosValues(contentData.contentMeta),
-          // New contents go on top.
           zIndex: getTopZIndex(contentData),
         },
       };
@@ -153,18 +117,14 @@ export const useEditorContents = ({
   );
 
   /**
-   * Adopt the IDs assigned by the server after a save, without triggering
-   * another save.
-   *
    * The content ID is always taken from the response, since the server owns
    * row identity and a save may have replaced the row. Keeping a local ID
-   * here would leave every later save pointing at a row which no longer
-   * exists, which the server would then recreate over and over.
+   * would leave every later save pointing at a row which no longer exists,
+   * which the server would then recreate over and over.
    *
-   * The data content ID is different: the server may assign a different one
-   * than was sent, e.g. when a duplicated content's image is cloned, so it is
-   * only adopted while the local value is still the one that was sent and the
-   * response of an older save cannot overwrite a newer upload.
+   * The data content ID is only adopted while the local value is still the one
+   * that was sent, so the response of an older save cannot overwrite a newer
+   * upload.
    */
   const setContentPersistedIds = (
     formId: string,
@@ -209,7 +169,7 @@ export const useEditorContents = ({
       }
 
       // The patch only ever carries keys valid for the content's own type, so
-      // the merge keeps the discriminant intact.
+      // the cast is safe.
       const contentMeta = { ...content.contentMeta, ...patch } as TEnvelopeContentMeta;
 
       updateContentByFormId(formId, { contentMeta });
@@ -225,7 +185,6 @@ export const useEditorContents = ({
         formId: createLocalFormId(),
         contentMeta: {
           ...restrictContentMetaPosValues(offsetContentMetaPosValues(content.contentMeta)),
-          // The duplicate goes on top of the original.
           zIndex: getTopZIndex(content),
         },
       };
@@ -242,8 +201,6 @@ export const useEditorContents = ({
       contentsArray.updateByFormId(formId, (content) => {
         const page = getPageSiblings(content);
 
-        // Nothing to do when it already renders last on its page. The
-        // tiebreak matches how the page is rendered.
         const isAlreadyOnTop = isContentOnTop(
           page.map((candidate) => ({ id: getLocalContentOrderId(candidate), zIndex: candidate.contentMeta.zIndex })),
           getLocalContentOrderId(content),
@@ -263,10 +220,8 @@ export const useEditorContents = ({
   );
 
   return {
-    // Core state
     localContents: contentsArray.items,
 
-    // Content operations
     addContent,
     setContentPersistedIds,
     removeContentsByFormId: contentsArray.removeByFormId,
@@ -274,11 +229,9 @@ export const useEditorContents = ({
     patchContentMeta,
     duplicateContent,
 
-    // Content utilities
     getContentByFormId: contentsArray.findItem,
     bringContentToFront,
 
-    // Selected content
     selectedContent: contentsArray.selectedItem,
     setSelectedContent: contentsArray.setSelected,
 
@@ -286,17 +239,8 @@ export const useEditorContents = ({
   };
 };
 
-/**
- * Clamp a content percentage to the page at the stored precision.
- *
- * Content specific: the shared `clampPercentage` does not round, since
- * fields are stored as is.
- */
 const clampContentPercentage = (value: number) => roundTo(clampPercentage(value), FIVE_DECIMAL_PLACES);
 
-/**
- * Clamp every side of a content box to the page at the stored precision.
- */
 const clampContentPercentageBox = <T extends PercentageBox>(box: T): T => ({
   ...box,
   positionX: clampContentPercentage(box.positionX),
@@ -306,17 +250,8 @@ const clampContentPercentageBox = <T extends PercentageBox>(box: T): T => ({
 });
 
 /**
- * Restrict a content meta to what the server accepts: every number at the
- * stored precision and the positional values within the page bounds.
- *
- * Each value is clamped on its own, which is all that can be done without
- * the page size. Upright boxes are also kept from running past the far
- * edges; rotated footprints are kept on the page by the canvas when the
- * transform is read, which knows the page. Lines use start/end coordinates
- * instead of a position and size.
- *
- * Rotation wraps as well as rounds, so a value just under a full turn cannot
- * round up to 360 and fall outside the accepted range.
+ * Rotated footprints are not kept on the page here, since that needs the page
+ * size; the canvas does it when the transform is read.
  */
 const restrictContentMetaPosValues = (contentMeta: TEnvelopeContentMeta): TEnvelopeContentMeta => {
   return match(contentMeta)
@@ -359,10 +294,6 @@ const restrictContentMetaPosValues = (contentMeta: TEnvelopeContentMeta): TEnvel
     .exhaustive();
 };
 
-/**
- * Clamp a box to the page, and keep an upright one from running past the
- * far edges.
- */
 const restrictBoxToPage = <T extends Exclude<TEnvelopeContentMeta, { type: EnvelopeContentType.LINE }>>(meta: T): T => {
   const clamped = clampContentPercentageBox(meta);
 
@@ -377,10 +308,6 @@ const restrictBoxToPage = <T extends Exclude<TEnvelopeContentMeta, { type: Envel
   };
 };
 
-/**
- * Offset the position of a content meta, used when duplicating contents so the
- * duplicate does not fully overlap the original.
- */
 const offsetContentMetaPosValues = (
   contentMeta: TEnvelopeContentMeta,
   offset = EDITOR_DUPLICATE_ITEM_OFFSET,

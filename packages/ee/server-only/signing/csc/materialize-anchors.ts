@@ -12,12 +12,9 @@ export type MaterializeTspAnchorsForEnvelopeOptions = {
   envelopeId: string;
 
   /**
-   * Document data to materialise onto instead of the one an envelope item
-   * currently points at, keyed by envelope item ID.
-   *
-   * Sending renders the envelope contents into new document data rows which
-   * the items are only pointed at once the send commits. The anchors have to
-   * go onto those rendered bytes, since the content render flattens the PDF
+   * Keyed by envelope item ID. Sending renders the contents into new document
+   * data rows which the items are only pointed at once the send commits, and
+   * the anchors have to go onto those bytes since the render flattens the PDF
    * and would strip them otherwise.
    */
   documentDataOverrides?: Record<string, DocumentData>;

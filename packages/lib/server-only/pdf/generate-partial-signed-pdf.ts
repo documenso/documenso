@@ -1,6 +1,7 @@
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { PDF } from '@libpdf/core';
 
+import type { ContentImageMap } from '../../universal/content-renderer/content-renderer';
 import { loadContentImages } from '../data-content/load-content-images';
 import type { OverlayContent } from './insert-field-in-pdf-v2';
 import { insertPageOverlays } from './insert-page-overlay';
@@ -9,6 +10,7 @@ type GeneratePartialSignedPdfOptions = {
   pdfData: Uint8Array;
   fields: FieldWithSignature[];
   contents?: OverlayContent[];
+  images?: ContentImageMap;
 };
 
 /**
@@ -20,13 +22,18 @@ type GeneratePartialSignedPdfOptions = {
  * No PKI signature, no certificate page, no audit log appendix - this is a
  * preview of the in-progress envelope, not a final executed document.
  */
-export const generatePartialSignedPdf = async ({ pdfData, fields, contents = [] }: GeneratePartialSignedPdfOptions) => {
+export const generatePartialSignedPdf = async ({
+  pdfData,
+  fields,
+  contents = [],
+  images: preloadedImages,
+}: GeneratePartialSignedPdfOptions) => {
   const pdfDoc = await PDF.load(pdfData);
 
   pdfDoc.flattenAll();
   pdfDoc.upgradeVersion('1.7');
 
-  const images = await loadContentImages(contents);
+  const images = preloadedImages ?? (await loadContentImages(contents));
 
   await insertPageOverlays({ pdfDoc, fields, contents, images });
 

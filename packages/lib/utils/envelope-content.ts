@@ -16,38 +16,20 @@ type EnvelopeContentWithData = {
   };
 };
 
-/**
- * The contents which hold data (images) but have none attached.
- *
- * Such contents render nothing once exported, so an envelope must not be
- * sent while any exist.
- */
+// These render nothing once exported, so an envelope must not be sent while any exist.
 export const getContentsMissingImages = <T extends EnvelopeContentWithData>(contents: T[]): T[] => {
   return contents.filter(
     (content) => CONTENT_TYPE_DATA_CONTENT_TYPE[content.contentMeta.type] !== undefined && !content.dataContentId,
   );
 };
 
-/**
- * The distinct IDs of the data contents attached to the given contents, in
- * first seen order. Contents without one are skipped.
- */
 export const getDataContentIds = (contents: { dataContentId?: string | null }[]) => {
   return unique(contents.map((content) => content.dataContentId).filter(isNonNullish));
 };
 
-/**
- * The per envelope content allowances of an organisation claim, where `0`
- * means unlimited.
- */
 type EnvelopeContentClaim = Pick<OrganisationClaim, 'envelopeContentCount' | 'envelopeContentImageCount'>;
 
 /**
- * Resolve how an envelope's contents sit against the organisation's claim.
- *
- * Both limits apply to the whole envelope (every item and page), and image
- * contents count towards both totals whether or not an image is attached.
- *
  * "Reached" means no more can be added, which is what the editor gates on.
  * "Exceeded" means the envelope is over the limit, which is what sending is
  * blocked on. They differ because an envelope can end up over its limit
@@ -73,10 +55,6 @@ export const resolveEnvelopeContentLimits = (contentTypes: EnvelopeContentType[]
   };
 };
 
-/**
- * Throw when an envelope holds more contents than the organisation's claim
- * allows, used when sending since that is where the limits are enforced.
- */
 export const assertEnvelopeContentLimits = (contentTypes: EnvelopeContentType[], claim: EnvelopeContentClaim) => {
   const limits = resolveEnvelopeContentLimits(contentTypes, claim);
 
@@ -95,15 +73,6 @@ export const assertEnvelopeContentLimits = (contentTypes: EnvelopeContentType[],
   }
 };
 
-/**
- * Throw when a save would push an envelope further past the organisation's
- * content allowances, used when contents are written.
- *
- * Only additions are rejected. An envelope can already sit over its limit
- * without having been edited, e.g. after the organisation's plan is lowered,
- * and such an envelope must stay saveable so its owner can remove contents
- * until it fits again.
- */
 export const assertEnvelopeContentSaveWithinLimits = ({
   incomingTypes,
   existingTypes,
@@ -132,19 +101,11 @@ export const assertEnvelopeContentSaveWithinLimits = ({
 };
 
 /**
- * Everything about a content which affects what it renders as, and where.
- *
  * Used to detect whether an envelope's contents have changed between being
  * rendered into its PDF and that render being committed.
  */
 export type EnvelopeContentSnapshot = Pick<EnvelopeContent, 'id' | 'envelopeItemId' | 'contentMeta' | 'dataContentId'>;
 
-/**
- * Whether two sets of contents describe the same rendered output: the same
- * contents, on the same items, with the same meta and attached data.
- *
- * Order is ignored since the sets come from separate reads.
- */
 export const areEnvelopeContentsEqual = (a: EnvelopeContentSnapshot[], b: EnvelopeContentSnapshot[]) => {
   if (a.length !== b.length) {
     return false;
@@ -171,14 +132,9 @@ type OrderedContent = {
 };
 
 /**
- * Sort contents into render order, first to last, so the last one draws on
- * top: `zIndex` ascending, ties broken by `id` so the order is deterministic
- * regardless of the input order. Every renderer (editor, signing, seal) must
- * use this so they agree.
- *
- * The `zIndex` lives in the content's `contentMeta`. The accessor lets callers
- * with differently shaped contents (e.g. rows vs. editor contents with a
- * `formId`) share the one sort.
+ * Render order, first to last: `zIndex` ascending, ties broken by `id` so the
+ * order is deterministic regardless of the input order. Every renderer
+ * (editor, signing, seal) must use this so they agree.
  */
 export const sortContentsForRender = <T extends { id: string }>(
   contents: T[],
@@ -188,18 +144,13 @@ export const sortContentsForRender = <T extends { id: string }>(
 };
 
 /**
- * The ID an editor content is ordered by.
- *
- * Ties are broken by ID, so the editor has to use the same one the rest of
- * the renderers see, which is the database ID. A content which has not been
- * saved yet has none, but it is also placed above everything else on its
- * page, so it never ties.
+ * The editor must tie-break on the same database ID the other renderers see.
+ * An unsaved content has none, but it is also placed above everything else on
+ * its page, so it never ties.
  */
 export const getLocalContentOrderId = (content: { id?: string | null; formId: string }) => content.id ?? content.formId;
 
 /**
- * The `zIndex` which places a content above every one of the given `zIndex`es.
- *
  * Clamped to the ceiling so a page already at it keeps accepting contents,
  * which then tie with the topmost one (and stack by ID) rather than failing
  * validation.
@@ -210,9 +161,6 @@ export const getNextContentZIndex = (zIndexes: number[]) => {
   return Math.min(next, CONTENT_MAX_Z_INDEX);
 };
 
-/**
- * Whether the content renders last, i.e. on top of the others.
- */
 export const isContentOnTop = (contents: OrderedContent[], contentId: string) => {
   // The reverse of the render order, so the same tiebreak applies.
   const topContent = firstBy(contents, [(content) => content.zIndex, 'desc'], [(content) => content.id, 'desc']);
@@ -221,39 +169,22 @@ export const isContentOnTop = (contents: OrderedContent[], contentId: string) =>
 };
 
 export type BuildEnvelopeContentCopyDataOptions = {
-  /**
-   * The contents of the source envelope to copy.
-   */
   contents: Pick<EnvelopeContent, 'envelopeItemId' | 'contentMeta' | 'dataContentId'>[];
 
-  /**
-   * The envelope to copy the contents to.
-   */
   envelopeId: string;
 
   /**
-   * Maps the source envelope item IDs to the destination envelope item IDs.
-   *
-   * Every item which has contents must be mapped. The mapped IDs must belong
-   * to `envelopeId`. This is entirely the caller's responsibility: the
-   * destination items may not exist yet so it cannot be checked here, and
-   * the database does not enforce it either since `envelopeId` and
-   * `envelopeItemId` are independent foreign keys.
+   * Source item ID to destination item ID. The mapped IDs must belong to
+   * `envelopeId`; this is the caller's responsibility since the destination
+   * items may not exist yet, and the database does not enforce it either as
+   * `envelopeId` and `envelopeItemId` are independent foreign keys.
    */
   envelopeItemIdMap: Record<string, string>;
 };
 
 /**
- * The rows to insert when copying the contents of one envelope onto another,
- * e.g. when creating a document from a template or duplicating an envelope.
- *
- * The caller passes the result to `envelopeContent.createMany` once the
- * destination envelope and its items exist.
- *
- * Throws if a content's item is not in the map. A content can only ever live
- * on the copy of the item it came from, so there is no safe place to put it
- * and dropping it silently would lose authored content. This should not
- * happen when the map covers every item of the source envelope.
+ * Throws rather than skipping a content whose item is not in the map, since
+ * dropping it silently would lose authored content.
  *
  * Data contents (e.g. images) are immutable and never deleted, so the copies
  * point at the same ones as the source rather than getting their own.

@@ -9,28 +9,14 @@ import type { EnvelopeCanvas, EnvelopeCanvasBox } from './envelope-canvas-types'
 type UseEnvelopeCanvasPendingCreationOptions = {
   canvas: EnvelopeCanvas;
 
-  /**
-   * The Konva name given to the pending rectangle, so it can be found and
-   * removed from the layer again.
-   */
   nodeName: string;
 };
 
-/**
- * The rectangle left on the page after a marquee is drawn over an empty area,
- * which is pending a choice of what to create within it.
- *
- * Shared by the fields and contents layers, which each decide when a marquee
- * becomes a pending creation and what gets created from it.
- */
 export const useEnvelopeCanvasPendingCreation = ({ canvas, nodeName }: UseEnvelopeCanvasPendingCreationOptions) => {
   const { pageLayer, scale, unscaledViewport } = canvas;
 
   const [pendingCreation, setPendingCreation] = useState<Konva.Rect | null>(null);
 
-  /**
-   * Remove any pending creation rectangle from the canvas.
-   */
   const clearPending = () => {
     setPendingCreation(null);
 
@@ -39,10 +25,6 @@ export const useEnvelopeCanvasPendingCreation = ({ canvas, nodeName }: UseEnvelo
     }
   };
 
-  /**
-   * Draw the pending rectangle for a marquee box, given in scaled stage
-   * coordinates.
-   */
   const setPendingFromBox = (box: EnvelopeCanvasBox) => {
     const layer = pageLayer.current;
 
@@ -64,10 +46,6 @@ export const useEnvelopeCanvasPendingCreation = ({ canvas, nodeName }: UseEnvelo
     setPendingCreation(pendingRect);
   };
 
-  /**
-   * The pending rectangle as a percentage box of the page, or null when
-   * nothing is pending.
-   */
   const getPendingBox = (): PercentageBox | null => {
     if (!pendingCreation) {
       return null;

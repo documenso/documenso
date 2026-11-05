@@ -20,38 +20,26 @@ import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 type ContentSettingsFormProviderProps = {
-  /**
-   * The content whose settings the form edits, or null when none is selected.
-   */
   content: TLocalContent | null;
 
   children: React.ReactNode;
 };
 
 /**
- * Hosts the single settings form for the selected content.
+ * Every surface which edits a content's presentational meta (sidebar panel,
+ * canvas action bar) must bind to this one form via `useContentSettingsForm`,
+ * so there is only one copy of the values. Geometry is owned by the canvas and
+ * is never part of the form.
  *
- * Every surface which edits a content's presentational meta (the sidebar
- * settings panel, the canvas action bar) binds to this one form via
- * `useContentSettingsForm`, so there is only ever one copy of the values and
- * nothing to keep in sync. The form is the sole writer of those keys onto the
- * store; geometry is owned by the canvas and is never part of the form.
- *
- * The form's values are written to the store whenever they change while
- * valid, merged onto the content's latest meta.
- *
- * The provider wraps the whole editor surface (including the PDF viewer), so
- * it must not remount when the selection changes. Instead the one form is
- * reset to the newly selected content's values.
+ * The provider wraps the whole editor surface, so it must not remount when the
+ * selection changes; the one form is reset to the new content's values instead.
  */
 export const ContentSettingsFormProvider = ({ content, children }: ContentSettingsFormProviderProps) => {
   const { editorContents } = useCurrentEnvelopeEditor();
 
   const config = getContentSettingsFormConfig(content?.contentMeta ?? null);
 
-  // The resolver is read on every render, so the schema follows the selected
-  // content's type. The default values are only used for the initial mount;
-  // later selections are applied via `reset` below.
+  // The resolver is read on every render, so the schema follows the selected content's type.
   const form = useForm<FieldValues>({
     resolver: zodResolver(config.schema),
     mode: 'onChange',
@@ -60,20 +48,14 @@ export const ContentSettingsFormProvider = ({ content, children }: ContentSettin
 
   const formId = content?.formId ?? null;
 
-  /**
-   * The content the form currently holds the values of.
-   *
-   * The reset below runs after the render which changed the selection, so
-   * for that one render the form still holds the previous content's values.
-   * Inputs must not mount during it: a Radix select which mounts with one
-   * value and is immediately given another pushes an empty string back into
-   * the form (its hidden native select has no options yet), which surfaces
-   * as a spurious validation error.
-   */
+  // The reset below runs after the render which changed the selection, so for
+  // that one render the form still holds the previous content's values. Inputs
+  // must not mount during it: a Radix select which mounts with one value and is
+  // immediately given another pushes an empty string back into the form (its
+  // hidden native select has no options yet), surfacing as a spurious validation error.
   const [readyFormId, setReadyFormId] = useState<string | null>(null);
 
-  // Reset then subscribe, in that order, so the reset is not observed as an
-  // edit and selecting a content never writes anything by itself. A layout
+  // Reset before subscribing so the reset is not observed as an edit. A layout
   // effect so the fields beneath never paint the previous content's values.
   useLayoutEffect(() => {
     form.reset(config.defaultValues);
@@ -107,12 +89,6 @@ export const ContentSettingsFormProvider = ({ content, children }: ContentSettin
   );
 };
 
-/**
- * The settings form of the selected content, for the surfaces which edit it.
- *
- * Typed by the caller since the form's shape depends on the content type,
- * which the caller has already narrowed on.
- */
 export const useContentSettingsForm = <TForm extends FieldValues>() => {
   const context = useContext(ContentSettingsFormContext);
 
@@ -125,16 +101,8 @@ export const useContentSettingsForm = <TForm extends FieldValues>() => {
   return {
     form,
 
-    /**
-     * The content the form is bound to, so a consumer holding a different
-     * content (e.g. a stale canvas selection) can tell it is not this one.
-     */
     content: context.content,
 
-    /**
-     * Whether the form holds the selected content's values yet. Inputs must
-     * only be mounted once it does, see the provider.
-     */
     isReady: context.isReady,
   };
 };
@@ -151,10 +119,6 @@ type ContentSettingsFormConfig = {
   defaultValues: FieldValues;
 };
 
-/**
- * Only the presentational settings are editable in the form. Geometry (page,
- * position, size and endpoints) is managed on the canvas.
- */
 export const ZContentTextFormSchema = ZContentTextMetaSchema.pick({
   text: true,
   fontSize: true,
@@ -192,15 +156,8 @@ export const ZContentHighlightFormSchema = ZContentHighlightMetaSchema.pick({
 
 export type TContentHighlightFormSchema = z.infer<typeof ZContentHighlightFormSchema>;
 
-/**
- * Contents without settings (images, or no selection) get an empty form so
- * the form context always exists for whatever is mounted beneath it.
- */
 const ZEmptyFormSchema = z.object({});
 
-/**
- * The schema and initial values of the settings form for a content, by type.
- */
 const getContentSettingsFormConfig = (meta: TEnvelopeContentMeta | null): ContentSettingsFormConfig => {
   if (!meta) {
     return { schema: ZEmptyFormSchema, defaultValues: {} };
@@ -223,11 +180,6 @@ const getContentSettingsFormConfig = (meta: TEnvelopeContentMeta | null): Conten
     .exhaustive();
 };
 
-/**
- * The form's initial values are the content's meta laid over the type's
- * default meta, narrowed to the form's keys by the schema (which strips the
- * rest, e.g. geometry).
- */
 const createFormConfig = <TSchema extends z.ZodType<Partial<TEnvelopeContentMeta>>>(
   schema: TSchema,
   defaults: TEnvelopeContentMeta,

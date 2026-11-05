@@ -30,10 +30,6 @@ export type TLocalField = z.infer<typeof ZLocalFieldSchema>;
 type EditorFieldsProps = {
   envelope: TEditorEnvelope;
 
-  /**
-   * Receives a getter rather than the fields so the values are read when the
-   * save is sent, not when it was queued.
-   */
   handleFieldsUpdate: (getFields: () => TLocalField[]) => unknown;
 };
 
@@ -92,9 +88,6 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     [envelope.recipients],
   );
 
-  /**
-   * Selecting a field also selects its recipient.
-   */
   const setSelectedField = useCallback(
     (formId: string | null, bypassCheck = false) => {
       const foundField = formId ? fieldsArray.findItem(formId) : undefined;
@@ -123,10 +116,6 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     [fieldsArray.appendItems, setSelectedField],
   );
 
-  /**
-   * Adopt the ID assigned by the server after a save, without triggering
-   * another save.
-   */
   const setFieldId = (formId: string, id: number) => {
     fieldsArray.updateByFormId(formId, (field) => ({ ...field, id }), { shouldTriggerChange: false });
   };

@@ -43,21 +43,12 @@ import {
 import { EnvelopeCanvasActionButton, EnvelopeCanvasActionDivider } from './envelope-canvas-action-bar';
 
 type EnvelopeCanvasContentActionsProps = {
-  /**
-   * The single selected content.
-   */
   content: TLocalContent;
 };
 
 /**
- * The type specific quick actions for a single selected content, shown at the
- * start of the content action bar: the frequently adjusted styles (colors,
- * stroke width) and the image upload for image contents.
- *
  * The style actions are fields of the selected content's settings form, the
- * same form the sidebar edits, so the two never disagree. The full set of
- * settings remains in the sidebar. Renders nothing for types without quick
- * actions.
+ * same form the sidebar edits, so the two never disagree.
  */
 export const EnvelopeCanvasContentActions = ({ content }: EnvelopeCanvasContentActionsProps) => {
   const { t } = useLingui();
@@ -66,7 +57,7 @@ export const EnvelopeCanvasContentActions = ({ content }: EnvelopeCanvasContentA
 
   // The canvas selection and the settings form follow each other, but guard
   // against a render in between so a stale selection never edits another
-  // content's form, and wait for the form to hold this content's values.
+  // content's form.
   if (formContent?.formId !== content.formId || !isReady) {
     return null;
   }
@@ -249,23 +240,13 @@ const HighlightContentActions = () => {
 type ColorActionProps = {
   title: string;
 
-  /**
-   * The current color, or null when none is set (e.g. no fill).
-   */
   value: string | null;
 
-  /**
-   * The color the picker starts from when none is set.
-   */
   defaultValue?: string;
 
   onChange: (color: string) => void;
 };
 
-/**
- * A swatch button which opens a color picker. An unset color shows a struck
- * through swatch.
- */
 const ColorAction = ({ title, value, defaultValue, onChange }: ColorActionProps) => {
   return (
     <ColorPicker
@@ -291,9 +272,6 @@ type FontSizeActionProps = {
   onChange: (fontSize: number) => void;
 };
 
-/**
- * A button showing the current font size which opens a slider.
- */
 const FontSizeAction = ({ value, onChange }: FontSizeActionProps) => {
   const { t } = useLingui();
 
@@ -336,10 +314,6 @@ type ChoiceActionProps<T extends string> = {
   onChange: (value: T) => void;
 };
 
-/**
- * A button showing the icon of the current choice which opens the other
- * choices, e.g. text alignment.
- */
 const ChoiceAction = <T extends string>({ title, value, options, onChange }: ChoiceActionProps<T>) => {
   const current = options.find((option) => option.value === value) ?? options[0];
   const CurrentIcon = current.icon;
@@ -383,9 +357,6 @@ type StrokeWidthActionProps = {
   onChange: (width: number) => void;
 };
 
-/**
- * A button showing the current stroke width which opens a slider.
- */
 const StrokeWidthAction = ({ value, onChange }: StrokeWidthActionProps) => {
   const { t } = useLingui();
 
@@ -397,7 +368,6 @@ const StrokeWidthAction = ({ value, onChange }: StrokeWidthActionProps) => {
           title={t`Thickness`}
           className="flex h-[26px] w-[26px] items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
         >
-          {/* A bar whose thickness follows the value, so the current width is still glanceable. */}
           <span className="block w-3.5 rounded-full bg-current" style={{ height: Math.max(1.5, Math.min(value, 6)) }} />
         </button>
       </PopoverTrigger>

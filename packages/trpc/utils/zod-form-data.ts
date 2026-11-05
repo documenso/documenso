@@ -42,10 +42,8 @@ export const zfdBrandingImageFile = () => {
 };
 
 /**
- * A `zfd.file()` schema constrained to content images: size-limited and
- * restricted to the content image MIME allowlist. The declared type is
- * client controlled so this is only an early rejection; the bytes are
- * verified while the image is normalized.
+ * The declared MIME type is client controlled so this is only an early
+ * rejection; the bytes are verified while the image is normalized.
  */
 export const zfdContentImageFile = () => {
   return zfd

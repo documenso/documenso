@@ -22,27 +22,17 @@ import { useEffect, useRef, useState } from 'react';
 import { createCallable } from 'react-call';
 import { match } from 'ts-pattern';
 
-/**
- * The DOM id of the dialog's file input, so the e2e suite can find it.
- */
+/** Exported so the e2e suite can find the input. */
 export const getContentImageInputId = (formId: string) => `content-image-input-${formId}`;
 
 type ContentImageUploadDialogProps = {
   formId: string;
 
-  /**
-   * A file to upload straight away, e.g. one dropped onto the settings
-   * panel. Without it the file picker is opened first.
-   */
   file?: File;
 };
 
 type UploadStatus = 'picking' | 'uploading' | 'invalid-image' | 'too-large' | 'failed';
 
-/**
- * Why the server would reject the file, if it would, so the user finds out
- * before it is uploaded. Applies to dropped and picked files alike.
- */
 const getRejectionReason = (file: File): 'too-large' | 'invalid-image' | null => {
   if (file.size > megabytesToBytes(APP_CONTENT_IMAGE_UPLOAD_SIZE_LIMIT)) {
     return 'too-large';
@@ -55,16 +45,6 @@ const getRejectionReason = (file: File): 'too-large' | 'invalid-image' | null =>
   return null;
 };
 
-/**
- * Attach an image to an image content.
- *
- * Blocks the editor from the moment it is opened until the upload settles,
- * so there is only ever one upload in flight. Pending autosaves are flushed
- * before uploading, so the content always has a server id by then.
- *
- * Invoke with `ContentImageUploadDialog.call({ formId })`; `Root` must be
- * mounted inside the envelope editor and render providers.
- */
 export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogProps, void>(
   ({ call, formId, file: droppedFile }) => {
     const { t } = useLingui();
@@ -83,11 +63,6 @@ export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogP
       return getRejectionReason(droppedFile) ?? 'uploading';
     });
 
-    /**
-     * Point the content at its new image, fitting its box to the image.
-     *
-     * `data` is the file of an image which has not been uploaded yet.
-     */
     const attachImage = (dataContentId: string, image: Size, data?: File) => {
       // Re-read in case the content moved while the image was on its way.
       const latest = editorContents.getContentByFormId(formId);
@@ -120,8 +95,6 @@ export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogP
     };
 
     const uploadToServer = async (file: File) => {
-      // The content must exist on the server before an image can be
-      // attached to it.
       await flushAutosave();
 
       const content = editorContents.getContentByFormId(formId);
@@ -137,8 +110,7 @@ export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogP
 
       const { dataContent } = await uploadImage(formData);
 
-      // Decode the local file at the size the server normalized it to, so
-      // the preview matches what the route would serve.
+      // Decode at the server's normalized size so the preview matches what the route serves.
       const image = await createImageBitmap(file, {
         resizeWidth: dataContent.metadata.width,
         resizeHeight: dataContent.metadata.height,
@@ -159,9 +131,8 @@ export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogP
 
       try {
         if (isEmbedded) {
-          // Decoded the way the server will store it, which also rejects what
-          // the server would, since it only sees the image once the envelope is
-          // saved.
+          // Decoded the way the server will store it, which also rejects what the
+          // server would, since it only sees the image once the envelope is saved.
           const { image, details } = await decodeLocalContentImage(file);
 
           const dataContentId = `${PRESIGNED_DATA_CONTENT_ID_PREFIX}${nanoid()}`;
@@ -186,9 +157,8 @@ export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogP
       }
     };
 
-    // Dismissing the picker without choosing closes the dialog too. Browsers
-    // fire `cancel` on the input for this, but React does not expose it as a
-    // prop, so it is attached natively.
+    // Dismissing the picker closes the dialog. React does not expose the input's
+    // `cancel` event as a prop, so it is attached natively.
     useEffect(() => {
       const input = inputRef.current;
 
@@ -203,9 +173,6 @@ export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogP
       return () => input.removeEventListener('cancel', onCancel);
     }, [call]);
 
-    // Start immediately: upload the dropped file, or open the picker so the
-    // user does not have to click twice. A dropped file the server would
-    // reject opens on the reason instead.
     const hasStartedRef = useRef(false);
 
     useEffect(() => {
@@ -245,8 +212,7 @@ export const ContentImageUploadDialog = createCallable<ContentImageUploadDialogP
       void upload(file);
     };
 
-    // Clicked directly rather than via state, since the status may already
-    // be `picking` and a state change alone would not reopen the picker.
+    // The status may already be `picking`, so a state change alone would not reopen the picker.
     const reopenPicker = () => {
       setStatus('picking');
       inputRef.current?.click();

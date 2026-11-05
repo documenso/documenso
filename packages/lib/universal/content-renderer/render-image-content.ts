@@ -15,16 +15,9 @@ import {
 } from './content-renderer';
 
 /**
- * Render an image content.
- *
- * The image is fitted within the content box preserving its aspect ratio
- * (CSS `object-fit: contain`). The box takes the image's shape when the image
- * is attached (see `resolveAttachedImageBox`) and the transformer only
- * resizes it from the corners with that ratio kept, so in practice the image
- * fills the box; the fit is a safety net for boxes which do not match.
- *
- * Until an image is attached (or while it is loading) a dashed placeholder
- * is shown instead, except when exporting.
+ * The box takes the image's shape when attached (`resolveAttachedImageBox`)
+ * and the transformer keeps that ratio, so in practice the image fills the
+ * box; the contain fit is a safety net for boxes which do not match.
  */
 export const renderImageContentElement = (content: ContentToRender, options: RenderContentOptions): Konva.Group => {
   const { mode, translations, images } = options;
@@ -89,8 +82,6 @@ export const renderImageContentElement = (content: ContentToRender, options: Ren
         }),
     );
 
-    // Placeholders are editor guides: outside the content editor an empty image
-    // content renders as it will be sealed, i.e. as nothing.
     const isPlaceholderVisible = !image && isContentEditorGuidesVisible(options);
 
     placeholderRect.setAttrs({

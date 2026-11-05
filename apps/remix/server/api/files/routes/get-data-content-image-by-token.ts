@@ -15,10 +15,6 @@ const ZGetDataContentImageByTokenParamsSchema = z.object({
   dataContentId: z.string().min(1),
 });
 
-/**
- * Returns the image of a data content attached to a content of the envelope,
- * using a recipient or QR token.
- */
 route.get(
   '/token/:token/envelope/:envelopeId/dataContent/:dataContentId/image',
   sValidator('param', ZGetDataContentImageByTokenParamsSchema),
@@ -29,7 +25,6 @@ route.get(
       return c.json({ error: 'Not found' }, 404);
     }
 
-    // Recipient token based query.
     let envelopeWhereQuery: Prisma.EnvelopeWhereInput = {
       id: envelopeId,
       recipients: {
@@ -39,7 +34,6 @@ route.get(
       },
     };
 
-    // QR token based query.
     if (token.startsWith('qr_')) {
       envelopeWhereQuery = {
         id: envelopeId,
@@ -47,7 +41,7 @@ route.get(
       };
     }
 
-    // Validate envelope access via a content the data content is attached to.
+    // The token must grant access to the envelope the data content is attached to.
     const envelopeContent = await prisma.envelopeContent.findFirst({
       where: {
         envelopeId,

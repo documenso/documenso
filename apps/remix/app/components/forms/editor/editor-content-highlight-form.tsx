@@ -6,15 +6,9 @@ import {
 
 import { EditorContentColorField, EditorContentOpacityField } from './editor-content-generic-field-forms';
 
-/**
- * Settings form for highlight contents, bound to the selected content's
- * settings form. Only the presentational settings are editable here;
- * geometry (page, position and size) is managed on the canvas.
- */
 export const EditorContentHighlightForm = () => {
   const { form, isReady } = useContentSettingsForm<TContentHighlightFormSchema>();
 
-  // Mount the inputs only once the form holds this content's values.
   if (!isReady) {
     return null;
   }

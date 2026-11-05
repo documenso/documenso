@@ -20,14 +20,6 @@ export type UploadEnvelopeContentImageOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-/**
- * Store an image and attach it to an image content.
- *
- * This is the only way a data content comes into being. The content must
- * already exist, so the client flushes its pending saves before calling
- * this, and the dialog which drives it keeps the editor blocked until it
- * settles - so there is never more than one upload in flight.
- */
 export const uploadEnvelopeContentImage = async ({
   userId,
   teamId,
@@ -89,7 +81,6 @@ export const uploadEnvelopeContentImage = async ({
       },
     });
 
-    // Templates are not audit logged, matching `setEnvelopeContents`.
     if (content.envelope.type === EnvelopeType.DOCUMENT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({

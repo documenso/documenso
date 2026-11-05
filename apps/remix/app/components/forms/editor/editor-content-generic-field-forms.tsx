@@ -129,10 +129,6 @@ export const EditorContentStrokeStyleField = ({ formControl, className }: Generi
   );
 };
 
-/**
- * An opacity slider. The form value is a fraction (0-1) while the slider and
- * label display a percentage.
- */
 export const EditorContentOpacityField = ({
   formControl,
   className,

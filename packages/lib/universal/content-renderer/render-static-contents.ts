@@ -13,16 +13,9 @@ type RenderStaticContentsOptions = {
   scale: number;
   mode: FieldRenderMode;
 
-  /**
-   * The loaded images of the image contents.
-   */
   images?: ContentImageMap;
 };
 
-/**
- * Render contents as inert, display-only groups beneath everything else on
- * the layer, e.g. for signing and previews where contents cannot be edited.
- */
 export const renderStaticContents = ({
   contents,
   pageLayer,

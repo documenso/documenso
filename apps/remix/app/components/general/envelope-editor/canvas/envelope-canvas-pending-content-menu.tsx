@@ -3,19 +3,11 @@ import { useLingui } from '@lingui/react/macro';
 import type { ContentDragDropItem } from '../envelope-editor-content-drag-drop';
 
 type EnvelopeCanvasPendingContentMenuProps = {
-  /**
-   * The palette items on offer, e.g. without images once the organisation's
-   * image allowance is used up.
-   */
   items: ContentDragDropItem[];
 
   onSelectItem: (item: ContentDragDropItem) => void;
 };
 
-/**
- * The content type picker shown after drawing a marquee on an empty area of
- * the page while editing contents, to create a content of that size.
- */
 export const EnvelopeCanvasPendingContentMenu = ({ items, onSelectItem }: EnvelopeCanvasPendingContentMenuProps) => {
   const { t } = useLingui();
 

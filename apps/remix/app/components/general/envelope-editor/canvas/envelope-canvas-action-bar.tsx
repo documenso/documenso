@@ -1,22 +1,13 @@
 import type Konva from 'konva';
 import type { LucideIcon } from 'lucide-react';
 
-/**
- * The gap between a selection and its floating action bar.
- */
 const ACTION_BAR_OFFSET_PX = 5;
 
 /**
- * Resolve the absolute CSS position for an action bar hanging below the
- * bottom center of a set of nodes.
- *
  * Uses the union of the nodes' own client rects rather than the transformer's,
  * since the transformer rect includes its handles (e.g. the rotate anchor and
  * its stem above the selection) which would otherwise push the bar away from
  * the selection.
- *
- * Client rects are in scaled stage coordinates, matching the CSS pixel space
- * of the konva container.
  */
 const getNodesActionBarPosition = (nodes: Konva.Node[]) => {
   let minX = Number.POSITIVE_INFINITY;
@@ -42,23 +33,14 @@ const getNodesActionBarPosition = (nodes: Konva.Node[]) => {
 };
 
 type EnvelopeCanvasActionBarProps = {
-  /**
-   * The Konva nodes the bar hangs below.
-   */
   nodes: Konva.Node[];
 
-  /**
-   * Hide the bar, e.g. while the nodes are being transformed.
-   */
   hidden?: boolean;
 
   children: React.ReactNode;
 };
 
 /**
- * A floating container positioned below the bottom center of a set of canvas
- * nodes, for action bars and menus attached to a selection.
- *
  * Must be rendered within the page's relatively positioned container.
  */
 export const EnvelopeCanvasActionBar = ({ nodes, hidden = false, children }: EnvelopeCanvasActionBarProps) => {
@@ -88,12 +70,9 @@ export const EnvelopeCanvasActionBar = ({ nodes, hidden = false, children }: Env
 };
 
 /**
- * The floating pill which groups action buttons, themed like the viewer
- * toolbar so the two float over the page consistently.
- *
- * The ring and shadow are stronger than the toolbar's since the bar sits
- * directly on the page, which is usually white, rather than on the viewer
- * background.
+ * Themed like the viewer toolbar, but the ring and shadow are stronger since
+ * the bar sits directly on the page, which is usually white, rather than on
+ * the viewer background.
  */
 export const EnvelopeCanvasActionButtonGroup = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -103,9 +82,6 @@ export const EnvelopeCanvasActionButtonGroup = ({ children }: { children: React.
   );
 };
 
-/**
- * A thin vertical separator between groups of actions within the pill.
- */
 export const EnvelopeCanvasActionDivider = () => {
   return <div className="mx-0.5 h-4 w-px bg-border" />;
 };

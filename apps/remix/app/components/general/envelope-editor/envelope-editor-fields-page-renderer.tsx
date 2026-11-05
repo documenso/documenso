@@ -38,9 +38,6 @@ import { useEnvelopeCanvasMarquee } from './canvas/use-envelope-canvas-marquee';
 import { useEnvelopeCanvasSelection } from './canvas/use-envelope-canvas-selection';
 import { contentButtonList } from './envelope-editor-content-drag-drop';
 
-/**
- * Resolve the selectable kind of a Konva node, if any.
- */
 const getNodeSelectionKind = (node: Konva.Node): EnvelopeCanvasSelectionKind | null => {
   if (node.hasName(ENVELOPE_CANVAS_GROUP_NAMES.field)) {
     return 'field';
@@ -76,21 +73,14 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     contentsVisibility,
     applyPageItemsVisibility,
   } = usePageRenderer(({ stage, pageLayer }) => createPageCanvas(stage, pageLayer), pageData, {
-    // Mute the fields while contents are being edited.
     fieldsVisibility: selectedEditorTab === 'contents' ? 'muted' : 'visible',
   });
 
   const canvas: EnvelopeCanvas = { stage, pageLayer, scale, pageNumber, unscaledViewport, scaledViewport };
 
-  /**
-   * Whether contents can currently be edited on the canvas.
-   */
   const isContentsEditable =
     selectedEditorTab === 'contents' && canContentBeChanged(envelope) && contentsVisibility === 'visible';
 
-  /**
-   * Keep the editor's selected field/content in sync with the canvas selection.
-   */
   const syncEditorSelection = (selection: EnvelopeCanvasSelection) => {
     const singleFormId = selection?.groups.length === 1 ? selection.groups[0].id() : null;
 
@@ -132,21 +122,13 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   });
 
   const marquee = useEnvelopeCanvasMarquee({
-    // While editing contents the marquee selects contents instead of fields.
     onSelect: (box) => (isContentsEditable ? contents.selectInBox(box) : fields.selectInBox(box)),
     onEmptyClick: selection.clear,
   });
 
-  /**
-   * Picking a field or content from the palette drops the selection and any
-   * pending creation, so nothing floating over the page sits under the
-   * placement click.
-   *
-   * The action bar and pending menus are DOM elements above the canvas, so a
-   * placement click landing on one would press its button as well as placing
-   * the item, and by then the button acts on the item which was just placed
-   * (e.g. removing it).
-   */
+  // The action bar and pending menus are DOM elements above the canvas, so a
+  // placement click landing on one would press its button as well as placing the
+  // item, and by then the button acts on the item just placed (e.g. removing it).
   useEffect(() => {
     if (!isPlacingItem) {
       return;
@@ -159,9 +141,6 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     pageLayer.current?.batchDraw();
   }, [isPlacingItem]);
 
-  /**
-   * Initialize the Konva page canvas and all fields, contents and interactions.
-   */
   const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
     selection.attach(currentPageLayer);
 
@@ -175,7 +154,6 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
     marquee.bind(currentStage, currentPageLayer);
 
-    // Clicking an empty area of the stage deselects.
     currentStage.on('mousedown', (e) => {
       fields.clearPending();
       contents.clearPending();
@@ -220,10 +198,6 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
   const { selection: currentSelection, isTransforming } = selection;
 
-  /**
-   * The selected content when exactly one is selected. Type specific quick
-   * actions (styles, image upload) are only offered for single selections.
-   */
   const selectedSingleContent = match(currentSelection)
     .with({ kind: 'content' }, ({ groups }) =>
       groups.length === 1 ? (editorContents.getContentByFormId(groups[0].id()) ?? null) : null,
@@ -236,20 +210,12 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     )
     .otherwise(() => []);
 
-  /**
-   * Duplicating adds a copy of every selected content, so it is offered only
-   * while the organisation's allowance has room for them.
-   */
   const canSelectionBeDuplicated =
     !isContentLimitReached &&
     !(
       isImageLimitReached && selectedContents.some((content) => content.contentMeta.type === EnvelopeContentType.IMAGE)
     );
 
-  /**
-   * The contents which can be created from a drawn box. Image contents have
-   * their own allowance, so they are left out once it is used up.
-   */
   const creatableContentItems = contentButtonList.filter(
     (item) => !isImageLimitReached || item.type !== EnvelopeContentType.IMAGE,
   );

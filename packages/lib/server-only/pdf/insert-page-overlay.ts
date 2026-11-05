@@ -11,23 +11,13 @@ type InsertPageOverlaysOptions = {
   pdfDoc: PDF;
   fields: FieldWithSignature[];
   contents?: OverlayContent[];
-
-  /**
-   * The loaded images of the image contents, see `loadContentImages`.
-   */
   images?: ContentImageMap;
 };
 
-/**
- * Render the fields and contents of every page which has any into an overlay
- * and draw it onto the page, where the client renders them. Each page is
- * touched exactly once.
- */
 export const insertPageOverlays = async ({ pdfDoc, fields, contents = [], images }: InsertPageOverlaysOptions) => {
   const fieldsByPage = groupBy(fields, (field) => field.page);
   const contentsByPage = groupBy(contents, (content) => content.contentMeta.page);
 
-  // Object keys are always strings, so the page numbers are parsed back.
   const pageNumbers = unique([...Object.keys(fieldsByPage), ...Object.keys(contentsByPage)].map(Number));
 
   for (const pageNumber of pageNumbers) {
@@ -73,7 +63,6 @@ export const insertPageOverlays = async ({ pdfDoc, fields, contents = [], images
         break;
     }
 
-    // Draw the overlay on the page
     page.drawPage(embeddedPage, {
       x: translateX,
       y: translateY,

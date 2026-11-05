@@ -13,32 +13,18 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import type { EnvelopeCanvasSelection, EnvelopeCanvasSelectionKind } from './envelope-canvas-types';
 import { ENVELOPE_CANVAS_GROUP_NAMES } from './envelope-canvas-types';
 
-/**
- * A stable empty array so consumers of a kind which is not selected keep a
- * stable dependency and don't re-render on every selection change.
- */
+// Stable so consumers of an unselected kind don't re-render on every selection change.
 const EMPTY_GROUPS: Konva.Group[] = [];
 
-/** How far past a resize handle you can still grab it, in screen pixels. */
 const TRANSFORMER_ANCHOR_HIT_STROKE_PX = 24;
 
 type UseEnvelopeCanvasSelectionOptions = {
-  /**
-   * Resolve the transformer configuration for a selection.
-   */
   getTransformerConfig: (kind: EnvelopeCanvasSelectionKind, groups: Konva.Group[]) => TransformerSelectionConfig;
 
-  /**
-   * Called synchronously whenever the selection changes, so the editor
-   * selection can be kept in sync without a frame of drift.
-   */
   onChange: (selection: EnvelopeCanvasSelection) => void;
 };
 
 /**
- * The single canvas selection shared by fields and contents, along with the
- * Konva transformer which acts upon it.
- *
  * The exposed functions are stable and read their options through refs, so
  * they are safe to call from Konva handlers bound once at stage creation.
  */
@@ -47,9 +33,6 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
 
   const [selection, setSelectionState] = useState<EnvelopeCanvasSelection>(null);
 
-  /**
-   * Whether a selected item is being dragged, resized or rotated.
-   */
   const [isTransforming, setIsTransforming] = useState(false);
 
   const getTransformerConfigRef = useLatestRef(getTransformerConfig);
@@ -69,9 +52,8 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
   const selectionRef = useLatestRef(selection);
 
   /**
-   * Re-sync the transformer after the items change without the selection
-   * changing: re-resolve its configuration (e.g. an image attached to the
-   * selected content locks its ratio) and raise it back above the items.
+   * The configuration can change without the selection changing, e.g. an image
+   * attached to the selected content locks its ratio.
    *
    * The handles straddle the selected item's edges, so any item stacked above
    * the transformer hides part of them and takes their clicks. Rendering
@@ -128,12 +110,6 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
     [applySelection],
   );
 
-  /**
-   * Toggle a node in or out of the current selection (shift-click semantics).
-   *
-   * Nodes of a different kind than the toggled node are dropped, since only
-   * one kind can be selected at a time.
-   */
   const toggle = useCallback(
     (kind: EnvelopeCanvasSelectionKind, node: Konva.Node) => {
       const currentNodes = transformerRef.current?.nodes() ?? [];
@@ -153,8 +129,6 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
   }, []);
 
   /**
-   * Re-resolve the selection against the groups currently on the layer.
-   *
    * The stage is destroyed and rebuilt whenever the page is rescaled (e.g.
    * zooming), which leaves the selection holding detached nodes: the handles
    * disappear, the action bar positions itself from an empty rect, and the
@@ -180,13 +154,7 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
     [select],
   );
 
-  /**
-   * Create the transformer on a layer. Called once when the page canvas is
-   * created, and again whenever the stage is recreated.
-   */
   const attach = useCallback((layer: Konva.Layer) => {
-    // Match the brand green used for the first recipient's fields rather than
-    // Konva's default blue.
     const selectionColor = getRecipientColorStyles('green').baseRing;
 
     const transformer = new Konva.Transformer({
@@ -206,8 +174,7 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
         anchor.hitStrokeWidth(TRANSFORMER_ANCHOR_HIT_STROKE_PX / stageScale);
       },
       boundBoxFunc: (oldBox, newBox) => {
-        // Boxes are in absolute stage coordinates and the stage is the page,
-        // so pin the resize to the stage's own size.
+        // Boxes are in absolute stage coordinates and the stage is the page.
         const stage = layer.getStage();
 
         if (!stage) {
@@ -223,7 +190,6 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
           ? boundTransformerBoxToPageKeepingRatio(oldBox, newBox, page)
           : boundTransformerBoxToPage(oldBox, newBox, page);
 
-        // Enforce minimum size
         if (bounded.width < 30 || bounded.height < 20) {
           return oldBox;
         }

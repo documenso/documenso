@@ -39,8 +39,6 @@ export const renderLineContentElement = (content: ContentToRender, options: Rend
   contentLine.setAttrs({
     points: geometry.points,
     stroke,
-    // Stroke width is in unscaled page units, so it scales with the page like
-    // the rest of the document content.
     strokeWidth,
     dash,
     // Round caps read well for solid/dashed lines, but would merge dots

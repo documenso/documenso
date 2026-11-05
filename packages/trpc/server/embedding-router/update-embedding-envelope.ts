@@ -108,8 +108,7 @@ export const updateEmbeddingEnvelopeRoute = procedure
       });
     }
 
-    // Contents are frozen once the envelope has been sent, and the editor does
-    // not let them be changed from then on, so they are only saved before.
+    // Contents are frozen once sent, so they are skipped rather than rejected.
     const contentsToSet = data.contents && canContentBeChanged(envelope) ? data.contents : null;
 
     // Step 1: Update the envelope items.
@@ -239,9 +238,8 @@ export const updateEmbeddingEnvelopeRoute = procedure
       }
     }
 
-    // Check the contents before anything is written, since they are only set
-    // in the last step, so an invalid content cannot leave the envelope half
-    // updated.
+    // Checked up front since the contents are only set in the last step, so an
+    // invalid content cannot leave the envelope half updated.
     if (contentsToSet) {
       assertEmbeddedContentsCanBeSet({
         contents: contentsToSet,
@@ -251,8 +249,6 @@ export const updateEmbeddingEnvelopeRoute = procedure
       });
     }
 
-    // Store the new images the contents use, once each, before anything else
-    // is written so an invalid image or index fails the request cleanly.
     const contentImageDataContents = await createEnvelopeContentImages({
       contents: contentsToSet ?? [],
       images: contentImages,
@@ -310,10 +306,6 @@ export const updateEmbeddingEnvelopeRoute = procedure
       });
     }
 
-    /**
-     * Resolve an envelope item ID sent by the client, which is the temporary
-     * ID for items created in this request.
-     */
     const resolveEnvelopeItemId = (clientEnvelopeItemId: string) => {
       let envelopeItemId = clientEnvelopeItemId;
 
@@ -534,7 +526,6 @@ export const updateEmbeddingEnvelopeRoute = procedure
       }
     }
 
-    // Step 6: Update the contents.
     if (contentsToSet) {
       await setEnvelopeContents({
         userId: apiToken.userId,
@@ -544,7 +535,6 @@ export const updateEmbeddingEnvelopeRoute = procedure
           id: envelope.id,
         },
         contents: contentsToSet.map((content) => ({
-          // New contents only have a temporary ID, which creates them.
           id: content.id.startsWith(PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX) ? undefined : content.id,
           envelopeItemId: resolveEnvelopeItemId(content.envelopeItemId),
           contentMeta: content.contentMeta,
@@ -561,26 +551,15 @@ export const updateEmbeddingEnvelopeRoute = procedure
 
 type AssertEmbeddedContentsCanBeSetOptions = {
   contents: NonNullable<TUpdateEmbeddingEnvelopePayload['data']['contents']>;
-
-  /**
-   * The IDs of the envelope items the envelope will have, temporary ones
-   * included.
-   */
   envelopeItemIds: string[];
-
   existingContents: Pick<EnvelopeContent, 'id' | 'envelopeItemId' | 'contentMeta' | 'dataContentId'>[];
   claim: Pick<OrganisationClaim, 'envelopeContentCount' | 'envelopeContentImageCount'>;
 };
 
 /**
- * Throw if the contents cannot be set.
- *
  * `setEnvelopeContents` checks the same, but it runs last, once the envelope
  * items, recipients and fields have already been written. Checking up front
  * means a request which would fail there changes nothing.
- *
- * New images (`imageIndex`) are checked by `createEnvelopeContentImages`,
- * which also runs before anything is written.
  */
 const assertEmbeddedContentsCanBeSet = ({
   contents,
@@ -588,7 +567,6 @@ const assertEmbeddedContentsCanBeSet = ({
   existingContents,
   claim,
 }: AssertEmbeddedContentsCanBeSetOptions) => {
-  // Contents on the envelope items being deleted go along with them.
   const remainingContents = existingContents.filter((content) => envelopeItemIds.includes(content.envelopeItemId));
 
   assertEnvelopeContentSaveWithinLimits({

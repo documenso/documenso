@@ -15,8 +15,7 @@ import {
 } from './content-renderer';
 
 /**
- * Text contents are laid out within the box the author drew and never grow
- * past it. This is not configurable since content should not be dynamic.
+ * Not configurable since content should not be dynamic.
  */
 const CONTENT_TEXT_OVERFLOW_MODE: TFieldOverflowMode = 'crop';
 
@@ -81,9 +80,7 @@ export const renderTextContentElement = (content: ContentToRender, options: Rend
 
     upsertContentHitRect(contentGroup, content, geometry.width, geometry.height);
 
-    // A persistent dashed outline marks the text box bounds while editing,
-    // matching the image placeholder treatment, since the text itself
-    // gives no indication of the box it is laid out within.
+    // The text itself gives no indication of the box it is laid out within.
     const boundsRect = upsertContentGroupChild(
       contentGroup,
       `${content.renderId}-bounds-rect`,

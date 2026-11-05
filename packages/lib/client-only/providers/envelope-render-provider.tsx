@@ -10,14 +10,7 @@ import { clamp } from 'remeda';
 import type { TEnvelope } from '../../types/envelope';
 import { areContentsImprinted } from '../../utils/envelope';
 
-/**
- * The minimum content data required to render a content.
- */
 export type EnvelopeRenderContent = Pick<EnvelopeContent, 'id' | 'envelopeItemId' | 'contentMeta' | 'dataContentId'> & {
-  /**
-   * The file of an image which has not been uploaded yet, e.g. one picked in
-   * the embedded editor. It is drawn from the file rather than fetched.
-   */
   data?: Blob;
 };
 
@@ -29,13 +22,6 @@ export const ENVELOPE_VIEWER_MIN_ZOOM = 0.5;
 export const ENVELOPE_VIEWER_MAX_ZOOM = 2;
 export const ENVELOPE_VIEWER_ZOOM_STEP = 0.25;
 
-/**
- * User controls for the envelope PDF viewer, shared across the editor, signing
- * and preview surfaces.
- *
- * Written by the viewer toolbar and consumed by the PDF viewer (zoom) and
- * `usePageRenderer` (fields/contents visibility).
- */
 export type EnvelopeViewerControls = {
   zoom: number;
   setZoom: (zoom: number) => void;
@@ -70,11 +56,9 @@ export type PageRenderData = {
   imageLoadingState: ImageLoadingState;
 
   /**
-   * Report whether everything drawn on the page is ready.
-   *
-   * A page renderer may have to load things of its own (e.g. the images of
-   * the page's contents), which it can only start once the page image is
-   * ready. The page waits for this so it is never shown half drawn.
+   * The page holds back its bitmap until the renderer reports ready, so a
+   * renderer which loads its own assets (e.g. content images) is never shown
+   * half drawn.
    */
   onReadyChange?: (isReady: boolean) => void;
 };
@@ -87,9 +71,7 @@ export type PageSize = {
 };
 
 /**
- * The unscaled sizes of the pages rendered so far, registered by the page
- * renderers so page relative geometry can be computed outside of them, e.g.
- * by the settings panel.
+ * Sizes are unscaled.
  */
 export type PageSizeRegistry = {
   register: (envelopeItemId: string, pageNumber: number, size: PageSize) => void;
@@ -126,9 +108,6 @@ type EnvelopeRenderProviderValue = {
   fields: Field[];
   contents: EnvelopeRenderContent[];
 
-  /**
-   * The images of the image contents, loaded ahead of rendering.
-   */
   contentImages: ContentImages;
 
   pageSizes: PageSizeRegistry;
@@ -175,11 +154,6 @@ interface EnvelopeRenderProviderProps {
    */
   fields?: Field[];
 
-  /**
-   * Optional contents which are passed down to renderers for custom rendering needs.
-   *
-   * Only pass if the CustomRenderer you are passing in wants contents.
-   */
   contents?: EnvelopeRenderContent[];
 
   /**
@@ -326,8 +300,6 @@ export const EnvelopeRenderProvider = ({
     }
   }, [currentItem, envelopeItems]);
 
-  // Once an envelope is sealed the contents are imprinted onto the current
-  // PDF and are not rendered, so their images are not loaded either.
   const isContentsImprinted = version === 'current' && areContentsImprinted(envelope.status);
 
   const contentImages = useContentImages({

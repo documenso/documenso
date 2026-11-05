@@ -99,9 +99,6 @@ export type DataContentImageUrlOptions = {
 };
 
 /**
- * The URL of the image of a data content attached to a content of the
- * envelope.
- *
  * A data content is immutable (replacing an image creates a new one), so the
  * URL is content addressed by `dataContentId` and hard cached like
  * `getDocumentDataUrl`.
@@ -111,12 +108,10 @@ export const getDataContentImageUrl = (options: DataContentImageUrlOptions) => {
 
   const partialUrl = `envelope/${envelopeId}/dataContent/${dataContentId}/image`;
 
-  // Recipient token endpoint.
   if (token) {
     return `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/token/${token}/${partialUrl}`;
   }
 
-  // Endpoint authenticated by session or presigned token.
   const baseUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/${partialUrl}`;
 
   if (presignToken) {

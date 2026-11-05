@@ -196,10 +196,8 @@ export const EnvelopeItemEditDialog = ({
         formData.append('payload', JSON.stringify(payload));
         formData.append('file', file);
 
-        // This dialog is opened from the fields step, where a content or
-        // field save may be waiting on its debounce. Send it first so it
-        // cannot land after the replacement with items the server has since
-        // pruned, which would recreate them.
+        // A debounced field/content autosave may still be pending. Send it first so it
+        // cannot land after the replacement and recreate items the server has pruned.
         await flushAutosave();
 
         const replacePromise = replaceEnvelopeItemPdf(formData);

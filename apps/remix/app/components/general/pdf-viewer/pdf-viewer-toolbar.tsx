@@ -10,38 +10,18 @@ import { useLayoutEffect, useState } from 'react';
 
 import type { ScrollTarget } from '../virtual-list/use-virtual-list';
 
-/**
- * The gap between the toolbar and the bottom of the visible viewer area.
- */
 const TOOLBAR_BOTTOM_OFFSET = 24;
 
 export type EnvelopePdfViewerToolbarControl = 'zoom' | 'fields' | 'contents';
 
 export type EnvelopePdfViewerToolbarProps = {
-  /**
-   * The controls to display in the toolbar.
-   */
   controls?: EnvelopePdfViewerToolbarControl[];
 
-  /**
-   * The scroll container the toolbar is aligned against.
-   *
-   * The toolbar is fixed to the viewport, horizontally centered over the
-   * scroll container and pinned to the bottom of its visible area.
-   */
   scrollParentRef: ScrollTarget;
 
   className?: string;
 };
 
-/**
- * A floating toolbar for the envelope PDF viewer providing zoom and
- * fields/contents visibility controls.
- *
- * Rendered with fixed positioning aligned to the viewer's scroll container,
- * so it can be mounted anywhere within the viewer tree, including inside the
- * scroll container itself.
- */
 export const EnvelopePdfViewerToolbar = ({
   controls = ['zoom'],
   scrollParentRef,
@@ -64,13 +44,9 @@ export const EnvelopePdfViewerToolbar = ({
 
   const [position, setPosition] = useState<{ left: number; bottom: number } | null>(null);
 
-  /**
-   * Keep the toolbar aligned with the visible area of the scroll container.
-   */
   useLayoutEffect(() => {
-    // The toolbar renders inside the scroll container, so the container's ref
-    // is not attached yet when this first runs. It is therefore observed as
-    // soon as measuring finds it, which also covers it being replaced.
+    // The toolbar renders inside the scroll container, so its ref is not attached
+    // yet on the first run. It is observed once measuring finds it.
     let observedScrollEl: HTMLElement | null = null;
 
     function measure() {
@@ -117,8 +93,7 @@ export const EnvelopePdfViewerToolbar = ({
 
     window.addEventListener('resize', measure);
 
-    // Covers viewport and page level layout changes, and delivers an initial
-    // notification which picks up the scroll container once it is attached.
+    // The initial notification picks up the scroll container once it is attached.
     resizeObserver.observe(document.body);
 
     return () => {

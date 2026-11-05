@@ -37,10 +37,7 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
     overrideSettings,
   } = useCurrentEnvelopeRender();
 
-  /**
-   * Once an envelope is sent its contents are inserted into the current PDF, so
-   * rendering them again would double them up.
-   */
+  // Once sent, the contents are baked into the current PDF, so rendering them again doubles them up.
   const shouldRenderContents = !(version === 'current' && areContentsImprinted(envelopeStatus));
 
   const signaturesByFieldId = useMemo(() => {
@@ -61,10 +58,7 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
 
   const { scale, pageNumber } = pageData;
 
-  /**
-   * A content image which failed to load would render the page differently
-   * to how it was authored, so it is treated like any other render failure.
-   */
+  // A failed image would render the page differently to how it was authored.
   useEffect(() => {
     if (shouldRenderContents && hasFailedImage) {
       setRenderError(true);
@@ -134,7 +128,6 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
       translations: fieldTranslations,
       pageWidth: unscaledViewport.width,
       pageHeight: unscaledViewport.height,
-      // Muted fields are rendered with the read-only styling.
       color: fieldsVisibility === 'muted' ? 'readOnly' : getRecipientColorKey(field.recipientId),
       editable: false,
       mode: overrideSettings?.mode ?? 'edit',
@@ -161,8 +154,7 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
    * Initialize the Konva page canvas and all fields and interactions.
    */
   const createPageCanvas = (_currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
-    // Render the contents beneath the fields. Contents are static, so they
-    // only need to be rendered when the canvas is created.
+    // Contents must be rendered before the fields so they sit beneath them.
     if (shouldRenderContents) {
       renderContents(currentPageLayer);
     }
@@ -175,9 +167,6 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
     currentPageLayer.batchDraw();
   };
 
-  /**
-   * Render the authored contents of the page beneath the fields.
-   */
   const renderContents = (currentPageLayer: Konva.Layer) => {
     try {
       renderStaticContents({

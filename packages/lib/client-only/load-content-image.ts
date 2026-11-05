@@ -12,13 +12,7 @@ const defaultDependencies = (): LoadContentImageDependencies => ({
   createImageBitmap: async (blob) => await createImageBitmap(blob),
 });
 
-/**
- * What is known about a content image's file, for display.
- */
 export type ContentImageDetails = {
-  /**
-   * The size of the stored bytes.
-   */
   fileSize: number;
 };
 
@@ -28,11 +22,8 @@ export type LoadedContentImage = {
 };
 
 /**
- * Fetch and decode a content image, retrying once after a network or server
- * error. Client errors (e.g. not found) fail immediately.
- *
- * The image is decoded off the main thread into an `ImageBitmap`, which is
- * what the canvas renderer wants and carries no cross origin taint.
+ * Decoded into an `ImageBitmap` rather than an image element since it carries
+ * no cross origin taint.
  */
 export const loadContentImage = async (
   url: string,
@@ -50,12 +41,8 @@ export const loadContentImage = async (
 };
 
 /**
- * Decode an image file which has not been uploaded, as the server would store
- * it: oriented and scaled down to `CONTENT_IMAGE_MAX_EDGE`.
- *
- * Used where an image is held on the client until the envelope is saved,
- * e.g. in the embedded editor. Throws `INVALID_IMAGE_FILE` for anything the
- * server would reject once decoded.
+ * Must mirror the server's image normalization, so what is drawn locally is
+ * what gets stored once the envelope is saved.
  */
 export const decodeLocalContentImage = async (file: Blob): Promise<LoadedContentImage> => {
   if (!(await hasSupportedImageSignature(file))) {
@@ -128,10 +115,7 @@ const fetchAndDecode = async (
   };
 };
 
-/**
- * Network failures surface as thrown `TypeError`s, and server errors are
- * worth one more attempt. Anything else is a definitive answer.
- */
+// Network failures surface as thrown `TypeError`s.
 const isRetryable = (error: unknown) => {
   if (isResponseError(error)) {
     return error.status >= 500;
@@ -141,9 +125,6 @@ const isRetryable = (error: unknown) => {
 };
 
 /**
- * Whether a file starts with the signature of a PNG, JPEG or WebP, the
- * formats the server accepts.
- *
  * The file's MIME type is not enough, since it comes from the extension,
  * while browsers decode whatever format the bytes are in. A GIF renamed to
  * `.png` would otherwise only be rejected once the envelope is saved.

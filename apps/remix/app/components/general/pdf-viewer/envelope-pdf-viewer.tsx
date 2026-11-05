@@ -17,16 +17,8 @@ export type EnvelopePdfViewerProps = {
    */
   errorMessage: { title: MessageDescriptor; description: MessageDescriptor } | null;
 
-  /**
-   * The controls to display in the floating viewer toolbar.
-   *
-   * When omitted no toolbar is rendered.
-   */
   toolbar?: EnvelopePdfViewerToolbarControl[];
 
-  /**
-   * Additional class names for the floating viewer toolbar.
-   */
   toolbarClassName?: string;
 } & Omit<PDFViewerProps, 'data'>;
 

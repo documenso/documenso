@@ -155,7 +155,6 @@ export const EnvelopeEditorUploadPage = () => {
         editorFields.resetForm(fields);
       }
 
-      // Same for contents.
       if (contents) {
         setLocalEnvelope({ contents });
         editorContents.resetForm(contents);
@@ -188,9 +187,8 @@ export const EnvelopeEditorUploadPage = () => {
     // Directly commit the files for embedded documents since those are not uploaded
     // until the end of the embedded flow.
     if (isEmbedded) {
-      // New items go after the existing ones, in the order they were added.
-      // Deleting an item does not renumber the rest, so this continues from
-      // the highest order rather than the item count.
+      // Deleting an item does not renumber the rest, so continue from the
+      // highest order rather than the item count.
       const highestOrder = envelope.envelopeItems.reduce((highest, item) => Math.max(highest, item.order), 0);
 
       setLocalEnvelope({
@@ -285,8 +283,7 @@ export const EnvelopeEditorUploadPage = () => {
           (field) => field.envelopeItemId !== envelopeItemId || field.page <= newPageCount,
         );
 
-        // Contents are pruned by the same rule, matching what the server does
-        // for non embedded replacements.
+        // Must match the server's pruning for non embedded replacements.
         const remainingContents = envelope.contents.filter(
           (content) => content.envelopeItemId !== envelopeItemId || content.contentMeta.page <= newPageCount,
         );

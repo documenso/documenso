@@ -16,6 +16,7 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
+import pMap from 'p-map';
 
 import { validateCheckboxLength } from '../../advanced-fields-validation/validate-checkbox';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '../../constants/direct-templates';
@@ -41,9 +42,11 @@ import { assertEnvelopeContentLimits, getContentsMissingImages } from '../../uti
 import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
+import { loadContentImages } from '../data-content/load-content-images';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import {
   commitRenderedEnvelopeItems,
+  RENDER_CONTENTS_CONCURRENCY,
   type RenderedEnvelopeItem,
   renderContentsIntoEnvelopeItem,
 } from '../envelope-content/insert-contents-into-envelope-item';
@@ -202,8 +205,8 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     }
   });
 
-  // Validate that every image content has an image, since they
-  // render nothing otherwise and the document would silently ship without them.
+  // An image content without an image renders nothing, so the document would
+  // silently ship without it.
   const contentsMissingImages = getContentsMissingImages(envelope.contents);
 
   if (contentsMissingImages.length > 0) {
@@ -231,21 +234,24 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     });
   }
 
-  // Render the contents into a copy of every item's PDF up front. The items are
-  // only pointed at those copies once everything else has passed, inside the
-  // transaction that moves the envelope on from DRAFT, so a failure in any item
-  // or in any later step leaves every item on its original file rather than
-  // some of them on a rendered one which the next send would render onto again.
+  // The items are only pointed at the rendered copies inside the transaction
+  // that moves the envelope on from DRAFT, so a failure anywhere before that
+  // leaves every item on its original file rather than some on a rendered one
+  // which the next send would render onto again.
   let renderedEnvelopeItems: RenderedEnvelopeItem[] = [];
 
-  if (envelope.status === DocumentStatus.DRAFT) {
-    const results = await Promise.all(
-      envelope.envelopeItems.map(async (envelopeItem) =>
+  if (envelope.status === DocumentStatus.DRAFT && envelope.contents.length > 0) {
+    const images = await loadContentImages(envelope.contents);
+
+    const results = await pMap(
+      envelope.envelopeItems,
+      async (envelopeItem) =>
         renderContentsIntoEnvelopeItem({
           envelopeItemId: envelopeItem.id,
           contents: envelope.contents.filter((content) => content.envelopeItemId === envelopeItem.id),
+          images,
         }),
-      ),
+      { concurrency: RENDER_CONTENTS_CONCURRENCY },
     );
 
     renderedEnvelopeItems = results.filter((result): result is RenderedEnvelopeItem => result !== null);
@@ -256,8 +262,8 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
   );
 
   if (allRecipientsHaveNoActionToTake) {
-    // Render the contents directly onto the envelope items and proceed to seal
-    // since there's no-one left to act on the envelope.
+    // Nobody is left to act, so the send transaction below is skipped and the
+    // rendered items have to be committed here before sealing.
     if (envelope.status === DocumentStatus.DRAFT) {
       await prisma.$transaction(async (tx) => {
         await commitRenderedEnvelopeItems(tx, {
@@ -322,7 +328,6 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
   if (isTspEnvelope(envelope) && envelope.status === DocumentStatus.DRAFT) {
     await materializeTspAnchorsForEnvelope({
       envelopeId: envelope.id,
-      // Override the envelope items which have contents with updated document data.
       documentDataOverrides: Object.fromEntries(
         renderedEnvelopeItems.map((item) => [item.envelopeItemId, item.documentData]),
       ),

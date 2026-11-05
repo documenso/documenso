@@ -27,9 +27,6 @@ type EnvelopeCanvasFieldActionButtonsProps = {
   onChangeFieldType: (type: FieldType) => void;
 };
 
-/**
- * The floating actions for the selected fields.
- */
 export const EnvelopeCanvasFieldActionButtons = ({
   selectedFieldFormIds,
   onDuplicate,
@@ -50,12 +47,6 @@ export const EnvelopeCanvasFieldActionButtons = ({
     [editorFields.localFields, selectedFieldFormIds],
   );
 
-  /**
-   * Decide the preselected field type in the command input.
-   *
-   * If all fields share the same type, use that as the default selection.
-   * Otherwise show no preselection.
-   */
   const preselectedFieldType = useMemo(() => {
     if (selectedFields.length === 0) {
       return null;
@@ -67,13 +58,6 @@ export const EnvelopeCanvasFieldActionButtons = ({
     return isTypesSame ? firstType : null;
   }, [selectedFields]);
 
-  /**
-   * Decide the preselected recipient in the command input.
-   *
-   * If all fields belong to the same recipient then use that recipient as the default.
-   *
-   * Otherwise show the placeholder.
-   */
   const preselectedRecipient = useMemo(() => {
     if (selectedFields.length === 0) {
       return null;

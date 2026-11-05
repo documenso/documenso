@@ -16,17 +16,11 @@ import {
   EditorGenericVerticalAlignField,
 } from './editor-field-generic-field-forms';
 
-/**
- * Settings form for text contents, bound to the selected content's settings
- * form. Only the presentational settings are editable here; geometry (page,
- * position and size) is managed on the canvas.
- */
 export const EditorContentTextForm = () => {
   const { t } = useLingui();
 
   const { form, isReady } = useContentSettingsForm<TContentTextFormSchema>();
 
-  // Mount the inputs only once the form holds this content's values.
   if (!isReady) {
     return null;
   }

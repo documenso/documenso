@@ -13,9 +13,6 @@ export type ColorPickerProps = {
   onChange: (color: string) => void;
   nonce?: string;
 
-  /**
-   * A custom element to open the picker, replacing the default swatch button.
-   */
   trigger?: React.ReactNode;
 } & Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>;
 
@@ -33,8 +30,7 @@ export const ColorPicker = ({
   const [inputColor, setInputColor] = useState(value || defaultValue);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Follow external changes to the value (e.g. the same color being edited
-  // from another control) only while closed.
+  // External value changes are ignored while open so they do not fight the user's edits.
   useEffect(() => {
     if (isOpen) {
       return;

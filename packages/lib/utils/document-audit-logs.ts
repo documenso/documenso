@@ -151,10 +151,6 @@ export const diffRecipientChanges = (
   return diffs;
 };
 
-/**
- * Audit log values are stored as JSON, so anything which is not already a
- * scalar is recorded by its serialised form rather than being dropped.
- */
 const toContentDiffValue = (value: unknown) => {
   if (value === undefined || value === null) {
     return null;
@@ -172,9 +168,6 @@ type ContentDiffSource = {
   dataContentId?: string | null;
 };
 
-/**
- * Every content meta key and the attached image are compared.
- */
 export const diffContentChanges = (
   oldContent: ContentDiffSource,
   newContent: ContentDiffSource,
@@ -198,7 +191,6 @@ export const diffContentChanges = (
     }
   }
 
-  // The attached image lives alongside the content meta rather than within it.
   const fromDataContentId = oldContent.dataContentId ?? null;
   const toDataContentId = newContent.dataContentId ?? null;
 

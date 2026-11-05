@@ -3,17 +3,10 @@ import { CONTENT_TEXT_MAX_LENGTH } from '../constants/envelope-content';
 import { FIVE_DECIMAL_PLACES, roundTo } from '../utils/geometry';
 import { DataContentType } from './data-content-meta';
 
-/**
- * The smallest step between stored numbers, i.e. one unit in the fifth
- * decimal place. Written as a literal since `10 ** -5` is not exact in
- * floating point.
- */
+// Written as a literal since `10 ** -5` is not exact in floating point.
 const CONTENT_NUMBER_STEP = 0.00001;
 
 /**
- * Whether a number is exactly representable at the stored precision, i.e.
- * has at most five decimal places.
- *
  * Values are rejected rather than rounded, so the editor rounds everything
  * it produces (see `roundTo`) before it is saved.
  *
@@ -25,24 +18,13 @@ const isFiveDecimalPlacesRefinement = (value: number) => roundTo(value, FIVE_DEC
 
 const FIVE_DECIMAL_PLACES_ERROR = { message: 'Must have at most five decimal places' };
 
-/**
- * Half a step, so sums of stored values compare against a bound without
- * false rejections.
- */
+// Half a step, so sums of stored values compare against a bound without false rejections.
 const GEOMETRY_TOLERANCE = CONTENT_NUMBER_STEP / 2;
 
-// Note: The default is different to fields (12), the range is the same.
 export const DEFAULT_CONTENT_FONT_SIZE = 10;
 export const CONTENT_MIN_FONT_SIZE = 8;
 export const CONTENT_MAX_FONT_SIZE = 96;
 
-/**
- * Text layout settings.
- *
- * These mirror the field text settings in value but are owned here so the
- * content schemas, defaults and OpenAPI descriptions do not depend on.
- * Unlike the field equivalents these do not coerce strings and do not accept `null`.
- */
 export const CONTENT_MIN_LINE_HEIGHT = 1;
 export const CONTENT_MAX_LINE_HEIGHT = 10;
 export const DEFAULT_CONTENT_LINE_HEIGHT = 1;
@@ -82,8 +64,6 @@ export const ZContentLetterSpacingSchema = z
   .describe('The spacing between each character');
 
 /**
- * Generic content schemas.
- *
  * All content geometry is percentage based (0-100) relative to the page, unlike
  * fields which are stored in page units and clamped separately.
  */
@@ -100,10 +80,7 @@ export const ZContentPercentageSchema = z
   .max(100)
   .refine(isFiveDecimalPlacesRefinement, FIVE_DECIMAL_PLACES_ERROR);
 
-/**
- * A percentage which must be visibly non zero, for sizes. The smallest value
- * which survives rounding to the stored precision.
- */
+// The smallest size which survives rounding to the stored precision.
 const CONTENT_MIN_SIZE_PERCENTAGE = CONTENT_NUMBER_STEP;
 
 export const ZContentSizePercentageSchema = z
@@ -130,13 +107,9 @@ export const ZContentHeightSchema = ZContentSizePercentageSchema.describe(
 );
 
 /**
- * Rotation in degrees, clockwise, normalized to [0, 360).
- *
- * The content rotates about its top left corner (`positionX`, `positionY`),
- * which stays fixed while the rest of the box sweeps around it. The editor's
- * transformer works the same way. API callers rotating a content should
- * adjust `positionX`/`positionY` as needed to keep the swept box where they
- * want it and within the page.
+ * Only the pivot (`positionX`, `positionY`) is validated against the page, so
+ * API callers rotating a content must adjust it themselves to keep the swept
+ * box within the page.
  */
 export const ZContentRotationSchema = z
   .number()
@@ -147,31 +120,20 @@ export const ZContentRotationSchema = z
   .describe('Rotation in degrees, clockwise, about the top left corner of the content.');
 
 /**
- * Normalize any rotation in degrees to the [0, 360) range at the stored
- * precision.
- *
- * Non-finite input (`NaN`, `Infinity`) is treated as no rotation rather
- * than propagated, since `%` would turn it into `NaN`. The wrap runs again
- * after rounding so a value just under 360 cannot round up to it.
+ * Non-finite input is treated as no rotation rather than propagated as `NaN`.
+ * The wrap runs again after rounding so a value just under 360 cannot round up to it.
  */
 export const normalizeContentRotation = (rotation: number) => {
   if (!Number.isFinite(rotation)) {
     return 0;
   }
 
-  // `%` keeps the sign of the dividend, so a negative rotation needs the
-  // extra `+ 360` before the second `%` to land in the positive range.
   const wrapped = ((rotation % 360) + 360) % 360;
 
   return roundTo(wrapped, FIVE_DECIMAL_PLACES) % 360;
 };
 
-/**
- * A hex color (`#rgb` or `#rrggbb`), stored as lowercase `#rrggbb` so the
- * same color always has one spelling and compares equal.
- *
- * Kept strict since colors are drawn directly onto the canvas and PDF.
- */
+// Stored as lowercase `#rrggbb` so the same color always has one spelling and compares equal.
 export const ZContentColorSchema = z
   .string()
   .regex(/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i, 'Must be a valid hex color')
@@ -194,13 +156,9 @@ export const DEFAULT_CONTENT_STROKE_COLOR = '#000000';
 export const DEFAULT_CONTENT_HIGHLIGHT_COLOR = '#ffe600';
 export const DEFAULT_CONTENT_HIGHLIGHT_FILL_OPACITY = 0.4;
 
-// No fill by default, see `fillColor` on the shape meta.
 export const DEFAULT_CONTENT_FILL_COLOR = null;
 export const DEFAULT_CONTENT_FILL_OPACITY = 1;
 
-/**
- * Opacity as a fraction between 0 (transparent) and 1 (opaque).
- */
 export const ZContentOpacitySchema = z
   .number()
   .finite()
@@ -208,16 +166,12 @@ export const ZContentOpacitySchema = z
   .max(1)
   .refine(isFiveDecimalPlacesRefinement, FIVE_DECIMAL_PLACES_ERROR);
 
-/**
- * Stroke width in unscaled page units.
- */
+// Stroke width is in unscaled page units.
 export const CONTENT_MIN_STROKE_WIDTH = 0.5;
 export const CONTENT_MAX_STROKE_WIDTH = 20;
 export const DEFAULT_CONTENT_STROKE_WIDTH = 1;
 
 /**
- * The highest stacking order an author may give a content.
- *
  * Deliberately low so contents which must always sit above authored ones
  * (e.g. page numbers or redactions in future) can be placed past it without
  * ever colliding with a user value.
@@ -225,10 +179,7 @@ export const DEFAULT_CONTENT_STROKE_WIDTH = 1;
 export const CONTENT_MAX_Z_INDEX = 10_000;
 export const DEFAULT_CONTENT_Z_INDEX = 0;
 
-/**
- * The stacking order among the contents of a page, higher on top. Ties are
- * broken by the content's ID so the order is always deterministic.
- */
+// Higher on top. Ties are broken by the content's ID so the order is always deterministic.
 export const ZContentZIndexSchema = z.number().int().min(0).max(CONTENT_MAX_Z_INDEX);
 
 export const ZContentStrokeWidthSchema = z
@@ -255,11 +206,6 @@ export enum EnvelopeContentType {
 
 export const ZEnvelopeContentTypeSchema = z.nativeEnum(EnvelopeContentType);
 
-/**
- * The types of shape a shape content can be.
- *
- * Example: rectangle, star, arrow, etc.
- */
 export enum EnvelopeContentShapeType {
   RECTANGLE = 'rectangle',
 }
@@ -267,12 +213,8 @@ export enum EnvelopeContentShapeType {
 export const ZEnvelopeContentShapeTypeSchema = z.nativeEnum(EnvelopeContentShapeType);
 
 /**
- * The content types which can currently be rotated, both via the canvas and
- * the settings form.
- *
- * The set is typed against `TRotatableContentMeta` so a type can only be
- * listed here once its meta actually has a `rotation` field, keeping
- * `isRotatableContentMeta` honest.
+ * Typed against `TRotatableContentMeta` so a type can only be listed here once
+ * its meta actually has a `rotation` field, keeping `isRotatableContentMeta` honest.
  */
 export const ROTATABLE_CONTENT_TYPES: ReadonlySet<EnvelopeContentType> = new Set<TRotatableContentMeta['type']>([
   EnvelopeContentType.IMAGE,
@@ -280,13 +222,6 @@ export const ROTATABLE_CONTENT_TYPES: ReadonlySet<EnvelopeContentType> = new Set
   EnvelopeContentType.SHAPE,
 ]);
 
-/**
- * The content types laid out as a box (position, width, height, rotation),
- * i.e. every type except lines, which are drawn between two points.
- *
- * New box types are added here once and the type, meta union and guard
- * below all follow.
- */
 export const BOX_CONTENT_TYPES = [
   EnvelopeContentType.TEXT,
   EnvelopeContentType.SHAPE,
@@ -296,17 +231,10 @@ export const BOX_CONTENT_TYPES = [
 
 export type TBoxContentType = (typeof BOX_CONTENT_TYPES)[number];
 
-/**
- * The type of data content each content type can be linked to, e.g. an
- * uploaded image. Content types not listed cannot hold data.
- */
 export const CONTENT_TYPE_DATA_CONTENT_TYPE: Partial<Record<EnvelopeContentType, DataContentType>> = {
   [EnvelopeContentType.IMAGE]: DataContentType.IMAGE,
 };
 
-/**
- * Generic positional data for specific content types.
- */
 export const ZBasePositionalContentMetaSchema = z.object({
   page: ZContentPageNumberSchema,
   positionX: ZContentPositionXSchema,
@@ -316,11 +244,7 @@ export const ZBasePositionalContentMetaSchema = z.object({
   zIndex: ZContentZIndexSchema.optional().default(DEFAULT_CONTENT_Z_INDEX),
 });
 
-// TEXT CONTENT
-
 /**
- * Characters which must not appear in content text.
- *
  * - C0 and C1 control characters other than tab and newline, and DEL. These
  *   have no glyphs and can break text shaping and PDF text encoding.
  * - Bidirectional overrides and isolates, which can visually reorder the
@@ -330,15 +254,9 @@ const CONTENT_TEXT_FORBIDDEN_CHARACTERS =
   // biome-ignore lint/suspicious/noControlCharactersInRegex: stripping control characters is the point
   /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\u202A-\u202E\u2066-\u2069]/g;
 
-/**
- * A lone UTF-16 surrogate, i.e. half of a pair without its other half, which
- * is not a valid character and cannot be encoded into a PDF.
- */
+// Half of a surrogate pair without its other half cannot be encoded into a PDF.
 const LONE_SURROGATE = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g;
 
-/**
- * Line endings are stored as `\n` only.
- */
 const LINE_ENDINGS = /\r\n?/g;
 
 export const ZContentTextSchema = z
@@ -389,8 +307,6 @@ export const CONTENT_TEXT_META_DEFAULT_VALUES: TContentTextMeta = {
   color: DEFAULT_CONTENT_TEXT_COLOR,
 };
 
-// LINE CONTENT
-
 export const ZContentLineMetaSchema = ZBasePositionalContentMetaSchema.pick({
   page: true,
   zIndex: true,
@@ -422,11 +338,7 @@ export const CONTENT_LINE_META_DEFAULT_VALUES: TContentLineMeta = {
   strokeStyle: DEFAULT_CONTENT_STROKE_STYLE,
 };
 
-// SHAPE CONTENT
-
 /**
- * A shape within a box, discriminated by `shape`.
- *
  * Every shape currently shares the same stroke and fill settings, so this is a
  * single schema. Turn it into a `discriminatedUnion('shape', ...)` once a
  * shape needs its own fields.
@@ -440,9 +352,6 @@ export const ZContentShapeMetaSchema = ZBasePositionalContentMetaSchema.extend({
   strokeColor: ZContentColorSchema.optional().default(DEFAULT_CONTENT_STROKE_COLOR),
   strokeStyle: ZContentStrokeStyleSchema.optional().default(DEFAULT_CONTENT_STROKE_STYLE),
 
-  /**
-   * The fill color, or `null` for no fill.
-   */
   fillColor: ZContentColorSchema.nullable().optional().default(DEFAULT_CONTENT_FILL_COLOR),
   fillOpacity: ZContentOpacitySchema.optional().default(DEFAULT_CONTENT_FILL_OPACITY),
 });
@@ -466,19 +375,11 @@ export const CONTENT_RECTANGLE_META_DEFAULT_VALUES: TContentShapeMeta = {
   fillOpacity: DEFAULT_CONTENT_FILL_OPACITY,
 };
 
-/**
- * The default meta per shape, for when a specific shape is placed.
- */
 export const CONTENT_SHAPE_META_DEFAULT_VALUES_BY_SHAPE: Record<EnvelopeContentShapeType, TContentShapeMeta> = {
   [EnvelopeContentShapeType.RECTANGLE]: CONTENT_RECTANGLE_META_DEFAULT_VALUES,
 };
 
-/**
- * The default meta for a shape content when no particular shape is asked for.
- */
 export const CONTENT_SHAPE_META_DEFAULT_VALUES: TContentShapeMeta = CONTENT_RECTANGLE_META_DEFAULT_VALUES;
-
-// HIGHLIGHT CONTENT
 
 export const ZContentHighlightMetaSchema = ZBasePositionalContentMetaSchema.extend({
   type: z.literal(EnvelopeContentType.HIGHLIGHT),
@@ -499,8 +400,6 @@ export const CONTENT_HIGHLIGHT_META_DEFAULT_VALUES: TContentHighlightMeta = {
   color: DEFAULT_CONTENT_HIGHLIGHT_COLOR,
   fillOpacity: DEFAULT_CONTENT_HIGHLIGHT_FILL_OPACITY,
 };
-
-// IMAGE CONTENT
 
 export const ZContentImageMetaSchema = ZBasePositionalContentMetaSchema.extend({
   type: z.literal(EnvelopeContentType.IMAGE),
@@ -528,10 +427,6 @@ export const CONTENT_META_DEFAULT_VALUES: Record<EnvelopeContentType, TEnvelopeC
   [EnvelopeContentType.IMAGE]: CONTENT_IMAGE_META_DEFAULT_VALUES,
 } as const;
 
-/**
- * The per type schemas, kept as plain objects so they can be extended and
- * picked from. Cross field checks live on the union below.
- */
 const ZEnvelopeContentMetaUnionSchema = z.discriminatedUnion('type', [
   ZContentTextMetaSchema,
   ZContentLineMetaSchema,
@@ -545,19 +440,14 @@ export const ZEnvelopeContentMetaSchema = ZEnvelopeContentMetaUnionSchema.superR
     return;
   }
 
-  // Reject an upright box whose far edges run past the page. Each side is
-  // bounded on its own, so this is the only check which sees them together.
-  //
   // A rotated box's footprint depends on the page's aspect ratio, which the
-  // schema does not know, so only its pivot is bounded here (by the position
+  // schema does not know, so only its pivot is bounded (by the position
   // schemas) and the editor keeps the footprint on the page when saving. API
   // callers are told to compensate, see `ZContentRotationSchema`.
   if (getContentRotation(meta) !== 0) {
     return;
   }
 
-  // Each axis is reported on its own so the caller is pointed at the side
-  // which actually overflows.
   if (meta.positionX + meta.width > 100 + GEOMETRY_TOLERANCE) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -577,37 +467,22 @@ export const ZEnvelopeContentMetaSchema = ZEnvelopeContentMetaUnionSchema.superR
 
 export type TEnvelopeContentMetaInput = z.input<typeof ZEnvelopeContentMetaUnionSchema>;
 
-/**
- * The parsed meta of any content, i.e. with every default applied.
- */
 export type TEnvelopeContentMeta = z.output<typeof ZEnvelopeContentMetaUnionSchema>;
 
-/**
- * The meta of any box content, see `BOX_CONTENT_TYPES`.
- */
 export type TBoxContentMeta = Extract<TEnvelopeContentMeta, { type: TBoxContentType }>;
 
 export const isBoxContentMeta = (meta: TEnvelopeContentMeta): meta is TBoxContentMeta => {
-  // `includes` on a readonly tuple only accepts its own members, so the
-  // lookup goes through the wider type.
   const boxContentTypes: readonly EnvelopeContentType[] = BOX_CONTENT_TYPES;
 
   return boxContentTypes.includes(meta.type);
 };
 
-/**
- * The meta of any content which can be rotated, see `ROTATABLE_CONTENT_TYPES`.
- */
 export type TRotatableContentMeta = Extract<TEnvelopeContentMeta, { rotation: number }>;
 
 export const isRotatableContentMeta = (meta: TEnvelopeContentMeta): meta is TRotatableContentMeta => {
   return ROTATABLE_CONTENT_TYPES.has(meta.type);
 };
 
-/**
- * The rotation of a content in degrees, 0 for content types which cannot be
- * rotated (e.g. text and highlights).
- */
 export const getContentRotation = (meta: TEnvelopeContentMeta): number => {
   return isRotatableContentMeta(meta) ? meta.rotation : 0;
 };

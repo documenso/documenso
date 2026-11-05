@@ -7,11 +7,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  * keeps editing while a save is on the wire, their newest changes get saved
  * right after, never dropped.
  *
- * A getter may be queued instead of a value, in which case it is read when
- * the save is about to be sent rather than when it was queued. Callers whose
- * state is corrected by the response of a save (e.g. rows which are assigned
- * an ID by the server) need this, otherwise the queued save would be sent
- * with data captured before that correction.
+ * A queued getter is read when the save is sent, not when it was queued, so a
+ * save corrected by the response of the previous one (e.g. rows assigned an
+ * ID by the server) is not sent with data captured before that correction.
  */
 export function useEnvelopeAutosave<T>(saveFn: (data: T) => Promise<void>, delay = 1000) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

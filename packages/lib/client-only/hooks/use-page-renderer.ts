@@ -11,19 +11,8 @@ import { useCurrentEnvelopeRender } from '../providers/envelope-render-provider'
 type RenderFunction = (props: { stage: Konva.Stage; pageLayer: Konva.Layer }) => void;
 
 type UsePageRendererOptions = {
-  /**
-   * Additional fields visibility input which is composed with the viewer
-   * controls visibility, where the most restrictive input wins.
-   *
-   * Used by renderers with extra context, e.g. the editor muting fields while
-   * the contents tab is active.
-   */
   fieldsVisibility?: EnvelopePageItemsVisibility;
 
-  /**
-   * Additional contents visibility input which is composed with the viewer
-   * controls visibility, where the most restrictive input wins.
-   */
   contentsVisibility?: EnvelopePageItemsVisibility;
 };
 
@@ -38,8 +27,6 @@ export const usePageRenderer = (
 
   const konvaContainer = useRef<HTMLDivElement>(null);
 
-  // Publish the page size so page relative geometry can be computed outside
-  // the renderer, e.g. when sizing a content to an uploaded image.
   useEffect(() => {
     if (currentEnvelopeItem) {
       pageSizes.register(currentEnvelopeItem.id, pageNumber, { width: pageWidth, height: pageHeight });
@@ -57,9 +44,6 @@ export const usePageRenderer = (
   const hasFailedImage = hasFailedContentImage(pageContentImagesOptions);
 
   /**
-   * Whether the images of this page's contents have finished loading, so the
-   * page renders with its images in place rather than them popping in.
-   *
    * Latched once true: readiness only delays the initial render and never
    * tears down a live page, e.g. when the editor's contents gain a new image
    * which is then drawn progressively.
@@ -72,9 +56,6 @@ export const usePageRenderer = (
 
   const isReady = imageLoadingState === 'loaded' && hasBeenReady.current;
 
-  // The page holds back its image until everything drawn on it is ready, so
-  // the two appear together rather than the page looking finished while its
-  // contents are still loading.
   useEffect(() => {
     onReadyChange?.(isReady);
   }, [isReady, onReadyChange]);
@@ -98,13 +79,9 @@ export const usePageRenderer = (
   const [applyContentsVisibility] = useState(createPageItemsVisibilityApplier);
 
   /**
-   * Apply the current fields/contents visibility to all named groups on the
-   * page layer.
-   *
-   * This is automatically applied when the page is created and when the
-   * visibility changes. Renderers which re-render groups outside of those
-   * moments should call this after drawing so newly created groups pick up
-   * the current visibility.
+   * Renderers which re-render groups outside of page creation and visibility
+   * changes must call this after drawing, or the new groups ignore the
+   * current visibility.
    */
   const applyPageItemsVisibility = useCallback(() => {
     const layer = pageLayer.current;
@@ -183,9 +160,6 @@ export const usePageRenderer = (
     };
   }, [isReady, scaledViewport]);
 
-  /**
-   * Reapply the visibility whenever it changes.
-   */
   useEffect(() => {
     applyPageItemsVisibility();
   }, [applyPageItemsVisibility]);
@@ -200,17 +174,8 @@ export const usePageRenderer = (
     contentsVisibility,
     applyPageItemsVisibility,
 
-    /**
-     * Whether the page bitmap and content images are ready and the stage has
-     * been (or is about to be) created.
-     */
     isReady,
 
-    /**
-     * Whether a content image on this page failed to load. Renderers decide
-     * how to surface this, e.g. an error state for signers or a placeholder
-     * for authors.
-     */
     hasFailedImage,
   };
 };

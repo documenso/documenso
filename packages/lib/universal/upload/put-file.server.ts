@@ -12,12 +12,6 @@ import { uploadS3File } from './server-actions';
 type File = {
   name: string;
   type: string;
-
-  /**
-   * The bytes to store. A `Uint8Array` (including a Node `Buffer`) is
-   * accepted as-is since the consumers below only ever read the view's
-   * bytes, so callers don't need to copy into a standalone `ArrayBuffer`.
-   */
   arrayBuffer: () => Promise<ArrayBuffer | Uint8Array>;
 };
 
@@ -56,19 +50,11 @@ export const putPdfFileServerSide = async (file: File, initialData?: string) => 
 
 type PutNormalizedPdfFileOptions = {
   flattenForm?: boolean;
-
-  /**
-   * The initial data of the created document data, e.g. the source file when
-   * copying one. Defaults to the uploaded file.
-   */
   initialData?: string;
 };
 
 /**
  * Uploads a pdf file and normalizes it.
- *
- * Returns the created document data and the file's page count, in the same
- * shape as `putPdfFileServerSide`.
  */
 export const putNormalizedPdfFileServerSide = async (
   file: File,

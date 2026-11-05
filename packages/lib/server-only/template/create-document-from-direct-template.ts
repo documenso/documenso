@@ -15,6 +15,7 @@ import {
   WebhookTriggerEvents,
 } from '@prisma/client';
 import { DateTime } from 'luxon';
+import pMap from 'p-map';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -51,10 +52,14 @@ import {
   isRecipientBefore,
   sortRecipientsBySigningPosition,
 } from '../../utils/recipients';
+import { loadContentImages } from '../data-content/load-content-images';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
-import { renderContentsOntoPdf } from '../envelope-content/insert-contents-into-envelope-item';
+import {
+  RENDER_CONTENTS_CONCURRENCY,
+  renderContentsOntoPdf,
+} from '../envelope-content/insert-contents-into-envelope-item';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { assignOmittedRecipientSigningOrders } from '../recipient/assign-omitted-recipient-signing-orders';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
@@ -202,8 +207,8 @@ export const createDocumentFromDirectTemplate = async ({
     });
   }
 
-  // A direct template is never explicitly sent, so this is where an image
-  // content without an image would otherwise slip into a document.
+  // Mirrors the checks in `sendDocument`, which this flow never reaches since
+  // it creates the document directly in PENDING.
   if (getContentsMissingImages(directTemplateEnvelope.contents).length > 0) {
     throw new AppError('MISSING_CONTENT_IMAGE', {
       message: 'One or more image contents on this direct template have no image attached',
@@ -211,8 +216,6 @@ export const createDocumentFromDirectTemplate = async ({
     });
   }
 
-  // Mirrors the check in `sendDocument`, which this flow never reaches since it
-  // creates the document directly in PENDING.
   assertEnvelopeContentLimits(
     directTemplateEnvelope.contents.map((content) => content.contentMeta.type),
     directTemplateEnvelope.team.organisation.organisationClaim,
@@ -379,23 +382,23 @@ export const createDocumentFromDirectTemplate = async ({
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
 
-  // Duplicate the envelope item data and rendering the template's contents into
-  // the copy.
-  //
   // The document is created directly in PENDING, so `sendDocument` below will
   // not insert the contents (it only does so from DRAFT).
-  const envelopeItemsToCreate = await Promise.all(
-    directTemplateEnvelope.envelopeItems.map(async (item, i) => {
+  const contentImages = await loadContentImages(directTemplateEnvelope.contents);
+
+  const envelopeItemsToCreate = await pMap(
+    directTemplateEnvelope.envelopeItems,
+    async (item, i) => {
       const buffer = await getFileServerSide(item.documentData);
 
       const titleToUse = item.title || directTemplateEnvelope.title;
 
       const itemContents = directTemplateEnvelope.contents.filter((content) => content.envelopeItemId === item.id);
 
-      // Render the contents onto the PDF.
       const envelopeItemWithContents = await renderContentsOntoPdf({
         pdfData: buffer,
         contents: itemContents,
+        images: contentImages,
       });
 
       const { documentData: newDocumentData } = await putPdfFileServerSide(
@@ -404,9 +407,7 @@ export const createDocumentFromDirectTemplate = async ({
           type: 'application/pdf',
           arrayBuffer: async () => Promise.resolve(envelopeItemWithContents),
         },
-        // The template's file is never modified, so the copy keeps it as its
-        // initial data rather than re-uploading the same bytes. This is what
-        // preserves the original PDF once the contents are rendered in.
+        // Kept as the initial data so the original PDF survives the rendered contents.
         item.documentData.data,
       );
 
@@ -420,7 +421,8 @@ export const createDocumentFromDirectTemplate = async ({
         documentDataId: newDocumentData.id,
         order: item.order !== undefined ? item.order : i + 1,
       };
-    }),
+    },
+    { concurrency: RENDER_CONTENTS_CONCURRENCY },
   );
 
   const documentMeta = await prisma.documentMeta.create({
@@ -431,8 +433,6 @@ export const createDocumentFromDirectTemplate = async ({
 
   const envelopeId = prefixedId('envelope');
 
-  // The template's contents are remapped onto the new envelope items up front
-  // so they can be inserted as soon as the envelope exists.
   const contentsToCreate = buildEnvelopeContentCopyData({
     contents: directTemplateEnvelope.contents,
     envelopeId,

@@ -69,20 +69,13 @@ type CreateEnvelopeRecipientOptions = {
 };
 
 type CreateEnvelopeContentOptions = {
-  /**
-   * The document data of the envelope item to place the content on.
-   */
   documentDataId: string;
 
   contentMeta: TEnvelopeContentMetaInput;
 
   /**
-   * The data content (e.g. an image) to attach to the content, or null for
-   * none.
-   *
-   * Must be one the caller has just created for this envelope and of the type
-   * the content can hold, since it is attached as is. Never pass an ID taken
-   * from a request here.
+   * Must be one the caller has just created for this envelope, since it is
+   * attached as is. Never pass an ID taken from a request here.
    */
   dataContentId: string | null;
 };
@@ -331,7 +324,6 @@ export const createEnvelope = async ({
     contentMeta: ZEnvelopeContentMetaSchema.parse(content.contentMeta),
   }));
 
-  // The organisation's plan caps how much content an envelope may hold.
   assertEnvelopeContentSaveWithinLimits({
     incomingTypes: contents.map((content) => content.contentMeta.type),
     existingTypes: [],

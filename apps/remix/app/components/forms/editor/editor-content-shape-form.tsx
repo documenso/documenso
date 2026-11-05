@@ -27,12 +27,6 @@ import {
  */
 export const DEFAULT_ENABLED_FILL_COLOR = '#e5e7eb';
 
-/**
- * Settings form for shape contents, bound to the selected content's settings
- * form, with the fields for the content's shape. Only the presentational
- * settings are editable here; geometry (page, position and size) is managed
- * on the canvas.
- */
 export const EditorContentShapeForm = () => {
   const { form, content, isReady } = useContentSettingsForm<TContentShapeFormSchema>();
 
@@ -41,15 +35,12 @@ export const EditorContentShapeForm = () => {
   const hasFill = Boolean(fillColor);
 
   const onFillToggle = (enabled: boolean) => {
-    // The fill is represented purely by the fill color, so toggling sets it
-    // or clears it to `null`.
     form.setValue('fillColor', enabled ? DEFAULT_ENABLED_FILL_COLOR : null, {
       shouldDirty: true,
       shouldValidate: true,
     });
   };
 
-  // Mount the inputs only once the form holds this content's values.
   if (!isReady || content?.contentMeta.type !== EnvelopeContentType.SHAPE) {
     return null;
   }

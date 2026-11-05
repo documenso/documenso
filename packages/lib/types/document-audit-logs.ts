@@ -147,12 +147,9 @@ export const ZDocumentAuditLogDocumentMetaSchema = z.union([
 ]);
 
 /**
- * Any single part of a content, e.g. where it sits, its size, its text or its
- * attached image. Keyed rather than enumerated so a newly added setting is
- * recorded without having to be registered here.
- *
- * Kept as a discriminated shape so a more structured diff can be introduced
- * later without having to migrate the rows written today.
+ * Keyed rather than enumerated so a newly added setting is recorded without
+ * having to be registered here. Kept as a discriminated shape so a more
+ * structured diff can be introduced later without migrating the rows written today.
  */
 export const ZContentDiffPropertySchema = z.object({
   type: z.literal(CONTENT_DIFF_TYPE.PROPERTY),
@@ -675,32 +672,21 @@ export const ZDocumentAuditLogEventDocumentExternalIdUpdatedSchema = z.object({
   }),
 });
 
-/**
- * Event: Content created.
- */
 export const ZDocumentAuditLogEventContentCreatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.CONTENT_CREATED),
   data: ZBaseContentEventDataSchema.extend({
-    // The full content meta as it was created. Stored as a loose record rather
-    // than the content meta schema so rows written today still parse if the
-    // content meta schema later gains a required key.
+    // A loose record rather than the content meta schema so rows written today
+    // still parse if the schema later gains a required key.
     contentMeta: z.record(z.string(), z.unknown()),
-    // The attached image, if any. Lives alongside the content meta rather than within it.
     dataContentId: z.string().nullable(),
   }),
 });
 
-/**
- * Event: Content deleted.
- */
 export const ZDocumentAuditLogEventContentRemovedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.CONTENT_DELETED),
   data: ZBaseContentEventDataSchema,
 });
 
-/**
- * Event: Content updated.
- */
 export const ZDocumentAuditLogEventContentUpdatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.CONTENT_UPDATED),
   data: ZBaseContentEventDataSchema.extend({

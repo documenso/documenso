@@ -18,22 +18,10 @@ type InsertFieldInPDFV2Options = {
   pageWidth: number;
   pageHeight: number;
   fields: FieldWithSignature[];
-
-  /**
-   * The contents to render beneath the fields.
-   */
   contents?: OverlayContent[];
-
-  /**
-   * The loaded images of the image contents, see `loadContentImages`.
-   */
   images?: ContentImageMap;
 };
 
-/**
- * Render the given page's contents and fields into a single page PDF overlay,
- * to be embedded onto the original page.
- */
 export const insertFieldInPDFV2 = async ({
   pageWidth,
   pageHeight,
@@ -46,8 +34,7 @@ export const insertFieldInPDFV2 = async ({
   let stage: Konva.Stage | null = new Konva.Stage({ width: pageWidth, height: pageHeight });
   let layer: Konva.Layer | null = new Konva.Layer();
 
-  // Render the contents first so they sit beneath the fields, in stacking
-  // order so the last one is on top.
+  // Contents go first so they sit beneath the fields.
   for (const content of sortContentsForRender(contents, (content) => content.contentMeta.zIndex)) {
     renderContent(
       {

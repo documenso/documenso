@@ -3,13 +3,6 @@ import { type PDF, rgb } from '@libpdf/core';
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 
 type AddRejectionStampToPdfOptions = {
-  /**
-   * The number of pages to stamp, counted from the start of the document.
-   *
-   * Do not include the certificate and audit log pages.
-   *
-   * Defaults to every page.
-   */
   pageCount?: number;
 };
 

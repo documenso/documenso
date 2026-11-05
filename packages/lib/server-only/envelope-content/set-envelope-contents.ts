@@ -19,44 +19,21 @@ export type SetEnvelopeContentsOptions = {
   teamId: number;
   id: EnvelopeIdOptions;
   contents: {
-    /**
-     * The ID of an existing content to update. Omit to create a new content.
-     */
     id?: string | null;
-
-    /**
-     * A temporary client side ID, echoed back so the client can map newly
-     * created contents to their local counterparts.
-     */
     formId?: string;
-
-    /**
-     * The envelope item the content is placed on. Fixed once the content is
-     * created: an update must send the item the content already belongs to.
-     */
     envelopeItemId: string;
 
     contentMeta: TEnvelopeContentMetaInput;
 
     /**
-     * The ID of a data content (e.g. an image) to attach to the content, or
-     * null for none.
-     *
-     * This ID must already be attached to the content, or be null to remove an image.
-     *
-     * This ID parameter is only here to allow users to duplicate data content without
-     * reuploading it.
-     *
-     * To attach a new image you must go through trpc.envelope.content.uploadImage,
-     * or pass the data content in `newDataContents`.
+     * Must already be attached to this envelope, or null to remove the image.
+     * Only here so a data content can be duplicated without reuploading it; new
+     * images go through `trpc.envelope.content.uploadImage` or `newDataContents`.
      */
     dataContentId: string | null;
   }[];
 
   /**
-   * Data contents created outside of this function which should (but not yet)
-   * belong to this envelope.
-   *
    * Never pass data content IDs taken from a request here, since these are
    * attached without checking where they came from.
    */
@@ -65,12 +42,6 @@ export type SetEnvelopeContentsOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-/**
- * Replace the contents of an envelope with the given list.
- *
- * Existing contents not present in the list are deleted, contents with a
- * matching ID are updated, and the rest are created.
- */
 export const setEnvelopeContents = async ({
   userId,
   teamId,
@@ -127,15 +98,10 @@ export const setEnvelopeContents = async ({
     });
   }
 
-  // Contents are part of the authored document, so they follow the same
-  // rules as the file itself (frozen once sent, always editable on templates).
-  // Checked again inside the transaction below.
   await assertContentCanBeChanged(envelope);
 
   const existingContents = envelope.contents.map(({ dataContent: _dataContent, ...content }) => content);
 
-  // Create a map of all the data contents which may be attached: the ones
-  // already on this envelope, and the ones the caller just created.
   const attachedDataContents = new Map([
     ...envelope.contents.flatMap((content) =>
       content.dataContent ? [[content.dataContent.id, content.dataContent] as const] : [],
@@ -143,7 +109,6 @@ export const setEnvelopeContents = async ({
     ...newDataContents.map((dataContent) => [dataContent.id, dataContent] as const),
   ]);
 
-  // The organisation's plan caps how much content an envelope may hold.
   assertEnvelopeContentSaveWithinLimits({
     incomingTypes: contents.map((content) => ZEnvelopeContentMetaSchema.parse(content.contentMeta).type),
     existingTypes: existingContents.map((content) => content.contentMeta.type),
@@ -165,14 +130,12 @@ export const setEnvelopeContents = async ({
 
     const contentMeta = ZEnvelopeContentMetaSchema.parse(content.contentMeta);
 
-    // Only treat the content as existing if it actually belongs to this
-    // envelope, otherwise a new content is created.
+    // An ID from another envelope is treated as a new content, not an update.
     const persisted = existingContents.find((existingContent) => existingContent.id === content.id);
 
-    // A content stays on the item it was created on. Nothing in the editor
-    // moves contents between items, and allowing it here would let a move
-    // slip through without an audit log since the diff only covers the
-    // content meta and attached image.
+    // Nothing in the editor moves contents between items, and allowing it here
+    // would let a move slip through without an audit log since the diff only
+    // covers the content meta and attached image.
     if (persisted && persisted.envelopeItemId !== content.envelopeItemId) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: `Content ${persisted.id} cannot be moved to a different envelope item`,
@@ -194,8 +157,6 @@ export const setEnvelopeContents = async ({
     // its contents have already been rendered into the PDF and must not change.
     await assertContentCanBeChanged(envelope, tx);
 
-    // Collected as the contents are written and inserted in one go at the end
-    // of the transaction, rather than a round trip per content.
     const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
     if (removedContents.length > 0) {
@@ -230,11 +191,9 @@ export const setEnvelopeContents = async ({
       linkedContents.map(async (content) => {
         const { dataContentId } = content;
 
-        // Handle updating an existing content.
         if (content._persisted) {
-          // The editor sends every content on every save, so the row is only
-          // written (and the update only logged) when something about the
-          // content actually changed.
+          // The editor sends every content on every save, so unchanged contents
+          // are neither written nor logged.
           const changes = diffContentChanges(content._persisted, {
             contentMeta: content.contentMeta,
             dataContentId,
@@ -285,7 +244,6 @@ export const setEnvelopeContents = async ({
           };
         }
 
-        // Handle creating a new content.
         const createdContent = await tx.envelopeContent.create({
           data: {
             id: generateDatabaseId('envelope_content'),
@@ -327,10 +285,8 @@ export const setEnvelopeContents = async ({
 
     auditLogs.push(...upsertResults.flatMap((result) => (result.auditLog ? [result.auditLog] : [])));
 
-    // Data contents are never deleted. One that a content stops referencing
-    // may still be referenced by another (e.g. a document created from the
-    // same template), and the stored files behind them are never removed
-    // either.
+    // Data contents are never deleted: one a content stops referencing may still
+    // be referenced by another (e.g. a document created from the same template).
 
     if (auditLogs.length > 0) {
       await tx.documentAuditLog.createMany({
@@ -347,10 +303,6 @@ export const setEnvelopeContents = async ({
 };
 
 /**
- * The data content to attach to a content, or null for none. Throws if the
- * data content is not already attached to the envelope or is not the type the
- * content type can hold.
- *
  * Deliberately reports an unattached data content as not found rather than
  * forbidden, so the response does not reveal whether the ID exists.
  */

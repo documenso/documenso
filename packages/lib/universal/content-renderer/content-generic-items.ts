@@ -13,10 +13,6 @@ import {
   KONVA_CONTENT_HOVER_OUTLINE_COLOR,
 } from './content-renderer';
 
-/**
- * Where a content's group sits on the page, in pixels. The group rotates
- * about this origin.
- */
 type ContentGroupPosition = {
   x: number;
   y: number;
@@ -24,32 +20,17 @@ type ContentGroupPosition = {
 };
 
 /**
- * Draws a box content type's own nodes inside the group, after the shared
- * frame (group, position, hover outline) has been set up.
- *
  * Called on every render, and again on every tick of a resize with the box
  * at its current size, so it must lay everything out from `geometry` rather
  * than assume the size is settled.
- *
- * `meta` is any box content; the renderer narrows it to its own type via
- * `assertContentMetaType`.
  */
 type RenderBoxContentChildren = (context: {
   contentGroup: Konva.Group;
   meta: TBoxContentMeta;
 
-  /**
-   * The content box in pixels. The group sits at its origin, so children are
-   * positioned relative to `(0, 0)` with its width and height.
-   */
   geometry: Rect;
 }) => void;
 
-/**
- * Render a box content: compute the box in pixels, upsert the group at it,
- * draw the type's own nodes via `renderChildren`, and bind the hover outline
- * around the box.
- */
 export const renderBoxContent = (
   content: ContentToRender,
   options: RenderContentOptions,
@@ -71,10 +52,6 @@ export const renderBoxContent = (
     rotation: getContentRotation(meta),
   });
 
-  /**
-   * Lay the content out at a box: the type's own nodes, then the shared hover
-   * outline around them.
-   */
   const layoutBox = (box: Rect) => {
     renderChildren({ contentGroup, meta, geometry: box });
 
@@ -89,8 +66,6 @@ export const renderBoxContent = (
 };
 
 /**
- * Keep a box content's strokes and text unscaled while it is being resized.
- *
  * The transformer resizes by scaling the group, which scales everything in
  * it: strokes thicken unevenly and dash patterns stretch until the gesture
  * ends and the box is re-rendered from its written back size. So on every
@@ -126,12 +101,6 @@ const bindBoxContentResize = (contentGroup: Konva.Group, layoutBox: (box: Rect) 
   });
 };
 
-/**
- * Upsert the Konva group of a content at the given position.
- *
- * If the content type has changed since the last render, all children are
- * destroyed so the new type renders fresh.
- */
 export const upsertContentGroup = (
   content: ContentToRender,
   options: RenderContentOptions,
@@ -165,15 +134,11 @@ export const upsertContentGroup = (
 };
 
 /**
- * Clamp a dragged content group so its visual bounds stay within the page.
- *
  * Unlike fields, a content group's origin is not necessarily its visual top
  * left, e.g. rotated contents pivot around their origin and lines extend from
  * it in any direction. So rather than clamping the origin directly, the
  * group's axis aligned client rect is measured and the drag position shifted
  * by however far that rect would overflow the page.
- *
- * Positions and rects are in scaled stage coordinates.
  */
 const createContentDragBound = (
   contentGroup: Konva.Group,
@@ -217,9 +182,6 @@ const createContentDragBound = (
   };
 };
 
-/**
- * Upsert a child node within a content group by ID.
- */
 export const upsertContentGroupChild = <T extends Konva.Group | Konva.Shape>(
   contentGroup: Konva.Group,
   id: string,
@@ -241,13 +203,8 @@ export const upsertContentGroupChild = <T extends Konva.Group | Konva.Shape>(
 };
 
 /**
- * Upsert an invisible rectangle spanning the content bounds so the whole area
- * is clickable/draggable, since shapes like text do not fill their box.
- *
- * Konva hit detection ignores alpha, so a transparent fill still registers.
- *
- * The hit rect spans the full bounds by definition, so it also serves as the
- * content's bounds node.
+ * Makes the whole box clickable, since shapes like text do not fill it. Konva
+ * hit detection ignores alpha, so a transparent fill still registers.
  */
 export const upsertContentHitRect = (
   contentGroup: Konva.Group,
@@ -278,8 +235,8 @@ export const upsertContentHitRect = (
 };
 
 /**
- * Show a dashed outline around a box content while hovered, providing edit
- * mode feedback since contents have no permanent outline like field rects.
+ * Contents have no permanent outline like field rects, so hover is the only
+ * edit mode feedback.
  */
 export const createContentHoverInteraction = (
   contentGroup: Konva.Group,
@@ -314,8 +271,7 @@ export const createContentHoverInteraction = (
 };
 
 /**
- * Show a dashed trace along a line content while hovered. A bounding box
- * would not follow a diagonal line, so the outline is the line itself.
+ * A bounding box would not follow a diagonal line, so the outline is the line itself.
  */
 export const createLineContentHoverInteraction = (
   contentGroup: Konva.Group,
@@ -348,10 +304,6 @@ export const createLineContentHoverInteraction = (
   bindContentHoverOutline(contentGroup, outline, options);
 };
 
-/**
- * Toggle an outline node with the group's hover while the content is
- * editable, keeping it hidden otherwise.
- */
 const bindContentHoverOutline = (contentGroup: Konva.Group, outline: Konva.Shape, options: RenderContentOptions) => {
   outline.moveToTop();
 

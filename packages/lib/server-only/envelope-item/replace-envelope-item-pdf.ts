@@ -66,12 +66,6 @@ type UnsafeReplaceEnvelopeItemPdfResult = {
    */
   fields: Field[] | undefined;
 
-  /**
-   * The full list of contents for the envelope after the replacement.
-   *
-   * Only returned when contents were deleted during the replacement,
-   * otherwise `undefined`.
-   */
   contents: EnvelopeContent[] | undefined;
 };
 
@@ -153,7 +147,6 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
 
     const outOfBoundsContents = itemContents.filter((content) => content.contentMeta.page > filePageCount);
 
-    // Delete contents that reference pages beyond the new PDF's page count.
     if (outOfBoundsContents.length > 0) {
       await tx.envelopeContent.deleteMany({
         where: {
@@ -275,7 +268,6 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
         },
       });
     } catch (err) {
-      // Do nothing.
       console.error(err);
     }
   }

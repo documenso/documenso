@@ -9,51 +9,27 @@ import { type ContentImageDetails, decodeLocalContentImage, loadContentImage } f
 import { useLatestRef } from './use-latest-ref';
 
 export type ContentImages = {
-  /**
-   * The loaded images by data content ID.
-   */
   images: ContentImageMap;
 
-  /**
-   * The file details of the loaded images by data content ID, for display.
-   */
   details: ReadonlyMap<string, ContentImageDetails>;
 
-  /**
-   * The loading status by data content ID. IDs which have not started
-   * loading are absent.
-   */
   loadingStatuses: ContentImageStatusMap;
 
   /**
-   * The images being loaded.
-   *
-   * An image belonging to a content is not always requested, e.g. nothing is
-   * loaded for a sealed envelope since its contents are imprinted on the PDF.
-   * Consumers need this to tell an image which is still on its way from one
-   * which is never coming.
+   * Nothing is loaded for a sealed envelope since its contents are imprinted
+   * on the PDF, so consumers need this to tell an image which is still on its
+   * way from one which is never coming.
    */
   requestedDataContentIds: ReadonlySet<string>;
 
-  /**
-   * Insert an already decoded image, e.g. an upload decoded locally, so it is
-   * available immediately without a request.
-   */
   setImage: (dataContentId: string, image: ContentImageSource, details: ContentImageDetails) => void;
 };
 
 type UseContentImagesOptions = {
   envelopeId: string;
 
-  /**
-   * The envelope item currently being rendered. Only its images are loaded.
-   */
   envelopeItemId: string | null;
 
-  /**
-   * Data is only used for embeds, where the image has yet to be uploaded since
-   * embeds are all built locally before being sent at the end of the flow.
-   */
   contents: (Pick<EnvelopeContent, 'envelopeItemId' | 'dataContentId'> & { data?: Blob })[];
   token: string | undefined;
   presignToken?: string | undefined;
@@ -72,14 +48,9 @@ const createEmptyState = (): ContentImagesState => ({
 });
 
 /**
- * Load and cache the images of the image contents of the envelope item being
- * rendered, starting as soon as the contents are known so they are ready by
- * the time the pages render.
- *
- * Images are kept for the lifetime of the provider, including across item
- * switches, so navigating back never refetches or re-decodes. They are only
- * closed on unmount, since a Konva node may still draw an image until its
- * stage is destroyed and drawing a closed bitmap throws.
+ * Images are kept across item switches and only closed on unmount, since a
+ * Konva node may still draw an image until its stage is destroyed and drawing
+ * a closed bitmap throws.
  */
 export const useContentImages = ({
   envelopeId,
@@ -90,19 +61,13 @@ export const useContentImages = ({
 }: UseContentImagesOptions): ContentImages => {
   const [state, setState] = useState<ContentImagesState>(createEmptyState);
 
-  // Read when a load starts, so the effect does not re-run on every content
-  // change. A content always holds its file before its ID is requested.
   const contentsRef = useLatestRef(contents);
 
-  // Mirrors of the state for the effects, so starting loads does not depend
-  // on the state itself (which would re-run the effect on every update) and
-  // unmounting can close whatever was loaded.
   const loadingStatusesRef = useLatestRef(state.loadingStatuses);
   const imagesRef = useLatestRef(state.images);
 
-  // Identifies the current mount. Bumped on unmount so a load started under a
-  // previous mount discards its result rather than writing into state which
-  // has since been cleared. A strict mode remount counts as a new mount.
+  // Bumped on unmount so a load started under a previous mount discards its
+  // result rather than writing into state which has since been cleared.
   const mountIdRef = useRef(0);
 
   const requestedDataContentIds = useMemo(() => {
@@ -111,7 +76,6 @@ export const useContentImages = ({
     return getDataContentIds(itemContents).sort();
   }, [contents, envelopeItemId]);
 
-  // A stable key so the effect only re-runs when the set of IDs changes.
   const requestedDataContentIdsKey = requestedDataContentIds.join(',');
 
   useEffect(() => {
@@ -165,7 +129,6 @@ export const useContentImages = ({
           }));
         });
     }
-    // The IDs are tracked via their key so an equal set does not re-run.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [envelopeId, requestedDataContentIdsKey, token, presignToken]);
 
@@ -177,8 +140,8 @@ export const useContentImages = ({
         closeImage(image);
       }
 
-      // Also reset the mirrors so a strict mode remount reloads everything
-      // rather than reusing closed images.
+      // Reset the mirrors so a strict mode remount reloads everything rather
+      // than reusing closed images.
       imagesRef.current = new Map();
       loadingStatusesRef.current = new Map();
 
@@ -200,10 +163,6 @@ export const useContentImages = ({
       details: state.details,
       loadingStatuses: state.loadingStatuses,
 
-      /**
-       * The images being loaded, so consumers can tell an image which is
-       * still on its way from one which is never coming.
-       */
       requestedDataContentIds: new Set(requestedDataContentIds),
       setImage,
     }),
@@ -211,10 +170,6 @@ export const useContentImages = ({
   );
 };
 
-/**
- * A copy of the statuses with the given data contents set to the given
- * status. The original is left untouched so it can be used as React state.
- */
 const setDataContentStatuses = (
   loadingStatuses: Map<string, ContentImageStatus>,
   dataContentIds: string[],
@@ -229,10 +184,6 @@ const setDataContentStatuses = (
   return remappedLoadingStatuses;
 };
 
-/**
- * Release the memory of a decoded bitmap. Image elements have nothing to
- * release.
- */
 const closeImage = (image: ContentImageSource) => {
   if ('close' in image) {
     image.close();
