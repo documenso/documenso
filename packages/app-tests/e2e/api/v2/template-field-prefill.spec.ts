@@ -1,6 +1,10 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
-import type { TCheckboxFieldMeta, TRadioFieldMeta } from '@documenso/lib/types/field-meta';
+import {
+  FIELD_DATE_META_DEFAULT_VALUES,
+  type TCheckboxFieldMeta,
+  type TRadioFieldMeta,
+} from '@documenso/lib/types/field-meta';
 import {
   mapDocumentIdToSecondaryId,
   mapSecondaryIdToDocumentId,
@@ -562,6 +566,75 @@ test.describe('Template Field Prefill API v2', () => {
     await page.goto(`${WEBAPP_BASE_URL}/sign/${documentRecipient?.token}`);
 
     await expect(page.getByText('This is prefilled')).not.toBeVisible();
+  });
+
+  test('should format a prefilled date with the document date format', async ({ request }) => {
+    const { user, team } = await seedUser();
+
+    const { token } = await createApiToken({
+      userId: user.id,
+      teamId: team.id,
+      tokenName: 'test-token',
+      expiresIn: null,
+    });
+
+    const template = await seedBlankTemplate(user, team.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        envelopeId: template.id,
+        email: 'recipient@example.com',
+        name: 'Test Recipient',
+        role: RecipientRole.SIGNER,
+        token: 'test-token',
+        readStatus: 'NOT_OPENED',
+        sendStatus: 'NOT_SENT',
+        signingStatus: 'NOT_SIGNED',
+      },
+    });
+
+    const dateField = await prisma.field.create({
+      data: {
+        envelopeId: template.id,
+        envelopeItemId: template.envelopeItems[0].id,
+        recipientId: recipient.id,
+        type: FieldType.DATE,
+        page: 1,
+        positionX: 5,
+        positionY: 5,
+        width: 20,
+        height: 5,
+        customText: '',
+        inserted: false,
+        fieldMeta: FIELD_DATE_META_DEFAULT_VALUES,
+      },
+    });
+
+    // The template keeps the default date format, so dd/MM/yyyy can only come from the override.
+    const response = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/use`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
+        recipients: [{ id: recipient.id, email: 'recipient@example.com', name: 'Test Recipient' }],
+        // Noon UTC keeps the same calendar day for servers between UTC-11 and UTC+11.
+        prefillFields: [{ id: dateField.id, type: 'date', value: '2026-10-13T12:00:00.000Z' }],
+        override: { dateFormat: 'dd/MM/yyyy' },
+      },
+    });
+
+    expect(response.status()).toBe(200);
+
+    const { id } = await response.json();
+
+    const document = await prisma.envelope.findFirstOrThrow({
+      where: { secondaryId: mapDocumentIdToSecondaryId(id) },
+      include: { fields: true },
+    });
+
+    expect(document.fields[0]).toMatchObject({ inserted: true, customText: '13/10/2026' });
   });
 
   test('should handle invalid field prefill values', async ({ request }) => {
