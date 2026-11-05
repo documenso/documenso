@@ -3,6 +3,7 @@ import type { Field, FieldType, Signature } from '@prisma/client';
 import type Konva from 'konva';
 
 import type { TFieldMetaSchema } from '../../types/field-meta';
+import { toPercentageBox, toPixelRect } from '../../utils/geometry';
 
 export const MIN_FIELD_HEIGHT_PX = 12;
 export const MIN_FIELD_WIDTH_PX = 36;
@@ -54,19 +55,26 @@ export type FieldCanvasStyle = {
 
 /**
  * Converts a fields percentage based values to pixel based values.
+ *
+ * Field geometry is stored as Prisma decimals, hence the `Number` coercion
+ * before handing off to the shared percentage helpers.
  */
 export const calculateFieldPosition = (
   field: Pick<FieldToRender, 'width' | 'height' | 'positionX' | 'positionY'>,
   pageWidth: number,
   pageHeight: number,
 ) => {
-  const fieldWidth = pageWidth * (Number(field.width) / 100);
-  const fieldHeight = pageHeight * (Number(field.height) / 100);
+  const rect = toPixelRect(
+    {
+      positionX: Number(field.positionX),
+      positionY: Number(field.positionY),
+      width: Number(field.width),
+      height: Number(field.height),
+    },
+    { width: pageWidth, height: pageHeight },
+  );
 
-  const fieldX = pageWidth * (Number(field.positionX) / 100);
-  const fieldY = pageHeight * (Number(field.positionY) / 100);
-
-  return { fieldX, fieldY, fieldWidth, fieldHeight };
+  return { fieldX: rect.x, fieldY: rect.y, fieldWidth: rect.width, fieldHeight: rect.height };
 };
 
 type ConvertPixelToPercentageOptions = {
@@ -81,13 +89,9 @@ type ConvertPixelToPercentageOptions = {
 export const convertPixelToPercentage = (options: ConvertPixelToPercentageOptions) => {
   const { positionX, positionY, width, height, pageWidth, pageHeight } = options;
 
-  const fieldX = (positionX / pageWidth) * 100;
-  const fieldY = (positionY / pageHeight) * 100;
+  const box = toPercentageBox({ x: positionX, y: positionY, width, height }, { width: pageWidth, height: pageHeight });
 
-  const fieldWidth = (width / pageWidth) * 100;
-  const fieldHeight = (height / pageHeight) * 100;
-
-  return { fieldX, fieldY, fieldWidth, fieldHeight };
+  return { fieldX: box.positionX, fieldY: box.positionY, fieldWidth: box.width, fieldHeight: box.height };
 };
 
 type CalculateMultiItemPositionOptions = {

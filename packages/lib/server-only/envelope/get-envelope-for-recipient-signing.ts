@@ -10,6 +10,7 @@ import { z } from 'zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAuthMethods } from '../../types/document-auth';
+import { ZEnvelopeContentSchema } from '../../types/envelope-content';
 import { ZEnvelopeFieldSchema, ZFieldSchema } from '../../types/field';
 import { ZRecipientLiteSchema } from '../../types/recipient';
 import { isTspEnvelope } from '../../types/signature-level';
@@ -77,6 +78,8 @@ export const ZEnvelopeForSigningResponse = z.object({
         }).array(),
       })
       .array(),
+
+    contents: ZEnvelopeContentSchema.array(),
 
     envelopeItems: EnvelopeItemSchema.pick({
       envelopeId: true,
@@ -189,6 +192,7 @@ export const getEnvelopeForRecipientSigning = async ({
         },
       },
       documentMeta: true,
+      contents: true,
       recipients: {
         include: {
           fields: {
