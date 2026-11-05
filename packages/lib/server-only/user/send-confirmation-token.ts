@@ -7,9 +7,9 @@ import { ONE_HOUR } from '../../constants/time';
 import { sendConfirmationEmail } from '../auth/send-confirmation-email';
 import { getMostRecentEmailVerificationToken } from './get-most-recent-email-verification-token';
 
-type SendConfirmationTokenOptions = { email: string; force?: boolean };
+type SendConfirmationTokenOptions = { email: string; force?: boolean; returnTo?: string };
 
-export const sendConfirmationToken = async ({ email, force = false }: SendConfirmationTokenOptions) => {
+export const sendConfirmationToken = async ({ email, force = false, returnTo }: SendConfirmationTokenOptions) => {
   const token = crypto.randomBytes(20).toString('hex');
 
   const user = await prisma.user.findFirst({
@@ -55,7 +55,7 @@ export const sendConfirmationToken = async ({ email, force = false }: SendConfir
   }
 
   try {
-    await sendConfirmationEmail({ userId: user.id });
+    await sendConfirmationEmail({ userId: user.id, returnTo });
 
     return { success: true };
   } catch (err) {

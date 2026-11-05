@@ -72,7 +72,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    const { email, password, totpCode, backupCode, csrfToken, captchaToken } = c.req.valid('json');
+    const { email, password, totpCode, backupCode, csrfToken, captchaToken, returnTo } = c.req.valid('json');
 
     const loginLimitResult = await loginRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
@@ -171,11 +171,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
           name: 'send.signup.confirmation.email',
           payload: {
             email: user.email,
+            returnTo,
           },
         });
       }
 
-      throw new AppError('UNVERIFIED_EMAIL', {
+      throw new AppError(AuthenticationErrorCode.UnverifiedEmail, {
         message: 'Unverified email',
       });
     }
@@ -198,7 +199,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    const { name, email, password, signature, captchaToken } = c.req.valid('json');
+    const { name, email, password, signature, captchaToken, returnTo } = c.req.valid('json');
 
     const signupLimitResult = await signupRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
@@ -240,6 +241,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       name: 'send.signup.confirmation.email',
       payload: {
         email: user.email,
+        returnTo,
       },
     });
 
@@ -313,7 +315,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/verify-email', sValidator('json', ZVerifyEmailSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    const { token } = c.req.valid('json');
+    const { token, returnTo } = c.req.valid('json');
 
     const verifyLimitResult = await verifyEmailRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
@@ -328,7 +330,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    const { state, userId } = await verifyEmail({ token });
+    const { state, userId } = await verifyEmail({ token, returnTo });
 
     // If email is verified, automatically authenticate user.
     if (state === EMAIL_VERIFICATION_STATE.VERIFIED && userId !== null) {
@@ -345,7 +347,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/resend-verify-email', sValidator('json', ZResendVerifyEmailSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    const { email } = c.req.valid('json');
+    const { email, returnTo } = c.req.valid('json');
 
     const resendLimitResult = await resendVerifyEmailRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
@@ -364,6 +366,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       name: 'send.signup.confirmation.email',
       payload: {
         email,
+        returnTo,
       },
     });
 

@@ -1,10 +1,31 @@
 import { hashSync } from '@documenso/lib/server-only/auth/hash';
 import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
-import type { OrganisationMemberRole, OrganisationType } from '@prisma/client';
-import { OrganisationGroupType, type User } from '@prisma/client';
+import { generateDatabaseId, nanoid } from '@documenso/lib/universal/id';
+import type { OrganisationType } from '@prisma/client';
+import { OrganisationGroupType, OrganisationMemberRole, type User } from '@prisma/client';
 
 import { prisma } from '..';
 import { seedTestEmail } from './users';
+
+export const seedOrganisationMemberInvite = async ({
+  organisationId,
+  email = seedTestEmail(),
+  organisationRole = OrganisationMemberRole.MEMBER,
+}: {
+  organisationId: string;
+  email?: string;
+  organisationRole?: OrganisationMemberRole;
+}) => {
+  return await prisma.organisationMemberInvite.create({
+    data: {
+      id: generateDatabaseId('member_invite'),
+      token: nanoid(32),
+      organisationId,
+      organisationRole,
+      email,
+    },
+  });
+};
 
 export const seedOrganisationMembers = async ({
   members,

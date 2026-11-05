@@ -18,6 +18,7 @@ export enum AppErrorCode {
   INVALID_CAPTCHA = 'INVALID_CAPTCHA',
   UNAUTHORIZED = 'UNAUTHORIZED',
   FORBIDDEN = 'FORBIDDEN',
+  UNVERIFIED_EMAIL = 'UNVERIFIED_EMAIL',
   UNKNOWN_ERROR = 'UNKNOWN_ERROR',
   RETRY_EXCEPTION = 'RETRY_EXCEPTION',
   SCHEMA_FAILED = 'SCHEMA_FAILED',
@@ -115,6 +116,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.MISSING_ENV_VAR]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
   [AppErrorCode.UNAUTHORIZED]: { code: 'UNAUTHORIZED', status: 401 },
   [AppErrorCode.FORBIDDEN]: { code: 'FORBIDDEN', status: 403 },
+  [AppErrorCode.UNVERIFIED_EMAIL]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.UNKNOWN_ERROR]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
   [AppErrorCode.RETRY_EXCEPTION]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
   [AppErrorCode.SCHEMA_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
@@ -349,7 +351,13 @@ export class AppError extends Error {
         () => 400 as const,
       )
       .with(AppErrorCode.UNAUTHORIZED, () => 401 as const)
-      .with(AppErrorCode.FORBIDDEN, AppErrorCode.SENDER_DISABLED, AppErrorCode.CSC_UNLICENSED, () => 403 as const)
+      .with(
+        AppErrorCode.FORBIDDEN,
+        AppErrorCode.UNVERIFIED_EMAIL,
+        AppErrorCode.SENDER_DISABLED,
+        AppErrorCode.CSC_UNLICENSED,
+        () => 403 as const,
+      )
       .with(AppErrorCode.NOT_FOUND, () => 404 as const)
       .with(AppErrorCode.NOT_IMPLEMENTED, () => 501 as const)
       .otherwise(() => 500 as const);

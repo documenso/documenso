@@ -3,6 +3,7 @@ import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error
 import { formatPath } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { env } from '@documenso/lib/utils/env';
+import { getValidReturnTo, withReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
@@ -107,14 +108,12 @@ export const SignInForm = ({
       return LOGIN_REDIRECT_PATH;
     }
 
-    let url = new URL(returnTo || LOGIN_REDIRECT_PATH, window.location.origin);
+    // The validated path is app-relative and this one is sent to the browser
+    // verbatim after sign in, so re-apply the sub-path. The embed popup passes
+    // its API completion URL here, which is why API routes are allowed.
+    const validReturnTo = getValidReturnTo(returnTo, { allowApiRoutes: true });
 
-    // Don't allow different origins
-    if (url.origin !== window.location.origin) {
-      url = new URL(LOGIN_REDIRECT_PATH, window.location.origin);
-    }
-
-    return url.toString();
+    return new URL(formatPath(validReturnTo ?? '/'), window.location.origin).toString();
   }, [returnTo]);
 
   const { mutateAsync: createPasskeySigninOptions } = trpc.auth.passkey.createSigninOptions.useMutation();
@@ -231,6 +230,7 @@ export const SignInForm = ({
         backupCode,
         captchaToken: token ?? undefined,
         redirectPath,
+        returnTo,
       });
     } catch (err) {
       console.log(err);
@@ -250,7 +250,7 @@ export const SignInForm = ({
           return;
         }
 
-        await navigate('/unverified-account');
+        await navigate(withReturnTo('/unverified-account', returnTo));
 
         toast({
           title: _(msg`Unable to sign in`),

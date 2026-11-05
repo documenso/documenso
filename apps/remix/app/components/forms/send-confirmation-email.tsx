@@ -20,9 +20,10 @@ export type TSendConfirmationEmailFormSchema = z.infer<typeof ZSendConfirmationE
 
 export type SendConfirmationEmailFormProps = {
   className?: string;
+  returnTo?: string;
 };
 
-export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFormProps) => {
+export const SendConfirmationEmailForm = ({ className, returnTo }: SendConfirmationEmailFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -37,7 +38,7 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
 
   const onFormSubmit = async ({ email }: TSendConfirmationEmailFormSchema) => {
     try {
-      await authClient.emailPassword.resendVerifyEmail({ email });
+      await authClient.emailPassword.resendVerifyEmail({ email, returnTo });
 
       toast({
         title: _(msg`Confirmation email sent`),

@@ -1,4 +1,5 @@
 import { ZNameSchema } from '@documenso/lib/types/name';
+import { ZReturnToSchema } from '@documenso/lib/utils/is-valid-return-to';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { z } from 'zod';
 
@@ -11,6 +12,7 @@ export const ZSignInSchema = z.object({
   backupCode: z.string().trim().optional(),
   csrfToken: z.string().trim(),
   captchaToken: z.string().trim().optional(),
+  returnTo: ZReturnToSchema,
 });
 
 export type TSignInSchema = z.infer<typeof ZSignInSchema>;
@@ -38,6 +40,7 @@ export const ZSignUpSchema = z.object({
   password: ZPasswordSchema,
   signature: z.string().nullish(),
   captchaToken: z.string().trim().optional(),
+  returnTo: ZReturnToSchema,
 });
 
 export type TSignUpSchema = z.infer<typeof ZSignUpSchema>;
@@ -57,12 +60,14 @@ export type TResetPasswordSchema = z.infer<typeof ZResetPasswordSchema>;
 
 export const ZVerifyEmailSchema = z.object({
   token: z.string().min(1),
+  returnTo: ZReturnToSchema,
 });
 
 export type TVerifyEmailSchema = z.infer<typeof ZVerifyEmailSchema>;
 
 export const ZResendVerifyEmailSchema = z.object({
   email: zEmail().min(1),
+  returnTo: ZReturnToSchema,
 });
 
 export type TResendVerifyEmailSchema = z.infer<typeof ZResendVerifyEmailSchema>;
