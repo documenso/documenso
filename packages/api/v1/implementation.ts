@@ -1,7 +1,7 @@
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { DocumentDataType, DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
+import { DocumentDataType, EnvelopeType, SigningStatus } from '@prisma/client';
 import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 import '@documenso/lib/constants/time-zones';
@@ -39,7 +39,7 @@ import {
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { getPresignGetUrl, getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { isDocumentCompleted, isDocumentSealed } from '@documenso/lib/utils/document';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
@@ -240,10 +240,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      // A cancelled document was never sealed, so its data is the unsigned original.
-      // Treat it as not-completed here so a "signed" version is never served for it.
-      // REJECTED and COMPLETED keep their prior behavior.
-      const hasSignedArtifact = isDocumentCompleted(envelope.status) && envelope.status !== DocumentStatus.CANCELLED;
+      const hasSignedArtifact = isDocumentSealed(envelope);
 
       if (!downloadOriginalDocument && !hasSignedArtifact) {
         return {

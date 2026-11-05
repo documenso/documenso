@@ -6,6 +6,7 @@ import { EnvelopeType, RecipientRole, SendStatus } from '@prisma/client';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import { isDocumentCompleted } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { buildTeamWhereQuery } from '../../utils/teams';
@@ -67,7 +68,7 @@ export const deleteEnvelopeRecipient = async ({
 
   assertEnvelopeMutable(envelope);
 
-  if (envelope.completedAt) {
+  if (isDocumentCompleted(envelope)) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });
