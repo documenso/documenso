@@ -69,6 +69,7 @@ export const getOrganisationTemplateById = async ({ id, userId, teamId }: GetOrg
         },
       },
       fields: true,
+      contents: true,
       team: {
         select: {
           id: true,

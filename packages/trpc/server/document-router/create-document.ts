@@ -46,7 +46,7 @@ export const createDocumentRoute = authenticatedProcedure
       });
     }
 
-    const { id: documentDataId } = await putNormalizedPdfFileServerSide({
+    const { documentData } = await putNormalizedPdfFileServerSide({
       name: file.name,
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(pdf),
@@ -86,14 +86,14 @@ export const createDocumentRoute = authenticatedProcedure
             page: field.pageNumber,
             positionX: field.pageX,
             positionY: field.pageY,
-            documentDataId,
+            documentDataId: documentData.id,
           })),
         })),
         folderId,
         envelopeItems: [
           {
             // If you ever allow more than 1 in this endpoint, make sure to use `maximumEnvelopeItemCount` to limit it.
-            documentDataId,
+            documentDataId: documentData.id,
           },
         ],
       },

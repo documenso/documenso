@@ -34,5 +34,8 @@ export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean
 
   const normalizedPdfBytes = await pdfDoc.save();
 
-  return Buffer.from(normalizedPdfBytes);
+  return {
+    pdf: Buffer.from(normalizedPdfBytes),
+    pageCount: pdfDoc.getPageCount(),
+  };
 };
