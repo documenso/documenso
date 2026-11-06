@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType, type Prisma } from '@prisma/client';
 import { z } from 'zod';
-
+import { MAX_POSTGRES_INT } from '../../constants/app';
 import type { FindResultResponse } from '../../types/search-params';
 
 export interface AdminFindDocumentsOptions {
@@ -9,8 +9,6 @@ export interface AdminFindDocumentsOptions {
   page?: number;
   perPage?: number;
 }
-
-const MAX_POSTGRES_INT = 2147483647;
 
 /**
  * IDs are Postgres int4 columns: values above the range can never be valid

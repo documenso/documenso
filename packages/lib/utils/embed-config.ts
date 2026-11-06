@@ -1,9 +1,50 @@
+import { AppError, AppErrorCode } from '../errors/app-error';
 import type { EnvelopeEditorConfig } from '../types/envelope-editor';
 import { DEFAULT_EMBEDDED_EDITOR_CONFIG } from '../types/envelope-editor';
 
 export const PRESIGNED_ENVELOPE_ITEM_ID_PREFIX = 'PRESIGNED_';
 
+export const PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX = 'PRESIGNED_';
+
+export const PRESIGNED_DATA_CONTENT_ID_PREFIX = 'PRESIGNED_';
+
 export type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;
+
+export type TPendingEmbedImageToUpload = {
+  id: string;
+  file: File;
+  index: number;
+};
+
+/**
+ * Contents sharing an image (e.g. a duplicated image content) share its
+ * temporary ID, so each image is only uploaded once.
+ */
+export const getPendingEmbedImagesToUpload = (
+  contents: { dataContentId: string | null; data?: File }[],
+): TPendingEmbedImageToUpload[] => {
+  const imagesToUpload: TPendingEmbedImageToUpload[] = [];
+
+  for (const { dataContentId, data } of contents) {
+    if (!dataContentId?.startsWith(PRESIGNED_DATA_CONTENT_ID_PREFIX)) {
+      continue;
+    }
+
+    if (imagesToUpload.some((image) => image.id === dataContentId)) {
+      continue;
+    }
+
+    if (!data) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Content image ${dataContentId} has no data`,
+      });
+    }
+
+    imagesToUpload.push({ id: dataContentId, file: data, index: imagesToUpload.length });
+  }
+
+  return imagesToUpload;
+};
 
 /**
  * Takes parsed `features` from the embedding hash and an `embedded` config,
@@ -74,6 +115,7 @@ export const buildEmbeddedFeatures = (features: DeepPartial<EnvelopeEditorConfig
         : null,
 
     actions: {
+      allowContents: features.actions?.allowContents ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowContents,
       allowAttachments: features.actions?.allowAttachments ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowAttachments,
       allowDistributing:
         features.actions?.allowDistributing ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDistributing,
