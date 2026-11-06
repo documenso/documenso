@@ -818,7 +818,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         formValues: body.formValues,
       });
 
-      const newDocumentData = await putNormalizedPdfFileServerSide({
+      const { documentData: newDocumentData } = await putNormalizedPdfFileServerSide({
         name: fileName,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(prefilled),

@@ -1,12 +1,13 @@
 import Konva from 'konva';
 
-import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
+import { getSignatureFontFamily } from '../../constants/pdf';
 import type { GenericTextFieldTypeMetas } from '../../types/field-meta';
 import {
   FIELD_DEFAULT_GENERIC_ALIGN,
   FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN,
   FIELD_DEFAULT_LETTER_SPACING,
   FIELD_DEFAULT_LINE_HEIGHT,
+  resolveFieldFontSize,
   resolveFieldOverflowMode,
 } from '../../types/field-meta';
 import { calculateOverflowLayout } from './calculate-overflow-layout';
@@ -28,6 +29,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   const { fieldX, fieldY, fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
   const fieldMeta = field.fieldMeta as GenericTextFieldTypeMetas | undefined;
+  const isHandwriting = fieldMeta?.type === 'initials' && fieldMeta.fontFamily === 'handwriting';
 
   const fieldTypeName = translations?.[field.type] || field.type;
 
@@ -42,7 +44,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   // Calculate text positioning based on alignment
   const textX = 0;
   const textY = 0;
-  const textFontSize = fieldMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
+  const textFontSize = resolveFieldFontSize(fieldMeta);
 
   // By default, render the field name or label centered.
   // isLabel tracks whether we're rendering the field type name (like "Text", "Date", "Email")
@@ -104,12 +106,14 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     }
   }
 
+  const textFontFamily = isHandwriting ? getSignatureFontFamily(textToRender) : konvaTextFontFamily;
+
   const overflowLayout = calculateOverflowLayout({
     overflowMode: resolveFieldOverflowMode(fieldMeta),
     isLabel,
     textToRender,
     fontSize: textFontSize,
-    fontFamily: konvaTextFontFamily,
+    fontFamily: textFontFamily,
     lineHeight: textLineHeight,
     letterSpacing: textLetterSpacing,
     textAlign,
@@ -136,7 +140,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     align: overflowLayout.textAlign,
     lineHeight: textLineHeight,
     letterSpacing: textLetterSpacing,
-    fontFamily: konvaTextFontFamily,
+    fontFamily: textFontFamily,
     fill: konvaTextFill,
     width: overflowLayout.width,
     height: overflowLayout.height,
@@ -147,6 +151,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     isLabel,
     textToRender,
     textFontSize,
+    textFontFamily,
     textAlign,
     textVerticalAlign,
     textLineHeight,
@@ -178,6 +183,7 @@ export const renderGenericTextFieldElement = (field: FieldToRender, options: Ren
     isLabel,
     textToRender,
     textFontSize,
+    textFontFamily,
     textAlign,
     textVerticalAlign,
     textLineHeight,
@@ -221,7 +227,7 @@ export const renderGenericTextFieldElement = (field: FieldToRender, options: Ren
       isLabel,
       textToRender,
       fontSize: textFontSize,
-      fontFamily: konvaTextFontFamily,
+      fontFamily: textFontFamily,
       lineHeight: textLineHeight,
       letterSpacing: textLetterSpacing,
       textAlign,

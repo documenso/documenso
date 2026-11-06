@@ -28,6 +28,7 @@ export const duplicateDocumentRoute = authenticatedProcedure
       },
       userId: user.id,
       teamId,
+      requestMetadata: ctx.metadata,
     });
 
     return {
