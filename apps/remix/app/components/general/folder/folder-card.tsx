@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router';
 
+import { useFolderSort } from '~/components/general/folder/folder-sort-dropdown';
 import { useCurrentTeam } from '~/providers/team';
 
 export type FolderCardProps = {
@@ -35,13 +36,15 @@ export type FolderCardProps = {
 export const FolderCard = ({ folder, onMove, onSettings, onDelete }: FolderCardProps) => {
   const team = useCurrentTeam();
 
+  const { withFolderSort } = useFolderSort();
+
   const { mutateAsync: updateFolderMutation } = trpc.folder.updateFolder.useMutation();
 
   const formatPath = () => {
     const rootPath =
       folder.type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
-    return `${rootPath}/f/${folder.id}`;
+    return withFolderSort(`${rootPath}/f/${folder.id}`);
   };
 
   const updateFolder = async ({ pinned }: { pinned: boolean }) => {
