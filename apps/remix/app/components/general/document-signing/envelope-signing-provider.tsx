@@ -170,26 +170,28 @@ export const EnvelopeSigningProvider = ({
   const [signature, setSignature] = useState(
     (() => {
       const sig = initialSignature || '';
-      const isBase64 = isBase64Image(sig);
+
+      if (sig) {
+        const isBase64 = isBase64Image(sig);
+
+        if (isBase64 && (envelope.documentMeta.uploadSignatureEnabled || envelope.documentMeta.drawSignatureEnabled)) {
+          return sig;
+        }
+
+        if (!isBase64 && envelope.documentMeta.typedSignatureEnabled) {
+          return sig;
+        }
+      }
 
       if (
-        !sig &&
         (envelope.documentMeta.uploadSignatureEnabled || envelope.documentMeta.drawSignatureEnabled) &&
         envelopeData.recipientSignature?.signatureImageAsBase64
       ) {
         return envelopeData.recipientSignature.signatureImageAsBase64;
       }
 
-      if (!sig && envelope.documentMeta.typedSignatureEnabled && envelopeData.recipientSignature?.typedSignature) {
+      if (envelope.documentMeta.typedSignatureEnabled && envelopeData.recipientSignature?.typedSignature) {
         return envelopeData.recipientSignature.typedSignature;
-      }
-
-      if (isBase64 && (envelope.documentMeta.uploadSignatureEnabled || envelope.documentMeta.drawSignatureEnabled)) {
-        return sig;
-      }
-
-      if (!isBase64 && envelope.documentMeta.typedSignatureEnabled) {
-        return sig;
       }
 
       return null;
