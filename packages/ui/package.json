@@ -20,14 +20,12 @@
     "@types/luxon": "^3.7.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "react": "^19.2.7",
     "typescript": "5.6.2"
   },
   "dependencies": {
     "@documenso/lib": "*",
     "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^3",
-    "@lingui/macro": "^5.6.0",
     "@lingui/react": "^5.6.0",
     "@scure/base": "^1.2.6",
     "@tanstack/react-table": "^8.21.3",

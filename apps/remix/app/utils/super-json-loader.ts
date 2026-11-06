@@ -7,7 +7,7 @@
 /**
  * https://github.com/kiliman/remix-superjson/
  */
-import { useActionData, useLoaderData } from 'react-router';
+import { useLoaderData } from 'react-router';
 import * as _superjson from 'superjson';
 
 export type SuperJsonFunction = <Data>(data: Data, init?: number | ResponseInit) => SuperTypedResponse<Data>;
@@ -44,9 +44,4 @@ export function useSuperLoaderData<T = AppData>(): UseDataFunctionReturn<T> {
   const data = useLoaderData();
 
   return _superjson.deserialize(data);
-}
-export function useSuperActionData<T = AppData>(): UseDataFunctionReturn<T> | null {
-  const data = useActionData();
-
-  return data ? _superjson.deserialize(data) : null;
 }

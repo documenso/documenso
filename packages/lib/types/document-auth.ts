@@ -112,7 +112,6 @@ export const ZRecipientActionAuthTypesSchema = z
 
 export const DocumentAccessAuth = ZDocumentAccessAuthTypesSchema.Enum;
 export const DocumentActionAuth = ZDocumentActionAuthTypesSchema.Enum;
-export const RecipientAccessAuth = ZRecipientAccessAuthTypesSchema.Enum;
 export const RecipientActionAuth = ZRecipientActionAuthTypesSchema.Enum;
 
 /**

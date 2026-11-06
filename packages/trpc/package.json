@@ -16,7 +16,6 @@
     "@trpc/react-query": "11.17.0",
     "@trpc/server": "11.17.0",
     "@ts-rest/core": "^3.52.1",
-    "formidable": "^3.5.4",
     "luxon": "^3.7.2",
     "superjson": "^2.2.5",
     "trpc-to-openapi": "^2.1.5",
@@ -24,8 +23,5 @@
     "zod": "^3.25.76",
     "zod-form-data": "^2.0.8",
     "zod-openapi": "^4.2.4"
-  },
-  "devDependencies": {
-    "@types/formidable": "^3.4.6"
   }
 }

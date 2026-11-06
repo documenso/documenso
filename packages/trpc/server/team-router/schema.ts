@@ -1,7 +1,6 @@
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
 import { ZNameSchema } from '@documenso/lib/types/name';
 import { zEmail } from '@documenso/lib/utils/zod';
-import { TeamMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
 /**
@@ -54,14 +53,6 @@ export const ZUpdateTeamEmailMutationSchema = z.object({
   teamId: z.number(),
   data: z.object({
     name: ZNameSchema,
-  }),
-});
-
-export const ZUpdateTeamMemberMutationSchema = z.object({
-  teamId: z.number(),
-  teamMemberId: z.number(),
-  data: z.object({
-    role: z.nativeEnum(TeamMemberRole),
   }),
 });
 

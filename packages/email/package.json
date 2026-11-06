@@ -21,8 +21,7 @@
     "@documenso/tailwind-config": "*",
     "@react-email/render": "2.1.0",
     "nodemailer": "^9.0.0",
-    "react-email": "^6.9.0",
-    "resend": "^6.5.2"
+    "react-email": "^6.9.0"
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",
