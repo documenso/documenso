@@ -132,7 +132,7 @@ export const DocumentSigningPageViewV1 = ({
   let senderName = document.user.name ?? '';
   let senderEmail = `(${document.user.email})`;
 
-  if (includeSenderDetails) {
+  if (!includeSenderDetails) {
     senderName = document.team?.name ?? '';
     senderEmail = document.team?.teamEmail?.email ? `(${document.team.teamEmail.email})` : '';
   }
