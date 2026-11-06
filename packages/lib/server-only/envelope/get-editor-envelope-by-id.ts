@@ -60,6 +60,7 @@ export const getEditorEnvelopeById = async ({ id, userId, teamId, type }: GetEdi
         },
       },
       fields: true,
+      contents: true,
       team: {
         select: {
           id: true,

@@ -30,6 +30,13 @@ export default function Layout() {
       (organisation.subscription && organisation.subscription.status === SubscriptionStatus.INACTIVE) ||
       isOrganisationPendingPayment(organisation);
 
+    // The content allowances come straight from the organisation's claim, as
+    // they are already known on the client.
+    const contentLimits = {
+      maximumEnvelopeContentCount: organisation.organisationClaim.envelopeContentCount,
+      maximumEnvelopeContentImageCount: organisation.organisationClaim.envelopeContentImageCount,
+    };
+
     if (isRestricted) {
       return {
         quota: {
@@ -43,6 +50,7 @@ export default function Layout() {
           directTemplates: 0,
         },
         maximumEnvelopeItemCount: 0,
+        ...contentLimits,
       };
     }
 
@@ -50,6 +58,7 @@ export default function Layout() {
       quota: PAID_PLAN_LIMITS,
       remaining: PAID_PLAN_LIMITS,
       maximumEnvelopeItemCount: DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
+      ...contentLimits,
     };
   }, [organisation]);
 
