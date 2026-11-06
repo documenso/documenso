@@ -45,11 +45,7 @@ export const validateNumberField = (
     errors.push('Minimum value cannot be greater than maximum value');
   }
 
-  if (typeof maxValue === 'number' && typeof minValue === 'number' && maxValue < minValue) {
-    errors.push('Maximum value cannot be less than minimum value');
-  }
-
-  if (readOnly && numberValue < 1) {
+  if (readOnly && numberValue <= 0) {
     errors.push('A read-only field must have a value greater than 0');
   }
 
