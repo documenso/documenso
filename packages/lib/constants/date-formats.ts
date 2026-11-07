@@ -166,6 +166,12 @@ export const DATE_FORMATS = [
   value: (typeof VALID_DATE_FORMAT_VALUES)[number];
 }[];
 
+const hasTimeComponent = (dateFormat: string): boolean => {
+  const formatWithoutLiterals = dateFormat.replace(/'[^']*'/g, '');
+
+  return /[Hhmsa]/.test(formatWithoutLiterals) || formatWithoutLiterals.includes('ZZ');
+};
+
 export const convertToLocalSystemFormat = (
   customText: string,
   dateFormat: string | null = DEFAULT_DOCUMENT_DATE_FORMAT,
@@ -180,6 +186,13 @@ export const convertToLocalSystemFormat = (
 
   if (!parsedDate.isValid) {
     return 'Invalid date';
+  }
+
+  // A date-only value has no time to convert: it parses to midnight in the
+  // document zone, so shifting it to a viewer zone west of the document
+  // moves it to the previous calendar day.
+  if (!hasTimeComponent(coalescedDateFormat)) {
+    return parsedDate.toFormat(coalescedDateFormat);
   }
 
   const formattedDate = parsedDate.toLocal().toFormat(coalescedDateFormat);
