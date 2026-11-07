@@ -29,7 +29,7 @@ export const VALID_DATE_FORMAT_VALUES = [
   'MMMM dd, yyyy HH:mm',
   'EEEE, MMMM dd, yyyy hh:mm a',
   'EEEE, MMMM dd, yyyy HH:mm',
-  "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+  "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
 ] as const;
 
 export type ValidDateFormat = (typeof VALID_DATE_FORMAT_VALUES)[number];
@@ -118,7 +118,7 @@ export const DATE_FORMATS = [
   {
     key: 'ISO8601',
     label: 'ISO 8601',
-    value: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+    value: "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
   },
   {
     key: 'YYYYMMDD',
@@ -189,4 +189,8 @@ export const convertToLocalSystemFormat = (
 
 export const isValidDateFormat = (dateFormat: unknown): dateFormat is ValidDateFormat => {
   return VALID_DATE_FORMAT_VALUES.includes(dateFormat as ValidDateFormat);
+};
+
+export const convertDateFormatToLuxon = (format: string): string => {
+  return format.replace(/XXX/g, 'ZZ');
 };
