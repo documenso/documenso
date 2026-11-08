@@ -42,6 +42,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { Combobox } from '@documenso/ui/primitives/combobox';
 import {
   Dialog,
@@ -102,6 +103,7 @@ export const ZAddSettingsFormSchema = z.object({
     timezone: ZDocumentMetaTimezoneSchema.default(DEFAULT_DOCUMENT_TIME_ZONE),
     dateFormat: ZDocumentMetaDateFormatSchema.default(DEFAULT_DOCUMENT_DATE_FORMAT),
     distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional().default(DocumentDistributionMethod.EMAIL),
+    includeAuditLog: z.boolean().default(false),
     redirectUrl: z
       .string()
       .optional()
@@ -202,6 +204,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         dateFormat: (envelope.documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT) as TDocumentMetaDateFormat,
         distributionMethod: envelope.documentMeta.distributionMethod || DocumentDistributionMethod.EMAIL,
+        includeAuditLog: envelope.documentMeta.includeAuditLog,
         redirectUrl: envelope.documentMeta.redirectUrl ?? '',
         language: envelope.documentMeta.language ?? 'en',
         emailId: envelope.documentMeta.emailId ?? null,
@@ -259,6 +262,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
       emailReplyTo,
       envelopeExpirationPeriod,
       reminderSettings,
+      includeAuditLog,
     } = data.meta;
 
     const parsedGlobalAccessAuth = z.array(ZDocumentAccessAuthTypesSchema).safeParse(data.globalAccessAuth);
@@ -288,6 +292,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           envelopeExpirationPeriod,
           reminderSettings,
+          includeAuditLog,
         },
       });
 
@@ -928,6 +933,33 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                 onValueChange={field.onChange}
                               />
                             </FormControl>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="meta.includeAuditLog"
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="flex items-center">
+                              <FormControl>
+                                <Checkbox
+                                  id="include-audit-log"
+                                  checked={field.value}
+                                  disabled={field.disabled}
+                                  onCheckedChange={(checked) => field.onChange(Boolean(checked))}
+                                />
+                              </FormControl>
+
+                              <FormLabel className="ml-2 text-muted-foreground text-sm" htmlFor="include-audit-log">
+                                <Trans>Include audit logs in signed PDF</Trans>
+                              </FormLabel>
+                            </div>
+
+                            <FormDescription>
+                              <Trans>Audit logs can still be downloaded separately from the document logs page.</Trans>
+                            </FormDescription>
                           </FormItem>
                         )}
                       />

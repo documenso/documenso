@@ -45,6 +45,7 @@ export const ZEnvelopeForSigningResponse = z.object({
     documentMeta: DocumentMetaSchema.pick({
       signingOrder: true,
       distributionMethod: true,
+      includeAuditLog: true,
       timezone: true,
       dateFormat: true,
       redirectUrl: true,
