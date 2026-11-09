@@ -1,7 +1,10 @@
 import { AppError } from '@documenso/lib/errors/app-error';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
-import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import {
+  fieldsContainUnsignedRequiredField,
+  isFieldUnsignedAndRequired,
+} from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
@@ -153,7 +156,7 @@ export const DocumentSigningForm = ({
                 <DocumentSigningCompleteDialog
                   isSubmitting={isSubmitting}
                   documentTitle={document.title}
-                  fields={fields}
+                  isComplete={!fieldsContainUnsignedRequiredField(fields)}
                   fieldsValidated={localFieldsValidated}
                   onSignatureComplete={async (nextSigner, accessAuthOptions) =>
                     completeDocument({ nextSigner, accessAuthOptions })
@@ -287,7 +290,7 @@ export const DocumentSigningForm = ({
                 <DocumentSigningCompleteDialog
                   isSubmitting={isSubmitting || isAssistantSubmitting}
                   documentTitle={document.title}
-                  fields={fields}
+                  isComplete={!fieldsContainUnsignedRequiredField(fields)}
                   fieldsValidated={localFieldsValidated}
                   disabled={!isRecipientsTurn}
                   onSignatureComplete={async (nextSigner, accessAuthOptions) =>

@@ -3,7 +3,6 @@ import type { EmbedPopupAuthCscOptions } from '@documenso/lib/client-only/hooks/
 import { openPopupWindow, useEmbedPopupAuth } from '@documenso/lib/client-only/hooks/use-embed-popup-auth';
 import { useIsFramed } from '@documenso/lib/client-only/hooks/use-is-framed';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import { PDF_VIEWER_CONTENT_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
@@ -17,6 +16,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useRevalidator, useSearchParams } from 'react-router';
 
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
+import { scrollToSigningField } from '~/utils/scroll-to-signing-field';
 
 import { DocumentSigningCompleteDialog } from '../document-signing/document-signing-complete-dialog';
 import { useRequiredEnvelopeSigningContext } from '../document-signing/envelope-signing-provider';
@@ -165,32 +165,13 @@ export const EnvelopeSignerCompleteDialog = () => {
       return;
     }
 
-    const isEnvelopeItemSwitch = nextField.envelopeItemId !== currentEnvelopeItem?.id;
-
-    if (isEnvelopeItemSwitch) {
-      setCurrentEnvelopeItem(nextField.envelopeItemId);
-    }
-
     setShowPendingFieldTooltip(true);
 
-    setTimeout(
-      () => {
-        const fieldTooltip = document.querySelector(`#field-tooltip`);
-
-        if (fieldTooltip) {
-          fieldTooltip.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-          // Tooltip not in DOM (page virtualized away) — signal the PDF viewer
-          // to scroll to the correct page via the data attribute.
-          const pdfContent = document.querySelector(PDF_VIEWER_CONTENT_SELECTOR);
-
-          if (pdfContent) {
-            pdfContent.setAttribute('data-scroll-to-page', String(nextField.page));
-          }
-        }
-      },
-      isEnvelopeItemSwitch ? 150 : 50,
-    );
+    scrollToSigningField({
+      field: nextField,
+      currentEnvelopeItemId: currentEnvelopeItem?.id,
+      setCurrentEnvelopeItem,
+    });
   };
 
   const handleOnCompleteClick = async (
@@ -380,6 +361,7 @@ export const EnvelopeSignerCompleteDialog = () => {
       onSignatureComplete={isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick}
       documentTitle={envelope.title}
       fields={recipientFieldsRemaining}
+      isComplete={recipientFieldsRemaining.length === 0}
       fieldsValidated={handleOnNextFieldClick}
       recipient={recipient}
       allowDictateNextSigner={Boolean(nextRecipient && envelope.documentMeta.allowDictateNextSigner)}

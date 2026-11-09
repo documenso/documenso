@@ -52,6 +52,7 @@ import {
   isRecipientBefore,
   sortRecipientsBySigningPosition,
 } from '../../utils/recipients';
+import { assertRecipientFieldsComplete } from '../../utils/signing-items';
 import { loadContentImages } from '../data-content/load-content-images';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
@@ -365,6 +366,41 @@ export const createDocumentFromDirectTemplate = async ({
     }),
   );
 
+  /**
+   * Whether a submitted field should be marked as inserted. On V2, fields in a group act
+   * as one field, so every member is inserted once any member has a value.
+   */
+  const isDirectRecipientFieldInserted = (templateField: Field, customText: string | undefined): boolean => {
+    if (directTemplateEnvelope.internalVersion !== 2) {
+      return true;
+    }
+
+    if (customText) {
+      return true;
+    }
+
+    if (!templateField.groupId) {
+      return false;
+    }
+
+    return createDirectRecipientFieldArgs.some(
+      (arg) => arg.templateField.groupId === templateField.groupId && Boolean(arg.customText),
+    );
+  };
+
+  // V1 relies on the required field check made while mapping the submitted values above.
+  if (directTemplateEnvelope.internalVersion === 2) {
+    assertRecipientFieldsComplete({
+      internalVersion: directTemplateEnvelope.internalVersion,
+      recipientId: directTemplateRecipient.id,
+      fields: createDirectRecipientFieldArgs.map(({ templateField, customText, signature }) => ({
+        ...templateField,
+        customText: customText ?? '',
+        inserted: signature !== null || isDirectRecipientFieldInserted(templateField, customText),
+      })),
+    });
+  }
+
   const directTemplateNonSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature === null);
 
   const directTemplateSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature !== null);
@@ -529,6 +565,8 @@ export const createDocumentFromDirectTemplate = async ({
           customText: '',
           inserted: false,
           fieldMeta: field.fieldMeta,
+          groupId: field.groupId,
+          externalId: field.externalId,
         })),
       );
     });
@@ -559,12 +597,7 @@ export const createDocumentFromDirectTemplate = async ({
         fields: {
           createMany: {
             data: directTemplateNonSignatureFields.map(({ templateField, customText }) => {
-              let inserted = true;
-
-              // Custom logic for V2 to only insert if values exist.
-              if (directTemplateEnvelope.internalVersion === 2) {
-                inserted = customText !== '';
-              }
+              const inserted = isDirectRecipientFieldInserted(templateField, customText);
 
               return {
                 envelopeId: createdEnvelope.id,
@@ -578,6 +611,8 @@ export const createDocumentFromDirectTemplate = async ({
                 customText: customText ?? '',
                 inserted,
                 fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
+                groupId: templateField.groupId,
+                externalId: templateField.externalId,
               };
             }),
           },
@@ -610,6 +645,7 @@ export const createDocumentFromDirectTemplate = async ({
             customText: '',
             inserted: true,
             fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
+            externalId: templateField.externalId,
             signature: {
               create: {
                 recipientId: createdDirectRecipient.id,

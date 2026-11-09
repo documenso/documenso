@@ -10,6 +10,7 @@ import { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { assertFieldGroupAllowedForType, assertFieldGroupsValid } from '../../utils/field-groups';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
@@ -46,6 +47,8 @@ export type CreateEnvelopeFieldInput = TFieldAndMeta & {
   envelopeItemId?: string;
 
   recipientId: number;
+  groupId?: string | null;
+  externalId?: string | null;
 } & FieldPosition;
 
 export interface CreateEnvelopeFieldsOptions {
@@ -165,6 +168,17 @@ export const createEnvelopeFields = async ({
 
     const envelopeItemId = field.envelopeItemId || firstEnvelopeItem.id;
 
+    const groupId = field.groupId ?? null;
+    const externalId = field.externalId ?? null;
+
+    assertFieldGroupAllowedForType(field.type, groupId);
+
+    if (groupId && envelope.internalVersion !== 2) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Field groups are only supported for V2 envelopes',
+      });
+    }
+
     /*
       Resolve field position(s). Placeholder fields are resolved by searching the
       PDF text for the placeholder string and using its bounding box.
@@ -226,6 +240,8 @@ export const createEnvelopeFields = async ({
           positionY: (topLeftY / page.height) * 100,
           width: widthPercent,
           height: heightPercent,
+          groupId,
+          externalId,
         };
       });
     }
@@ -241,8 +257,18 @@ export const createEnvelopeFields = async ({
       positionY: field.positionY,
       width: field.width,
       height: field.height,
+      groupId,
+      externalId,
     };
   });
+
+  const newGroupIds = new Set(validatedFields.flatMap((field) => (field.groupId ? [field.groupId] : [])));
+
+  if (newGroupIds.size > 0) {
+    const existingGroupedFields = envelope.fields.filter((field) => field.groupId && newGroupIds.has(field.groupId));
+
+    assertFieldGroupsValid([...existingGroupedFields, ...validatedFields]);
+  }
 
   const createdFields = await prisma.$transaction(async (tx) => {
     await assertEnvelopeMutable(envelope, tx);
@@ -261,6 +287,8 @@ export const createEnvelopeFields = async ({
         envelopeId: envelope.id,
         envelopeItemId: field.envelopeItemId,
         recipientId: field.recipientId,
+        groupId: field.groupId,
+        externalId: field.externalId,
       })),
     });
 

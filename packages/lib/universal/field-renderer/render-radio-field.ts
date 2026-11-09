@@ -96,7 +96,7 @@ export const renderRadioFieldElement = (field: FieldToRender, options: RenderFie
         scaleY: 1,
       });
 
-      textElement.setAttrs({
+      textElement?.setAttrs({
         x: textX,
         y: textY,
         scaleX: 1,
@@ -187,7 +187,10 @@ export const renderRadioFieldElement = (field: FieldToRender, options: RenderFie
 
     fieldGroup.add(circle);
     fieldGroup.add(dot);
-    fieldGroup.add(text);
+
+    if (!radioMeta?.hideLabel) {
+      fieldGroup.add(text);
+    }
   });
 
   if (color !== 'readOnly' && mode !== 'export') {

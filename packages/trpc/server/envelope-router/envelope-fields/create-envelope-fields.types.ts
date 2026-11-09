@@ -1,8 +1,11 @@
 import {
+  refineFieldGroupIdAllowedForType,
   ZClampedFieldHeightSchema,
   ZClampedFieldPositionXSchema,
   ZClampedFieldPositionYSchema,
   ZClampedFieldWidthSchema,
+  ZFieldExternalIdSchema,
+  ZFieldGroupIdSchema,
   ZFieldPageNumberSchema,
   ZFieldSchema,
 } from '@documenso/lib/types/field';
@@ -30,6 +33,8 @@ const ZCreateFieldBaseSchema = ZEnvelopeFieldAndMetaSchema.and(
       .describe(
         'The ID of the envelope item to put the field on. If not provided, field will be placed on the first item.',
       ),
+    groupId: ZFieldGroupIdSchema,
+    externalId: ZFieldExternalIdSchema,
   }),
 );
 
@@ -71,10 +76,12 @@ export const ZPlaceholderPositionSchema = z.object({
     ),
 });
 
-const ZCreateFieldSchema = z.union([
-  ZCreateFieldBaseSchema.and(ZCoordinatePositionSchema),
-  ZCreateFieldBaseSchema.and(ZPlaceholderPositionSchema),
-]);
+const ZCreateFieldSchema = z
+  .union([
+    ZCreateFieldBaseSchema.and(ZCoordinatePositionSchema),
+    ZCreateFieldBaseSchema.and(ZPlaceholderPositionSchema),
+  ])
+  .superRefine(refineFieldGroupIdAllowedForType);
 
 export const ZCreateEnvelopeFieldsRequestSchema = z.object({
   envelopeId: z.string(),
