@@ -469,6 +469,7 @@ export const DocumentEditForm = ({ className, initialDocument, documentRootPath 
               key={document.id}
               documentFlow={documentFlow.signers}
               recipients={recipients}
+              documentMeta={document.documentMeta}
               signingOrder={document.documentMeta?.signingOrder}
               allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
               fields={fields}
