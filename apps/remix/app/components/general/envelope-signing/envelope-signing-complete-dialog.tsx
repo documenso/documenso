@@ -38,7 +38,7 @@ export const EnvelopeSignerCompleteDialog = () => {
     isDirectTemplate,
     envelope,
     setShowPendingFieldTooltip,
-    recipientFieldsRemaining,
+    pendingRecipientSigningItems,
     recipient,
     nextRecipient,
     email,
@@ -158,7 +158,8 @@ export const EnvelopeSignerCompleteDialog = () => {
   };
 
   const handleOnNextFieldClick = () => {
-    const nextField = recipientFieldsRemaining[0];
+    // A group is pointed out on its first field, which is where the pending tooltip sits.
+    const nextField = pendingRecipientSigningItems[0]?.primaryField;
 
     if (!nextField) {
       setShowPendingFieldTooltip(false);
@@ -360,8 +361,7 @@ export const EnvelopeSignerCompleteDialog = () => {
       recipientPayload={recipientPayload}
       onSignatureComplete={isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick}
       documentTitle={envelope.title}
-      fields={recipientFieldsRemaining}
-      isComplete={recipientFieldsRemaining.length === 0}
+      isComplete={pendingRecipientSigningItems.length === 0}
       fieldsValidated={handleOnNextFieldClick}
       recipient={recipient}
       allowDictateNextSigner={Boolean(nextRecipient && envelope.documentMeta.allowDictateNextSigner)}

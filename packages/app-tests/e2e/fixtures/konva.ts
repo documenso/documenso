@@ -144,6 +144,45 @@ export const getKonvaFieldGroupHighlight = async (
 };
 
 /**
+ * The opacity of the group highlight overlay on the field at a canvas position, or null
+ * when that field is not highlighted. For the editor, whose fields are keyed by form IDs.
+ */
+export const getKonvaFieldGroupHighlightAt = async (
+  page: Page,
+  pageNumber: number,
+  position: { x: number; y: number },
+): Promise<number | null> => {
+  return await page.evaluate(
+    ({ pageNumber, position }) => {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const konva: typeof Konva = (window as unknown as { Konva: typeof Konva }).Konva;
+
+      const stage = konva.stages.find((stage) => stage.attrs.id === `page-${pageNumber}`);
+
+      const fieldGroup = stage?.find('.field-group').find((node) => {
+        const rect = node.getClientRect();
+
+        return (
+          position.x >= rect.x &&
+          position.x <= rect.x + rect.width &&
+          position.y >= rect.y &&
+          position.y <= rect.y + rect.height
+        );
+      });
+
+      if (!(fieldGroup instanceof konva.Group)) {
+        return null;
+      }
+
+      const highlight = fieldGroup.findOne('.group-highlight');
+
+      return highlight ? highlight.opacity() : null;
+    },
+    { pageNumber, position },
+  );
+};
+
+/**
  * Whether a field on the signing page canvas currently shows its loading spinner.
  */
 export const hasKonvaFieldSpinner = async (page: Page, pageNumber: number, fieldId: number): Promise<boolean> => {

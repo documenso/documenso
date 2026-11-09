@@ -11,7 +11,7 @@ import { DEFAULT_TRANSFORMER_SELECTION_CONFIG } from '@documenso/lib/universal/k
 import { canContentBeChanged } from '@documenso/lib/utils/envelope';
 import { resolveEnvelopeContentLimits } from '@documenso/lib/utils/envelope-content';
 import { useLingui } from '@lingui/react/macro';
-import type Konva from 'konva';
+import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { CopyPlusIcon, TrashIcon } from 'lucide-react';
 import { useEffect } from 'react';
@@ -30,7 +30,7 @@ import type {
   EnvelopeCanvasSelection,
   EnvelopeCanvasSelectionKind,
 } from './canvas/envelope-canvas-types';
-import { ENVELOPE_CANVAS_GROUP_NAMES } from './canvas/envelope-canvas-types';
+import { ENVELOPE_CANVAS_GROUP_NAMES, ENVELOPE_CANVAS_IS_GROUPED_ATTR } from './canvas/envelope-canvas-types';
 import { useEnvelopeCanvasContentsLayer } from './canvas/use-envelope-canvas-contents-layer';
 import { useEnvelopeCanvasFieldsLayer } from './canvas/use-envelope-canvas-fields-layer';
 import { useEnvelopeCanvasLineAnchors } from './canvas/use-envelope-canvas-line-anchors';
@@ -188,6 +188,24 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
     currentStage.on('dragstart', onDragStartOrEnd);
     currentStage.on('dragend', onDragStartOrEnd);
+
+    // Hover is resolved from whatever is under the pointer on every move, rather than from
+    // per field enter and leave events, because Konva never reports the pointer leaving a
+    // field which was re-rendered underneath it.
+    currentStage.on('mousemove', (event) => {
+      const parent = event.target.getParent();
+
+      // The transformer is drawn over the selected field, so the pointer hits it instead.
+      const hoveredFieldGroup =
+        event.target.findAncestor(`.${ENVELOPE_CANVAS_GROUP_NAMES.field}`, true) ??
+        (parent instanceof Konva.Transformer && parent.nodes().length === 1 ? parent.nodes()[0] : null);
+
+      editorFields.setHoveredGroupedFieldFormId(
+        hoveredFieldGroup?.getAttr(ENVELOPE_CANVAS_IS_GROUPED_ATTR) === true ? hoveredFieldGroup.id() : null,
+      );
+    });
+
+    currentStage.on('mouseleave', () => editorFields.setHoveredGroupedFieldFormId(null));
 
     currentPageLayer.batchDraw();
   };

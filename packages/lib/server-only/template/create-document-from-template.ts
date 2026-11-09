@@ -17,6 +17,7 @@ import { match } from 'ts-pattern';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { TEnvelopeExpirationPeriod } from '../../constants/envelope-expiration';
+import { isFieldGroupValueShared } from '../../constants/field-groups';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { ZDefaultRecipientsSchema } from '../../types/default-recipients';
@@ -48,6 +49,7 @@ import {
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildEnvelopeContentCopyData } from '../../utils/envelope-content';
+import { assertFieldGroupsValid, groupFieldsByGroupId } from '../../utils/field-groups';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -123,6 +125,10 @@ export type CreateDocumentFromTemplateOptions = {
 
   formValues?: TDocumentFormValues;
   requestMetadata: ApiRequestMetadata;
+};
+
+const getPrefillLabel = (prefillField: TFieldMetaPrefillFieldsSchema) => {
+  return 'label' in prefillField ? prefillField.label : undefined;
 };
 
 const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillFieldsSchema) => {
@@ -709,6 +715,36 @@ export const createDocumentFromTemplate = async ({
           });
         }
       }
+
+      // A group which shares its value acts as one field, so it is only prefilled when every
+      // field is given the same value. Checkbox and radio fields have their own options
+      // and are prefilled one at a time.
+      const sharedValueTemplateFields = finalRecipients
+        .flatMap((recipient) => recipient.fields)
+        .filter((field) => isFieldGroupValueShared(field.type));
+
+      for (const [groupId, items] of groupFieldsByGroupId(sharedValueTemplateFields)) {
+        const itemPrefillFields = items.map((item) => prefillFields.find((value) => value.id === item.id));
+        const [firstPrefillField] = itemPrefillFields;
+
+        if (itemPrefillFields.every((itemPrefillField) => !itemPrefillField)) {
+          continue;
+        }
+
+        const isEveryItemPrefilledAlike = itemPrefillFields.every(
+          (itemPrefillField) =>
+            itemPrefillField &&
+            firstPrefillField &&
+            itemPrefillField.value === firstPrefillField.value &&
+            getPrefillLabel(itemPrefillField) === getPrefillLabel(firstPrefillField),
+        );
+
+        if (!isEveryItemPrefilledAlike) {
+          throw new AppError(AppErrorCode.INVALID_BODY, {
+            message: `Every field in group "${groupId}" must be prefilled with the same value and label`,
+          });
+        }
+      }
     }
 
     Object.values(allFinalRecipients).forEach(({ token, fields }) => {
@@ -735,6 +771,8 @@ export const createDocumentFromTemplate = async ({
             customText: '',
             inserted: false,
             fieldMeta: field.fieldMeta,
+            groupId: field.groupId,
+            externalId: field.externalId,
           };
 
           if (prefillField) {
@@ -769,6 +807,10 @@ export const createDocumentFromTemplate = async ({
         }),
       );
     });
+
+    // Prefilled checkbox and radio fields can still leave a group out of sync, such as two
+    // selected radio options across its fields, so the groups are checked before saving.
+    assertFieldGroupsValid(fieldsToCreate);
 
     await tx.field.createMany({
       data: fieldsToCreate.map((field) => ({

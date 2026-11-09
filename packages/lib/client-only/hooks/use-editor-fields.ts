@@ -1,11 +1,20 @@
 import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { clampPercentageBox } from '@documenso/lib/utils/geometry';
+import { useToast } from '@documenso/ui/primitives/use-toast';
+import { useLingui } from '@lingui/react/macro';
 import type { Field } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { useCallback, useMemo, useState } from 'react';
+import { isDeepEqual } from 'remeda';
 import { z } from 'zod';
 import { EDITOR_DUPLICATE_ITEM_OFFSET } from '../../constants/envelope-editor';
+import {
+  applyEditorFieldUpdate,
+  type EditorFieldChanges,
+  type EditorFieldUpdate,
+  resolveEditorFieldGroupChanges,
+} from '../editor-field-group-changes';
 import { createLocalFormId, getOtherPageNumbers, useEditorFormArray } from './use-editor-form-array';
 
 export const ZLocalFieldSchema = z.object({
@@ -23,6 +32,8 @@ export const ZLocalFieldSchema = z.object({
   width: z.number().min(0),
   height: z.number().min(0),
   fieldMeta: ZFieldMetaSchema,
+  groupId: z.string().max(255).nullish(),
+  externalId: z.string().max(255).nullish(),
 });
 
 export type TLocalField = z.infer<typeof ZLocalFieldSchema>;
@@ -40,11 +51,19 @@ type UseEditorFieldsResponse = {
   selectedField: TLocalField | undefined;
   setSelectedField: (formId: string | null) => void;
 
+  /**
+   * The grouped field under the pointer on any page, so the rest of its group can be
+   * highlighted.
+   */
+  hoveredGroupedFieldFormId: string | null;
+  setHoveredGroupedFieldFormId: (formId: string | null) => void;
+
   // Field operations
   addField: (field: Omit<TLocalField, 'formId'>) => TLocalField;
   setFieldId: (formId: string, id: number) => void;
   removeFieldsByFormId: (formIds: string[]) => void;
   updateFieldByFormId: (formId: string, updates: Partial<TLocalField>) => void;
+  updateFieldsByFormId: (fieldUpdates: EditorFieldUpdate[]) => void;
   duplicateField: (field: TLocalField) => TLocalField;
   duplicateFieldToAllPages: (field: TLocalField) => TLocalField[];
 
@@ -59,6 +78,10 @@ type UseEditorFieldsResponse = {
 };
 
 export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsProps): UseEditorFieldsResponse => {
+  const { t } = useLingui();
+  const { toast } = useToast();
+
+  const [hoveredGroupedFieldFormId, setHoveredGroupedFieldFormId] = useState<string | null>(null);
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
 
   const fieldsArray = useEditorFormArray<TLocalField, Field>({
@@ -75,6 +98,8 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
       height: Number(field.height),
       recipientId: field.recipientId,
       fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+      groupId: field.groupId,
+      externalId: field.externalId,
     }),
     onChange: handleFieldsUpdate,
   });
@@ -116,15 +141,109 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     [fieldsArray.appendItems, setSelectedField],
   );
 
+  /**
+   * Applies a set of changes to the local fields while keeping every affected group
+   * valid and in sync. This is the single entry point for all field writes.
+   *
+   * Returns the fields as they are after the change.
+   */
+  const applyFieldChanges = useCallback(
+    ({ fieldUpdates = [], newFields = [], removedFormIds = [] }: EditorFieldChanges): TLocalField[] => {
+      const previousFields = fieldsArray.getItems();
+
+      const previousFieldsByFormId = new Map(previousFields.map((field) => [field.formId, field]));
+
+      const fieldUpdatesByFormId = new Map(
+        fieldUpdates
+          .filter(({ formId }) => previousFieldsByFormId.has(formId))
+          .map((update) => [update.formId, update]),
+      );
+
+      const removedFormIdSet = new Set(removedFormIds.filter((formId) => previousFieldsByFormId.has(formId)));
+
+      const hasChanges = fieldUpdatesByFormId.size > 0 || newFields.length > 0 || removedFormIdSet.size > 0;
+
+      if (!hasChanges) {
+        return previousFields;
+      }
+
+      const changedFormIds = new Set([...fieldUpdatesByFormId.keys(), ...newFields.map(({ formId }) => formId)]);
+
+      const nextFields = previousFields
+        .filter((field) => !removedFormIdSet.has(field.formId))
+        .map((field) => {
+          const fieldUpdate = fieldUpdatesByFormId.get(field.formId);
+
+          return fieldUpdate ? applyEditorFieldUpdate(field, fieldUpdate.updates) : field;
+        })
+        .concat(newFields);
+
+      const { reconciledFields, validationRemovedGroupIds } = resolveEditorFieldGroupChanges({
+        previousFields,
+        nextFields,
+        changedFormIds,
+      });
+
+      const appendedFields: TLocalField[] = [];
+
+      // Only touch the form entries which actually changed.
+      for (const reconciledField of reconciledFields) {
+        const previousField = previousFieldsByFormId.get(reconciledField.formId);
+
+        if (!previousField) {
+          appendedFields.push(reconciledField);
+          continue;
+        }
+
+        if (!isDeepEqual(previousField, reconciledField)) {
+          fieldsArray.updateByFormId(reconciledField.formId, () => reconciledField);
+        }
+      }
+
+      fieldsArray.removeByFormId([...removedFormIdSet]);
+      fieldsArray.appendItems(appendedFields);
+
+      // Changes are never blocked by a group becoming invalid. Its validation rule is
+      // removed instead, so the user is told why it disappeared.
+      if (validationRemovedGroupIds.length > 0) {
+        toast({
+          title: t`Group validation removed`,
+          description:
+            validationRemovedGroupIds.length === 1
+              ? t`Group "${validationRemovedGroupIds[0]}" no longer satisfies its validation rule, so the rule has been removed from its fields.`
+              : t`${validationRemovedGroupIds.length} groups no longer satisfy their validation rules, so the rules have been removed from their fields.`,
+          duration: 7500,
+        });
+      }
+
+      return reconciledFields;
+    },
+    [fieldsArray.getItems, fieldsArray.updateByFormId, fieldsArray.removeByFormId, fieldsArray.appendItems, t, toast],
+  );
+
+  const removeFieldsByFormId = useCallback(
+    (formIds: string[]) => {
+      applyFieldChanges({ removedFormIds: formIds });
+    },
+    [applyFieldChanges],
+  );
+
   const setFieldId = (formId: string, id: number) => {
     fieldsArray.updateByFormId(formId, (field) => ({ ...field, id }), { shouldTriggerChange: false });
   };
 
+  const updateFieldsByFormId = useCallback(
+    (fieldUpdates: EditorFieldUpdate[]) => {
+      applyFieldChanges({ fieldUpdates });
+    },
+    [applyFieldChanges],
+  );
+
   const updateFieldByFormId = useCallback(
     (formId: string, updates: Partial<TLocalField>) => {
-      fieldsArray.updateByFormId(formId, (field) => clampPercentageBox({ ...field, ...updates }));
+      updateFieldsByFormId([{ formId, updates }]);
     },
-    [fieldsArray.updateByFormId],
+    [updateFieldsByFormId],
   );
 
   const duplicateField = useCallback(
@@ -137,11 +256,11 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
         positionY: field.positionY + EDITOR_DUPLICATE_ITEM_OFFSET,
       };
 
-      fieldsArray.appendItems([newField]);
+      const reconciledFields = applyFieldChanges({ newFields: [newField] });
 
-      return newField;
+      return reconciledFields.find((reconciledField) => reconciledField.formId === newField.formId) ?? newField;
     },
-    [fieldsArray.appendItems],
+    [applyFieldChanges],
   );
 
   const duplicateFieldToAllPages = useCallback(
@@ -155,13 +274,13 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
         }),
       );
 
-      if (newFields.length > 0) {
-        fieldsArray.appendItems(newFields);
-      }
+      const newFormIds = new Set(newFields.map((newField) => newField.formId));
 
-      return newFields;
+      const reconciledFields = applyFieldChanges({ newFields });
+
+      return reconciledFields.filter((reconciledField) => newFormIds.has(reconciledField.formId));
     },
-    [fieldsArray.appendItems],
+    [applyFieldChanges],
   );
 
   const selectedRecipient = useMemo(() => {
@@ -175,8 +294,9 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     // Field operations
     addField,
     setFieldId,
-    removeFieldsByFormId: fieldsArray.removeByFormId,
+    removeFieldsByFormId,
     updateFieldByFormId,
+    updateFieldsByFormId,
     duplicateField,
     duplicateFieldToAllPages,
 
@@ -186,6 +306,9 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     // Selected field
     selectedField: fieldsArray.selectedItem,
     setSelectedField,
+
+    hoveredGroupedFieldFormId,
+    setHoveredGroupedFieldFormId,
 
     // Selected recipient
     selectedRecipient,

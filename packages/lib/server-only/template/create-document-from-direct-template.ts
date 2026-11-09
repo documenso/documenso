@@ -19,6 +19,7 @@ import pMap from 'p-map';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { isFieldGroupValueShared } from '../../constants/field-groups';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '../../types/document-audit-logs';
@@ -46,6 +47,7 @@ import {
   buildEnvelopeContentCopyData,
   getContentsMissingImages,
 } from '../../utils/envelope-content';
+import { groupFieldsByGroupId } from '../../utils/field-groups';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import {
   getRecipientsWithMissingFields,
@@ -368,7 +370,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   /**
    * Whether a submitted field should be marked as inserted. On V2, fields in a group act
-   * as one field, so every member is inserted once any member has a value.
+   * as one field, so every field is inserted once any field has a value.
    */
   const isDirectRecipientFieldInserted = (templateField: Field, customText: string | undefined): boolean => {
     if (directTemplateEnvelope.internalVersion !== 2) {
@@ -390,6 +392,21 @@ export const createDocumentFromDirectTemplate = async ({
 
   // V1 relies on the required field check made while mapping the submitted values above.
   if (directTemplateEnvelope.internalVersion === 2) {
+    // Every field in a group which shares its value is marked as inserted once any of them
+    // has a value, so a field submitted blank or with another value would end up wrong on
+    // the signed document.
+    const sharedValueFields = createDirectRecipientFieldArgs
+      .filter(({ templateField }) => isFieldGroupValueShared(templateField.type))
+      .map(({ templateField, customText }) => ({ groupId: templateField.groupId, customText: customText ?? '' }));
+
+    for (const [groupId, groupFields] of groupFieldsByGroupId(sharedValueFields)) {
+      if (new Set(groupFields.map((field) => field.customText)).size > 1) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Fields in group "${groupId}" must all have the same value`,
+        });
+      }
+    }
+
     assertRecipientFieldsComplete({
       internalVersion: directTemplateEnvelope.internalVersion,
       recipientId: directTemplateRecipient.id,
