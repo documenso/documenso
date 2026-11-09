@@ -33,7 +33,7 @@ import {
   type TEnvelopeEditorSurface,
 } from '../fixtures/envelope-editor';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
-import { getKonvaElementCountForPage } from '../fixtures/konva';
+import { getKonvaElementCountForPage, getKonvaFieldGroupHighlightAt } from '../fixtures/konva';
 
 type TFlowResult = {
   externalId: string;
@@ -285,6 +285,25 @@ const runGroupAssignmentFlow = async (surface: TEnvelopeEditorSurface): Promise<
   await selectFieldOnCanvas(root, POSITIONS.rowThree);
   await openFieldSettingsAdvancedSection(root);
   await expect(getFieldSettingsGroupIdInput(root)).toHaveValue('');
+
+  // Hovering a grouped field highlights the rest of its group, which stays lightly tinted
+  // while one of its fields is selected. Ungrouped field C is never highlighted.
+  const getHighlightAt = async (position: TCanvasPosition) => await getKonvaFieldGroupHighlightAt(root, 1, position);
+  const hoverCanvas = async (position: TCanvasPosition) => await getFieldsCanvas(root).hover({ position, force: true });
+
+  await selectFieldOnCanvas(root, POSITIONS.rowOne);
+  await expect.poll(async () => await getHighlightAt(POSITIONS.rowTwo)).toBeCloseTo(0.3);
+
+  await hoverCanvas(POSITIONS.rowFive);
+  await expect.poll(async () => await getHighlightAt(POSITIONS.rowTwo)).toBeCloseTo(0.06);
+
+  // The selected field is under its transformer, which must still count as hovering it.
+  await hoverCanvas(POSITIONS.rowOne);
+  await expect.poll(async () => await getHighlightAt(POSITIONS.rowTwo)).toBeCloseTo(0.3);
+
+  await hoverCanvas(POSITIONS.rowTwo);
+  await expect.poll(async () => await getHighlightAt(POSITIONS.rowOne)).toBeCloseTo(0.3);
+  expect(await getHighlightAt(POSITIONS.rowThree)).toBeNull();
 
   return { externalId, groupId };
 };
