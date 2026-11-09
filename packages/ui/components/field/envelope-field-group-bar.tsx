@@ -1,4 +1,3 @@
-import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
 import { Trans } from '@lingui/react/macro';
 import type { Field } from '@prisma/client';
 import { motion } from 'framer-motion';
@@ -15,7 +14,7 @@ const BAR_OFFSET_PX = 4;
 export const FIELD_GROUP_BAR_DATA_ATTRIBUTE = 'data-field-group-bar';
 
 export type EnvelopeFieldGroupBarProps = {
-  field: Pick<Field, 'id' | 'positionX' | 'positionY' | 'width' | 'height' | 'page'>;
+  field: Pick<Field, 'id' | 'positionX' | 'positionY' | 'width'>;
   /**
    * One based position of the field within its group.
    */
@@ -39,7 +38,8 @@ export type EnvelopeFieldGroupBarProps = {
  * A floating bar anchored above a grouped field, showing its position within the
  * group and arrows to move between the group's fields.
  *
- * Render inside an `AnimatePresence` so it fades out when removed.
+ * Render inside the field's page box, and inside an `AnimatePresence` so it fades out
+ * when removed.
  */
 export const EnvelopeFieldGroupBar = ({
   field,
@@ -51,20 +51,15 @@ export const EnvelopeFieldGroupBar = ({
   onHoverChange,
   className,
 }: EnvelopeFieldGroupBarProps) => {
-  const coords = useFieldPageCoords(field, { relativeToPage: true });
-
   const ringColor = getRecipientColorStyles(color).baseRing;
 
   return (
-    // A zero height anchor at the field's top left corner. The bar hangs above it so it
-    // lines up with the field's left edge and never overlaps the field. Framer Motion
-    // owns the bar's transform, so the offset is done with positioning here.
     <div
       className={cn('pointer-events-none absolute z-40', className)}
       style={{
-        left: `${coords.x}px`,
-        top: `${coords.y}px`,
-        width: `${coords.width}px`,
+        left: `${Number(field.positionX)}%`,
+        top: `${Number(field.positionY)}%`,
+        width: `${Number(field.width)}%`,
         height: 0,
       }}
     >

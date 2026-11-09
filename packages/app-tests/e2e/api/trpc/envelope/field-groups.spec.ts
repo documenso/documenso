@@ -423,7 +423,7 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     expect(completeResponse.ok(), await completeResponse.text()).toBeTruthy();
   });
 
-  test('documents created from a template carry group settings and require every field to be prefilled', async ({
+  test('documents created from a template carry group settings and reject prefills which leave a group out of sync', async ({
     request,
   }) => {
     const textField = (externalId: string, positionY: number) => ({
@@ -466,11 +466,11 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     const prefill = (id: number, value: string) => ({ id, type: 'text', label: 'Employer', value });
 
     // A group acts as one field, so prefilling only some fields or giving them different
-    // values is rejected.
+    // values leaves it out of sync and is rejected.
     const partialResponse = await useTemplate([prefill(templateTextA.id, 'Acme Inc')]);
 
     expect(partialResponse.status()).toBe(400);
-    expect(await partialResponse.text()).toContain('must be prefilled with the same value and label');
+    expect(await partialResponse.text()).toContain('must be identical for all fields in the group');
 
     const mismatchedResponse = await useTemplate([
       prefill(templateTextA.id, 'Acme Inc'),
@@ -595,5 +595,61 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     const matchingResponse = await createDocument('Acme Inc', 'Acme Inc');
 
     expect(matchingResponse.ok(), await matchingResponse.text()).toBeTruthy();
+  });
+
+  test('direct template radio groups accept a selection in only one field', async ({ request }) => {
+    const radioField = (externalId: string, positionY: number, values: ReturnType<typeof option>[]) => ({
+      type: FieldType.RADIO,
+      page: 1,
+      positionX: 5,
+      positionY,
+      ...FIELD_SIZE,
+      groupId: 'grp_direct_radio',
+      externalId,
+      fieldMeta: { type: 'radio', required: true, values },
+    });
+
+    const { envelope, directLink } = await apiSeedDirectTemplate(request, {
+      fieldsPerRecipient: [
+        [
+          SIGNATURE_FIELD,
+          radioField('radio-a', 10, [option(1, 'A1'), option(2, 'A2')]),
+          radioField('radio-b', 20, [option(1, 'B1')]),
+        ],
+      ],
+    });
+
+    const { updatedAt } = await prisma.envelope.findUniqueOrThrow({ where: { id: envelope.id } });
+
+    const signatureField = envelope.fields.find((field) => field.type === FieldType.SIGNATURE);
+    const radioA = findFieldByExternalId(envelope.fields, 'radio-a');
+    const radioB = findFieldByExternalId(envelope.fields, 'radio-b');
+
+    const createDocument = async (radioAValue: string, radioBValue: string) =>
+      await request.post(`${WEBAPP_BASE_URL}/api/trpc/template.createDocumentFromDirectTemplate`, {
+        headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
+        data: JSON.stringify({
+          json: {
+            directTemplateToken: directLink.token,
+            directRecipientEmail: `direct-radio-${Date.now()}@test.documenso.com`,
+            templateUpdatedAt: updatedAt.toISOString(),
+            signedFieldValues: [
+              { token: '', fieldId: signatureField?.id, value: 'Direct Signer', isBase64: false },
+              { token: '', fieldId: radioA.id, value: radioAValue, isBase64: false },
+              { token: '', fieldId: radioB.id, value: radioBValue, isBase64: false },
+            ],
+          },
+          meta: { values: { templateUpdatedAt: ['Date'] } },
+        }),
+      });
+
+    // Selecting in both fields would give a single choice group two answers.
+    const doubleSelectionResponse = await createDocument('1', '0');
+
+    expect(doubleSelectionResponse.status(), await doubleSelectionResponse.text()).toBe(400);
+
+    const singleSelectionResponse = await createDocument('1', '');
+
+    expect(singleSelectionResponse.ok(), await singleSelectionResponse.text()).toBeTruthy();
   });
 });

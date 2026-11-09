@@ -48,6 +48,7 @@ import {
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildEnvelopeContentCopyData } from '../../utils/envelope-content';
+import { assertFieldGroupsValid } from '../../utils/field-groups';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -735,6 +736,8 @@ export const createDocumentFromTemplate = async ({
             customText: '',
             inserted: false,
             fieldMeta: field.fieldMeta,
+            groupId: field.groupId,
+            externalId: field.externalId,
           };
 
           if (prefillField) {
@@ -769,6 +772,8 @@ export const createDocumentFromTemplate = async ({
         }),
       );
     });
+
+    assertFieldGroupsValid(fieldsToCreate);
 
     await tx.field.createMany({
       data: fieldsToCreate.map((field) => ({
