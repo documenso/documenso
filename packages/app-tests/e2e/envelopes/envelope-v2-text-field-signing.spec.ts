@@ -6,9 +6,34 @@ import { expect, test } from '@playwright/test';
 import { FieldType } from '@prisma/client';
 
 import { apiSeedPendingDocument } from '../fixtures/api-seeds';
+import { getCanvasBox, getPageCanvas } from '../fixtures/contents';
 import { getKonvaFieldTextForPage } from '../fixtures/konva';
 
 test.describe('V2 envelope text field signing', () => {
+  test('dialog opens on release with the textarea focused and existing text selected', async ({ page, request }) => {
+    const { token, textField } = await seedTextFieldDocument(request);
+
+    await openSigningPage(page, token);
+
+    const dialog = page.getByRole('dialog');
+    const textInput = dialog.locator('#custom-text');
+
+    // The dialog mounts synchronously during the gesture, so there is nothing to wait for here.
+    await pressFieldAndReleaseOutside(page, textField);
+    await expect(dialog).toBeHidden();
+
+    await clickField(page, textField);
+    await expect(textInput).toBeFocused();
+    await textInput.fill('First value');
+    await dialog.getByRole('button', { name: 'Enter' }).click();
+    await expect.poll(() => getKonvaFieldTextForPage(page, 1, textField.id)).toBe('First value');
+
+    await clickField(page, textField);
+    await expect(textInput).toHaveValue('First value');
+    await page.keyboard.type('!');
+    await expect(textInput).toHaveValue('!');
+  });
+
   test('inserted text can be edited and removed', async ({ page, request }) => {
     const { envelope, token, textField } = await seedTextFieldDocument(request);
 
@@ -122,20 +147,37 @@ const openSigningPage = async (page: Page, token: string) => {
   await page.goto(`/sign/${token}`);
 
   await expect(page.locator('img[data-page-number]').first()).toBeVisible({ timeout: 30_000 });
-  await expect(page.locator('.konva-container canvas').first()).toBeVisible({ timeout: 30_000 });
+  await expect(getPageCanvas(page)).toBeVisible({ timeout: 30_000 });
 };
 
-const clickField = async (page: Page, field: TGetEnvelopeResponse['fields'][number]) => {
-  const canvas = page.locator('.konva-container canvas').first();
-  const canvasBox = await canvas.boundingBox();
+const clickField = async (page: Page, field: EnvelopeField) => {
+  const canvasBox = await getCanvasBox(page);
 
-  if (!canvasBox) {
-    throw new Error('Canvas bounding box not found');
-  }
+  await getPageCanvas(page).click({ position: getFieldCenter(canvasBox, field) });
+};
 
-  // Field positions and sizes are percentages of the page.
-  const x = ((Number(field.positionX) + Number(field.width) / 2) / 100) * canvasBox.width;
-  const y = ((Number(field.positionY) + Number(field.height) / 2) / 100) * canvasBox.height;
+const pressFieldAndReleaseOutside = async (page: Page, field: EnvelopeField) => {
+  const canvasBox = await getCanvasBox(page);
+  const center = getFieldCenter(canvasBox, field);
+  const fieldHeight = (Number(field.height) / 100) * canvasBox.height;
 
-  await canvas.click({ position: { x, y } });
+  await page.mouse.move(canvasBox.x + center.x, canvasBox.y + center.y);
+  await page.mouse.down();
+  await page.mouse.move(canvasBox.x + center.x, canvasBox.y + center.y + 2 * fieldHeight);
+  await page.mouse.up();
+};
+
+// Field positions and sizes are percentages of the page.
+const getFieldCenter = (canvasBox: CanvasBox, field: EnvelopeField) => ({
+  x: ((Number(field.positionX) + Number(field.width) / 2) / 100) * canvasBox.width,
+  y: ((Number(field.positionY) + Number(field.height) / 2) / 100) * canvasBox.height,
+});
+
+type EnvelopeField = TGetEnvelopeResponse['fields'][number];
+
+type CanvasBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 };
