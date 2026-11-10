@@ -303,11 +303,8 @@ export type ExtractGroupedCheckboxInsertionValuesOptions = {
    * Every field in the group.
    */
   fields: Field[];
-  /**
-   * The selected option indices for the fields which have changed. Fields not included
-   * keep their current selection.
-   */
-  fieldValues: { fieldId: number; value: number[] }[];
+  selectedFieldId: number;
+  selectedIndices: number[];
 };
 
 /**
@@ -318,30 +315,23 @@ export type ExtractGroupedCheckboxInsertionValuesOptions = {
  */
 export const extractGroupedCheckboxInsertionValues = ({
   fields,
-  fieldValues,
+  selectedFieldId,
+  selectedIndices,
 }: ExtractGroupedCheckboxInsertionValuesOptions): FieldInsertionValues[] => {
-  if (fields.length === 0) {
-    return [];
-  }
-
-  const selectedIndicesByFieldId = new Map(fieldValues.map(({ fieldId, value }) => [fieldId, value]));
-
-  for (const fieldId of selectedIndicesByFieldId.keys()) {
-    if (!fields.some((field) => field.id === fieldId)) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: `Field ${fieldId} not found in group`,
-      });
-    }
+  if (!fields.some((field) => field.id === selectedFieldId)) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `Field ${selectedFieldId} not found in group`,
+    });
   }
 
   const itemSelections = fields.map((field) => {
     const parsedCheckboxFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
     const checkboxFieldValues = parsedCheckboxFieldMeta.values || [];
 
-    const selectedIndices =
-      selectedIndicesByFieldId.get(field.id) ?? (field.customText ? parseCheckboxCustomText(field.customText) : []);
+    const currentIndices = field.customText ? parseCheckboxCustomText(field.customText) : [];
+    const fieldSelectedIndices = field.id === selectedFieldId ? selectedIndices : currentIndices;
 
-    if (selectedIndices.some((index) => !checkboxFieldValues[index])) {
+    if (fieldSelectedIndices.some((index) => !checkboxFieldValues[index])) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
         message: 'Invalid checkbox values',
       });
@@ -349,7 +339,7 @@ export const extractGroupedCheckboxInsertionValues = ({
 
     return {
       field,
-      selectedIndices,
+      selectedIndices: fieldSelectedIndices,
     };
   });
 

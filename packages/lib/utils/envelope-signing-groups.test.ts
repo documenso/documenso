@@ -87,8 +87,8 @@ describe('extractGroupedCheckboxInsertionValues', () => {
     }),
   ];
 
-  it('keeps the selection of fields which are not part of the request', () => {
-    const result = extractGroupedCheckboxInsertionValues({ fields, fieldValues: [{ fieldId: 1, value: [1] }] });
+  it('keeps the selection of the other fields in the group', () => {
+    const result = extractGroupedCheckboxInsertionValues({ fields, selectedFieldId: 1, selectedIndices: [1] });
 
     expect(result).toEqual([
       { fieldId: 1, customText: '[1]', inserted: true },
@@ -97,13 +97,14 @@ describe('extractGroupedCheckboxInsertionValues', () => {
   });
 
   it('does not enforce the validation rule at sign time', () => {
-    // The rule is enforced when the recipient completes the document instead.
+    const unansweredFields = fields.map((field) => ({ ...field, customText: '', inserted: false }));
+
+    // One option across the group breaks "at least 2", which is enforced when the
+    // recipient completes the document instead.
     const result = extractGroupedCheckboxInsertionValues({
-      fields,
-      fieldValues: [
-        { fieldId: 1, value: [1] },
-        { fieldId: 2, value: [] },
-      ],
+      fields: unansweredFields,
+      selectedFieldId: 1,
+      selectedIndices: [1],
     });
 
     expect(result).toEqual([
@@ -113,13 +114,7 @@ describe('extractGroupedCheckboxInsertionValues', () => {
   });
 
   it('uninserts the whole group when no options remain selected', () => {
-    const result = extractGroupedCheckboxInsertionValues({
-      fields,
-      fieldValues: [
-        { fieldId: 1, value: [] },
-        { fieldId: 2, value: [] },
-      ],
-    });
+    const result = extractGroupedCheckboxInsertionValues({ fields, selectedFieldId: 2, selectedIndices: [] });
 
     expect(result).toEqual([
       { fieldId: 1, customText: '', inserted: false },
@@ -127,31 +122,14 @@ describe('extractGroupedCheckboxInsertionValues', () => {
     ]);
   });
 
-  it('marks fields with no selection as inserted once the group has a selection', () => {
-    const unruledFields = [
-      createField({ id: 1, type: FieldType.CHECKBOX, fieldMeta: checkboxMeta(['A']) }),
-      createField({ id: 2, type: FieldType.CHECKBOX, fieldMeta: checkboxMeta(['B']) }),
-    ];
-
-    const result = extractGroupedCheckboxInsertionValues({
-      fields: unruledFields,
-      fieldValues: [{ fieldId: 1, value: [0] }],
-    });
-
-    expect(result).toEqual([
-      { fieldId: 1, customText: '[0]', inserted: true },
-      { fieldId: 2, customText: '', inserted: true },
-    ]);
-  });
-
-  it('rejects option indices that do not exist on their field', () => {
-    expect(() => extractGroupedCheckboxInsertionValues({ fields, fieldValues: [{ fieldId: 2, value: [5] }] })).toThrow(
+  it('rejects option indices that do not exist on the selected field', () => {
+    expect(() => extractGroupedCheckboxInsertionValues({ fields, selectedFieldId: 2, selectedIndices: [5] })).toThrow(
       AppError,
     );
   });
 
-  it('rejects values for fields outside the group', () => {
-    expect(() => extractGroupedCheckboxInsertionValues({ fields, fieldValues: [{ fieldId: 99, value: [0] }] })).toThrow(
+  it('rejects a field that is not part of the group', () => {
+    expect(() => extractGroupedCheckboxInsertionValues({ fields, selectedFieldId: 99, selectedIndices: [0] })).toThrow(
       AppError,
     );
   });

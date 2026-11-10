@@ -162,7 +162,8 @@ test.describe('[ASSISTANT_SIGNING_GROUPS]: same-step (group peer) field access',
 
     const res = await trpcMutation(request, 'envelope.field.sign', {
       token: assistantToken,
-      fieldValues: [{ fieldId: peerTextFieldId, fieldValue: { type: FieldType.TEXT, value: 'TEXT' } }],
+      fieldId: peerTextFieldId,
+      fieldValue: { type: FieldType.TEXT, value: 'TEXT' },
     });
 
     expect(res.ok()).toBeFalsy();

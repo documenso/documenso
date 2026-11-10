@@ -178,7 +178,8 @@ test('[ENVELOPE_EXPIRATION]: expired recipient cannot sign a field via the V2 AP
   // Sanity check: the recipient can sign while the signing window is open.
   const beforeExpiry = await trpcMutation(request, 'envelope.field.sign', {
     token: recipient.token,
-    fieldValues: [{ fieldId: textField.id, fieldValue: { type: FieldType.TEXT, value: 'before' } }],
+    fieldId: textField.id,
+    fieldValue: { type: FieldType.TEXT, value: 'before' },
   });
 
   expect(beforeExpiry.ok()).toBeTruthy();
@@ -195,7 +196,8 @@ test('[ENVELOPE_EXPIRATION]: expired recipient cannot sign a field via the V2 AP
 
   const afterExpiry = await trpcMutation(request, 'envelope.field.sign', {
     token: recipient.token,
-    fieldValues: [{ fieldId: textField.id, fieldValue: { type: FieldType.TEXT, value: 'after' } }],
+    fieldId: textField.id,
+    fieldValue: { type: FieldType.TEXT, value: 'after' },
   });
 
   expect(afterExpiry.ok()).toBeFalsy();

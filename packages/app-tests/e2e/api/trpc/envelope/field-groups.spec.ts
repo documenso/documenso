@@ -351,21 +351,11 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
       throw new Error('Signature field not found');
     }
 
-    // Multiple fields may only be signed together when they form a checkbox group.
-    const crossGroupResponse = await postTrpc(request, 'envelope.field.sign', {
-      token: recipientToken,
-      fieldValues: [
-        { fieldId: textA.id, fieldValue: { type: FieldType.TEXT, value: 'A' } },
-        { fieldId: checkboxA.id, fieldValue: { type: FieldType.CHECKBOX, value: [0] } },
-      ],
-    });
-
-    expect(crossGroupResponse.ok()).toBeFalsy();
-
     // Signing one field of a shared value group returns every field in the group.
     const textSignResponse = await postTrpc(request, 'envelope.field.sign', {
       token: recipientToken,
-      fieldValues: [{ fieldId: textA.id, fieldValue: { type: FieldType.TEXT, value: 'Acme Inc' } }],
+      fieldId: textA.id,
+      fieldValue: { type: FieldType.TEXT, value: 'Acme Inc' },
     });
 
     expect(textSignResponse.ok(), await textSignResponse.text()).toBeTruthy();
@@ -381,7 +371,8 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
 
     await postTrpc(request, 'envelope.field.sign', {
       token: recipientToken,
-      fieldValues: [{ fieldId: signatureField.id, fieldValue: { type: FieldType.SIGNATURE, value: 'Signature' } }],
+      fieldId: signatureField.id,
+      fieldValue: { type: FieldType.SIGNATURE, value: 'Signature' },
     });
 
     // The checkbox group has not been answered yet.
@@ -395,7 +386,8 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     // A single tick is accepted but the pooled rule is not satisfied.
     const singleTickResponse = await postTrpc(request, 'envelope.field.sign', {
       token: recipientToken,
-      fieldValues: [{ fieldId: checkboxA.id, fieldValue: { type: FieldType.CHECKBOX, value: [0] } }],
+      fieldId: checkboxA.id,
+      fieldValue: { type: FieldType.CHECKBOX, value: [0] },
     });
 
     expect(singleTickResponse.ok(), await singleTickResponse.text()).toBeTruthy();
@@ -410,7 +402,8 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     // Ticking the sibling satisfies the rule and completion succeeds.
     const secondTickResponse = await postTrpc(request, 'envelope.field.sign', {
       token: recipientToken,
-      fieldValues: [{ fieldId: checkboxB.id, fieldValue: { type: FieldType.CHECKBOX, value: [0] } }],
+      fieldId: checkboxB.id,
+      fieldValue: { type: FieldType.CHECKBOX, value: [0] },
     });
 
     expect(secondTickResponse.ok(), await secondTickResponse.text()).toBeTruthy();

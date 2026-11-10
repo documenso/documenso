@@ -73,15 +73,11 @@ const callSignEnvelopeField = async (page: Page, input: { token: string; fieldId
     data: JSON.stringify({
       json: {
         token: input.token,
-        fieldValues: [
-          {
-            fieldId: input.fieldId,
-            fieldValue: {
-              type: FieldType.TEXT,
-              value: 'TEXT',
-            },
-          },
-        ],
+        fieldId: input.fieldId,
+        fieldValue: {
+          type: FieldType.TEXT,
+          value: 'TEXT',
+        },
       },
     }),
   });

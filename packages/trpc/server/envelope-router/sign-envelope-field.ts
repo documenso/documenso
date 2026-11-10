@@ -1,14 +1,20 @@
+import { isFieldGroupValueShared } from '@documenso/lib/constants/field-groups';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-field-auth';
 import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
+import {
+  extractFieldInsertionValues,
+  extractGroupedCheckboxInsertionValues,
+  extractGroupedRadioInsertionValues,
+  type FieldInsertionValues,
+} from '@documenso/lib/utils/envelope-signing';
 import { getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipient-queries';
 import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentStatus, type Field, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { procedure } from '../trpc';
@@ -41,6 +47,7 @@ export const signEnvelopeFieldRoute = procedure
     const field = await prisma.field.findFirst({
       where: {
         id: fieldId,
+        envelopeId: recipient.envelopeId,
         recipient: getRecipientFieldsWhereInput({
           recipient,
           allowAssistantAccessToOtherRecipients: true,
@@ -125,20 +132,78 @@ export const signEnvelopeFieldRoute = procedure
       throw new Error(`Field ${fieldId} has no recipientId`);
     }
 
-    const insertionValues = extractFieldInsertionValues({ fieldValue, field, documentMeta });
+    let groupFields: Field[] = [field];
+
+    // Load all the fields in the group if available. This includes the field itself, since
+    // it matches every condition.
+    if (field.groupId) {
+      groupFields = await prisma.field.findMany({
+        where: {
+          envelopeId: envelope.id,
+          recipientId: field.recipientId,
+          groupId: field.groupId,
+          type: field.type,
+        },
+      });
+    }
+
+    const fieldInsertionValues: FieldInsertionValues[] = match({ type: field.type, isGrouped: Boolean(field.groupId) })
+      .with({ type: FieldType.RADIO, isGrouped: true }, () => {
+        if (fieldValue.type !== FieldType.RADIO) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'Selected values do not match the field values',
+          });
+        }
+
+        return extractGroupedRadioInsertionValues({
+          fields: groupFields,
+          selectedFieldId: field.id,
+          selectedIndex: fieldValue.value,
+        });
+      })
+      .with({ type: FieldType.CHECKBOX, isGrouped: true }, () => {
+        if (fieldValue.type !== FieldType.CHECKBOX) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'Selected values do not match the field values',
+          });
+        }
+
+        return extractGroupedCheckboxInsertionValues({
+          fields: groupFields,
+          selectedFieldId: field.id,
+          selectedIndices: fieldValue.value,
+        });
+      })
+      .otherwise(() => {
+        const insertionValues = extractFieldInsertionValues({ fieldValue, field, documentMeta });
+
+        // Shared value groups apply the same value to every field.
+        const fieldsToUpdate = field.groupId && isFieldGroupValueShared(field.type) ? groupFields : [field];
+
+        return fieldsToUpdate.map((fieldToUpdate) => ({
+          fieldId: fieldToUpdate.id,
+          ...insertionValues,
+        }));
+      });
+
+    const isUninserting = fieldInsertionValues.every((insertionValues) => !insertionValues.inserted);
 
     // Early return for uninserting fields.
-    if (!insertionValues.inserted) {
+    if (isUninserting) {
       return await prisma.$transaction(async (tx) => {
-        const updatedField = await tx.field.update({
-          where: {
-            id: field.id,
-          },
-          data: {
-            customText: '',
-            inserted: false,
-          },
-        });
+        const updatedFields = await Promise.all(
+          fieldInsertionValues.map(async (insertionValues) =>
+            tx.field.update({
+              where: {
+                id: insertionValues.fieldId,
+              },
+              data: {
+                customText: '',
+                inserted: false,
+              },
+            }),
+          ),
+        );
 
         await tx.signature.deleteMany({
           where: {
@@ -147,25 +212,29 @@ export const signEnvelopeFieldRoute = procedure
         });
 
         if (recipient.role !== RecipientRole.ASSISTANT) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
-              envelopeId: envelope.id,
-              user: {
-                name: recipient.name,
-                email: recipient.email,
-              },
-              requestMetadata: metadata.requestMetadata,
-              data: {
-                field: field.type,
-                fieldId: field.secondaryId,
-              },
-            }),
+          await tx.documentAuditLog.createMany({
+            data: updatedFields.map((uninsertedField) =>
+              createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
+                envelopeId: envelope.id,
+                user: {
+                  name: recipient.name,
+                  email: recipient.email,
+                },
+                requestMetadata: metadata.requestMetadata,
+                data: {
+                  field: uninsertedField.type,
+                  fieldId: uninsertedField.secondaryId,
+                },
+              }),
+            ),
           });
         }
 
         return {
-          signedField: updatedField,
+          // Clients merge the response into their local fields, so the deleted signature
+          // must be returned as null rather than omitted.
+          signedFields: updatedFields.map((updatedField) => ({ ...updatedField, signature: null })),
         };
       });
     }
@@ -199,19 +268,31 @@ export const signEnvelopeFieldRoute = procedure
     }
 
     return await prisma.$transaction(async (tx) => {
-      const updatedField = await tx.field.update({
-        where: {
-          id: field.id,
-        },
-        data: {
-          customText: insertionValues.customText,
-          inserted: insertionValues.inserted,
-        },
-        include: {
-          signature: true,
-        },
-      });
+      const updatedFields = await Promise.all(
+        fieldInsertionValues.map(async (insertionValues) =>
+          tx.field.update({
+            where: {
+              id: insertionValues.fieldId,
+            },
+            data: {
+              customText: insertionValues.customText,
+              inserted: insertionValues.inserted,
+            },
+            include: {
+              signature: true,
+            },
+          }),
+        ),
+      );
 
+      const updatedField = updatedFields.find((currentField) => currentField.id === field.id);
+
+      if (!updatedField) {
+        throw new Error('Not possible');
+      }
+
+      // Update the signature and mutate the response to contain
+      // the new signature for the updated field.
       if (field.type === FieldType.SIGNATURE) {
         const signature = await tx.signature.upsert({
           where: {
@@ -235,49 +316,51 @@ export const signEnvelopeFieldRoute = procedure
         });
       }
 
-      await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type:
-            assistant && field.recipientId !== assistant.id
-              ? DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED
-              : DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
-          envelopeId: envelope.id,
-          user: {
-            email: assistant?.email ?? recipient.email,
-            name: assistant?.name ?? recipient.name,
-          },
-          requestMetadata: metadata.requestMetadata,
-          data: {
-            recipientEmail: recipient.email,
-            recipientId: recipient.id,
-            recipientName: recipient.name,
-            recipientRole: recipient.role,
-            fieldId: updatedField.secondaryId,
-            field: match(updatedField.type)
-              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
-                type,
-                data: signatureImageAsBase64 || typedSignature || '',
-              }))
-              .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, FieldType.TEXT, FieldType.INITIALS, (type) => ({
-                type,
-                data: updatedField.customText,
-              }))
-              .with(FieldType.NUMBER, FieldType.RADIO, FieldType.CHECKBOX, FieldType.DROPDOWN, (type) => ({
-                type,
-                data: updatedField.customText,
-              }))
-              .exhaustive(),
-            fieldSecurity: derivedRecipientActionAuth
-              ? {
-                  type: derivedRecipientActionAuth,
-                }
-              : undefined,
-          },
-        }),
+      await tx.documentAuditLog.createMany({
+        data: updatedFields.map((insertedField) =>
+          createDocumentAuditLogData({
+            type:
+              assistant && field.recipientId !== assistant.id
+                ? DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED
+                : DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+            envelopeId: envelope.id,
+            user: {
+              email: assistant?.email ?? recipient.email,
+              name: assistant?.name ?? recipient.name,
+            },
+            requestMetadata: metadata.requestMetadata,
+            data: {
+              recipientEmail: recipient.email,
+              recipientId: recipient.id,
+              recipientName: recipient.name,
+              recipientRole: recipient.role,
+              fieldId: insertedField.secondaryId,
+              field: match(insertedField.type)
+                .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
+                  type,
+                  data: signatureImageAsBase64 || typedSignature || '',
+                }))
+                .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, FieldType.TEXT, FieldType.INITIALS, (type) => ({
+                  type,
+                  data: insertedField.customText,
+                }))
+                .with(FieldType.NUMBER, FieldType.RADIO, FieldType.CHECKBOX, FieldType.DROPDOWN, (type) => ({
+                  type,
+                  data: insertedField.customText,
+                }))
+                .exhaustive(),
+              fieldSecurity: derivedRecipientActionAuth
+                ? {
+                    type: derivedRecipientActionAuth,
+                  }
+                : undefined,
+            },
+          }),
+        ),
       });
 
       return {
-        signedField: updatedField,
+        signedFields: updatedFields,
       };
     });
   });

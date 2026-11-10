@@ -47,18 +47,10 @@ export const ZSignEnvelopeFieldValue = z.discriminatedUnion('type', [
   }),
 ]);
 
-export const ZSignEnvelopeFieldValuesSchema = z
-  .array(
-    z.object({
-      fieldId: z.number().int().min(1),
-      fieldValue: ZSignEnvelopeFieldValue,
-    }),
-  )
-  .min(1);
-
 export const ZSignEnvelopeFieldRequestSchema = z.object({
-  token: z.string(),
-  fieldValues: ZSignEnvelopeFieldValuesSchema,
+  token: z.string().min(1),
+  fieldId: z.number().int().min(1),
+  fieldValue: ZSignEnvelopeFieldValue,
   authOptions: ZRecipientActionAuthSchema.optional(),
 });
 
@@ -77,6 +69,5 @@ export const ZSignEnvelopeFieldResponseSchema = z.object({
 });
 
 export type TSignEnvelopeFieldValue = z.infer<typeof ZSignEnvelopeFieldValue>;
-export type TSignEnvelopeFieldValues = z.infer<typeof ZSignEnvelopeFieldValuesSchema>;
 export type TSignEnvelopeFieldRequest = z.infer<typeof ZSignEnvelopeFieldRequestSchema>;
 export type TSignEnvelopeFieldResponse = z.infer<typeof ZSignEnvelopeFieldResponseSchema>;
