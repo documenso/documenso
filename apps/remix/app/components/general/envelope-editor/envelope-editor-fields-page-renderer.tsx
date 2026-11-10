@@ -30,7 +30,7 @@ import type {
   EnvelopeCanvasSelection,
   EnvelopeCanvasSelectionKind,
 } from './canvas/envelope-canvas-types';
-import { ENVELOPE_CANVAS_GROUP_NAMES, ENVELOPE_CANVAS_IS_GROUPED_ATTR } from './canvas/envelope-canvas-types';
+import { ENVELOPE_CANVAS_GROUP_NAMES } from './canvas/envelope-canvas-types';
 import { useEnvelopeCanvasContentsLayer } from './canvas/use-envelope-canvas-contents-layer';
 import { useEnvelopeCanvasFieldsLayer } from './canvas/use-envelope-canvas-fields-layer';
 import { useEnvelopeCanvasLineAnchors } from './canvas/use-envelope-canvas-line-anchors';
@@ -200,9 +200,11 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
         event.target.findAncestor(`.${ENVELOPE_CANVAS_GROUP_NAMES.field}`, true) ??
         (parent instanceof Konva.Transformer && parent.nodes().length === 1 ? parent.nodes()[0] : null);
 
-      editorFields.setHoveredGroupedFieldFormId(
-        hoveredFieldGroup?.getAttr(ENVELOPE_CANVAS_IS_GROUPED_ATTR) === true ? hoveredFieldGroup.id() : null,
-      );
+      // This handler is bound once when the stage is created, which is safe here because
+      // the lookup reads the live form values rather than a render's copy of the fields.
+      const hoveredField = hoveredFieldGroup ? editorFields.getFieldByFormId(hoveredFieldGroup.id()) : undefined;
+
+      editorFields.setHoveredGroupedFieldFormId(hoveredField?.groupId ? hoveredField.formId : null);
     });
 
     currentStage.on('mouseleave', () => editorFields.setHoveredGroupedFieldFormId(null));

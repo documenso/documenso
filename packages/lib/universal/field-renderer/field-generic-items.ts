@@ -15,9 +15,13 @@ export const FIELD_GROUP_HIGHLIGHT_NAME = 'group-highlight';
 const FIELD_GROUP_HIGHLIGHT_FADE_SECONDS = 0.3;
 const FIELD_GROUP_HIGHLIGHT_TWEEN_ATTR = 'groupHighlightTween';
 
+const FIELD_FILL_FADE_SECONDS = 0.3;
+const FIELD_FILL_TWEEN_ATTR = 'fillTween';
+const FIELD_FILL_PROGRESS_ATTR = 'fillProgress';
+
 const FIELD_GROUP_HIGHLIGHT_OPACITY: Record<FieldGroupHighlightLevel, number> = {
-  focused: 0.3,
-  item: 0.06,
+  primary: 0.3,
+  secondary: 0.06,
 };
 
 export const upsertFieldGroup = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Group => {
@@ -151,17 +155,29 @@ export const syncFieldSpinner = (fieldGroup: Konva.Group, isSigning: boolean) =>
 };
 
 /**
- * How strongly a field is tinted as part of a highlighted group. The focused field is
- * tinted like a hovered field and the other fields more lightly.
+ * How strongly a field is tinted as part of a highlighted group. Primary is tinted like a
+ * hovered field and secondary more lightly.
  */
-export type FieldGroupHighlightLevel = 'focused' | 'item';
+export type FieldGroupHighlightLevel = 'primary' | 'secondary';
+
+type SyncFieldGroupHighlightOptions = {
+  /**
+   * Whether a newly added highlight fades in. Renderers clear a field's children on every
+   * render, so redraws pass false to avoid the highlight flickering.
+   */
+  isAnimated?: boolean;
+};
 
 /**
  * Adds, fades or removes the translucent overlay marking a rendered field as part of a
  * highlighted group. An overlay is used rather than changing the field's fill so it does
  * not fight the hover transition.
  */
-export const syncFieldGroupHighlight = (fieldGroup: Konva.Group, level: FieldGroupHighlightLevel | null) => {
+export const syncFieldGroupHighlight = (
+  fieldGroup: Konva.Group,
+  level: FieldGroupHighlightLevel | null,
+  { isAnimated = true }: SyncFieldGroupHighlightOptions = {},
+) => {
   const existingHighlight = fieldGroup.findOne(`.${FIELD_GROUP_HIGHLIGHT_NAME}`);
 
   if (!level) {
@@ -191,14 +207,16 @@ export const syncFieldGroupHighlight = (fieldGroup: Konva.Group, level: FieldGro
     height: fieldRect.height(),
     cornerRadius: fieldRect.cornerRadius(),
     fill: fieldRect.stroke(),
-    opacity: 0,
+    opacity: isAnimated ? 0 : opacity,
     listening: false,
   });
 
   fieldGroup.add(highlightRect);
   highlightRect.zIndex(fieldRect.zIndex() + 1);
 
-  tweenFieldGroupHighlight(highlightRect, opacity);
+  if (isAnimated) {
+    tweenFieldGroupHighlight(highlightRect, opacity);
+  }
 };
 
 /**
@@ -217,6 +235,7 @@ const tweenFieldGroupHighlight = (highlight: Konva.Node, opacity: number, onFini
     duration: FIELD_GROUP_HIGHLIGHT_FADE_SECONDS,
     opacity,
     onFinish: () => {
+      tween.destroy();
       highlight.setAttr(FIELD_GROUP_HIGHLIGHT_TWEEN_ATTR, null);
       onFinish?.();
     },
@@ -234,6 +253,9 @@ type CreateFieldHoverInteractionOptions = {
 
 /**
  * Adds smooth transition-like behavior for hover effects to the field group and rectangle.
+ *
+ * Uses enter and leave rather than over and out, which fire whenever the pointer crosses
+ * from one of the field's shapes to another and would restart the fade each time.
  */
 export const createFieldHoverInteraction = ({ options, fieldGroup, fieldRect }: CreateFieldHoverInteractionOptions) => {
   const { mode } = options;
@@ -248,55 +270,66 @@ export const createFieldHoverInteraction = ({ options, fieldGroup, fieldRect }: 
 
   const hoverColor = getRecipientColorStyles(options.color).baseRingHover;
 
-  fieldGroup.on('mouseover', () => {
-    const layer = fieldRect.getLayer();
-    if (!layer) {
-      return;
-    }
+  fieldGroup.on('mouseenter', () => tweenFieldRectFill(fieldRect, hoverColor));
+  fieldGroup.on('mouseleave', () => tweenFieldRectFill(fieldRect, DEFAULT_RECT_BACKGROUND));
+  fieldGroup.on('transformstart', () => tweenFieldRectFill(fieldRect, hoverColor));
+  fieldGroup.on('transformend', () => tweenFieldRectFill(fieldRect, DEFAULT_RECT_BACKGROUND));
+};
 
-    new Konva.Tween({
-      node: fieldRect,
-      duration: 0.3,
-      fill: hoverColor,
-    }).play();
+/**
+ * Fades a field's fill to the given colour.
+ *
+ * Konva would interpolate the colour and its alpha separately. The fill fades between a
+ * nearly opaque white and a translucent recipient colour, so the field would look darkest
+ * part way through and then lighten. Mixing the premultiplied colours instead keeps the
+ * visible colour moving in one direction, whatever is behind the field.
+ */
+const tweenFieldRectFill = (fieldRect: Konva.Rect, fill: string) => {
+  if (!fieldRect.getLayer()) {
+    return;
+  }
+
+  const existingTween = fieldRect.getAttr(FIELD_FILL_TWEEN_ATTR);
+
+  // The fill is set from the progress attribute on every frame, so a tween left running
+  // would keep painting its own colours over the new one.
+  if (existingTween instanceof Konva.Tween) {
+    existingTween.destroy();
+  }
+
+  const currentFill = fieldRect.fill();
+  const from = Konva.Util.colorToRGBA(typeof currentFill === 'string' ? currentFill : fill);
+  const to = Konva.Util.colorToRGBA(fill);
+
+  if (!from || !to) {
+    fieldRect.fill(fill);
+    return;
+  }
+
+  fieldRect.setAttr(FIELD_FILL_PROGRESS_ATTR, 0);
+
+  const tween = new Konva.Tween({
+    node: fieldRect,
+    duration: FIELD_FILL_FADE_SECONDS,
+    [FIELD_FILL_PROGRESS_ATTR]: 1,
+    onUpdate: () => {
+      const progress: number = fieldRect.getAttr(FIELD_FILL_PROGRESS_ATTR);
+      const alpha = from.a + (to.a - from.a) * progress;
+
+      const mixChannel = (fromChannel: number, toChannel: number) =>
+        alpha === 0 ? 0 : Math.round((fromChannel * from.a * (1 - progress) + toChannel * to.a * progress) / alpha);
+
+      fieldRect.fill(
+        `rgba(${mixChannel(from.r, to.r)}, ${mixChannel(from.g, to.g)}, ${mixChannel(from.b, to.b)}, ${alpha})`,
+      );
+    },
+    onFinish: () => {
+      tween.destroy();
+      fieldRect.fill(fill);
+      fieldRect.setAttr(FIELD_FILL_TWEEN_ATTR, null);
+    },
   });
 
-  fieldGroup.on('mouseout', () => {
-    const layer = fieldRect.getLayer();
-    if (!layer) {
-      return;
-    }
-
-    new Konva.Tween({
-      node: fieldRect,
-      duration: 0.3,
-      fill: DEFAULT_RECT_BACKGROUND,
-    }).play();
-  });
-
-  fieldGroup.on('transformstart', () => {
-    const layer = fieldRect.getLayer();
-    if (!layer) {
-      return;
-    }
-
-    new Konva.Tween({
-      node: fieldRect,
-      duration: 0.3,
-      fill: hoverColor,
-    }).play();
-  });
-
-  fieldGroup.on('transformend', () => {
-    const layer = fieldRect.getLayer();
-    if (!layer) {
-      return;
-    }
-
-    new Konva.Tween({
-      node: fieldRect,
-      duration: 0.3,
-      fill: DEFAULT_RECT_BACKGROUND,
-    }).play();
-  });
+  fieldRect.setAttr(FIELD_FILL_TWEEN_ATTR, tween);
+  tween.play();
 };

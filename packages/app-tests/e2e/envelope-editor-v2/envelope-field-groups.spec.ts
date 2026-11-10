@@ -505,7 +505,9 @@ const runGroupInvalidationFlow = async (surface: TEnvelopeEditorSurface): Promis
   expect(await getKonvaElementCountForPage(root, 1, '.field-group')).toBe(4);
 
   // The clone is offset by 3% of the page from the original, so click just below the
-  // original's bottom edge to select the clone.
+  // original's bottom edge to select the clone. The original's action bar sits over that
+  // spot, so the selection is cleared first to remove it.
+  await getFieldsCanvas(root).click({ position: POSITIONS.rowFive });
   await selectFieldOnCanvas(root, DUPLICATE_RADIO_POSITION);
   await expect(root.getByTestId('field-form-values-0-checked')).toHaveAttribute('data-state', 'unchecked');
   await openFieldSettingsAdvancedSection(root);
