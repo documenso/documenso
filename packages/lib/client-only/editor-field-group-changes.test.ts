@@ -98,7 +98,7 @@ describe('resolveEditorFieldGroupChanges', () => {
     expect(reconciledA.fieldMeta.validationRule).toBeUndefined();
   });
 
-  it('removes the validation rule from the old group when a field leaves it', () => {
+  it('removes the validation rule from the old group and the leaving field when neither satisfies it', () => {
     const previousFields = [groupedCheckbox('a', 'A'), groupedCheckbox('b', 'B')];
 
     const { reconciledFields, validationRemovedGroupIds } = resolveEditorFieldGroupChanges({
@@ -110,9 +110,54 @@ describe('resolveEditorFieldGroupChanges', () => {
     expect(validationRemovedGroupIds).toEqual(['g']);
 
     const reconciledA = reconciledFields.find((field) => field.formId === 'a');
+    const reconciledB = reconciledFields.find((field) => field.formId === 'b');
 
     assert(reconciledA?.fieldMeta?.type === 'checkbox');
     expect(reconciledA.fieldMeta.validationRule).toBeUndefined();
+
+    // B's single option cannot satisfy "at least 2" on its own, and it is validated on its
+    // own once ungrouped.
+    assert(reconciledB?.fieldMeta?.type === 'checkbox');
+    expect(reconciledB.fieldMeta.validationRule).toBeUndefined();
+  });
+
+  it('keeps the validation rule on a leaving field which satisfies it on its own', () => {
+    const leaving = createLocalField({
+      formId: 'b',
+      type: FieldType.CHECKBOX,
+      groupId: 'g',
+      fieldMeta: checkboxMeta(['B1', 'B2'], atLeastTwo),
+    });
+
+    const previousFields = [groupedCheckbox('a', 'A'), leaving, groupedCheckbox('c', 'C')];
+
+    const { reconciledFields, validationRemovedGroupIds } = resolveEditorFieldGroupChanges({
+      previousFields,
+      nextFields: [previousFields[0], { ...leaving, groupId: null }, previousFields[2]],
+      changedFormIds: new Set(['b']),
+    });
+
+    expect(validationRemovedGroupIds).toEqual([]);
+
+    const reconciledB = reconciledFields.find((field) => field.formId === 'b');
+
+    assert(reconciledB?.fieldMeta?.type === 'checkbox');
+    expect(reconciledB.fieldMeta.validationRule).toBe('Select at least');
+  });
+
+  it('keeps a field out of a group of a different type or recipient', () => {
+    const existing = groupedCheckbox('a', 'A');
+    const otherType = createLocalField({ formId: 'b', type: FieldType.TEXT, groupId: 'other' });
+    const otherRecipient = createLocalField({ formId: 'c', type: FieldType.CHECKBOX, recipientId: 2 });
+
+    const { reconciledFields } = resolveEditorFieldGroupChanges({
+      previousFields: [existing, otherType, otherRecipient],
+      nextFields: [existing, { ...otherType, groupId: 'g' }, { ...otherRecipient, groupId: 'g' }],
+      changedFormIds: new Set(['b', 'c']),
+    });
+
+    expect(reconciledFields.find((field) => field.formId === 'b')?.groupId).toBe('other');
+    expect(reconciledFields.find((field) => field.formId === 'c')?.groupId).toBeNull();
   });
 
   it('unchecks a duplicated radio when the group already has a selection', () => {

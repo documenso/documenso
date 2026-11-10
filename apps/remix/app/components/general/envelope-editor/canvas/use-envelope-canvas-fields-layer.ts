@@ -19,7 +19,7 @@ import { useLingui } from '@lingui/react/macro';
 import type { FieldType } from '@prisma/client';
 import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { EnvelopeCanvas, EnvelopeCanvasBox } from './envelope-canvas-types';
 import { ENVELOPE_CANVAS_GROUP_NAMES } from './envelope-canvas-types';
@@ -51,6 +51,8 @@ export const useEnvelopeCanvasFieldsLayer = ({
   const analytics = useAnalytics();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
+
+  const [hoveredGroupedFieldFormId, setHoveredGroupedFieldFormId] = useState<string | null>(null);
 
   const { stage, pageLayer, scale, pageNumber, unscaledViewport, scaledViewport } = canvas;
   const { fieldGroups: selectedGroups, isTransforming } = selection;
@@ -96,17 +98,15 @@ export const useEnvelopeCanvasFieldsLayer = ({
 
   /**
    * How strongly each field on this page is tinted to show which fields act together.
-   * Hovering a grouped field highlights the rest of its group, and the rest of the
-   * selected field's group keeps a light tint.
+   * Hovering a grouped field highlights the rest of its group on this page, and the rest
+   * of the selected field's group keeps a light tint.
    */
   const groupHighlightLevels = useMemo(() => {
     const levels = new Map<string, FieldGroupHighlightLevel>();
 
-    const { hoveredGroupedFieldFormId, selectedField } = editorFields;
+    const { selectedField } = editorFields;
 
-    const hoveredGroupId = editorFields.localFields.find(
-      (field) => field.formId === hoveredGroupedFieldFormId,
-    )?.groupId;
+    const hoveredGroupId = localPageFields.find((field) => field.formId === hoveredGroupedFieldFormId)?.groupId;
 
     for (const field of localPageFields) {
       if (!field.groupId) {
@@ -121,7 +121,7 @@ export const useEnvelopeCanvasFieldsLayer = ({
     }
 
     return levels;
-  }, [editorFields.hoveredGroupedFieldFormId, editorFields.selectedField, editorFields.localFields, localPageFields]);
+  }, [hoveredGroupedFieldFormId, editorFields.selectedField, localPageFields]);
 
   // Read through a ref so the render path, which may run from a stale closure when the
   // stage is created, always paints the current highlight.
@@ -458,29 +458,29 @@ export const useEnvelopeCanvasFieldsLayer = ({
   };
 
   const changeSelectedRecipient = (recipientId: number) => {
-    for (const field of getSelectedFields()) {
-      if (field.recipientId !== recipientId) {
-        editorFields.updateFieldByFormId(field.formId, { recipientId, id: undefined });
-      }
-    }
+    const fieldsToUpdate = getSelectedFields().filter((field) => field.recipientId !== recipientId);
+
+    editorFields.updateFieldsByFormId(
+      fieldsToUpdate.map((field) => ({ formId: field.formId, updates: { recipientId, id: undefined } })),
+    );
   };
 
   const changeSelectedType = (type: FieldType) => {
-    for (const field of getSelectedFields()) {
-      if (field.type !== type) {
-        editorFields.updateFieldByFormId(field.formId, {
-          type,
-          fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[type]),
-          id: undefined,
-        });
-      }
-    }
+    const fieldsToUpdate = getSelectedFields().filter((field) => field.type !== type);
+
+    editorFields.updateFieldsByFormId(
+      fieldsToUpdate.map((field) => ({
+        formId: field.formId,
+        updates: { type, fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[type]), id: undefined },
+      })),
+    );
   };
 
   return {
     localPageFields,
     renderAll,
     selectInBox,
+    setHoveredGroupedFieldFormId,
     pendingCreation: pending.pendingCreation,
     createFromPending,
     clearPending: pending.clearPending,

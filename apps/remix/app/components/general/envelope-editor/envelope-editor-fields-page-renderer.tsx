@@ -204,10 +204,10 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       // the lookup reads the live form values rather than a render's copy of the fields.
       const hoveredField = hoveredFieldGroup ? editorFields.getFieldByFormId(hoveredFieldGroup.id()) : undefined;
 
-      editorFields.setHoveredGroupedFieldFormId(hoveredField?.groupId ? hoveredField.formId : null);
+      fields.setHoveredGroupedFieldFormId(hoveredField?.groupId ? hoveredField.formId : null);
     });
 
-    currentStage.on('mouseleave', () => editorFields.setHoveredGroupedFieldFormId(null));
+    currentStage.on('mouseleave', () => fields.setHoveredGroupedFieldFormId(null));
 
     currentPageLayer.batchDraw();
   };
