@@ -1,10 +1,15 @@
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
+import { useLatestRef } from '@documenso/lib/client-only/hooks/use-latest-ref';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import type { EnvelopePageItemsVisibility } from '@documenso/lib/types/envelope-page-items-visibility';
 import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
+import {
+  type FieldGroupHighlightLevel,
+  syncFieldGroupHighlight,
+} from '@documenso/lib/universal/field-renderer/field-generic-items';
 import { MIN_FIELD_HEIGHT_PX, MIN_FIELD_WIDTH_PX } from '@documenso/lib/universal/field-renderer/field-renderer';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
@@ -88,6 +93,39 @@ export const useEnvelopeCanvasFieldsLayer = ({
 
     return formIds;
   }, [debouncedPageFields]);
+
+  /**
+   * How strongly each field on this page is tinted to show which fields act together.
+   * Hovering a grouped field highlights the rest of its group, and the rest of the
+   * selected field's group keeps a light tint.
+   */
+  const groupHighlightLevels = useMemo(() => {
+    const levels = new Map<string, FieldGroupHighlightLevel>();
+
+    const { hoveredGroupedFieldFormId, selectedField } = editorFields;
+
+    const hoveredGroupId = editorFields.localFields.find(
+      (field) => field.formId === hoveredGroupedFieldFormId,
+    )?.groupId;
+
+    for (const field of localPageFields) {
+      if (!field.groupId) {
+        continue;
+      }
+
+      if (field.groupId === hoveredGroupId && field.formId !== hoveredGroupedFieldFormId) {
+        levels.set(field.formId, 'primary');
+      } else if (field.groupId === selectedField?.groupId && field.formId !== selectedField.formId) {
+        levels.set(field.formId, 'secondary');
+      }
+    }
+
+    return levels;
+  }, [editorFields.hoveredGroupedFieldFormId, editorFields.selectedField, editorFields.localFields, localPageFields]);
+
+  // Read through a ref so the render path, which may run from a stale closure when the
+  // stage is created, always paints the current highlight.
+  const groupHighlightLevelsRef = useLatestRef(groupHighlightLevels);
 
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
     const isDragEvent = event.type === 'dragend';
@@ -218,6 +256,10 @@ export const useEnvelopeCanvasFieldsLayer = ({
     });
 
     syncOverlapHighlight(fieldGroup, overlappingFieldFormIds.has(field.formId));
+
+    syncFieldGroupHighlight(fieldGroup, groupHighlightLevelsRef.current.get(field.formId) ?? null, {
+      isAnimated: false,
+    });
 
     if (!isFieldEditable) {
       return;
@@ -360,6 +402,28 @@ export const useEnvelopeCanvasFieldsLayer = ({
     editorFields.selectedField?.formId,
     fieldsVisibility,
   ]);
+
+  /**
+   * Highlights don't change the field data, so sync them directly whenever they change.
+   * Full re-renders pick them up through the render path.
+   */
+  useEffect(() => {
+    const layer = pageLayer.current;
+
+    if (!layer) {
+      return;
+    }
+
+    for (const field of localPageFields) {
+      const fieldGroup = layer.findOne(`#${field.formId}`);
+
+      if (fieldGroup instanceof Konva.Group) {
+        syncFieldGroupHighlight(fieldGroup, groupHighlightLevels.get(field.formId) ?? null);
+      }
+    }
+
+    layer.batchDraw();
+  }, [groupHighlightLevels, localPageFields]);
 
   // Otherwise the transformer and floating toolbars would remain anchored to hidden fields.
   useEffect(() => {
