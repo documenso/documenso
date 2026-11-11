@@ -21,7 +21,17 @@ export const SignFieldSignatureDialog = createCallable<SignFieldSignatureDialogP
 
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent position="center">
+        <DialogContent
+          position="center"
+          onOpenAutoFocus={(event) => {
+            if (!(event.currentTarget instanceof HTMLElement)) {
+              return;
+            }
+
+            event.preventDefault();
+            event.currentTarget.focus({ preventScroll: true });
+          }}
+        >
           <div>
             <DialogHeader>
               <DialogTitle>
