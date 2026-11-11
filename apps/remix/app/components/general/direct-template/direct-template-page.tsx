@@ -146,7 +146,7 @@ export const DirectTemplatePageView = ({
   const currentDocumentFlow = directTemplateFlow[step];
 
   return (
-    <div className="grid w-full grid-cols-12 gap-8">
+    <div className="grid w-full grid-cols-12 gap-y-8 lg:gap-x-8">
       <Card className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7" gradient>
         <CardContent className="p-2">
           <PDFViewerLazy

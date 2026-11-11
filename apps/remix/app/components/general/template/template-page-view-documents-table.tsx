@@ -170,7 +170,7 @@ export const TemplatePageViewDocumentsTable = ({ templateId }: TemplatePageViewD
 
   return (
     <div>
-      <div className="mb-4 flex flex-row space-x-4">
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-0 sm:space-x-4">
         <DocumentSearch />
 
         <SearchParamSelector

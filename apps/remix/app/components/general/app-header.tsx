@@ -86,12 +86,12 @@ export const Header = ({ className, fullWidth = false, ...props }: HeaderProps) 
           <OrgMenuSwitcher />
         </div>
 
-        <div className="flex flex-row items-center space-x-4 md:hidden">
-          <button onClick={() => setIsCommandMenuOpen(true)}>
+        <div className="flex flex-row items-center gap-x-4 md:hidden">
+          <button className="-m-2 p-2" onClick={() => setIsCommandMenuOpen(true)}>
             <SearchIcon className="h-6 w-6 text-muted-foreground" />
           </button>
 
-          <button onClick={() => setIsHamburgerMenuOpen(true)}>
+          <button className="-m-2 p-2" onClick={() => setIsHamburgerMenuOpen(true)}>
             <MenuIcon className="h-6 w-6 text-muted-foreground" />
           </button>
 
