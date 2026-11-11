@@ -1,6 +1,7 @@
 import { authClient } from '@documenso/auth/client';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
+import { getReturnToFromRequest, withReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
@@ -13,7 +14,7 @@ import { match } from 'ts-pattern';
 
 import type { Route } from './+types/verify-email.$token';
 
-export const loader = ({ params }: Route.LoaderArgs) => {
+export const loader = ({ params, request }: Route.LoaderArgs) => {
   const { token } = params;
 
   if (!token) {
@@ -22,11 +23,12 @@ export const loader = ({ params }: Route.LoaderArgs) => {
 
   return {
     token,
+    returnTo: getReturnToFromRequest(request),
   };
 };
 
 export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
-  const { token } = loaderData;
+  const { token, returnTo } = loaderData;
 
   const { refreshSession } = useOptionalSession();
   const { _ } = useLingui();
@@ -42,6 +44,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
     try {
       const response = await authClient.emailPassword.verifyEmail({
         token,
+        returnTo,
       });
 
       await refreshSession();
@@ -146,7 +149,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
             </p>
 
             <Button className="mt-4" asChild>
-              <Link to="/">
+              <Link to={returnTo ?? '/'}>
                 <Trans>Continue</Trans>
               </Link>
             </Button>
@@ -170,11 +173,23 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
               <Trans>Your email has already been confirmed. You can now use all features of Documenso.</Trans>
             </p>
 
-            <Button className="mt-4" asChild>
-              <Link to="/">
-                <Trans>Go back home</Trans>
-              </Link>
-            </Button>
+            {/*
+             * Verifying signs the user in, but an already verified token does
+             * not, so the destination has to go through sign in first.
+             */}
+            {returnTo ? (
+              <Button className="mt-4" asChild>
+                <Link to={withReturnTo('/signin', returnTo)}>
+                  <Trans>Continue</Trans>
+                </Link>
+              </Button>
+            ) : (
+              <Button className="mt-4" asChild>
+                <Link to="/">
+                  <Trans>Go back home</Trans>
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>

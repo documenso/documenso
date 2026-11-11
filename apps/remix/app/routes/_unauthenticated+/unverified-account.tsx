@@ -1,9 +1,20 @@
+import { getReturnToFromRequest } from '@documenso/lib/utils/is-valid-return-to';
 import { Trans } from '@lingui/react/macro';
 import { Mails } from 'lucide-react';
 
 import { SendConfirmationEmailForm } from '~/components/forms/send-confirmation-email';
 
-export default function UnverifiedAccount() {
+import type { Route } from './+types/unverified-account';
+
+export const loader = ({ request }: Route.LoaderArgs) => {
+  return {
+    returnTo: getReturnToFromRequest(request),
+  };
+};
+
+export default function UnverifiedAccount({ loaderData }: Route.ComponentProps) {
+  const { returnTo } = loaderData;
+
   return (
     <div className="w-screen max-w-lg px-4">
       <div className="flex items-start">
@@ -26,7 +37,7 @@ export default function UnverifiedAccount() {
             <Trans>If you don't find the confirmation link in your inbox, you can request a new one below.</Trans>
           </p>
 
-          <SendConfirmationEmailForm />
+          <SendConfirmationEmailForm returnTo={returnTo} />
         </div>
       </div>
     </div>

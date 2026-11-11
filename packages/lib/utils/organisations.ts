@@ -42,6 +42,10 @@ export const formatOrganisationAnalyticsPath = (organisationUrl: string) => {
   return `/o/${organisationUrl}/analytics`;
 };
 
+export const formatOrganisationInvitePath = (token: string) => {
+  return `/organisation/invite/${token}`;
+};
+
 /**
  * Compares the provided `currentUserRole` with the provided `roleToCheck` to determine
  * whether the `currentUserRole` has permission to modify the `roleToCheck`.

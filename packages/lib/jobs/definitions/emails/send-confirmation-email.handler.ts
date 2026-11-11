@@ -5,5 +5,6 @@ export const run = async ({ payload }: { payload: TSendConfirmationEmailJobDefin
   await sendConfirmationToken({
     email: payload.email,
     force: payload.force,
+    returnTo: payload.returnTo,
   });
 };
