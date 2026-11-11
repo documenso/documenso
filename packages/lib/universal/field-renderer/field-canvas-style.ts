@@ -2,6 +2,7 @@ import {
   FIELD_PROBE_ANCHOR_SELECTOR,
   FIELD_ROOT_CONTAINER_PROBE_CLASS_NAME,
 } from '@documenso/ui/lib/field-root-container-classes';
+import { DEFAULT_RECT_BACKGROUND } from '@documenso/ui/lib/recipient-colors';
 import { colord } from 'colord';
 
 import { KONVA_TRANSPARENT_FILL } from '../konva/constants';
@@ -95,6 +96,13 @@ const createFieldProbeElement = (field: FieldToRender): HTMLElement => {
   return $probe;
 };
 
+/**
+ * Whether a probed background is the same colour as the renderer default, ignoring alpha.
+ */
+const isDefaultBackgroundColor = (color: string) => {
+  return colord(color).alpha(1).toHex() === colord(DEFAULT_RECT_BACKGROUND).alpha(1).toHex();
+};
+
 const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyle | undefined => {
   if (typeof document === 'undefined' || typeof window === 'undefined') {
     return undefined;
@@ -122,8 +130,10 @@ const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyl
     const hasBorderStyle = computedStyle.borderTopStyle !== 'none' && Boolean(borderWidth);
     const borderRadius = getPixelValue(computedStyle.borderTopLeftRadius);
 
+    const backgroundColor = getRenderableColor(computedStyle.backgroundColor);
+
     return {
-      backgroundColor: getRenderableColor(computedStyle.backgroundColor),
+      backgroundColor: backgroundColor && isDefaultBackgroundColor(backgroundColor) ? undefined : backgroundColor,
       borderColor: hasBorderStyle ? borderColor : undefined,
       borderRadius,
       borderWidth: hasBorderStyle ? borderWidth : undefined,

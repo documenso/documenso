@@ -39,6 +39,7 @@ import { isDocumentCompleted } from '../../utils/document';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { assertEnvelopeContentLimits, getContentsMissingImages } from '../../utils/envelope-content';
+import { assertFieldGroupsValid, groupFieldsByGroupId } from '../../utils/field-groups';
 import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
@@ -307,6 +308,11 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
 
   // Validate and autoinsert fields for V2 envelopes.
   if (envelope.internalVersion === 2) {
+    // Grouped fields must be in a valid state before the document can be sent.
+    assertFieldGroupsValid(envelope.fields);
+
+    const groupedFields = groupFieldsByGroupId(envelope.fields);
+
     for (const unknownField of envelope.fields) {
       const recipient = envelope.recipients.find((r) => r.id === unknownField.recipientId);
 
@@ -316,12 +322,42 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
         });
       }
 
+      // Only auto-insert fields if the recipient has not been sent the document yet.
+      if (recipient.sendStatus === SendStatus.SENT) {
+        continue;
+      }
+
+      // Grouped radio and checkbox fields are handled as a whole group below.
+      if (unknownField.groupId && isPooledOptionFieldType(unknownField.type)) {
+        continue;
+      }
+
       const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField, recipient);
 
-      // Only auto-insert fields if the recipient has not been sent the document yet.
-      if (fieldToAutoInsert && recipient.sendStatus !== SendStatus.SENT) {
+      if (fieldToAutoInsert) {
         fieldsToAutoInsert.push(fieldToAutoInsert);
       }
+    }
+
+    /*
+      Grouped radio and checkbox fields pool their options, so pre-checked values and
+      validation rules are evaluated across the whole group. Either every field in the
+      group is auto-inserted or none are.
+    */
+    for (const items of groupedFields.values()) {
+      const [firstItem] = items;
+
+      if (!firstItem || !isPooledOptionFieldType(firstItem.type)) {
+        continue;
+      }
+
+      const recipient = envelope.recipients.find((r) => r.id === firstItem.recipientId);
+
+      if (!recipient || recipient.sendStatus === SendStatus.SENT) {
+        continue;
+      }
+
+      fieldsToAutoInsert.push(...extractGroupedOptionFieldAutoInsertValues(items));
     }
   }
 
@@ -608,4 +644,92 @@ export const extractFieldAutoInsertValues = (
   }
 
   return null;
+};
+
+const isPooledOptionFieldType = (type: FieldType): boolean => {
+  return type === FieldType.RADIO || type === FieldType.CHECKBOX;
+};
+
+/**
+ * Extracts the auto insertion values for a group of radio or checkbox fields.
+ *
+ * Pre-checked options are pooled across the group. If the group should be auto
+ * inserted, every field is returned so the whole group is inserted together,
+ * with fields that have no checked options receiving an empty value.
+ *
+ * Returns an empty list if the group should not be auto inserted.
+ */
+export const extractGroupedOptionFieldAutoInsertValues = (
+  items: Field[],
+): { fieldId: number; customText: string }[] => {
+  const [firstItem] = items;
+
+  if (!firstItem) {
+    return [];
+  }
+
+  if (firstItem.type === FieldType.RADIO) {
+    const itemWithCheckedOption = items.find((item) => {
+      const { values = [] } = ZRadioFieldMeta.parse(item.fieldMeta);
+
+      return values.some((value) => value.checked);
+    });
+
+    if (!itemWithCheckedOption) {
+      return [];
+    }
+
+    return items.map((item) => {
+      if (item.id !== itemWithCheckedOption.id) {
+        return {
+          fieldId: item.id,
+          customText: '',
+        };
+      }
+
+      const { values = [] } = ZRadioFieldMeta.parse(item.fieldMeta);
+
+      return {
+        fieldId: item.id,
+        customText: toRadioCustomText(values.findIndex((value) => value.checked)),
+      };
+    });
+  }
+
+  if (firstItem.type === FieldType.CHECKBOX) {
+    const { validationRule, validationLength } = ZCheckboxFieldMeta.parse(firstItem.fieldMeta);
+
+    const itemCheckedIndices = items.map((item) => {
+      const { values = [] } = ZCheckboxFieldMeta.parse(item.fieldMeta);
+
+      return values.flatMap((value, index) => (value.checked ? [index] : []));
+    });
+
+    const totalCheckedCount = itemCheckedIndices.reduce((total, indices) => total + indices.length, 0);
+
+    if (totalCheckedCount === 0) {
+      return [];
+    }
+
+    if (validationRule && validationLength) {
+      const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
+
+      if (!validation) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Invalid checkbox validation rule',
+        });
+      }
+
+      if (!validateCheckboxLength(totalCheckedCount, validation.value, validationLength)) {
+        return [];
+      }
+    }
+
+    return items.map((item, index) => ({
+      fieldId: item.id,
+      customText: itemCheckedIndices[index].length > 0 ? toCheckboxCustomText(itemCheckedIndices[index]) : '',
+    }));
+  }
+
+  return [];
 };

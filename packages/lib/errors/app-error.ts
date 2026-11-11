@@ -59,9 +59,11 @@ export enum AppErrorCode {
 
   /**
    * A completion request was made for a recipient that still has required
-   * fields which have not been inserted. Usually indicates the client's field
-   * state is out of sync with the server (e.g. a field insert failed to
-   * persist before submission).
+   * fields which have not been inserted, or on V2 envelopes, inserted fields
+   * which break their validation rules (e.g. a checkbox group without enough
+   * options selected). Usually indicates the client's field state is out of
+   * sync with the server (e.g. a field insert failed to persist before
+   * submission).
    */
   RECIPIENT_HAS_UNSIGNED_FIELDS = 'RECIPIENT_HAS_UNSIGNED_FIELDS',
 

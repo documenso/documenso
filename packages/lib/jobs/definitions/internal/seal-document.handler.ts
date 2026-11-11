@@ -28,10 +28,10 @@ import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../
 import { prefixedId } from '../../../universal/id';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../../universal/upload/put-file.server';
-import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
 import { isDocumentCompleted } from '../../../utils/document';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { mapDocumentIdToSecondaryId } from '../../../utils/envelope';
+import { hasIncompleteFields } from '../../../utils/signing-items';
 import { jobs } from '../../client';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSealDocumentJobDefinition } from './seal-document';
@@ -126,8 +126,8 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
     const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
 
     // Skip the field check if the document is rejected
-    if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
-      throw new Error(`Document ${envelope.id} has unsigned required fields`);
+    if (!isRejected && hasIncompleteFields(envelope.internalVersion, fields)) {
+      throw new Error(`Document ${envelope.id} has unsigned or invalid required fields`);
     }
 
     if (isResealing) {

@@ -33,6 +33,12 @@ export const ENVELOPE_CANVAS_GROUP_NAMES: Record<EnvelopeCanvasSelectionKind, st
 };
 
 /**
+ * Set on each rendered field group so the stage's hover handler, which only sees Konva
+ * nodes, can tell whether the field under the pointer belongs to a group.
+ */
+export const ENVELOPE_CANVAS_IS_GROUPED_ATTR = 'isGrouped';
+
+/**
  * A box in scaled stage coordinates, e.g. from a client rect.
  */
 export type EnvelopeCanvasBox = {

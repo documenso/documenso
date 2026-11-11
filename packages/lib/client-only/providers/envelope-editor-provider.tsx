@@ -840,6 +840,8 @@ const mapLocalFieldsToFields = ({
       inserted: foundField?.inserted || false,
       customText: foundField?.customText || '',
       fieldMeta: field.fieldMeta || null,
+      groupId: field.groupId ?? null,
+      externalId: field.externalId ?? null,
     };
   });
 };

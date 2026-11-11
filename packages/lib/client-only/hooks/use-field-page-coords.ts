@@ -3,7 +3,18 @@ import { PDF_VIEWER_CONTENT_SELECTOR, PDF_VIEWER_PAGE_SELECTOR } from '@documens
 import type { Field } from '@prisma/client';
 import { useCallback, useEffect, useState } from 'react';
 
-export const useFieldPageCoords = (field: Pick<Field, 'positionX' | 'positionY' | 'width' | 'height' | 'page'>) => {
+type UseFieldPageCoordsOptions = {
+  /**
+   * Measure from the top left of the field's page rather than the document, for elements
+   * rendered inside the page.
+   */
+  relativeToPage?: boolean;
+};
+
+export const useFieldPageCoords = (
+  field: Pick<Field, 'positionX' | 'positionY' | 'width' | 'height' | 'page'>,
+  { relativeToPage = false }: UseFieldPageCoordsOptions = {},
+) => {
   const [coords, setCoords] = useState({
     x: 0,
     y: 0,
@@ -20,9 +31,12 @@ export const useFieldPageCoords = (field: Pick<Field, 'positionX' | 'positionY' 
 
     const { top, left, height, width } = getBoundingClientRect($page);
 
+    const offsetX = relativeToPage ? 0 : left;
+    const offsetY = relativeToPage ? 0 : top;
+
     // X and Y are percentages of the page's height and width
-    const fieldX = (Number(field.positionX) / 100) * width + left;
-    const fieldY = (Number(field.positionY) / 100) * height + top;
+    const fieldX = (Number(field.positionX) / 100) * width + offsetX;
+    const fieldY = (Number(field.positionY) / 100) * height + offsetY;
 
     const fieldHeight = (Number(field.height) / 100) * height;
     const fieldWidth = (Number(field.width) / 100) * width;
@@ -33,7 +47,7 @@ export const useFieldPageCoords = (field: Pick<Field, 'positionX' | 'positionY' 
       height: fieldHeight,
       width: fieldWidth,
     });
-  }, [field.height, field.page, field.positionX, field.positionY, field.width]);
+  }, [field.height, field.page, field.positionX, field.positionY, field.width, relativeToPage]);
 
   useEffect(() => {
     calculateCoords();

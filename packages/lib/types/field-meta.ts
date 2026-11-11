@@ -44,7 +44,8 @@ export const resolveFieldOverflowMode = (fieldMeta?: { overflow?: TFieldOverflow
 };
 
 /**
- * Grouped field types that use the same generic text rendering function.
+ * Metas of the field types rendered by the generic text field renderer. Keep in sync with
+ * the generic text field branch in `renderField`.
  */
 export type GenericTextFieldTypeMetas =
   | TInitialsFieldMeta
@@ -158,8 +159,14 @@ export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
 
 export type TNumberFieldMeta = z.infer<typeof ZNumberFieldMeta>;
 
+const ZHideOptionLabels = z
+  .boolean()
+  .nullish()
+  .describe('Whether to hide the text next to each option when rendering the field.');
+
 export const ZRadioFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('radio'),
+  hideLabel: ZHideOptionLabels,
   values: z
     .array(
       z.object({
@@ -176,6 +183,7 @@ export type TRadioFieldMeta = z.infer<typeof ZRadioFieldMeta>;
 
 export const ZCheckboxFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('checkbox'),
+  hideLabel: ZHideOptionLabels,
   values: z
     .array(
       z.object({

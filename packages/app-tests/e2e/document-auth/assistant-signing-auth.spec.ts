@@ -102,8 +102,7 @@ test.describe('[ASSISTANT_SIGNING_AUTH]: cross-envelope field access', () => {
 
     const res = await trpcMutation(request, 'envelope.field.sign', {
       token: assistantToken,
-      fieldId: otherEnvelopeFieldId,
-      fieldValue: { type: FieldType.TEXT, value: 'TEXT' },
+      fieldValues: [{ fieldId: otherEnvelopeFieldId, fieldValue: { type: FieldType.TEXT, value: 'TEXT' } }],
     });
 
     expect(res.ok()).toBeFalsy();
