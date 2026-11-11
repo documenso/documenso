@@ -180,7 +180,7 @@ test.describe('V2 envelope field groups during signing', () => {
     await expectFieldsRemaining(page, 5);
   });
 
-  test('checkbox selections are pooled and validated on completion', async ({ page, request }) => {
+  test('checkbox selections are counted across the group and validated on completion', async ({ page, request }) => {
     const checkboxGroupId = 'grp_checkbox';
 
     const atLeastTwo = { validationRule: 'Select at least', validationLength: 2 };
@@ -272,7 +272,7 @@ test.describe('V2 envelope field groups during signing', () => {
     // reach it, coloured to match the pending state.
     await expect(getGroupBar(page, checkboxA.id)).toContainText('1 of 2');
 
-    // Ticking an option on the sibling satisfies the pooled rule.
+    // Ticking an option on the sibling satisfies the group's rule.
     await clickKonvaFieldOption(page, 1, checkboxB.id, { type: 'checkbox', index: 1 });
 
     await expectFieldsInDatabase([

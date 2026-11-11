@@ -262,7 +262,7 @@ test.describe('V2 field groups PDF', () => {
     // Checkbox groups on page 6.
     await scrollToSigningPage(page, 6);
 
-    // "At least 2": one tick is accepted but blocks completion until the pool has two, so
+    // "At least 2": one tick is accepted but blocks completion until the group has two, so
     // the field without a tick still counts.
     await clickKonvaFieldOption(page, 6, atLeastA.id, { type: 'checkbox', index: 0 });
     await expectFieldsInDatabase([

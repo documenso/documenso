@@ -122,7 +122,7 @@ describe('validateFieldGroup', () => {
     expect(errors).toEqual([]);
   });
 
-  it('pools checkbox options when evaluating validation rules', () => {
+  it('counts checkbox options across the group when evaluating validation rules', () => {
     const items = [
       {
         type: FieldType.CHECKBOX,
@@ -142,10 +142,10 @@ describe('validateFieldGroup', () => {
       },
     ];
 
-    // Each field only has 1 option but the pool has 2, which satisfies the rule.
+    // Each field only has 1 option but the group has 2, which satisfies the rule.
     expect(validateFieldGroup('g', items)).toEqual([]);
 
-    // A single field on its own does not have enough pooled options.
+    // A single field on its own does not have enough options.
     expect(validateFieldGroup('g', [items[0]]).some((error) => error.includes('at least 2'))).toBe(true);
   });
 

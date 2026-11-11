@@ -18,9 +18,9 @@ type ValidateFieldMetaOptions = {
   type: FieldType;
   fieldMeta: unknown;
   /**
-   * Grouped checkbox and radio fields are validated as a pool via
+   * Grouped checkbox and radio fields are validated as a whole group via
    * `assertFieldGroupsValid` instead of individually, since validation rules
-   * apply to the combined options of the whole group.
+   * apply to the options across the whole group.
    */
   groupId?: string | null;
 };

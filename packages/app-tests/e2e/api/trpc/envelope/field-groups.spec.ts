@@ -210,7 +210,7 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     expect(deleteResponse.ok()).toBeFalsy();
   });
 
-  test('distribution validates groups and auto inserts pre-checked pools', async ({ request }) => {
+  test('distribution validates groups and auto inserts groups with pre-checked options', async ({ request }) => {
     const ctx = await apiCreateTestContext('e2e-field-groups-distribute');
 
     const { envelope, token } = await apiSeedDraftDocument(request, {
@@ -383,7 +383,7 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
 
     await expectTrpcErrorCode(unsignedCompleteResponse, AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS);
 
-    // A single tick is accepted but the pooled rule is not satisfied.
+    // A single tick is accepted but the group's rule is not satisfied.
     const singleTickResponse = await postTrpc(request, 'envelope.field.sign', {
       token: recipientToken,
       fieldId: checkboxA.id,

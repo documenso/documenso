@@ -445,7 +445,7 @@ const runGroupInvalidationFlow = async (surface: TEnvelopeEditorSurface): Promis
   const root = surface.root;
   const externalId = await prepareFieldsStep(surface, 'e2e-field-group-invalidation');
 
-  // Three single option checkboxes requiring at least three pooled options.
+  // Three single option checkboxes requiring at least three options across the group.
   await placeFieldOnCanvas(root, 'Checkbox', POSITIONS.rowOne);
   const checkboxGroupId = await createFieldSettingsGroup(root);
 
@@ -461,11 +461,11 @@ const runGroupInvalidationFlow = async (surface: TEnvelopeEditorSurface): Promis
   await root.getByRole('option', { name: '3', exact: true }).click();
 
   // Selecting a length adds options to the edited field to satisfy the rule on its own,
-  // so trim it back to one option to rely on the pool.
+  // so trim it back to one option to rely on the rest of the group.
   await root.getByTestId('field-form-values-2-remove').click();
   await root.getByTestId('field-form-values-1-remove').click();
 
-  // Deleting a field drops the pool below the rule, so the rule is removed.
+  // Deleting a field drops the group's options below the rule, so the rule is removed.
   await selectFieldOnCanvas(root, POSITIONS.rowThree);
   await getFieldActionToolbarButton(root, 'Remove').click();
   await expectToastTextToBeVisible(root, TEST_VALUES.validationRemovedToast);
@@ -475,8 +475,8 @@ const runGroupInvalidationFlow = async (surface: TEnvelopeEditorSurface): Promis
   await selectFieldOnCanvas(root, POSITIONS.rowOne);
   await expect(root.getByTestId('field-form-validationLength')).toContainText('Pick a number');
 
-  // Re-apply "at least 3". The edited field gains two options so the pool is four, then
-  // removing options in the sidebar drops the pool below the rule again.
+  // Re-apply "at least 3". The edited field gains two options so the group has four, then
+  // removing options in the sidebar drops the group below the rule again.
   await root.getByTestId('field-form-validationRule').click();
   await root.getByRole('option', { name: 'Select at least' }).click();
   await root.getByTestId('field-form-validationLength').click();

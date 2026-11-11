@@ -23,8 +23,8 @@ export const canFieldTypeBeGrouped = (type: FieldType): boolean => {
  * Field types where every field in a group holds the same value, so inserting or
  * uninserting one field applies to the whole group.
  *
- * Radio and checkbox groups instead pool their options across fields, so each field
- * holds its own portion of the group's value.
+ * Radio and checkbox groups don't share a value. Each field keeps its own options and
+ * selection, and the group's rules count selections across all of its fields.
  */
 export const FIELD_GROUP_SHARED_VALUE_TYPES: FieldType[] = [
   FieldType.TEXT,

@@ -97,7 +97,7 @@ describe('reconcileFieldGroup', () => {
     expect(fieldMeta.values).toEqual([{ id: 2, checked: false, value: 'B' }]);
   });
 
-  it('removes the validation rule when the pooled options no longer satisfy it', () => {
+  it('removes the validation rule when the options across the group no longer satisfy it', () => {
     const result = reconcileFieldGroup({ groupId: 'g', items: [checkboxItem(1, 'A')] });
 
     expect(result.isValidationRemoved).toBe(true);

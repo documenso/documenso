@@ -128,7 +128,7 @@ describe('getPendingSigningItems', () => {
     expect(getPendingSigningItems([field])).toHaveLength(0);
   });
 
-  it('pools checkbox selections across a group when evaluating the rule', () => {
+  it('counts checkbox selections across a group when evaluating the rule', () => {
     const fields = [
       createField({
         id: 1,
@@ -150,7 +150,7 @@ describe('getPendingSigningItems', () => {
 
     expect(getPendingSigningItems(fields)).toHaveLength(0);
 
-    // Unticking one field drops the pool below the rule.
+    // Unticking one field drops the group's selections below the rule.
     fields[1].customText = '';
 
     const [item] = getPendingSigningItems(fields);

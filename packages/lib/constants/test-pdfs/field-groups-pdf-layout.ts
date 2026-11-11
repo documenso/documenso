@@ -100,7 +100,7 @@ export const FIELD_GROUPS_PDF_PAGES: TFieldGroupsPdfPageSpec[] = [
   },
   {
     title: 'Radio Group',
-    description: 'Options pooled across three fields. Only one option can be selected in the group.',
+    description: 'One group across three fields, each with its own options. Only one can be selected.',
     rows: [
       { label: 'Radio group (fields A, B)', cells: ['column', 'column'] },
       { label: 'Radio group (field C, pre-checked)', cells: ['column'] },
@@ -108,7 +108,7 @@ export const FIELD_GROUPS_PDF_PAGES: TFieldGroupsPdfPageSpec[] = [
   },
   {
     title: 'Checkbox Groups',
-    description: 'Options pooled across fields. Validation rules apply to the whole group.',
+    description: 'Each field has its own options. Validation rules apply to the whole group.',
     rows: [
       { label: 'At least 2 across the group (fields A, B)', cells: ['column', 'column'] },
       { label: 'Exactly 1 across the group (fields A, B)', cells: ['column', 'column'] },
