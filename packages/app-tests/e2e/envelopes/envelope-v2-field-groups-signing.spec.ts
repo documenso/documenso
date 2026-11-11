@@ -397,6 +397,39 @@ test.describe('V2 envelope field groups during signing', () => {
     }).toPass();
   });
 
+  test('direct template signing auto inserts pre-checked options across a checkbox group', async ({
+    page,
+    request,
+  }) => {
+    const checkboxGroupId = 'grp_direct_prechecked';
+    const atLeastTwo = { validationRule: 'Select at least', validationLength: 2 };
+
+    const prechecked = (externalId: string, positionY: number, value: string) => ({
+      type: FieldType.CHECKBOX,
+      page: 1,
+      positionX: 5,
+      positionY,
+      ...FIELD_SIZE,
+      groupId: checkboxGroupId,
+      externalId,
+      fieldMeta: { type: 'checkbox', required: true, values: [option(1, value, true)], ...atLeastTwo },
+    });
+
+    const { directLink } = await apiSeedDirectTemplate(request, {
+      title: '[TEST] Direct template with a pre-checked checkbox group',
+      recipients: [
+        { email: 'direct-prechecked-recipient@documenso.com', name: 'Direct Prechecked Recipient', role: 'SIGNER' },
+      ],
+      fieldsPerRecipient: [[SIGNATURE_FIELD, prechecked('checkbox-a', 10, 'A1'), prechecked('checkbox-b', 25, 'B1')]],
+    });
+
+    await openSigningPage(page, `/d/${directLink.token}`);
+
+    // Each field has one pre-checked option, which meets "at least 2" across the group but
+    // not on either field alone, so only the signature is left.
+    await expectFieldsRemaining(page, 1);
+  });
+
   test('document tabs count every field in a group', async ({ page, request }) => {
     const textMeta = { type: 'text', required: true, label: 'Company' };
 

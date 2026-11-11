@@ -39,6 +39,7 @@ import { isDocumentCompleted } from '../../utils/document';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { assertEnvelopeContentLimits, getContentsMissingImages } from '../../utils/envelope-content';
+import { assertFieldGroupsValid, groupFieldsByGroupId } from '../../utils/field-groups';
 import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
@@ -307,21 +308,28 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
 
   // Validate and autoinsert fields for V2 envelopes.
   if (envelope.internalVersion === 2) {
-    for (const unknownField of envelope.fields) {
-      const recipient = envelope.recipients.find((r) => r.id === unknownField.recipientId);
+    // Grouped fields must be in a valid state before the document can be sent.
+    assertFieldGroupsValid(envelope.fields);
 
-      if (!recipient) {
-        throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'Recipient not found',
-        });
-      }
+    const hasFieldWithoutRecipient = envelope.fields.some(
+      (field) => !envelope.recipients.some((recipient) => recipient.id === field.recipientId),
+    );
 
-      const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField, recipient);
+    if (hasFieldWithoutRecipient) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Recipient not found',
+      });
+    }
 
+    for (const recipient of envelope.recipients) {
       // Only auto-insert fields if the recipient has not been sent the document yet.
-      if (fieldToAutoInsert && recipient.sendStatus !== SendStatus.SENT) {
-        fieldsToAutoInsert.push(fieldToAutoInsert);
+      if (recipient.sendStatus === SendStatus.SENT) {
+        continue;
       }
+
+      const recipientFields = envelope.fields.filter((field) => field.recipientId === recipient.id);
+
+      fieldsToAutoInsert.push(...extractRecipientAutoInsertValues(recipientFields, recipient));
     }
   }
 
@@ -492,11 +500,57 @@ const injectFormValuesIntoDocument = async (
 };
 
 /**
- * Extracts the auto insertion values for a given field.
+ * The values to auto insert into a recipient's fields, such as their email or pre-checked
+ * options, when the fields are first shown to them.
+ *
+ * Radio and checkbox fields are resolved as a whole group, since pre-checked options and
+ * validation rules count across every field in it. An ungrouped one is a group of one.
+ */
+export const extractRecipientAutoInsertValues = (
+  fields: Field[],
+  recipient: Pick<Recipient, 'id' | 'email'>,
+): { fieldId: number; customText: string }[] => {
+  const autoInsertValues: { fieldId: number; customText: string }[] = [];
+
+  for (const field of fields) {
+    // Backup check.
+    if (field.recipientId !== recipient.id) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Mismatch between field recipient ID and passed in recipient ID`,
+      });
+    }
+
+    // Run for every field, including radio and checkbox, since it also validates the meta.
+    const autoInsertValue = extractFieldAutoInsertValues(field, recipient);
+
+    if (autoInsertValue) {
+      autoInsertValues.push(autoInsertValue);
+    }
+  }
+
+  const radioAndCheckboxFields = fields.filter(
+    (field) => field.type === FieldType.RADIO || field.type === FieldType.CHECKBOX,
+  );
+
+  const radioAndCheckboxGroups = [
+    ...groupFieldsByGroupId(radioAndCheckboxFields).values(),
+    ...radioAndCheckboxFields.filter((field) => !field.groupId).map((field) => [field]),
+  ];
+
+  for (const items of radioAndCheckboxGroups) {
+    autoInsertValues.push(...extractGroupedOptionFieldAutoInsertValues(items));
+  }
+
+  return autoInsertValues;
+};
+
+/**
+ * Extracts the auto insertion values for a given field. Radio and checkbox fields are
+ * resolved as a group by `extractGroupedOptionFieldAutoInsertValues` instead.
  *
  * If field is not auto insertable, returns `null`.
  */
-export const extractFieldAutoInsertValues = (
+const extractFieldAutoInsertValues = (
   unknownField: Field,
   recipient: Pick<Recipient, 'email'>,
 ): { fieldId: number; customText: string } | null => {
@@ -504,7 +558,7 @@ export const extractFieldAutoInsertValues = (
 
   if (parsedField.error) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'One or more fields have invalid metadata. Error: ' + parsedField.error.message,
+      message: `One or more fields have invalid metadata. Error: ${parsedField.error.message}`,
     });
   }
 
@@ -547,20 +601,6 @@ export const extractFieldAutoInsertValues = (
     }
   }
 
-  // Auto insert radio fields with the pre-checked value.
-  if (field.type === FieldType.RADIO) {
-    const { values = [] } = ZRadioFieldMeta.parse(field.fieldMeta);
-
-    const checkedItemIndex = values.findIndex((value) => value.checked);
-
-    if (checkedItemIndex !== -1) {
-      return {
-        fieldId,
-        customText: toRadioCustomText(checkedItemIndex),
-      };
-    }
-  }
-
   // Auto insert dropdown fields with the default value.
   if (field.type === FieldType.DROPDOWN) {
     const { defaultValue, values = [] } = ZDropdownFieldMeta.parse(field.fieldMeta);
@@ -573,19 +613,67 @@ export const extractFieldAutoInsertValues = (
     }
   }
 
-  // Auto insert checkbox fields with the pre-checked values.
-  if (field.type === FieldType.CHECKBOX) {
-    const { values = [], validationRule, validationLength } = ZCheckboxFieldMeta.parse(field.fieldMeta);
+  return null;
+};
 
-    const checkedIndices: number[] = [];
+/**
+ * Extracts the auto insertion values for a group of radio or checkbox fields.
+ *
+ * Pre-checked options are counted across the group. If the group should be auto
+ * inserted, every field is returned so the whole group is inserted together,
+ * with fields that have no checked options receiving an empty value.
+ *
+ * Returns an empty list if the group should not be auto inserted.
+ */
+const extractGroupedOptionFieldAutoInsertValues = (items: Field[]): { fieldId: number; customText: string }[] => {
+  const [firstItem] = items;
 
-    values.forEach((value, i) => {
-      if (value.checked) {
-        checkedIndices.push(i);
-      }
+  if (!firstItem) {
+    return [];
+  }
+
+  if (firstItem.type === FieldType.RADIO) {
+    const itemWithCheckedOption = items.find((item) => {
+      const { values = [] } = ZRadioFieldMeta.parse(item.fieldMeta);
+
+      return values.some((value) => value.checked);
     });
 
-    let isValid = true;
+    if (!itemWithCheckedOption) {
+      return [];
+    }
+
+    return items.map((item) => {
+      if (item.id !== itemWithCheckedOption.id) {
+        return {
+          fieldId: item.id,
+          customText: '',
+        };
+      }
+
+      const { values = [] } = ZRadioFieldMeta.parse(item.fieldMeta);
+
+      return {
+        fieldId: item.id,
+        customText: toRadioCustomText(values.findIndex((value) => value.checked)),
+      };
+    });
+  }
+
+  if (firstItem.type === FieldType.CHECKBOX) {
+    const { validationRule, validationLength } = ZCheckboxFieldMeta.parse(firstItem.fieldMeta);
+
+    const itemCheckedIndices = items.map((item) => {
+      const { values = [] } = ZCheckboxFieldMeta.parse(item.fieldMeta);
+
+      return values.flatMap((value, index) => (value.checked ? [index] : []));
+    });
+
+    const totalCheckedCount = itemCheckedIndices.reduce((total, indices) => total + indices.length, 0);
+
+    if (totalCheckedCount === 0) {
+      return [];
+    }
 
     if (validationRule && validationLength) {
       const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
@@ -596,16 +684,16 @@ export const extractFieldAutoInsertValues = (
         });
       }
 
-      isValid = validateCheckboxLength(checkedIndices.length, validation.value, validationLength);
+      if (!validateCheckboxLength(totalCheckedCount, validation.value, validationLength)) {
+        return [];
+      }
     }
 
-    if (isValid && checkedIndices.length > 0) {
-      return {
-        fieldId,
-        customText: toCheckboxCustomText(checkedIndices),
-      };
-    }
+    return items.map((item, index) => ({
+      fieldId: item.id,
+      customText: itemCheckedIndices[index].length > 0 ? toCheckboxCustomText(itemCheckedIndices[index]) : '',
+    }));
   }
 
-  return null;
+  return [];
 };

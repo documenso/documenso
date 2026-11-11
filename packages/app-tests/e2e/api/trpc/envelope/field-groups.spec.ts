@@ -249,12 +249,32 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
             externalId: 'checkbox-c',
             fieldMeta: { type: 'checkbox', values: [option(1, 'C1')], ...atLeastTwo },
           },
+          {
+            type: FieldType.CHECKBOX,
+            page: 1,
+            positionX: 50,
+            positionY: 10,
+            ...FIELD_SIZE,
+            externalId: 'checkbox-ungrouped',
+            fieldMeta: { type: 'checkbox', values: [option(1, 'U1', true), option(2, 'U2')], ...atLeastTwo },
+          },
+          {
+            type: FieldType.RADIO,
+            page: 1,
+            positionX: 50,
+            positionY: 25,
+            ...FIELD_SIZE,
+            externalId: 'radio-ungrouped',
+            fieldMeta: { type: 'radio', values: [option(1, 'R1'), option(2, 'R2', true)] },
+          },
         ],
       ],
     });
 
     const { fields } = envelope;
     const checkboxC = findFieldByExternalId(fields, 'checkbox-c');
+    const ungroupedCheckbox = findFieldByExternalId(fields, 'checkbox-ungrouped');
+    const ungroupedRadio = findFieldByExternalId(fields, 'radio-ungrouped');
 
     // Put the group in a state the editor would never produce, so distribution has to catch it.
     await prisma.field.update({
@@ -285,6 +305,14 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
 
     expect(insertedFields.every((field) => field.inserted)).toBe(true);
     expect(insertedFields.map((field) => field.customText)).toEqual(['[0]', '[0]', '']);
+
+    // Ungrouped fields are judged on their own. One pre-checked option does not meet the
+    // checkbox's rule, while the pre-checked radio is inserted.
+    const insertedUngroupedCheckbox = await prisma.field.findUniqueOrThrow({ where: { id: ungroupedCheckbox.id } });
+    const insertedUngroupedRadio = await prisma.field.findUniqueOrThrow({ where: { id: ungroupedRadio.id } });
+
+    expect(insertedUngroupedCheckbox.inserted).toBe(false);
+    expect(insertedUngroupedRadio).toMatchObject({ inserted: true, customText: '1' });
   });
 
   test('signing and completion treat a group as a single field', async ({ request }) => {
