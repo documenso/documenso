@@ -1,7 +1,7 @@
 import type { TGetTeamAnalyticsOverviewResponse } from '@documenso/trpc/server/team-router/get-team-analytics.types';
 import { cn } from '@documenso/ui/lib/utils';
 import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import type { LucideIcon } from 'lucide-react';
 import { ArrowDownRightIcon, ArrowUpRightIcon, CircleCheckIcon, SendIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -81,10 +81,27 @@ export const AnalyticsOverviewCards = <TData extends AnalyticsOverviewData>({
         value={entityCounts ? `${formatNumber(entityCounts.active)}/${formatNumber(entityCounts.total)}` : null}
         description={
           entityCounts ? (
-            <Trans>
-              {formatNumber(entityCounts.active)} active · {formatNumber(entityCounts.total - entityCounts.active)}{' '}
-              inactive
-            </Trans>
+            entity.testId === 'analytics-members' ? (
+              <>
+                <Plural context="active members" value={entityCounts.active} one="# active" other="# active" /> ·{' '}
+                <Plural
+                  context="inactive members"
+                  value={entityCounts.total - entityCounts.active}
+                  one="# inactive"
+                  other="# inactive"
+                />
+              </>
+            ) : (
+              <>
+                <Plural context="active teams" value={entityCounts.active} one="# active" other="# active" /> ·{' '}
+                <Plural
+                  context="inactive teams"
+                  value={entityCounts.total - entityCounts.active}
+                  one="# inactive"
+                  other="# inactive"
+                />
+              </>
+            )
           ) : null
         }
         testId={entity.testId}
