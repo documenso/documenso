@@ -1,6 +1,7 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { findUserByProvidedEmail } from '@documenso/lib/server-only/user/find-user-by-provided-email';
 import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -59,17 +60,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     } as const;
   }
 
-  const user = await prisma.user.findFirst({
-    where: {
-      email: {
-        equals: organisationMemberInvite.email,
-        mode: 'insensitive',
-      },
-    },
-    select: {
-      id: true,
-    },
-  });
+  const user = await findUserByProvidedEmail({ email: organisationMemberInvite.email });
 
   return {
     state: 'Pending',

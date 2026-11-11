@@ -18,6 +18,7 @@ import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { assertRecipientNotExpired } from '../../utils/recipients';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { findUserByProvidedEmail } from '../user/find-user-by-provided-email';
 
 export type RejectDocumentOnBehalfOfOptions = {
   /**
@@ -189,11 +190,7 @@ const getValidatedElectedUser = async ({ actAsEmail, teamId }: { actAsEmail?: st
     return null;
   }
 
-  const electedUser = await prisma.user.findFirst({
-    where: {
-      email: actAsEmail,
-    },
-  });
+  const electedUser = await findUserByProvidedEmail({ email: actAsEmail });
 
   if (!electedUser) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {

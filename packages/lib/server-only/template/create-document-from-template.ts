@@ -634,7 +634,7 @@ export const createDocumentFromTemplate = async ({
               const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
 
               return {
-                email: recipient.email,
+                email: recipient.email.toLowerCase(),
                 name: recipient.name,
                 role: recipient.role,
                 authOptions: createRecipientAuthOptions({

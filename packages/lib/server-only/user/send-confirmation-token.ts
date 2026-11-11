@@ -5,6 +5,7 @@ import { DateTime } from 'luxon';
 import { USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER } from '../../constants/email';
 import { ONE_HOUR } from '../../constants/time';
 import { sendConfirmationEmail } from '../auth/send-confirmation-email';
+import { findUserByProvidedEmail } from './find-user-by-provided-email';
 import { getMostRecentEmailVerificationToken } from './get-most-recent-email-verification-token';
 
 type SendConfirmationTokenOptions = { email: string; force?: boolean };
@@ -12,11 +13,7 @@ type SendConfirmationTokenOptions = { email: string; force?: boolean };
 export const sendConfirmationToken = async ({ email, force = false }: SendConfirmationTokenOptions) => {
   const token = crypto.randomBytes(20).toString('hex');
 
-  const user = await prisma.user.findFirst({
-    where: {
-      email: email,
-    },
-  });
+  const user = await findUserByProvidedEmail({ email });
 
   if (!user) {
     throw new Error('User not found');
