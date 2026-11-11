@@ -149,6 +149,8 @@ export default function AuthoringLayout() {
               quota: PAID_PLAN_LIMITS,
               remaining: PAID_PLAN_LIMITS,
               maximumEnvelopeItemCount: organisationClaim.envelopeItemCount,
+              maximumEnvelopeContentCount: organisationClaim.envelopeContentCount,
+              maximumEnvelopeContentImageCount: organisationClaim.envelopeContentImageCount,
             }}
             teamId={team.id}
           >

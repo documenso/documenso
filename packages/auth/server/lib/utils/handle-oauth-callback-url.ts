@@ -4,12 +4,14 @@ import {
   isEmailDomainAllowedForSignup,
   isSignupEnabledForProvider,
 } from '@documenso/lib/constants/auth';
+import { formatEmbedAuthCompletePageUrl } from '@documenso/lib/constants/embed-auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
+import { logger } from '@documenso/lib/utils/logger';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { decodeIdToken, OAuth2Client } from 'arctic';
@@ -18,6 +20,7 @@ import { deleteCookie } from 'hono/cookie';
 
 import type { OAuthClientOptions } from '../../config';
 import { AuthenticationErrorCode } from '../errors/error-codes';
+import { failEmbedAuthFlow } from '../handoff/record-embed-auth-failure';
 import { onAuthorize } from './authorizer';
 import { getOpenIdConfiguration } from './open-id';
 
@@ -26,7 +29,44 @@ type HandleOAuthCallbackUrlOptions = {
   clientOptions: OAuthClientOptions;
 };
 
+const redirectToSignInError = async (c: Context, errorCode: string) => {
+  const isEmbedFlow = await failEmbedAuthFlow(c, c.req.query('state'), errorCode);
+
+  if (isEmbedFlow) {
+    return c.redirect(formatEmbedAuthCompletePageUrl('error'), 302);
+  }
+
+  const errorUrl = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
+
+  errorUrl.searchParams.set('error', errorCode);
+
+  return c.redirect(errorUrl.toString(), 302);
+};
+
 export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOptions) => {
+  const { c } = options;
+
+  try {
+    return await handleOAuthCallback(options);
+  } catch (err) {
+    const reason = err instanceof AppError ? err.code : AppErrorCode.UNKNOWN_ERROR;
+
+    const isEmbedFlow = await failEmbedAuthFlow(c, c.req.query('state'), reason);
+
+    if (!isEmbedFlow) {
+      throw err;
+    }
+
+    logger.error({
+      event: 'auth.embed.oauth_callback_failed',
+      error: err,
+    });
+
+    return c.redirect(formatEmbedAuthCompletePageUrl('error'), 302);
+  }
+};
+
+const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
   const { c, clientOptions } = options;
 
   const requestMeta = c.get('requestMetadata');
@@ -37,6 +77,12 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
   });
 
   if (email.toLowerCase() === legacyServiceAccountEmail() || email.toLowerCase() === deletedServiceAccountEmail()) {
+    const isEmbedFlow = await failEmbedAuthFlow(c, c.req.query('state'), 'service_account');
+
+    if (isEmbedFlow) {
+      return c.redirect(formatEmbedAuthCompletePageUrl('error'), 302);
+    }
+
     return c.text('FORBIDDEN', 403);
   }
 
@@ -121,31 +167,19 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   // Check if signups are disabled for this provider.
   if (!isSignupEnabledForProvider(clientOptions.id as 'google' | 'microsoft' | 'oidc')) {
-    const errorUrl = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
-
-    errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
-
-    return c.redirect(errorUrl.toString(), 302);
+    return redirectToSignInError(c, AuthenticationErrorCode.SignupDisabled);
   }
 
   // Check domain restriction for new SSO users.
   if (!isEmailDomainAllowedForSignup(email)) {
-    const errorUrl = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
-
-    errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
-
-    return c.redirect(errorUrl.toString(), 302);
+    return redirectToSignInError(c, AuthenticationErrorCode.SignupDisabled);
   }
 
   // Reject disposable / throwaway email providers for new SSO users.
   const additionalBlockedDomains = await getEmailBlocklistDomains();
 
   if (isDisposableEmail(email, additionalBlockedDomains)) {
-    const errorUrl = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
-
-    errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisposableEmail);
-
-    return c.redirect(errorUrl.toString(), 302);
+    return redirectToSignInError(c, AuthenticationErrorCode.SignupDisposableEmail);
   }
 
   // Handle new user.

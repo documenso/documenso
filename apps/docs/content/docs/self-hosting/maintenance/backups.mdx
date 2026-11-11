@@ -159,7 +159,7 @@ Document the certificate passphrase (`NEXT_PRIVATE_SIGNING_PASSPHRASE`) in a sec
 
 If using S3 storage (`NEXT_PUBLIC_UPLOAD_TRANSPORT=s3`), back up your S3 bucket.
 
-<Tabs items={['AWS S3', 'S3-Compatible (MinIO, etc.)']}>
+<Tabs items={['AWS S3', 'S3-Compatible']}>
 <Tab value="AWS S3">
 
 Enable versioning on your bucket:
@@ -179,7 +179,7 @@ aws s3 sync s3://your-documenso-bucket /backup/documenso/documents/
 ```
 
 </Tab>
-<Tab value="S3-Compatible (MinIO, etc.)">
+<Tab value="S3-Compatible">
 
 Use the same commands with the `--endpoint-url` flag:
 

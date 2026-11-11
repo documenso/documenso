@@ -24,6 +24,13 @@ export const ZDuplicateEnvelopeRequestSchema = z.object({
     .optional()
     .default(true)
     .describe('Whether to copy the fields to the duplicated envelope. Requires includeRecipients. Defaults to true.'),
+  includeContents: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe(
+      'Whether to copy the contents (text, shapes, images, etc.) to the duplicated envelope. Defaults to true.',
+    ),
 });
 
 export const ZDuplicateEnvelopeResponseSchema = z.object({

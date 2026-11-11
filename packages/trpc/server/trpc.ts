@@ -1,3 +1,4 @@
+import { assertNotEmbedSession } from '@documenso/auth/server/lib/session/embed-session-restrictions';
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import { assertUserNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
@@ -29,6 +30,12 @@ export type TrpcRouteMeta = {
     successDescription?: string;
     errorResponses?: number[] | Record<number, string>;
   };
+  /**
+   * Embed sessions exist only to let a recipient sign inside an iframe and are
+   * rejected by `authenticatedProcedure` (and downgraded to anonymous by
+   * `maybeAuthenticatedProcedure`) unless the route opts in here.
+   */
+  allowEmbedSession?: boolean;
 } & Record<string, unknown>;
 
 const t = initTRPC
@@ -150,6 +157,10 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path, me
   // authenticated TRPC call here.
   assertUserNotDisabled(ctx.user);
 
+  if (!meta?.allowEmbedSession) {
+    assertNotEmbedSession(ctx.session);
+  }
+
   // Recreate the logger with a sub request ID to differentiate between batched
   // requests, as well as identifying attributes so every subsequent log line
   // (including errors) inherits them.
@@ -257,8 +268,11 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, pat
   // `maybeAuthenticatedProcedure` are signer/invite flows that key off an
   // input token rather than `ctx.user`, so downgrading lets those keep
   // working while routes that genuinely need an account naturally fall
-  // through to their own auth checks.
-  const sessionUser = ctx.user && !ctx.user.disabled ? ctx.user : null;
+  // through to their own auth checks. Embed sessions get the same treatment
+  // unless the route has opted in via `allowEmbedSession`.
+  const isEmbedSessionAllowed = !ctx.session?.isEmbed || Boolean(meta?.allowEmbedSession);
+
+  const sessionUser = ctx.user && !ctx.user.disabled && isEmbedSessionAllowed ? ctx.user : null;
   const sessionRecord = sessionUser ? ctx.session : null;
 
   // Resolve `auth` once so it stays in sync between the logger bindings and
@@ -311,6 +325,8 @@ export const adminMiddleware = t.middleware(async ({ ctx, next, path }) => {
 
   // Disabled admins shouldn't be able to do anything either.
   assertUserNotDisabled(ctx.user);
+
+  assertNotEmbedSession(ctx.session);
 
   const isUserAdmin = isAdmin(ctx.user);
 

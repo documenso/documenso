@@ -1,6 +1,7 @@
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
@@ -89,7 +90,7 @@ export const MultiSignDocumentSigningView = ({
     document?.fields.filter((field) => field.recipient.signingStatus === SigningStatus.SIGNED) ?? [],
   ];
 
-  const uninsertedFields = document?.fields.filter((field) => !field.inserted) ?? [];
+  const hasUnsignedRequiredFields = fieldsContainUnsignedRequiredField(document?.fields ?? []);
 
   const onSignField = async (payload: TSignFieldWithTokenMutationSchema) => {
     try {
@@ -143,10 +144,23 @@ export const MultiSignDocumentSigningView = ({
     try {
       setIsSubmitting(true);
 
-      await completeDocumentWithToken({
+      const result = await completeDocumentWithToken({
         documentId: document!.id,
         token,
       });
+
+      // TSP envelopes return a CSC authorize URL the multisign embed cannot run.
+      if (result.status === 'REDIRECT') {
+        onDocumentError?.();
+
+        toast({
+          title: _(msg`Unable to sign document`),
+          description: _(msg`Qualified electronic signatures are not supported in this embed.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
 
       onBack();
 
@@ -351,7 +365,7 @@ export const MultiSignDocumentSigningView = ({
                       <div className="hidden flex-1 group-data-[expanded]/document-widget:block md:block" />
 
                       <div className="embed--DocumentWidgetFooter mt-4 hidden w-full grid-cols-2 items-center group-data-[expanded]/document-widget:grid md:grid">
-                        {uninsertedFields.length > 0 ? (
+                        {hasUnsignedRequiredFields ? (
                           <Button className="col-start-2" onClick={onNextFieldClick}>
                             <Trans>Next</Trans>
                           </Button>

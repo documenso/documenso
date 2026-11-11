@@ -48,6 +48,8 @@ const seedSubscriptionClaim = (name: string) =>
       memberCount: 1,
       envelopeItemCount: 10,
       recipientCount: 10,
+      envelopeContentCount: 0,
+      envelopeContentImageCount: 0,
       flags: {},
       documentRateLimits: [],
       emailRateLimits: [],

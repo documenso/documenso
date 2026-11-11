@@ -1,6 +1,7 @@
 import { DEFAULT_RECT_BACKGROUND, getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
 import Konva from 'konva';
 
+import { resolvePrimaryColor } from './field-canvas-style';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 import { calculateFieldPosition } from './field-renderer';
 
@@ -94,7 +95,7 @@ export const createSpinner = ({ fieldWidth, fieldHeight }: { fieldWidth: number;
     outerRadius: spinnerSize / 2,
     angle: 270,
     rotation: 0,
-    fill: 'rgba(122, 195, 85, 1)',
+    fill: resolvePrimaryColor() ?? 'rgba(122, 195, 85, 1)',
     lineCap: 'round',
   });
 

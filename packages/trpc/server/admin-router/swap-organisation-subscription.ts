@@ -124,6 +124,8 @@ export const swapOrganisationSubscriptionRoute = adminProcedure
             memberCount: sourceOrg.organisationClaim.memberCount,
             envelopeItemCount: sourceOrg.organisationClaim.envelopeItemCount,
             recipientCount: sourceOrg.organisationClaim.recipientCount,
+            envelopeContentCount: sourceOrg.organisationClaim.envelopeContentCount,
+            envelopeContentImageCount: sourceOrg.organisationClaim.envelopeContentImageCount,
             flags: sourceOrg.organisationClaim.flags,
           },
         });

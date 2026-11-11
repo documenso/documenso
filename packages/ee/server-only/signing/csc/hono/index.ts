@@ -6,18 +6,21 @@ import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import type { HonoCscEnv } from './context';
 import { cscOAuthAuthorizeRoute } from './oauth-authorize';
 import { cscOAuthCallbackRoute } from './oauth-callback';
+import { cscSessionStatusRoute } from './session-status';
 
 /**
  * `@documenso/ee` CSC subapp. Mount under `/api/csc` in the remix host (see
  * `apps/remix/server/router.ts`). All CSC endpoints — OAuth authorize +
- * callback — are composed here so the host only has to wire one route.
+ * callback, plus the embed-facing session status probe — are composed here so
+ * the host only has to wire one route.
  *
  * Routes throw `AppError` freely; the `.onError` handler below normalises
  * them into REST responses (mirrors `@documenso/auth/server`'s pattern).
  */
 export const csc = new Hono<HonoCscEnv>()
   .route('/oauth/authorize', cscOAuthAuthorizeRoute)
-  .route('/oauth/callback', cscOAuthCallbackRoute);
+  .route('/oauth/callback', cscOAuthCallbackRoute)
+  .route('/session-status', cscSessionStatusRoute);
 
 csc.onError((err, c) => {
   const logger = c.get('logger');

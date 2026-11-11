@@ -66,6 +66,20 @@ export const linkOrgAccountRateLimit = createRateLimit({
   window: '1h',
 });
 
+export const embedAuthStartRateLimit = createRateLimit({
+  action: 'auth.embed-start',
+  max: 100,
+  window: '15m',
+});
+
+// IP only: the nonce must never be a rate limit key (it would be persisted in plaintext).
+// The client polls every 2s, so this allows ~40 concurrent flows behind one IP.
+export const embedAuthRedeemRateLimit = createRateLimit({
+  action: 'auth.embed-redeem',
+  max: 1200,
+  window: '1m',
+});
+
 // ---- Auth (Tier 3 - Authenticated, verifies secrets) ----
 
 /**
@@ -82,6 +96,15 @@ export const reportSenderRateLimit = createRateLimit({
   action: 'recipient.report-sender',
   max: 1,
   window: '7d',
+});
+
+// ---- Embedding ----
+
+export const persistEmbedSignatureRateLimit = createRateLimit({
+  action: 'embed.persist-signature',
+  max: 10,
+  globalMax: 30,
+  window: '1m',
 });
 
 // ---- Billing ----
@@ -120,6 +143,16 @@ export const aiRateLimit = createRateLimit({
 
 export const fileUploadRateLimit = createRateLimit({
   action: 'api.file-upload',
+  max: 20,
+  window: '1m',
+});
+
+/**
+ * Envelope content image uploads, kept separate from the document (PDF)
+ * upload budget so placing several images does not block uploading a PDF.
+ */
+export const envelopeContentRateLimit = createRateLimit({
+  action: 'api.envelope-content',
   max: 20,
   window: '1m',
 });

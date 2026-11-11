@@ -55,13 +55,18 @@ export const AdminOrganisationsTable = ({
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isLoadingError } = trpc.admin.organisation.find.useQuery({
-    query: parsedSearchParams.query,
-    page: parsedSearchParams.page,
-    perPage: parsedSearchParams.perPage,
-    ownerUserId,
-    memberUserId,
-  });
+  const { data, isLoading, isLoadingError } = trpc.admin.organisation.find.useQuery(
+    {
+      query: parsedSearchParams.query,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+      ownerUserId,
+      memberUserId,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({

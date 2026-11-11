@@ -37,7 +37,7 @@ import type {
 import { expect, test } from '@playwright/test';
 import type { Team, User } from '@prisma/client';
 
-import { apiSignin } from '../../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -3082,6 +3082,7 @@ test.describe('Document API V2', () => {
 
         const res = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.getMany`, {
           headers: {
+            ...WEBAPP_ORIGIN_HEADERS,
             'x-team-id': String(teamA.id),
           },
           data: {
@@ -3110,6 +3111,7 @@ test.describe('Document API V2', () => {
 
         const res = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.getMany`, {
           headers: {
+            ...WEBAPP_ORIGIN_HEADERS,
             'Content-Type': 'application/json',
             'x-team-id': String(teamA.id),
           },
@@ -3145,6 +3147,7 @@ test.describe('Document API V2', () => {
 
         const res = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/envelope.getMany`, {
           headers: {
+            ...WEBAPP_ORIGIN_HEADERS,
             'x-team-id': String(teamA.id),
           },
           data: {

@@ -21,27 +21,37 @@ export const handleTextFieldClick = async (
     });
   }
 
-  if (field.inserted) {
+  if (text && !field.inserted) {
+    return {
+      type: FieldType.TEXT,
+      value: text,
+    };
+  }
+
+  // Inserted fields reopen the dialog with their current text so it can be edited or removed.
+  const result = await SignFieldTextDialog.call({
+    fieldMeta: field.fieldMeta,
+    insertedText: field.inserted ? field.customText : undefined,
+  });
+
+  if (!result) {
+    return null;
+  }
+
+  if (result.action === 'remove') {
     return {
       type: FieldType.TEXT,
       value: null,
     };
   }
 
-  let textToInsert = text;
-
-  if (!textToInsert) {
-    textToInsert = await SignFieldTextDialog.call({
-      fieldMeta: field.fieldMeta,
-    });
-  }
-
-  if (!textToInsert) {
+  // Avoid re-signing the field when the text has not changed.
+  if (field.inserted && result.text === field.customText) {
     return null;
   }
 
   return {
     type: FieldType.TEXT,
-    value: textToInsert,
+    value: result.text,
   };
 };
