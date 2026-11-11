@@ -1,9 +1,15 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
 import { seedUser } from '@documenso/prisma/seed/users';
-import { expect, test } from '@playwright/test';
+import { expect, type Locator, type Page, test } from '@playwright/test';
 
 import { apiSignin } from '../../fixtures/authentication';
+
+/** The role and remove actions of a member are behind the "Manage" button of the row. */
+const openUpdateRoleDialog = async (page: Page, row: Locator) => {
+  await row.getByRole('button', { name: /^Manage / }).click();
+  await page.getByRole('button', { name: 'Update role' }).click();
+};
 
 test('[ADMIN]: promote member to owner', async ({ page }) => {
   // Create an admin user who can access the admin panel
@@ -46,13 +52,11 @@ test('[ADMIN]: promote member to owner', async ({ page }) => {
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=members`,
   });
 
   // Verify we're on the admin organisation page
-  await expect(page.getByText(`Manage organization`)).toBeVisible();
-
-  await expect(page.getByLabel('Organization Name')).toHaveValue(organisation.name);
+  await expect(page.getByRole('heading', { name: organisation.name })).toBeVisible();
 
   // Check that the organisation members table shows the correct roles
   const ownerRow = page.getByRole('row', { name: ownerUser.email });
@@ -67,14 +71,7 @@ test('[ADMIN]: promote member to owner', async ({ page }) => {
   // Test promoting a MEMBER to owner
   const memberRow = page.getByRole('row', { name: memberUser.email });
 
-  // Find and click the "Update role" button for the member
-  const updateRoleButton = memberRow.getByRole('button', {
-    name: 'Update role',
-  });
-  await expect(updateRoleButton).toBeVisible();
-  await expect(updateRoleButton).not.toBeDisabled();
-
-  await updateRoleButton.click();
+  await openUpdateRoleDialog(page, memberRow);
 
   // Wait for dialog to open and select Owner role
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -102,14 +99,8 @@ test('[ADMIN]: promote member to owner', async ({ page }) => {
   const previousOwnerRow = page.getByRole('row', { name: ownerUser.email });
   await expect(previousOwnerRow.getByRole('status').filter({ hasText: 'Owner' })).not.toBeVisible();
 
-  // Verify that the Update role button exists for the new owner and shows Owner as current role
-  const newOwnerUpdateButton = newOwnerRow.getByRole('button', {
-    name: 'Update role',
-  });
-  await expect(newOwnerUpdateButton).toBeVisible();
-
-  // Verify clicking it shows the dialog with Owner already selected
-  await newOwnerUpdateButton.click();
+  // Verify that the role dialog still opens for the new owner
+  await openUpdateRoleDialog(page, newOwnerRow);
   await expect(page.getByRole('dialog')).toBeVisible();
 
   // Close the dialog without making changes
@@ -144,16 +135,12 @@ test('[ADMIN]: promote manager to owner', async ({ page }) => {
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=members`,
   });
 
   // Promote the manager to owner
   const managerRow = page.getByRole('row', { name: managerUser.email });
-  const updateRoleButton = managerRow.getByRole('button', {
-    name: 'Update role',
-  });
-
-  await updateRoleButton.click();
+  await openUpdateRoleDialog(page, managerRow);
 
   // Wait for dialog to open and select Owner role
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -203,16 +190,12 @@ test('[ADMIN]: promote admin member to owner', async ({ page }) => {
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=members`,
   });
 
   // Promote the admin member to owner
   const adminMemberRow = page.getByRole('row', { name: adminMemberUser.email });
-  const updateRoleButton = adminMemberRow.getByRole('button', {
-    name: 'Update role',
-  });
-
-  await updateRoleButton.click();
+  await openUpdateRoleDialog(page, adminMemberRow);
 
   // Wait for dialog to open and select Owner role
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -249,7 +232,7 @@ test('[ADMIN]: cannot promote non-existent user', async ({ page }) => {
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=members`,
   });
 
   // Try to manually call the API with invalid data - this should be handled by the UI validation
@@ -288,7 +271,7 @@ test('[ADMIN]: verify role hierarchy after promotion', async ({ page }) => {
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=members`,
   });
 
   // Before promotion - verify member has MEMBER role
@@ -297,10 +280,7 @@ test('[ADMIN]: verify role hierarchy after promotion', async ({ page }) => {
   await expect(memberRow.getByRole('status').filter({ hasText: 'Owner' })).not.toBeVisible();
 
   // Promote member to owner
-  const updateRoleButton = memberRow.getByRole('button', {
-    name: 'Update role',
-  });
-  await updateRoleButton.click();
+  await openUpdateRoleDialog(page, memberRow);
 
   // Wait for dialog to open and select Owner role
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -324,11 +304,8 @@ test('[ADMIN]: verify role hierarchy after promotion', async ({ page }) => {
   memberRow = page.getByRole('row', { name: memberUser.email });
   await expect(memberRow.getByRole('status').filter({ hasText: 'Owner' })).toBeVisible();
 
-  // Verify the Update role button exists and shows Owner as current role
-  const newOwnerUpdateButton = memberRow.getByRole('button', {
-    name: 'Update role',
-  });
-  await expect(newOwnerUpdateButton).toBeVisible();
+  // Verify the new owner can still be managed
+  await expect(memberRow.getByRole('button', { name: /^Manage / })).toBeVisible();
 
   // Sign in as the newly promoted user to verify they have owner permissions
   await apiSignin({
@@ -395,15 +372,12 @@ test('[ADMIN]: multiple promotions in sequence', async ({ page }) => {
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=members`,
   });
 
   // First promotion: Member 1 becomes owner
   let member1Row = page.getByRole('row', { name: member1User.email });
-  let updateRoleButton1 = member1Row.getByRole('button', {
-    name: 'Update role',
-  });
-  await updateRoleButton1.click();
+  await openUpdateRoleDialog(page, member1Row);
 
   // Wait for dialog to open and select Owner role
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -425,16 +399,11 @@ test('[ADMIN]: multiple promotions in sequence', async ({ page }) => {
   // Verify Member 1 is now owner
   member1Row = page.getByRole('row', { name: member1User.email });
   await expect(member1Row.getByRole('status').filter({ hasText: 'Owner' })).toBeVisible();
-  updateRoleButton1 = member1Row.getByRole('button', { name: 'Update role' });
-  await expect(updateRoleButton1).toBeVisible();
+  await expect(member1Row.getByRole('button', { name: /^Manage / })).toBeVisible();
 
   // Second promotion: Member 2 becomes the new owner
   const member2Row = page.getByRole('row', { name: member2User.email });
-  const updateRoleButton2 = member2Row.getByRole('button', {
-    name: 'Update role',
-  });
-  await expect(updateRoleButton2).toBeVisible();
-  await updateRoleButton2.click();
+  await openUpdateRoleDialog(page, member2Row);
 
   // Wait for dialog to open and select Owner role
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -457,11 +426,8 @@ test('[ADMIN]: multiple promotions in sequence', async ({ page }) => {
   await expect(member2Row.getByRole('status').filter({ hasText: 'Owner' })).toBeVisible();
   await expect(member1Row.getByRole('status').filter({ hasText: 'Owner' })).not.toBeVisible();
 
-  // Verify Member 1's Update role button is still visible
-  const newUpdateButton1 = member1Row.getByRole('button', {
-    name: 'Update role',
-  });
-  await expect(newUpdateButton1).toBeVisible();
+  // Verify Member 1 can still be managed
+  await expect(member1Row.getByRole('button', { name: /^Manage / })).toBeVisible();
 });
 
 test('[ADMIN]: verify organisation access after ownership change', async ({ page }) => {
@@ -492,14 +458,11 @@ test('[ADMIN]: verify organisation access after ownership change', async ({ page
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=members`,
   });
 
   const memberRow = page.getByRole('row', { name: memberUser.email });
-  const updateRoleButton = memberRow.getByRole('button', {
-    name: 'Update role',
-  });
-  await updateRoleButton.click();
+  await openUpdateRoleDialog(page, memberRow);
 
   // Wait for dialog to open and select Owner role
   await expect(page.getByRole('dialog')).toBeVisible();

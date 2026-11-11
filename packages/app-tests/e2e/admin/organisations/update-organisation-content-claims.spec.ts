@@ -16,10 +16,10 @@ test('[ADMIN]: update envelope content claims for an organisation', async ({ pag
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=plan`,
   });
 
-  await expect(page.getByText('Manage organization')).toBeVisible();
+  await expect(page.getByRole('heading', { name: organisation.name })).toBeVisible();
 
   const contentCountInput = page.getByLabel('Envelope Content Count', { exact: true });
   const imageCountInput = page.getByLabel('Envelope Content Image Count', { exact: true });
@@ -31,8 +31,7 @@ test('[ADMIN]: update envelope content claims for an organisation', async ({ pag
   await contentCountInput.fill('25');
   await imageCountInput.fill('5');
 
-  // "Update role" buttons also match a non-exact name.
-  await page.getByRole('button', { name: 'Update', exact: true }).last().click();
+  await page.getByRole('button', { name: 'Update', exact: true }).click();
 
   await expect(async () => {
     const claim = await prisma.organisationClaim.findFirstOrThrow({

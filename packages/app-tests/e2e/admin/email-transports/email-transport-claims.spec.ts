@@ -213,7 +213,7 @@ test('[ADMIN][EMAIL_TRANSPORT]: setting the email transport on an organisation c
     data: { emailTransportId: null },
   });
 
-  await apiSignin({ page, email: adminUser.email, redirectPath: `/admin/organisations/${organisation.id}` });
+  await apiSignin({ page, email: adminUser.email, redirectPath: `/admin/organisations/${organisation.id}?tab=plan` });
 
   // Scope to the billing/claims form (the one containing the "Email transport" field);
   // the page has a second form (name/url) with its own "Update" button.
@@ -249,7 +249,7 @@ test('[ADMIN][EMAIL_TRANSPORT]: clearing an organisation claim transport resets 
     data: { emailTransportId: transport.id },
   });
 
-  await apiSignin({ page, email: adminUser.email, redirectPath: `/admin/organisations/${organisation.id}` });
+  await apiSignin({ page, email: adminUser.email, redirectPath: `/admin/organisations/${organisation.id}?tab=plan` });
 
   const billingForm = page.locator('form', { has: page.getByText('Email transport', { exact: true }) });
 
