@@ -19,6 +19,7 @@ import pMap from 'p-map';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { toLuxonDateFormat } from '../../constants/date-formats';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '../../types/document-audit-logs';
@@ -344,7 +345,9 @@ export const createDocumentFromDirectTemplate = async ({
       const typedSignature = isSignatureField && !isBase64 ? value : undefined;
 
       if (templateField.type === FieldType.DATE) {
-        customText = DateTime.now().setZone(derivedDocumentMeta.timezone).toFormat(derivedDocumentMeta.dateFormat);
+        customText = DateTime.now()
+          .setZone(derivedDocumentMeta.timezone)
+          .toFormat(toLuxonDateFormat(derivedDocumentMeta.dateFormat));
       }
 
       if (isSignatureField && !signatureImageAsBase64 && !typedSignature) {
