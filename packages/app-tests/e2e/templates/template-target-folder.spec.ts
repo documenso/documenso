@@ -1,6 +1,7 @@
 import { AppErrorCode } from '@documenso/lib/errors/app-error';
 import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { prisma } from '@documenso/prisma';
@@ -15,6 +16,12 @@ import { apiSignin } from '../fixtures/authentication';
 import { getEnvelopeEditorSettingsTrigger } from '../fixtures/envelope-editor';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
 import { signSignaturePad } from '../fixtures/signature';
+
+const requestMetadata: ApiRequestMetadata = {
+  requestMetadata: {},
+  source: 'app',
+  auth: null,
+};
 
 test('[TEMPLATE_TARGET_FOLDER]: target folder configured in settings applies to direct links and template use with override', async ({
   page,
@@ -60,12 +67,10 @@ test('[TEMPLATE_TARGET_FOLDER]: target folder configured in settings applies to 
 
   await expectToastTextToBeVisible(page, 'Envelope updated');
 
-  // Reopen settings to verify the selected target folder persisted on the template.
   await getEnvelopeEditorSettingsTrigger(page).click();
   await expect(page.getByTestId('templateTargetFolderSelectValue')).toContainText('Target Folder');
   await page.keyboard.press('Escape');
 
-  // 1. Direct link signing places the generated document in the configured target folder.
   const directSignatureField = template.fields[0];
 
   if (!directSignatureField || !template.directLink) {
@@ -113,7 +118,6 @@ test('[TEMPLATE_TARGET_FOLDER]: target folder configured in settings applies to 
 
   expect(directCreatedEnvelope.folderId).toBe(targetFolder.id);
 
-  // 2. Using the template pre-selects the target folder and allows overriding it.
   await page.goto(`/t/${team.url}/templates`);
   await page.getByRole('button', { name: 'Use Template' }).click();
   await expect(page.getByRole('heading', { name: 'Create document from template' })).toBeVisible();
@@ -134,7 +138,6 @@ test('[TEMPLATE_TARGET_FOLDER]: target folder configured in settings applies to 
 
   expect(overriddenEnvelope.folderId).toBe(overrideFolder.id);
 
-  // 3. Overriding back to Home (No Folder) creates the document in the root folder.
   await page.goto(`/t/${team.url}/templates`);
   await page.getByRole('button', { name: 'Use Template' }).click();
   await expect(useTargetFolderSelect).toContainText('Target Folder');
@@ -224,46 +227,42 @@ test('[TEMPLATE_TARGET_FOLDER]: rejects non-document folders, cross-team folders
     },
   });
 
-  // Document envelopes cannot set a template target folder.
   await expect(
     updateEnvelope({
       userId: user.id,
       teamId: team.id,
       id: { type: 'envelopeId', id: documentEnvelope.id },
       data: { targetFolderId: otherTeamDocumentFolder.id },
-      requestMetadata: {},
+      requestMetadata,
     }),
   ).rejects.toMatchObject({
     code: AppErrorCode.INVALID_BODY,
   });
 
-  // Template folders cannot be used as the document target folder.
   await expect(
     updateEnvelope({
       userId: user.id,
       teamId: team.id,
       id: { type: 'envelopeId', id: template.id },
       data: { targetFolderId: templateTypeFolder.id },
-      requestMetadata: {},
+      requestMetadata,
     }),
   ).rejects.toMatchObject({
     code: AppErrorCode.NOT_FOUND,
   });
 
-  // Another team's document folder cannot be targeted.
   await expect(
     updateEnvelope({
       userId: user.id,
       teamId: team.id,
       id: { type: 'envelopeId', id: template.id },
       data: { targetFolderId: otherTeamDocumentFolder.id },
-      requestMetadata: {},
+      requestMetadata,
     }),
   ).rejects.toMatchObject({
     code: AppErrorCode.NOT_FOUND,
   });
 
-  // Programmatic template use without `folderId` uses `targetFolderId`, while `null` overrides to root.
   const validFolder = await seedBlankFolder(user, team.id, {
     createFolderOptions: {
       name: 'Valid Target Folder',
@@ -276,7 +275,7 @@ test('[TEMPLATE_TARGET_FOLDER]: rejects non-document folders, cross-team folders
     teamId: team.id,
     id: { type: 'envelopeId', id: template.id },
     data: { targetFolderId: validFolder.id },
-    requestMetadata: {},
+    requestMetadata,
   });
 
   const defaultFolderDoc = await createDocumentFromTemplate({
@@ -288,7 +287,7 @@ test('[TEMPLATE_TARGET_FOLDER]: rejects non-document folders, cross-team folders
       name: 'Recipient',
       email: seedTestEmail(),
     })),
-    requestMetadata: { requestMetadata: {} },
+    requestMetadata,
   });
 
   expect(defaultFolderDoc.folderId).toBe(validFolder.id);
@@ -303,7 +302,7 @@ test('[TEMPLATE_TARGET_FOLDER]: rejects non-document folders, cross-team folders
       name: 'Recipient',
       email: seedTestEmail(),
     })),
-    requestMetadata: { requestMetadata: {} },
+    requestMetadata,
   });
 
   expect(rootOverrideDoc.folderId).toBeNull();

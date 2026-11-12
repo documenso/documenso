@@ -105,7 +105,7 @@ export const ApiContractV1 = c.router(
     createTemplate: {
       method: 'POST',
       path: '/api/v1/templates',
-      body: ZCreateTemplateV2RequestSchema,
+      body: ZCreateTemplateV2RequestSchema.omit({ targetFolderId: true }),
       responses: {
         200: ZCreateTemplateV2ResponseSchema,
         401: ZUnsuccessfulResponseSchema,

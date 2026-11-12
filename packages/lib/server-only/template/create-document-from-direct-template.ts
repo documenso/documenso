@@ -442,7 +442,6 @@ export const createDocumentFromDirectTemplate = async ({
 
   let resolvedTargetFolderId: string | null = null;
 
-  // Fall back to the root folder if the configured target folder was removed.
   if (directTemplateEnvelope.targetFolderId) {
     const targetFolder = await prisma.folder.findFirst({
       where: {
