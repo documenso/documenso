@@ -224,6 +224,7 @@ export const templateRouter = router({
       const {
         title,
         folderId,
+        targetFolderId,
         externalId,
         visibility,
         globalAccessAuth,
@@ -267,6 +268,7 @@ export const templateRouter = router({
             },
           ],
           folderId,
+          targetFolderId,
           externalId: externalId ?? undefined,
           visibility,
           globalAccessAuth,
@@ -312,6 +314,7 @@ export const templateRouter = router({
       const {
         title,
         folderId,
+        targetFolderId,
         externalId,
         visibility,
         globalAccessAuth,
@@ -345,6 +348,7 @@ export const templateRouter = router({
             },
           ],
           folderId,
+          targetFolderId,
           externalId: externalId ?? undefined,
           visibility,
           globalAccessAuth,

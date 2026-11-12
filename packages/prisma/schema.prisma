@@ -430,9 +430,10 @@ model Folder {
   team       Team               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   pinned     Boolean            @default(false)
   parentId   String?
-  parent     Folder?            @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
-  envelopes  Envelope[]
-  createdAt  DateTime           @default(now())
+  parent          Folder?            @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
+  envelopes       Envelope[]
+  targetEnvelopes Envelope[]         @relation("EnvelopeTargetFolder")
+  createdAt       DateTime           @default(now())
   updatedAt  DateTime           @default(now()) @updatedAt
   subfolders Folder[]           @relation("FolderToFolder")
   visibility DocumentVisibility @default(EVERYONE)
@@ -490,6 +491,8 @@ model Envelope {
   publicDescription String              @default("")
   directLink        TemplateDirectLink?
   templateId        Int?
+  targetFolder      Folder?             @relation("EnvelopeTargetFolder", fields: [targetFolderId], references: [id], onDelete: SetNull)
+  targetFolderId    String?
 
   // Relations
   userId Int /// @zod.number.describe("The ID of the user that created this document.")
@@ -511,6 +514,7 @@ model Envelope {
   @@index([userId])
   @@index([teamId])
   @@index([folderId])
+  @@index([targetFolderId])
   @@index([createdAt])
 }
 

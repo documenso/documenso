@@ -65,6 +65,7 @@ export const mapEnvelopeToTemplateLite = (envelope: Envelope): TTemplateLite => 
     publicTitle: envelope.publicTitle,
     publicDescription: envelope.publicDescription,
     folderId: envelope.folderId,
+    targetFolderId: envelope.targetFolderId,
     useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
     templateDocumentDataId: '',
   };
@@ -100,6 +101,7 @@ export const mapEnvelopeToTemplateMany = (envelope: EnvelopeWithTemplateManyRela
     publicTitle: envelope.publicTitle,
     publicDescription: envelope.publicDescription,
     folderId: envelope.folderId,
+    targetFolderId: envelope.targetFolderId,
     useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
     team: envelope.team,
     fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),

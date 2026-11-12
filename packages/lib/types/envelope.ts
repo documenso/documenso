@@ -35,6 +35,7 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
   userId: true,
   teamId: true,
   folderId: true,
+  targetFolderId: true,
   templateId: true,
 }).extend({
   documentMeta: DocumentMetaSchema.pick({
@@ -110,6 +111,7 @@ export const ZEnvelopeLiteSchema = EnvelopeSchema.pick({
   userId: true,
   teamId: true,
   folderId: true,
+  targetFolderId: true,
 });
 
 export type TEnvelopeLite = z.infer<typeof ZEnvelopeLiteSchema>;
@@ -139,6 +141,7 @@ export const ZEnvelopeManySchema = EnvelopeSchema.pick({
   userId: true,
   teamId: true,
   folderId: true,
+  targetFolderId: true,
   templateId: true,
 }).extend({
   user: z.object({

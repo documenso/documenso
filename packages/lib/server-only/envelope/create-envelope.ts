@@ -109,6 +109,7 @@ export type CreateEnvelopeOptions = {
     recipients?: CreateEnvelopeRecipientOptions[];
     contents?: CreateEnvelopeContentOptions[];
     folderId?: string;
+    targetFolderId?: string;
     delegatedDocumentOwner?: string;
     signatureLevel?: TSignatureLevel;
   };
@@ -152,6 +153,7 @@ export const createEnvelope = async ({
     formValues,
     userTimezone,
     folderId,
+    targetFolderId,
     templateType,
     globalAccessAuth,
     globalActionAuth,
@@ -208,6 +210,28 @@ export const createEnvelope = async ({
     if (!folder) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Folder not found',
+      });
+    }
+  }
+
+  if (targetFolderId) {
+    if (data.type !== EnvelopeType.TEMPLATE) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Target folder can only be set for template envelopes',
+      });
+    }
+
+    const targetFolder = await prisma.folder.findUnique({
+      where: {
+        id: targetFolderId,
+        type: FolderType.DOCUMENT,
+        team: buildTeamWhereQuery({ teamId, userId }),
+      },
+    });
+
+    if (!targetFolder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Target folder not found',
       });
     }
   }
@@ -441,6 +465,7 @@ export const createEnvelope = async ({
         templateType: type === EnvelopeType.TEMPLATE ? templateType : undefined,
         publicTitle: type === EnvelopeType.TEMPLATE ? publicTitle : undefined,
         publicDescription: type === EnvelopeType.TEMPLATE ? publicDescription : undefined,
+        targetFolderId: type === EnvelopeType.TEMPLATE ? targetFolderId : undefined,
       },
       include: {
         envelopeItems: true,

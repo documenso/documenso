@@ -92,6 +92,7 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
         publicTitle: envelope.publicTitle,
         publicDescription: envelope.publicDescription,
         folderId: envelope.folderId,
+        targetFolderId: envelope.targetFolderId,
         useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
         team: envelope.team
           ? {

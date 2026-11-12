@@ -8,6 +8,7 @@ import {
   DocumentStatus,
   EnvelopeType,
   FieldType,
+  FolderType,
   Prisma,
   RecipientRole,
   SendStatus,
@@ -439,6 +440,24 @@ export const createDocumentFromDirectTemplate = async ({
     envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
   });
 
+  let resolvedTargetFolderId: string | null = null;
+
+  // Fall back to the root folder if the configured target folder was removed.
+  if (directTemplateEnvelope.targetFolderId) {
+    const targetFolder = await prisma.folder.findFirst({
+      where: {
+        id: directTemplateEnvelope.targetFolderId,
+        teamId: directTemplateEnvelope.teamId,
+        type: FolderType.DOCUMENT,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    resolvedTargetFolderId = targetFolder?.id ?? null;
+  }
+
   const { createdEnvelope, recipientId, token } = await prisma.$transaction(async (tx) => {
     // Create the envelope and non direct template recipients.
     const createdEnvelope = await tx.envelope.create({
@@ -453,6 +472,7 @@ export const createDocumentFromDirectTemplate = async ({
         templateId: directTemplateEnvelopeLegacyId,
         userId: directTemplateEnvelope.userId,
         teamId: directTemplateEnvelope.teamId,
+        folderId: resolvedTargetFolderId,
         title: directTemplateEnvelope.title,
         createdAt: initialRequestTime,
         status: DocumentStatus.PENDING,

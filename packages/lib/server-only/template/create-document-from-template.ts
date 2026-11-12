@@ -77,7 +77,7 @@ export type CreateDocumentFromTemplateOptions = {
     email: string;
     signingOrder?: number | null;
   }[];
-  folderId?: string;
+  folderId?: string | null;
   prefillFields?: TFieldMetaPrefillFieldsSchema[];
 
   customDocumentData?: {
@@ -361,6 +361,8 @@ export const createDocumentFromTemplate = async ({
     });
   }
 
+  let resolvedFolderId: string | null = null;
+
   if (folderId) {
     const folder = await prisma.folder.findUnique({
       where: {
@@ -375,6 +377,20 @@ export const createDocumentFromTemplate = async ({
         message: 'Folder not found',
       });
     }
+
+    resolvedFolderId = folder.id;
+  } else if (folderId === undefined && template.targetFolderId && template.teamId === teamId) {
+    // Only fall back to the template's target folder when `folderId` is omitted;
+    // an explicit `null` means the caller chose the root folder override.
+    const targetFolder = await prisma.folder.findUnique({
+      where: {
+        id: template.targetFolderId,
+        type: FolderType.DOCUMENT,
+        team: buildTeamWhereQuery({ teamId, userId }),
+      },
+    });
+
+    resolvedFolderId = targetFolder?.id ?? null;
   }
 
   const legacyTemplateId = mapSecondaryIdToTemplateId(template.secondaryId);
@@ -612,7 +628,7 @@ export const createDocumentFromTemplate = async ({
         externalId: externalId || template.externalId,
         templateId: legacyTemplateId, // The template this envelope was created from.
         userId,
-        folderId,
+        folderId: resolvedFolderId,
         teamId,
         title: finalEnvelopeTitle,
         envelopeItems: {
