@@ -85,7 +85,7 @@
     "inngest-cli": "^1.44.0",
     "lint-staged": "^16.2.7",
     "nanoid": "^5.1.6",
-    "nodemailer": "^9.0.0",
+    "nodemailer": "^10.0.0",
     "pdfjs-dist": "5.4.296",
     "pino": "^9.14.0",
     "pino-pretty": "^13.1.2",
@@ -153,6 +153,7 @@
   "overrides": {
     "lodash": "4.18.1",
     "brace-expansion@1": "^1.1.18",
+    "fflate@0.7": "^0.7.5",
     "pdfjs-dist": "5.4.296",
     "postcss": "^8.5.19",
     "react": "$react",
@@ -163,6 +164,15 @@
     "zod": "$zod",
     "fumadocs-mdx": {
       "zod": "^4.3.5"
+    },
+    "@tailwindcss/typography": {
+      "postcss-selector-parser": "^6.1.5"
+    },
+    "inngest-cli": {
+      "adm-zip": "^0.6.1"
+    },
+    "@prisma/config": {
+      "deepmerge-ts": "^8.0.2"
     }
   }
 }

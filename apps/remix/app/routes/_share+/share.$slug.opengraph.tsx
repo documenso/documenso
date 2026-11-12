@@ -86,6 +86,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
         <div
           style={{
             position: 'absolute',
+            boxSizing: 'border-box',
             padding: '24px 48px',
             display: 'flex',
             alignItems: 'center',
@@ -111,6 +112,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
         <p
           style={{
             position: 'absolute',
+            boxSizing: 'border-box',
             padding: '24px 48px',
             marginTop: '-8px',
             display: 'flex',
@@ -142,6 +144,8 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
         <h2
           style={{
             fontSize: '20px',
+            // Pinned so the heading stays level with the "Join Documenso" text baked into the frame image.
+            marginTop: 20,
             color: '#828282',
             fontFamily: 'Inter',
             fontWeight: 700,
