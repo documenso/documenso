@@ -17,15 +17,14 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/nodemailer-resend": "5.0.0",
+    "@documenso/nodemailer-resend": "6.0.1",
     "@documenso/tailwind-config": "*",
-    "@react-email/render": "2.1.0",
-    "nodemailer": "^9.0.0",
-    "react-email": "^6.9.0",
+    "@react-email/render": "2.2.0",
+    "nodemailer": "^10.0.0",
+    "react-email": "^6.11.11",
     "resend": "^6.5.2"
   },
   "devDependencies": {
-    "@documenso/tsconfig": "*",
-    "@types/nodemailer": "^8.0.1"
+    "@documenso/tsconfig": "*"
   }
 }
