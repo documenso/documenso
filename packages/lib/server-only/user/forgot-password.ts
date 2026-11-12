@@ -7,10 +7,7 @@ import { sendForgotPassword } from '../auth/send-forgot-password';
 export const forgotPassword = async ({ email }: { email: string }) => {
   const user = await prisma.user.findFirst({
     where: {
-      email: {
-        equals: email,
-        mode: 'insensitive',
-      },
+      email: email.toLowerCase(),
     },
   });
 

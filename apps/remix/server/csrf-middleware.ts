@@ -1,7 +1,7 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createMiddleware } from 'hono/factory';
 
 import type { HonoEnv } from './router';
+import { isWebappOrigin } from './utils/is-webapp-origin';
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
@@ -26,9 +26,8 @@ export const csrfMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
   }
 
   const origin = c.req.header('Origin');
-  const validOrigin = new URL(NEXT_PUBLIC_WEBAPP_URL()).origin;
 
-  if (origin !== validOrigin) {
+  if (!isWebappOrigin(origin)) {
     c.get('logger').warn({
       event: 'csrf.origin_rejected',
       method: c.req.method,

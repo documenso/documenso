@@ -11,10 +11,16 @@ export const getRecipientOrSenderByShareLinkSlug = async ({ slug }: GetRecipient
     },
   });
 
+  // The link keeps the email as it was when the link was created, which can be a mixed-case
+  // address that has since been lowercased on the user or recipient.
+  const emails = [email, email.toLowerCase()];
+
   const sender = await prisma.user.findFirst({
     where: {
       envelopes: { some: { id: envelopeId } },
-      email,
+      email: {
+        in: emails,
+      },
     },
     select: {
       email: true,
@@ -30,7 +36,9 @@ export const getRecipientOrSenderByShareLinkSlug = async ({ slug }: GetRecipient
   const recipient = await prisma.recipient.findFirst({
     where: {
       envelopeId,
-      email,
+      email: {
+        in: emails,
+      },
     },
     select: {
       email: true,

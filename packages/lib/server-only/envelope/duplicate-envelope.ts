@@ -230,7 +230,7 @@ export const duplicateEnvelope = async ({
           },
           data: {
             envelopeId: duplicatedEnvelope.id,
-            email: recipient.email,
+            email: recipient.email.toLowerCase(),
             name: recipient.name,
             role: recipient.role,
             signingOrder: recipient.signingOrder,
