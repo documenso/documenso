@@ -32,7 +32,13 @@ import type {
   TRadioFieldMeta,
   TTextFieldMeta,
 } from '../../types/field-meta';
-import { ZCheckboxFieldMeta, ZDropdownFieldMeta, ZFieldMetaSchema, ZRadioFieldMeta } from '../../types/field-meta';
+import {
+  ZBaseFieldMeta,
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZFieldMetaSchema,
+  ZRadioFieldMeta,
+} from '../../types/field-meta';
 import { ZSignatureLevelSchema } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
@@ -141,6 +147,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
   // We've already validated that the field types match at a higher level
   // Start with the existing field meta or an empty object
   const existingMeta = field.fieldMeta || {};
+  const existingBaseMeta = ZBaseFieldMeta.safeParse(existingMeta).data;
 
   // Apply type-specific updates based on the prefill field type using ts-pattern
   return match(prefillField)
@@ -154,8 +161,8 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TTextFieldMeta = {
         ...existingMeta,
         type: 'text',
-        label: field.label,
-        placeholder: field.placeholder,
+        label: field.label ?? existingBaseMeta?.label,
+        placeholder: field.placeholder ?? existingBaseMeta?.placeholder,
         text: field.value,
       };
 
@@ -171,8 +178,8 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TNumberFieldMeta = {
         ...existingMeta,
         type: 'number',
-        label: field.label,
-        placeholder: field.placeholder,
+        label: field.label ?? existingBaseMeta?.label,
+        placeholder: field.placeholder ?? existingBaseMeta?.placeholder,
         value: field.value,
       };
 
@@ -212,7 +219,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TRadioFieldMeta = {
         ...existingMeta,
         type: 'radio',
-        label: field.label,
+        label: field.label ?? existingBaseMeta?.label,
         values: newValues,
         direction: radioMeta.direction ?? 'vertical',
       };
@@ -257,7 +264,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TCheckboxFieldMeta = {
         ...existingMeta,
         type: 'checkbox',
-        label: field.label,
+        label: field.label ?? existingBaseMeta?.label,
         values: newValues,
         direction: checkboxMeta.direction ?? 'vertical',
       };
@@ -287,7 +294,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TDropdownFieldMeta = {
         ...existingMeta,
         type: 'dropdown',
-        label: field.label,
+        label: field.label ?? existingBaseMeta?.label,
         defaultValue: field.value,
       };
 
@@ -650,7 +657,7 @@ export const createDocumentFromTemplate = async ({
               const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
 
               return {
-                email: recipient.email,
+                email: recipient.email.toLowerCase(),
                 name: recipient.name,
                 role: recipient.role,
                 authOptions: createRecipientAuthOptions({

@@ -76,7 +76,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const loginLimitResult = await loginRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
-      identifier: email,
+      identifier: email.toLowerCase(),
     });
 
     const loginLimited = rateLimitResponse(c, loginLimitResult);
@@ -349,7 +349,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const resendLimitResult = await resendVerifyEmailRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
-      identifier: email,
+      identifier: email.toLowerCase(),
     });
 
     const resendLimited = rateLimitResponse(c, resendLimitResult);
@@ -385,7 +385,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const forgotLimitResult = await forgotPasswordRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
-      identifier: email,
+      identifier: email.toLowerCase(),
     });
 
     const forgotLimited = rateLimitResponse(c, forgotLimitResult);

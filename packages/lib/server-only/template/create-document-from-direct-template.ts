@@ -103,7 +103,7 @@ export type TCreateDocumentFromDirectTemplateResponse = z.infer<typeof ZCreateDo
 
 export const createDocumentFromDirectTemplate = async ({
   directRecipientName: initialDirectRecipientName,
-  directRecipientEmail,
+  directRecipientEmail: providedDirectRecipientEmail,
   directTemplateToken,
   directTemplateExternalId,
   signedFieldValues,
@@ -112,6 +112,8 @@ export const createDocumentFromDirectTemplate = async ({
   requestMetadata,
   user,
 }: CreateDocumentFromDirectTemplateOptions): Promise<TCreateDocumentFromDirectTemplateResponse> => {
+  const directRecipientEmail = providedDirectRecipientEmail.toLowerCase();
+
   const directTemplateEnvelope = await prisma.envelope.findFirst({
     where: {
       directLink: {
@@ -824,7 +826,7 @@ export const createDocumentFromDirectTemplate = async ({
                 {
                   type: RECIPIENT_DIFF_TYPE.EMAIL,
                   from: nextRecipient.email,
-                  to: nextSigner.email,
+                  to: nextSigner.email.toLowerCase(),
                 },
               ],
             },
@@ -835,7 +837,7 @@ export const createDocumentFromDirectTemplate = async ({
           where: { id: nextRecipient.id },
           data: {
             name: nextSigner.name,
-            email: nextSigner.email,
+            email: nextSigner.email.toLowerCase(),
           },
         });
       }

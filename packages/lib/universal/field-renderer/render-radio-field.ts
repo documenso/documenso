@@ -158,7 +158,8 @@ export const renderRadioFieldElement = (field: FieldToRender, options: RenderFie
       fill: 'white',
     });
 
-    // Dot which represents the selected state.
+    // Dot which represents the selected state. Konva only fires a click when press and release hit
+    // the same shape, so the dot must not intercept hits meant for the circle beneath it.
     const dot = new Konva.Circle({
       internalRadioIndex: index,
       id: `radio-dot-${index}`,
@@ -168,6 +169,7 @@ export const renderRadioFieldElement = (field: FieldToRender, options: RenderFie
       radius: calculateRadioSize(fontSize) / 4,
       fill: '#111827',
       visible: isRadioValueChecked,
+      listening: false,
     });
 
     const text = new Konva.Text({

@@ -158,6 +158,7 @@ export const AddSubjectFormPartial = ({
               showRecipientColors={true}
               recipientIds={recipients.map((recipient) => recipient.id)}
               fields={mapFieldsWithRecipients(fields, recipients)}
+              documentMeta={document.documentMeta}
             />
           )}
 

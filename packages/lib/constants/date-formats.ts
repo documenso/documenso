@@ -166,25 +166,39 @@ export const DATE_FORMATS = [
   value: (typeof VALID_DATE_FORMAT_VALUES)[number];
 }[];
 
-export const convertToLocalSystemFormat = (
-  customText: string,
-  dateFormat: string | null = DEFAULT_DOCUMENT_DATE_FORMAT,
-  timeZone: string | null = DEFAULT_DOCUMENT_TIME_ZONE,
-): string => {
+type ConvertToLocalSystemFormatOptions = {
+  customText: string;
+  dateFormat: string | null | undefined;
+  timezone: string | null | undefined;
+};
+
+export const convertToLocalSystemFormat = ({
+  customText,
+  dateFormat,
+  timezone,
+}: ConvertToLocalSystemFormatOptions): string => {
   const coalescedDateFormat = dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT;
-  const coalescedTimeZone = timeZone ?? DEFAULT_DOCUMENT_TIME_ZONE;
+  const coalescedTimezone = timezone ?? DEFAULT_DOCUMENT_TIME_ZONE;
 
   const parsedDate = DateTime.fromFormat(customText, coalescedDateFormat, {
-    zone: coalescedTimeZone,
+    zone: coalescedTimezone,
   });
 
   if (!parsedDate.isValid) {
     return 'Invalid date';
   }
 
-  const formattedDate = parsedDate.toLocal().toFormat(coalescedDateFormat);
+  const hasHour = DateTime.fromFormatExplain(customText, coalescedDateFormat).tokens.some(
+    ({ literal, val }) => !literal && ['h', 'hh', 'H', 'HH'].includes(val),
+  );
 
-  return formattedDate;
+  // Formats without an hour are calendar dates, not moments, so converting them to the viewer's timezone could
+  // only shift the day.
+  if (!hasHour) {
+    return parsedDate.toFormat(coalescedDateFormat);
+  }
+
+  return parsedDate.toLocal().toFormat(coalescedDateFormat);
 };
 
 export const isValidDateFormat = (dateFormat: unknown): dateFormat is ValidDateFormat => {

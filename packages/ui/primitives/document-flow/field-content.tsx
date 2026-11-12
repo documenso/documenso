@@ -1,4 +1,4 @@
-import { convertToLocalSystemFormat, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { convertToLocalSystemFormat } from '@documenso/lib/constants/date-formats';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { useLingui } from '@lingui/react';
@@ -24,7 +24,7 @@ type FieldIconProps = {
     fieldMeta?: TFieldMetaSchema | null;
     signature?: Signature | null;
   };
-  documentMeta?: Pick<DocumentMeta, 'dateFormat'>;
+  documentMeta?: Pick<DocumentMeta, 'dateFormat' | 'timezone'>;
 };
 
 /**
@@ -151,10 +151,11 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
     }
 
     if (field.type === FieldType.DATE) {
-      textToDisplay = convertToLocalSystemFormat(
-        field.customText ?? '',
-        documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
-      );
+      textToDisplay = convertToLocalSystemFormat({
+        customText: field.customText ?? '',
+        dateFormat: documentMeta?.dateFormat,
+        timezone: documentMeta?.timezone,
+      });
     }
 
     if (isSignatureField && field.signature?.typedSignature) {

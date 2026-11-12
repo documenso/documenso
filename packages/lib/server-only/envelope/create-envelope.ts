@@ -3,6 +3,7 @@ import type { PlaceholderInfo } from '@documenso/lib/server-only/pdf/auto-place-
 import { convertPlaceholdersToFieldInputs } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { findRecipientByPlaceholder } from '@documenso/lib/server-only/pdf/helpers';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
+import { findUserByProvidedEmail } from '@documenso/lib/server-only/user/find-user-by-provided-email';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -333,7 +334,10 @@ export const createEnvelope = async ({
     role: recipient.role,
   }));
 
-  const requestedRecipients = [...(data.recipients ?? []), ...defaultRecipients];
+  const requestedRecipients = [...(data.recipients ?? []), ...defaultRecipients].map((recipient) => ({
+    ...recipient,
+    email: recipient.email.toLowerCase(),
+  }));
 
   assertCompatibleRecipientGrouping({ signatureLevel, recipients: requestedRecipients });
 
@@ -379,11 +383,7 @@ export const createEnvelope = async ({
       return null;
     }
 
-    const delegatedOwner = await prisma.user.findFirst({
-      where: {
-        email: delegatedDocumentOwner,
-      },
-    });
+    const delegatedOwner = await findUserByProvidedEmail({ email: delegatedDocumentOwner });
 
     if (!delegatedOwner) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
@@ -632,7 +632,7 @@ export const createEnvelope = async ({
               placeholder,
               data.recipients && data.recipients.length > 0
                 ? data.recipients.map((r) => {
-                    const found = availableRecipients.find((cr) => cr.email === r.email);
+                    const found = availableRecipients.find((cr) => cr.email === r.email.toLowerCase());
 
                     if (!found) {
                       throw new AppError(AppErrorCode.NOT_FOUND, {
