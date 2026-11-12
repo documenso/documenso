@@ -57,7 +57,13 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
   }, [currentTeam, organisations]);
 
   return (
-    <div className={cn('ml-8 hidden flex-1 items-center gap-x-12 md:flex md:justify-between', className)} {...props}>
+    <div
+      className={cn(
+        'ml-4 hidden flex-1 items-center gap-x-4 md:flex md:justify-between lg:ml-8 lg:gap-x-12',
+        className,
+      )}
+      {...props}
+    >
       <div>
         <AnimatePresence>
           {menuNavigationLinks.length > 0 && (
@@ -96,7 +102,7 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
           <Trans>Search</Trans>
         </div>
 
-        <div>
+        <div className="hidden lg:block">
           <div className="flex items-center rounded-md bg-muted px-1.5 py-0.5 text-muted-foreground text-xs tracking-wider">
             {modifierKey}+K
           </div>

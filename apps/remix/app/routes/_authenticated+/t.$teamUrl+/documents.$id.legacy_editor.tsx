@@ -92,7 +92,7 @@ export default function DocumentEditPage() {
         <Trans>Documents</Trans>
       </Link>
 
-      <div className="mt-4 flex w-full items-end justify-between">
+      <div className="mt-4 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2">
         <div className="flex-1">
           <h1
             className="block max-w-[20rem] truncate font-semibold text-2xl md:max-w-[30rem] md:text-3xl"
