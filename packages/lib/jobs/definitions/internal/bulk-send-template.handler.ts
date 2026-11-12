@@ -4,7 +4,7 @@ import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { validateBulkSendCsv } from '@documenso/lib/server-only/template/validate-bulk-send-csv';
 import { prisma } from '@documenso/prisma';
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { createElement } from 'react';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';

@@ -1,8 +1,5 @@
 import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
 
-export const ORGANISATION_URL_ROOT_REGEX = /^\/t\/[^/]+\/?$/;
-export const ORGANISATION_URL_REGEX = /^\/t\/[^/]+/;
-
 export const ORGANISATION_INTERNAL_GROUPS: {
   organisationRole: OrganisationMemberRole;
   type: OrganisationGroupType;
@@ -50,82 +47,6 @@ export const ORGANISATION_MEMBER_ROLE_HIERARCHY = {
 } satisfies Record<OrganisationMemberRole, OrganisationMemberRole[]>;
 
 export const LOWEST_ORGANISATION_ROLE = OrganisationMemberRole.MEMBER;
-
-export const PROTECTED_ORGANISATION_URLS = [
-  '403',
-  '404',
-  '500',
-  '502',
-  '503',
-  '504',
-  'about',
-  'account',
-  'admin',
-  'administrator',
-  'api',
-  'app',
-  'archive',
-  'auth',
-  'backup',
-  'config',
-  'configure',
-  'contact',
-  'contact-us',
-  'copyright',
-  'crime',
-  'criminal',
-  'dashboard',
-  'docs',
-  'documentation',
-  'document',
-  'documents',
-  'error',
-  'exploit',
-  'exploitation',
-  'exploiter',
-  'feedback',
-  'finance',
-  'forgot-password',
-  'fraud',
-  'fraudulent',
-  'hack',
-  'hacker',
-  'harassment',
-  'help',
-  'helpdesk',
-  'illegal',
-  'internal',
-  'legal',
-  'login',
-  'logout',
-  'maintenance',
-  'malware',
-  'newsletter',
-  'policy',
-  'privacy',
-  'profile',
-  'public',
-  'reset-password',
-  'scam',
-  'scammer',
-  'settings',
-  'setup',
-  'sign',
-  'signin',
-  'signout',
-  'signup',
-  'spam',
-  'support',
-  'system',
-  'organisation',
-  'terms',
-  'virus',
-  'webhook',
-];
-
-export const isOrganisationUrlProtected = (url: string) => {
-  return PROTECTED_ORGANISATION_URLS.some((protectedUrl) => url.startsWith(`/${protectedUrl}`));
-};
 
 export const ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER = 'organisation-account-link';
 

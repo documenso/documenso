@@ -8,8 +8,6 @@ import { useMemo, useState } from 'react';
 import type { AppRouter } from '../server/router';
 import { dataTransformer } from '../utils/data-transformer';
 
-export { getQueryKey } from '@trpc/react-query';
-
 export const trpc = createTRPCReact<AppRouter>({
   overrides: {
     useMutation: {

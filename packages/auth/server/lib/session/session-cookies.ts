@@ -11,7 +11,6 @@ import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
 import { z } from 'zod';
 
 import { AUTH_EMBED_SESSION_LIFETIME, AUTH_SESSION_LIFETIME } from '../../config';
-import { extractCookieFromHeaders } from '../utils/cookies';
 import { generateSessionToken } from './session';
 
 const sessionCookieName = formatSecureCookieName('sessionId');
@@ -68,12 +67,6 @@ export const embedSessionCookieOptions = {
   secure: shouldUseSecureCookies(),
   partitioned: shouldUseSecureCookies(),
 } as const;
-
-export const extractSessionCookieFromHeaders = (headers: Headers): string | null => {
-  return (
-    extractCookieFromHeaders(sessionCookieName, headers) ?? extractCookieFromHeaders(embedSessionCookieName, headers)
-  );
-};
 
 /**
  * Get the session cookie attached to the request headers.
