@@ -39,6 +39,35 @@ import type { TSealDocumentJobDefinition } from './seal-document';
 export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition; io: JobRunIO }) => {
   const { documentId, sendEmail = true, isResealing = false, requestMetadata } = payload;
 
+  // Idempotency guard: sealing must happen exactly once per envelope.
+  // A duplicate trigger (two recipients completing a PARALLEL document within
+  // the same window, or a job retry landing after the winning run committed)
+  // must no-op once the envelope is in a terminal state instead of sealing
+  // over the already-sealed PDF - resealing invalidates the first signature
+  // and resends completion webhooks and emails. The admin reseal flow sets
+  // isResealing explicitly and is not affected.
+  const alreadySealed = await io.runTask('seal-document-guard', async () => {
+    const envelope = await prisma.envelope.findFirst({
+      where: {
+        type: EnvelopeType.DOCUMENT,
+        secondaryId: mapDocumentIdToSecondaryId(documentId),
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    return (
+      !isResealing &&
+      !!envelope &&
+      (envelope.status === DocumentStatus.COMPLETED || envelope.status === DocumentStatus.REJECTED)
+    );
+  });
+
+  if (alreadySealed) {
+    return;
+  }
+
   const { envelopeId, envelopeStatus, isRejected } = await io.runTask('seal-document', async () => {
     const envelope = await prisma.envelope.findFirstOrThrow({
       where: {
