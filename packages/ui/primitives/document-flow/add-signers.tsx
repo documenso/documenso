@@ -24,7 +24,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Field } from '@prisma/client';
+import type { DocumentMeta, Field } from '@prisma/client';
 import { DocumentSigningOrder, RecipientRole, SendStatus } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircle, Plus, Trash } from 'lucide-react';
@@ -63,6 +63,7 @@ export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: TRecipientLite[];
   fields: Field[];
+  documentMeta: Pick<DocumentMeta, 'dateFormat' | 'timezone'>;
   signingOrder?: DocumentSigningOrder | null;
   allowDictateNextSigner?: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
@@ -80,6 +81,7 @@ export const AddSignersFormPartial = ({
   documentFlow,
   recipients,
   fields,
+  documentMeta,
   signingOrder,
   allowDictateNextSigner,
   onSubmit,
@@ -545,6 +547,7 @@ export const AddSignersFormPartial = ({
             showRecipientColors={true}
             recipientIds={recipients.map((recipient) => recipient.id)}
             fields={mapFieldsWithRecipients(fields, recipients)}
+            documentMeta={documentMeta}
           />
         )}
 

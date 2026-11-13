@@ -165,7 +165,7 @@ export const updateEnvelopeRecipients = async ({
           },
           data: {
             name: mergedRecipient.name,
-            email: mergedRecipient.email,
+            email: mergedRecipient.email.toLowerCase(),
             role: mergedRecipient.role,
             signingOrder: mergedRecipient.signingOrder,
             envelopeId: envelope.id,

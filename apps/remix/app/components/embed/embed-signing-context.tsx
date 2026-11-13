@@ -3,6 +3,7 @@ import { createContext, useContext } from 'react';
 export type EmbedSigningContextValue = {
   isEmbed: true;
   allowDocumentRejection: boolean;
+  allowDownloadPDF: boolean;
   isNameLocked: boolean;
   isEmailLocked: boolean;
   hidePoweredBy: boolean;
@@ -39,6 +40,7 @@ export const useRequiredEmbedSigningContext = () => {
 
 export type EmbedSigningProviderProps = {
   allowDocumentRejection?: boolean;
+  allowDownloadPDF?: boolean;
   isNameLocked?: boolean;
   isEmailLocked?: boolean;
   hidePoweredBy?: boolean;
@@ -60,6 +62,7 @@ export type EmbedSigningProviderProps = {
 
 export const EmbedSigningProvider = ({
   allowDocumentRejection = false,
+  allowDownloadPDF = true,
   isNameLocked = false,
   isEmailLocked = true,
   hidePoweredBy = false,
@@ -77,6 +80,7 @@ export const EmbedSigningProvider = ({
       value={{
         isEmbed: true,
         allowDocumentRejection,
+        allowDownloadPDF,
         isNameLocked,
         isEmailLocked,
         hidePoweredBy,

@@ -58,7 +58,7 @@ export const getServerLimits = async ({ userId, teamId }: GetServerLimitsOptions
   }
 
   // Bypass all limits even if plan expired for ENTERPRISE.
-  if (organisation.organisationClaimId === INTERNAL_CLAIM_ID.ENTERPRISE) {
+  if (organisation.organisationClaim.originalSubscriptionClaimId === INTERNAL_CLAIM_ID.ENTERPRISE) {
     return {
       quota: PAID_PLAN_LIMITS,
       remaining: PAID_PLAN_LIMITS,
