@@ -1,20 +1,18 @@
+import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
-import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
 import { cn } from '@documenso/ui/lib/utils';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import { DataTable, type DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import {
   Form,
   FormControl,
@@ -26,28 +24,32 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { Skeleton } from '@documenso/ui/primitives/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationMemberRole, SubscriptionStatus } from '@prisma/client';
-import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
-import { useMemo } from 'react';
+import { SubscriptionStatus } from '@prisma/client';
+import { CheckIcon, CopyIcon, ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
+import { parseAsStringLiteral, useQueryState } from 'nuqs';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { AdminOrganisationDeleteDialog } from '~/components/dialogs/admin-organisation-delete-dialog';
-import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
-import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { AdminOrganisationSyncSubscriptionDialog } from '~/components/dialogs/admin-organisation-sync-subscription-dialog';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
 import { ClaimLimitFields } from '~/components/general/claim-limit-fields';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-import { OrganisationUsagePanel } from '~/components/general/organisation-usage-panel';
-import { SettingsHeader } from '~/components/general/settings-header';
+import { OrganisationUsageAlertDot, OrganisationUsagePanel } from '~/components/general/organisation-usage-panel';
+import { useAdminOrganisationInsights } from '~/components/general/use-admin-organisation-insights';
+import { AdminOrganisationDocumentsTable } from '~/components/tables/admin-organisation-documents-table';
+import { AdminOrganisationMembersTable } from '~/components/tables/admin-organisation-members-table';
+import { AdminOrganisationTeamsTable } from '~/components/tables/admin-organisation-teams-table';
 
 import type { Route } from './+types/organisations.$id';
 
@@ -78,6 +80,8 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
     },
   );
 
+  const [tab, setTab] = useQueryState('tab', parseAsStringLiteral(ORGANISATION_TABS).withDefault('documents'));
+
   const { mutateAsync: createStripeCustomer, isPending: isCreatingStripeCustomer } =
     trpc.admin.stripe.createCustomer.useMutation({
       onSuccess: async () => {
@@ -96,134 +100,6 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
         });
       },
     });
-
-  const teamsColumns = useMemo(() => {
-    return [
-      {
-        header: t`Team`,
-        accessorKey: 'name',
-        cell: ({ row }) => (
-          <Link className="font-medium hover:underline" to={`/admin/teams/${row.original.id}`}>
-            {row.original.name}
-          </Link>
-        ),
-      },
-      {
-        header: t`Team ID`,
-        accessorKey: 'id',
-        cell: ({ row }) => <span className="font-mono text-muted-foreground text-xs">{row.original.id}</span>,
-      },
-      {
-        header: t`Team url`,
-        accessorKey: 'url',
-        cell: ({ row }) => <span className="font-mono text-xs">{row.original.url}</span>,
-      },
-      {
-        header: t`Created`,
-        accessorKey: 'createdAt',
-        cell: ({ row }) => {
-          return (
-            <span className="whitespace-nowrap font-mono text-muted-foreground text-xs">
-              {i18n.date(row.original.createdAt)}
-            </span>
-          );
-        },
-      },
-    ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['teams'][number]>[];
-  }, [i18n, t]);
-
-  const organisationMembersColumns = useMemo(() => {
-    if (!organisation) {
-      return [];
-    }
-
-    return [
-      {
-        header: t`Member`,
-        cell: ({ row }) => (
-          <div className="space-y-1">
-            <Link className="font-medium hover:underline" to={`/admin/users/${row.original.user.id}`}>
-              {row.original.user.name ?? row.original.user.email}
-            </Link>
-            {row.original.user.name && (
-              <div className="font-mono text-muted-foreground text-xs">{row.original.user.email}</div>
-            )}
-          </div>
-        ),
-      },
-      {
-        header: t`User ID`,
-        accessorKey: 'userId',
-        cell: ({ row }) => <span className="font-mono text-muted-foreground text-xs">{row.original.userId}</span>,
-      },
-      {
-        header: t`Role`,
-        cell: ({ row }) => {
-          const isOwner = row.original.userId === organisation.ownerUserId;
-
-          if (isOwner) {
-            return <Badge>{t`Owner`}</Badge>;
-          }
-
-          const highestRole = getHighestOrganisationRoleInGroup(
-            row.original.organisationGroupMembers.map((ogm) => ogm.group),
-          );
-
-          const roleLabel = match(highestRole)
-            .with(OrganisationMemberRole.ADMIN, () => t`Admin`)
-            .with(OrganisationMemberRole.MANAGER, () => t`Manager`)
-            .with(OrganisationMemberRole.MEMBER, () => t`Member`)
-            .exhaustive();
-
-          return <Badge variant="secondary">{roleLabel}</Badge>;
-        },
-      },
-      {
-        header: t`Joined`,
-        accessorKey: 'createdAt',
-        cell: ({ row }) => {
-          return (
-            <span className="whitespace-nowrap font-mono text-muted-foreground text-xs">
-              {i18n.date(row.original.createdAt)}
-            </span>
-          );
-        },
-      },
-      {
-        header: t`Actions`,
-        cell: ({ row }) => {
-          const isOwner = row.original.userId === organisation.ownerUserId;
-
-          const memberName = row.original.user.name ?? row.original.user.email;
-
-          return (
-            <div className="flex justify-end space-x-2">
-              <AdminOrganisationMemberUpdateDialog
-                trigger={
-                  <Button variant="outline">
-                    <Trans>Update role</Trans>
-                  </Button>
-                }
-                organisationId={organisationId}
-                organisationMember={row.original}
-                isOwner={isOwner}
-              />
-
-              {!isOwner && (
-                <AdminOrganisationMemberDeleteDialog
-                  organisationId={organisationId}
-                  organisationName={organisation.name}
-                  organisationMemberId={row.original.id}
-                  organisationMemberName={memberName}
-                  organisationMemberEmail={row.original.user.email}
-                />
-              )}
-            </div>
-          );
-        },
-      },
-    ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['members'][number]>[];
-  }, [organisation, i18n, t]);
 
   if (isLoadingOrganisation) {
     return (
@@ -256,207 +132,307 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
     );
   }
 
+  const usage = {
+    monthlyStats: organisation.monthlyStats,
+    organisationClaim: organisation.organisationClaim,
+    memberCount: organisation.members.length,
+    teamCount: organisation.teams.length,
+  };
+
   return (
-    <div>
-      <SettingsHeader
-        hideDivider
-        title={t`Manage organisation`}
-        subtitle={t`Manage the ${organisation.name} organisation`}
+    <div className="space-y-6">
+      <OrganisationHeader organisation={organisation} />
+
+      <Tabs
+        value={tab}
+        onValueChange={(value) => void setTab(ORGANISATION_TABS.find((name) => name === value) ?? null)}
       >
-        <Button variant="outline" asChild>
-          <Link to={`/admin/organisation-insights/${organisationId}`}>
-            <Trans>View insights</Trans>
-          </Link>
-        </Button>
-      </SettingsHeader>
+        <div className="-mx-1 overflow-x-auto px-1 pb-1">
+          <TabsList>
+            <TabsTrigger value="documents">
+              <Trans>Documents</Trans>
+              <DocumentCount organisationId={organisationId} />
+            </TabsTrigger>
 
-      <GenericOrganisationAdminForm organisation={organisation} />
+            <TabsTrigger value="usage">
+              <Trans>Usage</Trans>
+              <OrganisationUsageAlertDot {...usage} />
+            </TabsTrigger>
 
-      <SettingsHeader
-        hideDivider
-        title={t`Organisation usage`}
-        subtitle={t`Current usage against organisation limits.`}
-        className="mt-6"
-      />
+            <TabsTrigger value="teams">
+              <Trans>Teams</Trans>
+              <TabCount value={organisation.teams.length} />
+            </TabsTrigger>
 
-      <OrganisationUsagePanel
-        organisationId={organisation.id}
-        monthlyStats={organisation.monthlyStats}
-        organisationClaim={organisation.organisationClaim}
-        capacityUsage={{
-          members: organisation.members.length,
-          teams: organisation.teams.length,
-        }}
-      />
+            <TabsTrigger value="members">
+              <Trans>Members</Trans>
+              <TabCount value={organisation.members.length} />
+            </TabsTrigger>
 
-      <div className="mt-6 rounded-lg border p-4">
-        <Accordion type="single" collapsible>
-          <AccordionItem value="global-settings" className="border-b-0">
-            <AccordionTrigger className="py-0">
-              <div className="text-left">
-                <p className="font-semibold text-base">
-                  <Trans>Global Settings</Trans>
-                </p>
-                <p className="mt-1 text-muted-foreground text-sm">
-                  <Trans>Default settings applied to this organisation.</Trans>
-                </p>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="mt-4">
-                <AdminGlobalSettingsSection settings={organisation.organisationGlobalSettings} />
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
+            <TabsTrigger value="plan">
+              <Trans>Plan and limits</Trans>
+            </TabsTrigger>
 
-      <SettingsHeader
-        hideDivider
-        title={t`Manage subscription`}
-        subtitle={t`Manage the ${organisation.name} organisation subscription`}
-        className="mt-16"
-      />
+            <TabsTrigger value="settings">
+              <Trans>Settings</Trans>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-      <Alert
-        className={cn(
-          'my-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center',
-          organisation.subscription?.status === SubscriptionStatus.ACTIVE &&
-            'border border-green-600/20 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10',
-          organisation.subscription?.status === SubscriptionStatus.INACTIVE && 'opacity-60',
-        )}
-        variant="neutral"
-      >
-        <div className="mb-4 sm:mb-0">
-          <AlertTitle>
-            <Trans>Subscription</Trans>
-          </AlertTitle>
+        <TabsContent value="documents" className="mt-5">
+          <AdminOrganisationDocumentsTable organisationId={organisationId} />
+        </TabsContent>
 
-          <AlertDescription className="mr-2">
-            {organisation.subscription ? (
-              <span className="flex items-center gap-2">
-                {organisation.subscription.status === SubscriptionStatus.ACTIVE && (
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-green-600 dark:bg-green-400" aria-hidden="true" />
-                )}
-                <span>{i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription found</span>
-              </span>
-            ) : (
-              <span>
-                <Trans>No subscription found</Trans>
-              </span>
+        <TabsContent value="usage" className="mt-5">
+          <OrganisationUsagePanel organisationId={organisationId} {...usage} />
+        </TabsContent>
+
+        <TabsContent value="teams" className="mt-5">
+          <AdminOrganisationTeamsTable organisation={organisation} />
+        </TabsContent>
+
+        <TabsContent value="members" className="mt-5">
+          <AdminOrganisationMembersTable organisation={organisation} />
+        </TabsContent>
+
+        <TabsContent value="plan" className="mt-5 space-y-6">
+          <Alert
+            className={cn(
+              'flex flex-col justify-between p-6 sm:flex-row sm:items-center',
+              organisation.subscription?.status === SubscriptionStatus.ACTIVE &&
+                'border border-green-600/20 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10',
+              organisation.subscription?.status === SubscriptionStatus.INACTIVE && 'opacity-60',
             )}
-          </AlertDescription>
-        </div>
+            variant="neutral"
+          >
+            <div className="mb-4 sm:mb-0">
+              <AlertTitle>
+                <Trans>Subscription</Trans>
+              </AlertTitle>
 
-        {!organisation.customerId && (
-          <div>
-            <Button
-              variant="outline"
-              className="bg-background"
-              loading={isCreatingStripeCustomer}
-              onClick={async () => createStripeCustomer({ organisationId })}
-            >
-              <Trans>Create Stripe customer</Trans>
-            </Button>
-          </div>
-        )}
+              <AlertDescription className="mr-2">
+                {organisation.subscription ? (
+                  <span className="flex items-center gap-2">
+                    {organisation.subscription.status === SubscriptionStatus.ACTIVE && (
+                      <span
+                        className="h-2 w-2 shrink-0 rounded-full bg-green-600 dark:bg-green-400"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span>{i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription found</span>
+                  </span>
+                ) : (
+                  <span>
+                    <Trans>No subscription found</Trans>
+                  </span>
+                )}
+              </AlertDescription>
+            </div>
 
-        {organisation.customerId && !organisation.subscription && (
-          <div>
-            <Button variant="outline" className="bg-background" asChild>
-              <Link
-                target="_blank"
-                to={`https://dashboard.stripe.com/customers/${organisation.customerId}?create=subscription&subscription_default_customer=${organisation.customerId}`}
-              >
-                <Trans>Create subscription</Trans>
-                <ExternalLinkIcon className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        )}
-
-        {organisation.subscription && (
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <AdminOrganisationSyncSubscriptionDialog
-              organisationId={organisationId}
-              trigger={
-                <Button variant="outline" className="bg-background">
-                  <Trans>Sync Stripe subscription</Trans>
+            {!organisation.customerId && (
+              <div>
+                <Button
+                  variant="outline"
+                  className="bg-background"
+                  loading={isCreatingStripeCustomer}
+                  onClick={async () => createStripeCustomer({ organisationId })}
+                >
+                  <Trans>Create Stripe customer</Trans>
                 </Button>
-              }
-            />
+              </div>
+            )}
 
-            <Button variant="outline" className="bg-background" asChild>
-              <Link
-                target="_blank"
-                to={`https://dashboard.stripe.com/subscriptions/${organisation.subscription.planId}`}
-              >
-                <Trans>Manage subscription</Trans>
-                <ExternalLinkIcon className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        )}
-      </Alert>
+            {organisation.customerId && !organisation.subscription && (
+              <div>
+                <Button variant="outline" className="bg-background" asChild>
+                  <Link
+                    target="_blank"
+                    to={`https://dashboard.stripe.com/customers/${organisation.customerId}?create=subscription&subscription_default_customer=${organisation.customerId}`}
+                  >
+                    <Trans>Create subscription</Trans>
+                    <ExternalLinkIcon className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            )}
 
-      <OrganisationAdminForm organisation={organisation} licenseFlags={licenseFlags} />
+            {organisation.subscription && (
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <AdminOrganisationSyncSubscriptionDialog
+                  organisationId={organisationId}
+                  trigger={
+                    <Button variant="outline" className="bg-background">
+                      <Trans>Sync Stripe subscription</Trans>
+                    </Button>
+                  }
+                />
 
-      <div className="mt-16 space-y-10">
-        <div>
-          <h3 className="font-semibold text-base">
-            <Trans>Organisation Members</Trans>
-          </h3>
-          <p className="mt-1 text-muted-foreground text-sm">
-            <Trans>People with access to this organisation.</Trans>
-          </p>
+                <Button variant="outline" className="bg-background" asChild>
+                  <Link
+                    target="_blank"
+                    to={`https://dashboard.stripe.com/subscriptions/${organisation.subscription.planId}`}
+                  >
+                    <Trans>Manage subscription</Trans>
+                    <ExternalLinkIcon className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </Alert>
 
-          <div className="mt-3">
-            <DataTable columns={organisationMembersColumns} data={organisation.members} />
-          </div>
-        </div>
+          <OrganisationAdminForm organisation={organisation} licenseFlags={licenseFlags} />
+        </TabsContent>
 
-        <div>
-          <h3 className="font-semibold text-base">
-            <Trans>Organisation Teams</Trans>
-          </h3>
-          <p className="mt-1 text-muted-foreground text-sm">
-            <Trans>Teams that belong to this organisation.</Trans>
-          </p>
+        <TabsContent value="settings" className="mt-5 space-y-10">
+          <GenericOrganisationAdminForm organisation={organisation} />
 
-          <div className="mt-3">
-            <DataTable columns={teamsColumns} data={organisation.teams} />
-          </div>
-        </div>
-      </div>
+          <section>
+            <h3 className="font-semibold text-base">
+              <Trans>Global Settings</Trans>
+            </h3>
+            <p className="mt-1 text-muted-foreground text-sm">
+              <Trans>Default settings applied to this organisation.</Trans>
+            </p>
 
-      <SettingsHeader
-        hideDivider
-        title={t`Danger Zone`}
-        subtitle={t`Irreversible actions for this organisation`}
-        className="mt-16"
-      />
+            <div className="mt-3">
+              <AdminGlobalSettingsSection settings={organisation.organisationGlobalSettings} />
+            </div>
+          </section>
 
-      <Alert className="my-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="destructive">
-        <div className="mb-4 sm:mb-0">
-          <AlertTitle>
-            <Trans>Delete organisation</Trans>
-          </AlertTitle>
+          <section>
+            <h3 className="font-semibold text-base">
+              <Trans>Danger Zone</Trans>
+            </h3>
+            <p className="mt-1 text-muted-foreground text-sm">
+              <Trans>Irreversible actions for this organisation</Trans>
+            </p>
 
-          <AlertDescription className="mr-2">
-            <Trans>
-              Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible
-              via the deleted-account service account.
-            </Trans>
-          </AlertDescription>
-        </div>
+            <Alert className="mt-3 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="destructive">
+              <div className="mb-4 sm:mb-0">
+                <AlertTitle>
+                  <Trans>Delete organisation</Trans>
+                </AlertTitle>
 
-        <div>
-          <AdminOrganisationDeleteDialog organisationId={organisation.id} organisationName={organisation.name} />
-        </div>
-      </Alert>
+                <AlertDescription className="mr-2">
+                  <Trans>
+                    Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain
+                    accessible via the deleted-account service account.
+                  </Trans>
+                </AlertDescription>
+              </div>
+
+              <div>
+                <AdminOrganisationDeleteDialog organisationId={organisation.id} organisationName={organisation.name} />
+              </div>
+            </Alert>
+          </section>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
+
+const ORGANISATION_TABS = ['documents', 'usage', 'teams', 'members', 'plan', 'settings'] as const;
+
+const TabCount = ({ value }: { value: number | undefined }) => (
+  <span className="ml-2 inline-flex min-w-[2ch] justify-end text-muted-foreground text-xs tabular-nums">
+    {value === undefined ? <Skeleton className="h-3 w-5" /> : value.toLocaleString()}
+  </span>
+);
+
+// A component of its own, so insights load only after the page knows that the organisation exists.
+// The loader throws for an unknown organisation, and that error would replace the not-found page.
+const DocumentCount = ({ organisationId }: { organisationId: string }) => {
+  const { insights } = useAdminOrganisationInsights({ organisationId, view: 'documents', perPage: 1 });
+
+  return <TabCount value={insights?.summary?.totalDocuments} />;
+};
+
+const OrganisationHeader = ({ organisation }: { organisation: TGetAdminOrganisationResponse }) => {
+  const { i18n, t } = useLingui();
+
+  const [, copy] = useCopyToClipboard();
+  const [isCopied, setIsCopied] = useState(false);
+
+  const owner = organisation.members.find((member) => member.userId === organisation.ownerUserId);
+
+  const status = organisation.subscription?.status;
+  const statusLabel = status && i18n._(SUBSCRIPTION_STATUS_MAP[status]);
+
+  // The copy icon turns into a check for a moment, so the click has a visible result.
+  useEffect(() => {
+    if (!isCopied) {
+      return;
+    }
+
+    const timeout = setTimeout(() => setIsCopied(false), 1500);
+
+    return () => clearTimeout(timeout);
+  }, [isCopied]);
+
+  return (
+    <header className="space-y-1.5">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <h2 className="text-balance font-semibold text-2xl tracking-tight">{organisation.name}</h2>
+
+        <Badge
+          size="small"
+          variant={
+            status === SubscriptionStatus.ACTIVE
+              ? 'default'
+              : status === SubscriptionStatus.PAST_DUE
+                ? 'destructive'
+                : 'neutral'
+          }
+        >
+          {statusLabel ? <Trans>{statusLabel} subscription</Trans> : <Trans>No subscription</Trans>}
+        </Badge>
+      </div>
+
+      <dl className="flex flex-wrap items-center gap-x-5 gap-y-1 text-muted-foreground text-sm">
+        <div className="flex items-center gap-1">
+          <dt className="sr-only">
+            <Trans>ID</Trans>
+          </dt>
+          <dd className="font-mono text-xs">{organisation.id}</dd>
+
+          <button
+            type="button"
+            aria-label={t`Copy organisation ID`}
+            className="relative rounded-sm p-1 before:absolute before:-inset-2.5 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-foreground/40"
+            onClick={async () => setIsCopied(await copy(organisation.id))}
+          >
+            {isCopied ? <CheckIcon className="h-3.5 w-3.5" /> : <CopyIcon className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+
+        {owner && (
+          <div className="flex min-w-0 gap-1.5">
+            <dt>
+              <Trans>Owner</Trans>
+            </dt>
+            <dd className="min-w-0">
+              <Link
+                className="block max-w-64 truncate font-medium text-foreground hover:underline"
+                to={`/admin/users/${owner.userId}`}
+                title={owner.user.email}
+              >
+                {owner.user.name || owner.user.email}
+              </Link>
+            </dd>
+          </div>
+        )}
+
+        <div className="flex gap-1.5">
+          <dt>
+            <Trans>Created</Trans>
+          </dt>
+          <dd className="text-foreground">{i18n.date(organisation.createdAt, { dateStyle: 'medium' })}</dd>
+        </div>
+      </dl>
+    </header>
+  );
+};
 
 const ZUpdateGenericOrganisationDataFormSchema = ZUpdateAdminOrganisationRequestSchema.shape.data.pick({
   name: true,

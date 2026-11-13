@@ -69,7 +69,7 @@ test('[ADMIN][DELETE_ORG]: admin can delete an organisation via the dialog', asy
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   await expect(page.getByRole('heading', { name: 'Danger Zone' })).toBeVisible();
@@ -107,7 +107,7 @@ test('[ADMIN][DELETE_ORG]: typing the wrong confirmation text prevents deletion'
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   await page.getByRole('button', { name: 'Delete' }).first().click();
@@ -136,7 +136,7 @@ test('[ADMIN][DELETE_ORG]: empty confirmation text prevents deletion', async ({ 
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   await page.getByRole('button', { name: 'Delete' }).first().click();
@@ -160,7 +160,7 @@ test('[ADMIN][DELETE_ORG]: clicking Cancel closes the dialog without deleting', 
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   await page.getByRole('button', { name: 'Delete' }).first().click();
@@ -188,7 +188,7 @@ test('[ADMIN][DELETE_ORG]: email checkbox can be unchecked, payload reflects cho
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   await page.getByRole('button', { name: 'Delete' }).first().click();
@@ -294,7 +294,7 @@ test('[ADMIN][DELETE_ORG]: envelopes authored by owner and members are orphaned,
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   await page.getByRole('button', { name: 'Delete' }).first().click();
@@ -388,7 +388,7 @@ test('[ADMIN][DELETE_ORG]: the original owner loses access after deletion', asyn
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   await page.getByRole('button', { name: 'Delete' }).first().click();
@@ -423,7 +423,7 @@ test('[ADMIN][DELETE_ORG]: non-admin user cannot access /admin/organisations/$id
   await apiSignin({
     page,
     email: nonAdminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   // The admin layout loader redirects non-admins to "/". They must not see the
@@ -464,7 +464,7 @@ test('[ADMIN][DELETE_ORG]: an organisation owner without admin role cannot reach
   await apiSignin({
     page,
     email: owner.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   await expect(page.getByRole('heading', { name: 'Danger Zone' })).not.toBeVisible();
@@ -488,7 +488,7 @@ test('[ADMIN][DELETE_ORG]: job payload targets the organisation owner for the em
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   await page.getByRole('button', { name: 'Delete' }).first().click();
@@ -553,7 +553,7 @@ test('[ADMIN][DELETE_ORG]: template envelopes are removed (not orphaned)', async
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/admin/organisations/${organisation.id}`,
+    redirectPath: `/admin/organisations/${organisation.id}?tab=settings`,
   });
 
   await page.getByRole('button', { name: 'Delete' }).first().click();

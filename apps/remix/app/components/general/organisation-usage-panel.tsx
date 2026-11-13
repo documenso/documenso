@@ -8,292 +8,275 @@ import {
 import { cn } from '@documenso/ui/lib/utils';
 import type { BadgeProps } from '@documenso/ui/primitives/badge';
 import { Badge } from '@documenso/ui/primitives/badge';
-import { Progress } from '@documenso/ui/primitives/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
-
-import { Trans } from '@lingui/react/macro';
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import type { OrganisationClaim, OrganisationMonthlyStat } from '@prisma/client';
-import type { LucideIcon } from 'lucide-react';
-import { FileIcon, MailIcon, MailOpenIcon, PlugIcon, UsersIcon, UsersRoundIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 
 import { OrganisationUsageResetButton } from './organisation-usage-reset-button';
 
-type CapacityUsage = {
-  members: number;
-  teams: number;
-};
-
-type UsageRow = {
-  counter: 'document' | 'email' | 'api';
-  label: ReactNode;
-  icon: LucideIcon;
-  used: number;
-  effectiveLimit: number | null;
-};
-
-type OrganisationUsagePanelProps = {
-  organisationId: string;
+type OrganisationUsage = {
   monthlyStats: Pick<
     OrganisationMonthlyStat,
     'period' | 'documentCount' | 'emailCount' | 'apiCount' | 'emailReports'
   >[];
   organisationClaim: OrganisationClaim;
-  capacityUsage?: CapacityUsage;
+  memberCount: number;
+  teamCount: number;
 };
 
-type UsageCardState = {
-  status: {
-    label: ReactNode;
-    variant: NonNullable<BadgeProps['variant']>;
-  };
-  percent: number;
-  hasFiniteLimit: boolean;
-  progressClassName: string;
-  subtext: ReactNode;
+type OrganisationUsagePanelProps = OrganisationUsage & {
+  organisationId: string;
 };
 
-type UsageCardStateOptions = {
-  used: number;
-  limit: number | null | undefined;
-  footnote?: ReactNode;
+/** Every limit as one aligned row: capacity first, then the monthly counters with their resets. */
+export const OrganisationUsagePanel = ({ organisationId, ...usage }: OrganisationUsagePanelProps) => {
+  const { t } = useLingui();
+
+  const currentPeriod = currentMonthlyPeriod();
+
+  const [period, setPeriod] = useState(currentPeriod);
+
+  // The current month has no stat row until its first counted event, so it is always offered.
+  const periods = [...new Set([currentPeriod, ...usage.monthlyStats.map((stat) => stat.period)])];
+
+  const meters = getUsageMeters(usage, period);
+  const reports = usage.monthlyStats.find((stat) => stat.period === period)?.emailReports ?? 0;
+
+  return (
+    <div className="space-y-8">
+      <section>
+        <h3 className="font-semibold text-base">
+          <Trans>Capacity</Trans>
+        </h3>
+        <p className="mt-1 text-muted-foreground text-sm">
+          <Trans>Counted now. These do not reset.</Trans>
+        </p>
+
+        <ul className="mt-3 divide-y rounded-lg border">
+          {meters.map((meter) => !meter.counter && <UsageMeterRow key={meter.key} meter={meter} />)}
+        </ul>
+      </section>
+
+      <section>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h3 className="font-semibold text-base">
+              <Trans>Monthly usage</Trans>
+            </h3>
+            <p className="mt-1 text-muted-foreground text-sm">
+              {period === currentPeriod ? (
+                <Trans>Counters reset on the first of each month, UTC.</Trans>
+              ) : (
+                <Trans>A past month, read against the limits of today.</Trans>
+              )}
+            </p>
+          </div>
+
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="h-9 w-36 tabular-nums" aria-label={t`Month`}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {periods.map((option) => (
+                <SelectItem key={option} value={option} className="tabular-nums">
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <ul className="mt-3 divide-y rounded-lg border">
+          {meters.map(
+            (meter) =>
+              meter.counter && (
+                <UsageMeterRow
+                  key={meter.key}
+                  meter={meter}
+                  action={
+                    // Resetting only affects the current month, because the server hardcodes the current period.
+                    period === currentPeriod && (
+                      <OrganisationUsageResetButton organisationId={organisationId} counter={meter.counter} />
+                    )
+                  }
+                />
+              ),
+          )}
+
+          <li className="flex h-14 items-center gap-4 px-4 text-sm">
+            <span className="flex-1 font-medium">
+              <Trans>Reports sent</Trans>
+            </span>
+            <span className="w-28 shrink-0 text-right tabular-nums">{reports.toLocaleString()}</span>
+            {/* The width of a badge slot, a gap and an action slot, so the figure sits in the count column. */}
+            <span className="w-[216px] shrink-0" />
+          </li>
+        </ul>
+      </section>
+    </div>
+  );
 };
 
-const getUsageCardState = ({ used, limit, footnote }: UsageCardStateOptions): UsageCardState => {
-  const percent = getQuotaUsagePercent(used, limit ?? null);
-  const hasFiniteLimit = Boolean(limit && limit > 0);
+/** A coloured dot for the worst limit, or nothing when every limit has room. */
+export const OrganisationUsageAlertDot = (usage: OrganisationUsage) => {
+  const { t } = useLingui();
 
-  if (limit === null || limit === undefined) {
-    return {
-      status: { label: <Trans>Unlimited</Trans>, variant: 'neutral' },
-      percent,
-      hasFiniteLimit,
-      progressClassName: '',
-      subtext: footnote ?? null,
-    };
+  const [worst] = getUsageMeters(usage, currentMonthlyPeriod())
+    .filter((meter) => SEVERITY.includes(meter.state))
+    .sort((a, b) => SEVERITY.indexOf(a.state) - SEVERITY.indexOf(b.state));
+
+  if (!worst) {
+    return null;
+  }
+
+  return (
+    <>
+      <span aria-hidden="true" className={cn('ml-2 h-2 w-2 shrink-0 rounded-full', USAGE_STATES[worst.state].bar)} />
+      <span className="sr-only">
+        {t(worst.label)}: {t(USAGE_STATES[worst.state].label)}
+      </span>
+    </>
+  );
+};
+
+/** The trailing slot is reserved even when empty, so bars and figures line up down the list. */
+const UsageMeterRow = ({ meter, action }: { meter: UsageMeter; action?: ReactNode }) => {
+  const { t } = useLingui();
+
+  const state = USAGE_STATES[meter.state];
+
+  return (
+    <li className="flex min-h-14 items-center gap-4 px-4 py-2 text-sm">
+      <span className="w-28 shrink-0 font-medium">{t(meter.label)}</span>
+
+      {meter.limit === null ? (
+        <span className="min-w-12 flex-1" />
+      ) : (
+        <div
+          role="progressbar"
+          aria-label={t(meter.label)}
+          aria-valuemin={0}
+          aria-valuemax={meter.limit}
+          aria-valuenow={meter.used}
+          className="h-1.5 min-w-12 flex-1 overflow-hidden rounded-full bg-secondary"
+        >
+          <div
+            className={cn('h-full rounded-full', state.bar)}
+            style={{ width: `${meter.state === 'blocked' ? 100 : getQuotaUsagePercent(meter.used, meter.limit)}%` }}
+          />
+        </div>
+      )}
+
+      <span className="w-28 shrink-0 text-right tabular-nums">
+        {meter.used.toLocaleString()}
+        {meter.limit !== null && <span className="text-muted-foreground"> / {meter.limit.toLocaleString()}</span>}
+      </span>
+
+      <span className="flex w-28 shrink-0">
+        <Badge variant={state.badge} size="small">
+          {t(state.label)}
+        </Badge>
+      </span>
+
+      <span className="flex w-[88px] shrink-0 justify-end">{action}</span>
+    </li>
+  );
+};
+
+/** Usage against every limit of the claim. Monthly limits read the given `YYYY-MM` period. */
+const getUsageMeters = (usage: OrganisationUsage, period: string): UsageMeter[] => {
+  const claim = usage.organisationClaim;
+  const stat = usage.monthlyStats.find((monthlyStat) => monthlyStat.period === period);
+
+  const meter = (values: Omit<UsageMeter, 'state'>): UsageMeter => ({
+    ...values,
+    state: getUsageState(values.used, values.limit),
+  });
+
+  return [
+    meter({
+      key: 'members',
+      label: msg`Members`,
+      used: usage.memberCount,
+      limit: normalizeCapacityLimit(claim.memberCount),
+    }),
+    meter({
+      key: 'teams',
+      label: msg`Teams`,
+      used: usage.teamCount,
+      limit: normalizeCapacityLimit(claim.teamCount),
+    }),
+    meter({
+      key: 'documents',
+      label: msg`Documents`,
+      counter: 'document',
+      used: stat?.documentCount ?? 0,
+      limit: claim.documentQuota,
+    }),
+    meter({
+      key: 'emails',
+      label: msg`Emails`,
+      counter: 'email',
+      used: stat?.emailCount ?? 0,
+      limit: claim.emailQuota,
+    }),
+    meter({
+      key: 'api',
+      label: msg`API requests`,
+      counter: 'api',
+      used: stat?.apiCount ?? 0,
+      limit: claim.apiQuota,
+    }),
+  ];
+};
+
+const getUsageState = (used: number, limit: number | null): UsageState => {
+  if (limit === null) {
+    return 'unlimited';
   }
 
   if (limit === 0) {
-    return {
-      status: { label: <Trans>Blocked</Trans>, variant: 'destructive' },
-      percent,
-      hasFiniteLimit,
-      progressClassName: '',
-      subtext: footnote ?? <Trans>Resource blocked</Trans>,
-    };
+    return 'blocked';
   }
 
   if (used > limit) {
-    return {
-      status: { label: <Trans>Exceeded</Trans>, variant: 'destructive' },
-      percent,
-      hasFiniteLimit,
-      progressClassName: '[&>div]:bg-destructive',
-      subtext: footnote ?? null,
-    };
+    return 'exceeded';
   }
 
   if (isQuotaExceeded(limit, used)) {
-    return {
-      status: { label: <Trans>Limit reached</Trans>, variant: 'orange' },
-      percent,
-      hasFiniteLimit,
-      progressClassName: '[&>div]:bg-orange-500 dark:[&>div]:bg-orange-400',
-      subtext: footnote ?? null,
-    };
+    return 'reached';
   }
 
-  if (isQuotaNearing(limit, used)) {
-    return {
-      status: { label: <Trans>Near limit</Trans>, variant: 'warning' },
-      percent,
-      hasFiniteLimit,
-      progressClassName: '[&>div]:bg-yellow-500 dark:[&>div]:bg-yellow-400',
-      subtext: footnote ?? null,
-    };
-  }
-
-  return {
-    status: { label: <Trans>Within limit</Trans>, variant: 'default' },
-    percent,
-    hasFiniteLimit,
-    progressClassName: '',
-    subtext: footnote ?? null,
-  };
+  return isQuotaNearing(limit, used) ? 'near' : 'within';
 };
 
-type UsageStatCardProps = {
-  label: ReactNode;
-  icon: LucideIcon;
+const USAGE_STATES: Record<
+  UsageState,
+  { label: MessageDescriptor; badge: NonNullable<BadgeProps['variant']>; bar: string }
+> = {
+  unlimited: { label: msg`Unlimited`, badge: 'neutral', bar: 'bg-muted-foreground/40' },
+  blocked: { label: msg`Blocked`, badge: 'destructive', bar: 'bg-destructive' },
+  exceeded: { label: msg`Exceeded`, badge: 'destructive', bar: 'bg-destructive' },
+  reached: { label: msg`Limit reached`, badge: 'orange', bar: 'bg-orange-500 dark:bg-orange-400' },
+  near: { label: msg`Near limit`, badge: 'warning', bar: 'bg-yellow-500 dark:bg-yellow-400' },
+  within: { label: msg`Within limit`, badge: 'default', bar: 'bg-primary' },
+};
+
+/** The states that need an admin's attention, worst first. */
+const SEVERITY: UsageState[] = ['blocked', 'exceeded', 'reached', 'near'];
+
+type UsageState = 'unlimited' | 'blocked' | 'exceeded' | 'reached' | 'near' | 'within';
+
+type UsageMeter = {
+  key: string;
+  label: MessageDescriptor;
+  /** The monthly counter behind the meter. Capacity meters have none: they count what exists now. */
+  counter?: 'document' | 'email' | 'api';
   used: number;
-  limit: number | null | undefined;
-  /** When true the card is a plain counter with no limit, status or progress. */
-  countOnly?: boolean;
-  footnote?: ReactNode;
-  action?: ReactNode;
-};
-
-const UsageStatCard = ({ label, icon: Icon, used, limit, countOnly = false, footnote, action }: UsageStatCardProps) => {
-  const { status, percent, hasFiniteLimit, progressClassName, subtext } = getUsageCardState({ used, limit, footnote });
-
-  return (
-    <div className="flex flex-col rounded-lg border bg-background p-5">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 font-medium text-foreground text-sm">
-          <Icon className="h-4 w-4 text-muted-foreground" />
-          <span>{label}</span>
-        </div>
-
-        {!countOnly && (
-          <Badge variant={status.variant} size="small">
-            {status.label}
-          </Badge>
-        )}
-      </div>
-
-      <div className="mt-4 flex flex-1 flex-col">
-        <div className="flex items-baseline justify-between gap-2">
-          <div className="flex items-baseline gap-1.5">
-            <span className="font-semibold text-3xl text-foreground tabular-nums tracking-tight">
-              {used.toLocaleString()}
-            </span>
-            {hasFiniteLimit ? (
-              <span className="text-base text-muted-foreground tabular-nums">/ {limit?.toLocaleString()}</span>
-            ) : null}
-          </div>
-
-          {hasFiniteLimit ? (
-            <span className="font-medium text-muted-foreground text-sm tabular-nums">{percent}%</span>
-          ) : null}
-        </div>
-
-        {hasFiniteLimit ? <Progress className={cn('mt-3 h-2', progressClassName)} value={percent} /> : null}
-
-        {subtext ? <p className="mt-2 text-muted-foreground text-xs">{subtext}</p> : null}
-      </div>
-
-      {action ? <div className="mt-4 flex justify-end border-t pt-4">{action}</div> : null}
-    </div>
-  );
-};
-
-export const OrganisationUsagePanel = ({
-  organisationId,
-  monthlyStats,
-  organisationClaim,
-  capacityUsage,
-}: OrganisationUsagePanelProps) => {
-  const monthlyUsagePeriodId = useId();
-  const [selectedPeriod, setSelectedPeriod] = useState<string | undefined>(() => monthlyStats[0]?.period);
-
-  const selectedStat = monthlyStats.find((stat) => stat.period === selectedPeriod) ?? monthlyStats[0];
-
-  // Resetting a counter only affects the current month (the server hardcodes the
-  // current period), so only offer the reset action when viewing the current month.
-  const isCurrentPeriod = selectedStat?.period === currentMonthlyPeriod();
-
-  const capacityRows = capacityUsage
-    ? [
-        {
-          key: 'members',
-          label: <Trans>Members</Trans>,
-          icon: UsersIcon,
-          used: capacityUsage.members,
-          limit: normalizeCapacityLimit(organisationClaim.memberCount),
-        },
-        {
-          key: 'teams',
-          label: <Trans>Teams</Trans>,
-          icon: UsersRoundIcon,
-          used: capacityUsage.teams,
-          limit: normalizeCapacityLimit(organisationClaim.teamCount),
-        },
-      ]
-    : [];
-
-  const monthlyRows: UsageRow[] = [
-    {
-      counter: 'document',
-      label: <Trans>Documents</Trans>,
-      icon: FileIcon,
-      used: selectedStat?.documentCount ?? 0,
-      effectiveLimit: organisationClaim.documentQuota,
-    },
-    {
-      counter: 'email',
-      label: <Trans>Emails</Trans>,
-      icon: MailIcon,
-      used: selectedStat?.emailCount ?? 0,
-      effectiveLimit: organisationClaim.emailQuota,
-    },
-    {
-      counter: 'api',
-      label: <Trans>API requests</Trans>,
-      icon: PlugIcon,
-      used: selectedStat?.apiCount ?? 0,
-      effectiveLimit: organisationClaim.apiQuota,
-    },
-  ];
-
-  return (
-    <div className="mt-4 space-y-6">
-      {capacityRows.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {capacityRows.map((row) => (
-            <UsageStatCard key={row.key} label={row.label} icon={row.icon} used={row.used} limit={row.limit} />
-          ))}
-        </div>
-      ) : null}
-
-      <div className="space-y-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 id={monthlyUsagePeriodId} className="font-semibold text-base">
-            <Trans>Monthly usage</Trans>
-          </h3>
-
-          {monthlyStats.length > 0 ? (
-            <Select value={selectedStat?.period} onValueChange={setSelectedPeriod}>
-              <SelectTrigger className="h-9 w-full sm:w-44" aria-labelledby={monthlyUsagePeriodId}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {monthlyStats.map((stat) => (
-                  <SelectItem key={stat.period} value={stat.period}>
-                    {stat.period}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : null}
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {monthlyRows.map((row) => (
-            <UsageStatCard
-              key={row.counter}
-              label={row.label}
-              icon={row.icon}
-              used={row.used}
-              limit={row.effectiveLimit}
-              action={
-                selectedStat && isCurrentPeriod ? (
-                  <OrganisationUsageResetButton organisationId={organisationId} counter={row.counter} />
-                ) : undefined
-              }
-            />
-          ))}
-
-          <UsageStatCard
-            label={<Trans>Reports</Trans>}
-            icon={MailOpenIcon}
-            used={selectedStat?.emailReports ?? 0}
-            limit={null}
-            countOnly
-            footnote={<Trans>Sent this period</Trans>}
-          />
-        </div>
-      </div>
-    </div>
-  );
+  limit: number | null;
+  state: UsageState;
 };
