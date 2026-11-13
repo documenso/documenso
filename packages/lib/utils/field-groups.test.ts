@@ -1,7 +1,12 @@
 import { FieldType } from '@prisma/client';
 import { assert, describe, expect, it } from 'vitest';
 
-import type { TCheckboxFieldMeta, TRadioFieldMeta, TTextFieldMeta } from '../types/field-meta';
+import {
+  FIELD_META_DEFAULT_VALUES,
+  type TCheckboxFieldMeta,
+  type TRadioFieldMeta,
+  type TTextFieldMeta,
+} from '../types/field-meta';
 import {
   assertFieldGroupsValid,
   extractFieldGroupSharedMeta,
@@ -192,7 +197,12 @@ describe('assertFieldGroupsValid', () => {
   it('ignores fields without a group id', () => {
     expect(() =>
       assertFieldGroupsValid([
-        { type: FieldType.SIGNATURE, recipientId: 1, groupId: null, fieldMeta: { type: 'signature' } },
+        {
+          type: FieldType.SIGNATURE,
+          recipientId: 1,
+          groupId: null,
+          fieldMeta: FIELD_META_DEFAULT_VALUES[FieldType.SIGNATURE],
+        },
         { type: FieldType.TEXT, recipientId: 2, fieldMeta: textMeta() },
       ]),
     ).not.toThrow();

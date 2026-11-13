@@ -354,5 +354,5 @@ type FieldGroupState = {
   type: FieldType;
   recipientId: number;
   groupId: string | null;
-  fieldMeta: unknown;
+  fieldMeta: TFieldMetaSchema | null;
 };

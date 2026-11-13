@@ -4,6 +4,7 @@ import { validateNumberField } from '@documenso/lib/advanced-fields-validation/v
 import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import {
+  type TFieldMetaSchema,
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
   ZNumberFieldMeta,
@@ -16,7 +17,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 type ValidateFieldMetaOptions = {
   type: FieldType;
-  fieldMeta: unknown;
+  fieldMeta: TFieldMetaSchema | null;
   /**
    * Grouped checkbox and radio fields are validated as a whole group via
    * `assertFieldGroupsValid` instead of individually, since validation rules

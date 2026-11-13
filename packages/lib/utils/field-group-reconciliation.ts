@@ -123,7 +123,7 @@ export const reconcileFieldGroup = <T extends FieldGroupItem & { formId: string 
  * Removes the validation rule from a field's meta. Only checkbox fields currently carry a
  * group level validation rule, which is removed when the group no longer satisfies it.
  */
-export const removeFieldGroupValidation = (type: FieldType, fieldMeta: unknown): TFieldMetaSchema => {
+export const removeFieldGroupValidation = (type: FieldType, fieldMeta: TFieldMetaSchema | null): TFieldMetaSchema => {
   const baseMeta = parseFieldMetaOrDefault(type, fieldMeta);
 
   if (!baseMeta || baseMeta.type !== 'checkbox') {
