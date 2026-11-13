@@ -1,6 +1,11 @@
 import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import {
+  NEXT_PUBLIC_IMPRINT_URL,
+  NEXT_PUBLIC_PRIVACY_POLICY_URL,
+  NEXT_PUBLIC_TERMS_OF_SERVICE_URL,
+} from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { ZNameSchema } from '@documenso/lib/types/name';
 import { env } from '@documenso/lib/utils/env';
@@ -20,7 +25,8 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import { Turnstile } from '@marsidev/react-turnstile';
-import { useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
@@ -101,6 +107,14 @@ export const SignUpForm = ({
   });
 
   const isSubmitting = form.formState.isSubmitting;
+
+  const legalLinks: { href: string | undefined; label: ReactNode }[] = [
+    { href: NEXT_PUBLIC_TERMS_OF_SERVICE_URL(), label: <Trans>Terms of Service</Trans> },
+    { href: NEXT_PUBLIC_PRIVACY_POLICY_URL(), label: <Trans>Privacy Policy</Trans> },
+    { href: NEXT_PUBLIC_IMPRINT_URL(), label: <Trans>Imprint</Trans> },
+  ];
+
+  const availableLegalLinks = legalLinks.filter((link): link is { href: string; label: ReactNode } => !!link.href);
 
   const onFormSubmit = async ({ name, email, password, signature }: TSignUpFormSchema) => {
     try {
@@ -406,27 +420,32 @@ export const SignUpForm = ({
             )}
           </form>
         </Form>
-        <p className="mt-6 text-muted-foreground text-xs">
-          <Trans>
-            By proceeding, you agree to our{' '}
-            <Link
-              to="https://documen.so/terms"
-              target="_blank"
-              className="text-documenso-700 duration-200 hover:opacity-70"
-            >
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link
-              to="https://documen.so/privacy"
-              target="_blank"
-              className="text-documenso-700 duration-200 hover:opacity-70"
-            >
-              Privacy Policy
-            </Link>
-            .
-          </Trans>
-        </p>
+        {availableLegalLinks.length > 0 && (
+          <p className="mt-6 text-muted-foreground text-xs">
+            <Trans>
+              By proceeding, you agree to our{' '}
+              {availableLegalLinks.map((link, index) => (
+                <Fragment key={link.href}>
+                  {index > 0 && (
+                    <>
+                      {' '}
+                      <Trans>and</Trans>{' '}
+                    </>
+                  )}
+                  <Link
+                    to={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-documenso-700 duration-200 hover:opacity-70"
+                  >
+                    {link.label}
+                  </Link>
+                </Fragment>
+              ))}
+              .
+            </Trans>
+          </p>
+        )}
       </div>
     </div>
   );

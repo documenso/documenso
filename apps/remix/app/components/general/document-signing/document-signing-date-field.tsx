@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { convertToLocalSystemFormat, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -39,6 +40,7 @@ export const DocumentSigningDateField = ({
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
+  const analytics = useAnalytics();
 
   const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
@@ -53,7 +55,7 @@ export const DocumentSigningDateField = ({
   const safeFieldMeta = ZDateFieldMeta.safeParse(field.fieldMeta);
   const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
 
-  const localDateString = convertToLocalSystemFormat(field.customText, dateFormat, timezone);
+  const localDateString = convertToLocalSystemFormat({ customText: field.customText, dateFormat, timezone });
   const isDifferentTime = field.inserted && localDateString !== field.customText;
   const tooltipText = _(
     msg`"${field.customText}" will appear on the document as it has a timezone of "${timezone || ''}".`,
@@ -85,6 +87,13 @@ export const DocumentSigningDateField = ({
 
       console.error(err);
 
+      analytics.captureException(err, {
+        source: 'signing',
+        location: 'sign_field',
+        fieldType: field.type,
+        recipientId: field.recipientId,
+      });
+
       toast({
         title: _(msg`Error`),
         description: isAssistantMode
@@ -112,6 +121,13 @@ export const DocumentSigningDateField = ({
       await revalidate();
     } catch (err) {
       console.error(err);
+
+      analytics.captureException(err, {
+        source: 'signing',
+        location: 'remove_field',
+        fieldType: field.type,
+        recipientId: field.recipientId,
+      });
 
       toast({
         title: _(msg`Error`),

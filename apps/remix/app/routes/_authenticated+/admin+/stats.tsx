@@ -144,7 +144,7 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
             title={_(msg`MAU (had document completed)`)}
             tooltip={_(msg`Monthly Active Users: Users that had at least one of their documents completed`)}
           />
-          <AdminStatsSignerConversionChart title="Signers that Signed Up" data={signerConversionMonthly} />
+          <AdminStatsSignerConversionChart title={_(msg`Signers that Signed Up`)} data={signerConversionMonthly} />
           <AdminStatsSignerConversionChart
             title={_(msg`Total Signers that Signed Up`)}
             data={signerConversionMonthly}

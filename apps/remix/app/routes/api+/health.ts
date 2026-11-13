@@ -22,7 +22,7 @@ export const loader = async () => {
   }
 
   try {
-    const certStatus = getCertificateStatus();
+    const certStatus = await getCertificateStatus();
 
     if (certStatus.isAvailable) {
       checks.certificate = { status: 'ok' };

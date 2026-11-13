@@ -3,7 +3,7 @@ import { OrganisationType } from '@prisma/client';
 
 import { IS_BILLING_ENABLED } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
-import { INTERNAL_CLAIM_ID } from '../types/subscription';
+import { INTERNAL_CLAIM_ID, type TClaimFlags } from '../types/subscription';
 
 /**
  * Throws an error if billing is enabled and no subscription is found.
@@ -55,4 +55,8 @@ export const isOrganisationPendingPayment = (organisation: PendingPaymentOrganis
   }
 
   return organisation.organisationClaim.originalSubscriptionClaimId === INTERNAL_CLAIM_ID.FREE;
+};
+
+export const isEmbedSignaturePersistenceEnabled = (flags: TClaimFlags) => {
+  return !IS_BILLING_ENABLED() || flags.embedSigningWhiteLabel === true;
 };

@@ -1,22 +1,21 @@
-import { formatSecureCookieName, getCookieDomain, useSecureCookies } from '@documenso/lib/constants/auth';
+import {
+  embedAuthFlowCookieOptions,
+  embedSessionCookieOptions,
+} from '@documenso/auth/server/lib/session/session-cookies';
+import { formatHostCookieName } from '@documenso/lib/constants/auth';
 import { requireEnv } from '@documenso/lib/utils/env';
 
 /**
  * Shared HMAC secret + base attribute set for the CSC cookies.
  *
  * `NEXTAUTH_SECRET` is reused so signed-cookie verification stays uniform
- * across the auth + CSC surfaces. The `sameSite` conditional matches
- * `sessionCookieOptions` in `@documenso/auth` so a future embedding flow
- * (CSC inside an `<iframe>` on a partner host) works without a separate
- * cookie-attribute regime.
+ * across the auth + CSC surfaces.
  */
 
 /** HMAC secret for hono `setSignedCookie` / `getSignedCookie`. */
 export const getCscCookieSecret = (): string => requireEnv('NEXTAUTH_SECRET');
 
 /**
- * CSC cookie names; prefixed with `__Secure-` in production over HTTPS.
- *
  * Naming maps 1:1 to the CSC OAuth scope each cookie attests:
  * - `csc_service_session` — service-scope grant (long-lived per-browser SCA
  *   attestation; lifetime = TSP `expires_in`).
@@ -28,19 +27,21 @@ export const getCscCookieSecret = (): string => requireEnv('NEXTAUTH_SECRET');
  *   service-scope error (e.g. empty credential list, refused algorithm) to
  *   the next `/sign/{token}` loader, read-once.
  */
-export const CSC_SERVICE_SESSION_COOKIE_NAME = formatSecureCookieName('csc_service_session');
-export const CSC_SAD_SESSION_COOKIE_NAME = formatSecureCookieName('csc_sad_session');
-export const CSC_OAUTH_FLOW_COOKIE_NAME = formatSecureCookieName('csc_oauth_flow');
-export const CSC_BLOCKING_ERROR_COOKIE_NAME = formatSecureCookieName('csc_blocking_error');
+export const CSC_SERVICE_SESSION_COOKIE_NAME = formatHostCookieName('csc_service_session');
+export const CSC_SAD_SESSION_COOKIE_NAME = formatHostCookieName('csc_sad_session');
+export const CSC_OAUTH_FLOW_COOKIE_NAME = formatHostCookieName('csc_oauth_flow');
+export const CSC_BLOCKING_ERROR_COOKIE_NAME = formatHostCookieName('csc_blocking_error');
 
 /**
- * Base options spread into every CSC cookie. Callers add per-cookie expiry
- * (`maxAge` or `expires`) on top.
+ * Partitioned so the CSC cookies can be read from inside a cross-site embed
+ * iframe. Partitioning is harmless top-level (the key is our own site) and
+ * ignored by browsers that predate it. Callers add their own expiry.
  */
-export const cscCookieBaseOptions = {
-  httpOnly: true,
-  path: '/',
-  sameSite: useSecureCookies ? 'none' : 'lax',
-  secure: useSecureCookies,
-  domain: getCookieDomain(),
+export const cscCookieBaseOptions = embedSessionCookieOptions;
+
+// The TSP redirect back is always top-level, so `SameSite=Lax` suffices here.
+// `maxAge` is owned by `oauth-flow-cookie.ts`.
+export const cscOAuthFlowCookieOptions = {
+  ...embedAuthFlowCookieOptions,
+  maxAge: undefined,
 } as const;

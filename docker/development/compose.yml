@@ -7,7 +7,7 @@ services:
     volumes:
       - documenso_database:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,20 +33,6 @@ services:
       - 63790:6379
     volumes:
       - redis:/data
-
-  minio:
-    image: minio/minio
-    container_name: minio
-    ports:
-      - 9002:9002
-      - 9001:9001
-    volumes:
-      - minio:/data
-    environment:
-      MINIO_ROOT_USER: documenso
-      MINIO_ROOT_PASSWORD: password
-    entrypoint: sh
-    command: -c 'mkdir -p /data/documenso && minio server /data --console-address ":9001" --address ":9002"'
 
   gotenberg:
     build:
@@ -95,6 +81,5 @@ services:
       start_period: 20s
 
 volumes:
-  minio:
   redis:
   documenso_database:

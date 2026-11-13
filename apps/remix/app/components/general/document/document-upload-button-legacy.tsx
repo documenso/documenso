@@ -1,5 +1,4 @@
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
-import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
@@ -38,7 +37,6 @@ export const DocumentUploadButtonLegacy = ({ className, type }: DocumentUploadBu
   const team = useCurrentTeam();
 
   const navigate = useNavigate();
-  const analytics = useAnalytics();
   const organisation = useCurrentOrganisation();
 
   const userTimezone =
@@ -102,12 +100,6 @@ export const DocumentUploadButtonLegacy = ({ className, type }: DocumentUploadBu
           title: _(msg`Document uploaded`),
           description: _(msg`Your document has been uploaded successfully.`),
           duration: 5000,
-        });
-
-        analytics.capture('App: Document Uploaded', {
-          userId: user.id,
-          documentId: id,
-          timestamp: new Date().toISOString(),
         });
       }
 

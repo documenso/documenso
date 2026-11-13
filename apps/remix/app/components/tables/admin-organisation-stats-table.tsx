@@ -12,7 +12,7 @@ import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from 'lucide-react
 import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router';
 
-type OrderByColumn = 'documentCount' | 'emailCount' | 'apiCount' | 'emailReports' | 'totalCount';
+type OrderByColumn = 'documentCount' | 'emailCount' | 'apiCount' | 'emailReports' | 'teamCount' | 'totalCount';
 type OrderByDirection = 'asc' | 'desc';
 
 const parseOrderByColumn = (value: string | undefined): OrderByColumn | undefined => {
@@ -21,6 +21,7 @@ const parseOrderByColumn = (value: string | undefined): OrderByColumn | undefine
     value === 'emailCount' ||
     value === 'apiCount' ||
     value === 'emailReports' ||
+    value === 'teamCount' ||
     value === 'totalCount'
   ) {
     return value;
@@ -77,15 +78,20 @@ export const AdminOrganisationStatsTable = ({ displayMode = 'usage' }: AdminOrga
   const orderByColumn = parseOrderByColumn(searchParams?.get('orderByColumn') ?? undefined);
   const orderByDirection = parseOrderByDirection(searchParams?.get('orderByDirection') ?? undefined);
 
-  const { data, isLoading, isLoadingError } = trpc.admin.organisation.stats.find.useQuery({
-    query: parsedSearchParams.query,
-    page: parsedSearchParams.page,
-    perPage: parsedSearchParams.perPage,
-    period,
-    claimId,
-    orderByColumn,
-    orderByDirection,
-  });
+  const { data, isLoading, isLoadingError } = trpc.admin.organisation.stats.find.useQuery(
+    {
+      query: parsedSearchParams.query,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+      period,
+      claimId,
+      orderByColumn,
+      orderByDirection,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({
@@ -179,6 +185,11 @@ export const AdminOrganisationStatsTable = ({ displayMode = 'usage' }: AdminOrga
         cell: ({ row }) => <span className="text-muted-foreground text-sm">{row.original.originalClaimId ?? '—'}</span>,
       },
       {
+        header: () => sortableHeader(t`Teams`, 'teamCount'),
+        accessorKey: 'teamCount',
+        cell: ({ row }) => row.original.teamCount,
+      },
+      {
         header: t`Period`,
         accessorKey: 'period',
         cell: ({ row }) => <span className="text-sm">{row.original.period}</span>,
@@ -239,6 +250,9 @@ export const AdminOrganisationStatsTable = ({ displayMode = 'usage' }: AdminOrga
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-24 rounded-full" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-10 rounded-full" />
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-16 rounded-full" />

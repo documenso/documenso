@@ -15,6 +15,7 @@ import {
   WebhookTriggerEvents,
 } from '@prisma/client';
 import { DateTime } from 'luxon';
+import pMap from 'p-map';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -40,13 +41,30 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
-import { getRecipientsWithMissingFields } from '../../utils/recipients';
+import {
+  assertEnvelopeContentLimits,
+  buildEnvelopeContentCopyData,
+  getContentsMissingImages,
+} from '../../utils/envelope-content';
+import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
+import {
+  getRecipientsWithMissingFields,
+  isRecipientBefore,
+  sortRecipientsBySigningPosition,
+} from '../../utils/recipients';
+import { loadContentImages } from '../data-content/load-content-images';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
+import {
+  RENDER_CONTENTS_CONCURRENCY,
+  renderContentsOntoPdf,
+} from '../envelope-content/insert-contents-into-envelope-item';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { assignOmittedRecipientSigningOrders } from '../recipient/assign-omitted-recipient-signing-orders';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
+import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentFromDirectTemplateOptions = {
@@ -84,7 +102,7 @@ export type TCreateDocumentFromDirectTemplateResponse = z.infer<typeof ZCreateDo
 
 export const createDocumentFromDirectTemplate = async ({
   directRecipientName: initialDirectRecipientName,
-  directRecipientEmail,
+  directRecipientEmail: providedDirectRecipientEmail,
   directTemplateToken,
   directTemplateExternalId,
   signedFieldValues,
@@ -93,6 +111,8 @@ export const createDocumentFromDirectTemplate = async ({
   requestMetadata,
   user,
 }: CreateDocumentFromDirectTemplateOptions): Promise<TCreateDocumentFromDirectTemplateResponse> => {
+  const directRecipientEmail = providedDirectRecipientEmail.toLowerCase();
+
   const directTemplateEnvelope = await prisma.envelope.findFirst({
     where: {
       directLink: {
@@ -111,6 +131,7 @@ export const createDocumentFromDirectTemplate = async ({
           documentData: true,
         },
       },
+      contents: true,
       documentMeta: true,
       user: {
         select: {
@@ -127,6 +148,8 @@ export const createDocumentFromDirectTemplate = async ({
               organisationClaim: {
                 select: {
                   recipientCount: true,
+                  envelopeContentCount: true,
+                  envelopeContentImageCount: true,
                 },
               },
             },
@@ -139,6 +162,8 @@ export const createDocumentFromDirectTemplate = async ({
   if (!directTemplateEnvelope?.directLink?.enabled) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Invalid or missing template' });
   }
+
+  await assertSenderNotDisabled({ userId: directTemplateEnvelope.userId });
 
   if (
     nextSigner &&
@@ -184,6 +209,20 @@ export const createDocumentFromDirectTemplate = async ({
     });
   }
 
+  // Mirrors the checks in `sendDocument`, which this flow never reaches since
+  // it creates the document directly in PENDING.
+  if (getContentsMissingImages(directTemplateEnvelope.contents).length > 0) {
+    throw new AppError('MISSING_CONTENT_IMAGE', {
+      message: 'One or more image contents on this direct template have no image attached',
+      statusCode: 400,
+    });
+  }
+
+  assertEnvelopeContentLimits(
+    directTemplateEnvelope.contents.map((content) => content.contentMeta.type),
+    directTemplateEnvelope.team.organisation.organisationClaim,
+  );
+
   if (directTemplateEnvelope.updatedAt.getTime() !== templateUpdatedAt.getTime()) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Template no longer matches' });
   }
@@ -210,6 +249,16 @@ export const createDocumentFromDirectTemplate = async ({
   const nonDirectTemplateRecipients = directTemplateEnvelope.recipients.filter(
     (recipient) => recipient.id !== directTemplateRecipient.id,
   );
+
+  // Number unordered recipients by template position since the copies get new ids.
+  const signingOrderByTemplateRecipientId = new Map(
+    assignOmittedRecipientSigningOrders({
+      recipients: sortRecipientsBySigningPosition(recipients),
+    }).map((recipient) => [recipient.id, recipient.signingOrder]),
+  );
+
+  const resolveSigningOrder = (templateRecipientId: number) =>
+    signingOrderByTemplateRecipientId.get(templateRecipientId) ?? null;
 
   // Carry the template's level forward, coercing if the instance mode has
   // changed since the template was created. ZSignatureLevelSchema parses the
@@ -335,18 +384,34 @@ export const createDocumentFromDirectTemplate = async ({
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
 
-  // Duplicate the envelope item data.
-  const envelopeItemsToCreate = await Promise.all(
-    directTemplateEnvelope.envelopeItems.map(async (item, i) => {
+  // The document is created directly in PENDING, so `sendDocument` below will
+  // not insert the contents (it only does so from DRAFT).
+  const contentImages = await loadContentImages(directTemplateEnvelope.contents);
+
+  const envelopeItemsToCreate = await pMap(
+    directTemplateEnvelope.envelopeItems,
+    async (item, i) => {
       const buffer = await getFileServerSide(item.documentData);
 
       const titleToUse = item.title || directTemplateEnvelope.title;
 
-      const { documentData: newDocumentData } = await putPdfFileServerSide({
-        name: titleToUse,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(buffer),
+      const itemContents = directTemplateEnvelope.contents.filter((content) => content.envelopeItemId === item.id);
+
+      const envelopeItemWithContents = await renderContentsOntoPdf({
+        pdfData: buffer,
+        contents: itemContents,
+        images: contentImages,
       });
+
+      const { documentData: newDocumentData } = await putPdfFileServerSide(
+        {
+          name: titleToUse,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(envelopeItemWithContents),
+        },
+        // Kept as the initial data so the original PDF survives the rendered contents.
+        item.documentData.data,
+      );
 
       const newEnvelopeItemId = prefixedId('envelope_item');
 
@@ -358,7 +423,8 @@ export const createDocumentFromDirectTemplate = async ({
         documentDataId: newDocumentData.id,
         order: item.order !== undefined ? item.order : i + 1,
       };
-    }),
+    },
+    { concurrency: RENDER_CONTENTS_CONCURRENCY },
   );
 
   const documentMeta = await prisma.documentMeta.create({
@@ -367,11 +433,19 @@ export const createDocumentFromDirectTemplate = async ({
 
   const incrementedDocumentId = await incrementDocumentId();
 
+  const envelopeId = prefixedId('envelope');
+
+  const contentsToCreate = buildEnvelopeContentCopyData({
+    contents: directTemplateEnvelope.contents,
+    envelopeId,
+    envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
+  });
+
   const { createdEnvelope, recipientId, token } = await prisma.$transaction(async (tx) => {
     // Create the envelope and non direct template recipients.
     const createdEnvelope = await tx.envelope.create({
       data: {
-        id: prefixedId('envelope'),
+        id: envelopeId,
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
         internalVersion: directTemplateEnvelope.internalVersion,
@@ -410,7 +484,7 @@ export const createDocumentFromDirectTemplate = async ({
                 }),
                 sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
                 signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
-                signingOrder: recipient.signingOrder,
+                signingOrder: resolveSigningOrder(recipient.id),
                 token: nanoid(),
               };
             }),
@@ -425,13 +499,14 @@ export const createDocumentFromDirectTemplate = async ({
             url: true,
           },
         },
-        envelopeItems: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
+
+    if (contentsToCreate.length > 0) {
+      await tx.envelopeContent.createMany({
+        data: contentsToCreate,
+      });
+    }
 
     let nonDirectRecipientFieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
@@ -482,7 +557,7 @@ export const createDocumentFromDirectTemplate = async ({
         signingStatus: SigningStatus.SIGNED,
         sendStatus: SendStatus.SENT,
         signedAt: initialRequestTime,
-        signingOrder: directTemplateRecipient.signingOrder,
+        signingOrder: resolveSigningOrder(directTemplateRecipient.id),
         fields: {
           createMany: {
             data: directTemplateNonSignatureFields.map(({ templateField, customText }) => {
@@ -676,6 +751,7 @@ export const createDocumentFromDirectTemplate = async ({
         select: {
           id: true,
           signingOrder: true,
+          signingStatus: true,
           name: true,
           email: true,
           role: true,
@@ -694,9 +770,20 @@ export const createDocumentFromDirectTemplate = async ({
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       });
 
-      const nextRecipient = pendingRecipients[0];
+      const nextRecipients = getRecipientsInActiveSigningStep(pendingRecipients);
 
-      if (nextRecipient) {
+      // The direct recipient can share a step with other recipients (a signing
+      // group). Those peers are still pending, so without this check they would
+      // look like the "next" step and be dictated over — dictation may only
+      // affect a strictly later step.
+      const hasCompletedCurrentStep = nextRecipients.every((pendingRecipient) =>
+        isRecipientBefore(createdDirectRecipient, pendingRecipient),
+      );
+
+      // Dictation can only apply when the next step is a single recipient.
+      const nextRecipient = hasCompletedCurrentStep && nextRecipients.length === 1 ? nextRecipients[0] : null;
+
+      if (nextRecipient && documentMeta.allowDictateNextSigner) {
         auditLogsToCreate.push(
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
@@ -720,7 +807,7 @@ export const createDocumentFromDirectTemplate = async ({
                 {
                   type: RECIPIENT_DIFF_TYPE.EMAIL,
                   from: nextRecipient.email,
-                  to: nextSigner.email,
+                  to: nextSigner.email.toLowerCase(),
                 },
               ],
             },
@@ -730,12 +817,8 @@ export const createDocumentFromDirectTemplate = async ({
         await tx.recipient.update({
           where: { id: nextRecipient.id },
           data: {
-            ...(nextSigner && documentMeta?.allowDictateNextSigner
-              ? {
-                  name: nextSigner.name,
-                  email: nextSigner.email,
-                }
-              : {}),
+            name: nextSigner.name,
+            email: nextSigner.email.toLowerCase(),
           },
         });
       }

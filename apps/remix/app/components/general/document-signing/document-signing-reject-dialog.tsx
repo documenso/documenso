@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -41,6 +42,7 @@ export function DocumentSigningRejectDialog({
 }: DocumentSigningRejectDialogProps) {
   const { t } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
   const [searchParams] = useSearchParams();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -76,6 +78,12 @@ export function DocumentSigningRejectDialog({
         window.location.href = `/sign/${token}/rejected`;
       }
     } catch (err) {
+      analytics.captureException(err, {
+        source: 'signing',
+        location: 'reject_document',
+        documentId,
+      });
+
       toast({
         title: t`Error`,
         description: t`An error occurred while rejecting the document. Please try again.`,

@@ -1,6 +1,6 @@
+import { Canvas, Image, Path2D } from '@documenso/skia-canvas';
 import pMap from 'p-map';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
-import { Canvas, Image, Path2D } from 'skia-canvas';
 
 // @ts-expect-error napi-rs/canvas satisfies the requirements
 globalThis.Path2D = Path2D;

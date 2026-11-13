@@ -1,4 +1,5 @@
 import { Img } from '../components';
+import { getEmailAssetUrl } from '../utils/asset-url';
 
 export interface TemplateImageProps {
   assetBaseUrl: string;
@@ -7,11 +8,7 @@ export interface TemplateImageProps {
 }
 
 export const TemplateImage = ({ assetBaseUrl, className, staticAsset }: TemplateImageProps) => {
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
-
-  return <Img className={className} src={getAssetUrl(`/static/${staticAsset}`)} alt="" />;
+  return <Img className={className} src={getEmailAssetUrl(assetBaseUrl, `static/${staticAsset}`)} alt="" />;
 };
 
 export default TemplateImage;

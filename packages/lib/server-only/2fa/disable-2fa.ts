@@ -32,7 +32,7 @@ export const disableTwoFactorAuthentication = async ({
   }
 
   if (!isValid) {
-    throw new AppError('INCORRECT_TWO_FACTOR_CODE');
+    throw new AppError(AppErrorCode.INCORRECT_TWO_FACTOR_CODE);
   }
 
   await prisma.$transaction(async (tx) => {

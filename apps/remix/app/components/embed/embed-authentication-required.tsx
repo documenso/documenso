@@ -1,26 +1,15 @@
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Trans } from '@lingui/react/macro';
 
-import { SignInForm } from '~/components/forms/signin';
+import { EmbedPopupAuth } from '~/components/embed/embed-popup-auth';
 import { BrandingLogo } from '~/components/general/branding-logo';
 
 export type EmbedAuthenticationRequiredProps = {
   email?: string;
-  returnTo: string;
-  isGoogleSSOEnabled?: boolean;
-  isMicrosoftSSOEnabled?: boolean;
-  isOIDCSSOEnabled?: boolean;
-  oidcProviderLabel?: string;
 };
 
-export const EmbedAuthenticationRequired = ({
-  email,
-  returnTo,
-  // isGoogleSSOEnabled,
-  // isMicrosoftSSOEnabled,
-  // isOIDCSSOEnabled,
-  // oidcProviderLabel,
-}: EmbedAuthenticationRequiredProps) => {
+// Rendered from an ErrorBoundary, so providers come from public env rather than loader data.
+export const EmbedAuthenticationRequired = ({ email }: EmbedAuthenticationRequiredProps) => {
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center">
       <div className="flex w-full max-w-md flex-col">
@@ -32,16 +21,7 @@ export const EmbedAuthenticationRequired = ({
           </AlertDescription>
         </Alert>
 
-        <SignInForm
-          // Embed currently not supported.
-          // isGoogleSSOEnabled={isGoogleSSOEnabled}
-          // isMicrosoftSSOEnabled={isMicrosoftSSOEnabled}
-          // isOIDCSSOEnabled={isOIDCSSOEnabled}
-          // oidcProviderLabel={oidcProviderLabel}
-          className="mt-4"
-          initialEmail={email}
-          returnTo={returnTo}
-        />
+        <EmbedPopupAuth className="mt-4" email={email} onSuccess={() => window.location.reload()} />
       </div>
     </div>
   );

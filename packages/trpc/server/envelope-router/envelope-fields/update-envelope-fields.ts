@@ -29,7 +29,17 @@ export const updateEnvelopeFieldsRoute = authenticatedProcedure
         id: envelopeId,
       },
       type: null,
-      fields,
+      fields: fields.map((field) => ({
+        id: field.id,
+        type: field.type,
+        pageNumber: field.page,
+        pageX: field.positionX,
+        pageY: field.positionY,
+        width: field.width,
+        height: field.height,
+        fieldMeta: field.fieldMeta,
+        envelopeItemId: field.envelopeItemId,
+      })),
       requestMetadata: ctx.metadata,
     });
 

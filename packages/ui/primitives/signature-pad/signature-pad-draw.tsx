@@ -1,45 +1,17 @@
 import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
-import { SIGNATURE_CANVAS_DPI, SIGNATURE_MIN_COVERAGE_THRESHOLD } from '@documenso/lib/constants/signatures';
+import { SIGNATURE_CANVAS_DPI } from '@documenso/lib/constants/signatures';
 
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
-import type { MouseEvent, PointerEvent, RefObject, TouchEvent } from 'react';
-import { useMemo, useRef, useState } from 'react';
+import type { MouseEvent, PointerEvent, TouchEvent } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { cn } from '../../lib/utils';
-import { getSvgPathFromStroke } from './helper';
+import { checkSignatureValidity, getSvgPathFromStroke } from './helper';
 import { Point } from './point';
 import { SignaturePadColorPicker } from './signature-pad-color-picker';
-
-const checkSignatureValidity = (element: RefObject<HTMLCanvasElement>) => {
-  if (!element.current) {
-    return false;
-  }
-
-  const ctx = element.current.getContext('2d');
-
-  if (!ctx) {
-    return false;
-  }
-
-  const imageData = ctx.getImageData(0, 0, element.current.width, element.current.height);
-  const data = imageData.data;
-  let filledPixels = 0;
-  const totalPixels = data.length / 4;
-
-  for (let i = 0; i < data.length; i += 4) {
-    if (data[i + 3] > 0) {
-      filledPixels++;
-    }
-  }
-
-  const filledPercentage = filledPixels / totalPixels;
-  const isValid = filledPercentage > SIGNATURE_MIN_COVERAGE_THRESHOLD;
-
-  return isValid;
-};
 
 export type SignaturePadDrawProps = {
   className?: string;
@@ -48,10 +20,13 @@ export type SignaturePadDrawProps = {
 };
 
 export const SignaturePadDraw = ({ className, value, onChange, ...props }: SignaturePadDrawProps) => {
+  const { t } = useLingui();
+
   const $el = useRef<HTMLCanvasElement>(null);
 
   const $imageData = useRef<ImageData | null>(null);
   const $fileInput = useRef<HTMLInputElement>(null);
+  const $hasPressStartedOnPad = useRef(false);
 
   const [isPressed, setIsPressed] = useState(false);
   const [lines, setLines] = useState<Point[][]>([]);
@@ -84,6 +59,17 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
     const point = Point.fromEvent(event, SIGNATURE_CANVAS_DPI, $el.current);
 
     setCurrentLine([point]);
+  };
+
+  const onPointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
+    // Right and middle clicks can open a context menu that swallows pointerup, leaving the stroke stuck.
+    if (!event.isPrimary || event.button !== 0) {
+      return;
+    }
+
+    $hasPressStartedOnPad.current = true;
+
+    onMouseDown(event);
   };
 
   const onMouseMove = (event: MouseEvent | PointerEvent | TouchEvent) => {
@@ -173,7 +159,9 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
       event.preventDefault();
     }
 
-    if ('buttons' in event && event.buttons === 1) {
+    // A press can already be held when the pad mounts (e.g. the one that opened it), so only
+    // resume strokes that started on the pad.
+    if ($hasPressStartedOnPad.current && 'buttons' in event && event.buttons === 1) {
       onMouseDown(event);
     }
   };
@@ -207,6 +195,7 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
     setLines([]);
     setCurrentLine([]);
     setIsPressed(false);
+    setIsSignatureValid(null);
   };
 
   const onUndoClick = () => {
@@ -231,8 +220,25 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
       ctx?.fill(pathData);
     });
 
-    onChange?.($el.current.toDataURL());
+    const isValidSignature = checkSignatureValidity($el);
+    const isEmptySignature = newLines.length === 0 && !$imageData.current;
+
+    setIsSignatureValid(isEmptySignature ? null : isValidSignature);
+    onChange(isValidSignature ? $el.current.toDataURL() : '');
   };
+
+  useEffect(() => {
+    // Releasing outside the pad never reaches the canvas.
+    const onWindowPointerUp = () => {
+      $hasPressStartedOnPad.current = false;
+    };
+
+    window.addEventListener('pointerup', onWindowPointerUp);
+
+    return () => {
+      window.removeEventListener('pointerup', onWindowPointerUp);
+    };
+  }, []);
 
   unsafe_useEffectOnce(() => {
     if ($el.current) {
@@ -269,16 +275,26 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
         })}
         style={{ touchAction: 'none' }}
         onPointerMove={(event) => onMouseMove(event)}
-        onPointerDown={(event) => onMouseDown(event)}
+        onPointerDown={(event) => onPointerDown(event)}
         onPointerUp={(event) => onMouseUp(event)}
         onPointerLeave={(event) => onMouseLeave(event)}
         onPointerEnter={(event) => onMouseEnter(event)}
         {...props}
       />
 
-      <SignaturePadColorPicker selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
+      <SignaturePadColorPicker
+        className={cn('transition-opacity duration-100', {
+          'pointer-events-none opacity-0': isPressed,
+        })}
+        selectedColor={selectedColor}
+        setSelectedColor={setSelectedColor}
+      />
 
-      <div className="absolute right-3 bottom-3 flex gap-2">
+      <div
+        className={cn('absolute right-3 bottom-3 flex gap-2 transition-opacity duration-100', {
+          'pointer-events-none opacity-0': isPressed,
+        })}
+      >
         <button
           type="button"
           className="rounded-full p-0 text-[0.688rem] text-muted-foreground/60 ring-offset-background hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -288,19 +304,15 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
         </button>
       </div>
 
-      {isSignatureValid === false && (
-        <div className="absolute bottom-4 left-4 flex gap-2">
-          <span className="text-destructive text-xs">
-            <Trans>Signature is too small</Trans>
-          </span>
-        </div>
-      )}
-
-      {isSignatureValid && lines.length > 0 && (
-        <div className="absolute bottom-4 left-4 flex gap-2">
+      <div
+        className={cn('absolute bottom-4 left-4 flex items-center gap-2 transition-opacity duration-100', {
+          'pointer-events-none opacity-0': isPressed,
+        })}
+      >
+        {lines.length > 0 && (
           <button
             type="button"
-            title="undo"
+            title={t`Undo`}
             className="rounded-full p-0 text-[0.688rem] text-muted-foreground/60 ring-offset-background hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={onUndoClick}
           >
@@ -309,8 +321,14 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
               <Trans>Undo</Trans>
             </span>
           </button>
-        </div>
-      )}
+        )}
+
+        {isSignatureValid === false && (
+          <span className="text-destructive text-xs">
+            <Trans>Signature is too small</Trans>
+          </span>
+        )}
+      </div>
     </div>
   );
 };

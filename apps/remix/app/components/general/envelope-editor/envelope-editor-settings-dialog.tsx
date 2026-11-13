@@ -16,7 +16,7 @@ import {
   ZDocumentMetaTimezoneSchema,
 } from '@documenso/lib/types/document-meta';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+import { isHttpUrl } from '@documenso/lib/utils/is-http-url';
 import { canAccessTeamDocument, DocumentSignatureType, extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
@@ -51,7 +51,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
@@ -97,7 +105,7 @@ export const ZAddSettingsFormSchema = z.object({
     redirectUrl: z
       .string()
       .optional()
-      .refine((value) => value === undefined || value === '' || isValidRedirectUrl(value), {
+      .refine((value) => value === undefined || value === '' || isHttpUrl(value), {
         message: 'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
     language: z
@@ -943,6 +951,10 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                   onValueChange={field.onChange}
                                 />
                               </FormControl>
+
+                              <FormDescription>
+                                <Trans>The document owner and assigned recipients will always have access.</Trans>
+                              </FormDescription>
                             </FormItem>
                           )}
                         />

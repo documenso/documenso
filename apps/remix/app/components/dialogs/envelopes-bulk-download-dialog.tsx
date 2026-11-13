@@ -290,15 +290,16 @@ export const EnvelopesBulkDownloadDialog = ({
         {isOverDownloadLimit && (
           <Alert variant="warning">
             <AlertDescription>
-              <Trans>
-                You can download up to {MAX_BULK_DOWNLOAD_ENVELOPES} documents at a time. Deselect some documents to
-                continue.
-              </Trans>
+              <Plural
+                value={MAX_BULK_DOWNLOAD_ENVELOPES}
+                one="You can download up to # document at a time. Deselect some documents to continue."
+                other="You can download up to # documents at a time. Deselect some documents to continue."
+              />
             </AlertDescription>
           </Alert>
         )}
 
-        <fieldset disabled={isDownloading} className="space-y-4">
+        <fieldset disabled={isDownloading} className="min-w-0 space-y-4">
           <div className="-mx-3 max-h-96 overflow-y-auto px-3">
             <div className="divide-y divide-border rounded-lg border border-border">
               {envelopes.map((envelope) => {

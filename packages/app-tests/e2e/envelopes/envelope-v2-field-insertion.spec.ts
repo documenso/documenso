@@ -62,7 +62,6 @@ test.describe('V2 envelope field insertion during signing', () => {
       (Number(sigField.positionY) / 100) * canvasBox.height + ((Number(sigField.height) / 100) * canvasBox.height) / 2;
 
     await canvas.click({ position: { x, y } });
-    await page.waitForTimeout(500);
 
     await expect(page.getByText('0 Fields Remaining').first()).toBeVisible({ timeout: 10_000 });
 

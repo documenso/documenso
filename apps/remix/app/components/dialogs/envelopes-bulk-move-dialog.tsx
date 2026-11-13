@@ -96,7 +96,10 @@ export const EnvelopesBulkMoveDialog = ({
       if (isDocument) {
         await trpcUtils.document.findDocumentsInternal.invalidate();
       } else {
-        await trpcUtils.template.findTemplates.invalidate();
+        await Promise.all([
+          trpcUtils.template.findTemplates.invalidate(),
+          trpcUtils.template.findTemplatesInternal.invalidate(),
+        ]);
       }
 
       await onSuccess?.(data.folderId);

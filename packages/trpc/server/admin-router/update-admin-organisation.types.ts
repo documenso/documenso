@@ -14,6 +14,8 @@ export const ZUpdateAdminOrganisationRequestSchema = z.object({
       memberCount: true,
       envelopeItemCount: true,
       recipientCount: true,
+      envelopeContentCount: true,
+      envelopeContentImageCount: true,
       flags: true,
       documentRateLimits: true,
       documentQuota: true,
@@ -26,8 +28,11 @@ export const ZUpdateAdminOrganisationRequestSchema = z.object({
     customerId: z.string().optional(),
     originalSubscriptionClaimId: z.string().optional(),
   }),
+  notifyOrganisation: z.boolean().optional(),
 });
 
-export const ZUpdateAdminOrganisationResponseSchema = z.void();
+export const ZUpdateAdminOrganisationResponseSchema = z.object({
+  isNotificationSent: z.boolean(),
+});
 
 export type TUpdateAdminOrganisationRequest = z.infer<typeof ZUpdateAdminOrganisationRequestSchema>;

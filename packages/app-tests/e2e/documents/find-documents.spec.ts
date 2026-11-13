@@ -167,6 +167,29 @@ test.describe('Find Documents UI - Personal Context', () => {
     await expect(page.getByRole('link', { name: 'Annual Budget Plan', exact: true })).not.toBeVisible();
   });
 
+  test('should reset pagination when the search query changes', async ({ page }) => {
+    const { user: owner, team } = await seedUser();
+
+    await seedDraftDocument(owner, team.id, [], {
+      createDocumentOptions: { title: 'Quarterly Report 2024' },
+    });
+    await seedDraftDocument(owner, team.id, [], {
+      createDocumentOptions: { title: 'Annual Budget Plan' },
+    });
+
+    // Start on a page that would be empty once the search narrows the results.
+    await apiSignin({
+      page,
+      email: owner.email,
+      redirectPath: `/t/${team.url}/documents?page=2&perPage=1`,
+    });
+
+    await page.getByPlaceholder('Search documents...').fill('Quarterly');
+    await page.waitForURL((url) => url.searchParams.get('query') === 'Quarterly' && !url.searchParams.has('page'));
+
+    await expect(page.getByRole('link', { name: 'Quarterly Report 2024' })).toBeVisible();
+  });
+
   test('should not show deleted documents', async ({ page }) => {
     const { user: owner, team } = await seedUser();
 

@@ -1,0 +1,44 @@
+diff --git a/node_modules/@radix-ui/react-menu/dist/index.js b/node_modules/@radix-ui/react-menu/dist/index.js
+index b3f6113..d8ec2e3 100644
+--- a/node_modules/@radix-ui/react-menu/dist/index.js
++++ b/node_modules/@radix-ui/react-menu/dist/index.js
+@@ -139,9 +139,14 @@ var Menu = /* @__PURE__ */ __name((props) => {
+     if (!open) {
+       return;
+     }
+-    const handleBlur = /* @__PURE__ */ __name(() => handleOpenChange(false), "handleBlur");
+-    window.addEventListener("blur", handleBlur);
+-    return () => window.removeEventListener("blur", handleBlur);
++    // DOCUMENSO PATCH: @radix-ui/react-menu 2.1.18+ closes open menus when the window
++    // fires a "blur" event. Opening a native file picker blurs the window, which closes
++    // the menu and unmounts anything rendered within its content, such as dialogs that
++    // contain file inputs, silently discarding the user's file selection. This restores
++    // the pre-2.1.18 behaviour. Regression test: e2e/templates/template-bulk-send.spec.ts
++    // const handleBlur = () => handleOpenChange(false);
++    // window.addEventListener("blur", handleBlur);
++    // return () => window.removeEventListener("blur", handleBlur);
+   }, [open, handleOpenChange]);
+   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PopperPrimitive.Root, { ...popperScope, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+     MenuProvider,
+diff --git a/node_modules/@radix-ui/react-menu/dist/index.mjs b/node_modules/@radix-ui/react-menu/dist/index.mjs
+index cd4303a..68865e3 100644
+--- a/node_modules/@radix-ui/react-menu/dist/index.mjs
++++ b/node_modules/@radix-ui/react-menu/dist/index.mjs
+@@ -73,9 +73,14 @@ var Menu = /* @__PURE__ */ __name((props) => {
+     if (!open) {
+       return;
+     }
+-    const handleBlur = /* @__PURE__ */ __name(() => handleOpenChange(false), "handleBlur");
+-    window.addEventListener("blur", handleBlur);
+-    return () => window.removeEventListener("blur", handleBlur);
++    // DOCUMENSO PATCH: @radix-ui/react-menu 2.1.18+ closes open menus when the window
++    // fires a "blur" event. Opening a native file picker blurs the window, which closes
++    // the menu and unmounts anything rendered within its content, such as dialogs that
++    // contain file inputs, silently discarding the user's file selection. This restores
++    // the pre-2.1.18 behaviour. Regression test: e2e/templates/template-bulk-send.spec.ts
++    // const handleBlur = () => handleOpenChange(false);
++    // window.addEventListener("blur", handleBlur);
++    // return () => window.removeEventListener("blur", handleBlur);
+   }, [open, handleOpenChange]);
+   return /* @__PURE__ */ jsx(PopperPrimitive.Root, { ...popperScope, children: /* @__PURE__ */ jsx(
+     MenuProvider,

@@ -72,7 +72,7 @@ export const createOrganisationMemberInvites = async ({
     },
   });
 
-  const organisationMemberEmails = organisation.members.map((member) => member.user.email);
+  const organisationMemberEmails = organisation.members.map((member) => member.user.email.toLowerCase());
   const organisationMemberInviteEmails = organisation.invites.map((invite) => invite.email);
 
   const usersToInvite = invitations.filter((invitation) => {

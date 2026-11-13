@@ -5,7 +5,7 @@ import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones'
 import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZDocumentMetaDateFormatSchema, ZDocumentMetaTimezoneSchema } from '@documenso/lib/types/document-meta';
-import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+import { isHttpUrl } from '@documenso/lib/utils/is-http-url';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { msg } from '@lingui/core/macro';
 import { DocumentDistributionMethod, DocumentVisibility, TemplateType } from '@prisma/client';
@@ -31,7 +31,7 @@ export const ZAddTemplateSettingsFormSchema = z.object({
     redirectUrl: z
       .string()
       .optional()
-      .refine((value) => value === undefined || value === '' || isValidRedirectUrl(value), {
+      .refine((value) => value === undefined || value === '' || isHttpUrl(value), {
         message: 'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
     language: z

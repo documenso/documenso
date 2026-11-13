@@ -11,6 +11,12 @@ Documenso enforces rate limits on all API endpoints to ensure service stability.
 
 ## HTTP Rate Limits
 
+The rate limit applies to:
+
+- `/api/v1/*`
+- `/api/v2/*`
+- `/api/v2-beta/*`
+
 **Limit:** 1000 requests per minute per IP address  
 **Response:** 429 Too Many Requests
 
@@ -19,7 +25,7 @@ Documenso enforces rate limits on all API endpoints to ensure service stability.
   this value, in which case you can be rate-limited before reaching the global limit.
 </Callout>
 
-### Rate Limit Response
+### Global per-IP 429 Response
 
 ```json
 {
@@ -27,10 +33,22 @@ Documenso enforces rate limits on all API endpoints to ensure service stability.
 }
 ```
 
-<Callout type="warn">
-  No rate limit headers are currently provided. When you receive a 429 response, wait at least 60
-  seconds before retrying.
-</Callout>
+### Rate Limit Headers
+
+Responses from `/api/v1/*`, `/api/v2/*`, and `/api/v2-beta/*` include these headers. The only
+exception is CORS preflight (`OPTIONS`) requests, which are answered before the rate limiter runs
+and carry no rate limit headers:
+
+| Header                  | Description                                                            |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `X-RateLimit-Limit`     | Maximum requests allowed in the current global window                  |
+| `X-RateLimit-Remaining` | Requests remaining in the current global window                        |
+| `X-RateLimit-Reset`     | End of the current global window, as a Unix epoch timestamp in seconds |
+
+A 429 response from a windowed limiter also includes `Retry-After`, in seconds, with a minimum
+value of `1`. The global API limit uses fixed, epoch-aligned one-minute buckets, so the actual wait
+until the next window is between 1 and 60 seconds. Honor `Retry-After` exactly instead of sleeping
+for a fixed 60 seconds. See the [Retry-After handling example](/docs/developers/examples/common-workflows#error-handling-patterns).
 
 ## Resource Limits
 
@@ -44,24 +62,55 @@ Beyond HTTP rate limits, your account has usage limits based on your subscriptio
 | Total Recipients | 10   | Unlimited | Unlimited   | Unlimited  |
 | Direct Templates | 3    | Unlimited | Unlimited   | Unlimited  |
 
-### Error Response
+### Organisation Limit 429 Responses
 
-When you exceed a resource limit:
+Organisation windowed limits and organisation monthly quotas produce 429 responses whose body
+shape depends on the API version, and neither matches the global per-IP limiter's
+`{ "error": "..." }` body.
+
+On `/api/v1/*`, the body contains only a message:
 
 ```json
 {
-  "error": "You have reached your document limit for this month. Please upgrade your plan.",
-  "code": "LIMIT_EXCEEDED",
-  "statusCode": 400
+  "message": "Too many requests, please try again later. Contact support if you require higher limits."
 }
 ```
 
+On `/api/v2/*` and `/api/v2-beta/*`, the body is a structured error object:
+
+```json
+{
+  "message": "Too many requests, please try again later. Contact support if you require higher limits.",
+  "code": "TOO_MANY_REQUESTS",
+  "data": {
+    "code": "TOO_MANY_REQUESTS",
+    "httpStatus": 429,
+    "appError": {
+      "code": "TOO_MANY_REQUESTS",
+      "message": "Too many requests, please try again later. Contact support if you require higher limits."
+    }
+  }
+}
+```
+
+Organisation windowed limit responses include the `X-RateLimit-*` headers and `Retry-After` for
+their own window. Monthly quota responses carry no quota-specific rate limit headers or
+`Retry-After` because the quota is not a time window; rely on the status code and message instead.
+
 ## Error Codes
 
-| Code                | Status | Description                   |
-| ------------------- | ------ | ----------------------------- |
-| `TOO_MANY_REQUESTS` | 429    | HTTP rate limit exceeded      |
-| `LIMIT_EXCEEDED`    | 400    | Resource usage limit exceeded |
+| Code                | Status | Description                                                        |
+| ------------------- | ------ | ------------------------------------------------------------------ |
+| `TOO_MANY_REQUESTS` | 429    | Global per-IP, organisation windowed, or monthly quota exceeded    |
+| `LIMIT_EXCEEDED`    | 400    | Resource usage limit exceeded                                      |
+
+There are three sources of `TOO_MANY_REQUESTS` responses:
+
+1. The global per-IP limit, returning the `{ "error": "..." }` body shown above.
+2. Organisation windowed rate limits for the `api`, `document`, and `email` counters.
+3. Organisation monthly quotas for the same three counters. Every authenticated API request
+   consumes the `api` counter, so any endpoint can return this 429 once the monthly API quota is
+   exhausted — not just envelope-related ones.
 
 ---
 

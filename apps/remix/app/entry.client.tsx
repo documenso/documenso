@@ -18,6 +18,23 @@ import './utils/polyfills/promise-with-resolvers';
  * the page early, leaving dead event handlers (broken dropdowns, native form
  * submits).
  */
+/**
+ * Signing and direct template URLs contain recipient tokens which must never
+ * be sent to PostHog. Recipient context is attached explicitly via
+ * `recipientId` where needed instead.
+ */
+const redactTokensFromUrl = (value: string) => {
+  return value.replace(/(\/(?:sign|d|direct)\/)([^/?#]+)/g, '$1:token');
+};
+
+const URL_EVENT_PROPERTIES = [
+  '$current_url',
+  '$pathname',
+  '$referrer',
+  '$initial_referrer',
+  '$prev_pageview_pathname',
+] as const;
+
 function initPosthog() {
   const postHogConfig = extractPostHogConfig();
 
@@ -25,8 +42,55 @@ function initPosthog() {
     void import('posthog-js').then(({ default: posthog }) => {
       posthog.init(postHogConfig.key, {
         api_host: postHogConfig.host,
+        // Only create person profiles for identified (authenticated) users,
+        // anonymous recipients on signing pages stay anonymous.
+        person_profiles: 'identified_only',
+        // Explicit events only, autocapture on signing pages blows up usage
+        // without providing actionable data.
+        autocapture: false,
+        capture_pageview: true,
+        capture_pageleave: false,
         capture_exceptions: true,
+        before_send: (event) => {
+          if (!event) {
+            return null;
+          }
+
+          for (const property of URL_EVENT_PROPERTIES) {
+            const value = event.properties?.[property];
+
+            if (typeof value === 'string') {
+              event.properties[property] = redactTokensFromUrl(value);
+            }
+          }
+
+          if (event.$set_once && typeof event.$set_once['$initial_current_url'] === 'string') {
+            event.$set_once['$initial_current_url'] = redactTokensFromUrl(event.$set_once['$initial_current_url']);
+          }
+
+          return event;
+        },
       });
+    });
+  }
+}
+
+/**
+ * Surfaces hydration recoveries (React 19 discards the server HTML and
+ * re-renders on the client instead of dying) so we can track how often
+ * extensions/early clicks interfere with hydration in the wild.
+ */
+function onRecoverableError(error: unknown, errorInfo: { componentStack?: string }) {
+  console.error('[hydration] recovered from error', error, errorInfo.componentStack);
+
+  if (extractPostHogConfig()) {
+    void import('posthog-js').then(({ default: posthog }) => {
+      if (posthog.__loaded) {
+        posthog.capture('$hydration_recoverable_error', {
+          message: error instanceof Error ? error.message : String(error),
+          componentStack: errorInfo.componentStack,
+        });
+      }
     });
   }
 }
@@ -44,6 +108,7 @@ async function main() {
           <HydratedRouter />
         </I18nProvider>
       </StrictMode>,
+      { onRecoverableError },
     );
   });
 

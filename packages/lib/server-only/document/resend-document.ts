@@ -27,6 +27,7 @@ import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { shouldShowNewAccountWarning } from '../../utils/sender-trust';
 import { buildEnvelopeEmailHeaders } from '../email/build-envelope-email-headers';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
@@ -53,6 +54,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
       email: true,
       name: true,
       disabled: true,
+      createdAt: true,
     },
   });
 
@@ -169,6 +171,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
   const {
     branding,
     emailLanguage,
+    settings,
     organisationType,
     senderEmail,
     replyToEmail,
@@ -198,6 +201,11 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     type: 'email',
   });
 
+  const isNewAccountSender = shouldShowNewAccountWarning({
+    userCreatedAt: user.createdAt,
+    organisationClaim: claims,
+  });
+
   await Promise.all(
     recipientsToRemind.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC || !isRecipientEmailValidForSending(recipient)) {
@@ -225,11 +233,16 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
 
       if (organisationType === OrganisationType.ORGANISATION) {
         emailSubject = i18n._(msg`Reminder: ${envelope.team.name} invited you to ${recipientActionVerb} a document`);
-        emailMessage =
-          envelope.documentMeta.message ||
-          i18n._(
-            msg`${user.name || user.email} on behalf of "${envelope.team.name}" has invited you to ${recipientActionVerb} the document "${envelope.title}".`,
+
+        if (!emailMessage) {
+          const inviterName = user.name || user.email;
+
+          emailMessage = i18n._(
+            settings.includeSenderDetails
+              ? msg`${inviterName} on behalf of "${envelope.team.name}" has invited you to ${recipientActionVerb} the document "${envelope.title}".`
+              : msg`${envelope.team.name} has invited you to ${recipientActionVerb} the document "${envelope.title}".`,
           );
+        }
       }
 
       const customEmailTemplate = {
@@ -256,7 +269,9 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
         selfSigner,
         organisationType,
         teamName: envelope.team?.name,
+        includeSenderDetails: settings.includeSenderDetails,
         reportUrl,
+        newAccountWarningSenderEmail: isNewAccountSender && !selfSigner ? user.email : undefined,
       });
 
       const [html, text] = await Promise.all([

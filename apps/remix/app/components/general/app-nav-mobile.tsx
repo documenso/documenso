@@ -1,6 +1,9 @@
 import LogoImage from '@documenso/assets/logo.png';
 import { authClient } from '@documenso/auth/client';
+import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { canAccessOrganisationAnalytics, formatOrganisationAnalyticsPath } from '@documenso/lib/utils/organisations';
+import { canExecuteTeamAction, formatAnalyticsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
@@ -22,6 +25,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
   const { organisations } = useSession();
 
   const currentTeam = useOptionalCurrentTeam();
+  const currentOrganisation = useOptionalCurrentOrganisation();
 
   const { data: unreadCountData } = trpc.document.inbox.getCount.useQuery(
     {
@@ -37,24 +41,27 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
   };
 
   const menuNavigationLinks = useMemo(() => {
-    let teamUrl = currentTeam?.url || null;
+    const navigationTeam =
+      currentTeam ??
+      (organisations.length === 1 && organisations[0].teams.length === 1 ? organisations[0].teams[0] : null);
 
-    if (!teamUrl && organisations.length === 1 && organisations[0].teams.length === 1) {
-      teamUrl = organisations[0].teams[0].url;
-    }
-
-    if (!teamUrl) {
+    if (!navigationTeam) {
       return [
         {
           href: '/inbox',
           text: t`Inbox`,
         },
+        ...(currentOrganisation && canAccessOrganisationAnalytics(currentOrganisation.currentOrganisationRole)
+          ? [{ href: formatOrganisationAnalyticsPath(currentOrganisation.url), text: t`Analytics` }]
+          : []),
         {
           href: '/settings/profile',
           text: t`Settings`,
         },
       ];
     }
+
+    const teamUrl = navigationTeam.url;
 
     return [
       {
@@ -69,12 +76,15 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         href: '/inbox',
         text: t`Inbox`,
       },
+      ...(canExecuteTeamAction('MANAGE_TEAM', navigationTeam.currentTeamRole)
+        ? [{ href: formatAnalyticsPath(teamUrl), text: t`Analytics` }]
+        : []),
       {
         href: '/settings/profile',
         text: t`Settings`,
       },
     ];
-  }, [currentTeam, organisations]);
+  }, [currentTeam, currentOrganisation, organisations, t]);
 
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
