@@ -1,6 +1,10 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { createTeam } from '@documenso/lib/server-only/team/create-team';
+import { nanoid } from '@documenso/lib/universal/id';
+import { prisma } from '@documenso/prisma';
+import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { expectTextToBeVisible } from '../fixtures/generic';
@@ -47,6 +51,65 @@ test('[TEAMS]: delete team', async ({ page }) => {
   await expectTextToBeVisible(page, 'Your team has been successfully deleted');
 });
 
+test('[TEAMS]: delete team without transferring documents', async ({ page }) => {
+  const { user, team, organisation } = await seedUser();
+  const otherTeam = await seedSiblingTeam(user.id, organisation.id);
+  const document = await seedBlankDocument(user, team.id);
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/t/${team.url}/settings`,
+  });
+
+  await page.getByRole('button', { name: 'Delete' }).click();
+  await page.getByLabel(`Confirm by typing delete ${team.name}`).fill(`delete ${team.name}`);
+
+  const transferSelect = page.getByRole('dialog').getByRole('combobox');
+
+  // Pick a team first: "Don't transfer" has to replace that choice, not only work as the untouched default.
+  await transferSelect.click();
+  await page.getByRole('option', { name: otherTeam.name }).click();
+  await transferSelect.click();
+  await page.getByRole('option', { name: "Don't transfer (Delete all documents)" }).click();
+  await expect(transferSelect).toHaveText("Don't transfer (Delete all documents)");
+
+  await page.getByRole('button', { name: 'Delete' }).click();
+
+  await expectTextToBeVisible(page, 'Your team has been successfully deleted');
+
+  expect(await prisma.team.findUnique({ where: { id: team.id } })).toBeNull();
+  expect(await prisma.envelope.findUnique({ where: { id: document.id } })).toBeNull();
+});
+
+test('[TEAMS]: delete team and transfer documents to another team', async ({ page }) => {
+  const { user, team, organisation } = await seedUser();
+  const otherTeam = await seedSiblingTeam(user.id, organisation.id);
+  const document = await seedBlankDocument(user, team.id);
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/t/${team.url}/settings`,
+  });
+
+  await page.getByRole('button', { name: 'Delete' }).click();
+  await page.getByLabel(`Confirm by typing delete ${team.name}`).fill(`delete ${team.name}`);
+
+  await page.getByRole('dialog').getByRole('combobox').click();
+  await page.getByRole('option', { name: otherTeam.name }).click();
+
+  await page.getByRole('button', { name: 'Delete' }).click();
+
+  await expectTextToBeVisible(page, 'Your team has been successfully deleted');
+
+  expect(await prisma.team.findUnique({ where: { id: team.id } })).toBeNull();
+
+  const transferredDocument = await prisma.envelope.findUnique({ where: { id: document.id } });
+
+  expect(transferredDocument?.teamId).toBe(otherTeam.id);
+});
+
 test('[TEAMS]: update team', async ({ page }) => {
   const { user, team } = await seedUser();
 
@@ -72,3 +135,18 @@ test('[TEAMS]: update team', async ({ page }) => {
   // The team settings index redirects to the explicit General route.
   await page.waitForURL(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${updatedTeamId}/settings/general`);
 });
+
+// The delete dialog only offers a transfer target when the organisation has another team.
+const seedSiblingTeam = async (userId: number, organisationId: string) => {
+  const teamUrl = `team-${nanoid()}`;
+
+  await createTeam({
+    userId,
+    teamName: teamUrl,
+    teamUrl,
+    organisationId,
+    inheritMembers: true,
+  });
+
+  return await prisma.team.findUniqueOrThrow({ where: { url: teamUrl } });
+};
