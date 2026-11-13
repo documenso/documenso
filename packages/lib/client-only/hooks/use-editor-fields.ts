@@ -10,7 +10,6 @@ import { isDeepEqual } from 'remeda';
 import { z } from 'zod';
 import { EDITOR_DUPLICATE_ITEM_OFFSET } from '../../constants/envelope-editor';
 import {
-  applyEditorFieldUpdate,
   type EditorFieldChanges,
   type EditorFieldUpdate,
   type EditorFieldUpdates,
@@ -155,7 +154,24 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
         .map((field) => {
           const updates = fieldUpdatesByFormId.get(field.formId);
 
-          return updates ? applyEditorFieldUpdate(field, updates) : field;
+          if (!updates) {
+            return field;
+          }
+
+          const updatedField = {
+            ...field,
+            ...updates,
+          };
+
+          const hasTypeChanged = updates.type !== undefined && updates.type !== field.type;
+          const hasRecipientChanged = updates.recipientId !== undefined && updates.recipientId !== field.recipientId;
+
+          // Fields must be removed from groups if their type or recipient has changed.
+          if (Boolean(updatedField.groupId) && (hasTypeChanged || hasRecipientChanged)) {
+            updatedField.groupId = null;
+          }
+
+          return clampPercentageBox(updatedField);
         })
         .concat(newFields);
 

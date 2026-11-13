@@ -2,7 +2,7 @@ import { FieldType } from '@prisma/client';
 import { assert, describe, expect, it } from 'vitest';
 
 import type { TCheckboxFieldMeta, TRadioFieldMeta } from '../types/field-meta';
-import { applyEditorFieldUpdate, resolveEditorFieldGroupChanges } from './editor-field-group-changes';
+import { resolveEditorFieldGroupChanges } from './editor-field-group-changes';
 import type { TLocalField } from './hooks/use-editor-fields';
 
 const createLocalField = (overrides: Partial<TLocalField> & Pick<TLocalField, 'formId' | 'type'>): TLocalField => ({
@@ -33,22 +33,6 @@ const radioMeta = (checked: boolean): TRadioFieldMeta => ({
 });
 
 const atLeastTwo = { validationRule: 'Select at least', validationLength: 2 };
-
-describe('applyEditorFieldUpdate', () => {
-  const field = createLocalField({ formId: 'a', type: FieldType.TEXT, groupId: 'g' });
-
-  it('keeps the group when the type and recipient are unchanged', () => {
-    expect(applyEditorFieldUpdate(field, { positionX: 20 }).groupId).toBe('g');
-  });
-
-  it('leaves the group when the type changes', () => {
-    expect(applyEditorFieldUpdate(field, { type: FieldType.NUMBER }).groupId).toBeNull();
-  });
-
-  it('leaves the group when the recipient changes', () => {
-    expect(applyEditorFieldUpdate(field, { recipientId: 2 }).groupId).toBeNull();
-  });
-});
 
 describe('resolveEditorFieldGroupChanges', () => {
   const groupedCheckbox = (formId: string, value: string, overrides: Partial<TCheckboxFieldMeta> = {}) =>
