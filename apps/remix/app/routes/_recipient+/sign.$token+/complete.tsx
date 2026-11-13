@@ -148,6 +148,13 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
     );
   }
 
+  // The envelope may complete or get rejected while this page polls, so derive
+  // the download dialog status from the live signing status.
+  const envelopeStatus = match(signingStatus)
+    .with('COMPLETED', () => DocumentStatus.COMPLETED)
+    .with('REJECTED', () => DocumentStatus.REJECTED)
+    .otherwise(() => document.status);
+
   return (
     <>
       <RecipientBranding branding={branding} cspNonce={cspNonce} />
@@ -255,10 +262,11 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                 className="w-full max-w-none md:flex-1"
               />
 
-              {isDocumentCompleted(document) && (
+              {(isDocumentCompleted(envelopeStatus) || envelopeStatus === DocumentStatus.PENDING) && (
                 <EnvelopeDownloadDialog
                   envelopeId={document.envelopeId}
-                  envelopeStatus={document.status}
+                  envelopeStatus={envelopeStatus}
+                  isLegacy={document.internalVersion === 1}
                   envelopeItems={document.envelopeItems}
                   token={recipient?.token}
                   trigger={
