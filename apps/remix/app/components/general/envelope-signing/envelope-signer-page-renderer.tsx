@@ -54,6 +54,7 @@ import { scrollToSigningField } from '~/utils/scroll-to-signing-field';
 
 import { useRequiredDocumentSigningAuthContext } from '../document-signing/document-signing-auth-provider';
 import { useRequiredEnvelopeSigningContext } from '../document-signing/envelope-signing-provider';
+import { useEnvelopeSigningFieldGroups } from './envelope-signing-field-group-provider';
 
 type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
@@ -76,13 +77,6 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
     recipientFields,
     pendingRecipientSigningItems,
     signingFieldIds,
-    groupPointerTarget,
-    groupBarFieldId,
-    groupHighlightFieldId,
-    onCanvasPointer,
-    onGroupBarPointer,
-    getFieldGroupNavigation,
-    navigateFieldGroup,
     showPendingFieldTooltip,
     signField: signFieldInternal,
     email: emailState,
@@ -95,6 +89,16 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
     selectedAssistantRecipient,
     isDirectTemplate,
   } = useRequiredEnvelopeSigningContext();
+
+  const {
+    groupPointerTarget,
+    groupBarFieldId,
+    groupHighlightFieldId,
+    onCanvasPointer,
+    onGroupBarPointer,
+    getFieldGroupNavigation,
+    navigateFieldGroup,
+  } = useEnvelopeSigningFieldGroups();
 
   // Note: We're using refs here due to the closure within the signField function.
   const fullName = useRef(fullNameState);

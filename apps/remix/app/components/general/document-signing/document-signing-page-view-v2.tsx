@@ -30,6 +30,7 @@ import { SignFieldSignatureDialog } from '~/components/dialogs/sign-field-signat
 import { SignFieldTextDialog } from '~/components/dialogs/sign-field-text-dialog';
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { EnvelopeSignerPageRenderer } from '~/components/general/envelope-signing/envelope-signer-page-renderer';
+import { EnvelopeSigningFieldGroupProvider } from '~/components/general/envelope-signing/envelope-signing-field-group-provider';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 import { PublicLegalLinks } from '~/components/general/public-legal-links';
 
@@ -264,15 +265,17 @@ export const DocumentSigningPageViewV2 = () => {
             {/* Document View */}
             <div className="embed--DocumentViewer flex flex-col items-center justify-center p-2 sm:mt-4 sm:p-4">
               {currentEnvelopeItem ? (
-                <EnvelopePdfViewer
-                  key={currentEnvelopeItem.id}
-                  customPageRenderer={EnvelopeSignerPageRenderer}
-                  scrollParentRef={scrollableContainerRef}
-                  errorMessage={PDF_VIEWER_ERROR_MESSAGES.signing}
-                  toolbar={['zoom']}
-                  // Todo: Content - Decide how to manage zooming on mobile.
-                  toolbarClassName="hidden lg:flex"
-                />
+                <EnvelopeSigningFieldGroupProvider>
+                  <EnvelopePdfViewer
+                    key={currentEnvelopeItem.id}
+                    customPageRenderer={EnvelopeSignerPageRenderer}
+                    scrollParentRef={scrollableContainerRef}
+                    errorMessage={PDF_VIEWER_ERROR_MESSAGES.signing}
+                    toolbar={['zoom']}
+                    // Todo: Content - Decide how to manage zooming on mobile.
+                    toolbarClassName="hidden lg:flex"
+                  />
+                </EnvelopeSigningFieldGroupProvider>
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">
                   <p className="text-foreground text-sm">
