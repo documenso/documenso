@@ -5,6 +5,7 @@ import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { isDocumentCompleted } from '../../utils/document';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
@@ -62,7 +63,7 @@ export const deleteDocumentField = async ({ userId, teamId, fieldId, requestMeta
 
   assertEnvelopeMutable(envelope);
 
-  if (envelope.completedAt) {
+  if (isDocumentCompleted(envelope)) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });

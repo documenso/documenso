@@ -62,9 +62,27 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
 
   assertRecipientNotExpired(recipient);
 
-  // Update the recipient status to rejected
-  const [updatedRecipient] = await prisma.$transaction([
-    prisma.recipient.update({
+  // Mark the envelope REJECTED here rather than waiting for the seal job, so other
+  // recipients are locked out as soon as this returns.
+  const updatedRecipient = await prisma.$transaction(async (tx) => {
+    // Conditional so two concurrent rejections can't both succeed.
+    const { count } = await tx.envelope.updateMany({
+      where: {
+        id: envelope.id,
+        status: DocumentStatus.PENDING,
+      },
+      data: {
+        status: DocumentStatus.REJECTED,
+      },
+    });
+
+    if (count === 0) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Document ${envelope.id} must be pending to reject`,
+      });
+    }
+
+    const rejectedRecipient = await tx.recipient.update({
       where: {
         id: recipient.id,
       },
@@ -73,8 +91,9 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
         signingStatus: SigningStatus.REJECTED,
         rejectionReason: reason,
       },
-    }),
-    prisma.documentAuditLog.create({
+    });
+
+    await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         envelopeId: envelope.id,
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED,
@@ -91,8 +110,10 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
         },
         requestMetadata,
       }),
-    }),
-  ]);
+    });
+
+    return rejectedRecipient;
+  });
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
