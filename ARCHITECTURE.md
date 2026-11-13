@@ -189,10 +189,12 @@ The codebase uses a **strategy pattern** with `ts-pattern` for provider selectio
 
 Handles file uploads and downloads.
 
-| Provider | Description                          | Env Value  |
-| -------- | ------------------------------------ | ---------- |
-| Database | Store files as Base64 in DB          | `database` |
-| S3       | S3-compatible storage (+ CloudFront) | `s3`       |
+| Provider | Description                              | Env Value    |
+| -------- | ---------------------------------------- | ------------ |
+| Database | Store files as Base64 in DB              | `database`   |
+| S3       | S3-compatible storage (+ CloudFront)     | `s3`         |
+| Azure    | Azure Blob Storage (SAS URLs)            | `azure-blob` |
+| Neon     | Neon Object Storage (S3 API, branchable) | `neon`       |
 
 **Config**: `NEXT_PUBLIC_UPLOAD_TRANSPORT`
 
@@ -349,7 +351,7 @@ npm run test:e2e
 
 | Variable                         | Purpose          | Options                                           |
 | -------------------------------- | ---------------- | ------------------------------------------------- |
-| `NEXT_PUBLIC_UPLOAD_TRANSPORT`   | Storage provider | `database`, `s3`                                  |
+| `NEXT_PUBLIC_UPLOAD_TRANSPORT`   | Storage provider | `database`, `s3`, `azure-blob`, `neon`            |
 | `NEXT_PRIVATE_SIGNING_TRANSPORT` | Signing provider | `local`, `gcloud-hsm`                             |
 | `NEXT_PRIVATE_SMTP_TRANSPORT`    | Email provider   | `smtp-auth`, `smtp-api`, `resend`, `mailchannels` |
 | `NEXT_PRIVATE_JOBS_PROVIDER`     | Jobs provider    | `local`, `inngest`                                |

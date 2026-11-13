@@ -163,12 +163,12 @@ For detailed email setup, see [Email Configuration](/docs/self-hosting/configura
 
 ## Storage Configuration
 
-Documenso can store documents in the database or S3-compatible storage.
+Documenso can store documents in the database, S3-compatible storage, Azure Blob Storage, or Neon Object Storage.
 
-| Variable                                 | Description                                 | Default    |
-| ---------------------------------------- | ------------------------------------------- | ---------- |
-| `NEXT_PUBLIC_UPLOAD_TRANSPORT`           | Storage backend: `database` or `s3`         | `database` |
-| `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT` | Maximum upload size displayed to users (MB) | `5`        |
+| Variable                                 | Description                                               | Default    |
+| ---------------------------------------- | --------------------------------------------------------- | ---------- |
+| `NEXT_PUBLIC_UPLOAD_TRANSPORT`           | Storage backend: `database`, `s3`, `azure-blob` or `neon` | `database` |
+| `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT` | Maximum upload size displayed to users (MB)               | `5`        |
 
 ### S3 Configuration
 
@@ -190,6 +190,17 @@ Required when `NEXT_PUBLIC_UPLOAD_TRANSPORT` is set to `s3`:
 | `NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN`       | CloudFront distribution domain  |
 | `NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID`       | CloudFront key pair ID          |
 | `NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_CONTENTS` | CloudFront private key contents |
+
+### Neon Object Storage
+
+Required when `NEXT_PUBLIC_UPLOAD_TRANSPORT` is set to `neon`. Path-style URLs are always used, and the region is read from the endpoint unless `NEXT_PRIVATE_UPLOAD_REGION` is set.
+
+| Variable                                | Description                                 |
+| --------------------------------------- | ------------------------------------------- |
+| `NEXT_PRIVATE_UPLOAD_ENDPOINT`          | Neon branch storage endpoint                |
+| `NEXT_PRIVATE_UPLOAD_BUCKET`            | Bucket name                                 |
+| `NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID`     | Neon credential `token_id` (`nak_live_...`) |
+| `NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY` | Neon credential secret (`nsk_live_...`)     |
 
 For detailed storage setup, see [Storage Configuration](/docs/self-hosting/configuration/storage).
 
