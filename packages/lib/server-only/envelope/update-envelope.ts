@@ -28,6 +28,7 @@ export type UpdateEnvelopeOptions = {
   data?: {
     title?: string;
     folderId?: string | null;
+    targetFolderId?: string | null;
     externalId?: string | null;
     visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
@@ -95,7 +96,10 @@ export const updateEnvelope = async ({
     });
   }
 
-  if (envelope.type !== EnvelopeType.TEMPLATE && (data.publicTitle || data.publicDescription || data.templateType)) {
+  if (
+    envelope.type !== EnvelopeType.TEMPLATE &&
+    (data.publicTitle || data.publicDescription || data.templateType || data.targetFolderId !== undefined)
+  ) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
       message: 'You cannot update the template fields for document type envelopes',
     });
@@ -190,6 +194,46 @@ export const updateEnvelope = async ({
   // Move to root folder if folderId is null.
   if (data.folderId === null) {
     folderUpdateQuery = {
+      disconnect: true,
+    };
+  }
+
+  const isTargetFolderSame = data.targetFolderId === undefined || data.targetFolderId === envelope.targetFolderId;
+
+  let targetFolderUpdateQuery: Prisma.FolderUpdateOneWithoutTargetEnvelopesNestedInput | undefined;
+
+  // Skip validation when unchanged so editors without visibility to the existing
+  // target folder can still save other template settings.
+  if (!isTargetFolderSame && data.targetFolderId) {
+    const targetFolder = await prisma.folder.findFirst({
+      where: {
+        id: data.targetFolderId,
+        team: buildTeamWhereQuery({
+          teamId,
+          userId,
+        }),
+        type: FolderType.DOCUMENT,
+        visibility: {
+          in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+        },
+      },
+    });
+
+    if (!targetFolder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Target folder not found',
+      });
+    }
+
+    targetFolderUpdateQuery = {
+      connect: {
+        id: data.targetFolderId,
+      },
+    };
+  }
+
+  if (!isTargetFolderSame && data.targetFolderId === null) {
+    targetFolderUpdateQuery = {
       disconnect: true,
     };
   }
@@ -332,6 +376,7 @@ export const updateEnvelope = async ({
         useLegacyFieldInsertion: data.useLegacyFieldInsertion,
         authOptions,
         folder: folderUpdateQuery,
+        targetFolder: targetFolderUpdateQuery,
         documentMeta: {
           update: {
             ...meta,

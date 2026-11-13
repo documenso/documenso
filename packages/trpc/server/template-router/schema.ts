@@ -128,9 +128,9 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   folderId: z
     .string()
     .describe(
-      'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
+      'The ID of the folder to create the document in. If not provided, the template target folder will be used if configured, otherwise the document will be created in the root folder.',
     )
-    .optional(),
+    .nullish(),
 
   prefillFields: z
     .array(ZFieldMetaPrefillFieldsSchema)
@@ -223,6 +223,7 @@ export const ZDeleteTemplateMutationSchema = z.object({
 export const ZCreateTemplateV2RequestSchema = z.object({
   title: ZTemplateTitleSchema,
   folderId: z.string().optional(),
+  targetFolderId: z.string().optional(),
   externalId: z.string().nullish(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
   globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
@@ -276,6 +277,7 @@ export const ZUpdateTemplateRequestSchema = z.object({
       type: z.nativeEnum(TemplateType).optional(),
       useLegacyFieldInsertion: z.boolean().optional(),
       folderId: z.string().nullish(),
+      targetFolderId: z.string().nullish(),
     })
     .optional(),
   meta: ZTemplateMetaUpsertSchema.optional(),

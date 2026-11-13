@@ -73,6 +73,7 @@ import {
   DocumentDistributionMethod,
   DocumentVisibility,
   EnvelopeType,
+  FolderType,
   RecipientRole,
   SendStatus,
   TemplateType,
@@ -88,6 +89,7 @@ import { useCurrentTeam } from '~/providers/team';
 
 export const ZAddSettingsFormSchema = z.object({
   templateType: z.nativeEnum(TemplateType).optional(),
+  targetFolderId: z.string().nullish(),
   externalId: z.string().optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
   globalAccessAuth: z
@@ -191,6 +193,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
   const createDefaultValues = () => {
     return {
       templateType: envelope.templateType || TemplateType.PRIVATE,
+      targetFolderId: envelope.targetFolderId ?? null,
       externalId: envelope.externalId || '',
       visibility: envelope.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
@@ -242,6 +245,18 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
 
   const emails = emailData?.data || organisationEmails || [];
 
+  const { data: foldersData, isLoading: isLoadingFolders } = trpc.folder.findFoldersInternal.useQuery(
+    {
+      type: FolderType.DOCUMENT,
+    },
+    {
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      enabled: open && envelope.type === EnvelopeType.TEMPLATE && !isEmbedded,
+    },
+  );
+
+  const documentFolders = foldersData?.data ?? [];
+
   const canUpdateVisibility = canAccessTeamDocument(team.currentTeamRole, envelope.visibility);
 
   const onFormSubmit = async (data: TAddSettingsFormSchema) => {
@@ -267,6 +282,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
       await updateEnvelopeAsync({
         data: {
           templateType: envelope.type === EnvelopeType.TEMPLATE ? data.templateType : undefined,
+          targetFolderId: envelope.type === EnvelopeType.TEMPLATE ? (data.targetFolderId ?? null) : undefined,
           externalId: data.externalId || null,
           visibility: data.visibility,
           globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
@@ -612,6 +628,70 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                               </FormControl>
                             </FormItem>
                           )}
+                        />
+                      )}
+
+                      {envelope.type === EnvelopeType.TEMPLATE && !isEmbedded && (
+                        <FormField
+                          control={form.control}
+                          name="targetFolderId"
+                          render={({ field }) => {
+                            const selectedTargetFolderValue =
+                              field.value &&
+                              (!foldersData || documentFolders.some((folder) => folder.id === field.value))
+                                ? field.value
+                                : '-1';
+
+                            return (
+                              <FormItem>
+                                <FormLabel className="flex flex-row items-center">
+                                  <Trans>Target Folder</Trans>
+                                  <Tooltip>
+                                    <TooltipTrigger type="button">
+                                      <InfoIcon className="mx-2 h-4 w-4" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent className="max-w-xs text-muted-foreground">
+                                      <Trans>
+                                        Select the folder where documents created from this template or its direct link
+                                        will be placed by default.
+                                      </Trans>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </FormLabel>
+
+                                <FormControl>
+                                  <Select
+                                    value={selectedTargetFolderValue}
+                                    disabled={field.disabled}
+                                    onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
+                                  >
+                                    <SelectTrigger
+                                      data-testid="templateTargetFolderSelectValue"
+                                      loading={isLoadingFolders}
+                                      className="bg-background"
+                                    >
+                                      <SelectValue />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                      <SelectItem value="-1">
+                                        <Trans>Home (No Folder)</Trans>
+                                      </SelectItem>
+
+                                      {documentFolders.map((folder) => (
+                                        <SelectItem key={folder.id} value={folder.id}>
+                                          {folder.name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
                         />
                       )}
 

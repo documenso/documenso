@@ -270,6 +270,7 @@ export const ZEditorEnvelopeSchema = EnvelopeSchema.pick({
   userId: true,
   teamId: true,
   folderId: true,
+  targetFolderId: true,
 }).extend({
   documentMeta: DocumentMetaSchema.pick({
     signingOrder: true,

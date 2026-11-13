@@ -33,6 +33,10 @@ export const ZUpdateEnvelopeRequestSchema = z.object({
         .describe('The authentication methods required to sign the envelope.')
         .optional(),
       folderId: z.string().describe('The ID of the folder containing the envelope.').nullish(),
+      targetFolderId: z
+        .string()
+        .describe('The ID of the folder where documents created from this template will be placed by default.')
+        .nullish(),
       templateType: z.nativeEnum(TemplateType).describe('The template type.').optional(),
     })
     .describe('The envelope properties to update.')
