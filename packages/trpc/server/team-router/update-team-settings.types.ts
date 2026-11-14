@@ -4,7 +4,7 @@ import { ZEnvelopeReminderSettings } from '@documenso/lib/constants/envelope-rem
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentEmailSettingsInputSchema } from '@documenso/lib/types/document-email';
 import { ZDocumentMetaDateFormatSchema, ZDocumentMetaTimezoneSchema } from '@documenso/lib/types/document-meta';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { ZSanitizeBrandingCssWarningSchema } from '@documenso/lib/utils/sanitize-branding-css';
@@ -44,7 +44,7 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     emailId: z.string().nullish(),
     emailReplyTo: zEmail().nullish(),
     // emailReplyToName: z.string().nullish(),
-    emailDocumentSettings: ZDocumentEmailSettingsSchema.nullish(),
+    emailDocumentSettings: ZDocumentEmailSettingsInputSchema.nullish(),
 
     // Default recipients settings.
     defaultRecipients: ZDefaultRecipientsSchema.nullish(),
