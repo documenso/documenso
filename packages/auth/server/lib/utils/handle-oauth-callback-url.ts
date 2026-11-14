@@ -6,6 +6,7 @@ import {
 } from '@documenso/lib/constants/auth';
 import { formatEmbedAuthCompletePageUrl } from '@documenso/lib/constants/embed-auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { exchangeAuthorizationCode } from '@documenso/lib/server-only/auth/exchange-authorization-code';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { findUserByProvidedEmail } from '@documenso/lib/server-only/user/find-user-by-provided-email';
@@ -15,7 +16,7 @@ import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-vali
 import { logger } from '@documenso/lib/utils/logger';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@prisma/client';
-import { decodeIdToken, OAuth2Client } from 'arctic';
+import { decodeIdToken } from 'arctic';
 import type { Context } from 'hono';
 import { deleteCookie } from 'hono/cookie';
 
@@ -222,8 +223,6 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
     requiredScopes: clientOptions.scope,
   });
 
-  const oAuthClient = new OAuth2Client(clientOptions.clientId, clientOptions.clientSecret, clientOptions.redirectUrl);
-
   const code = c.req.query('code');
   const state = c.req.query('state');
 
@@ -253,14 +252,17 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
 
   redirectPath = normalizeReturnTo(redirectPath) || defaultRedirectPath;
 
-  const tokens = await oAuthClient.validateAuthorizationCode(token_endpoint, code, storedCodeVerifier);
-
-  const accessToken = tokens.accessToken();
-  const accessTokenExpiresAt = tokens.accessTokenExpiresAt();
-  const idToken = tokens.idToken();
+  const { accessToken, accessTokenExpiresAt, idToken } = await exchangeAuthorizationCode({
+    tokenEndpoint: token_endpoint,
+    redirectUrl: clientOptions.redirectUrl,
+    clientId: clientOptions.clientId,
+    clientSecret: clientOptions.clientSecret,
+    code,
+    codeVerifier: storedCodeVerifier,
+  });
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const claims = decodeIdToken(tokens.idToken()) as Record<string, unknown>;
+  const claims = decodeIdToken(idToken) as Record<string, unknown>;
 
   const email = claims.email;
   const name = claims.name;
