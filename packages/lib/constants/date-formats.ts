@@ -166,10 +166,40 @@ export const DATE_FORMATS = [
   value: (typeof VALID_DATE_FORMAT_VALUES)[number];
 }[];
 
-type ConvertToLocalSystemFormatOptions = {
+const LUXON_TIME_TOKENS = new Set([
+  'h',
+  'hh',
+  'H',
+  'HH',
+  'm',
+  'mm',
+  's',
+  'ss',
+  'S',
+  'SSS',
+  'u',
+  't',
+  'tt',
+  'ttt',
+  'tttt',
+  'T',
+  'TT',
+  'TTT',
+  'TTTT',
+  'X',
+  'x',
+]);
+
+export const isDateOnlyFormat = (format: string): boolean => {
+  return !DateTime.fromFormatExplain('', format).tokens.some(
+    ({ literal, val }) => !literal && LUXON_TIME_TOKENS.has(val),
+  );
+};
+
+export type ConvertToLocalSystemFormatOptions = {
   customText: string;
-  dateFormat: string | null | undefined;
-  timezone: string | null | undefined;
+  dateFormat?: string | null;
+  timezone?: string | null;
 };
 
 export const convertToLocalSystemFormat = ({
@@ -188,13 +218,9 @@ export const convertToLocalSystemFormat = ({
     return 'Invalid date';
   }
 
-  const hasHour = DateTime.fromFormatExplain(customText, coalescedDateFormat).tokens.some(
-    ({ literal, val }) => !literal && ['h', 'hh', 'H', 'HH'].includes(val),
-  );
-
-  // Formats without an hour are calendar dates, not moments, so converting them to the viewer's timezone could
-  // only shift the day.
-  if (!hasHour) {
+  // Date-only formats represent calendar dates rather than instants, so converting them to the viewer's timezone
+  // could shift the displayed day.
+  if (isDateOnlyFormat(coalescedDateFormat)) {
     return parsedDate.toFormat(coalescedDateFormat);
   }
 
