@@ -18,6 +18,7 @@ import { match } from 'ts-pattern';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { TEnvelopeExpirationPeriod } from '../../constants/envelope-expiration';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { ZDefaultRecipientsSchema } from '../../types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -761,9 +762,9 @@ export const createDocumentFromTemplate = async ({
                   });
                 }
 
-                payload.customText = DateTime.fromJSDate(date).toFormat(
-                  documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
-                );
+                payload.customText = DateTime.fromJSDate(date)
+                  .setZone(documentMeta.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+                  .toFormat(documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
 
                 payload.inserted = true;
               })
