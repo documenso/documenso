@@ -15,7 +15,7 @@ import {
   PanelLeftOpenIcon,
   PaperclipIcon,
 } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -32,6 +32,7 @@ import { useEmbedSigningContext } from '~/components/embed/embed-signing-context
 import { EnvelopeSignerPageRenderer } from '~/components/general/envelope-signing/envelope-signer-page-renderer';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 import { PublicLegalLinks } from '~/components/general/public-legal-links';
+import ReflowDocumentLazy from '~/components/general/reflow/reflow-document-lazy';
 
 import { BrandingLogo } from '../branding-logo';
 import { DocumentSigningAttachmentsPopover } from '../document-signing/document-signing-attachments-popover';
@@ -42,8 +43,31 @@ import { DocumentSigningMobileWidget } from './document-signing-mobile-widget';
 import { DocumentSigningRejectDialog } from './document-signing-reject-dialog';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
 
+// Matches Tailwind's `md` breakpoint: phones open the easy-read view, wider screens show only the pages.
+const EASY_READ_MAX_WIDTH = 767;
+
+const useIsPhoneScreen = () => {
+  const [isPhone, setIsPhone] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia(`(max-width: ${EASY_READ_MAX_WIDTH}px)`);
+    const update = () => setIsPhone(query.matches);
+
+    update();
+    query.addEventListener('change', update);
+
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  return isPhone;
+};
+
 export const DocumentSigningPageViewV2 = () => {
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
+
+  const isPhoneScreen = useIsPhoneScreen();
+  const [readMode, setReadMode] = useState<'easy' | 'original'>('easy');
+  const showEasyRead = isPhoneScreen && readMode === 'easy';
 
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -268,9 +292,36 @@ export const DocumentSigningPageViewV2 = () => {
               </div>
             )}
 
+            {isPhoneScreen && currentEnvelopeItem && (
+              <div className="flex justify-center px-2 pt-2">
+                <div className="inline-flex rounded-lg border bg-background p-1 text-sm">
+                  {(
+                    [
+                      ['easy', <Trans key="easy">Easy read</Trans>],
+                      ['original', <Trans key="original">Original page</Trans>],
+                    ] as const
+                  ).map(([mode, label]) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setReadMode(mode)}
+                      className={cn(
+                        'rounded-md px-4 py-1.5 font-medium transition-colors',
+                        readMode === mode ? 'bg-primary text-primary-foreground' : 'text-muted-foreground',
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Document View */}
             <div className="embed--DocumentViewer flex flex-col items-center justify-center p-2 sm:mt-4 sm:p-4">
-              {currentEnvelopeItem ? (
+              {currentEnvelopeItem && showEasyRead ? (
+                <ReflowDocumentLazy key="easy-read" onShowOriginal={() => setReadMode('original')} />
+              ) : currentEnvelopeItem ? (
                 <EnvelopePdfViewer
                   key={currentEnvelopeItem.id}
                   customPageRenderer={EnvelopeSignerPageRenderer}
