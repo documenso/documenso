@@ -115,7 +115,7 @@ export async function rejectDocumentOnBehalfOf({
   // recipients are locked out as soon as this returns.
   const updatedRecipient = await prisma.$transaction(async (tx) => {
     // Conditional so two concurrent rejections can't both succeed.
-    const { count } = await tx.envelope.updateMany({
+    const { count: rejectedEnvelopeCount } = await tx.envelope.updateMany({
       where: {
         id: envelope.id,
         status: DocumentStatus.PENDING,
@@ -125,15 +125,18 @@ export async function rejectDocumentOnBehalfOf({
       },
     });
 
-    if (count === 0) {
+    if (rejectedEnvelopeCount === 0) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: `Document ${envelope.id} must be pending to reject`,
       });
     }
 
-    const rejectedRecipient = await tx.recipient.update({
+    // Conditional so a completion by this recipient that committed since our
+    // initial read is not overwritten. Throwing rolls the envelope back to PENDING.
+    const { count: rejectedRecipientCount } = await tx.recipient.updateMany({
       where: {
         id: recipient.id,
+        signingStatus: SigningStatus.NOT_SIGNED,
       },
       data: {
         signedAt: new Date(),
@@ -141,6 +144,12 @@ export async function rejectDocumentOnBehalfOf({
         rejectionReason: reason,
       },
     });
+
+    if (rejectedRecipientCount === 0) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient ${recipient.id} has already actioned this document`,
+      });
+    }
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
@@ -164,7 +173,11 @@ export async function rejectDocumentOnBehalfOf({
       }),
     });
 
-    return rejectedRecipient;
+    return await tx.recipient.findUniqueOrThrow({
+      where: {
+        id: recipient.id,
+      },
+    });
   });
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);

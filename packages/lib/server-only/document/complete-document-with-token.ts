@@ -319,15 +319,14 @@ export const completeDocumentWithToken = async ({
   }
 
   await prisma.$transaction(async (tx) => {
-    // Conditional update so two concurrent completion requests can't both
-    // proceed: only the request that transitions the recipient to SIGNED
-    // continues, the loser sees a count of 0 and aborts.
+    // Conditional update so a concurrent completion or rejection for this
+    // recipient can't both be recorded: only the request that moves the
+    // recipient on from NOT_SIGNED continues, the loser sees a count of 0 and
+    // aborts.
     const { count: updatedRecipientCount } = await tx.recipient.updateMany({
       where: {
         id: recipient.id,
-        signingStatus: {
-          not: SigningStatus.SIGNED,
-        },
+        signingStatus: SigningStatus.NOT_SIGNED,
       },
       data: {
         signingStatus: SigningStatus.SIGNED,
@@ -337,10 +336,24 @@ export const completeDocumentWithToken = async ({
       },
     });
 
-    // A concurrent request completed the recipient between our initial read
-    // and this transaction. Abort so the winning request handles all side
-    // effects, the router resolves this code idempotently.
     if (updatedRecipientCount === 0) {
+      const currentRecipient = await tx.recipient.findUnique({
+        where: { id: recipient.id },
+        select: { signingStatus: true },
+      });
+
+      // A rejection for this recipient committed between our initial read and
+      // this transaction, and rejected the envelope with it.
+      if (currentRecipient?.signingStatus === SigningStatus.REJECTED) {
+        throw new AppError(AppErrorCode.ENVELOPE_REJECTED, {
+          message: `Recipient ${recipient.id} rejected document ${envelope.id} before the completion was recorded`,
+          statusCode: 400,
+        });
+      }
+
+      // A concurrent request completed the recipient between our initial read
+      // and this transaction. Abort so the winning request handles all side
+      // effects, the router resolves this code idempotently.
       throw new AppError(AppErrorCode.RECIPIENT_ALREADY_SIGNED, {
         message: `Recipient ${recipient.id} has already signed`,
         statusCode: 400,
