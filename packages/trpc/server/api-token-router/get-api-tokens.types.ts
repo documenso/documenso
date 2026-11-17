@@ -9,6 +9,7 @@ export const ZGetApiTokensResponseSchema = z.array(
     name: true,
     createdAt: true,
     expires: true,
+    lastUsedAt: true,
   }),
 );
 

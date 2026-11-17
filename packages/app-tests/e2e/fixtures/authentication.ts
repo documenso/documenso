@@ -1,6 +1,12 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import type { Page } from '@playwright/test';
 
+// Playwright's `APIRequestContext` never sends `Origin`, which the CSRF
+// middleware requires on cookie-authenticated mutations.
+export const WEBAPP_ORIGIN_HEADERS = {
+  Origin: new URL(NEXT_PUBLIC_WEBAPP_URL()).origin,
+} as const;
+
 type LoginOptions = {
   page: Page;
   email?: string;
@@ -23,6 +29,7 @@ export const apiSignin = async ({
   const csrfToken = await getCsrfToken(page);
 
   await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/email-password/authorize`, {
+    headers: WEBAPP_ORIGIN_HEADERS,
     data: {
       email,
       password,
@@ -37,7 +44,9 @@ export const apiSignin = async ({
 export const apiSignout = async ({ page }: { page: Page }) => {
   const { request } = page.context();
 
-  await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/signout`);
+  await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/signout`, {
+    headers: WEBAPP_ORIGIN_HEADERS,
+  });
 
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/signin`);
 };

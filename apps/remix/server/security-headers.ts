@@ -19,31 +19,30 @@ const NON_PAGE_PATH_REGEX = /^(\/api\/|\/ingest\/|\/__manifest|\/assets\/|\/appl
 const EMBED_PATH_REGEX = /^\/embed(\/|\.data|$)/;
 
 /**
- * Non-`/embed` page routes that customers iframe directly, plus the auth
- * pages reachable from inside an embed iframe during the
- * reauth-as-different-account flow.
+ * The popup auth pages exchange the auth nonce with their opener via
+ * `postMessage` and must never be framed, or a hostile page could drive the
+ * handshake. Checked before `EMBED_PATH_REGEX`.
+ */
+const EMBED_AUTH_PATH_REGEX = /^\/embed\/auth(\/|\.data|$)/;
+
+/**
+ * Non-`/embed` page routes that customers iframe directly.
  *
- * Signing routes (`/sign/:token`, `/d/:token`):
- * Some customer integrations embed these URLs directly (without going
- * through `EmbedSignDocument`). Without `frame-ancestors *` here, those
- * integrations break with a "refused to connect" iframe error.
+ * Some customer integrations embed `/sign/:token` and `/d/:token` directly
+ * (without going through `EmbedSignDocument`). Without `frame-ancestors *`
+ * here, those integrations break with a "refused to connect" iframe error.
  *
- * Auth routes (`/signin`, `/forgot-password`, `/check-email`,
- * `/unverified-account`):
- * `apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx`
- * does `window.location.href = '/signin?...'` inside the iframe when the
- * user needs to sign out and sign back in as a different account, and
- * `<SignInForm>` links/navigates to `/forgot-password`, `/check-email`, and
- * `/unverified-account` from there. Without `frame-ancestors *` on these
- * routes, the customer's iframe gets blocked the moment the user clicks
- * "Login" in the reauth dialog.
+ * Direct framing is best-effort; `/embed/*` is the supported surface. Sign in
+ * from these pages goes through the popup flow, so `/signin` etc. are never
+ * framed and keep `frame-ancestors 'self'`. CSC/TSP signing is not supported
+ * when framed directly.
  *
  * These routes still get the strict nonced `script-src`/`style-src-elem`
  * policy — only `frame-ancestors` is relaxed. The `(\/|\.data|$)` tail
  * keeps `/sign` from matching `/signin`/`/signup` and `/d` from matching
  * `/dashboard`.
  */
-const FRAMEABLE_PATH_REGEX = /^\/(signin|forgot-password|check-email|unverified-account|sign|d)(\/|\.data|$)/;
+const FRAMEABLE_PATH_REGEX = /^\/(sign|d)(\/|\.data|$)/;
 
 /**
  * Hono context variable name where the per-request CSP nonce is stashed.
@@ -67,7 +66,7 @@ const generateNonce = () => {
   return btoa(binary);
 };
 
-type CspPathKind = 'embed' | 'frameable' | 'default';
+type CspPathKind = 'embed' | 'embed-auth' | 'frameable' | 'default';
 
 const buildCspHeader = ({ nonce, kind }: { nonce: string; kind: CspPathKind }) => {
   // `'self'` is included alongside `'strict-dynamic'` as a fallback for
@@ -95,19 +94,18 @@ const buildCspHeader = ({ nonce, kind }: { nonce: string; kind: CspPathKind }) =
   // Embeds inject customer-supplied CSS via runtime-created `<style>`
   // elements (see apps/remix/app/utils/css-vars.ts). Nonce-stamping those
   // would be brittle for white-label customers, so we accept
-  // `'unsafe-inline'` on the embed scope only. Frameable (auth/signing)
-  // pages do NOT load customer CSS and keep the strict nonced policy.
+  // `'unsafe-inline'` on the embed scope only. Everything else does NOT load
+  // customer CSS and keeps the strict nonced policy.
   if (kind === 'embed') {
     directives.push(`style-src-elem 'self' 'unsafe-inline'`);
   } else {
     directives.push(`style-src-elem 'self' 'nonce-${nonce}'`);
   }
 
-  // Embed, signing, and auth routes are all reachable from inside a
-  // customer's iframe and therefore need `frame-ancestors *`. Every other
-  // page gets clickjacking protection.
   if (kind === 'embed' || kind === 'frameable') {
     directives.push(`frame-ancestors *`);
+  } else if (kind === 'embed-auth') {
+    directives.push(`frame-ancestors 'none'`);
   } else {
     directives.push(`frame-ancestors 'self'`);
   }
@@ -116,6 +114,10 @@ const buildCspHeader = ({ nonce, kind }: { nonce: string; kind: CspPathKind }) =
 };
 
 const classifyPath = (path: string): CspPathKind => {
+  if (EMBED_AUTH_PATH_REGEX.test(path)) {
+    return 'embed-auth';
+  }
+
   if (EMBED_PATH_REGEX.test(path)) {
     return 'embed';
   }
@@ -141,11 +143,11 @@ const classifyPath = (path: string): CspPathKind => {
  * - `embed`     — wildcard `frame-ancestors`, `'unsafe-inline'`
  *                 style-src-elem (white-label CSS injection), strict
  *                 nonced script-src.
- * - `frameable` — wildcard `frame-ancestors` only; needed because the
- *                 embed reauth flow redirects the iframe to `/signin` etc,
- *                 and because some customers iframe `/sign/:token` and
- *                 `/d/:token` directly without using `EmbedSignDocument`.
- *                 Strict nonced script-src and style-src-elem otherwise.
+ * - `embed-auth` — strict policy with `frame-ancestors 'none'`; the popup
+ *                 auth pages must never be framed.
+ * - `frameable` — wildcard `frame-ancestors` only; some customers iframe
+ *                 `/sign/:token` and `/d/:token` directly. Strict nonced
+ *                 script-src and style-src-elem otherwise.
  * - default     — strict nonced script-src and style-src-elem,
  *                 `frame-ancestors 'self'` for clickjacking protection.
  */
@@ -168,7 +170,7 @@ export const securityHeadersMiddleware = createMiddleware<HonoEnv>(async (c, nex
 
   // Preserved from the per-route `headers()` export in
   // apps/remix/app/routes/embed+/_v0+/_layout.tsx, which has been removed.
-  if (kind === 'embed') {
+  if (kind === 'embed' || kind === 'embed-auth') {
     if (!c.res.headers.has('Referrer-Policy')) {
       c.res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     }

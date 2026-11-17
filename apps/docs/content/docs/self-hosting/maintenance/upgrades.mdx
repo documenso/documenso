@@ -426,8 +426,9 @@ docker pull documenso/documenso:<version>
 # Run migrations only
 docker run --rm \
   -e NEXT_PRIVATE_DATABASE_URL="postgresql://user:password@host:5432/documenso" \
+  -e NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://user:password@host:5432/documenso" \
   documenso/documenso:<version> \
-  npx prisma migrate deploy
+  npx prisma migrate deploy --schema ../../packages/prisma/schema.prisma
 ```
 
 <Callout type="warn">

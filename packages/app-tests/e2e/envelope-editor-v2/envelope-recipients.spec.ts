@@ -9,11 +9,12 @@ import {
   clickAddMyselfButton,
   clickAddSignerButton,
   clickEnvelopeEditorStep,
+  dragRecipientRowToGap,
   getEnvelopeEditorSettingsTrigger,
   getRecipientEmailInputs,
   getRecipientNameInputs,
   getRecipientRemoveButtons,
-  getSigningOrderInputs,
+  getRecipientStepCards,
   openDocumentEnvelopeEditor,
   openEmbeddedEnvelopeEditor,
   openTemplateEnvelopeEditor,
@@ -21,7 +22,6 @@ import {
   setRecipientEmail,
   setRecipientName,
   setRecipientRole,
-  setSigningOrderValue,
   type TEnvelopeEditorSurface,
   toggleAllowDictateSigners,
   toggleSigningOrder,
@@ -112,46 +112,71 @@ const runRecipientFlow = async (surface: TEnvelopeEditorSurface): Promise<Recipi
   await setRecipientRole(surface.root, 1, 'Needs to approve');
   await setRecipientRole(surface.root, 2, 'Receives copy');
 
+  // The role selects must reflect the change immediately, without requiring a
+  // navigation or reload (regression: leaf controllers going stale after a
+  // root-level signers array update).
+  await assertRecipientRole(surface.root, 1, 'Needs to approve');
+  await assertRecipientRole(surface.root, 2, 'Receives copy');
+
   await getRecipientRemoveButtons(surface.root).nth(2).click();
   await expect(getRecipientEmailInputs(surface.root)).toHaveCount(2);
 
   await toggleSigningOrder(surface.root, true);
-  await expect(getSigningOrderInputs(surface.root)).toHaveCount(2);
-  await setSigningOrderValue(surface.root, 0, 2);
+  await expect(getRecipientStepCards(surface.root)).toHaveCount(2);
+
+  // Reordering is drag-only. Pointer-emulated drags are unreliable inside the
+  // embedded authoring surface (its inner scroll container auto-scrolls and
+  // cancels the emulated drag), so the drag-swap is exercised on the native
+  // surfaces only — the same component drives all surfaces.
+  const shouldSwapViaDrag = !surface.isEmbedded;
+
+  if (shouldSwapViaDrag) {
+    // Let the debounced autosave from the edits above land before dragging —
+    // the editor re-rendering mid-drag would cancel the drag.
+    await surface.root.waitForTimeout(1500);
+
+    // Drag the first recipient's row into the gap after the last group,
+    // swapping the two.
+    await dragRecipientRowToGap(surface.root, 0, 2);
+  }
 
   await toggleAllowDictateSigners(surface.root, true);
 
   await navigateToAddFieldsAndBack(surface.root);
 
+  const [firstRecipient, secondRecipient] = shouldSwapViaDrag
+    ? [TEST_RECIPIENT_VALUES.secondRecipient, primaryRecipient]
+    : [primaryRecipient, TEST_RECIPIENT_VALUES.secondRecipient];
+
   await expect(getRecipientEmailInputs(surface.root)).toHaveCount(2);
-  await expect(getRecipientEmailInputs(surface.root).nth(0)).toHaveValue(TEST_RECIPIENT_VALUES.secondRecipient.email);
-  await expect(getRecipientEmailInputs(surface.root).nth(1)).toHaveValue(primaryRecipient.email);
+  await expect(getRecipientEmailInputs(surface.root).nth(0)).toHaveValue(firstRecipient.email);
+  await expect(getRecipientEmailInputs(surface.root).nth(1)).toHaveValue(secondRecipient.email);
 
-  await expect(getRecipientNameInputs(surface.root).nth(0)).toHaveValue(TEST_RECIPIENT_VALUES.secondRecipient.name);
-  await expect(getRecipientNameInputs(surface.root).nth(1)).toHaveValue(primaryRecipient.name);
+  await expect(getRecipientNameInputs(surface.root).nth(0)).toHaveValue(firstRecipient.name);
+  await expect(getRecipientNameInputs(surface.root).nth(1)).toHaveValue(secondRecipient.name);
 
-  await assertRecipientRole(surface.root, 0, 'Needs to approve');
-  await assertRecipientRole(surface.root, 1, 'Needs to sign');
+  await assertRecipientRole(surface.root, 0, shouldSwapViaDrag ? 'Needs to approve' : 'Needs to sign');
+  await assertRecipientRole(surface.root, 1, shouldSwapViaDrag ? 'Needs to sign' : 'Needs to approve');
 
   await expect(surface.root.locator('#signingOrder')).toHaveAttribute('aria-checked', 'true');
   await expect(surface.root.locator('#allowDictateNextSigner')).toHaveAttribute('aria-checked', 'true');
-  await expect(getSigningOrderInputs(surface.root).nth(0)).toHaveValue('1');
-  await expect(getSigningOrderInputs(surface.root).nth(1)).toHaveValue('2');
+  await expect(surface.root.getByText('Group 1', { exact: true })).toBeVisible();
+  await expect(surface.root.getByText('Group 2', { exact: true })).toBeVisible();
 
   return {
     externalId,
     removedRecipientEmail: TEST_RECIPIENT_VALUES.thirdRecipient.email,
     expectedRecipientsBySigningOrder: [
       {
-        email: TEST_RECIPIENT_VALUES.secondRecipient.email,
-        name: TEST_RECIPIENT_VALUES.secondRecipient.name,
-        role: RecipientRole.APPROVER,
+        email: firstRecipient.email,
+        name: firstRecipient.name,
+        role: shouldSwapViaDrag ? RecipientRole.APPROVER : RecipientRole.SIGNER,
         signingOrder: 1,
       },
       {
-        email: primaryRecipient.email,
-        name: primaryRecipient.name,
-        role: RecipientRole.SIGNER,
+        email: secondRecipient.email,
+        name: secondRecipient.name,
+        role: shouldSwapViaDrag ? RecipientRole.SIGNER : RecipientRole.APPROVER,
         signingOrder: 2,
       },
     ],
