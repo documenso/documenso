@@ -1,6 +1,7 @@
 import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
 import { base64 } from '@documenso/lib/universal/base64';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
@@ -167,7 +168,7 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
       <div className="mt-4">
         <AdminDocumentRecipientsTable
           envelopeId={envelope.id}
-          isDocumentCompleted={Boolean(envelope.completedAt)}
+          isDocumentCompleted={isDocumentCompleted(envelope.status)}
           recipients={envelope.recipients}
         />
       </div>
