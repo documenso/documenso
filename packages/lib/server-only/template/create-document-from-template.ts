@@ -386,7 +386,12 @@ export const createDocumentFromTemplate = async ({
     }
 
     resolvedFolderId = folder.id;
-  } else if (folderId === undefined && template.targetFolderId && template.teamId === teamId) {
+  } else if (
+    folderId === undefined &&
+    template.internalVersion === 2 &&
+    template.targetFolderId &&
+    template.teamId === teamId
+  ) {
     // Only fall back to the template's target folder when `folderId` is omitted;
     // an explicit `null` means the caller chose the root folder override.
     const targetFolder = await prisma.folder.findUnique({

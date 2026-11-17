@@ -257,7 +257,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 <TemplateUseDialog
                   envelopeId={envelope.id}
                   templateSigningOrder={envelope.documentMeta?.signingOrder}
-                  targetFolderId={isOwnTeamTemplate ? envelope.targetFolderId : null}
+                  targetFolderId={isOwnTeamTemplate && envelope.internalVersion === 2 ? envelope.targetFolderId : null}
                   recipients={envelope.recipients}
                   documentRootPath={documentRootPath}
                   trigger={

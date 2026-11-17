@@ -222,6 +222,12 @@ export const createEnvelope = async ({
       });
     }
 
+    if (internalVersion !== 2) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Target folder is only supported for v2 template envelopes',
+      });
+    }
+
     const targetFolder = await prisma.folder.findUnique({
       where: {
         id: targetFolderId,
@@ -465,7 +471,7 @@ export const createEnvelope = async ({
         templateType: type === EnvelopeType.TEMPLATE ? templateType : undefined,
         publicTitle: type === EnvelopeType.TEMPLATE ? publicTitle : undefined,
         publicDescription: type === EnvelopeType.TEMPLATE ? publicDescription : undefined,
-        targetFolderId: type === EnvelopeType.TEMPLATE ? targetFolderId : undefined,
+        targetFolderId: type === EnvelopeType.TEMPLATE && internalVersion === 2 ? targetFolderId : undefined,
       },
       include: {
         envelopeItems: true,

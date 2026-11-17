@@ -251,7 +251,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
     },
     {
       ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      enabled: open && envelope.type === EnvelopeType.TEMPLATE && !isEmbedded,
+      enabled: open && envelope.type === EnvelopeType.TEMPLATE && envelope.internalVersion === 2 && !isEmbedded,
     },
   );
 
@@ -282,7 +282,10 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
       await updateEnvelopeAsync({
         data: {
           templateType: envelope.type === EnvelopeType.TEMPLATE ? data.templateType : undefined,
-          targetFolderId: envelope.type === EnvelopeType.TEMPLATE ? (data.targetFolderId ?? null) : undefined,
+          targetFolderId:
+            envelope.type === EnvelopeType.TEMPLATE && envelope.internalVersion === 2
+              ? (data.targetFolderId ?? null)
+              : undefined,
           externalId: data.externalId || null,
           visibility: data.visibility,
           globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
@@ -631,7 +634,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                         />
                       )}
 
-                      {envelope.type === EnvelopeType.TEMPLATE && !isEmbedded && (
+                      {envelope.type === EnvelopeType.TEMPLATE && envelope.internalVersion === 2 && !isEmbedded && (
                         <FormField
                           control={form.control}
                           name="targetFolderId"

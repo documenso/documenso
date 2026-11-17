@@ -444,7 +444,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   let resolvedTargetFolderId: string | null = null;
 
-  if (directTemplateEnvelope.targetFolderId) {
+  if (directTemplateEnvelope.internalVersion === 2 && directTemplateEnvelope.targetFolderId) {
     const targetFolder = await prisma.folder.findFirst({
       where: {
         id: directTemplateEnvelope.targetFolderId,

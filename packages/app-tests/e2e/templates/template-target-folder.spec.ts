@@ -211,6 +211,13 @@ test('[TEMPLATE_TARGET_FOLDER]: rejects non-document folders, cross-team folders
     internalVersion: 2,
   });
 
+  const legacyTemplate = await seedDirectTemplate({
+    title: 'Legacy v1 template',
+    userId: user.id,
+    teamId: team.id,
+    internalVersion: 1,
+  });
+
   const documentEnvelope = await seedBlankDocument(user, team.id);
 
   const templateTypeFolder = await seedBlankFolder(user, team.id, {
@@ -268,6 +275,18 @@ test('[TEMPLATE_TARGET_FOLDER]: rejects non-document folders, cross-team folders
       name: 'Valid Target Folder',
       type: FolderType.DOCUMENT,
     },
+  });
+
+  await expect(
+    updateEnvelope({
+      userId: user.id,
+      teamId: team.id,
+      id: { type: 'envelopeId', id: legacyTemplate.id },
+      data: { targetFolderId: validFolder.id },
+      requestMetadata,
+    }),
+  ).rejects.toMatchObject({
+    code: AppErrorCode.INVALID_BODY,
   });
 
   await updateEnvelope({

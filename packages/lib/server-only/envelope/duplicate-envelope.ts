@@ -165,7 +165,7 @@ export const duplicateEnvelope = async ({
       publicTitle: envelope.publicTitle ?? undefined,
       publicDescription: envelope.publicDescription ?? undefined,
       targetFolderId:
-        targetType === EnvelopeType.TEMPLATE && envelope.teamId === teamId
+        envelope.internalVersion === 2 && targetType === EnvelopeType.TEMPLATE && envelope.teamId === teamId
           ? (envelope.targetFolderId ?? undefined)
           : undefined,
       source: targetType === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.TEMPLATE,

@@ -105,6 +105,12 @@ export const updateEnvelope = async ({
     });
   }
 
+  if (envelope.internalVersion !== 2 && data.targetFolderId !== undefined) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Target folder is only supported for v2 template envelopes',
+    });
+  }
+
   // If no data just return the document since this function is normally chained after a meta update.
   if (Object.values(data).length === 0 && Object.keys(meta).length === 0) {
     return envelope;
