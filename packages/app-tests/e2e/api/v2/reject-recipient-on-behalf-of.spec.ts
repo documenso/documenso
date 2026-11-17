@@ -104,10 +104,12 @@ test.describe('Reject recipient on behalf of', () => {
       throw new Error('Seeded recipients not found');
     }
 
+    const { documentData } = envelope.envelopeItems[0];
+
     // The seal job cannot read this PDF and never finishes, so the status
     // asserted below can only have been written by the rejection itself.
-    await prisma.documentData.updateMany({
-      where: { envelopeItem: { envelopeId: envelope.id } },
+    await prisma.documentData.update({
+      where: { id: documentData.id },
       data: { data: 'not-a-pdf', initialData: 'not-a-pdf' },
     });
 
@@ -121,6 +123,13 @@ test.describe('Reject recipient on behalf of', () => {
 
     expect(envelopeRes.status()).toBe(200);
     expect((await envelopeRes.json()).status).toBe(DocumentStatus.REJECTED);
+
+    // Put the PDF back, or the seal sweep of a long-running server keeps
+    // retrying this envelope every 15 minutes for 6 hours.
+    await prisma.documentData.update({
+      where: { id: documentData.id },
+      data: { data: documentData.data, initialData: documentData.initialData },
+    });
 
     const bystanderRejectRes = await rejectRecipient(request, token, envelope.id, bystander.id, 'Too late');
 
