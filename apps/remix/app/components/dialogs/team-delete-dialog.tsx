@@ -51,14 +51,14 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName, redirectTo }: Team
     teamName: z.literal(deleteMessage, {
       errorMap: () => ({ message: _(msg`You must enter '${deleteMessage}' to proceed`) }),
     }),
-    transferTeamId: z.string().optional(),
+    transferTeamId: z.number().nullable(),
   });
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof ZDeleteTeamFormSchema>>({
     resolver: zodResolver(ZDeleteTeamFormSchema),
     defaultValues: {
       teamName: '',
-      transferTeamId: undefined,
+      transferTeamId: null,
     },
   });
 
@@ -66,9 +66,7 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName, redirectTo }: Team
 
   const onFormSubmit = async (data: z.infer<typeof ZDeleteTeamFormSchema>) => {
     try {
-      const transferTeamId = data.transferTeamId ? parseInt(data.transferTeamId, 10) : undefined;
-
-      await deleteTeam({ teamId, transferTeamId: transferTeamId || undefined });
+      await deleteTeam({ teamId, transferTeamId: data.transferTeamId ?? undefined });
 
       await refreshSession();
 
@@ -171,9 +169,13 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName, redirectTo }: Team
                         <Trans>Transfer documents to a different team</Trans>
                       </FormLabel>
                       <FormControl>
-                        <Select {...field} onValueChange={field.onChange}>
+                        <Select
+                          {...field}
+                          value={field.value === null ? '-1' : field.value.toString()}
+                          onValueChange={(value) => field.onChange(value === '-1' ? null : Number(value))}
+                        >
                           <SelectTrigger>
-                            <SelectValue placeholder={_(msg`Don't transfer (Delete all documents)`)} />
+                            <SelectValue />
                           </SelectTrigger>
 
                           <SelectContent>

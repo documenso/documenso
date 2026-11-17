@@ -8,7 +8,7 @@ import pMap from 'p-map';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import pdfjsWorker from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
 import type React from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import type { ScrollTarget } from '../virtual-list/use-virtual-list';
 import { useVirtualList } from '../virtual-list/use-virtual-list';
@@ -28,6 +28,10 @@ type LoadingState = 'loading' | 'loaded' | 'error';
 const LOW_RENDER_RESOLUTION = 1;
 const HIGH_RENDER_RESOLUTION = 2;
 const IDLE_RENDER_DELAY = 200;
+
+// 32px for the page number text and margins (my-2 = 8px * 2 + ~16px text) plus 2px
+// so the page outline ring (drawn outside the page box) does not touch neighbouring items.
+const PAGE_ITEM_EXTRA_HEIGHT = 34;
 
 export type PDFViewerProps = {
   className?: string;
@@ -53,6 +57,14 @@ export type PDFViewerProps = {
   onDocumentLoad?: () => void;
 
   /**
+   * Values above 1 can overflow the container horizontally, so the scroll
+   * parent should allow horizontal scrolling.
+   */
+  zoom?: number;
+
+  maxPageWidth?: number;
+
+  /**
    * Additional component to render next to the image, such as a Konva canvas
    * for rendering fields.
    */
@@ -64,6 +76,8 @@ export default function PDFViewer({
   data,
   scrollParentRef,
   onDocumentLoad,
+  zoom = 1,
+  maxPageWidth,
   customPageRenderer,
   ...props
 }: PDFViewerProps) {
@@ -213,6 +227,8 @@ export default function PDFViewer({
           numPages={pages.length}
           pages={pages}
           pdf={pdfRef.current}
+          zoom={zoom}
+          maxPageWidth={maxPageWidth}
           customPageRenderer={customPageRenderer}
         />
       )}
@@ -226,6 +242,8 @@ type VirtualizedPageListProps = {
   pages: PageMeta[];
   numPages: number;
   pdf: pdfjsLib.PDFDocumentProxy;
+  zoom: number;
+  maxPageWidth?: number;
   customPageRenderer?: React.FunctionComponent<{ pageData: PageRenderData }>;
 };
 
@@ -235,6 +253,8 @@ const VirtualizedPageList = ({
   pages,
   numPages,
   pdf,
+  zoom,
+  maxPageWidth,
   customPageRenderer,
 }: VirtualizedPageListProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -244,21 +264,67 @@ const VirtualizedPageList = ({
     constraintRef,
     contentRef,
     itemCount: numPages,
-    itemSize: (index, width) => {
-      const pageMeta = pages[index];
-
-      // Calculate height based on aspect ratio and available width
-      const aspectRatio = pageMeta.height / pageMeta.width;
-      const scaledHeight = width * aspectRatio;
-
-      // Add 32px for the page number text and margins (my-2 = 8px * 2 + text height ~16px)
-      // Add additional 2px for the top and bottom borders.
-      return scaledHeight + 32 + 2;
-    },
+    itemSize: (index, width) => getPageItemSize(pages[index], getDisplayWidth(width, zoom, maxPageWidth)),
     overscan: 5,
   });
 
+  const displayWidth = getDisplayWidth(constraintWidth, zoom, maxPageWidth);
+
   useScrollToPage(contentRef, scrollToItem);
+
+  const previousDisplayWidthRef = useRef(displayWidth);
+
+  // Keeps the viewport's center point stable across zoom, otherwise zooming
+  // anchors to the top left of the content.
+  useLayoutEffect(() => {
+    const previousDisplayWidth = previousDisplayWidthRef.current;
+    previousDisplayWidthRef.current = displayWidth;
+
+    if (previousDisplayWidth === displayWidth || previousDisplayWidth === 0 || displayWidth === 0) {
+      return;
+    }
+
+    const contentEl = contentRef.current;
+    const scrollEl = scrollParentRef === 'window' ? document.scrollingElement : scrollParentRef.current;
+
+    if (!contentEl || !scrollEl) {
+      return;
+    }
+
+    const viewportHeight = scrollParentRef === 'window' ? window.innerHeight : scrollEl.clientHeight;
+
+    // Only depends on the content above the page list, which is unaffected by zoom.
+    const contentOffsetTop =
+      contentEl.getBoundingClientRect().top -
+      (scrollParentRef === 'window' ? 0 : scrollEl.getBoundingClientRect().top) +
+      scrollEl.scrollTop;
+
+    const oldMetrics = computePageMetrics(pages, previousDisplayWidth);
+    const newMetrics = computePageMetrics(pages, displayWidth);
+
+    const oldCenterY = Math.min(
+      Math.max(0, scrollEl.scrollTop + viewportHeight / 2 - contentOffsetTop),
+      oldMetrics.totalSize,
+    );
+
+    let pageIndex = 0;
+
+    for (let i = 0; i < pages.length; i += 1) {
+      if (oldMetrics.offsets[i] <= oldCenterY) {
+        pageIndex = i;
+      } else {
+        break;
+      }
+    }
+
+    const pageFraction =
+      oldMetrics.sizes[pageIndex] > 0 ? (oldCenterY - oldMetrics.offsets[pageIndex]) / oldMetrics.sizes[pageIndex] : 0;
+
+    const newCenterY = newMetrics.offsets[pageIndex] + pageFraction * newMetrics.sizes[pageIndex];
+
+    scrollEl.scrollTop = Math.max(0, newCenterY + contentOffsetTop - viewportHeight / 2);
+    scrollEl.scrollLeft = Math.max(0, (scrollEl.scrollWidth - scrollEl.clientWidth) / 2);
+  }, [displayWidth, pages, scrollParentRef]);
 
   return (
     <div
@@ -268,7 +334,9 @@ const VirtualizedPageList = ({
       data-page-count={numPages}
       style={{
         height: `${totalSize}px`,
-        width: '100%',
+        width: displayWidth > 0 ? `${displayWidth}px` : '100%',
+        // Not flex centering: overflowing pages must stay reachable by scrolling.
+        margin: '0 auto',
         position: 'relative',
       }}
     >
@@ -277,11 +345,11 @@ const VirtualizedPageList = ({
         const pageMeta = pages[index];
         const pageNumber = index + 1;
 
-        // Calculate scale based on constraint width
-        const scale = constraintWidth / pageMeta.width;
+        // Calculate scale based on the rendered page width.
+        const scale = displayWidth / pageMeta.width;
 
-        const scaledWidth = Math.floor(pageMeta.width * scale);
-        const scaledHeight = Math.floor(pageMeta.height * scale);
+        const scaledWidth = displayWidth;
+        const scaledHeight = Math.round(pageMeta.height * scale);
 
         return (
           <div
@@ -290,7 +358,7 @@ const VirtualizedPageList = ({
               position: 'absolute',
               top: 0,
               left: 0,
-              width: constraintWidth,
+              width: displayWidth,
               height: `${virtualItem.size}px`,
               transform: `translateY(${virtualItem.start}px)`,
             }}
@@ -306,7 +374,12 @@ const VirtualizedPageList = ({
               customPageRenderer={customPageRenderer}
             />
 
-            <p className="my-2 text-center text-[11px] text-muted-foreground/80">
+            <p
+              className={cn('my-2 text-center text-[11px] text-muted-foreground/80', {
+                // Allocate room for the floating viewer toolbar.
+                'pb-20': index === numPages - 1,
+              })}
+            >
               <Trans>
                 Page {pageNumber} of {numPages}
               </Trans>
@@ -316,6 +389,40 @@ const VirtualizedPageList = ({
       })}
     </div>
   );
+};
+
+const getDisplayWidth = (constraintWidth: number, zoom: number, maxPageWidth?: number) => {
+  if (constraintWidth === 0) {
+    return 0;
+  }
+
+  const baseWidth = maxPageWidth !== undefined ? Math.min(constraintWidth, maxPageWidth) : constraintWidth;
+
+  return Math.floor(baseWidth * zoom);
+};
+
+// Shared by the virtual list `itemSize` and `computePageMetrics` so the two cannot drift apart.
+const getPageItemSize = (pageMeta: PageMeta, displayWidth: number) => {
+  const aspectRatio = pageMeta.height / pageMeta.width;
+
+  return displayWidth * aspectRatio + PAGE_ITEM_EXTRA_HEIGHT;
+};
+
+const computePageMetrics = (pages: PageMeta[], displayWidth: number) => {
+  const offsets: number[] = [];
+  const sizes: number[] = [];
+
+  let totalSize = 0;
+
+  for (const pageMeta of pages) {
+    const size = getPageItemSize(pageMeta, displayWidth);
+
+    offsets.push(totalSize);
+    sizes.push(size);
+    totalSize += size;
+  }
+
+  return { offsets, sizes, totalSize };
 };
 
 type PdfViewerPageProps = {
@@ -349,8 +456,16 @@ const PdfViewerPage = ({
     scale,
   });
 
+  // The page image is held back until the custom renderer has loaded its own
+  // dependencies so both appear at once.
+  const [isCustomRendererReady, setIsCustomRendererReady] = useState(false);
+
+  const isPageReady = imageLoadingState === 'loaded' && (!CustomPageRenderer || isCustomRendererReady);
+
   return (
-    <div className="relative w-full rounded border border-border" style={{ width: scaledWidth, height: scaledHeight }}>
+    // Must use ring instead of border since borders take up space inside the box,
+    // which shrinks the page image (constrained to the box by `max-width: 100%`)
+    <div className="relative w-full rounded ring-1 ring-border" style={{ width: scaledWidth, height: scaledHeight }}>
       {CustomPageRenderer && imageLoadingState === 'loaded' && (
         <CustomPageRenderer
           pageData={{
@@ -360,11 +475,12 @@ const PdfViewerPage = ({
             pageWidth: unscaledWidth,
             pageHeight: unscaledHeight,
             imageLoadingState,
+            onReadyChange: setIsCustomRendererReady,
           }}
         />
       )}
 
-      <PdfViewerPageImage imageLoadingState={imageLoadingState} imageProps={imageProps} />
+      <PdfViewerPageImage imageLoadingState={imageLoadingState} isPageReady={isPageReady} imageProps={imageProps} />
     </div>
   );
 };
@@ -502,8 +618,16 @@ const usePdfPageImage = ({ pageNumber, pdf, scale, scaledWidth, scaledHeight }: 
   const imageProps = useMemo(
     (): React.ImgHTMLAttributes<HTMLImageElement> & Record<string, unknown> & { alt: '' } => ({
       className: PDF_VIEWER_PAGE_CLASSNAME,
-      width: Math.floor(scaledWidth),
-      height: Math.floor(scaledHeight),
+      width: scaledWidth,
+      height: scaledHeight,
+      // Pin the rendered size to the page size. Tailwind's preflight applies
+      // `max-width: 100%; height: auto` to images, which would otherwise let
+      // the container clamp the image out of alignment with the page overlay.
+      style: {
+        width: scaledWidth,
+        height: scaledHeight,
+        maxWidth: 'none',
+      },
       alt: '',
       onLoad: () => setImageLoadingState('loaded'),
       onError: () => setImageLoadingState('error'),

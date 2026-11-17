@@ -8,6 +8,7 @@ import { formatEmbedAuthCompletePageUrl } from '@documenso/lib/constants/embed-a
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
+import { findUserByProvidedEmail } from '@documenso/lib/server-only/user/find-user-by-provided-email';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
@@ -108,15 +109,7 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
     return c.redirect(redirectPath, 302);
   }
 
-  const userWithSameEmail = await prisma.user.findFirst({
-    where: {
-      email: email,
-    },
-    select: {
-      id: true,
-      emailVerified: true,
-    },
-  });
+  const userWithSameEmail = await findUserByProvidedEmail({ email });
 
   // Handle existing user but no account.
   if (userWithSameEmail) {
@@ -186,7 +179,7 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
   const createdUser = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: {
-        email: email,
+        email: email.toLowerCase(),
         name: name,
         emailVerified: new Date(),
       },
