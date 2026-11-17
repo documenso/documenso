@@ -7,6 +7,7 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { assertRecipientFieldsComplete } from '@documenso/lib/utils/signing-items';
 import { prisma } from '@documenso/prisma';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { PDF } from '@libpdf/core';
@@ -95,6 +96,15 @@ export const prepareCscRecipientSigning = async (
       message: 'prepareCscRecipientSigning called for a non-TSP envelope.',
     });
   }
+
+  // TSP envelopes never reach `completeDocumentWithToken`, so this is the only place the
+  // recipient's fields are checked before they are rendered and signed. The seal job runs
+  // the same check after every recipient has signed, when nothing can be corrected.
+  assertRecipientFieldsComplete({
+    internalVersion: envelope.internalVersion,
+    recipientId: recipient.id,
+    fields: recipient.fields,
+  });
 
   const credential = await loadCscCredential(recipient.id);
 

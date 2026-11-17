@@ -123,6 +123,19 @@ export const setFieldsForDocument = async ({
       });
     }
 
+    // An update never moves a field to another recipient or envelope item, so the stored
+    // ones stay. Groups are validated with the values from this payload, which would then
+    // pass for a group which does not match what is stored.
+    const isMovingExistingField =
+      existing !== undefined &&
+      (existing.recipientId !== field.recipientId || existing.envelopeItemId !== field.envelopeItemId);
+
+    if (isMovingExistingField && (existing.groupId || groupId)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Cannot change the recipient or envelope item of field ${existing.id} because it belongs to a group`,
+      });
+    }
+
     if (groupId && envelope.internalVersion !== 2) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Field groups are only supported for V2 envelopes',
