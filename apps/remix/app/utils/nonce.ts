@@ -1,4 +1,10 @@
-import { useRouteLoaderData } from 'react-router';
+import { createContext, useRouteLoaderData } from 'react-router';
+
+/**
+ * Per-request CSP nonce. Set by the root route middleware, read with
+ * `context.get(nonceContext)` in loaders/actions and `entry.server`.
+ */
+export const nonceContext = createContext<string>('');
 
 /**
  * Returns the supplied CSP nonce only when rendering on the server.

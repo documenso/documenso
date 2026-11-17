@@ -29,11 +29,11 @@ test('[ORGANISATIONS]: create and delete organisation', async ({ page }) => {
 
   await page.waitForURL(`/settings/organisations`);
   await expectTextToBeVisible(page, 'No results found');
-  await page.getByRole('button', { name: 'Create organisation' }).click();
+  await page.getByRole('button', { name: 'Create organization' }).click();
 
-  await page.getByLabel('Organisation Name*').fill('test');
+  await page.getByLabel('Organization Name*').fill('test');
   await page.getByRole('button', { name: 'Create' }).click();
-  await expect(page.getByText('Your organisation has been created').first()).toBeVisible();
+  await expect(page.getByText('Your organization has been created').first()).toBeVisible();
   await page.reload();
 
   await page.getByRole('row').filter({ hasText: 'test' }).getByRole('link').nth(1).click();
@@ -53,12 +53,12 @@ test('[ORGANISATIONS]: manage general settings', async ({ page }) => {
   const updatedOrganisationId = `organisation-${Date.now()}`;
 
   // Update team.
-  await page.getByLabel('Organisation Name*').click();
-  await page.getByLabel('Organisation Name*').clear();
-  await page.getByLabel('Organisation Name*').fill(updatedOrganisationId);
-  await page.getByLabel('Organisation URL*').click();
-  await page.getByLabel('Organisation URL*').clear();
-  await page.getByLabel('Organisation URL*').fill(updatedOrganisationId);
+  await page.getByLabel('Organization Name*').click();
+  await page.getByLabel('Organization Name*').clear();
+  await page.getByLabel('Organization Name*').fill(updatedOrganisationId);
+  await page.getByLabel('Organization URL*').click();
+  await page.getByLabel('Organization URL*').clear();
+  await page.getByLabel('Organization URL*').fill(updatedOrganisationId);
 
   await page.getByRole('button', { name: 'Save changes' }).click();
 
@@ -277,8 +277,8 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   // Create a custom group A with 3 members "ORGANISATION ADMIN" to check that they get the correct roles.
   await page.getByRole('button', { name: 'Create group' }).click();
   await page.getByRole('textbox', { name: 'Group Name *' }).fill('CUSTOM_GROUP');
-  await page.getByRole('combobox').filter({ hasText: 'Organisation Member' }).click();
-  await page.getByRole('option', { name: 'Organisation Admin' }).click();
+  await page.getByRole('combobox').filter({ hasText: 'Organization Member' }).click();
+  await page.getByRole('option', { name: 'Organization Admin' }).click();
   await page.getByTestId('group-members-picker').click();
   await page.getByRole('option', { name: 'Member1' }).click();
   await page.getByRole('option', { name: 'Member2' }).click();
@@ -291,16 +291,16 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.goto(`/o/${organisation.url}/settings/members`);
 
   // Confirm org roles have been applied to these members.
-  await expect(page.getByRole('row').filter({ hasText: 'Organisation Admin' }).getByText(memberEmail1)).toBeVisible();
-  await expect(page.getByRole('row').filter({ hasText: 'Organisation Admin' }).getByText(memberEmail2)).toBeVisible();
-  await expect(page.getByRole('row').filter({ hasText: 'Organisation Admin' }).getByText(memberEmail3)).toBeVisible();
+  await expect(page.getByRole('row').filter({ hasText: 'Organization Admin' }).getByText(memberEmail1)).toBeVisible();
+  await expect(page.getByRole('row').filter({ hasText: 'Organization Admin' }).getByText(memberEmail2)).toBeVisible();
+  await expect(page.getByRole('row').filter({ hasText: 'Organization Admin' }).getByText(memberEmail3)).toBeVisible();
 
   // Test updating the group.
   await page.goto(`/o/${organisation.url}/settings/groups`);
   await page.getByRole('link', { name: 'Manage' }).click();
   await page.getByRole('textbox', { name: 'Group Name *' }).fill('CUSTOM_GROUP_A');
-  await page.getByRole('combobox').filter({ hasText: 'Organisation Admin' }).click();
-  await page.getByRole('option', { name: 'Organisation Member' }).click();
+  await page.getByRole('combobox').filter({ hasText: 'Organization Admin' }).click();
+  await page.getByRole('option', { name: 'Organization Member' }).click();
   // Remove Member3 by clicking the X on its chip in the multiselect.
   await page
     .getByTestId('group-members-picker')
@@ -327,16 +327,16 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.goto(`/o/${organisation.url}/settings/members`);
 
   // Confirm admins still get admin roles.
-  await expect(page.getByRole('row').filter({ hasText: 'Organisation Admin' }).getByText(adminEmail1)).toBeVisible();
-  await expect(page.getByRole('row').filter({ hasText: 'Organisation Admin' }).getByText(adminEmail2)).toBeVisible();
-  await expect(page.getByRole('row').filter({ hasText: 'Organisation Admin' }).getByText(adminEmail3)).toBeVisible();
+  await expect(page.getByRole('row').filter({ hasText: 'Organization Admin' }).getByText(adminEmail1)).toBeVisible();
+  await expect(page.getByRole('row').filter({ hasText: 'Organization Admin' }).getByText(adminEmail2)).toBeVisible();
+  await expect(page.getByRole('row').filter({ hasText: 'Organization Admin' }).getByText(adminEmail3)).toBeVisible();
 
   // Create another custom group with 3 members with "ORGANISATION MEMBER" role.
   await page.goto(`/o/${organisation.url}/settings/groups`);
   await page.getByRole('button', { name: 'Create group' }).click();
   await page.getByRole('textbox', { name: 'Group Name *' }).fill('CUSTOM_GROUP_B');
-  await page.getByRole('combobox').filter({ hasText: 'Organisation Member' }).click();
-  await page.getByRole('option', { name: 'Organisation Admin' }).click();
+  await page.getByRole('combobox').filter({ hasText: 'Organization Member' }).click();
+  await page.getByRole('option', { name: 'Organization Admin' }).click();
   await page.getByTestId('group-members-picker').click();
   await page.getByRole('option', { name: 'Member4' }).click();
   await page.getByRole('option', { name: 'Member5' }).click();
@@ -537,6 +537,6 @@ test('[ORGANISATIONS]: leave organisation', async ({ page }) => {
   await page.getByRole('button', { name: 'Leave' }).click();
   await page.getByRole('button', { name: 'Leave' }).click();
 
-  await expect(page.getByText('You have successfully left this organisation').first()).toBeVisible();
+  await expect(page.getByText('You have successfully left this organization').first()).toBeVisible();
   await expect(page.getByText('No results found').first()).toBeVisible();
 });

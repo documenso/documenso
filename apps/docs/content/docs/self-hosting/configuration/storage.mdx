@@ -61,7 +61,7 @@ No configuration required. Database storage is enabled when `NEXT_PUBLIC_UPLOAD_
 
 ## S3 Configuration
 
-S3 storage is recommended for production deployments. Documenso supports AWS S3 and any S3-compatible storage service.
+S3 storage is recommended for production deployments. Documenso supports AWS S3 and custom endpoints for S3-compatible storage services.
 
 ### Required Variables
 
@@ -157,89 +157,28 @@ NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 ---
 
-## MinIO Setup
-
-MinIO is a self-hosted S3-compatible object storage server.
-
-{/* prettier-ignore */}
-<Steps>
-<Step>
-### Deploy MinIO
-
-Using Docker:
-
-```bash
-docker run -d \
-  --name minio \
-  -p 9000:9000 \
-  -p 9001:9001 \
-  -e MINIO_ROOT_USER=minioadmin \
-  -e MINIO_ROOT_PASSWORD=minioadmin \
-  -v minio_data:/data \
-  minio/minio server /data --console-address ":9001"
-```
-
-Using Docker Compose with Documenso:
-
-```yaml
-services:
-  minio:
-    image: minio/minio
-    command: server /data --console-address ":9001"
-    ports:
-      - '9000:9000'
-      - '9001:9001'
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    volumes:
-      - minio_data:/data
-
-volumes:
-  minio_data:
-```
-
-</Step>
-<Step>
-### Create a Bucket
-
-Access the MinIO Console at `http://localhost:9001` and create a bucket, or use the CLI:
-
-```bash
-# Install MinIO client
-mc alias set myminio http://localhost:9000 minioadmin minioadmin
-
-# Create bucket
-mc mb myminio/documenso
-```
-
-</Step>
-<Step>
-### Configure Environment Variables
-
-```bash
-NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
-NEXT_PRIVATE_UPLOAD_BUCKET=documenso
-NEXT_PRIVATE_UPLOAD_ENDPOINT=http://minio:9000
-NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
-NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=minioadmin
-NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=minioadmin
-NEXT_PRIVATE_UPLOAD_REGION=us-east-1
-```
-
-</Step>
-</Steps>
-
-<Callout type="info">
-  Set `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true` for MinIO and other S3-compatible services that
-  don't support virtual-hosted bucket URLs.
-</Callout>
-
----
-
 ## Other S3-Compatible Services
 
-Documenso works with any S3-compatible storage service. Configure the endpoint and enable path-style URLs if required.
+To connect to an S3-compatible storage service, configure the endpoint and enable path-style URLs if required.
+
+<Callout type="info">
+  Set `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true` for S3-compatible services that don't support
+  virtual-hosted bucket URLs.
+</Callout>
+
+### Self-Hosted Providers
+
+If you prefer to run your own object storage, consider these S3-compatible options:
+
+- [SeaweedFS](https://github.com/seaweedfs/seaweedfs) — A distributed storage system with an S3 API, filesystem features, and a single-node Docker setup.
+- [RustFS](https://docs.rustfs.com/en/installation/container) — An S3-compatible object storage system written in Rust, with Docker support and a web console.
+
+These providers are optional and are not included in the default Docker Compose setup, which uses PostgreSQL for document storage. To connect one, set `NEXT_PUBLIC_UPLOAD_TRANSPORT=s3` and configure `NEXT_PRIVATE_UPLOAD_ENDPOINT`, the bucket, region, and access credentials for your deployment.
+
+<Callout type="warn">
+  These are alternatives to evaluate, not verified Documenso integrations. Test uploads, downloads,
+  presigned URLs, and CORS before using either provider in production.
+</Callout>
 
 ### Cloudflare R2
 
@@ -675,4 +614,4 @@ Default limit is 50MB per request.
 - [Database Configuration](/docs/self-hosting/configuration/database) - Configure PostgreSQL
 - [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
 - [Backups](/docs/self-hosting/maintenance/backups) - Backup strategies for both storage backends
-- [Docker Compose](/docs/self-hosting/deployment/docker-compose) - Deploy with MinIO for local storage
+- [Docker Compose](/docs/self-hosting/deployment/docker-compose) - Deploy with PostgreSQL and configure external S3 storage
