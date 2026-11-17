@@ -663,6 +663,158 @@ export const sweepRecipientRowOverCard = async (
   return result;
 };
 
+// ---------------------------------------------------------------------------
+// Fields step helpers
+// ---------------------------------------------------------------------------
+
+export type TEnvelopeEditorFieldButtonName =
+  | 'Signature'
+  | 'Email'
+  | 'Name'
+  | 'Initials'
+  | 'Date'
+  | 'Text'
+  | 'Number'
+  | 'Radio'
+  | 'Checkbox'
+  | 'Dropdown';
+
+export type TCanvasPosition = { x: number; y: number };
+
+export const getFieldsCanvas = (root: Page) => root.locator('.konva-container canvas').first();
+
+/**
+ * Place a field on the first page of the PDF by selecting it from the palette and
+ * clicking the canvas.
+ */
+export const placeFieldOnCanvas = async (
+  root: Page,
+  fieldName: TEnvelopeEditorFieldButtonName,
+  position: TCanvasPosition,
+) => {
+  await root.getByRole('button', { name: fieldName, exact: true }).click();
+
+  const canvas = getFieldsCanvas(root);
+  await expect(canvas).toBeVisible();
+  await canvas.click({ position });
+};
+
+/**
+ * Select an existing field on the canvas, which opens its settings in the sidebar.
+ */
+export const selectFieldOnCanvas = async (root: Page, position: TCanvasPosition) => {
+  const canvas = getFieldsCanvas(root);
+  await expect(canvas).toBeVisible();
+  await root.waitForTimeout(300);
+  // Use force:true to bypass any floating action toolbar buttons that may intercept clicks.
+  await canvas.click({ position, force: true });
+};
+
+export const getFieldActionToolbarButton = (
+  root: Page,
+  action: 'Change Recipient' | 'Change Field Type' | 'Duplicate' | 'Duplicate on all pages' | 'Remove',
+) => root.locator(`button[title="${action}"]`);
+
+export const changeSelectedFieldType = async (root: Page, newTypeLabel: TEnvelopeEditorFieldButtonName) => {
+  await getFieldActionToolbarButton(root, 'Change Field Type').click();
+
+  const option = root.getByRole('option', { name: newTypeLabel, exact: true });
+  await expect(option).toBeVisible();
+  await option.click();
+
+  await expect(root.getByRole('dialog')).toHaveCount(0);
+};
+
+export const changeSelectedFieldRecipient = async (root: Page, recipientIdentifier: string) => {
+  await getFieldActionToolbarButton(root, 'Change Recipient').click();
+
+  const option = root.getByRole('option', { name: recipientIdentifier });
+  await expect(option).toBeVisible();
+  await option.click();
+
+  await expect(root.getByRole('dialog')).toHaveCount(0);
+};
+
+// ---------------------------------------------------------------------------
+// Field settings sidebar helpers
+// ---------------------------------------------------------------------------
+
+export const getFieldSettingsAdvancedTrigger = (root: Page) => root.getByTestId('field-form-advanced-trigger');
+
+export const getFieldSettingsGroupIdInput = (root: Page) => root.getByTestId('field-form-groupId');
+
+export const getFieldSettingsExternalIdInput = (root: Page) => root.getByTestId('field-form-externalId');
+
+export const getFieldSettingsHideLabelCheckbox = (root: Page) => root.getByTestId('field-form-hideLabel');
+
+/**
+ * Expands the advanced section of the selected field's settings if it is collapsed.
+ */
+export const openFieldSettingsAdvancedSection = async (root: Page) => {
+  const trigger = getFieldSettingsAdvancedTrigger(root);
+  await expect(trigger).toBeVisible();
+
+  const isOpen = (await trigger.getAttribute('data-state')) === 'open';
+
+  if (!isOpen) {
+    await trigger.click();
+  }
+
+  await expect(getFieldSettingsExternalIdInput(root)).toBeVisible();
+};
+
+export const setFieldSettingsExternalId = async (root: Page, externalId: string) => {
+  await openFieldSettingsAdvancedSection(root);
+  await getFieldSettingsExternalIdInput(root).fill(externalId);
+};
+
+/**
+ * Types a group ID into the selected field's group input and commits it by pressing enter.
+ * Pass an empty string to remove the field from its group.
+ */
+export const setFieldSettingsGroupId = async (root: Page, groupId: string) => {
+  await openFieldSettingsAdvancedSection(root);
+
+  const input = getFieldSettingsGroupIdInput(root);
+  await input.fill(groupId);
+  await input.press('Enter');
+};
+
+/**
+ * Creates a new group for the selected field via the "Create Group" suggestion and
+ * returns the generated group ID.
+ */
+export const createFieldSettingsGroup = async (root: Page): Promise<string> => {
+  await openFieldSettingsAdvancedSection(root);
+
+  const input = getFieldSettingsGroupIdInput(root);
+  await input.click();
+
+  await root.getByRole('option', { name: 'Create Group' }).click();
+
+  await expect(input).toHaveValue(/^grp_[a-z]{4}$/);
+
+  return await input.inputValue();
+};
+
+/**
+ * Selects an existing group for the selected field from the autocomplete suggestions.
+ */
+export const selectFieldSettingsGroupSuggestion = async (root: Page, groupId: string) => {
+  await openFieldSettingsAdvancedSection(root);
+
+  // Typing filters the suggestions and always opens the list.
+  const input = getFieldSettingsGroupIdInput(root);
+  await input.click();
+  await input.fill(groupId);
+
+  await root.getByRole('option', { name: groupId }).click();
+
+  await expect(input).toHaveValue(groupId);
+};
+
+export const getFieldSettingsGroupSuggestions = (root: Page) => root.getByRole('option');
+
 export const persistEmbeddedEnvelope = async (surface: TEnvelopeEditorSurface) => {
   if (!surface.isEmbedded) {
     return;

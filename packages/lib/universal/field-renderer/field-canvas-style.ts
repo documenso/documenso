@@ -1,5 +1,6 @@
 import {
   FIELD_PROBE_ANCHOR_SELECTOR,
+  FIELD_ROOT_CONTAINER_DEFAULT_BACKGROUND,
   FIELD_ROOT_CONTAINER_PROBE_CLASS_NAME,
 } from '@documenso/ui/lib/field-root-container-classes';
 import { colord } from 'colord';
@@ -95,6 +96,13 @@ const createFieldProbeElement = (field: FieldToRender): HTMLElement => {
   return $probe;
 };
 
+/**
+ * Whether a probed background is the one the probe has without any custom CSS.
+ */
+export const isDefaultFieldBackground = (color: string) => {
+  return colord(color).isEqual(FIELD_ROOT_CONTAINER_DEFAULT_BACKGROUND);
+};
+
 const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyle | undefined => {
   if (typeof document === 'undefined' || typeof window === 'undefined') {
     return undefined;
@@ -122,8 +130,10 @@ const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyl
     const hasBorderStyle = computedStyle.borderTopStyle !== 'none' && Boolean(borderWidth);
     const borderRadius = getPixelValue(computedStyle.borderTopLeftRadius);
 
+    const backgroundColor = getRenderableColor(computedStyle.backgroundColor);
+
     return {
-      backgroundColor: getRenderableColor(computedStyle.backgroundColor),
+      backgroundColor: backgroundColor && isDefaultFieldBackground(backgroundColor) ? undefined : backgroundColor,
       borderColor: hasBorderStyle ? borderColor : undefined,
       borderRadius,
       borderWidth: hasBorderStyle ? borderWidth : undefined,

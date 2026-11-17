@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { KONVA_TRANSPARENT_FILL } from '../konva/constants';
-import { getFieldCanvasStyleCacheKey, getOpacityValue, getPixelValue, getRenderableColor } from './field-canvas-style';
+import {
+  getFieldCanvasStyleCacheKey,
+  getOpacityValue,
+  getPixelValue,
+  getRenderableColor,
+  isDefaultFieldBackground,
+} from './field-canvas-style';
 import type { FieldToRender } from './field-renderer';
 
 const createField = (overrides: Partial<FieldToRender> = {}) =>
@@ -98,6 +104,25 @@ describe('getRenderableColor', () => {
     expect(getRenderableColor('rgba(255, 0, 0, 0.5)')).toBe('rgba(255, 0, 0, 0.5)');
     expect(getRenderableColor('rgba(255, 0, 0, 1)')).toBe('rgba(255, 0, 0, 1)');
     expect(getRenderableColor('rgba(255, 0, 0, 0.01)')).toBe('rgba(255, 0, 0, 0.01)');
+  });
+});
+
+describe('isDefaultFieldBackground', () => {
+  it('matches the background the probe has without custom CSS', () => {
+    expect(isDefaultFieldBackground('rgba(255, 255, 255, 0.9)')).toBe(true);
+    expect(isDefaultFieldBackground('rgb(255 255 255 / 0.9)')).toBe(true);
+  });
+
+  it('does not match a custom white with another opacity', () => {
+    expect(isDefaultFieldBackground('rgb(255, 255, 255)')).toBe(false);
+    expect(isDefaultFieldBackground('rgba(255, 255, 255, 0.3)')).toBe(false);
+    expect(isDefaultFieldBackground('rgba(255, 255, 255, 0.95)')).toBe(false);
+  });
+
+  it('does not match other colours or a transparent fill', () => {
+    expect(isDefaultFieldBackground('rgba(254, 254, 254, 0.9)')).toBe(false);
+    expect(isDefaultFieldBackground('rgba(37, 99, 235, 0.9)')).toBe(false);
+    expect(isDefaultFieldBackground(KONVA_TRANSPARENT_FILL)).toBe(false);
   });
 });
 

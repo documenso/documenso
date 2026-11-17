@@ -9,7 +9,10 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import type { TTemplate } from '@documenso/lib/types/template';
-import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import {
+  fieldsContainUnsignedRequiredField,
+  isFieldUnsignedAndRequired,
+} from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { getNextDictatableRecipient } from '@documenso/lib/utils/recipient-groups';
 import type {
@@ -416,7 +419,7 @@ export const DirectTemplateSigningForm = ({
             isSubmitting={isSubmitting}
             onSignatureComplete={async (nextSigner) => handleSubmit(nextSigner)}
             documentTitle={template.title}
-            fields={localFields}
+            isComplete={!fieldsContainUnsignedRequiredField(localFields)}
             fieldsValidated={fieldsValidated}
             recipient={directRecipient}
             allowDictateNextSigner={Boolean(nextRecipient && template.templateMeta?.allowDictateNextSigner)}

@@ -39,6 +39,12 @@ export const deleteTemplateField = async ({ userId, teamId, fieldId }: DeleteTem
     teamId,
   });
 
+  if (field.groupId) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Fields in a group cannot be deleted through this endpoint. Use /envelope/field/delete instead.',
+    });
+  }
+
   await prisma.field.delete({
     where: {
       id: field.id,

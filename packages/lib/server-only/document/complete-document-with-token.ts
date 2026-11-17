@@ -2,8 +2,8 @@ import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-form
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { assertRecipientFieldsComplete } from '@documenso/lib/utils/signing-items';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentSigningOrder,
@@ -311,12 +311,7 @@ export const completeDocumentWithToken = async ({
     });
   }
 
-  if (fieldsContainUnsignedRequiredField(fields)) {
-    throw new AppError(AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS, {
-      message: `Recipient ${recipient.id} has unsigned fields`,
-      statusCode: 400,
-    });
-  }
+  assertRecipientFieldsComplete({ internalVersion: envelope.internalVersion, recipientId: recipient.id, fields });
 
   await prisma.$transaction(async (tx) => {
     // Conditional update so two concurrent completion requests can't both

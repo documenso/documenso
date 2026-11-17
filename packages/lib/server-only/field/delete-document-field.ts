@@ -83,6 +83,12 @@ export const deleteDocumentField = async ({ userId, teamId, fieldId, requestMeta
     });
   }
 
+  if (field.groupId) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Fields in a group cannot be deleted through this endpoint. Use /envelope/field/delete instead.',
+    });
+  }
+
   return await prisma.$transaction(async (tx) => {
     await assertEnvelopeMutable(envelope, tx);
 

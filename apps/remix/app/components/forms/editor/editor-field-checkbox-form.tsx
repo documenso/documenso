@@ -25,12 +25,14 @@ import { z } from 'zod';
 
 import {
   EditorGenericFontSizeField,
+  EditorGenericHideLabelField,
   EditorGenericReadOnlyField,
   EditorGenericRequiredField,
 } from './editor-field-generic-field-forms';
 
 const ZCheckboxFieldFormSchema = ZCheckboxFieldMeta.pick({
   label: true,
+  hideLabel: true,
   direction: true,
   validationRule: true,
   validationLength: true,
@@ -78,6 +80,7 @@ export const EditorFieldCheckboxForm = ({
     mode: 'onChange',
     defaultValues: {
       label: value.label || '',
+      hideLabel: value.hideLabel ?? false,
       direction: value.direction || 'vertical',
       validationRule: value.validationRule || '',
       validationLength: value.validationLength || 0,
@@ -271,6 +274,8 @@ export const EditorFieldCheckboxForm = ({
           </div>
 
           <EditorGenericReadOnlyField formControl={form.control} />
+
+          <EditorGenericHideLabelField formControl={form.control} />
 
           <section className="space-y-2">
             <div className="-mx-4 mt-2 mb-4">

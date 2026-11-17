@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -45,6 +46,12 @@ export const removeSignedFieldWithToken = async ({
   }
 
   await assertSenderNotDisabled({ userId: envelope.userId });
+
+  if (envelope.internalVersion !== 1) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Envelope ${envelope.id} is not a version 1 envelope`,
+    });
+  }
 
   if (envelope.status !== DocumentStatus.PENDING) {
     throw new Error(`Document ${envelope.id} must be pending`);
