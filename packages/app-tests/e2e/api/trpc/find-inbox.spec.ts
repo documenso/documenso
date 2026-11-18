@@ -85,7 +85,7 @@ test.describe('Inbox Find - Recipient Scoping', () => {
     // The attacker knows the exact title but is not a recipient.
     await apiSignin({ page, email: attacker.email });
 
-    for (const status of ['PENDING', 'COMPLETED', undefined]) {
+    for (const status of ['PENDING', 'PARTIALLY_APPROVED', 'COMPLETED', undefined]) {
       const { res, data } = await trpcInboxFind(page, { query: 'Confidential', status });
 
       expect(res.ok()).toBeTruthy();
@@ -121,6 +121,10 @@ test.describe('Inbox Find - Recipient Scoping', () => {
 
     const searched = await trpcInboxFind(page, { query: 'CC Only' });
     expect(titlesOf(searched.data)).toEqual([]);
+
+    // A CC recipient has nothing left to sign, which must not count as partially approved.
+    const partiallyApproved = await trpcInboxFind(page, { query: 'CC Only', status: 'PARTIALLY_APPROVED' });
+    expect(titlesOf(partiallyApproved.data)).toEqual([]);
 
     await apiSignout({ page });
   });
@@ -244,7 +248,7 @@ test.describe('Inbox Find - Search Hardening', () => {
     }
 
     // Wildcards combined with the status filter still cannot escape the scope.
-    for (const status of ['PENDING', 'COMPLETED', 'REJECTED', 'CANCELLED']) {
+    for (const status of ['PENDING', 'PARTIALLY_APPROVED', 'COMPLETED', 'REJECTED', 'CANCELLED']) {
       const { data } = await trpcInboxFind(page, { query: '%', status });
 
       expect(titlesOf(data), `status "${status}"`).not.toContain('Victim Alpha Report');
@@ -410,6 +414,17 @@ test.describe('Inbox Find - Status Filter Hardening', () => {
 
       expect(titlesOf(data), `status "${status}"`).toEqual(expected);
     }
+
+    await apiSignout({ page });
+
+    // The other recipient has signed neither shared document, so both still need their action.
+    await apiSignin({ page, email: otherRecipient.email });
+
+    const otherPending = await trpcInboxFind(page, { query: 'Scoped', status: 'PENDING' });
+    expect(titlesOf(otherPending.data)).toEqual(['Scoped Rejecting Document', 'Scoped Partially Approved Document']);
+
+    const otherPartiallyApproved = await trpcInboxFind(page, { query: 'Scoped', status: 'PARTIALLY_APPROVED' });
+    expect(titlesOf(otherPartiallyApproved.data)).toEqual([]);
 
     await apiSignout({ page });
   });

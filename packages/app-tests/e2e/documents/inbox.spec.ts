@@ -23,6 +23,7 @@ const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
 const DEFAULT_EMPTY_STATE = 'Documents that require your attention will appear here';
 const COMPLETED_EMPTY_STATE = 'Documents that you have completed will appear here';
+const PARTIALLY_APPROVED_EMPTY_STATE = 'Documents that are waiting on other recipients will appear here';
 const SEARCH_EMPTY_STATE = 'No documents match your search';
 
 const inboxRow = (page: Page, title: string) => page.getByRole('row').filter({ hasText: title });
@@ -160,6 +161,13 @@ test.describe('Inbox - Search & Status Filter', () => {
     await expect(page.getByTestId('documents-table-status-filter')).toContainText('Partially Approved');
     await expect(inboxRow(page, 'Inbox Signed Document')).toBeVisible();
     await expect(inboxRow(page, 'Inbox Unsigned Document')).not.toBeVisible();
+
+    // The other recipient has not signed, so the same document is not partially approved for them.
+    await page.context().clearCookies();
+    await apiSignin({ page, email: otherRecipient.email, redirectPath: '/inbox?status=PARTIALLY_APPROVED' });
+
+    await expect(page.getByText(PARTIALLY_APPROVED_EMPTY_STATE)).toBeVisible();
+    await expect(inboxRow(page, 'Inbox Signed Document')).not.toBeVisible();
   });
 
   test('should filter documents by title', async ({ page }) => {
