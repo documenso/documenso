@@ -351,6 +351,11 @@ export const filesRoute = new Hono<HonoEnv>()
         } as const;
 
         if (version === 'pending') {
+          // The signing page shows a deleted envelope as cancelled and shows none of its fields.
+          if (envelopeItem.envelope.deletedAt) {
+            return c.json({ error: 'Envelope item not found' }, 404);
+          }
+
           return await handleEnvelopeItemFileRequest({
             ...baseOptions,
             version,

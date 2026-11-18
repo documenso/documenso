@@ -262,7 +262,8 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                 className="w-full max-w-none md:flex-1"
               />
 
-              {(isDocumentCompleted(envelopeStatus) || envelopeStatus === DocumentStatus.PENDING) && (
+              {(isDocumentCompleted(envelopeStatus) ||
+                (envelopeStatus === DocumentStatus.PENDING && !document.deletedAt)) && (
                 <EnvelopeDownloadDialog
                   envelopeId={document.envelopeId}
                   envelopeStatus={envelopeStatus}

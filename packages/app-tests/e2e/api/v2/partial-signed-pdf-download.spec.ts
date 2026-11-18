@@ -436,4 +436,28 @@ test.describe('API V2 partial signed PDF downloads', () => {
     expect(completedResponse.status()).toBe(400);
     expect(completedError.code).toBe('ENVELOPE_COMPLETED');
   });
+
+  test('rejects a recipient token pending download for a deleted envelope', async ({ request }) => {
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request);
+
+    const [recipient] = distributeResult.recipients;
+    const downloadUrl = `${WEBAPP_BASE_URL}/api/files/token/${recipient.token}/envelopeItem/${envelope.envelopeItems[0].id}/download/pending`;
+
+    const pendingResponse = await request.get(downloadUrl);
+
+    expect(pendingResponse.status()).toBe(200);
+
+    await prisma.envelope.update({
+      where: {
+        id: envelope.id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    const deletedResponse = await request.get(downloadUrl);
+
+    expect(deletedResponse.status()).toBe(404);
+  });
 });
