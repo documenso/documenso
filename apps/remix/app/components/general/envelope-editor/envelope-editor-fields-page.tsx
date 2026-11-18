@@ -31,7 +31,7 @@ import { Separator } from '@documenso/ui/primitives/separator';
 import { Tabs, TabsContent } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
@@ -145,33 +145,39 @@ export const EnvelopeEditorFieldsPage = () => {
     [editorContents.selectedContent],
   );
 
-  const [copiedField, setCopiedField] = useState<TLocalField | null>(null);
+  const [copiedFields, setCopiedFields] = useState<TLocalField[]>([]);
 
   useHotkeys(['ctrl+c', 'meta+c'], (event) => {
     // Keep the native copy when the user has selected text.
-    if (!selectedField || window.getSelection()?.toString()) {
+    if (editorFields.selectedFields.length === 0 || window.getSelection()?.toString()) {
       return;
     }
 
     event.preventDefault();
-    setCopiedField(selectedField);
+    setCopiedFields(editorFields.selectedFields);
 
     toast({
-      title: _(msg`Copied field`),
-      description: _(msg`Copied field to clipboard`),
+      title: plural(editorFields.selectedFields.length, {
+        one: 'Copied field',
+        other: 'Copied # fields',
+      }),
     });
   });
 
   useHotkeys(['ctrl+v', 'meta+v'], (event) => {
     // A paste on the contents tab or on another envelope item would add a field that is out of view.
-    if (!copiedField || selectedEditorTab !== 'fields' || copiedField.envelopeItemId !== currentEnvelopeItem?.id) {
+    if (
+      copiedFields.length === 0 ||
+      selectedEditorTab !== 'fields' ||
+      copiedFields.some((field) => field.envelopeItemId !== currentEnvelopeItem?.id)
+    ) {
       return;
     }
 
     event.preventDefault();
 
-    // Paste the next copy offset from the last one, so repeated pastes do not stack.
-    setCopiedField(editorFields.duplicateField(copiedField));
+    // Paste the next copies offset from the last ones, so repeated pastes do not stack.
+    setCopiedFields(copiedFields.map((field) => editorFields.duplicateField(field)));
   });
 
   /**
