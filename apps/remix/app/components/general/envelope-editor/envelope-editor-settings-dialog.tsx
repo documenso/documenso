@@ -103,7 +103,7 @@ export const ZAddSettingsFormSchema = z.object({
     timezone: ZDocumentMetaTimezoneSchema.default(DEFAULT_DOCUMENT_TIME_ZONE),
     dateFormat: ZDocumentMetaDateFormatSchema.default(DEFAULT_DOCUMENT_DATE_FORMAT),
     distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional().default(DocumentDistributionMethod.EMAIL),
-    includeAuditLog: z.boolean().default(false),
+    includeAuditLog: z.boolean(),
     redirectUrl: z
       .string()
       .optional()
