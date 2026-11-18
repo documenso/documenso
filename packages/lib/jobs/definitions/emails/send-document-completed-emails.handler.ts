@@ -26,6 +26,17 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
   const envelope = await prisma.envelope.findUnique({
     where: unsafeBuildEnvelopeIdQuery({ type: 'envelopeId', id: envelopeId }, EnvelopeType.DOCUMENT),
     include: {
+      envelopeItems: {
+        include: {
+          documentData: {
+            select: {
+              type: true,
+              id: true,
+              data: true,
+            },
+          },
+        },
+      },
       documentMeta: true,
       recipients: true,
       user: {
@@ -76,28 +87,10 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
   const isDocumentCompletedEmailEnabled = emailSettings.documentCompleted;
   const isOwnerDocumentCompletedEmailEnabled = emailSettings.ownerDocumentCompleted;
 
-  if (!isDocumentCompletedEmailEnabled && !isOwnerDocumentCompletedEmailEnabled) {
-    return;
-  }
-
-  // Fetch PDF data only when attachments are enabled. Database-backed PDFs can
-  // contain the entire file in documentData.data.
-  const envelopeItems = emailSettings.attachDocument
-    ? await prisma.envelopeItem.findMany({
-        where: { envelopeId: envelope.id },
-        include: {
-          documentData: {
-            select: {
-              type: true,
-              data: true,
-            },
-          },
-        },
-      })
-    : [];
+  const envelopeItemsToAttach = emailSettings.attachDocument ? envelope.envelopeItems : [];
 
   const completedDocumentEmailAttachments = await Promise.all(
-    envelopeItems.map(async (envelopeItem) => {
+    envelopeItemsToAttach.map(async (envelopeItem) => {
       const file = await getFileServerSide(envelopeItem.documentData);
 
       // Use the envelope title for version 1, and the envelope item title for version 2.
