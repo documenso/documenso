@@ -94,6 +94,35 @@ test('[REJECT_DOCUMENT]: a rejection does not overwrite a completion that was in
   expect(envelope.status).toBe(DocumentStatus.PENDING);
 });
 
+test('[REJECT_DOCUMENT]: a completion that read the envelope before a rejection is refused after it', async () => {
+  const { document, recipients } = await seedDocumentWithTwoRecipients();
+
+  const [rejecter, bystander] = recipients;
+  const id = { type: 'envelopeId', id: document.id } as const;
+
+  // The bystander's completion has read a PENDING envelope and stops at its
+  // write. The other recipient's rejection then runs to the end.
+  const { outcome } = await withRowLocked({ table: 'Recipient', id: bystander.id }, async (lockHolderPid) => {
+    const completion = await startUntilBlockedBy(
+      async () => completeDocumentWithToken({ token: bystander.token, id }),
+      lockHolderPid,
+    );
+
+    await rejectDocumentWithToken({ token: rejecter.token, id, reason: 'I do not agree' });
+
+    // Handed back unawaited, inside an object: see `runBothBeforeEitherWrites`.
+    return { outcome: completion.outcome };
+  });
+
+  expect(await outcome).toMatchObject({ status: 'rejected', reason: { code: AppErrorCode.ENVELOPE_REJECTED } });
+
+  const { signingStatus } = await prisma.recipient.findUniqueOrThrow({
+    where: { id: bystander.id },
+  });
+
+  expect(signingStatus).toBe(SigningStatus.NOT_SIGNED);
+});
+
 test('[REJECT_DOCUMENT]: a duplicate completion is still reported as already signed', async () => {
   const { document, recipients } = await seedDocumentWithTwoRecipients();
 
