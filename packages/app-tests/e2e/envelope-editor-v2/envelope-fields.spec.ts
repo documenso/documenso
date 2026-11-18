@@ -710,6 +710,10 @@ const runMultiCopyPasteFieldFlow = async (surface: TEnvelopeEditorSurface): Prom
   const externalId = `e2e-multi-copy-paste-${nanoid()}`;
   const root = surface.root;
 
+  if (surface.isEmbedded && !surface.envelopeId) {
+    await addEnvelopeItemPdf(root, 'embedded-fields.pdf');
+  }
+
   await updateExternalId(surface, externalId);
   await setupRecipientsForFieldPlacement(surface);
 
@@ -722,8 +726,9 @@ const runMultiCopyPasteFieldFlow = async (surface: TEnvelopeEditorSurface): Prom
   await expect.poll(async () => getKonvaTransformerNodeCountForPage(root, 1)).toBe(2);
 
   await root.keyboard.press('ControlOrMeta+c');
-  await root.keyboard.press('ControlOrMeta+v');
+  await expectToastTextToBeVisible(root, 'Copied 2 fields');
 
+  await root.keyboard.press('ControlOrMeta+v');
   await expect.poll(async () => getKonvaElementCountForPage(root, 1, '.field-group')).toBe(4);
 
   // Navigate away and back to persist changes.
@@ -1224,6 +1229,21 @@ test.describe('embedded create', () => {
     });
   });
 
+  test('copy and paste multiple selected fields with keyboard shortcuts', async ({ page }) => {
+    const surface = await openEmbeddedEnvelopeEditor(page, {
+      envelopeType: 'DOCUMENT',
+      tokenNamePrefix: 'e2e-embed-multi-copy-paste',
+    });
+    const result = await runMultiCopyPasteFieldFlow(surface);
+
+    await persistEmbeddedEnvelope(surface);
+
+    await assertMultiCopyPasteFieldPersistedInDatabase({
+      surface,
+      ...result,
+    });
+  });
+
   test('place and configure all 10 field types', async ({ page }) => {
     const surface = await openEmbeddedEnvelopeEditor(page, {
       envelopeType: 'DOCUMENT',
@@ -1331,6 +1351,22 @@ test.describe('embedded edit', () => {
     await persistEmbeddedEnvelope(surface);
 
     await assertCopyPasteFieldPersistedInDatabase({
+      surface,
+      ...result,
+    });
+  });
+
+  test('copy and paste multiple selected fields with keyboard shortcuts', async ({ page }) => {
+    const surface = await openEmbeddedEnvelopeEditor(page, {
+      envelopeType: 'TEMPLATE',
+      mode: 'edit',
+      tokenNamePrefix: 'e2e-embed-multi-copy-paste',
+    });
+    const result = await runMultiCopyPasteFieldFlow(surface);
+
+    await persistEmbeddedEnvelope(surface);
+
+    await assertMultiCopyPasteFieldPersistedInDatabase({
       surface,
       ...result,
     });
