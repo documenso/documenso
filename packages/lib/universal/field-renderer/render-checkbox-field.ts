@@ -172,6 +172,8 @@ export const renderCheckboxFieldElement = (field: FieldToRender, options: Render
 
     const checkboxScale = itemSize / 16;
 
+    // Konva only fires a click when press and release hit the same shape, so the checkmark must not
+    // intercept hits meant for the square beneath it.
     const checkmark = new Konva.Line({
       internalCheckboxIndex: index,
       id: `checkbox-checkmark-${index}`,
@@ -183,6 +185,7 @@ export const renderCheckboxFieldElement = (field: FieldToRender, options: Render
       points: [3, 8, 7, 12, 13, 4],
       scale: { x: checkboxScale, y: checkboxScale },
       visible: isCheckboxChecked,
+      listening: false,
     });
 
     const text = new Konva.Text({

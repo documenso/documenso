@@ -50,6 +50,16 @@ export const selectEditorTab = async (root: Page, tab: 'Fields' | 'Contents') =>
 
 export const getPageCanvas = (root: Page) => root.locator('.konva-container canvas').first();
 
+export const getCanvasBox = async (root: Page) => {
+  const canvasBox = await getPageCanvas(root).boundingBox();
+
+  if (!canvasBox) {
+    throw new Error('The page canvas is not rendered');
+  }
+
+  return canvasBox;
+};
+
 /**
  * Run a mouse interaction on the canvas with the floating action bar of the
  * current selection unable to intercept it.
