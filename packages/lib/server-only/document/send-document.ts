@@ -5,7 +5,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
-import type { DocumentData, Envelope, EnvelopeItem, Field, Recipient } from '@prisma/client';
+import type { DocumentData, Envelope, EnvelopeItem, Field, Prisma, Recipient } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentStatus,
@@ -350,6 +350,8 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
           data: {},
         }),
       });
+    } else {
+      await assertSentEnvelopeIsStillOpen(tx, envelope.id);
     }
 
     if (envelope.internalVersion === 2) {
@@ -455,6 +457,33 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
   });
 
   return updatedEnvelope;
+};
+
+/**
+ * Locks the envelope row of a document that is being sent again, and refuses
+ * if it has been rejected, cancelled or completed since it was read.
+ *
+ * Must be the first write of the send transaction. A rejection takes the
+ * envelope row and then its recipient, so taking the recipients first, as the
+ * rest of the transaction would, deadlocks with it. Holding the row also keeps
+ * the status as read here until the transaction sets it to PENDING.
+ *
+ * NO KEY UPDATE is the lock that status update takes anyway. FOR UPDATE would
+ * also block inserts that reference the envelope, such as the audit log of a
+ * recipient who is completing, and deadlock with those instead.
+ */
+const assertSentEnvelopeIsStillOpen = async (tx: Prisma.TransactionClient, envelopeId: string) => {
+  const [lockedEnvelope] = await tx.$queryRaw<{ status: DocumentStatus }[]>`
+    SELECT "status" FROM "Envelope" WHERE "id" = ${envelopeId} FOR NO KEY UPDATE
+  `;
+
+  if (!lockedEnvelope) {
+    throw new Error('Document not found');
+  }
+
+  if (isDocumentCompleted(lockedEnvelope.status)) {
+    throw new Error('Can not send completed document');
+  }
 };
 
 const injectFormValuesIntoDocument = async (

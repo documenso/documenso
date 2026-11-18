@@ -3,13 +3,14 @@ import { jobs } from '@documenso/lib/jobs/client';
 import { adminFindUnsealedDocuments } from '@documenso/lib/server-only/admin/admin-find-unsealed-documents';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
+import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
-import { DocumentStatus, Prisma, SigningStatus } from '@prisma/client';
+import { DocumentStatus, FieldType, Prisma, SigningStatus } from '@prisma/client';
 
 /**
  * These drive the server functions directly rather than the browser or the
@@ -151,6 +152,38 @@ test('[REJECT_DOCUMENT]: a duplicate completion is still reported as already sig
   expect(completionCount).toBe(1);
 });
 
+test('[REJECT_DOCUMENT]: sending again while a recipient rejects is refused and leaves the envelope rejected', async () => {
+  const { owner, team, document, recipients } = await seedDocumentWithTwoRecipients({
+    // Sending requires every signer to have a signature field.
+    fields: [FieldType.SIGNATURE],
+  });
+
+  const [recipient] = recipients;
+  const id = { type: 'envelopeId', id: document.id } as const;
+
+  // The rejection queues for the envelope first, and the send behind it.
+  const { first: rejection, second: resend } = await runBothBeforeEitherWrites(
+    { table: 'Envelope', id: document.id },
+    async () => rejectDocumentWithToken({ token: recipient.token, id, reason: 'I do not agree' }),
+    async () =>
+      sendDocument({
+        id,
+        userId: owner.id,
+        teamId: team.id,
+        requestMetadata: { requestMetadata: {}, source: 'app', auth: 'session' },
+      }),
+  );
+
+  expect(rejection.status).toBe('fulfilled');
+  expect(resend).toMatchObject({ status: 'rejected', reason: { message: 'Can not send completed document' } });
+
+  const envelope = await prisma.envelope.findUniqueOrThrow({
+    where: { id: document.id },
+  });
+
+  expect(envelope.status).toBe(DocumentStatus.REJECTED);
+});
+
 test('[REJECT_DOCUMENT]: a rejected envelope is found and sealed as rejected when no recipient is marked as rejected', async () => {
   const { document } = await seedDocumentWithTwoRecipients();
 
@@ -180,7 +213,8 @@ test('[REJECT_DOCUMENT]: a rejected envelope is found and sealed as rejected whe
   expect(await findUnsealedEnvelopeIds()).not.toContain(document.id);
 });
 
-const seedDocumentWithTwoRecipients = async () => {
+// No fields by default, so completion is not blocked by unsigned required fields.
+const seedDocumentWithTwoRecipients = async ({ fields = [] }: { fields?: FieldType[] } = {}) => {
   const { user: owner, team } = await seedUser();
   const { user: firstSigner } = await seedUser();
   const { user: secondSigner } = await seedUser();
@@ -189,8 +223,7 @@ const seedDocumentWithTwoRecipients = async () => {
     owner,
     teamId: team.id,
     recipients: [firstSigner, secondSigner],
-    // No fields, so completion is not blocked by unsigned required fields.
-    fields: [],
+    fields,
   });
 
   return { owner, team, document, recipients };
@@ -245,8 +278,10 @@ const runBothBeforeEitherWrites = async (
 const withRowLocked = async <T>({ table, id }: LockedRow, scenario: (lockHolderPid: number) => Promise<T>) => {
   return await prisma.$transaction(
     async (tx) => {
+      // NO KEY UPDATE is the lock an update of the row takes, so it stops writes
+      // to the row itself but not inserts that only reference it, such as audit logs.
       const [{ pid: lockHolderPid }] = await tx.$queryRaw<{ pid: number }[]>(
-        Prisma.sql`SELECT pg_backend_pid() AS "pid" FROM ${Prisma.raw(`"${table}"`)} WHERE "id" = ${id} FOR UPDATE`,
+        Prisma.sql`SELECT pg_backend_pid() AS "pid" FROM ${Prisma.raw(`"${table}"`)} WHERE "id" = ${id} FOR NO KEY UPDATE`,
       );
 
       return await scenario(lockHolderPid);
