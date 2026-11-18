@@ -757,7 +757,7 @@ export const createDocumentFromTemplate = async ({
 
                 const date = new Date(selector.value);
 
-                if (Number.isNaN(date.getTime())) {
+                if (isNaN(date.getTime())) {
                   throw new AppError(AppErrorCode.INVALID_BODY, {
                     message: `Invalid date value for field ${field.id}: ${selector.value}`,
                   });
