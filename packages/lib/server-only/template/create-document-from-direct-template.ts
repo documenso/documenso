@@ -414,7 +414,7 @@ export const createDocumentFromDirectTemplate = async ({
     // so a submission selecting in several fields has to be rejected.
     const radioFields = createDirectRecipientFieldArgs
       .filter(({ templateField }) => templateField.type === FieldType.RADIO)
-      .map(({ templateField, customText }) => ({ groupId: templateField.groupId, customText }));
+      .map(({ templateField, customText }) => ({ groupId: templateField.groupId, customText: customText ?? '' }));
 
     for (const [groupId, groupFields] of groupFieldsByGroupId(radioFields)) {
       if (groupFields.filter((field) => field.customText !== '').length > 1) {

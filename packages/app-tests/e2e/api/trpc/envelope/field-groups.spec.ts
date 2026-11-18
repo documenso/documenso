@@ -954,7 +954,7 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     const radioA = findFieldByExternalId(envelope.fields, 'radio-a');
     const radioB = findFieldByExternalId(envelope.fields, 'radio-b');
 
-    const createDocument = async (radioAValue: string, radioBValue: string) =>
+    const createDocument = async (radioAValue: string, radioBValue: string | undefined) =>
       await request.post(`${WEBAPP_BASE_URL}/api/trpc/template.createDocumentFromDirectTemplate`, {
         headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
         data: JSON.stringify({
@@ -980,5 +980,10 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     const singleSelectionResponse = await createDocument('1', '');
 
     expect(singleSelectionResponse.ok(), await singleSelectionResponse.text()).toBeTruthy();
+
+    // A field sent without a value has no selection, the same as one sent with an empty value.
+    const omittedValueResponse = await createDocument('1', undefined);
+
+    expect(omittedValueResponse.ok(), await omittedValueResponse.text()).toBeTruthy();
   });
 });

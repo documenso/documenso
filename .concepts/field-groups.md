@@ -19,6 +19,7 @@ Conditions for a group to be valid:
 - Not locking the envelope when a file is deleted. Deleting two files at the same moment can fail one of the deletes, or leave a group with a validation rule it can no longer satisfy.
 - Not renaming a group for all its fields. Changing the Group ID on a field only moves that field.
 - Not enforcing checkbox validation rules while signing. Any options can be selected, and the rules are checked when the recipient completes the document.
+- Not locking a group while one of its fields is signed. Two requests ticking different checkbox fields of the same group at the same moment can lose one of the ticks.
 - Not treating an inserted optional field as optional. Once a recipient inserts it, its validation rules apply as if it were required.
 - Not showing the group navigation bar on hover for touch devices.
 - Not counting a group as one field in the signing counters. The fields remaining, the progress bar and the document tabs count every field in a group. Once a checkbox group is ticked but breaks its validation, only its fields without a selection still count.
