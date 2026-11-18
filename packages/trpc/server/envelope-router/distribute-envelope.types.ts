@@ -23,7 +23,6 @@ export const ZDistributeEnvelopeRequestSchema = z.object({
     timezone: true,
     dateFormat: true,
     distributionMethod: true,
-    includeAuditLog: true,
     redirectUrl: true,
     language: true,
     emailId: true,

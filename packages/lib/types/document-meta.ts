@@ -19,7 +19,6 @@ import { ZDocumentEmailSettingsSchema } from './document-email';
 export const ZDocumentMetaSchema = DocumentMetaSchema.pick({
   signingOrder: true,
   distributionMethod: true,
-  includeAuditLog: true,
   id: true,
   subject: true,
   message: true,

@@ -61,7 +61,6 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
           select: {
             signingOrder: true,
             distributionMethod: true,
-            includeAuditLog: true,
           },
         },
         directLink: {
@@ -107,7 +106,6 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
           ? {
               signingOrder: envelope.documentMeta.signingOrder,
               distributionMethod: envelope.documentMeta.distributionMethod,
-              includeAuditLog: envelope.documentMeta.includeAuditLog,
             }
           : null,
         directLink: envelope.directLink

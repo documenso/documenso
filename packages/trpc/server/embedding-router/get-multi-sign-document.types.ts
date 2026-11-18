@@ -21,7 +21,6 @@ export const ZGetMultiSignDocumentResponseSchema = ZDocumentLiteSchema.extend({
   documentMeta: DocumentMetaSchema.pick({
     signingOrder: true,
     distributionMethod: true,
-    includeAuditLog: true,
     id: true,
     subject: true,
     message: true,
