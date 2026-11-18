@@ -132,7 +132,7 @@ export const PublicProfileForm = ({ className, profile, onProfileUpdate }: Publi
                 <div
                   className={cn(
                     'flex h-10 w-full items-center overflow-hidden rounded-md border border-input bg-background pr-1.5 text-base ring-offset-background has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-ring has-[input:focus-visible]:ring-offset-2 md:text-sm',
-                    form.formState.errors.url && 'ring-2 ring-destructive',
+                    form.formState.errors.url && '!ring-destructive ring-2',
                   )}
                 >
                   <span className="flex h-full select-none items-center whitespace-nowrap border-input border-r bg-muted/50 pr-2.5 pl-3 text-muted-foreground">
