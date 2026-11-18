@@ -38,6 +38,12 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
             </TooltipTrigger>
 
             <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <h2>
+                <strong>
+                  <Trans>Document PDF attachments</Trans>
+                </strong>
+              </h2>
+
               <p>
                 <Trans>
                   Includes document PDFs in completion emails to the owner and all recipients, including CCs. Disable
@@ -48,6 +54,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
           </Tooltip>
         </label>
       </div>
+
       {!isHidden(DocumentEmailEvents.RecipientSigned) && (
         <div className="flex flex-row items-center">
           <Checkbox
