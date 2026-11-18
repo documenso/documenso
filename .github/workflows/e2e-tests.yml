@@ -10,10 +10,53 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  e2e_tests:
-    name: 'E2E Tests'
-    timeout-minutes: 60
+  build:
+    name: 'Build App'
+    timeout-minutes: 20
     runs-on: warp-ubuntu-2204-x64-8x
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy env
+        run: cp .env.example .env
+
+      - uses: ./.github/actions/node-install
+
+      - name: Build app
+        run: npm run build -w @documenso/remix
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: remix-build
+          path: apps/remix/build
+          retention-days: 1
+          if-no-files-found: error
+
+  e2e_tests:
+    name: 'E2E Tests (${{ matrix.name }})'
+    timeout-minutes: 30
+    runs-on: warp-ubuntu-2204-x64-8x
+    needs: build
+    strategy:
+      fail-fast: false
+      # API tests run ~10x faster than UI tests, so Playwright's count-based sharding
+      # leaves the UI tests piled into the last shards. Shard the UI project on its own.
+      matrix:
+        include:
+          - name: api
+            args: --project=api --project=license
+          - name: ui-1
+            args: --project=ui --shard=1/6
+          - name: ui-2
+            args: --project=ui --shard=2/6
+          - name: ui-3
+            args: --project=ui --shard=3/6
+          - name: ui-4
+            args: --project=ui --shard=4/6
+          - name: ui-5
+            args: --project=ui --shard=5/6
+          - name: ui-6
+            args: --project=ui --shard=6/6
     steps:
       - uses: actions/checkout@v4
 
@@ -27,18 +70,21 @@ jobs:
 
       - uses: ./.github/actions/playwright-install
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: remix-build
+          path: apps/remix/build
+
       - name: Create the database
         run: npm run prisma:migrate-dev
 
       - name: Seed the database
         run: npm run prisma:seed
 
-      - name: Install playwright browsers
-        run: npx playwright install --with-deps
-
       - name: Run Playwright tests
-        run: npm run ci
+        run: npm run test:e2e -w @documenso/app-tests
         env:
+          E2E_PLAYWRIGHT_ARGS: ${{ matrix.args }}
           # Needed since we use next start which will set the NODE_ENV to production
           NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: './example/cert.p12'
           DANGEROUS_BYPASS_RATE_LIMITS: 'true'
@@ -46,9 +92,20 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results
+          name: test-results-${{ matrix.name }}
           path: 'packages/app-tests/**/test-results/*'
           retention-days: 7
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+  # Single required check for branch protection; shard jobs come and go as the matrix changes.
+  e2e_tests_result:
+    name: 'E2E Tests'
+    if: always()
+    needs: e2e_tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check shard results
+        run: |
+          if [ "${{ needs.e2e_tests.result }}" != "success" ]; then
+            echo "One or more E2E shards failed: ${{ needs.e2e_tests.result }}"
+            exit 1
+          fi

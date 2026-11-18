@@ -8,6 +8,7 @@ import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recip
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 import { updateEnvelopeRecipients } from '@documenso/lib/server-only/recipient/update-envelope-recipients';
+import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { isTspEnvelope } from '@documenso/lib/types/signature-level';
 import { unsafeBuildEnvelopeIdQuery } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
@@ -603,13 +604,27 @@ export const recipientRouter = router({
         // can't complete via this route — they go through the CSC sync sign
         // flow (`enterprise.csc.signEnvelope`). This route returns the redirect URL
         // for the credential-scope OAuth round-trip.
-        const envelope = await prisma.envelope.findFirstOrThrow({
+        const envelope = await prisma.envelope.findFirst({
           where: {
             ...unsafeBuildEnvelopeIdQuery({ type: 'documentId', id: documentId }, EnvelopeType.DOCUMENT),
             recipients: { some: { token } },
           },
-          select: { signatureLevel: true, internalVersion: true },
+          select: { signatureLevel: true, internalVersion: true, userId: true },
         });
+
+        // The most common cause is a stale signing page: the document was
+        // deleted, or the recipient was removed, after the link was opened.
+        // Surface a NOT_FOUND instead of leaking a Prisma P2025 as a 500.
+        if (!envelope) {
+          throw new AppError(AppErrorCode.NOT_FOUND, {
+            message: 'Document not found for the provided signing token',
+            statusCode: 404,
+          });
+        }
+
+        // Checked here as well as inside `completeDocumentWithToken` so the
+        // TSP branch below is covered.
+        await assertSenderNotDisabled({ userId: envelope.userId });
 
         if (isTspEnvelope(envelope)) {
           return await prepareCscRecipientSigning({

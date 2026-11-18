@@ -1,3 +1,4 @@
+import { AppError } from '@documenso/lib/errors/app-error';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
@@ -19,6 +20,8 @@ import { useId, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
+import { getSigningCompletionErrorMessage } from '~/utils/toast-error-messages';
+
 import { AssistantConfirmationDialog, type NextSigner } from '../../dialogs/assistant-confirmation-dialog';
 import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
@@ -36,7 +39,11 @@ export type DocumentSigningFormProps = {
   }) => Promise<void>;
   isSubmitting: boolean;
   fieldsValidated: () => void;
-  nextRecipient?: RecipientWithFields;
+  /**
+   * The dictatable next recipient, decided server-side. Only their identity
+   * is needed — for the dictation flag and the prefilled inputs.
+   */
+  nextRecipient?: Pick<Recipient, 'name' | 'email'>;
 };
 
 export const DocumentSigningForm = ({
@@ -81,6 +88,10 @@ export const DocumentSigningForm = ({
     return fieldsRequiringValidation.filter((field) => field.recipientId === recipient.id);
   }, [fieldsRequiringValidation, recipient]);
 
+  const allowDictateNextSigner = Boolean(nextRecipient && document.documentMeta?.allowDictateNextSigner);
+
+  const defaultNextSigner = nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined;
+
   const localFieldsValidated = () => {
     setValidateUninsertedFields(true);
     fieldsValidated();
@@ -100,9 +111,12 @@ export const DocumentSigningForm = ({
     try {
       await completeDocument({ nextSigner });
     } catch (err) {
+      const error = AppError.parseError(err);
+      const toastMessage = getSigningCompletionErrorMessage(error.code);
+
       toast({
-        title: _(msg`Error`),
-        description: _(msg`An error occurred while completing the document. Please try again.`),
+        title: _(toastMessage.title),
+        description: _(toastMessage.description),
         variant: 'destructive',
       });
 
@@ -145,10 +159,8 @@ export const DocumentSigningForm = ({
                     completeDocument({ nextSigner, accessAuthOptions })
                   }
                   recipient={recipient}
-                  allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
-                  defaultNextSigner={
-                    nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined
-                  }
+                  allowDictateNextSigner={allowDictateNextSigner}
+                  defaultNextSigner={defaultNextSigner}
                 />
               </div>
             </div>
@@ -217,8 +229,8 @@ export const DocumentSigningForm = ({
                 onClose={() => !isAssistantSubmitting && setIsConfirmationDialogOpen(false)}
                 onConfirm={handleAssistantConfirmDialogSubmit}
                 isSubmitting={isAssistantSubmitting}
-                allowDictateNextSigner={nextRecipient && document.documentMeta?.allowDictateNextSigner}
-                defaultNextSigner={nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined}
+                allowDictateNextSigner={allowDictateNextSigner}
+                defaultNextSigner={defaultNextSigner}
               />
             </form>
           ) : (
@@ -285,10 +297,8 @@ export const DocumentSigningForm = ({
                     })
                   }
                   recipient={recipient}
-                  allowDictateNextSigner={nextRecipient && document.documentMeta?.allowDictateNextSigner}
-                  defaultNextSigner={
-                    nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined
-                  }
+                  allowDictateNextSigner={allowDictateNextSigner}
+                  defaultNextSigner={defaultNextSigner}
                 />
               </div>
             </>

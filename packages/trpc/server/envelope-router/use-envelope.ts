@@ -6,6 +6,7 @@ import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import { EnvelopeType } from '@prisma/client';
+import { match, P } from 'ts-pattern';
 
 import { authenticatedProcedure } from '../trpc';
 import { useEnvelopeMeta, ZUseEnvelopeRequestSchema, ZUseEnvelopeResponseSchema } from './use-envelope.types';
@@ -24,6 +25,7 @@ export const useEnvelopeRoute = authenticatedProcedure
       externalId,
       recipients = [],
       distributeDocument,
+      includeContents,
       customDocumentData = [],
       folderId,
       prefillFields,
@@ -74,33 +76,24 @@ export const useEnvelopeRoute = authenticatedProcedure
     const uploadedFiles = await Promise.all(
       filesToUpload.map(async (file) => {
         // We disable flattening here since `createDocumentFromTemplate` will handle it.
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file, {
+        const { documentData } = await putNormalizedPdfFileServerSide(file, {
           flattenForm: false,
         });
 
         return {
           name: file.name,
-          documentDataId,
+          documentDataId: documentData.id,
         };
       }),
     );
 
     // Map custom document data using identifiers
     const customDocumentDataMapped = customDocumentData?.map((mapping) => {
-      let documentDataId: string | undefined;
-
       // Find the uploaded file by identifier
-      if (typeof mapping.identifier === 'string') {
-        documentDataId = uploadedFiles.find((file) => file.name === mapping.identifier)?.documentDataId;
-      }
-
-      if (typeof mapping.identifier === 'number') {
-        documentDataId = uploadedFiles.at(mapping.identifier)?.documentDataId;
-      }
-
-      if (mapping.identifier === undefined) {
-        documentDataId = uploadedFiles.at(0)?.documentDataId;
-      }
+      const documentDataId = match(mapping.identifier)
+        .with(P.string, (name) => uploadedFiles.find((file) => file.name === name)?.documentDataId)
+        .with(P.number, (index) => uploadedFiles.at(index)?.documentDataId)
+        .exhaustive();
 
       if (!documentDataId) {
         throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -139,6 +132,7 @@ export const useEnvelopeRoute = authenticatedProcedure
       prefillFields,
       override,
       attachments,
+      includeContents,
       formValues,
     });
 
@@ -154,6 +148,12 @@ export const useEnvelopeRoute = authenticatedProcedure
         requestMetadata: ctx.metadata,
       }).catch((err) => {
         console.error(err);
+
+        // Keep specific errors (e.g. a missing signature field) so callers
+        // can act on them, only generic failures become a send failure.
+        if (err instanceof AppError) {
+          throw err;
+        }
 
         throw new AppError('DOCUMENT_SEND_FAILED');
       });

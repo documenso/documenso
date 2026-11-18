@@ -59,7 +59,7 @@ interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function TabsList({ children, className, ...props }: TabsListProps) {
   return (
-    <div className={cn('flex flex-wrap border-border border-b', className)} role="tabslist" {...props}>
+    <div className={cn('flex flex-wrap border-border border-b', className)} role="tablist" {...props}>
       {children}
     </div>
   );

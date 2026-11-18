@@ -17,7 +17,9 @@ import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/
 import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
+import { resolveReplacedRecipientSigningOrders } from './assign-omitted-recipient-signing-orders';
 
 export interface SetDocumentRecipientsOptions {
   userId: number;
@@ -98,12 +100,21 @@ export const setDocumentRecipients = async ({
     });
   }
 
-  const normalizedRecipients = recipients.map((recipient) => ({
-    ...recipient,
-    email: recipient.email.toLowerCase(),
-  }));
-
   const existingRecipients = envelope.recipients;
+
+  const { recipients: normalizedRecipients, requestedOrderRecipients } = resolveReplacedRecipientSigningOrders({
+    recipients: recipients.map((recipient) => ({
+      ...recipient,
+      email: recipient.email.toLowerCase(),
+    })),
+    existingRecipients,
+  });
+
+  assertCompatibleRecipientGrouping({
+    signatureLevel: envelope.signatureLevel,
+    recipients: requestedOrderRecipients,
+    existingRecipients: normalizedRecipients.filter((recipient) => !requestedOrderRecipients.includes(recipient)),
+  });
 
   const removedRecipients = existingRecipients.filter(
     (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
@@ -342,7 +353,9 @@ const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: Recipie
     recipient.email !== newRecipientData.email ||
     recipient.name !== newRecipientData.name ||
     recipient.role !== newRecipientData.role ||
-    recipient.signingOrder !== newRecipientData.signingOrder ||
+    // Null and undefined both mean "no order": the request schema cannot
+    // carry null, so a persisted null arrives as undefined
+    (recipient.signingOrder ?? null) !== (newRecipientData.signingOrder ?? null) ||
     !isDeepEqual(authOptions.accessAuth, newRecipientAccessAuth) ||
     !isDeepEqual(authOptions.actionAuth, newRecipientActionAuth)
   );

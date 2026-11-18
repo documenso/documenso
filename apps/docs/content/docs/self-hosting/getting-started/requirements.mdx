@@ -91,10 +91,11 @@ These services are not required but improve functionality or scalability:
 By default, Documenso stores documents in the PostgreSQL database. For production deployments with significant document volume, use S3-compatible storage:
 
 - Amazon S3
-- MinIO
 - Cloudflare R2
 - DigitalOcean Spaces
 - Any S3-compatible provider
+
+For self-hosted object storage, [SeaweedFS](https://github.com/seaweedfs/seaweedfs) and [RustFS](https://docs.rustfs.com/en/installation/container) are optional S3-compatible alternatives to evaluate. They are not bundled with Documenso; see [Self-Hosted Providers](/docs/self-hosting/configuration/storage#self-hosted-providers) for compatibility considerations.
 
 See [Storage Configuration](/docs/self-hosting/configuration/storage) for setup details.
 
@@ -141,8 +142,8 @@ If building from source (not using Docker images):
 
 | Requirement | Version |
 | ----------- | ------- |
-| Node.js     | 22+     |
-| npm         | 11+     |
+| Node.js     | 24+     |
+| npm         | 11.17+  |
 
 ---
 
@@ -169,7 +170,7 @@ Documenso runs on:
 | MySQL/MariaDB  | PostgreSQL-specific features required |
 | SQLite         | Not suitable for production workloads |
 | MongoDB        | Relational database required          |
-| Node.js < 22   | Modern JavaScript features required   |
+| Node.js < 24   | Modern JavaScript features required   |
 
 ---
 

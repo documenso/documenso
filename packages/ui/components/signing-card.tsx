@@ -14,19 +14,6 @@ export type SigningCardProps = {
 };
 
 /**
- * 2D signing card.
- */
-export const SigningCard = ({ className, name, signature, signingCelebrationImage }: SigningCardProps) => {
-  return (
-    <div className={cn('relative w-full max-w-sm md:max-w-md', className)}>
-      <SigningCardContent name={name} signature={signature} />
-
-      {signingCelebrationImage && <SigningCardImage signingCelebrationImage={signingCelebrationImage} />}
-    </div>
-  );
-};
-
-/**
  * 3D signing card that follows the mouse movement within a certain range.
  */
 export const SigningCard3D = ({ className, name, signature, signingCelebrationImage }: SigningCardProps) => {
@@ -35,7 +22,7 @@ export const SigningCard3D = ({ className, name, signature, signingCelebrationIm
 
   const [trackMouse, setTrackMouse] = useState(false);
 
-  const timeoutRef = useRef<number | undefined>();
+  const timeoutRef = useRef<number | undefined>(undefined);
 
   const cardX = useMotionValue(0);
   const cardY = useMotionValue(0);
