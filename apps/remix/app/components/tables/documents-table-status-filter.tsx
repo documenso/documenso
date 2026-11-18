@@ -23,7 +23,7 @@ type DocumentsTableStatusFilterProps = {
    * The statuses available for selection. Defaults to every status that
    * makes sense for the documents page.
    */
-  statuses?: readonly ExtendedDocumentStatus[];
+  statuses?: ExtendedDocumentStatus[];
 };
 
 export const DocumentsTableStatusFilter = ({

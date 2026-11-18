@@ -23,7 +23,7 @@ import { match } from 'ts-pattern';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { useOptionalCurrentTeam } from '~/providers/team';
-import { inboxSearchParams } from '~/utils/inbox-search-params';
+import { inboxSearchParams, resolveInboxStatus } from '~/utils/inbox-search-params';
 
 import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
@@ -43,7 +43,7 @@ export const InboxTable = () => {
     history: 'push',
   });
 
-  const status = findInboxSearchParams.status ?? undefined;
+  const status = resolveInboxStatus(findInboxSearchParams.status);
   const query = findInboxSearchParams.query ?? '';
 
   const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery(
