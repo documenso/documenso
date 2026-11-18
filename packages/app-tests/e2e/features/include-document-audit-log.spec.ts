@@ -1,10 +1,20 @@
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
+import type {
+  TUseEnvelopePayload,
+  TUseEnvelopeResponse,
+} from '@documenso/trpc/server/envelope-router/use-envelope.types';
 import { PDF } from '@libpdf/core';
-import { expect, type Page, test } from '@playwright/test';
+import { type APIRequestContext, expect, type Page, test } from '@playwright/test';
 import { DocumentStatus, type Field } from '@prisma/client';
-import { apiCreateTestContext, apiSeedDraftDocument, apiSeedPendingDocument } from '../fixtures/api-seeds';
+import {
+  apiCreateTestContext,
+  apiSeedDraftDocument,
+  apiSeedPendingDocument,
+  apiSeedTemplate,
+} from '../fixtures/api-seeds';
 import { apiSignin } from '../fixtures/authentication';
 import { signSignaturePad } from '../fixtures/signature';
 
@@ -27,6 +37,30 @@ const updateTeamDocumentSettings = async (teamId: number, data: TeamDocumentSett
       id: teamSettings.id,
     },
     data,
+  });
+};
+
+const createDocumentFromTemplate = async (request: APIRequestContext, token: string, payload: TUseEnvelopePayload) => {
+  const formData = new FormData();
+
+  formData.append('payload', JSON.stringify(payload));
+
+  const response = await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/v2-beta/envelope/use`, {
+    headers: { Authorization: `Bearer ${token}` },
+    multipart: formData,
+  });
+
+  expect(response.ok(), await response.text()).toBeTruthy();
+
+  const { id }: TUseEnvelopeResponse = await response.json();
+
+  return await prisma.envelope.findUniqueOrThrow({
+    where: {
+      id,
+    },
+    include: {
+      documentMeta: true,
+    },
   });
 };
 
@@ -82,8 +116,7 @@ const completeSigning = async ({
   }
 
   const x = (Number(field.positionX) / 100) * canvasBox.width + ((Number(field.width) / 100) * canvasBox.width) / 2;
-  const y =
-    (Number(field.positionY) / 100) * canvasBox.height + ((Number(field.height) / 100) * canvasBox.height) / 2;
+  const y = (Number(field.positionY) / 100) * canvasBox.height + ((Number(field.height) / 100) * canvasBox.height) / 2;
 
   await canvas.click({ position: { x, y } });
 
@@ -128,6 +161,33 @@ test.describe('Document audit log embedding', () => {
     });
 
     expect(documentMeta.includeAuditLog).toBe(true);
+  });
+
+  test('documents from a template take the template value unless overridden', async ({ request }) => {
+    const context = await apiCreateTestContext('e2e-audit-log-template');
+
+    // The team default is false, so true can only come from the template.
+    const { envelope: template } = await apiSeedTemplate(request, {
+      context,
+      meta: {
+        includeAuditLog: true,
+      },
+    });
+
+    const inherited = await createDocumentFromTemplate(request, context.token, {
+      envelopeId: template.id,
+    });
+
+    expect(inherited.documentMeta.includeAuditLog).toBe(true);
+
+    const overridden = await createDocumentFromTemplate(request, context.token, {
+      envelopeId: template.id,
+      override: {
+        includeAuditLog: false,
+      },
+    });
+
+    expect(overridden.documentMeta.includeAuditLog).toBe(false);
   });
 
   test('meta.includeAuditLog true appends audit-log pages when team default is false', async ({ page, request }) => {
