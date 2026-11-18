@@ -65,6 +65,11 @@ export type SignInFormProps = {
   isOIDCSSOEnabled?: boolean;
   oidcProviderLabel?: string;
   returnTo?: string;
+
+  hideForgotPassword?: boolean;
+
+  /** Called instead of navigating to `/unverified-account`. */
+  onUnverifiedEmail?: () => void;
 };
 
 export const SignInForm = ({
@@ -76,6 +81,8 @@ export const SignInForm = ({
   isOIDCSSOEnabled,
   oidcProviderLabel,
   returnTo,
+  hideForgotPassword = false,
+  onUnverifiedEmail,
 }: SignInFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -83,7 +90,6 @@ export const SignInForm = ({
   const navigate = useNavigate();
 
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] = useState(false);
-  const [isEmbeddedRedirect, setIsEmbeddedRedirect] = useState(false);
 
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<'totp' | 'backup'>('totp');
 
@@ -238,6 +244,12 @@ export const SignInForm = ({
       }
 
       if (error.code === AuthenticationErrorCode.UnverifiedEmail) {
+        if (onUnverifiedEmail) {
+          onUnverifiedEmail();
+
+          return;
+        }
+
         await navigate('/unverified-account');
 
         toast({
@@ -319,8 +331,6 @@ export const SignInForm = ({
     if (email) {
       form.setValue('email', email);
     }
-
-    setIsEmbeddedRedirect(params.get('embedded') === 'true');
   }, [form]);
 
   return (
@@ -362,14 +372,16 @@ export const SignInForm = ({
 
                     <FormMessage />
 
-                    <p className="mt-2 text-right">
-                      <Link
-                        to="/forgot-password"
-                        className="text-muted-foreground text-sm duration-200 hover:opacity-70"
-                      >
-                        <Trans>Forgot your password?</Trans>
-                      </Link>
-                    </p>
+                    {!hideForgotPassword && (
+                      <p className="mt-2 text-right">
+                        <Link
+                          to="/forgot-password"
+                          className="text-muted-foreground text-sm duration-200 hover:opacity-70"
+                        >
+                          <Trans>Forgot your password?</Trans>
+                        </Link>
+                      </p>
+                    )}
                   </FormItem>
                 )}
               />
@@ -396,60 +408,56 @@ export const SignInForm = ({
             </>
           )}
 
-          {!isEmbeddedRedirect && (
-            <>
-              {isEmailPasswordSigninEnabled && hasSocialAuthEnabled && (
-                <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-                  <div className="h-px flex-1 bg-border" />
-                  <span className="bg-transparent text-muted-foreground">
-                    <Trans>Or continue with</Trans>
-                  </span>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-              )}
+          {isEmailPasswordSigninEnabled && hasSocialAuthEnabled && (
+            <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+              <div className="h-px flex-1 bg-border" />
+              <span className="bg-transparent text-muted-foreground">
+                <Trans>Or continue with</Trans>
+              </span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          )}
 
-              {isGoogleSSOEnabled && (
-                <Button
-                  type="button"
-                  size="lg"
-                  variant="outline"
-                  className="border bg-background text-muted-foreground"
-                  disabled={isSubmitting}
-                  onClick={onSignInWithGoogleClick}
-                >
-                  <FcGoogle className="mr-2 h-5 w-5" />
-                  Google
-                </Button>
-              )}
+          {isGoogleSSOEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              className="border bg-background text-muted-foreground"
+              disabled={isSubmitting}
+              onClick={onSignInWithGoogleClick}
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Google
+            </Button>
+          )}
 
-              {isMicrosoftSSOEnabled && (
-                <Button
-                  type="button"
-                  size="lg"
-                  variant="outline"
-                  className="border bg-background text-muted-foreground"
-                  disabled={isSubmitting}
-                  onClick={onSignInWithMicrosoftClick}
-                >
-                  <img className="mr-2 h-4 w-4" alt="Microsoft Logo" src={'/static/microsoft.svg'} />
-                  Microsoft
-                </Button>
-              )}
+          {isMicrosoftSSOEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              className="border bg-background text-muted-foreground"
+              disabled={isSubmitting}
+              onClick={onSignInWithMicrosoftClick}
+            >
+              <img className="mr-2 h-4 w-4" alt="Microsoft Logo" src={'/static/microsoft.svg'} />
+              Microsoft
+            </Button>
+          )}
 
-              {isOIDCSSOEnabled && (
-                <Button
-                  type="button"
-                  size="lg"
-                  variant="outline"
-                  className="border bg-background text-muted-foreground"
-                  disabled={isSubmitting}
-                  onClick={onSignInWithOIDCClick}
-                >
-                  <FaIdCardClip className="mr-2 h-5 w-5" />
-                  {oidcProviderLabel || 'OIDC'}
-                </Button>
-              )}
-            </>
+          {isOIDCSSOEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              className="border bg-background text-muted-foreground"
+              disabled={isSubmitting}
+              onClick={onSignInWithOIDCClick}
+            >
+              <FaIdCardClip className="mr-2 h-5 w-5" />
+              {oidcProviderLabel || 'OIDC'}
+            </Button>
           )}
 
           <Button

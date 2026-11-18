@@ -1,14 +1,15 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 
+import { rejectEmbedSessionMiddleware } from './lib/session/embed-session-restrictions';
 import { setCsrfCookie } from './lib/session/session-cookies';
 import { accountRoute } from './routes/account';
 import { callbackRoute } from './routes/callback';
 import { emailPasswordRoute } from './routes/email-password';
+import { embedRoute } from './routes/embed';
 import { oauthRoute } from './routes/oauth';
 import { passkeyRoute } from './routes/passkey';
 import { sessionRoute } from './routes/session';
@@ -21,21 +22,13 @@ export const auth = new Hono<HonoAuthContext>()
   .use(async (c, next) => {
     c.set('requestMetadata', extractRequestMetadata(c.req.raw));
 
-    const validOrigin = new URL(NEXT_PUBLIC_WEBAPP_URL()).origin;
-    const headerOrigin = c.req.header('Origin');
-
-    if (headerOrigin && headerOrigin !== validOrigin) {
-      return c.json(
-        {
-          message: 'Forbidden',
-          statusCode: 403,
-        },
-        403,
-      );
-    }
-
     await next();
   })
+  .use('/accounts', rejectEmbedSessionMiddleware)
+  .use('/account/*', rejectEmbedSessionMiddleware)
+  .use('/email-password/update-password', rejectEmbedSessionMiddleware)
+  .use('/email-password/2fa/*', rejectEmbedSessionMiddleware)
+  .use('/two-factor/*', rejectEmbedSessionMiddleware)
   .get('/csrf', async (c) => {
     const csrfToken = await setCsrfCookie(c);
 
@@ -47,6 +40,7 @@ export const auth = new Hono<HonoAuthContext>()
   .route('/callback', callbackRoute)
   .route('/oauth', oauthRoute)
   .route('/email-password', emailPasswordRoute)
+  .route('/embed', embedRoute)
   .route('/passkey', passkeyRoute)
   .route('/two-factor', twoFactorRoute);
 
