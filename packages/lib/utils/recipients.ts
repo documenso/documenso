@@ -1,6 +1,6 @@
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { Envelope, Field, Recipient } from '@prisma/client';
-import { EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
@@ -100,6 +100,29 @@ export const isRecipientBefore = (
   }
 
   return hasPersistedId(recipient) && hasPersistedId(other) && recipient.id < other.id;
+};
+
+type HasAssistantWithoutSequentialSigningOptions = {
+  recipients: { role?: RecipientRole }[];
+  signingOrder?: DocumentSigningOrder | null;
+};
+
+/**
+ * Whether any of the recipients is an assistant the signing order can't support.
+ *
+ * Assistants prefill fields for the recipients after them. Parallel signing
+ * notifies every recipient at once, so those recipients could act before the
+ * assistant has.
+ */
+export const hasAssistantWithoutSequentialSigning = ({
+  recipients,
+  signingOrder,
+}: HasAssistantWithoutSequentialSigningOptions) => {
+  if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
+    return false;
+  }
+
+  return recipients.some((recipient) => recipient.role === RecipientRole.ASSISTANT);
 };
 
 /**

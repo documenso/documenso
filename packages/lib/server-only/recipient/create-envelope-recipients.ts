@@ -14,6 +14,7 @@ import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
+import { assertAssistantSigningOrder } from './assert-assistant-signing-order';
 import { assignOmittedRecipientSigningOrders } from './assign-omitted-recipient-signing-orders';
 
 export interface CreateEnvelopeRecipientsOptions {
@@ -48,6 +49,11 @@ export const createEnvelopeRecipients = async ({
   const envelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
     include: {
+      documentMeta: {
+        select: {
+          signingOrder: true,
+        },
+      },
       team: {
         select: {
           organisation: {
@@ -91,6 +97,11 @@ export const createEnvelopeRecipients = async ({
       role: recipient.role,
     });
   }
+
+  assertAssistantSigningOrder({
+    signingOrder: envelope.documentMeta.signingOrder,
+    recipients: recipientsToCreate,
+  });
 
   const createdRecipients = await prisma.$transaction(async (tx) => {
     // Lock the envelope so concurrent additions allocate distinct signing orders.

@@ -16,6 +16,7 @@ import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
+import { assertAssistantSigningOrder } from './assert-assistant-signing-order';
 
 export interface UpdateEnvelopeRecipientsOptions {
   userId: number;
@@ -52,6 +53,11 @@ export const updateEnvelopeRecipients = async ({
     include: {
       fields: true,
       recipients: true,
+      documentMeta: {
+        select: {
+          signingOrder: true,
+        },
+      },
       team: {
         select: {
           organisation: {
@@ -99,6 +105,19 @@ export const updateEnvelopeRecipients = async ({
       role: recipient.role,
     });
   }
+
+  // Only recipients whose role changes are checked, so an assistant saved before
+  // this rule was introduced can still be edited.
+  const recipientsWithNewRole = recipients.filter((recipient) => {
+    const existingRecipient = envelope.recipients.find((existing) => existing.id === recipient.id);
+
+    return recipient.role !== existingRecipient?.role;
+  });
+
+  assertAssistantSigningOrder({
+    signingOrder: envelope.documentMeta.signingOrder,
+    recipients: recipientsWithNewRole,
+  });
 
   const orderUpdates = recipients.flatMap((update) => {
     const existingRecipient = envelope.recipients.find((recipient) => recipient.id === update.id);
