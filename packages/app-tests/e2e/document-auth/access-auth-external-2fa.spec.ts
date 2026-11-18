@@ -60,7 +60,8 @@ const request2FACode = async (
   { apiToken, envelopeId, recipientId }: { apiToken?: string; envelopeId: string; recipientId: number },
 ) =>
   await request.post(`${WEBAPP_BASE_URL}/api/v2/envelope/recipient/${recipientId}/2fa-code`, {
-    headers: apiToken ? { Authorization: `Bearer ${apiToken}` } : {},
+    // With no token, the webapp origin lets the request pass the CSRF check and get to the auth check.
+    headers: apiToken ? { Authorization: `Bearer ${apiToken}` } : WEBAPP_ORIGIN_HEADERS,
     data: { envelopeId },
   });
 
