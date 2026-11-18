@@ -163,7 +163,8 @@ export const EnvelopeEditorFieldsPage = () => {
   });
 
   useHotkeys(['ctrl+v', 'meta+v'], (event) => {
-    if (!copiedField) {
+    // A paste on the contents tab or on another envelope item would add a field that is out of view.
+    if (!copiedField || selectedEditorTab !== 'fields' || copiedField.envelopeItemId !== currentEnvelopeItem?.id) {
       return;
     }
 
