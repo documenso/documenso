@@ -96,6 +96,30 @@ describe('isPrivateUrl', () => {
       expect(isPrivateUrl('http://[::ffff:8.8.8.8]')).toBe(false);
       expect(isPrivateUrl('http://[::ffff:1.1.1.1]')).toBe(false);
     });
+
+    it('should detect private IPv4-compatible IPv6 addresses (RFC 4291 ::/96)', () => {
+      // `new URL()` normalizes the dotted form to hex ("::127.0.0.1" ->
+      // "::7f00:1"), so both the dotted input and the raw hex literal must be
+      // decoded to the embedded IPv4 and re-checked. Otherwise a literal host
+      // such as http://[::127.0.0.1] slips through every check above (SSRF,
+      // see #3451).
+      expect(isPrivateUrl('http://[::127.0.0.1]')).toBe(true);
+      expect(isPrivateUrl('http://[::127.0.0.1]:3000')).toBe(true);
+      expect(isPrivateUrl('http://[::169.254.169.254]')).toBe(true);
+      expect(isPrivateUrl('http://[::10.0.0.1]')).toBe(true);
+      expect(isPrivateUrl('http://[::192.168.1.1]')).toBe(true);
+      expect(isPrivateUrl('http://[::172.16.0.1]')).toBe(true);
+      expect(isPrivateUrl('http://[::7f00:1]')).toBe(true);
+      expect(isPrivateUrl('http://[::a9fe:a9fe]')).toBe(true);
+      expect(isPrivateUrl('http://[::a00:1]')).toBe(true);
+      expect(isPrivateUrl('http://[::c0a8:101]')).toBe(true);
+    });
+
+    it('should still allow public IPv4-compatible IPv6 addresses', () => {
+      expect(isPrivateUrl('http://[::8.8.8.8]')).toBe(false);
+      expect(isPrivateUrl('http://[::1.1.1.1]')).toBe(false);
+      expect(isPrivateUrl('http://[::808:808]')).toBe(false);
+    });
   });
 
   describe('public URLs', () => {
