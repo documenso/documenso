@@ -323,9 +323,10 @@ export const filesRoute = new Hono<HonoEnv>()
                     token,
                   },
                   select: {
+                    id: true,
                     role: true,
                     signingOrder: true,
-                    token: true,
+                    envelopeId: true,
                   },
                 },
               },

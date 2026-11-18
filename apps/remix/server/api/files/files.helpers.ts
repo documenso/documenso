@@ -5,6 +5,7 @@ import { generatePartialSignedPdf } from '@documenso/lib/server-only/pdf/generat
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+import { getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipient-queries';
 import { prisma } from '@documenso/prisma';
 import {
   type DocumentDataType,
@@ -60,7 +61,7 @@ type EnvelopeForPendingDownload = {
   internalVersion: number;
 };
 
-type PendingDownloadRecipient = Pick<Recipient, 'role' | 'signingOrder'>;
+type PendingDownloadRecipient = Pick<Recipient, 'id' | 'role' | 'signingOrder' | 'envelopeId'>;
 
 /**
  * Options shape varies by `version`:
@@ -208,17 +209,16 @@ const handlePendingFileRequest = async ({
           },
         },
         {
+          recipientId: recipient.id,
+        },
+        {
           type: {
             not: FieldType.SIGNATURE,
           },
-          recipient: {
-            signingStatus: {
-              not: SigningStatus.SIGNED,
-            },
-            signingOrder: {
-              gt: recipient.signingOrder ?? 0,
-            },
-          },
+          recipient: getRecipientFieldsWhereInput({
+            recipient,
+            allowAssistantAccessToOtherRecipients: true,
+          }),
         },
       ],
     };
