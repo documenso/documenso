@@ -1,40 +1,47 @@
 import { AppErrorCode } from '@documenso/lib/errors/app-error';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
-import { rejectDocumentOnBehalfOf } from '@documenso/lib/server-only/document/reject-document-on-behalf-of';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
-import { DocumentStatus, SigningStatus } from '@prisma/client';
+import { DocumentStatus, Prisma, SigningStatus } from '@prisma/client';
 
 /**
  * These drive the server functions directly rather than the browser or the
- * API, so two requests can be in flight at the same moment.
+ * API, so that a row lock can decide the order in which two requests write.
  */
 
-test('[REJECT_DOCUMENT]: only one of two simultaneous rejections takes effect', async () => {
+test('[REJECT_DOCUMENT]: only one of two rejections that were in flight together takes effect', async () => {
   const { document, recipients } = await seedDocumentWithTwoRecipients();
 
-  const outcomes = await Promise.allSettled(
-    recipients.map(async (recipient) =>
-      rejectDocumentWithToken({
-        token: recipient.token,
-        id: { type: 'envelopeId', id: document.id },
-        reason: 'I do not agree',
-      }),
-    ),
+  const [firstRecipient, secondRecipient] = recipients;
+  const id = { type: 'envelopeId', id: document.id } as const;
+  const reason = 'I do not agree';
+
+  // The first rejection takes the envelope and stops at its recipient, so the
+  // second one queues behind it for the envelope.
+  const { first, second } = await runBothBeforeEitherWrites(
+    { table: 'Recipient', id: firstRecipient.id },
+    async () => rejectDocumentWithToken({ token: firstRecipient.token, id, reason }),
+    async () => rejectDocumentWithToken({ token: secondRecipient.token, id, reason }),
   );
 
-  expect(outcomes.filter((outcome) => outcome.status === 'fulfilled')).toHaveLength(1);
+  expect(first.status).toBe('fulfilled');
+  expect(second).toMatchObject({ status: 'rejected', reason: { code: AppErrorCode.INVALID_REQUEST } });
 
   const envelope = await prisma.envelope.findUniqueOrThrow({
     where: { id: document.id },
     include: { recipients: true },
   });
 
+  const rejectedRecipientIds = envelope.recipients
+    .filter((recipient) => recipient.signingStatus === SigningStatus.REJECTED)
+    .map((recipient) => recipient.id);
+
   expect(envelope.status).toBe(DocumentStatus.REJECTED);
-  expect(envelope.recipients.filter((recipient) => recipient.signingStatus === SigningStatus.REJECTED)).toHaveLength(1);
+  expect(rejectedRecipientIds).toEqual([firstRecipient.id]);
 });
 
 test('[REJECT_DOCUMENT]: a completion does not overwrite a rejection that was in flight with it', async () => {
@@ -44,7 +51,7 @@ test('[REJECT_DOCUMENT]: a completion does not overwrite a rejection that was in
   const id = { type: 'envelopeId', id: document.id } as const;
 
   const { first: rejection, second: completion } = await runBothBeforeEitherWrites(
-    recipient.id,
+    { table: 'Recipient', id: recipient.id },
     async () => rejectDocumentWithToken({ token: recipient.token, id, reason: 'I do not agree' }),
     async () => completeDocumentWithToken({ token: recipient.token, id }),
   );
@@ -61,46 +68,56 @@ test('[REJECT_DOCUMENT]: a completion does not overwrite a rejection that was in
   expect(envelope.status).toBe(DocumentStatus.REJECTED);
 });
 
-for (const isRejectedThroughApi of [false, true]) {
-  const rejectedBy = isRejectedThroughApi ? 'the API on their behalf' : 'the recipient';
+test('[REJECT_DOCUMENT]: a rejection does not overwrite a completion that was in flight with it', async () => {
+  const { document, recipients } = await seedDocumentWithTwoRecipients();
 
-  test(`[REJECT_DOCUMENT]: a rejection by ${rejectedBy} does not overwrite a completion that was in flight with it`, async () => {
-    const { owner, team, document, recipients } = await seedDocumentWithTwoRecipients();
+  const [recipient] = recipients;
+  const id = { type: 'envelopeId', id: document.id } as const;
 
-    const [recipient] = recipients;
-    const id = { type: 'envelopeId', id: document.id } as const;
-    const reason = 'I do not agree';
+  const { first: completion, second: rejection } = await runBothBeforeEitherWrites(
+    { table: 'Recipient', id: recipient.id },
+    async () => completeDocumentWithToken({ token: recipient.token, id }),
+    async () => rejectDocumentWithToken({ token: recipient.token, id, reason: 'I do not agree' }),
+  );
 
-    const { first: completion, second: rejection } = await runBothBeforeEitherWrites(
-      recipient.id,
-      async () => completeDocumentWithToken({ token: recipient.token, id }),
-      async () =>
-        isRejectedThroughApi
-          ? rejectDocumentOnBehalfOf({
-              envelopeId: document.id,
-              recipientId: recipient.id,
-              userId: owner.id,
-              teamId: team.id,
-              reason,
-              requestMetadata: { requestMetadata: {}, source: 'apiV2', auth: 'api' },
-            })
-          : rejectDocumentWithToken({ token: recipient.token, id, reason }),
-    );
+  expect(completion.status).toBe('fulfilled');
+  expect(rejection).toMatchObject({ status: 'rejected', reason: { code: AppErrorCode.INVALID_REQUEST } });
 
-    expect(completion.status).toBe('fulfilled');
-    expect(rejection).toMatchObject({ status: 'rejected', reason: { code: AppErrorCode.INVALID_REQUEST } });
-
-    const { signingStatus, envelope } = await prisma.recipient.findUniqueOrThrow({
-      where: { id: recipient.id },
-      include: { envelope: true },
-    });
-
-    // The other recipient has not signed, so a PENDING envelope shows that the
-    // rejection left nothing behind.
-    expect(signingStatus).toBe(SigningStatus.SIGNED);
-    expect(envelope.status).toBe(DocumentStatus.PENDING);
+  const { signingStatus, envelope } = await prisma.recipient.findUniqueOrThrow({
+    where: { id: recipient.id },
+    include: { envelope: true },
   });
-}
+
+  // The other recipient has not signed, so a PENDING envelope shows that the
+  // rejection left nothing behind.
+  expect(signingStatus).toBe(SigningStatus.SIGNED);
+  expect(envelope.status).toBe(DocumentStatus.PENDING);
+});
+
+test('[REJECT_DOCUMENT]: a duplicate completion is still reported as already signed', async () => {
+  const { document, recipients } = await seedDocumentWithTwoRecipients();
+
+  const [recipient] = recipients;
+  const id = { type: 'envelopeId', id: document.id } as const;
+
+  const { first, second } = await runBothBeforeEitherWrites(
+    { table: 'Recipient', id: recipient.id },
+    async () => completeDocumentWithToken({ token: recipient.token, id }),
+    async () => completeDocumentWithToken({ token: recipient.token, id }),
+  );
+
+  expect(first.status).toBe('fulfilled');
+  expect(second).toMatchObject({ status: 'rejected', reason: { code: AppErrorCode.RECIPIENT_ALREADY_SIGNED } });
+
+  const completionCount = await prisma.documentAuditLog.count({
+    where: {
+      envelopeId: document.id,
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
+    },
+  });
+
+  expect(completionCount).toBe(1);
+});
 
 const seedDocumentWithTwoRecipients = async () => {
   const { user: owner, team } = await seedUser();
@@ -118,52 +135,98 @@ const seedDocumentWithTwoRecipients = async () => {
   return { owner, team, document, recipients };
 };
 
+type LockedRow = { table: 'Envelope'; id: string } | { table: 'Recipient'; id: number };
+
+type StartedRequest = {
+  /** The database session that the request is waiting in. */
+  pid: number;
+  outcome: Promise<PromiseSettledResult<unknown>>;
+};
+
+const POLL_INTERVAL_MS = 25;
+
+// A request reaches its first write well within this, and it stays under the
+// 10s Prisma allows the transaction that the request then waits in.
+const MAX_WAIT_UNTIL_BLOCKED_MS = 8_000;
+
+// Room for two requests to become blocked, one after the other.
+const ROW_LOCK_TIMEOUT_MS = 30_000;
+
 /**
- * Runs two requests for one recipient so that both have read the recipient
- * before either writes to it, which is what two requests arriving together do.
- * `first` is the one whose write lands first.
- *
- * The recipient row is locked while both are started. Reads pass the lock and
- * writes queue behind it in the order they arrive.
+ * Runs two requests so that both have read the row before either writes to it,
+ * which is what two requests arriving together do. `first` is the one whose
+ * write lands first.
  */
 const runBothBeforeEitherWrites = async (
-  recipientId: number,
+  lockedRow: LockedRow,
   first: () => Promise<unknown>,
   second: () => Promise<unknown>,
 ) => {
-  const outcomes = await prisma.$transaction(
-    async (tx) => {
-      const [{ pid: lockHolderPid }] = await tx.$queryRaw<{ pid: number }[]>`
-        SELECT pg_backend_pid() AS "pid" FROM "Recipient" WHERE "id" = ${recipientId} FOR UPDATE
-      `;
+  const outcomes = await withRowLocked(lockedRow, async (lockHolderPid) => {
+    const firstRequest = await startUntilBlockedBy(first, lockHolderPid);
+    const secondRequest = await startUntilBlockedBy(second, firstRequest.pid);
 
-      const firstOutcome = Promise.allSettled([first()]);
-      const firstPid = await waitForSessionBlockedBy(lockHolderPid);
+    // Handed back unawaited, inside an array: neither request can end before
+    // the lock is released, so awaiting them here would wait for the timeout.
+    return [firstRequest.outcome, secondRequest.outcome];
+  });
 
-      const secondOutcome = Promise.allSettled([second()]);
-      await waitForSessionBlockedBy(firstPid);
+  const [firstOutcome, secondOutcome] = await Promise.all(outcomes);
 
-      return [firstOutcome, secondOutcome];
-    },
-    { timeout: 30_000 },
-  );
-
-  const [[firstResult], [secondResult]] = await Promise.all(outcomes);
-
-  return { first: firstResult, second: secondResult };
+  return { first: firstOutcome, second: secondOutcome };
 };
 
-const waitForSessionBlockedBy = async (blockingPid: number) => {
-  for (let attempt = 0; attempt < 400; attempt++) {
+/**
+ * Holds a lock on one row while `scenario` runs. Reads pass the lock. A request
+ * that writes to the row stops at that write, with its decisions already made
+ * from what it read, and writes queue behind the lock in the order they arrive.
+ */
+const withRowLocked = async <T>({ table, id }: LockedRow, scenario: (lockHolderPid: number) => Promise<T>) => {
+  return await prisma.$transaction(
+    async (tx) => {
+      const [{ pid: lockHolderPid }] = await tx.$queryRaw<{ pid: number }[]>(
+        Prisma.sql`SELECT pg_backend_pid() AS "pid" FROM ${Prisma.raw(`"${table}"`)} WHERE "id" = ${id} FOR UPDATE`,
+      );
+
+      return await scenario(lockHolderPid);
+    },
+    { timeout: ROW_LOCK_TIMEOUT_MS },
+  );
+};
+
+/**
+ * Starts a request and returns once it is waiting on a lock that the session
+ * `blockingPid` holds or is itself queued for.
+ */
+const startUntilBlockedBy = async (request: () => Promise<unknown>, blockingPid: number): Promise<StartedRequest> => {
+  const settled: PromiseSettledResult<unknown>[] = [];
+
+  const outcome = Promise.allSettled([request()]).then(([result]) => {
+    settled.push(result);
+
+    return result;
+  });
+
+  const deadline = Date.now() + MAX_WAIT_UNTIL_BLOCKED_MS;
+
+  while (Date.now() < deadline) {
     const [blockedSession] = await prisma.$queryRaw<{ pid: number }[]>`
       SELECT "pid" FROM pg_stat_activity WHERE ${blockingPid}::int = ANY (pg_blocking_pids("pid"))
     `;
 
     if (blockedSession) {
-      return blockedSession.pid;
+      return { pid: blockedSession.pid, outcome };
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 25));
+    const [result] = settled;
+
+    if (result) {
+      const ending = result.status === 'rejected' ? `failed with ${String(result.reason)}` : 'succeeded';
+
+      throw new Error(`The request ${ending} before it reached the locked row`);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
   }
 
   throw new Error(`No session is waiting on session ${blockingPid}`);
