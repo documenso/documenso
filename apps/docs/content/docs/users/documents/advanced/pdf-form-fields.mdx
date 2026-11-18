@@ -1,0 +1,56 @@
+---
+title: Import PDF Form Fields
+description: Change the form fields of a fillable PDF into Documenso fields.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Overview
+
+A fillable PDF, for example a form from Adobe Acrobat, has form fields (AcroForm fields). Documenso can change these form fields into Documenso fields with the same position and dimensions. You do not put each field on the page again.
+
+## Import the Form Fields
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Upload the fillable PDF to a new document and add a minimum of one recipient.
+  </Step>
+  <Step>
+    Open the envelope editor and go to the **Fields** tab.
+  </Step>
+  <Step>
+    In **Selected Recipient**, select the recipient who gets the fields.
+  </Step>
+  <Step>
+    Select **Import from PDF form**. The button shows only when the PDF has form fields.
+  </Step>
+  <Step>
+    Examine the imported fields and change them where necessary.
+  </Step>
+</Steps>
+
+## Supported Form Fields
+
+| PDF form field | Documenso field                                              |
+| -------------- | ------------------------------------------------------------ |
+| Signature      | Signature                                                    |
+| Text           | Text. The text in the PDF becomes the default text.          |
+| Checkbox       | Checkbox. A checked box in the PDF stays checked by default. |
+| Dropdown       | Dropdown with the same options and the same default value.   |
+
+The tooltip of a form field becomes the label of the Documenso field. A required form field becomes a required Documenso field.
+
+Documenso removes each imported form field from the PDF. All other form fields stay on the page as fixed content: read-only fields, signed signatures, radio groups, list boxes and buttons.
+
+<Callout type="info">
+  You can import form fields into a draft document only. You cannot import them into a template or
+  in the embedded editor. A document that the API creates with `formValues` has no form fields to
+  import, because Documenso writes the values into the PDF during the upload.
+</Callout>
+
+## See Also
+
+- [Add Fields](/docs/users/documents/add-fields) - Manually place fields on documents
+- [PDF Placeholders](/docs/users/documents/advanced/pdf-placeholders) - Place fields with placeholder text in the PDF
