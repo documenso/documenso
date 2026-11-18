@@ -18,6 +18,7 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { assertRecipientNotExpired } from '../../utils/recipients';
 import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
+import { commitRecipientRejection } from './commit-recipient-rejection';
 
 export type RejectDocumentWithTokenOptions = {
   token: string;
@@ -62,45 +63,12 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
 
   assertRecipientNotExpired(recipient);
 
-  // Mark the envelope REJECTED here rather than waiting for the seal job, so other
-  // recipients are locked out as soon as this returns.
   const updatedRecipient = await prisma.$transaction(async (tx) => {
-    // Conditional so two concurrent rejections can't both succeed.
-    const { count: rejectedEnvelopeCount } = await tx.envelope.updateMany({
-      where: {
-        id: envelope.id,
-        status: DocumentStatus.PENDING,
-      },
-      data: {
-        status: DocumentStatus.REJECTED,
-      },
+    const rejectedRecipient = await commitRecipientRejection(tx, {
+      envelopeId: envelope.id,
+      recipientId: recipient.id,
+      reason,
     });
-
-    if (rejectedEnvelopeCount === 0) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Document ${envelope.id} must be pending to reject`,
-      });
-    }
-
-    // Conditional so a completion by this recipient that committed since our
-    // initial read is not overwritten. Throwing rolls the envelope back to PENDING.
-    const { count: rejectedRecipientCount } = await tx.recipient.updateMany({
-      where: {
-        id: recipient.id,
-        signingStatus: SigningStatus.NOT_SIGNED,
-      },
-      data: {
-        signedAt: new Date(),
-        signingStatus: SigningStatus.REJECTED,
-        rejectionReason: reason,
-      },
-    });
-
-    if (rejectedRecipientCount === 0) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Recipient ${recipient.id} has already actioned this document`,
-      });
-    }
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
@@ -121,11 +89,7 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
       }),
     });
 
-    return await tx.recipient.findUniqueOrThrow({
-      where: {
-        id: recipient.id,
-      },
-    });
+    return rejectedRecipient;
   });
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
