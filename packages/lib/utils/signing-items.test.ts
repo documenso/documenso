@@ -158,6 +158,20 @@ describe('getPendingSigningItems', () => {
     expect(item.validationError?.selectedCount).toBe(1);
   });
 
+  it('counts an option selected twice as one selection', () => {
+    const field = createField({
+      id: 1,
+      type: FieldType.CHECKBOX,
+      inserted: true,
+      customText: '[0,0]',
+      fieldMeta: checkboxMeta(['A', 'B'], atLeastTwo),
+    });
+
+    const [item] = getPendingSigningItems([field]);
+
+    expect(item.validationError?.selectedCount).toBe(1);
+  });
+
   it('passes a checkbox which satisfies its rule', () => {
     const field = createField({
       id: 1,

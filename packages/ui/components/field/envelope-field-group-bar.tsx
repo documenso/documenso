@@ -82,7 +82,9 @@ export const EnvelopeFieldGroupBar = ({
         </span>
 
         <span className="mr-1 text-neutral-400">
-          {position} of {count}
+          <Trans>
+            {position} of {count}
+          </Trans>
         </span>
 
         <button

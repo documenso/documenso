@@ -1,5 +1,6 @@
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import { type Field, FieldType } from '@prisma/client';
+import { unique } from 'remeda';
 
 import { validateCheckboxLength } from '../advanced-fields-validation/validate-checkbox';
 import { AppError, AppErrorCode } from '../errors/app-error';
@@ -155,7 +156,7 @@ const resolveSigningItemValidationError = (fields: Field[]): SigningItemValidati
   }
 
   const selectedCount = fields.reduce(
-    (total, field) => total + (field.customText ? parseCheckboxCustomText(field.customText).length : 0),
+    (total, field) => total + (field.customText ? unique(parseCheckboxCustomText(field.customText)).length : 0),
     0,
   );
 
