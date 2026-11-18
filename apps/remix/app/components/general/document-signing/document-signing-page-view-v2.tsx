@@ -60,6 +60,7 @@ export const DocumentSigningPageViewV2 = () => {
   const {
     isEmbed = false,
     allowDocumentRejection = true,
+    allowDownloadPDF = true,
     hidePoweredBy = true,
     onDocumentRejected,
   } = useEmbedSigningContext() || {};
@@ -181,18 +182,20 @@ export const DocumentSigningPageViewV2 = () => {
                   }
                 />
 
-                <EnvelopeDownloadDialog
-                  envelopeId={envelope.id}
-                  envelopeStatus={envelope.status}
-                  envelopeItems={envelope.envelopeItems}
-                  token={recipient.token}
-                  trigger={
-                    <Button variant="ghost" size="sm" className="w-full justify-start">
-                      <DownloadCloudIcon className="mr-2 h-4 w-4" />
-                      <Trans>Download PDF</Trans>
-                    </Button>
-                  }
-                />
+                {allowDownloadPDF && (
+                  <EnvelopeDownloadDialog
+                    envelopeId={envelope.id}
+                    envelopeStatus={envelope.status}
+                    envelopeItems={envelope.envelopeItems}
+                    token={recipient.token}
+                    trigger={
+                      <Button variant="ghost" size="sm" className="w-full justify-start">
+                        <DownloadCloudIcon className="mr-2 h-4 w-4" />
+                        <Trans>Download PDF</Trans>
+                      </Button>
+                    }
+                  />
+                )}
 
                 {envelope.type === EnvelopeType.DOCUMENT && allowDocumentRejection && (
                   <DocumentSigningRejectDialog

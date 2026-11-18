@@ -2,6 +2,7 @@ import { expect, type Page, test } from '@playwright/test';
 import type Konva from 'konva';
 
 import {
+  getCanvasBox,
   getPageCanvas,
   interactWithCanvasPastActionBar,
   placeContentOnPdf,
@@ -15,16 +16,6 @@ import { getKonvaTransformerNodeCountForPage } from '../fixtures/konva';
  * easy to grab. Pressing and releasing one without dragging used to count as
  * a click on the empty page, which deselected the item.
  */
-
-const getCanvasBox = async (page: Page) => {
-  const box = await getPageCanvas(page).boundingBox();
-
-  if (!box) {
-    throw new Error('The page canvas is not rendered');
-  }
-
-  return box;
-};
 
 /**
  * Press and release the selection's bottom middle resize handle without

@@ -1122,7 +1122,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       teamId: team.id,
     });
 
-    const recipientAlreadyExists = recipients.some((recipient) => recipient.email === email);
+    const recipientAlreadyExists = recipients.some((recipient) => recipient.email === email.toLowerCase());
 
     if (recipientAlreadyExists) {
       return {
@@ -1160,7 +1160,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         requestMetadata: metadata,
       });
 
-      const newRecipient = newRecipients.find((recipient) => recipient.email === email);
+      const newRecipient = newRecipients.find((recipient) => recipient.email === email.toLowerCase());
 
       if (!newRecipient) {
         throw new Error('Recipient not found');

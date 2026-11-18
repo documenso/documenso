@@ -91,7 +91,13 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, Sign
 
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent>
+        <DialogContent
+          onOpenAutoFocus={(event) => {
+            // Radix only selects prefilled <input>s on open, not textareas.
+            event.preventDefault();
+            form.setFocus('text', { shouldSelect: true });
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{fieldMeta?.label || <Trans>Enter Text</Trans>}</DialogTitle>
 
