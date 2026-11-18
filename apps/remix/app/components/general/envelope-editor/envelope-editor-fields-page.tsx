@@ -265,7 +265,7 @@ export const EnvelopeEditorFieldsPage = () => {
   }, []);
 
   useEffect(() => {
-    if (editorFields.selectedField && editorFields.selectedField.envelopeItemId !== currentEnvelopeItem?.id) {
+    if (editorFields.selectedFields.some((field) => field.envelopeItemId !== currentEnvelopeItem?.id)) {
       editorFields.setSelectedField(null);
     }
 

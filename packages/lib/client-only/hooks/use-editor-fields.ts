@@ -36,9 +36,11 @@ type EditorFieldsProps = {
 type UseEditorFieldsResponse = {
   localFields: TLocalField[];
 
-  // Selected field
+  // Selected fields. `selectedField` is set only when exactly one field is selected.
+  selectedFields: TLocalField[];
   selectedField: TLocalField | undefined;
   setSelectedField: (formId: string | null) => void;
+  setSelectedFields: (formIds: string[]) => void;
 
   // Field operations
   addField: (field: Omit<TLocalField, 'formId'>) => TLocalField;
@@ -99,6 +101,18 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
       fieldsArray.setSelected(formId, bypassCheck);
     },
     [fieldsArray.findItem, fieldsArray.setSelected, setSelectedRecipient],
+  );
+
+  const setSelectedFields = useCallback(
+    (formIds: string[]) => {
+      if (formIds.length === 1) {
+        setSelectedField(formIds[0]);
+        return;
+      }
+
+      fieldsArray.setSelectedItems(formIds);
+    },
+    [setSelectedField, fieldsArray.setSelectedItems],
   );
 
   const addField = useCallback(
@@ -185,9 +199,11 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     // Field utilities
     getFieldByFormId: fieldsArray.findItem,
 
-    // Selected field
+    // Selected fields
+    selectedFields: fieldsArray.selectedItems,
     selectedField: fieldsArray.selectedItem,
     setSelectedField,
+    setSelectedFields,
 
     // Selected recipient
     selectedRecipient,
