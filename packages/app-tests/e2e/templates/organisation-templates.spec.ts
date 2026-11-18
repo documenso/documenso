@@ -10,7 +10,7 @@ import { expect, test } from '@playwright/test';
 import { TemplateType } from '@prisma/client';
 import { customAlphabet } from 'nanoid';
 
-import { apiSignin, apiSignout } from '../fixtures/authentication';
+import { apiSignin, apiSignout, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
 
@@ -83,6 +83,7 @@ const trpcMutation = async (page: Page, procedure: string, input: Record<string,
   const url = `${WEBAPP_BASE_URL}/api/trpc/${procedure}`;
 
   const headers: Record<string, string> = {
+    ...WEBAPP_ORIGIN_HEADERS,
     'content-type': 'application/json',
   };
 

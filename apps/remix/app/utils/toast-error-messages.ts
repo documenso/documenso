@@ -18,10 +18,28 @@ export const FAIR_USE_LIMIT_EXCEEDED_ERROR_MESSAGE = {
   description: msg`Your organisation has reached its plan's fair use limit. Please contact your organisation administrator or support to continue.`,
 };
 
+const MISSING_CONTENT_IMAGE_ERROR_MESSAGE: ToastMessageDescriptor = {
+  title: msg`Missing images`,
+  description: msg`One or more image contents have no image. Upload an image for each of them, or remove them.`,
+};
+
+const ENVELOPE_CONTENT_LIMIT_EXCEEDED_ERROR_MESSAGE: ToastMessageDescriptor = {
+  title: msg`Envelope content limit exceeded`,
+  description: msg`This envelope has too many content items. Please remove some, or contact support if you need more.`,
+};
+
+const ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED_ERROR_MESSAGE: ToastMessageDescriptor = {
+  title: msg`Envelope image content limit exceeded`,
+  description: msg`This envelope has too many image content items. Please remove some, or contact support if you need more.`,
+};
+
 export const getDistributeErrorMessage = (code: string): ToastMessageDescriptor => {
   return match(code)
     .with('RECIPIENT_LIMIT_EXCEEDED', () => RECIPIENT_LIMIT_EXCEEDED_ERROR_MESSAGE)
     .with(AppErrorCode.TOO_MANY_REQUESTS, () => FAIR_USE_LIMIT_EXCEEDED_ERROR_MESSAGE)
+    .with('MISSING_CONTENT_IMAGE', () => MISSING_CONTENT_IMAGE_ERROR_MESSAGE)
+    .with('ENVELOPE_CONTENT_LIMIT_EXCEEDED', () => ENVELOPE_CONTENT_LIMIT_EXCEEDED_ERROR_MESSAGE)
+    .with('ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED', () => ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED_ERROR_MESSAGE)
     .otherwise(() => ({
       title: msg`Something went wrong`,
       description: msg`An error occurred while distributing the document.`,
@@ -36,6 +54,9 @@ export const getDirectTemplateErrorMessage = (code: string): ToastMessageDescrip
       title: msg`Missing signature fields`,
       description: msg`This direct link template cannot be used because one or more signers do not have a signature field assigned.`,
     }))
+    .with('MISSING_CONTENT_IMAGE', () => MISSING_CONTENT_IMAGE_ERROR_MESSAGE)
+    .with('ENVELOPE_CONTENT_LIMIT_EXCEEDED', () => ENVELOPE_CONTENT_LIMIT_EXCEEDED_ERROR_MESSAGE)
+    .with('ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED', () => ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED_ERROR_MESSAGE)
     .otherwise(() => ({
       title: msg`Something went wrong`,
       description: msg`We were unable to submit this document at this time. Please try again later.`,
@@ -129,6 +150,10 @@ export const getTemplateUseErrorMessage = (code: string): ToastMessageDescriptor
     .with(AppErrorCode.MISSING_SIGNATURE_FIELD, () => ({
       title: msg`Missing signature fields`,
       description: msg`The document could not be sent because some signers do not have a signature field. Please edit the template and add a signature field for each signer.`,
+    }))
+    .with('MISSING_CONTENT_IMAGE', () => ({
+      title: msg`Missing images`,
+      description: msg`The document could not be sent because one or more image contents have no image. Please edit the template and upload an image for each of them, or remove them.`,
     }))
     .with(AppErrorCode.INVALID_BODY, AppErrorCode.INVALID_REQUEST, () => ({
       title: msg`Error`,

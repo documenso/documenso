@@ -47,7 +47,6 @@ type DocumentToSeed = {
 
 export const seedDocuments = async (documents: DocumentToSeed[]) => {
   await Promise.all(
-    // eslint-disable-next-line @typescript-eslint/require-await
     documents.map(async (document, i) =>
       match(document.type)
         .with(DocumentStatus.DRAFT, async () =>
@@ -67,7 +66,13 @@ export const seedDocuments = async (documents: DocumentToSeed[]) => {
             key: i,
             createDocumentOptions: document.documentOptions,
           }),
-        ),
+        )
+        // Ending the match returns the seeding promise for `Promise.all` to
+        // wait on. Without it the match object itself is returned, and the
+        // documents are still being written when this resolves.
+        .otherwise(() => {
+          throw new Error(`Seeding ${document.type} documents is not supported`);
+        }),
     ),
   );
 };

@@ -1,23 +1,16 @@
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import {
-  IS_GOOGLE_SSO_ENABLED,
-  IS_MICROSOFT_SSO_ENABLED,
-  IS_OIDC_SSO_ENABLED,
-  OIDC_PROVIDER_LABEL,
-} from '@documenso/lib/constants/auth';
 import { Trans } from '@lingui/react/macro';
 import { useEffect } from 'react';
 import { isRouteErrorResponse, Outlet, useRouteError } from 'react-router';
 
 import { EmbedAuthenticationRequired } from '~/components/embed/embed-authentication-required';
+import { EmbedCscAuthenticationRequired } from '~/components/embed/embed-csc-authentication-required';
 import { EmbedDocumentCompleted } from '~/components/embed/embed-document-completed';
 import { EmbedDocumentRejected } from '~/components/embed/embed-document-rejected';
 import { EmbedDocumentWaitingForTurn } from '~/components/embed/embed-document-waiting-for-turn';
 import { EmbedPaywall } from '~/components/embed/embed-paywall';
 import { EmbedRecipientExpired } from '~/components/embed/embed-recipient-expired';
 import { EmbedSenderDisabled } from '~/components/embed/embed-sender-disabled';
-
-import type { Route } from './+types/_layout';
 
 // Note: CSP (`frame-ancestors *`), `Referrer-Policy`, and
 // `X-Content-Type-Options` are now emitted globally by
@@ -28,28 +21,11 @@ import type { Route } from './+types/_layout';
 // HTML page renders, where CORS preflight does not apply, so they were a
 // no-op and have been dropped along with the rest of `headers()`.
 
-export function loader() {
-  // SSR env variables.
-  const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
-  const isMicrosoftSSOEnabled = IS_MICROSOFT_SSO_ENABLED;
-  const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
-  const oidcProviderLabel = OIDC_PROVIDER_LABEL;
-
-  return {
-    isGoogleSSOEnabled,
-    isMicrosoftSSOEnabled,
-    isOIDCSSOEnabled,
-    oidcProviderLabel,
-  };
-}
-
 export default function Layout() {
   return <Outlet />;
 }
 
-export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
-  const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } = loaderData || {};
-
+export function ErrorBoundary() {
   const analytics = useAnalytics();
   const error = useRouteError();
 
@@ -60,6 +36,7 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
       isRouteErrorResponse(error) &&
       [
         'embed-authentication-required',
+        'embed-csc-authentication-required',
         'embed-paywall',
         'embed-waiting-for-turn',
         'embed-recipient-expired',
@@ -77,16 +54,11 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
 
   if (isRouteErrorResponse(error)) {
     if (error.status === 401 && error.data.type === 'embed-authentication-required') {
-      return (
-        <EmbedAuthenticationRequired
-          isGoogleSSOEnabled={isGoogleSSOEnabled}
-          isMicrosoftSSOEnabled={isMicrosoftSSOEnabled}
-          isOIDCSSOEnabled={isOIDCSSOEnabled}
-          oidcProviderLabel={oidcProviderLabel}
-          email={error.data.email}
-          returnTo={error.data.returnTo}
-        />
-      );
+      return <EmbedAuthenticationRequired email={error.data.email} />;
+    }
+
+    if (error.status === 401 && error.data.type === 'embed-csc-authentication-required') {
+      return <EmbedCscAuthenticationRequired token={error.data.token} blockedCode={error.data.blockedCode} />;
     }
 
     if (error.status === 403 && error.data.type === 'embed-paywall') {

@@ -60,6 +60,7 @@ export const DocumentSigningPageViewV2 = () => {
   const {
     isEmbed = false,
     allowDocumentRejection = true,
+    allowDownloadPDF = true,
     hidePoweredBy = true,
     onDocumentRejected,
   } = useEmbedSigningContext() || {};
@@ -181,18 +182,20 @@ export const DocumentSigningPageViewV2 = () => {
                   }
                 />
 
-                <EnvelopeDownloadDialog
-                  envelopeId={envelope.id}
-                  envelopeStatus={envelope.status}
-                  envelopeItems={envelope.envelopeItems}
-                  token={recipient.token}
-                  trigger={
-                    <Button variant="ghost" size="sm" className="w-full justify-start">
-                      <DownloadCloudIcon className="mr-2 h-4 w-4" />
-                      <Trans>Download PDF</Trans>
-                    </Button>
-                  }
-                />
+                {allowDownloadPDF && (
+                  <EnvelopeDownloadDialog
+                    envelopeId={envelope.id}
+                    envelopeStatus={envelope.status}
+                    envelopeItems={envelope.envelopeItems}
+                    token={recipient.token}
+                    trigger={
+                      <Button variant="ghost" size="sm" className="w-full justify-start">
+                        <DownloadCloudIcon className="mr-2 h-4 w-4" />
+                        <Trans>Download PDF</Trans>
+                      </Button>
+                    }
+                  />
+                )}
 
                 {envelope.type === EnvelopeType.DOCUMENT && allowDocumentRejection && (
                   <DocumentSigningRejectDialog
@@ -238,7 +241,10 @@ export const DocumentSigningPageViewV2 = () => {
           </div>
         </div>
 
-        <div className="embed--DocumentContainer min-w-0 flex-1 overflow-y-auto" ref={scrollableContainerRef}>
+        <div
+          className="embed--DocumentContainer min-w-0 flex-1 overflow-x-auto overflow-y-auto"
+          ref={scrollableContainerRef}
+        >
           <div className="flex flex-col">
             {/* Horizontal envelope item selector */}
             {envelopeItems.length > 1 && (
@@ -270,6 +276,9 @@ export const DocumentSigningPageViewV2 = () => {
                   customPageRenderer={EnvelopeSignerPageRenderer}
                   scrollParentRef={scrollableContainerRef}
                   errorMessage={PDF_VIEWER_ERROR_MESSAGES.signing}
+                  toolbar={['zoom']}
+                  // Todo: Content - Decide how to manage zooming on mobile.
+                  toolbarClassName="hidden lg:flex"
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">

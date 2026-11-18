@@ -39,10 +39,14 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
 
   const allowsTwoFactorAuth = derivedRecipientAccessAuth.includes('TWO_FACTOR_AUTH');
   const allowsExternal2FA = derivedRecipientAccessAuth.includes('EXTERNAL_TWO_FACTOR_AUTH');
+  const hasAuthenticatorEnabled = user?.twoFactorEnabled === true;
 
-  // A recipient with only external 2FA has no method to choose, so start at the code input.
-  const [step, setStep] = useState<FormStep>(allowsTwoFactorAuth ? 'method-selection' : 'code-input');
-  const [selectedMethod, setSelectedMethod] = useState<TwoFactorMethod | null>(allowsTwoFactorAuth ? null : 'external');
+  // Email always comes with TWO_FACTOR_AUTH, so a choice exists only when a second method does.
+  const hasMethodChoice = allowsTwoFactorAuth && (hasAuthenticatorEnabled || allowsExternal2FA);
+  const onlyMethod: TwoFactorMethod = allowsTwoFactorAuth ? 'email' : 'external';
+
+  const [step, setStep] = useState<FormStep>(hasMethodChoice ? 'method-selection' : 'code-input');
+  const [selectedMethod, setSelectedMethod] = useState<TwoFactorMethod | null>(hasMethodChoice ? null : onlyMethod);
 
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
   const [millisecondsRemaining, setMillisecondsRemaining] = useState<number | null>(null);
@@ -59,8 +63,6 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
       token: '',
     },
   });
-
-  const hasAuthenticatorEnabled = user?.twoFactorEnabled === true;
 
   const onMethodSelect = async (method: TwoFactorMethod) => {
     setSelectedMethod(method);
@@ -112,7 +114,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
     setMillisecondsRemaining(null);
   };
 
-  const onResendEmail = async () => {
+  const requestEmailCode = async () => {
     if (selectedMethod !== 'email') {
       return;
     }
@@ -145,8 +147,26 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
     return () => clearInterval(interval);
   }, [expiresAt]);
 
+  // Deferred so StrictMode's dev-only effect re-run cancels the first call. Calling it
+  // directly sends two emails, and a ref guard leaves isPending stuck on true.
+  useEffect(() => {
+    if (hasMethodChoice || onlyMethod !== 'email') {
+      return;
+    }
+
+    const timeout = setTimeout(() => void requestEmailCode(), 0);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
-    <div className="py-4">
+    <div className="space-y-4 py-4">
+      {error && (
+        <Alert variant="destructive" padding="tight" className="text-sm">
+          {error}
+        </Alert>
+      )}
+
       {step === 'method-selection' && (
         <div className="space-y-4">
           <div>
@@ -157,12 +177,6 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
               <Trans>Please select how you'd like to receive your verification code.</Trans>
             </p>
           </div>
-
-          {error && (
-            <Alert variant="destructive" padding="tight" className="text-sm">
-              {error}
-            </Alert>
-          )}
 
           <div className="space-y-3">
             <Button
@@ -229,7 +243,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
       {step === 'code-input' && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            {allowsTwoFactorAuth && (
+            {hasMethodChoice && (
               <Button type="button" variant="ghost" size="sm" onClick={onGoBack}>
                 <ArrowLeftIcon className="h-4 w-4" />
               </Button>
@@ -254,12 +268,6 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
                 <Trans>Please open your authenticator app and enter the 6-digit code for this document.</Trans>
               ))}
           </div>
-
-          {error && (
-            <Alert variant="destructive" padding="tight" className="text-sm">
-              {error}
-            </Alert>
-          )}
 
           <Form {...form}>
             <form id="access-auth-2fa-form" className="space-y-4" onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -320,7 +328,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
                       variant="ghost"
                       size="sm"
                       className="w-full"
-                      onClick={onResendEmail}
+                      onClick={requestEmailCode}
                       loading={isRequesting2FAEmail}
                     >
                       <Trans>Resend code</Trans>

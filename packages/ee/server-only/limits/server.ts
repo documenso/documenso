@@ -42,22 +42,27 @@ export const getServerLimits = async ({ userId, teamId }: GetServerLimitsOptions
   const remaining = structuredClone(FREE_PLAN_LIMITS);
 
   const subscription = organisation.subscription;
-  const maximumEnvelopeItemCount = organisation.organisationClaim.envelopeItemCount;
+
+  const baseValues = {
+    maximumEnvelopeItemCount: organisation.organisationClaim.envelopeItemCount,
+    maximumEnvelopeContentCount: organisation.organisationClaim.envelopeContentCount,
+    maximumEnvelopeContentImageCount: organisation.organisationClaim.envelopeContentImageCount,
+  };
 
   if (!IS_BILLING_ENABLED()) {
     return {
       quota: SELFHOSTED_PLAN_LIMITS,
       remaining: SELFHOSTED_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
+      ...baseValues,
     };
   }
 
   // Bypass all limits even if plan expired for ENTERPRISE.
-  if (organisation.organisationClaimId === INTERNAL_CLAIM_ID.ENTERPRISE) {
+  if (organisation.organisationClaim.originalSubscriptionClaimId === INTERNAL_CLAIM_ID.ENTERPRISE) {
     return {
       quota: PAID_PLAN_LIMITS,
       remaining: PAID_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
+      ...baseValues,
     };
   }
 
@@ -66,7 +71,7 @@ export const getServerLimits = async ({ userId, teamId }: GetServerLimitsOptions
     return {
       quota: INACTIVE_PLAN_LIMITS,
       remaining: INACTIVE_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
+      ...baseValues,
     };
   }
 
@@ -75,7 +80,7 @@ export const getServerLimits = async ({ userId, teamId }: GetServerLimitsOptions
     return {
       quota: INACTIVE_PLAN_LIMITS,
       remaining: INACTIVE_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
+      ...baseValues,
     };
   }
 
@@ -85,7 +90,7 @@ export const getServerLimits = async ({ userId, teamId }: GetServerLimitsOptions
     return {
       quota: PAID_PLAN_LIMITS,
       remaining: PAID_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
+      ...baseValues,
     };
   }
 
@@ -123,6 +128,6 @@ export const getServerLimits = async ({ userId, teamId }: GetServerLimitsOptions
   return {
     quota,
     remaining,
-    maximumEnvelopeItemCount,
+    ...baseValues,
   };
 };
