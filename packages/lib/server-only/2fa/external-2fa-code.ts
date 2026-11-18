@@ -22,8 +22,8 @@ type External2FACodeOptions = {
  * The code is derived from the recipient and the encryption key, so nothing is stored.
  * Calls in the same period return the same code.
  */
-export const generateExternal2FACode = async (options: External2FACodeOptions) => {
-  const counter = Math.floor(Date.now() / PERIOD_MS);
+export const generateExternal2FACode = async (options: External2FACodeOptions, now = Date.now()) => {
+  const counter = Math.floor(now / PERIOD_MS);
 
   return {
     code: await generateHOTP(getSecret(options), counter),
