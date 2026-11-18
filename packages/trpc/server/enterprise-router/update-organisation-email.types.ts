@@ -6,11 +6,11 @@ export const ZUpdateOrganisationEmailRequestSchema = z
   .object({
     emailId: z.string(),
   })
-  .merge(
+  .extend(
     ZCreateOrganisationEmailRequestSchema.pick({
       emailName: true,
       // replyTo: true
-    }),
+    }).shape,
   );
 
 export const ZUpdateOrganisationEmailResponseSchema = z.void();

@@ -138,7 +138,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
 
     if (brandingCss === null) {
       sanitizedBrandingCss = null;
-    } else if (brandingCss !== undefined) {
+    } else if (typeof brandingCss === 'string') {
       const result = sanitizeBrandingCss(brandingCss);
       sanitizedBrandingCss = result.css.trim() === '' ? null : result.css;
       cssWarnings = result.warnings;
