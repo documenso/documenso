@@ -98,6 +98,15 @@ export const reportSenderRateLimit = createRateLimit({
   window: '7d',
 });
 
+// ---- Embedding ----
+
+export const persistEmbedSignatureRateLimit = createRateLimit({
+  action: 'embed.persist-signature',
+  max: 10,
+  globalMax: 30,
+  window: '1m',
+});
+
 // ---- Billing ----
 
 export const syncSubscriptionRateLimit = createRateLimit({
@@ -134,6 +143,16 @@ export const aiRateLimit = createRateLimit({
 
 export const fileUploadRateLimit = createRateLimit({
   action: 'api.file-upload',
+  max: 20,
+  window: '1m',
+});
+
+/**
+ * Envelope content image uploads, kept separate from the document (PDF)
+ * upload budget so placing several images does not block uploading a PDF.
+ */
+export const envelopeContentRateLimit = createRateLimit({
+  action: 'api.envelope-content',
   max: 20,
   window: '1m',
 });

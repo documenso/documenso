@@ -270,10 +270,12 @@ model SubscriptionClaim {
   name   String
   locked Boolean @default(false)
 
-  teamCount         Int
-  memberCount       Int
-  envelopeItemCount Int
-  recipientCount    Int
+  teamCount                 Int
+  memberCount               Int
+  envelopeItemCount         Int
+  recipientCount            Int
+  envelopeContentCount      Int
+  envelopeContentImageCount Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 
@@ -299,10 +301,12 @@ model OrganisationClaim {
   originalSubscriptionClaimId String?
   organisation                Organisation?
 
-  teamCount         Int
-  memberCount       Int
-  envelopeItemCount Int
-  recipientCount    Int
+  teamCount                 Int
+  memberCount               Int
+  envelopeItemCount         Int
+  recipientCount            Int
+  envelopeContentCount      Int
+  envelopeContentImageCount Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 
@@ -475,6 +479,7 @@ model Envelope {
   envelopeItems EnvelopeItem[]
   recipients    Recipient[]
   fields        Field[]
+  contents      EnvelopeContent[]
   shareLinks    DocumentShareLink[]
   auditLogs     DocumentAuditLog[]
 
@@ -526,7 +531,8 @@ model EnvelopeItem {
   envelopeId String
   envelope   Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
 
-  field Field[]
+  field    Field[]
+  contents EnvelopeContent[]
 
   @@unique([documentDataId])
   @@index([envelopeId])
@@ -729,6 +735,41 @@ model Field {
   @@index([recipientId])
 }
 
+/// @zod.import(["import { ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';"])
+model EnvelopeContent {
+  id             String @id
+  envelopeId     String
+  envelopeItemId String
+
+  envelopeItem EnvelopeItem @relation(fields: [envelopeItemId], references: [id], onDelete: Cascade)
+  envelope     Envelope     @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  contentMeta Json /// [EnvelopeContentMeta] @zod.custom.use(ZEnvelopeContentMetaSchema)
+
+  /// Any number of contents may point at the same data content, e.g. a
+  /// document created from a template shares the template's images.
+  dataContentId String?
+  dataContent   DataContent? @relation(fields: [dataContentId], references: [id], onDelete: SetNull)
+
+  @@index([envelopeId])
+  @@index([envelopeItemId])
+}
+
+/// Generic stored data (e.g. an uploaded image) which other models reference.
+/// The kind of data and its kind specific details live in `metadata`.
+/// @zod.import(["import { ZDataContentMetaSchema } from '@documenso/lib/types/data-content-meta';"])
+model DataContent {
+  id String @id
+
+  /// How `data` is stored, e.g. an S3 path or inline bytes.
+  type DocumentDataType
+  data String
+
+  metadata Json /// [DataContentMeta] @zod.custom.use(ZDataContentMetaSchema)
+
+  envelopeContents EnvelopeContent[]
+}
+
 model Signature {
   id                     Int      @id @default(autoincrement())
   created                DateTime @default(now())
@@ -854,6 +895,8 @@ model Organisation {
 
   monthlyStats OrganisationMonthlyStat[]
   adminTags    AdminTag[]
+
+  embedSignatures EmbedSignature[]
 
   avatarImage AvatarImage? @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
@@ -1280,6 +1323,26 @@ model OrganisationAuthenticationPortal {
 model Counter {
   id    String @id
   value Int
+}
+
+/// `key` is sha256(organisationId:lower(recipientEmail):clientUserId) so neither
+/// the recipient email nor the embedder's identifier is stored in plaintext.
+model EmbedSignature {
+  key       String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  /// Last writer. Not a relation so the row survives document deletion and
+  /// remains useful for abuse tracing.
+  recipientId Int
+
+  signature String
+
+  @@index([organisationId])
+  @@index([recipientId])
 }
 
 model RateLimit {

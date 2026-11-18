@@ -44,12 +44,17 @@ export const InboxTable = () => {
   const status = resolveInboxStatus(findInboxSearchParams.status);
   const query = findInboxSearchParams.query ?? '';
 
-  const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery({
-    page: Math.max(findInboxSearchParams.page ?? 1, 1),
-    perPage: Math.min(Math.max(findInboxSearchParams.perPage ?? 10, 1), 100),
-    query: query || undefined,
-    status,
-  });
+  const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery(
+    {
+      page: Math.max(findInboxSearchParams.page ?? 1, 1),
+      perPage: Math.min(Math.max(findInboxSearchParams.perPage ?? 10, 1), 100),
+      query: query || undefined,
+      status,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const hasSearchQuery = query.trim().length > 0;
 

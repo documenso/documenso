@@ -486,7 +486,7 @@ export const completeDocumentWithToken = async ({
               where: { id: nextRecipient.id },
               data: {
                 name: dictatedNextSigner.name,
-                email: dictatedNextSigner.email,
+                email: dictatedNextSigner.email.toLowerCase(),
               },
             });
 
@@ -513,7 +513,7 @@ export const completeDocumentWithToken = async ({
                     {
                       type: RECIPIENT_DIFF_TYPE.EMAIL,
                       from: nextRecipient.email,
-                      to: dictatedNextSigner.email,
+                      to: dictatedNextSigner.email.toLowerCase(),
                     },
                   ],
                 },

@@ -91,7 +91,7 @@ const MobileDropdownMenu = () => {
   const embedSigningContext = useEmbedSigningContext();
 
   const isEmbedSigning = embedSigningContext !== null;
-  const { allowDocumentRejection } = embedSigningContext || {};
+  const { allowDocumentRejection, allowDownloadPDF } = embedSigningContext || {};
 
   return (
     <DropdownMenu>
@@ -102,20 +102,22 @@ const MobileDropdownMenu = () => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
-        <EnvelopeDownloadDialog
-          envelopeId={envelope.id}
-          envelopeStatus={envelope.status}
-          envelopeItems={envelope.envelopeItems}
-          token={recipient.token}
-          trigger={
-            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-              <div>
-                <DownloadCloudIcon className="mr-2 h-4 w-4" />
-                <Trans>Download PDF</Trans>
-              </div>
-            </DropdownMenuItem>
-          }
-        />
+        {allowDownloadPDF !== false && (
+          <EnvelopeDownloadDialog
+            envelopeId={envelope.id}
+            envelopeStatus={envelope.status}
+            envelopeItems={envelope.envelopeItems}
+            token={recipient.token}
+            trigger={
+              <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+                <div>
+                  <DownloadCloudIcon className="mr-2 h-4 w-4" />
+                  <Trans>Download PDF</Trans>
+                </div>
+              </DropdownMenuItem>
+            }
+          />
+        )}
 
         {envelope.type === EnvelopeType.DOCUMENT && allowDocumentRejection !== false && (
           <DocumentSigningRejectDialog

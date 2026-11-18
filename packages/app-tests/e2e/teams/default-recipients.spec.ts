@@ -116,9 +116,6 @@ test.describe('Default Recipients', () => {
       .first()
       .fill('Regular Signer');
 
-    // Wait for autosave to complete
-    await page.waitForTimeout(3000);
-
     // Verify that default recipient is present in the database
     await expect(async () => {
       const envelope = await prisma.envelope.findFirstOrThrow({
@@ -208,9 +205,6 @@ test.describe('Default Recipients', () => {
       .getByPlaceholder(/Recipient/)
       .first()
       .fill('Regular Signer');
-
-    // Wait for autosave to complete
-    await page.waitForTimeout(3000);
 
     // Wait for recipients to be saved
     await expect(async () => {
