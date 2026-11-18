@@ -28,14 +28,12 @@ const getMultipartBody = async (req: Request) => {
     // !: Handles cases where our generated SDKs send key[] syntax for arrays.
     const normalizedKey = key.endsWith('[]') ? key.slice(0, -2) : key;
 
-    const existing = data[normalizedKey];
-
-    if (existing === undefined) {
+    if (data[normalizedKey] === undefined) {
       data[normalizedKey] = value;
-    } else if (Array.isArray(existing)) {
-      existing.push(value);
+    } else if (Array.isArray(data[normalizedKey])) {
+      data[normalizedKey].push(value);
     } else {
-      data[normalizedKey] = [existing, value];
+      data[normalizedKey] = [data[normalizedKey], value];
     }
   }
 
@@ -140,10 +138,8 @@ const createRequestProxy = async (req: Request, url?: string) => {
         }
 
         default:
-          // SAFETY: Every property this trap does not special-case is forwarded from the
-          // original Request, so `prop` can only be a key the caller reads off a Request.
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          return target[prop as keyof Request];
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any
+          return (target as unknown as Record<string | number | symbol, unknown>)[prop];
       }
     },
   });
@@ -164,25 +160,23 @@ export const createOpenApiFetchHandler = async <TRouter extends OpenApiRouter>(
   const url = new URL(opts.req.url.replace(opts.endpoint, ''));
   const req: Request = await createRequestProxy(opts.req, url.toString());
 
-  // The handler is typed against Node HTTP req/res, but only reads properties our request
-  // proxy and mock response provide, so we declare it against the fetch-based types we pass.
   // @ts-expect-error Inherited from original fetch handler in `trpc-to-openapi`
-  const openApiHttpHandler: (req: Request, res: ServerResponse) => void = createOpenApiNodeHttpHandler(opts);
+  const openApiHttpHandler = createOpenApiNodeHttpHandler(opts);
 
   return new Promise<Response>((resolve) => {
     let statusCode: number;
 
-    // SAFETY: The Node HTTP handler only calls setHeader/statusCode/end on the response,
-    // which this mock implements to bridge Node HTTP APIs with a Fetch API Response.
+    // Create a mock ServerResponse object that bridges Node HTTP APIs with Fetch API Response.
+    // This allows the Node HTTP handler to work with Fetch API Request objects.
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const res = {
-      setHeader: (key: string, value: string | string[]) => {
-        if (Array.isArray(value)) {
+      setHeader: (key: string, value: string | readonly string[]) => {
+        if (typeof value === 'string') {
+          resHeaders.set(key, value);
+        } else {
           for (const v of value) {
             resHeaders.append(key, v);
           }
-        } else {
-          resHeaders.set(key, value);
         }
       },
       get statusCode() {
@@ -201,6 +195,14 @@ export const createOpenApiFetchHandler = async <TRouter extends OpenApiRouter>(
       },
     } as ServerResponse;
 
-    void openApiHttpHandler(req, res);
+    // Type assertions are necessary here for interop between Fetch API Request/Response
+    // and Node HTTP IncomingMessage/ServerResponse types.
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const nodeReq = req as unknown as Parameters<typeof openApiHttpHandler>[0];
+
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const nodeRes = res as unknown as Parameters<typeof openApiHttpHandler>[1];
+
+    void openApiHttpHandler(nodeReq, nodeRes);
   });
 };
