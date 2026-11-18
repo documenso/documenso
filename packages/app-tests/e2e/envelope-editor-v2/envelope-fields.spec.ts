@@ -648,6 +648,10 @@ const runCopyPasteFieldFlow = async (surface: TEnvelopeEditorSurface): Promise<T
   const externalId = `e2e-copy-paste-${nanoid()}`;
   const root = surface.root;
 
+  if (surface.isEmbedded && !surface.envelopeId) {
+    await addEnvelopeItemPdf(root, 'embedded-fields.pdf');
+  }
+
   await updateExternalId(surface, externalId);
   await setupRecipientsForFieldPlacement(surface);
 
@@ -1135,6 +1139,21 @@ test.describe('embedded create', () => {
     });
   });
 
+  test('copy and paste fields with keyboard shortcuts', async ({ page }) => {
+    const surface = await openEmbeddedEnvelopeEditor(page, {
+      envelopeType: 'DOCUMENT',
+      tokenNamePrefix: 'e2e-embed-copy-paste',
+    });
+    const result = await runCopyPasteFieldFlow(surface);
+
+    await persistEmbeddedEnvelope(surface);
+
+    await assertCopyPasteFieldPersistedInDatabase({
+      surface,
+      ...result,
+    });
+  });
+
   test('place and configure all 10 field types', async ({ page }) => {
     const surface = await openEmbeddedEnvelopeEditor(page, {
       envelopeType: 'DOCUMENT',
@@ -1226,6 +1245,22 @@ test.describe('embedded edit', () => {
     await persistEmbeddedEnvelope(surface);
 
     await assertDuplicateDeleteFieldPersistedInDatabase({
+      surface,
+      ...result,
+    });
+  });
+
+  test('copy and paste fields with keyboard shortcuts', async ({ page }) => {
+    const surface = await openEmbeddedEnvelopeEditor(page, {
+      envelopeType: 'TEMPLATE',
+      mode: 'edit',
+      tokenNamePrefix: 'e2e-embed-copy-paste',
+    });
+    const result = await runCopyPasteFieldFlow(surface);
+
+    await persistEmbeddedEnvelope(surface);
+
+    await assertCopyPasteFieldPersistedInDatabase({
       surface,
       ...result,
     });
