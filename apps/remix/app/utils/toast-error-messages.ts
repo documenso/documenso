@@ -18,10 +18,28 @@ export const FAIR_USE_LIMIT_EXCEEDED_ERROR_MESSAGE = {
   description: msg`Your organisation has reached its plan's fair use limit. Please contact your organisation administrator or support to continue.`,
 };
 
+const MISSING_CONTENT_IMAGE_ERROR_MESSAGE: ToastMessageDescriptor = {
+  title: msg`Missing images`,
+  description: msg`One or more image contents have no image. Upload an image for each of them, or remove them.`,
+};
+
+const ENVELOPE_CONTENT_LIMIT_EXCEEDED_ERROR_MESSAGE: ToastMessageDescriptor = {
+  title: msg`Envelope content limit exceeded`,
+  description: msg`This envelope has too many content items. Please remove some, or contact support if you need more.`,
+};
+
+const ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED_ERROR_MESSAGE: ToastMessageDescriptor = {
+  title: msg`Envelope image content limit exceeded`,
+  description: msg`This envelope has too many image content items. Please remove some, or contact support if you need more.`,
+};
+
 export const getDistributeErrorMessage = (code: string): ToastMessageDescriptor => {
   return match(code)
     .with('RECIPIENT_LIMIT_EXCEEDED', () => RECIPIENT_LIMIT_EXCEEDED_ERROR_MESSAGE)
     .with(AppErrorCode.TOO_MANY_REQUESTS, () => FAIR_USE_LIMIT_EXCEEDED_ERROR_MESSAGE)
+    .with('MISSING_CONTENT_IMAGE', () => MISSING_CONTENT_IMAGE_ERROR_MESSAGE)
+    .with('ENVELOPE_CONTENT_LIMIT_EXCEEDED', () => ENVELOPE_CONTENT_LIMIT_EXCEEDED_ERROR_MESSAGE)
+    .with('ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED', () => ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED_ERROR_MESSAGE)
     .otherwise(() => ({
       title: msg`Something went wrong`,
       description: msg`An error occurred while distributing the document.`,
@@ -36,6 +54,54 @@ export const getDirectTemplateErrorMessage = (code: string): ToastMessageDescrip
       title: msg`Missing signature fields`,
       description: msg`This direct link template cannot be used because one or more signers do not have a signature field assigned.`,
     }))
+    .with('MISSING_CONTENT_IMAGE', () => MISSING_CONTENT_IMAGE_ERROR_MESSAGE)
+    .with('ENVELOPE_CONTENT_LIMIT_EXCEEDED', () => ENVELOPE_CONTENT_LIMIT_EXCEEDED_ERROR_MESSAGE)
+    .with('ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED', () => ENVELOPE_CONTENT_IMAGE_LIMIT_EXCEEDED_ERROR_MESSAGE)
+    .otherwise(() => ({
+      title: msg`Something went wrong`,
+      description: msg`We were unable to submit this document at this time. Please try again later.`,
+    }));
+};
+
+/**
+ * Toast messages for errors thrown while a recipient attempts to complete
+ * (sign) a document, so the user knows whether retrying can help and what to
+ * do next.
+ */
+export const getSigningCompletionErrorMessage = (code: string): ToastMessageDescriptor => {
+  return match(code)
+    .with(AppErrorCode.NOT_FOUND, () => ({
+      title: msg`Document no longer available`,
+      description: msg`This document can no longer be signed. It may have been removed by the sender, or your signing access may have been revoked. Please contact the sender for a new signing link.`,
+    }))
+    .with(AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS, () => ({
+      title: msg`Some fields were not saved`,
+      description: msg`One or more of your required fields have not been saved. Please refresh the page, complete any empty required fields, and try again.`,
+    }))
+    .with(AppErrorCode.RECIPIENT_OUT_OF_TURN, () => ({
+      title: msg`It's not your turn to sign yet`,
+      description: msg`This document is signed in a set order and other recipients must sign before you. You will receive an email when it is your turn.`,
+    }))
+    .with(AppErrorCode.RECIPIENT_EXPIRED, () => ({
+      title: msg`Signing link expired`,
+      description: msg`Your signing link has expired. Please contact the sender to request a new one.`,
+    }))
+    .with(AppErrorCode.ENVELOPE_COMPLETED, () => ({
+      title: msg`Document already completed`,
+      description: msg`This document has already been completed and no further signatures can be added.`,
+    }))
+    .with(AppErrorCode.ENVELOPE_REJECTED, () => ({
+      title: msg`Document rejected`,
+      description: msg`This document has been rejected by a recipient and can no longer be signed.`,
+    }))
+    .with(AppErrorCode.ENVELOPE_CANCELLED, () => ({
+      title: msg`Document cancelled`,
+      description: msg`This document has been cancelled by the sender and can no longer be signed. Please contact the sender if you believe this is a mistake.`,
+    }))
+    .with(AppErrorCode.ENVELOPE_DRAFT, () => ({
+      title: msg`Document not ready`,
+      description: msg`This document has not been sent for signing yet. Please wait for the sender to send it before signing.`,
+    }))
     .otherwise(() => ({
       title: msg`Something went wrong`,
       description: msg`We were unable to submit this document at this time. Please try again later.`,
@@ -47,7 +113,7 @@ export const getUploadErrorMessage = (code: string): ToastMessageDescriptor => {
     .with(AppErrorCode.TOO_MANY_REQUESTS, () => FAIR_USE_LIMIT_EXCEEDED_ERROR_MESSAGE)
     .with('INVALID_DOCUMENT_FILE', () => ({
       title: msg`Error`,
-      description: msg`You cannot upload encrypted PDFs.`,
+      description: msg`The file is not a valid PDF or is password protected.`,
     }))
     .with(AppErrorCode.LIMIT_EXCEEDED, () => ({
       title: msg`Error`,
@@ -84,6 +150,10 @@ export const getTemplateUseErrorMessage = (code: string): ToastMessageDescriptor
     .with(AppErrorCode.MISSING_SIGNATURE_FIELD, () => ({
       title: msg`Missing signature fields`,
       description: msg`The document could not be sent because some signers do not have a signature field. Please edit the template and add a signature field for each signer.`,
+    }))
+    .with('MISSING_CONTENT_IMAGE', () => ({
+      title: msg`Missing images`,
+      description: msg`The document could not be sent because one or more image contents have no image. Please edit the template and upload an image for each of them, or remove them.`,
     }))
     .with(AppErrorCode.INVALID_BODY, AppErrorCode.INVALID_REQUEST, () => ({
       title: msg`Error`,

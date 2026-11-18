@@ -344,7 +344,6 @@ npm run test:e2e
 | --------------- | ---------- |
 | PostgreSQL      | 54320      |
 | Inbucket (Mail) | 9000       |
-| MinIO (S3)      | 9001, 9002 |
 
 ## Environment Variables Summary
 

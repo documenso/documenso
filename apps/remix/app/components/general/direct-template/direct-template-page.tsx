@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { AppError } from '@documenso/lib/errors/app-error';
 import type { TTemplate } from '@documenso/lib/types/template';
@@ -41,6 +42,7 @@ export const DirectTemplatePageView = ({
 
   const { _ } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const { email, fullName, setEmail } = useRequiredDocumentSigningContext();
   const { recipient, setRecipient } = useRequiredDocumentSigningAuthContext();
@@ -123,6 +125,13 @@ export const DirectTemplatePageView = ({
     } catch (err) {
       const error = AppError.parseError(err);
       const errorMessage = getDirectTemplateErrorMessage(error.code);
+
+      analytics.captureException(err, {
+        source: 'signing',
+        location: 'direct_template',
+        recipientId: directTemplateRecipient.id,
+        envelopeId: template.envelopeId,
+      });
 
       toast({
         title: _(errorMessage.title),

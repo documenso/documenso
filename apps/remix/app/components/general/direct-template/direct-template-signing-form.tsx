@@ -11,6 +11,7 @@ import {
 import type { TTemplate } from '@documenso/lib/types/template';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { getNextDictatableRecipient } from '@documenso/lib/utils/recipient-groups';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
@@ -223,27 +224,10 @@ export const DirectTemplateSigningForm = ({
       return undefined;
     }
 
-    const sortedRecipients = template.recipients.sort((a, b) => {
-      // Sort by signingOrder first (nulls last), then by id
-      if (a.signingOrder === null && b.signingOrder === null) {
-        return a.id - b.id;
-      }
-      if (a.signingOrder === null) {
-        return 1;
-      }
-      if (b.signingOrder === null) {
-        return -1;
-      }
-      if (a.signingOrder === b.signingOrder) {
-        return a.id - b.id;
-      }
-      return a.signingOrder - b.signingOrder;
+    return getNextDictatableRecipient({
+      recipients: template.recipients,
+      currentRecipientId: directRecipient.id,
     });
-
-    const currentIndex = sortedRecipients.findIndex((r) => r.id === directRecipient.id);
-    return currentIndex !== -1 && currentIndex < sortedRecipients.length - 1
-      ? sortedRecipients[currentIndex + 1]
-      : undefined;
   }, [template.templateMeta?.signingOrder, template.recipients, directRecipient.id]);
 
   return (
@@ -435,7 +419,7 @@ export const DirectTemplateSigningForm = ({
             fields={localFields}
             fieldsValidated={fieldsValidated}
             recipient={directRecipient}
-            allowDictateNextSigner={nextRecipient && template.templateMeta?.allowDictateNextSigner}
+            allowDictateNextSigner={Boolean(nextRecipient && template.templateMeta?.allowDictateNextSigner)}
             defaultNextSigner={nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined}
           />
         </div>

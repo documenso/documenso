@@ -44,7 +44,10 @@ export const EnvelopesBulkDeleteDialog = ({
       if (isDocument) {
         await trpcUtils.document.findDocumentsInternal.invalidate();
       } else {
-        await trpcUtils.template.findTemplates.invalidate();
+        await Promise.all([
+          trpcUtils.template.findTemplates.invalidate(),
+          trpcUtils.template.findTemplatesInternal.invalidate(),
+        ]);
       }
 
       if (result.failedIds.length > 0) {

@@ -2,6 +2,7 @@ import { prisma } from '@documenso/prisma';
 import { FieldType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { getAssistableRecipientsWhereInput } from '../../utils/recipient-queries';
 
 export interface GetRecipientsForAssistantOptions {
   token: string;
@@ -23,9 +24,9 @@ export const getRecipientsForAssistant = async ({ token }: GetRecipientsForAssis
   let recipients = await prisma.recipient.findMany({
     where: {
       envelopeId: assistant.envelopeId,
-      signingOrder: {
-        gte: assistant.signingOrder ?? 0,
-      },
+      // The assistant themself plus strictly later steps — never their own
+      // group peers, with null orders treated as the tail step.
+      AND: [getAssistableRecipientsWhereInput(assistant)],
     },
     include: {
       fields: {

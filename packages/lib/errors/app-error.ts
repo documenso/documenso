@@ -23,6 +23,13 @@ export enum AppErrorCode {
   SCHEMA_FAILED = 'SCHEMA_FAILED',
   TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS',
   TWO_FACTOR_AUTH_FAILED = 'TWO_FACTOR_AUTH_FAILED',
+  TWO_FACTOR_SETUP_REQUIRED = 'TWO_FACTOR_SETUP_REQUIRED',
+  TWO_FACTOR_MISSING_SECRET = 'TWO_FACTOR_MISSING_SECRET',
+  TWO_FACTOR_MISSING_CREDENTIALS = 'TWO_FACTOR_MISSING_CREDENTIALS',
+  INCORRECT_TWO_FACTOR_CODE = 'INCORRECT_TWO_FACTOR_CODE',
+  NO_PASSWORD = 'NO_PASSWORD',
+  INCORRECT_PASSWORD = 'INCORRECT_PASSWORD',
+  SAME_PASSWORD = 'SAME_PASSWORD',
   WEBHOOK_INVALID_REQUEST = 'WEBHOOK_INVALID_REQUEST',
   ENVELOPE_DRAFT = 'ENVELOPE_DRAFT',
   ENVELOPE_COMPLETED = 'ENVELOPE_COMPLETED',
@@ -37,11 +44,32 @@ export enum AppErrorCode {
   ENVELOPE_TSP_LOCKED = 'ENVELOPE_TSP_LOCKED',
 
   /**
+   * Recipient action on an envelope whose sender's account is disabled.
+   * Distinct from `ACCOUNT_DISABLED` so the UI can show a "sender disabled"
+   * page rather than treating the recipient's own account as disabled.
+   */
+  SENDER_DISABLED = 'SENDER_DISABLED',
+
+  /**
    * A completion request was made for a recipient that has already signed.
    * Thrown for retried, stale or concurrent duplicate submissions so callers
    * can resolve them idempotently instead of surfacing an error.
    */
   RECIPIENT_ALREADY_SIGNED = 'RECIPIENT_ALREADY_SIGNED',
+
+  /**
+   * A completion request was made for a recipient that still has required
+   * fields which have not been inserted. Usually indicates the client's field
+   * state is out of sync with the server (e.g. a field insert failed to
+   * persist before submission).
+   */
+  RECIPIENT_HAS_UNSIGNED_FIELDS = 'RECIPIENT_HAS_UNSIGNED_FIELDS',
+
+  /**
+   * A completion request was made by a recipient in a sequential signing flow
+   * before the preceding recipients have signed.
+   */
+  RECIPIENT_OUT_OF_TURN = 'RECIPIENT_OUT_OF_TURN',
 
   /**
    * A signer recipient does not have a signature field assigned. Thrown when
@@ -98,7 +126,10 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.ENVELOPE_CANCELLED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_LEGACY]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_TSP_LOCKED]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.SENDER_DISABLED]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.MISSING_SIGNATURE_FIELD]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.RECIPIENT_OUT_OF_TURN]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.CSC_INSTANCE_MODE_MISMATCH]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.CSC_UNLICENSED]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.CSC_PROVIDER_INFO_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
@@ -307,6 +338,8 @@ export class AppError extends Error {
         AppErrorCode.ENVELOPE_LEGACY,
         AppErrorCode.ENVELOPE_TSP_LOCKED,
         AppErrorCode.MISSING_SIGNATURE_FIELD,
+        AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS,
+        AppErrorCode.RECIPIENT_OUT_OF_TURN,
         AppErrorCode.CSC_INSTANCE_MODE_MISMATCH,
         AppErrorCode.CSC_CREDENTIAL_LIST_EMPTY,
         AppErrorCode.CSC_CERT_INVALID,
@@ -316,7 +349,7 @@ export class AppError extends Error {
         () => 400 as const,
       )
       .with(AppErrorCode.UNAUTHORIZED, () => 401 as const)
-      .with(AppErrorCode.FORBIDDEN, AppErrorCode.CSC_UNLICENSED, () => 403 as const)
+      .with(AppErrorCode.FORBIDDEN, AppErrorCode.SENDER_DISABLED, AppErrorCode.CSC_UNLICENSED, () => 403 as const)
       .with(AppErrorCode.NOT_FOUND, () => 404 as const)
       .with(AppErrorCode.NOT_IMPLEMENTED, () => 501 as const)
       .otherwise(() => 500 as const);

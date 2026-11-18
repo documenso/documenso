@@ -1,6 +1,6 @@
 import type { User } from '@prisma/client';
 
-import { AppError } from '../../errors/app-error';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { getBackupCodes } from './get-backup-code';
 import { validateTwoFactorAuthentication } from './validate-2fa';
 
@@ -17,7 +17,7 @@ export const viewBackupCodes = async ({ token, user }: ViewBackupCodesOptions) =
   }
 
   if (!isValid) {
-    throw new AppError('INCORRECT_TWO_FACTOR_CODE');
+    throw new AppError(AppErrorCode.INCORRECT_TWO_FACTOR_CODE);
   }
 
   const backupCodes = getBackupCodes({ user });

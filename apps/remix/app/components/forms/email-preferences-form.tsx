@@ -243,7 +243,7 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
                   className="flex-1"
                   canInherit={canInherit}
                   isInherited={field.value === null}
-                  label={<Trans>Send on Behalf of Team</Trans>}
+                  label={<Trans>Include Sender Details</Trans>}
                   testId="include-sender-details"
                 >
                   <FormControl>
@@ -297,10 +297,15 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
 
                   <FormDescription>
                     <Trans>
-                      Controls the formatting of the message that will be sent when inviting a recipient to sign a
-                      document. If a custom message has been provided while configuring the document, it will be used
-                      instead.
+                      Choose Yes to show the individual sender's name alongside the team name in signing invitations.
+                      Choose No to show only the team name.
                     </Trans>
+                    <span className="mt-2 block">
+                      <Trans>
+                        If a custom message has been provided while configuring the document, it replaces the default
+                        body text, but the heading still follows this setting.
+                      </Trans>
+                    </span>
                   </FormDescription>
                 </InheritableField>
               )}
