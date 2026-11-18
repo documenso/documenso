@@ -55,7 +55,7 @@ export const DocumentSigningDateField = ({
   const safeFieldMeta = ZDateFieldMeta.safeParse(field.fieldMeta);
   const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
 
-  const localDateString = convertToLocalSystemFormat(field.customText, dateFormat, timezone);
+  const localDateString = convertToLocalSystemFormat({ customText: field.customText, dateFormat, timezone });
   const isDifferentTime = field.inserted && localDateString !== field.customText;
   const tooltipText = _(
     msg`"${field.customText}" will appear on the document as it has a timezone of "${timezone || ''}".`,

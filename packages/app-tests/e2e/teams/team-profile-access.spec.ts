@@ -4,7 +4,7 @@ import { TeamMemberRole } from '@documenso/prisma/client';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { expect, test } from '@playwright/test';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -21,7 +21,11 @@ test('[TEAMS]: a member cannot edit the team public profile', async ({ page }) =
   await apiSignin({ page, email: member.email });
 
   const profileRes = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/team.update`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': team.id.toString() },
+    headers: {
+      ...WEBAPP_ORIGIN_HEADERS,
+      'content-type': 'application/json',
+      'x-team-id': team.id.toString(),
+    },
     data: JSON.stringify({
       json: {
         teamId: team.id,
@@ -38,7 +42,11 @@ test('[TEAMS]: a member cannot edit the team public profile', async ({ page }) =
 
   // The name/url path of the same route is also management-gated.
   const nameRes = await page.context().request.post(`${WEBAPP_BASE_URL}/api/trpc/team.update`, {
-    headers: { 'content-type': 'application/json', 'x-team-id': team.id.toString() },
+    headers: {
+      ...WEBAPP_ORIGIN_HEADERS,
+      'content-type': 'application/json',
+      'x-team-id': team.id.toString(),
+    },
     data: JSON.stringify({
       json: { teamId: team.id, data: { name: 'renamed-by-member' } },
     }),

@@ -4,6 +4,7 @@ import { createEmbeddingEnvelopeRoute } from './create-embedding-envelope';
 import { createEmbeddingPresignTokenRoute } from './create-embedding-presign-token';
 import { createEmbeddingTemplateRoute } from './create-embedding-template';
 import { getMultiSignDocumentRoute } from './get-multi-sign-document';
+import { persistEmbedSignatureRoute } from './persist-embed-signature';
 import { updateEmbeddingDocumentRoute } from './update-embedding-document';
 import { updateEmbeddingEnvelopeRoute } from './update-embedding-envelope';
 import { updateEmbeddingTemplateRoute } from './update-embedding-template';
@@ -19,4 +20,5 @@ export const embeddingPresignRouter = router({
   updateEmbeddingDocument: updateEmbeddingDocumentRoute,
   updateEmbeddingTemplate: updateEmbeddingTemplateRoute,
   getMultiSignDocument: getMultiSignDocumentRoute,
+  persistEmbedSignature: persistEmbedSignatureRoute,
 });
