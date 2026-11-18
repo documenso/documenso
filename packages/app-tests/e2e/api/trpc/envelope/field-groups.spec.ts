@@ -1,6 +1,8 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppErrorCode } from '@documenso/lib/errors/app-error';
+import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import type { TCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
+import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { type APIRequestContext, expect, test } from '@playwright/test';
@@ -178,6 +180,38 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
 
     expect(mixedTypeResponse.ok()).toBeFalsy();
 
+    // Settings which are not set match however they are sent. A field without any settings is
+    // given defaults such as an empty label, which is the same as the other field having none.
+    const unsetSettingsResponse = await createFields([
+      { recipientId: recipientOne.id, type: FieldType.TEXT, positionX: 5, positionY: 60, groupId: 'grp_unset' },
+      {
+        recipientId: recipientOne.id,
+        type: FieldType.TEXT,
+        positionX: 5,
+        positionY: 70,
+        groupId: 'grp_unset',
+        fieldMeta: { type: 'text', fontSize: 10 },
+      },
+    ]);
+
+    expect(unsetSettingsResponse.ok(), await unsetSettingsResponse.text()).toBeTruthy();
+
+    // A setting which is set on one field only still has to match, and is the one named.
+    const setOnOneFieldResponse = await createFields([
+      {
+        recipientId: recipientOne.id,
+        type: FieldType.TEXT,
+        positionX: 5,
+        positionY: 80,
+        groupId: 'grp_unset',
+        fieldMeta: { type: 'text', required: true },
+      },
+    ]);
+
+    expect(setOnOneFieldResponse.status()).toBe(400);
+    // Not followed by a comma, so no other setting is named with it.
+    expect(await setOnOneFieldResponse.text()).toMatch(/fields in the group: required(?!,)/);
+
     // A valid checkbox group with a shared rule.
     await apiCreateFields(
       request,
@@ -264,6 +298,71 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     expect(legacyDeleteResponse.ok()).toBeFalsy();
     expect(await legacyDeleteResponse.text()).toContain('/envelope/field/delete');
     expect(await prisma.field.count({ where: { id: checkboxB.id } })).toBe(1);
+  });
+
+  test('a field cannot be put into the group of another recipient by saving it under that recipient', async ({
+    request,
+  }) => {
+    const radioField = (externalId: string, positionY: number, groupId?: string) => ({
+      type: FieldType.RADIO,
+      page: 1,
+      positionX: 5,
+      positionY,
+      ...FIELD_SIZE,
+      groupId,
+      externalId,
+      fieldMeta: { type: 'radio', values: [option(1, externalId)] },
+    });
+
+    const { envelope, user, team } = await apiSeedDraftDocument(request, {
+      recipients: [
+        { email: 'group-owner-one@test.documenso.com', name: 'Recipient One' },
+        { email: 'group-owner-two@test.documenso.com', name: 'Recipient Two' },
+      ],
+      fieldsPerRecipient: [
+        [SIGNATURE_FIELD, radioField('radio-one', 20)],
+        [SIGNATURE_FIELD, radioField('radio-two-a', 35, 'grp_two'), radioField('radio-two-b', 50, 'grp_two')],
+      ],
+    });
+
+    const recipientTwo = envelope.recipients[1];
+    const radioOne = findFieldByExternalId(envelope.fields, 'radio-one');
+
+    const saveFields = async (overrides: { recipientId?: number; groupId?: string } = {}) =>
+      await setFieldsForDocument({
+        userId: user.id,
+        teamId: team.id,
+        id: { type: 'envelopeId', id: envelope.id },
+        fields: envelope.fields.map((field) => ({
+          id: field.id,
+          envelopeItemId: field.envelopeItemId,
+          type: field.type,
+          recipientId: field.recipientId,
+          pageNumber: field.page,
+          pageX: Number(field.positionX),
+          pageY: Number(field.positionY),
+          pageWidth: Number(field.width),
+          pageHeight: Number(field.height),
+          fieldMeta: field.fieldMeta ?? undefined,
+          ...(field.id === radioOne.id ? overrides : {}),
+        })),
+        requestMetadata: { requestMetadata: {}, source: 'app', auth: 'session' },
+      });
+
+    // The group would look valid for recipient two, while the stored field stays with recipient one.
+    await expect(saveFields({ recipientId: recipientTwo.id, groupId: 'grp_two' })).rejects.toThrow(
+      /recipient or envelope item/,
+    );
+
+    const storedRadioOne = await prisma.field.findUniqueOrThrow({ where: { id: radioOne.id } });
+
+    expect(storedRadioOne.groupId).toBeNull();
+    expect(storedRadioOne.recipientId).toBe(radioOne.recipientId);
+
+    // The same payload without the move is accepted, so only the move caused the rejection.
+    const { fields: savedFields } = await saveFields();
+
+    expect(savedFields).toHaveLength(envelope.fields.length);
   });
 
   test('deleting a file removes a group rule which can no longer be satisfied', async ({ request }) => {
@@ -514,6 +613,64 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     });
 
     expect(completeResponse.ok(), await completeResponse.text()).toBeTruthy();
+  });
+
+  test('a qualified signature envelope cannot be completed with a broken checkbox rule', async ({ request }) => {
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+      recipients: [{ email: 'group-tsp@test.documenso.com', name: 'Group TSP Signer' }],
+      fieldsPerRecipient: [
+        [
+          SIGNATURE_FIELD,
+          {
+            type: FieldType.CHECKBOX,
+            page: 1,
+            positionX: 5,
+            positionY: 35,
+            ...FIELD_SIZE,
+            externalId: 'checkbox',
+            fieldMeta: {
+              type: 'checkbox',
+              required: true,
+              values: [option(1, 'A'), option(2, 'B'), option(3, 'C')],
+              ...atLeastTwo,
+            },
+          },
+        ],
+      ],
+    });
+
+    // These envelopes are completed through the signing provider flow instead of the
+    // usual completion, so they need their own check.
+    await prisma.envelope.update({ where: { id: envelope.id }, data: { signatureLevel: SignatureLevel.QES } });
+
+    const { token: recipientToken } = distributeResult.recipients[0];
+
+    const signatureField = envelope.fields.find((field) => field.type === FieldType.SIGNATURE);
+    const checkbox = findFieldByExternalId(envelope.fields, 'checkbox');
+
+    if (!signatureField) {
+      throw new Error('Signature field not found');
+    }
+
+    for (const [fieldId, fieldValue] of [
+      [signatureField.id, { type: FieldType.SIGNATURE, value: 'Signature' }],
+      [checkbox.id, { type: FieldType.CHECKBOX, value: [0] }],
+    ] as const) {
+      const signResponse = await postTrpc(request, 'envelope.field.sign', {
+        token: recipientToken,
+        fieldId,
+        fieldValue,
+      });
+
+      expect(signResponse.ok(), await signResponse.text()).toBeTruthy();
+    }
+
+    const completeResponse = await postTrpc(request, 'recipient.completeDocumentWithToken', {
+      token: recipientToken,
+      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+    });
+
+    await expectTrpcErrorCode(completeResponse, AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS);
   });
 
   test('legacy token routes cannot sign or unsign a field of a V2 envelope', async ({ request }) => {

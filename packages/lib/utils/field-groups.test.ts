@@ -53,6 +53,7 @@ describe('extractFieldGroupSharedMeta', () => {
     expect(shared).toEqual({
       required: false,
       readOnly: false,
+      label: '',
       validationRule: 'Select at least',
       validationLength: 2,
     });
@@ -106,16 +107,121 @@ describe('validateFieldGroup', () => {
       { type: FieldType.TEXT, recipientId: 1, groupId: 'g', fieldMeta: textMeta({ characterLimit: 20 }) },
     ]);
 
-    expect(errors.some((error) => error.includes('must be identical'))).toBe(true);
+    expect(errors).toEqual([
+      'Group "g": the following field meta values must be identical for all fields in the group: characterLimit',
+    ]);
   });
 
-  it('treats null and omitted shared values as identical', () => {
+  it('treats a shared value which is not set the same however it was written', () => {
     const errors = validateFieldGroup('g', [
-      { type: FieldType.NUMBER, recipientId: 1, groupId: 'g', fieldMeta: { type: 'number', minValue: null } },
+      {
+        type: FieldType.NUMBER,
+        recipientId: 1,
+        groupId: 'g',
+        fieldMeta: {
+          type: 'number',
+          required: false,
+          readOnly: false,
+          label: '',
+          numberFormat: null,
+          minValue: null,
+          maxValue: null,
+          value: '',
+        },
+      },
       { type: FieldType.NUMBER, recipientId: 1, groupId: 'g', fieldMeta: { type: 'number' } },
     ]);
 
     expect(errors).toEqual([]);
+  });
+
+  it('treats a character limit of 0 the same as no limit', () => {
+    const errors = validateFieldGroup('g', [
+      { type: FieldType.TEXT, recipientId: 1, groupId: 'g', fieldMeta: { type: 'text', characterLimit: 0 } },
+      { type: FieldType.TEXT, recipientId: 1, groupId: 'g', fieldMeta: { type: 'text' } },
+    ]);
+
+    expect(errors).toEqual([]);
+  });
+
+  it('keeps a number limit of 0 and an empty option list as real values', () => {
+    // The signing dialog only lets 0 be entered for a maximum of 0.
+    const numberErrors = validateFieldGroup('g', [
+      { type: FieldType.NUMBER, recipientId: 1, groupId: 'g', fieldMeta: { type: 'number', maxValue: 0 } },
+      { type: FieldType.NUMBER, recipientId: 1, groupId: 'g', fieldMeta: { type: 'number' } },
+    ]);
+
+    expect(numberErrors).toEqual([
+      'Group "g": the following field meta values must be identical for all fields in the group: maxValue',
+    ]);
+
+    // An empty option list rejects every value, a missing one does not.
+    const dropdownErrors = validateFieldGroup('g', [
+      { type: FieldType.DROPDOWN, recipientId: 1, groupId: 'g', fieldMeta: { type: 'dropdown', values: [] } },
+      { type: FieldType.DROPDOWN, recipientId: 1, groupId: 'g', fieldMeta: { type: 'dropdown' } },
+    ]);
+
+    expect(dropdownErrors).toEqual([
+      'Group "g": the following field meta values must be identical for all fields in the group: values',
+    ]);
+  });
+
+  it('accepts the default meta next to meta which only sets a visual value', () => {
+    const errors = validateFieldGroup('g', [
+      { type: FieldType.TEXT, recipientId: 1, groupId: 'g', fieldMeta: FIELD_META_DEFAULT_VALUES[FieldType.TEXT] },
+      { type: FieldType.TEXT, recipientId: 1, groupId: 'g', fieldMeta: { type: 'text', fontSize: 10 } },
+    ]);
+
+    expect(errors).toEqual([]);
+  });
+
+  it('accepts a new field next to a group which had its checkbox rule removed', () => {
+    // Removing a rule deletes the keys, while a new field has them written out as unused.
+    const withoutRule = checkboxMeta();
+    const withUnusedRule = checkboxMeta({
+      validationRule: '',
+      validationLength: 0,
+      values: [{ id: 2, checked: false, value: 'B' }],
+    });
+
+    const errors = validateFieldGroup('g', [
+      { type: FieldType.CHECKBOX, recipientId: 1, groupId: 'g', fieldMeta: withoutRule },
+      { type: FieldType.CHECKBOX, recipientId: 1, groupId: 'g', fieldMeta: withUnusedRule },
+    ]);
+
+    expect(errors).toEqual([]);
+  });
+
+  it('treats an unset setting on name and email fields the same however it was written', () => {
+    const nameErrors = validateFieldGroup('g', [
+      { type: FieldType.NAME, recipientId: 1, groupId: 'g', fieldMeta: { type: 'name', required: false, label: '' } },
+      { type: FieldType.NAME, recipientId: 1, groupId: 'g', fieldMeta: { type: 'name' } },
+    ]);
+
+    expect(nameErrors).toEqual([]);
+
+    const emailErrors = validateFieldGroup('g', [
+      {
+        type: FieldType.EMAIL,
+        recipientId: 1,
+        groupId: 'g',
+        fieldMeta: { type: 'email', overflow: 'auto', readOnly: false },
+      },
+      { type: FieldType.EMAIL, recipientId: 1, groupId: 'g', fieldMeta: { type: 'email', overflow: 'auto' } },
+    ]);
+
+    expect(emailErrors).toEqual([]);
+  });
+
+  it('still rejects a shared value which is set on one field only', () => {
+    const errors = validateFieldGroup('g', [
+      { type: FieldType.TEXT, recipientId: 1, groupId: 'g', fieldMeta: { type: 'text', required: true } },
+      { type: FieldType.TEXT, recipientId: 1, groupId: 'g', fieldMeta: { type: 'text', characterLimit: 5 } },
+    ]);
+
+    expect(errors).toEqual([
+      'Group "g": the following field meta values must be identical for all fields in the group: required, characterLimit',
+    ]);
   });
 
   it('allows differing visual meta', () => {

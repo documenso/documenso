@@ -3,7 +3,7 @@ import { isDeepEqual } from 'remeda';
 
 import { validateCheckboxField } from '../advanced-fields-validation/validate-checkbox';
 import { validateRadioField } from '../advanced-fields-validation/validate-radio';
-import { canFieldTypeBeGrouped, FIELD_GROUP_SHARED_META_KEYS } from '../constants/field-groups';
+import { canFieldTypeBeGrouped, FIELD_GROUP_SHARED_META_DEFAULTS } from '../constants/field-groups';
 import { AppError, AppErrorCode } from '../errors/app-error';
 import {
   FIELD_META_DEFAULT_VALUES,
@@ -17,7 +17,7 @@ import { prefixedId } from '../universal/id';
 export {
   ALLOWED_FIELD_GROUP_TYPES,
   canFieldTypeBeGrouped,
-  FIELD_GROUP_SHARED_META_KEYS,
+  FIELD_GROUP_SHARED_META_DEFAULTS,
 } from '../constants/field-groups';
 
 /**
@@ -32,34 +32,23 @@ export type FieldGroupItem = {
 };
 
 /**
- * Returns a copy of the shared meta values for the given field.
+ * Returns the shared meta values for the given field, with every shared key present.
  *
- * Null and undefined values are omitted so they compare equally.
+ * A key the field does not set takes its default from `FIELD_GROUP_SHARED_META_DEFAULTS`,
+ * so two fields compare equally whether a setting was left out or written out as unused.
  */
 export const extractFieldGroupSharedMeta = (
   type: FieldType,
   fieldMeta: TFieldMetaSchema | null,
 ): Record<string, unknown> => {
-  const sharedKeys = FIELD_GROUP_SHARED_META_KEYS[type];
-
-  if (!fieldMeta) {
-    return {};
-  }
-
   const meta: Record<string, unknown> = { ...fieldMeta };
-  const shared: Record<string, unknown> = {};
 
-  for (const key of sharedKeys) {
-    const value = meta[key];
-
-    if (value === undefined || value === null) {
-      continue;
-    }
-
-    shared[key] = value;
-  }
-
-  return shared;
+  return Object.fromEntries(
+    Object.entries(FIELD_GROUP_SHARED_META_DEFAULTS[type]).map(([key, defaultValue]) => [
+      key,
+      meta[key] ?? defaultValue,
+    ]),
+  );
 };
 
 /**
@@ -72,7 +61,7 @@ export const mergeFieldGroupSharedMeta = <T extends TFieldMetaSchema>(
   targetMeta: T,
   sourceMeta: TFieldMetaSchema | null,
 ): T => {
-  const sharedKeys = FIELD_GROUP_SHARED_META_KEYS[type];
+  const sharedKeys = Object.keys(FIELD_GROUP_SHARED_META_DEFAULTS[type]);
 
   if (!targetMeta) {
     return targetMeta;
@@ -126,16 +115,15 @@ export const validateFieldGroup = (groupId: string, items: FieldGroupItem[]): st
   }
 
   const firstSharedMeta = extractFieldGroupSharedMeta(firstItem.type, firstItem.fieldMeta);
+  const otherSharedMetas = items.slice(1).map((item) => extractFieldGroupSharedMeta(item.type, item.fieldMeta));
 
-  const hasMismatchedSharedMeta = items.some(
-    (item) => !isDeepEqual(extractFieldGroupSharedMeta(item.type, item.fieldMeta), firstSharedMeta),
+  const mismatchedSharedKeys = Object.keys(firstSharedMeta).filter((key) =>
+    otherSharedMetas.some((sharedMeta) => !isDeepEqual(sharedMeta[key], firstSharedMeta[key])),
   );
 
-  if (hasMismatchedSharedMeta) {
-    const sharedKeys = FIELD_GROUP_SHARED_META_KEYS[firstItem.type].join(', ');
-
+  if (mismatchedSharedKeys.length > 0) {
     errors.push(
-      `Group "${groupId}": the following field meta values must be identical for all fields in the group: ${sharedKeys}`,
+      `Group "${groupId}": the following field meta values must be identical for all fields in the group: ${mismatchedSharedKeys.join(', ')}`,
     );
   }
 
