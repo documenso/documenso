@@ -1,4 +1,5 @@
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import { formatFileSize } from '@documenso/lib/universal/unit-convertions';
 import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -96,16 +97,6 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
     }
 
     form.unregister('documentData');
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) {
-      return '0 Bytes';
-    }
-
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${parseFloat((bytes / 1024 ** i).toFixed(2))} ${sizes[i]}`;
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

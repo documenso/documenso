@@ -44,6 +44,7 @@ import { EmbedClientLoading } from './embed-client-loading';
 import { EmbedDocumentCompleted } from './embed-document-completed';
 import { EmbedDocumentFields } from './embed-document-fields';
 import { EmbedDocumentRejected } from './embed-document-rejected';
+import { usePersistEmbedSignature } from './use-persist-embed-signature';
 
 export type EmbedSignDocumentV1ClientPageProps = {
   token: string;
@@ -55,9 +56,11 @@ export type EmbedSignDocumentV1ClientPageProps = {
   completedFields: DocumentField[];
   metadata?: DocumentMeta | null;
   isCompleted?: boolean;
+  isRejected?: boolean;
   hidePoweredBy?: boolean;
   allowWhitelabelling?: boolean;
   allRecipients?: RecipientWithFields[];
+  clientUserId?: string | null;
 };
 
 export const EmbedSignDocumentV1ClientPage = ({
@@ -70,9 +73,11 @@ export const EmbedSignDocumentV1ClientPage = ({
   completedFields,
   metadata,
   isCompleted,
+  isRejected,
   hidePoweredBy = false,
   allowWhitelabelling = false,
   allRecipients = [],
+  clientUserId = null,
 }: EmbedSignDocumentV1ClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -80,10 +85,18 @@ export const EmbedSignDocumentV1ClientPage = ({
 
   const { fullName, email, signature, setFullName, setEmail, setSignature } = useRequiredDocumentSigningContext();
 
+  const { persistSignature } = usePersistEmbedSignature({
+    token,
+    clientUserId,
+    initialSignature: signature,
+  });
+
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
   const [hasCompletedDocument, setHasCompletedDocument] = useState(isCompleted);
-  const [hasRejectedDocument, setHasRejectedDocument] = useState(recipient.signingStatus === SigningStatus.REJECTED);
+  const [hasRejectedDocument, setHasRejectedDocument] = useState(
+    isRejected ?? recipient.signingStatus === SigningStatus.REJECTED,
+  );
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(
     allRecipients.length > 0 ? allRecipients[0].id : null,
   );
@@ -135,10 +148,31 @@ export const EmbedSignDocumentV1ClientPage = ({
         return;
       }
 
-      await completeDocumentWithToken({
+      const result = await completeDocumentWithToken({
         documentId,
         token,
       });
+
+      // TSP envelopes return a CSC authorize URL that only the v2 embed can run.
+      if (result.status === 'REDIRECT') {
+        if (window.parent) {
+          window.parent.postMessage(
+            {
+              action: 'document-error',
+              data: null,
+            },
+            '*',
+          );
+        }
+
+        toast({
+          title: _(msg`Unable to sign document`),
+          description: _(msg`Qualified electronic signatures are not supported in this embed.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
 
       if (window.parent) {
         window.parent.postMessage(
@@ -260,6 +294,44 @@ export const EmbedSignDocumentV1ClientPage = ({
 
     // !: While the two setters are stable we still want to ensure we're avoiding
     // !: re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!window.parent) {
+      return;
+    }
+
+    if (hasRejectedDocument) {
+      window.parent.postMessage(
+        {
+          action: 'document-rejected',
+          data: {
+            token,
+            documentId,
+            recipientId: recipient.id,
+          },
+        },
+        '*',
+      );
+
+      return;
+    }
+
+    if (hasCompletedDocument) {
+      window.parent.postMessage(
+        {
+          action: 'document-completed',
+          data: {
+            token,
+            documentId,
+            recipientId: recipient.id,
+          },
+        },
+        '*',
+      );
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -481,7 +553,10 @@ export const EmbedSignDocumentV1ClientPage = ({
                             disableAnimation
                             fullName={fullName}
                             value={signature ?? ''}
-                            onChange={(v) => setSignature(v ?? '')}
+                            onChange={(v) => {
+                              setSignature(v ?? '');
+                              persistSignature(v);
+                            }}
                             typedSignatureEnabled={metadata?.typedSignatureEnabled}
                             uploadSignatureEnabled={metadata?.uploadSignatureEnabled}
                             drawSignatureEnabled={metadata?.drawSignatureEnabled}
@@ -523,7 +598,7 @@ export const EmbedSignDocumentV1ClientPage = ({
           )}
 
           {/* Fields */}
-          <EmbedDocumentFields fields={fields} metadata={metadata} />
+          <EmbedDocumentFields fields={fields} metadata={metadata} onSignatureChanged={persistSignature} />
 
           {/* Completed fields */}
           <DocumentReadOnlyFields documentMeta={metadata || undefined} fields={completedFields} />

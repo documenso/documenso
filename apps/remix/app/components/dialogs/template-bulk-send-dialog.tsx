@@ -18,7 +18,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import { File as FileIcon, Upload, X } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -271,7 +271,12 @@ export const TemplateBulkSendDialog = ({ templateId, recipients, trigger, onSucc
                     ))
                     .with({ type: 'ROW_LIMIT_EXCEEDED' }, ({ rowCount, maxRows }) => (
                       <Trans>
-                        The CSV contains {rowCount} rows. A maximum of {maxRows} rows is allowed per upload.
+                        <Plural value={rowCount} one="The CSV contains # row." other="The CSV contains # rows." />{' '}
+                        <Plural
+                          value={maxRows}
+                          one="A maximum of # row is allowed per upload."
+                          other="A maximum of # rows is allowed per upload."
+                        />
                       </Trans>
                     ))
                     .with({ type: 'MISSING_COLUMNS' }, ({ missingColumns }) => (

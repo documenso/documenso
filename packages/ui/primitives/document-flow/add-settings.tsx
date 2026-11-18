@@ -25,7 +25,15 @@ import {
   DocumentVisibilityTooltip,
 } from '@documenso/ui/components/document/document-visibility-select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
 import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -169,6 +177,7 @@ export const AddSettingsFormPartial = ({
             showRecipientColors={true}
             recipientIds={recipients.map((recipient) => recipient.id)}
             fields={mapFieldsWithRecipients(fields, recipients)}
+            documentMeta={document.documentMeta}
           />
         )}
 
@@ -293,6 +302,10 @@ export const AddSettingsFormPartial = ({
                         }}
                       />
                     </FormControl>
+
+                    <FormDescription>
+                      <Trans>The document owner and assigned recipients will always have access.</Trans>
+                    </FormDescription>
                   </FormItem>
                 )}
               />

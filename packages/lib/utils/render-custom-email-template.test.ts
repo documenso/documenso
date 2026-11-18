@@ -8,15 +8,15 @@ describe('renderCustomEmailTemplate', () => {
   });
 
   it('replaces multiple variables separated by whitespace', () => {
-    expect(
-      renderCustomEmailTemplate('Hi {name}, sign at {url}', { name: 'Sam', url: 'https://x' }),
-    ).toBe('Hi Sam, sign at https://x');
+    expect(renderCustomEmailTemplate('Hi {name}, sign at {url}', { name: 'Sam', url: 'https://x' })).toBe(
+      'Hi Sam, sign at https://x',
+    );
   });
 
   it('replaces adjacent variables and variables separated by a non-whitespace character', () => {
-    expect(
-      renderCustomEmailTemplate('{day}/{month}/{year}', { day: '01', month: '02', year: '2026' }),
-    ).toBe('01/02/2026');
+    expect(renderCustomEmailTemplate('{day}/{month}/{year}', { day: '01', month: '02', year: '2026' })).toBe(
+      '01/02/2026',
+    );
 
     expect(
       renderCustomEmailTemplate('{firstName}-{lastName}', {

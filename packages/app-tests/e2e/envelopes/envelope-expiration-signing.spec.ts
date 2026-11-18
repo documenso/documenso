@@ -6,7 +6,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { type APIRequestContext, expect, test } from '@playwright/test';
 
 import { apiSeedPendingDocument } from '../fixtures/api-seeds';
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 import { signSignaturePad } from '../fixtures/signature';
 
 test.describe.configure({ mode: 'parallel' });
@@ -133,7 +133,7 @@ test('[ENVELOPE_EXPIRATION]: expired recipient cannot complete signing', async (
 
 const trpcMutation = async (request: APIRequestContext, procedure: string, input: Record<string, unknown>) => {
   return await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/${procedure}`, {
-    headers: { 'content-type': 'application/json' },
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
     data: JSON.stringify({ json: input }),
   });
 };
