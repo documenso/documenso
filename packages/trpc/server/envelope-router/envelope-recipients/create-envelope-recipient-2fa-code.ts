@@ -30,6 +30,14 @@ export const createEnvelopeRecipient2FACodeRoute = authenticatedProcedure
       },
     });
 
+    // Only an integration that sends the code itself needs this route, so keep it
+    // out of the internal app tRPC handler.
+    if (ctx.metadata.source !== 'apiV2') {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'This route is only accessible via the public API',
+      });
+    }
+
     const { envelopeWhereInput } = await getEnvelopeWhereInput({
       id: { type: 'envelopeId', id: envelopeId },
       type: EnvelopeType.DOCUMENT,
