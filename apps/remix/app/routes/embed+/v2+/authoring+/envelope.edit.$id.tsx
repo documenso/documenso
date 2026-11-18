@@ -1,5 +1,6 @@
 import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import type { SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
+import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getEditorEnvelopeById } from '@documenso/lib/server-only/envelope/get-editor-envelope-by-id';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
@@ -10,7 +11,11 @@ import {
   ZEmbedEditEnvelopeAuthoringSchema,
 } from '@documenso/lib/types/envelope-editor';
 import type { TEnvelopeFieldAndMeta } from '@documenso/lib/types/field-meta';
-import { buildEmbeddedEditorOptions, PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
+import {
+  buildEmbeddedEditorOptions,
+  getPendingEmbedImagesToUpload,
+  PRESIGNED_ENVELOPE_ITEM_ID_PREFIX,
+} from '@documenso/lib/utils/embed-config';
 import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
 import type { TUpdateEmbeddingEnvelopePayload } from '@documenso/trpc/server/embedding-router/update-embedding-envelope.types';
@@ -94,6 +99,18 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
     brandingLogo = settings.brandingLogo;
   }
 
+  captureServerEvent({
+    event: 'App: Embed Session Started',
+    userId: result.userId,
+    organisationId: envelope.team.organisationId,
+    teamId: result.teamId ?? undefined,
+    properties: {
+      type: 'authoring',
+      version: 'v2',
+      envelopeId: envelope.id,
+    },
+  });
+
   return superLoaderJson({
     token,
     envelope,
@@ -160,7 +177,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
 
   const buildUpdateEnvelopeRequest = (
     envelope: TEditorEnvelope,
-  ): { payload: TUpdateEmbeddingEnvelopePayload; files: File[] } => {
+  ): { payload: TUpdateEmbeddingEnvelopePayload; files: File[]; contentImages: File[] } => {
     const files: File[] = [];
 
     const envelopeItems = envelope.envelopeItems.map((item) => {
@@ -214,6 +231,24 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
       };
     });
 
+    // Removes duplicate content images, and gets the files to upload.
+    const imagesToUpload = getPendingEmbedImagesToUpload(envelope.contents);
+
+    const contentImages = imagesToUpload.map((image) => image.file);
+
+    const contents = envelope.contents.map((content) => {
+      const image = imagesToUpload.find((imageToUpload) => imageToUpload.id === content.dataContentId);
+
+      // A new image is referenced by its index, an uploaded one by its ID.
+      return {
+        id: content.id,
+        envelopeItemId: content.envelopeItemId,
+        contentMeta: content.contentMeta,
+        dataContentId: image ? null : content.dataContentId,
+        imageIndex: image?.index,
+      };
+    });
+
     const payload: TUpdateEmbeddingEnvelopePayload = {
       envelopeId: envelope.id,
       data: {
@@ -226,6 +261,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
         recipients,
         envelopeItems,
         attachments: envelope.attachments,
+        contents,
       },
       meta: {
         ...envelope.documentMeta,
@@ -244,7 +280,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
       },
     };
 
-    return { payload, files };
+    return { payload, files, contentImages };
   };
 
   const updateEmbeddedEnvelope = async (envelope: TEditorEnvelope) => {
@@ -255,13 +291,17 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
     setIsUpdatingEnvelope(true);
 
     try {
-      const { payload, files } = buildUpdateEnvelopeRequest(envelope);
+      const { payload, files, contentImages } = buildUpdateEnvelopeRequest(envelope);
 
       const formData = new FormData();
       formData.append('payload', JSON.stringify(payload));
 
       for (const file of files) {
         formData.append('files', file);
+      }
+
+      for (const contentImage of contentImages) {
+        formData.append('contentImages', contentImage);
       }
 
       await updateEmbeddingEnvelope(formData);
@@ -319,7 +359,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
   return (
     <div className="relative min-h-screen min-w-screen">
       {isUpdatingEnvelope && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background">
           <Spinner />
 
           <p className="mt-2 text-muted-foreground text-sm">
@@ -333,7 +373,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
       )}
 
       {updatedEnvelope && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background">
           <div className="mx-auto w-full max-w-md text-center">
             <CheckCircle2Icon className="mx-auto h-16 w-16 text-primary" />
 

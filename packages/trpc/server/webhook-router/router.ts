@@ -1,9 +1,12 @@
+import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
 import { createWebhook } from '@documenso/lib/server-only/webhooks/create-webhook';
 import { deleteWebhookById } from '@documenso/lib/server-only/webhooks/delete-webhook-by-id';
 import { editWebhook } from '@documenso/lib/server-only/webhooks/edit-webhook';
 import { getWebhookById } from '@documenso/lib/server-only/webhooks/get-webhook-by-id';
 import { getWebhooksByTeamId } from '@documenso/lib/server-only/webhooks/get-webhooks-by-team-id';
 import { triggerTestWebhook } from '@documenso/lib/server-only/webhooks/trigger-test-webhook';
+import { fireAndForget } from '@documenso/lib/universal/fire-and-forget';
+import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure, router } from '../trpc';
 import { findWebhookCallsRoute } from './find-webhook-calls';
@@ -51,7 +54,7 @@ export const webhookRouter = router({
   createWebhook: authenticatedProcedure.input(ZCreateWebhookRequestSchema).mutation(async ({ input, ctx }) => {
     const { enabled, eventTriggers, secret, webhookUrl } = input;
 
-    return await createWebhook({
+    const webhook = await createWebhook({
       enabled,
       secret,
       webhookUrl,
@@ -59,6 +62,25 @@ export const webhookRouter = router({
       teamId: ctx.teamId,
       userId: ctx.user.id,
     });
+
+    fireAndForget(async () => {
+      const team = await prisma.team.findFirst({
+        where: { id: ctx.teamId },
+        select: { organisationId: true },
+      });
+
+      captureServerEvent({
+        event: 'App: Webhook Created',
+        userId: ctx.user.id,
+        teamId: ctx.teamId,
+        organisationId: team?.organisationId,
+        properties: {
+          triggerCount: eventTriggers.length,
+        },
+      });
+    });
+
+    return webhook;
   }),
 
   deleteWebhook: authenticatedProcedure.input(ZDeleteWebhookRequestSchema).mutation(async ({ input, ctx }) => {

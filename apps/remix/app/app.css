@@ -63,6 +63,12 @@
 }
 
 @layer base {
+  html {
+    @apply antialiased;
+    font-optical-sizing: auto;
+    font-synthesis: style;
+  }
+
   :root {
     --font-sans: "Inter";
     --font-signature: "Caveat";

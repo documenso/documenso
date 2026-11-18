@@ -1,8 +1,10 @@
-import type { Envelope, Recipient } from '@prisma/client';
+import type { DocumentMeta, Envelope, Field, Recipient } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import type { TTemplateLite } from '../types/template';
 import { mapSecondaryIdToTemplateId } from './envelope';
+import { mapFieldToLegacyField } from './fields';
+import { mapRecipientToLegacyRecipient } from './recipients';
 
 export const formatDirectTemplatePath = (token: string) => {
   return `${NEXT_PUBLIC_WEBAPP_URL()}/d/${token}`;
@@ -65,5 +67,44 @@ export const mapEnvelopeToTemplateLite = (envelope: Envelope): TTemplateLite => 
     folderId: envelope.folderId,
     useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
     templateDocumentDataId: '',
+  };
+};
+
+type EnvelopeWithTemplateManyRelations = Envelope & {
+  team: { id: number; url: string; name: string } | null;
+  fields: Field[];
+  recipients: Recipient[];
+  documentMeta: DocumentMeta | null;
+  directLink: { token: string; enabled: boolean } | null;
+};
+
+/**
+ * Maps an envelope (with the relations loaded by the template find functions)
+ * to the legacy "template many" response shape.
+ */
+export const mapEnvelopeToTemplateMany = (envelope: EnvelopeWithTemplateManyRelations) => {
+  const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
+
+  return {
+    id: legacyTemplateId,
+    envelopeId: envelope.id,
+    type: envelope.templateType,
+    visibility: envelope.visibility,
+    externalId: envelope.externalId,
+    title: envelope.title,
+    userId: envelope.userId,
+    teamId: envelope.teamId,
+    authOptions: envelope.authOptions,
+    createdAt: envelope.createdAt,
+    updatedAt: envelope.updatedAt,
+    publicTitle: envelope.publicTitle,
+    publicDescription: envelope.publicDescription,
+    folderId: envelope.folderId,
+    useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
+    team: envelope.team,
+    fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),
+    recipients: envelope.recipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
+    templateMeta: envelope.documentMeta,
+    directLink: envelope.directLink,
   };
 };

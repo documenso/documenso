@@ -90,3 +90,33 @@ export const getDocumentDataUrlForPdfViewer = (options: DocumentDataUrlOptions):
 
   return getDocumentDataUrl(options);
 };
+
+export type DataContentImageUrlOptions = {
+  envelopeId: string;
+  dataContentId: string;
+  token: string | undefined;
+  presignToken?: string | undefined;
+};
+
+/**
+ * A data content is immutable (replacing an image creates a new one), so the
+ * URL is content addressed by `dataContentId` and hard cached like
+ * `getDocumentDataUrl`.
+ */
+export const getDataContentImageUrl = (options: DataContentImageUrlOptions) => {
+  const { envelopeId, dataContentId, token, presignToken } = options;
+
+  const partialUrl = `envelope/${envelopeId}/dataContent/${dataContentId}/image`;
+
+  if (token) {
+    return `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/token/${token}/${partialUrl}`;
+  }
+
+  const baseUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/${partialUrl}`;
+
+  if (presignToken) {
+    return `${baseUrl}?presignToken=${presignToken}`;
+  }
+
+  return baseUrl;
+};

@@ -7,7 +7,10 @@ import {
 } from '@documenso/lib/types/envelope-editor';
 import { trpc } from '@documenso/trpc/react';
 import type { TSetEnvelopeFieldsResponse } from '@documenso/trpc/server/envelope-router/set-envelope-fields.types';
-import type { TSetEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/set-envelope-recipients.types';
+import type {
+  TSetEnvelopeRecipientsRequest,
+  TSetEnvelopeRecipientsResponse,
+} from '@documenso/trpc/server/envelope-router/set-envelope-recipients.types';
 import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { getRecipientColor } from '@documenso/ui/lib/recipient-colors';
@@ -19,7 +22,11 @@ import { createContext, useCallback, useContext, useMemo, useRef, useState, useS
 import { useSearchParams } from 'react-router';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import { PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX } from '../../utils/embed-config';
 import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
+import { useAnalytics } from '../hooks/use-analytics';
+import type { TLocalContent } from '../hooks/use-editor-contents';
+import { useEditorContents } from '../hooks/use-editor-contents';
 import type { TLocalField } from '../hooks/use-editor-fields';
 import { useEditorFields } from '../hooks/use-editor-fields';
 import { useEditorRecipients } from '../hooks/use-editor-recipients';
@@ -27,7 +34,17 @@ import { useEnvelopeAutosave } from '../hooks/use-envelope-autosave';
 
 export type EnvelopeEditorStep = 'upload' | 'addFields' | 'preview';
 
+export type EnvelopeEditorTab = 'fields' | 'contents';
+
 type UpdateEnvelopePayload = Pick<TUpdateEnvelopeRequest, 'data' | 'meta'>;
+
+type SetRecipientsPayload = (TSetEnvelopeRecipientsRequest['recipients'][number] & {
+  /**
+   * Stable client-side key for the signer row, echoed to the server as
+   * `clientId` so newly created recipients can adopt their server-assigned id.
+   */
+  formId?: string;
+})[];
 
 type EnvelopeEditorProviderValue = {
   editorConfig: EnvelopeEditorConfig;
@@ -47,13 +64,25 @@ type EnvelopeEditorProviderValue = {
   setLocalEnvelope: (localEnvelope: Partial<TEditorEnvelope>) => void;
   updateEnvelope: (envelopeUpdates: UpdateEnvelopePayload) => void;
   updateEnvelopeAsync: (envelopeUpdates: UpdateEnvelopePayload) => Promise<void>;
-  setRecipientsDebounced: (recipients: TSetEnvelopeRecipientsRequest['recipients']) => void;
-  setRecipientsAsync: (recipients: TSetEnvelopeRecipientsRequest['recipients']) => Promise<void>;
+  setRecipientsDebounced: (recipients: SetRecipientsPayload) => void;
+  setRecipientsAsync: (recipients: SetRecipientsPayload) => Promise<void>;
 
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
 
   editorFields: ReturnType<typeof useEditorFields>;
+  editorContents: ReturnType<typeof useEditorContents>;
   editorRecipients: ReturnType<typeof useEditorRecipients>;
+
+  selectedEditorTab: EnvelopeEditorTab;
+  setSelectedEditorTab: (tab: EnvelopeEditorTab) => void;
+
+  /**
+   * The canvas drops its selection while this is set, so nothing floating
+   * over the page (the transformer, the action bar) sits under the
+   * placement click.
+   */
+  isPlacingItem: boolean;
+  setIsPlacingItem: (isPlacingItem: boolean) => void;
 
   isAutosaving: boolean;
   flushAutosave: () => Promise<TEditorEnvelope>;
@@ -104,6 +133,7 @@ export const EnvelopeEditorProvider = ({
 }: EnvelopeEditorProviderProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const [_searchParams, setSearchParams] = useSearchParams();
 
@@ -142,6 +172,8 @@ export const EnvelopeEditorProvider = ({
 
   const [autosaveError, setAutosaveError] = useState<boolean>(false);
 
+  const [isPlacingItem, setIsPlacingItem] = useState(false);
+
   const isCscMode = IS_INSTANCE_CSC_MODE();
 
   /**
@@ -167,8 +199,45 @@ export const EnvelopeEditorProvider = ({
     };
   }, [isCscMode, providedEditorConfig]);
 
+  const [selectedEditorTab, setSelectedEditorTab] = useState<EnvelopeEditorTab>('fields');
+
   const externalFlushCallbacksRef = useRef<Map<string, () => Promise<void>>>(new Map());
   const pendingMutationsRef = useRef<Set<Promise<unknown>>>(new Set());
+
+  /**
+   * Server-assigned ids for signers created during this session, keyed by
+   * their stable formId. The recipients form only learns real ids on a form
+   * reset (step navigation), so this map bridges the gap between autosaves.
+   */
+  const recipientIdByFormIdRef = useRef<Map<string, number>>(new Map());
+
+  /**
+   * Merges known server-assigned ids into the outgoing payload. Without
+   * this, a newly created signer (id-less in the form until the next form
+   * reset) would be deleted and recreated on every autosave — churning ids,
+   * signing tokens and the audit log. The formId doubles as the `clientId`
+   * echoed back by the server.
+   */
+  const withKnownRecipientIds = (localRecipients: SetRecipientsPayload) =>
+    localRecipients.map((recipient) => ({
+      ...recipient,
+      id: recipient.id ?? (recipient.formId ? recipientIdByFormIdRef.current.get(recipient.formId) : undefined),
+      clientId: recipient.formId,
+    }));
+
+  /**
+   * Records the ids of newly created recipients from the save response. A
+   * ref — rather than writing ids back into the form — is deliberate: the
+   * response can land mid interaction, and a form write here re-renders the
+   * signer rows, which breaks an in-progress recipient drag.
+   */
+  const rememberCreatedRecipientIds = (recipients: TSetEnvelopeRecipientsResponse['data']) => {
+    for (const recipient of recipients) {
+      if (recipient.clientId) {
+        recipientIdByFormIdRef.current.set(recipient.clientId, recipient.id);
+      }
+    }
+  };
 
   const registerExternalFlush = useCallback((key: string, flush: () => Promise<void>) => {
     externalFlushCallbacksRef.current.set(key, flush);
@@ -190,7 +259,12 @@ export const EnvelopeEditorProvider = ({
 
   const editorFields = useEditorFields({
     envelope,
-    handleFieldsUpdate: (fields) => setFieldsDebounced(fields),
+    handleFieldsUpdate: (getFields) => setFieldsDebounced(getFields),
+  });
+
+  const editorContents = useEditorContents({
+    envelope,
+    handleContentsUpdate: (getContents) => setContentsDebounced(getContents),
   });
 
   const editorRecipients = useEditorRecipients({
@@ -199,6 +273,7 @@ export const EnvelopeEditorProvider = ({
 
   const setRecipientsMutation = trpc.envelope.recipient.set.useMutation();
   const setFieldsMutation = trpc.envelope.field.set.useMutation();
+  const setContentsMutation = trpc.envelope.content.set.useMutation();
   const updateEnvelopeMutation = trpc.envelope.update.useMutation();
 
   /**
@@ -210,7 +285,7 @@ export const EnvelopeEditorProvider = ({
     triggerSave: setRecipientsDebounced,
     flush: flushSetRecipients,
     isPending: isRecipientsMutationPending,
-  } = useEnvelopeAutosave(async (localRecipients: TSetEnvelopeRecipientsRequest['recipients']) => {
+  } = useEnvelopeAutosave(async (localRecipients: SetRecipientsPayload) => {
     try {
       let recipients: TEditorEnvelope['recipients'] = [];
 
@@ -220,10 +295,12 @@ export const EnvelopeEditorProvider = ({
         const response = await setRecipientsMutation.mutateAsync({
           envelopeId: currentEnvelope.id,
           envelopeType: currentEnvelope.type,
-          recipients: localRecipients,
+          recipients: withKnownRecipientIds(localRecipients),
         });
 
         recipients = response.data;
+
+        rememberCreatedRecipientIds(response.data);
       } else {
         recipients = mapLocalRecipientsToRecipients({ envelope: currentEnvelope, localRecipients });
       }
@@ -241,6 +318,12 @@ export const EnvelopeEditorProvider = ({
     } catch (err) {
       console.error(err);
 
+      analytics.captureException(err, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'autosave_recipients',
+        envelopeId: envelope.id,
+      });
+
       setAutosaveError(true);
 
       toast({
@@ -252,7 +335,7 @@ export const EnvelopeEditorProvider = ({
     }
   }, 1000);
 
-  const setRecipientsAsync = async (localRecipients: TSetEnvelopeRecipientsRequest['recipients']) => {
+  const setRecipientsAsync = async (localRecipients: SetRecipientsPayload) => {
     setRecipientsDebounced(localRecipients);
     await flushSetRecipients();
   };
@@ -304,6 +387,12 @@ export const EnvelopeEditorProvider = ({
     } catch (err) {
       console.error(err);
 
+      analytics.captureException(err, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'autosave_fields',
+        envelopeId: envelope.id,
+      });
+
       setAutosaveError(true);
 
       toast({
@@ -319,6 +408,73 @@ export const EnvelopeEditorProvider = ({
     setFieldsDebounced(localFields);
     await flushSetFields();
   };
+
+  const {
+    triggerSave: setContentsDebounced,
+    flush: flushSetContents,
+    isPending: isContentsMutationPending,
+  } = useEnvelopeAutosave(async (localContents: TLocalContent[]) => {
+    try {
+      let contents: TEditorEnvelopeContentWithFormId[] = [];
+
+      const currentEnvelope = getEnvelope();
+
+      if (!isEmbedded) {
+        const response = await setContentsMutation.mutateAsync({
+          envelopeId: currentEnvelope.id,
+          contents: localContents.map((content) => ({
+            id: content.id,
+            formId: content.formId,
+            envelopeItemId: content.envelopeItemId,
+            contentMeta: content.contentMeta,
+            dataContentId: content.dataContentId,
+          })),
+        });
+
+        contents = response.data;
+      } else {
+        contents = mapLocalContentsToContents({ envelope: currentEnvelope, localContents });
+      }
+
+      setEnvelope((prev) => ({
+        ...prev,
+        contents,
+      }));
+
+      setAutosaveError(false);
+
+      contents.forEach((content) => {
+        const localContent = localContents.find((localContent) => localContent.formId === content.formId);
+
+        if (!localContent) {
+          return;
+        }
+
+        editorContents.setContentPersistedIds(
+          localContent.formId,
+          { id: content.id, dataContentId: content.dataContentId },
+          localContent.dataContentId,
+        );
+      });
+    } catch (err) {
+      console.error(err);
+
+      analytics.captureException(err, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'autosave_contents',
+        envelopeId: envelope.id,
+      });
+
+      setAutosaveError(true);
+
+      toast({
+        title: t`Save failed`,
+        description: t`We encountered an error while attempting to save your changes. Your changes cannot be saved at this time.`,
+        variant: 'destructive',
+        duration: 7500,
+      });
+    }
+  }, 2000);
 
   /**
    * Handles debouncing the envelope updates to the server.
@@ -358,6 +514,12 @@ export const EnvelopeEditorProvider = ({
       setAutosaveError(false);
     } catch (err) {
       console.error(err);
+
+      analytics.captureException(err, {
+        source: isEmbedded ? 'embed' : 'editor',
+        location: 'autosave_meta',
+        envelopeId: envelope.id,
+      });
 
       setAutosaveError(true);
 
@@ -434,6 +596,7 @@ export const EnvelopeEditorProvider = ({
       });
 
       editorFields.resetForm(fetchedEnvelopeData.data.fields);
+      editorContents.resetForm(fetchedEnvelopeData.data.contents);
     }
   };
 
@@ -442,8 +605,10 @@ export const EnvelopeEditorProvider = ({
   };
 
   const isAutosaving = useMemo(() => {
-    return isFieldsMutationPending || isRecipientsMutationPending || isEnvelopeMutationPending;
-  }, [isFieldsMutationPending, isRecipientsMutationPending, isEnvelopeMutationPending]);
+    return (
+      isFieldsMutationPending || isContentsMutationPending || isRecipientsMutationPending || isEnvelopeMutationPending
+    );
+  }, [isFieldsMutationPending, isContentsMutationPending, isRecipientsMutationPending, isEnvelopeMutationPending]);
 
   const relativePath = useMemo(() => {
     let documentRootPath = formatDocumentsPath(envelope.team.url);
@@ -499,10 +664,11 @@ export const EnvelopeEditorProvider = ({
     });
 
     editorFields.resetForm(currentEnvelope.fields);
+    editorContents.resetForm(currentEnvelope.contents);
   };
 
   const flushAutosave = async (): Promise<TEditorEnvelope> => {
-    await Promise.all([flushSetFields(), flushSetRecipients(), flushUpdateEnvelope()]);
+    await Promise.all([flushSetFields(), flushSetContents(), flushSetRecipients(), flushUpdateEnvelope()]);
 
     // Flush all registered external flushes (e.g., upload page's debounced item updates).
     const externalFlushes = Array.from(externalFlushCallbacksRef.current.values());
@@ -533,7 +699,12 @@ export const EnvelopeEditorProvider = ({
         setRecipientsDebounced,
         setRecipientsAsync,
         editorFields,
+        editorContents,
         editorRecipients,
+        selectedEditorTab,
+        setSelectedEditorTab,
+        isPlacingItem,
+        setIsPlacingItem,
         autosaveError,
         flushAutosave,
         isAutosaving,
@@ -596,6 +767,32 @@ const mapLocalRecipientsToRecipients = ({
       sendStatus: foundRecipient?.sendStatus || SendStatus.NOT_SENT,
       expiresAt: foundRecipient?.expiresAt || null,
       expirationNotifiedAt: foundRecipient?.expirationNotifiedAt || null,
+    };
+  });
+};
+
+type TEditorEnvelopeContentWithFormId = TEditorEnvelope['contents'][number] & {
+  formId?: string;
+};
+
+type MapLocalContentsToContentsOptions = {
+  localContents: TLocalContent[];
+  envelope: TEditorEnvelope;
+};
+
+const mapLocalContentsToContents = ({
+  envelope,
+  localContents,
+}: MapLocalContentsToContentsOptions): TEditorEnvelopeContentWithFormId[] => {
+  return localContents.map((content) => {
+    return {
+      id: content.id ?? `${PRESIGNED_ENVELOPE_CONTENT_ID_PREFIX}${content.formId}`,
+      formId: content.formId,
+      envelopeId: envelope.id,
+      envelopeItemId: content.envelopeItemId,
+      contentMeta: content.contentMeta,
+      dataContentId: content.dataContentId,
+      data: content.data,
     };
   });
 };

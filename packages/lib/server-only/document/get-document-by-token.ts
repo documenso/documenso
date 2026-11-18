@@ -4,6 +4,7 @@ import { EnvelopeType } from '@prisma/client';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAuthMethods } from '../../types/document-auth';
 import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 import { isRecipientAuthorized } from './is-recipient-authorized';
 
 export interface GetDocumentAndSenderByTokenOptions {
@@ -127,6 +128,8 @@ export const getDocumentAndSenderByToken = async ({
   if (!recipient) {
     throw new Error('Missing recipient');
   }
+
+  await assertSenderNotDisabled({ userId: result.userId });
 
   let documentAccessValid = true;
 
