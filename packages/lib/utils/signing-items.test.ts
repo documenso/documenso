@@ -57,6 +57,40 @@ describe('getSigningItems', () => {
     expect(groupItem?.isInserted).toBe(false);
   });
 
+  it('orders items and the fields of a group by file, then page, then position', () => {
+    const fields = [
+      createField({ id: 1, type: FieldType.TEXT, groupId: 'g', envelopeItemId: 'item_2', page: 1 }),
+      createField({
+        id: 2,
+        type: FieldType.TEXT,
+        groupId: 'g',
+        envelopeItemId: 'item_1',
+        page: 3,
+        positionX: new Prisma.Decimal(5),
+      }),
+      createField({
+        id: 3,
+        type: FieldType.TEXT,
+        groupId: 'g',
+        envelopeItemId: 'item_1',
+        page: 3,
+        positionY: new Prisma.Decimal(2),
+      }),
+      createField({ id: 4, type: FieldType.TEXT, envelopeItemId: 'item_2', page: 1 }),
+      createField({ id: 5, type: FieldType.TEXT, envelopeItemId: 'item_1', page: 1 }),
+    ];
+
+    const envelopeItems = [
+      { id: 'item_2', order: 2 },
+      { id: 'item_1', order: 1 },
+    ];
+
+    const items = getSigningItems(fields, envelopeItems);
+
+    expect(items.map((item) => item.primaryField.id)).toEqual([5, 3, 4]);
+    expect(items[1].fields.map((field) => field.id)).toEqual([3, 2, 1]);
+  });
+
   it('treats a group as inserted when any field is inserted', () => {
     const fields = [
       createField({ id: 1, type: FieldType.TEXT, groupId: 'g', inserted: true, customText: 'A' }),

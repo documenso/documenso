@@ -96,8 +96,14 @@ export const useEnvelopeSigningFieldGroups = () => {
  * Hover, highlight and navigation state for grouped fields on the signing page.
  */
 export const EnvelopeSigningFieldGroupProvider = ({ children }: { children: React.ReactNode }) => {
-  const { recipient, recipientSigningItems, pendingRecipientSigningItems, assistantFields, showPendingFieldTooltip } =
-    useRequiredEnvelopeSigningContext();
+  const {
+    envelope,
+    recipient,
+    recipientSigningItems,
+    pendingRecipientSigningItems,
+    assistantFields,
+    showPendingFieldTooltip,
+  } = useRequiredEnvelopeSigningContext();
 
   const [groupPointerTarget, setGroupPointerTarget] = useState<TGroupPointerTarget | null>(null);
   const [pinnedGroupFieldId, setPinnedGroupFieldId] = useState<number | null>(null);
@@ -114,8 +120,8 @@ export const EnvelopeSigningFieldGroupProvider = ({ children }: { children: Reac
       return recipientSigningItems;
     }
 
-    return getSigningItems(assistantFields);
-  }, [recipient.role, recipientSigningItems, assistantFields]);
+    return getSigningItems(assistantFields, envelope.envelopeItems);
+  }, [recipient.role, recipientSigningItems, assistantFields, envelope.envelopeItems]);
 
   const groupItemByFieldId = useMemo(() => {
     const map = new Map<number, SigningItem>();

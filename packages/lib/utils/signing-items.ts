@@ -1,6 +1,6 @@
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
-import { type Field, FieldType } from '@prisma/client';
-import { unique } from 'remeda';
+import { type EnvelopeItem, type Field, FieldType } from '@prisma/client';
+import { sortBy, unique } from 'remeda';
 
 import { validateCheckboxLength } from '../advanced-fields-validation/validate-checkbox';
 import { AppError, AppErrorCode } from '../errors/app-error';
@@ -10,6 +10,8 @@ import { groupFieldsByGroupId } from './field-groups';
 import { parseCheckboxCustomText } from './fields';
 
 export type CheckboxValidationRule = (typeof checkboxValidationSigns)[number]['value'];
+
+type EnvelopeItemOrder = Pick<EnvelopeItem, 'id' | 'order'>;
 
 /**
  * Why an inserted signing item is not valid.
@@ -47,17 +49,22 @@ export type SigningItem = {
 
 /**
  * Builds the signing items for a recipient's fields, treating each group as one item.
+ *
+ * Envelope items are used to sort the fields in document order.
  */
-export const getSigningItems = (fields: Field[]): SigningItem[] => {
-  const groupedFields = groupFieldsByGroupId(fields);
-  const ungroupedFields = fields.filter((field) => !field.groupId);
-  const standaloneItems = ungroupedFields.map((field) => createSigningItem([field], null));
+export const getSigningItems = (fields: Field[], envelopeItems: EnvelopeItemOrder[] = []): SigningItem[] => {
+  const sortedFields = sortFieldsByAttributes(fields, envelopeItems);
+  const groupedFields = groupFieldsByGroupId(sortedFields);
 
-  const groupItems = Array.from(groupedFields.entries()).map(([groupId, groupFields]) =>
-    createSigningItem(groupFields, groupId),
-  );
+  return sortedFields.flatMap((field) => {
+    if (!field.groupId) {
+      return [createSigningItem([field], null)];
+    }
 
-  return [...standaloneItems, ...groupItems];
+    const groupFields = groupedFields.get(field.groupId) ?? [];
+
+    return groupFields[0] === field ? [createSigningItem(groupFields, field.groupId)] : [];
+  });
 };
 
 /**
@@ -112,17 +119,15 @@ export const getRemainingFields = (fields: Field[]): Field[] => {
 };
 
 const createSigningItem = (fields: Field[], groupId: string | null): SigningItem => {
-  const sortedFields = sortFieldsByDocumentOrder(fields);
-
-  const isInserted = sortedFields.some((field) => field.inserted);
+  const isInserted = fields.some((field) => field.inserted);
 
   return {
-    fields: sortedFields,
-    primaryField: sortedFields[0],
+    fields,
+    primaryField: fields[0],
     groupId,
-    isRequired: sortedFields.some((field) => isRequiredField(field)),
+    isRequired: fields.some((field) => isRequiredField(field)),
     isInserted,
-    validationError: isInserted ? resolveSigningItemValidationError(sortedFields) : null,
+    validationError: isInserted ? resolveSigningItemValidationError(fields) : null,
   };
 };
 
@@ -172,8 +177,14 @@ const resolveSigningItemValidationError = (fields: Field[]): SigningItemValidati
   };
 };
 
-const sortFieldsByDocumentOrder = (fields: Field[]): Field[] => {
-  return [...fields].sort((a, b) => a.page - b.page || Number(a.positionY) - Number(b.positionY));
+const sortFieldsByAttributes = (fields: Field[], envelopeItems: EnvelopeItemOrder[]): Field[] => {
+  return sortBy(
+    fields,
+    (field) => envelopeItems.find((envelopeItem) => envelopeItem.id === field.envelopeItemId)?.order ?? 0,
+    (field) => field.page,
+    (field) => Number(field.positionY),
+    (field) => Number(field.positionX),
+  );
 };
 
 /**

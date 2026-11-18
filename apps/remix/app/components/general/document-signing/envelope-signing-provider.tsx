@@ -28,7 +28,6 @@ import type {
 import { EnvelopeType, type Field, FieldType, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { createContext, useContext, useMemo, useState } from 'react';
-import { prop, sortBy } from 'remeda';
 import { match } from 'ts-pattern';
 
 export type EnvelopeSigningContextValue = {
@@ -254,33 +253,10 @@ export const EnvelopeSigningProvider = ({
   /**
    * Every signing item for the actual recipient, sorted by document order.
    */
-  const recipientSigningItems = useMemo(() => {
-    const itemsWithOrder = getSigningItems(envelopeData.recipient.fields).map((item) => {
-      const envelopeItem = envelope.envelopeItems.find(
-        (envelopeItem) => envelopeItem.id === item.primaryField.envelopeItemId,
-      );
-
-      if (!envelopeItem) {
-        throw new Error('Missing envelope item');
-      }
-
-      return {
-        item,
-        envelopeItemOrder: envelopeItem.order,
-        page: item.primaryField.page,
-        positionY: Number(item.primaryField.positionY),
-        positionX: Number(item.primaryField.positionX),
-      };
-    });
-
-    return sortBy(
-      itemsWithOrder,
-      [prop('envelopeItemOrder'), 'asc'],
-      [prop('page'), 'asc'],
-      [prop('positionY'), 'asc'],
-      [prop('positionX'), 'asc'],
-    ).map(({ item }) => item);
-  }, [envelopeData.recipient.fields, envelope.envelopeItems]);
+  const recipientSigningItems = useMemo(
+    () => getSigningItems(envelopeData.recipient.fields, envelope.envelopeItems),
+    [envelopeData.recipient.fields, envelope.envelopeItems],
+  );
 
   const pendingRecipientSigningItems = useMemo(
     () => recipientSigningItems.filter(isSigningItemPending),

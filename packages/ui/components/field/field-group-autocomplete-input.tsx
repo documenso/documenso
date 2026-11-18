@@ -55,12 +55,7 @@ export const FieldGroupAutoCompleteInput = ({
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  /**
-   * Set when the pointer goes down on a suggestion. The input blurs before the suggestion's
-   * select event fires, so without this the blur would commit the partially typed query
-   * instead of the chosen suggestion.
-   */
-  const isSelectingSuggestionRef = useRef(false);
+  const bypassBlurCommitRef = useRef(false);
 
   /**
    * The last committed value, so the blur which follows pressing enter does not commit
@@ -93,7 +88,7 @@ export const FieldGroupAutoCompleteInput = ({
   };
 
   const markSelectingSuggestion = () => {
-    isSelectingSuggestionRef.current = true;
+    bypassBlurCommitRef.current = true;
   };
 
   const handleSearchQueryChange = (nextValue: string) => {
@@ -110,8 +105,8 @@ export const FieldGroupAutoCompleteInput = ({
   };
 
   const handleBlur = () => {
-    if (isSelectingSuggestionRef.current) {
-      isSelectingSuggestionRef.current = false;
+    if (bypassBlurCommitRef.current) {
+      bypassBlurCommitRef.current = false;
       return;
     }
 
@@ -129,6 +124,7 @@ export const FieldGroupAutoCompleteInput = ({
       event.preventDefault();
       setSearchQuery(value);
       setIsOpen(false);
+      bypassBlurCommitRef.current = true;
       inputRef.current?.blur();
     }
   };

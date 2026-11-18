@@ -251,9 +251,15 @@ const runGroupAssignmentFlow = async (surface: TEnvelopeEditorSurface): Promise<
   await setFieldSettingsGroupId(root, groupId);
   await expect(root.getByTestId('field-form-required')).toHaveAttribute('data-state', 'checked');
 
-  // Field C: join from the suggestion list, which now shows two fields.
+  // Field C: escape discards a typed ID instead of joining the group.
   await selectFieldOnCanvas(root, POSITIONS.rowThree);
   await openFieldSettingsAdvancedSection(root);
+  await getFieldSettingsGroupIdInput(root).fill(groupId);
+  await getFieldSettingsGroupIdInput(root).press('Escape');
+  await expect(getFieldSettingsGroupIdInput(root)).toHaveValue('');
+  await expect(root.getByTestId('field-form-required')).toHaveAttribute('data-state', 'unchecked');
+
+  // Field C: join from the suggestion list, which now shows two fields.
   await getFieldSettingsGroupIdInput(root).click();
   await expect(getFieldSettingsGroupSuggestions(root).filter({ hasText: groupId })).toContainText('2 items');
   await root.keyboard.press('Escape');
