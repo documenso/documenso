@@ -21,22 +21,37 @@ export const handleTextFieldClick = async (
     });
   }
 
-  let textToInsert = text;
-
-  if (!textToInsert) {
-    textToInsert = await SignFieldTextDialog.call({
-      fieldMeta: field.fieldMeta,
-      defaultValue: field.inserted ? field.customText : undefined,
-    });
+  if (text && !field.inserted) {
+    return {
+      type: FieldType.TEXT,
+      value: text,
+    };
   }
 
-  if (textToInsert === null) {
+  // Inserted fields reopen the dialog with their current text so it can be edited or removed.
+  const result = await SignFieldTextDialog.call({
+    fieldMeta: field.fieldMeta,
+    insertedText: field.inserted ? field.customText : undefined,
+  });
+
+  if (!result) {
     return null;
   }
 
-  // An empty value clears the field.
+  if (result.action === 'remove') {
+    return {
+      type: FieldType.TEXT,
+      value: null,
+    };
+  }
+
+  // Avoid re-signing the field when the text has not changed.
+  if (field.inserted && result.text === field.customText) {
+    return null;
+  }
+
   return {
     type: FieldType.TEXT,
-    value: textToInsert || null,
+    value: result.text,
   };
 };

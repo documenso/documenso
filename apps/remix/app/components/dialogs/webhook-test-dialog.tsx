@@ -55,8 +55,8 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
       });
 
       toast({
-        title: t`Test webhook sent`,
-        description: t`The test webhook has been successfully sent to your endpoint.`,
+        title: t`Test webhook queued`,
+        description: t`We'll send it to your endpoint shortly. Refresh the page to see the response in the logs.`,
         duration: 5000,
       });
 
@@ -64,7 +64,7 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
     } catch (error) {
       toast({
         title: t`Test webhook failed`,
-        description: t`We encountered an error while sending the test webhook. Please check your endpoint and try again.`,
+        description: t`We couldn't send the test webhook. Please try again.`,
         variant: 'destructive',
         duration: 5000,
       });

@@ -12,41 +12,92 @@ import {
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { createCallable } from 'react-call';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-const ZSignFieldTextFormSchema = z.object({
-  text: z.string().min(1, { message: msg`Text is required`.id }),
-});
+const createSignFieldTextFormSchema = ({
+  isInserted,
+  characterLimit,
+}: {
+  isInserted: boolean;
+  characterLimit?: number;
+}) =>
+  z.object({
+    text: z.string().superRefine((text, ctx) => {
+      // Inserted text can be cleared, which removes it from the field.
+      if (!isInserted && text.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: msg`Text is required`.id,
+        });
 
-type TSignFieldTextFormSchema = z.infer<typeof ZSignFieldTextFormSchema>;
+        return;
+      }
+
+      if (characterLimit !== undefined && text.length > characterLimit) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: plural(text.length - characterLimit, {
+            one: '# character over the limit',
+            other: '# characters over the limit',
+          }),
+        });
+      }
+    }),
+  });
+
+type TSignFieldTextFormSchema = z.infer<ReturnType<typeof createSignFieldTextFormSchema>>;
 
 export type SignFieldTextDialogProps = {
   fieldMeta?: TTextFieldMeta;
-
   /**
-   * The current value of the field. When set, an empty submit is allowed so the signer can clear the field.
+   * The text currently inserted into the field.
+   *
+   * When provided, the dialog is prefilled with this text and the user can remove it
+   * by either clearing the text or clicking the remove button.
    */
-  defaultValue?: string;
+  insertedText?: string;
 };
 
-export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, string | null>(
-  ({ call, fieldMeta, defaultValue }) => {
+export type SignFieldTextDialogResult = { action: 'save'; text: string } | { action: 'remove' };
+
+export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, SignFieldTextDialogResult | null>(
+  ({ call, fieldMeta, insertedText }) => {
     const { t } = useLingui();
 
+    const isInserted = insertedText !== undefined;
+
+    // A limit of 0 means the field has no limit.
+    const characterLimit = fieldMeta?.characterLimit || undefined;
+
     const form = useForm<TSignFieldTextFormSchema>({
-      resolver: zodResolver(defaultValue ? z.object({ text: z.string() }) : ZSignFieldTextFormSchema),
+      resolver: zodResolver(createSignFieldTextFormSchema({ isInserted, characterLimit })),
       defaultValues: {
-        text: defaultValue ?? '',
+        text: insertedText ?? '',
       },
     });
 
+    const onFormSubmit = ({ text }: TSignFieldTextFormSchema) => {
+      if (isInserted && text.trim().length === 0) {
+        call.end({ action: 'remove' });
+        return;
+      }
+
+      call.end({ action: 'save', text });
+    };
+
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent>
+        <DialogContent
+          onOpenAutoFocus={(event) => {
+            // Radix only selects prefilled <input>s on open, not textareas.
+            event.preventDefault();
+            form.setFocus('text', { shouldSelect: true });
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{fieldMeta?.label || <Trans>Enter Text</Trans>}</DialogTitle>
 
@@ -56,38 +107,70 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit((data) => call.end(data.text))}>
+            <form onSubmit={form.handleSubmit(onFormSubmit)}>
               <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
                 <FormField
                   control={form.control}
                   name="text"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Textarea
-                          id="custom-text"
-                          placeholder={fieldMeta?.placeholder ?? t`Enter your text here`}
-                          className={cn('w-full rounded-md', {
-                            'border-2 border-red-300 text-left ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
-                              fieldState.error,
-                          })}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                      {fieldMeta?.characterLimit !== undefined &&
-                        fieldMeta?.characterLimit > 0 &&
-                        !fieldState.error && (
-                          <div className="text-muted-foreground text-sm">
-                            <Plural
-                              value={fieldMeta?.characterLimit - (field.value?.length ?? 0)}
-                              one="# character remaining"
-                              other="# characters remaining"
-                            />
+                  render={({ field, fieldState }) => {
+                    const isCounterVisible = characterLimit !== undefined && !fieldState.error;
+
+                    return (
+                      <FormItem>
+                        {/* The dialog doesn't scroll, so the max height leaves 20rem for its title and buttons. */}
+                        <FormControl>
+                          <Textarea
+                            id="custom-text"
+                            placeholder={fieldMeta?.placeholder ?? t`Enter your text here`}
+                            className={cn(
+                              'h-auto max-h-[calc(100dvh-20rem)] min-h-20 w-full rounded-md [field-sizing:content]',
+                              {
+                                'border-2 border-red-300 text-left ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
+                                  fieldState.error,
+                              },
+                            )}
+                            {...field}
+                          />
+                        </FormControl>
+
+                        {(fieldState.error !== undefined || isCounterVisible || isInserted) && (
+                          <div className="flex items-center gap-x-4 text-sm">
+                            <FormMessage className="text-sm" />
+
+                            {isCounterVisible &&
+                              (field.value.length <= characterLimit ? (
+                                <span className="text-muted-foreground">
+                                  <Plural
+                                    value={characterLimit - field.value.length}
+                                    one="# character remaining"
+                                    other="# characters remaining"
+                                  />
+                                </span>
+                              ) : (
+                                <span className="text-destructive">
+                                  <Plural
+                                    value={field.value.length - characterLimit}
+                                    one="# character over the limit"
+                                    other="# characters over the limit"
+                                  />
+                                </span>
+                              ))}
+
+                            {isInserted && (
+                              <Button
+                                type="button"
+                                variant="link"
+                                className="ml-auto h-auto p-0 text-destructive"
+                                onClick={() => call.end({ action: 'remove' })}
+                              >
+                                <Trans>Remove</Trans>
+                              </Button>
+                            )}
                           </div>
                         )}
-                    </FormItem>
-                  )}
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 <DialogFooter>
@@ -95,9 +178,7 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
                     <Trans>Cancel</Trans>
                   </Button>
 
-                  <Button type="submit">
-                    <Trans>Enter</Trans>
-                  </Button>
+                  <Button type="submit">{isInserted ? <Trans>Save</Trans> : <Trans>Enter</Trans>}</Button>
                 </DialogFooter>
               </fieldset>
             </form>

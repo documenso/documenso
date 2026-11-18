@@ -12,9 +12,6 @@ import { renderGenericTextFieldElement } from './render-generic-text-field';
 import { renderRadioFieldElement } from './render-radio-field';
 import { renderSignatureFieldElement } from './render-signature-field';
 
-export const MIN_FIELD_HEIGHT_PX = 12;
-export const MIN_FIELD_WIDTH_PX = 36;
-
 type RenderFieldOptions = {
   field: FieldToRender;
   pageLayer: Konva.Layer;

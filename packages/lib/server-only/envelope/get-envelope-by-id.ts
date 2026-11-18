@@ -62,6 +62,7 @@ export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeB
         },
       },
       fields: true,
+      contents: true,
       team: {
         select: {
           id: true,
