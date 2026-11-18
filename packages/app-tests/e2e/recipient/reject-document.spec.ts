@@ -1,7 +1,10 @@
 import { AppErrorCode } from '@documenso/lib/errors/app-error';
+import { jobs } from '@documenso/lib/jobs/client';
+import { adminFindUnsealedDocuments } from '@documenso/lib/server-only/admin/admin-find-unsealed-documents';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -146,6 +149,35 @@ test('[REJECT_DOCUMENT]: a duplicate completion is still reported as already sig
   });
 
   expect(completionCount).toBe(1);
+});
+
+test('[REJECT_DOCUMENT]: a rejected envelope is found and sealed as rejected when no recipient is marked as rejected', async () => {
+  const { document } = await seedDocumentWithTwoRecipients();
+
+  // What is left when the recipient who rejected is edited or removed afterwards.
+  await prisma.envelope.update({
+    where: { id: document.id },
+    data: { status: DocumentStatus.REJECTED },
+  });
+
+  const findUnsealedEnvelopeIds = async () => {
+    const { data } = await adminFindUnsealedDocuments({ perPage: 100 });
+
+    return data.map((envelope) => envelope.id);
+  };
+
+  expect(await findUnsealedEnvelopeIds()).toContain(document.id);
+
+  await jobs.triggerJob({
+    name: 'internal.seal-document',
+    payload: { documentId: mapSecondaryIdToDocumentId(document.secondaryId) },
+  });
+
+  await expect
+    .poll(async () => prisma.envelope.findUniqueOrThrow({ where: { id: document.id } }), { timeout: 30_000 })
+    .toMatchObject({ status: DocumentStatus.REJECTED, completedAt: expect.any(Date) });
+
+  expect(await findUnsealedEnvelopeIds()).not.toContain(document.id);
 });
 
 const seedDocumentWithTwoRecipients = async () => {
