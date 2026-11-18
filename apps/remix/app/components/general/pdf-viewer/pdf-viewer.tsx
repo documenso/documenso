@@ -55,7 +55,11 @@ export type PDFViewerProps = {
   scrollParentRef: ScrollTarget;
 
   onDocumentLoad?: () => void;
-  onAcroFormDetected?: (hasFields: boolean) => void;
+
+  /**
+   * Called on each document load with whether the PDF has form fields.
+   */
+  onAcroFormDetected?: (hasFormFields: boolean) => void;
 
   /**
    * Values above 1 can overflow the container horizontally, so the scroll
@@ -143,16 +147,10 @@ export default function PDFViewer({
         pdfRef.current = loadedPdf;
 
         if (onAcroFormDetected) {
-          try {
-            const fieldObjects = await loadedPdf.getFieldObjects();
+          const fieldObjects = await loadedPdf.getFieldObjects().catch(() => null);
 
-            if (!isCancelled) {
-              onAcroFormDetected(fieldObjects !== null && Object.keys(fieldObjects).length > 0);
-            }
-          } catch {
-            if (!isCancelled) {
-              onAcroFormDetected(false);
-            }
+          if (!isCancelled) {
+            onAcroFormDetected(Object.keys(fieldObjects ?? {}).length > 0);
           }
         }
 
@@ -205,7 +203,7 @@ export default function PDFViewer({
         pdfRef.current = null;
       }
     };
-  }, [data, onAcroFormDetected]);
+  }, [data]);
 
   // Notify when document is loaded
   useEffect(() => {

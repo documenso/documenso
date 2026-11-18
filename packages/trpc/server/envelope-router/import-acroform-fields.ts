@@ -1,6 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { UNSAFE_importAcroFormFieldsFromEnvelope } from '@documenso/lib/server-only/envelope-item/import-acroform-fields';
+import { UNSAFE_importAcroFormFields } from '@documenso/lib/server-only/envelope-item/import-acroform-fields';
+import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
@@ -15,12 +16,23 @@ export const importAcroFormFieldsRoute = authenticatedProcedure
   .output(ZImportAcroFormFieldsResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId, metadata } = ctx;
-    const { envelopeId } = input;
+    const { envelopeId, envelopeItemId, recipientId } = input;
 
-    ctx.logger.info({ input: { envelopeId } });
+    ctx.logger.info({
+      input: {
+        envelopeId,
+        envelopeItemId,
+        recipientId,
+      },
+    });
 
+    // Documents only: a template keeps its PDF form, so that a document
+    // created from the template can still receive form values.
     const { envelopeWhereInput } = await getEnvelopeWhereInput({
-      id: { type: 'envelopeId', id: envelopeId },
+      id: {
+        type: 'envelopeId',
+        id: envelopeId,
+      },
       type: EnvelopeType.DOCUMENT,
       userId: user.id,
       teamId,
@@ -30,9 +42,11 @@ export const importAcroFormFieldsRoute = authenticatedProcedure
       where: envelopeWhereInput,
       include: {
         recipients: true,
+        fields: true,
         envelopeItems: {
-          include: { documentData: true },
-          orderBy: { order: 'asc' },
+          include: {
+            documentData: true,
+          },
         },
       },
     });
@@ -45,24 +59,40 @@ export const importAcroFormFieldsRoute = authenticatedProcedure
 
     if (envelope.internalVersion !== 2) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'AcroForm import is only supported for version 2 envelopes',
+        message: 'PDF form import is only supported for version 2 envelopes',
       });
     }
 
     if (envelope.status !== DocumentStatus.DRAFT) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'AcroForm import is only allowed while the envelope is in draft',
+        message: 'PDF form import is only allowed while the envelope is a draft',
       });
     }
 
-    if (envelope.envelopeItems.length === 0) {
+    const envelopeItem = envelope.envelopeItems.find((item) => item.id === envelopeItemId);
+
+    if (!envelopeItem) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Envelope item not found',
+      });
+    }
+
+    const recipient = envelope.recipients.find((recipient) => recipient.id === recipientId);
+
+    if (!recipient || !canRecipientFieldsBeModified(recipient, envelope.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Envelope has no items to import from',
+        message: 'Recipient not found, or the recipient cannot have fields',
       });
     }
 
-    return UNSAFE_importAcroFormFieldsFromEnvelope({
+    const fields = await UNSAFE_importAcroFormFields({
       envelope,
+      envelopeItem,
+      recipient,
       apiRequestMetadata: metadata,
     });
+
+    return {
+      fieldsCreated: fields.length,
+    };
   });

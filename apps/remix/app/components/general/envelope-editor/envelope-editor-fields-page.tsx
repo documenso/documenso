@@ -31,7 +31,7 @@ import { Separator } from '@documenso/ui/primitives/separator';
 import { Tabs, TabsContent } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
@@ -45,7 +45,7 @@ import {
   PencilIcon,
   SparklesIcon,
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
@@ -115,8 +115,11 @@ export const EnvelopeEditorFieldsPage = () => {
     editorConfig,
     selectedEditorTab,
     setSelectedEditorTab,
+    isDocument,
+    isEmbedded,
     flushAutosave,
     syncEnvelope,
+    registerPendingMutation,
   } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem, setCurrentEnvelopeItem, viewerControls } = useCurrentEnvelopeRender();
@@ -132,32 +135,12 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
-  const [acroFormHasFieldsByItemRevision, setAcroFormHasFieldsByItemRevision] = useState<Record<string, boolean>>({});
-
+  const [hasAcroForm, setHasAcroForm] = useState(false);
   const { revalidate } = useRevalidator();
   const { toast } = useToast();
 
-  const { mutateAsync: importFieldsFromPdf, isPending: isImportingFieldsFromPdf } =
+  const { mutateAsync: importAcroFormFields, isPending: isImportingAcroFormFields } =
     trpc.envelope.field.importFromPdf.useMutation();
-
-  const currentEnvelopeItemRevision = currentEnvelopeItem
-    ? `${currentEnvelopeItem.id}:${currentEnvelopeItem.documentDataId}`
-    : null;
-  const currentItemHasAcroForm =
-    currentEnvelopeItemRevision !== null && acroFormHasFieldsByItemRevision[currentEnvelopeItemRevision] === true;
-
-  const onAcroFormDetected = useCallback(
-    (hasFields: boolean) => {
-      if (!currentEnvelopeItemRevision) {
-        return;
-      }
-
-      setAcroFormHasFieldsByItemRevision((prev) =>
-        prev[currentEnvelopeItemRevision] === hasFields ? prev : { ...prev, [currentEnvelopeItemRevision]: hasFields },
-      );
-    },
-    [currentEnvelopeItemRevision],
-  );
 
   const envelopeItemPermissions = useMemo(
     () => getEnvelopeItemPermissions(envelope, envelope.recipients),
@@ -287,36 +270,45 @@ export const EnvelopeEditorFieldsPage = () => {
     });
   };
 
-  const onImportFromPdfClick = async () => {
+  const onImportAcroFormFieldsClick = async () => {
+    if (!currentEnvelopeItem || !editorFields.selectedRecipient) {
+      return;
+    }
+
     try {
+      // A pending field autosave does not have the imported fields. Send it first,
+      // so that it cannot land after the import and delete them.
       await flushAutosave();
-      const result = await importFieldsFromPdf({ envelopeId: envelope.id });
 
-      if (result.fieldsCreated === 0) {
-        toast({
-          title: _(msg`No form fields found`),
-          description: _(msg`This PDF does not contain any importable form fields.`),
-          duration: 5000,
-        });
+      const importPromise = importAcroFormFields({
+        envelopeId: envelope.id,
+        envelopeItemId: currentEnvelopeItem.id,
+        recipientId: editorFields.selectedRecipient.id,
+      });
 
-        return;
-      }
+      registerPendingMutation(importPromise);
+
+      const { fieldsCreated } = await importPromise;
 
       await syncEnvelope();
 
       toast({
-        title: _(msg`Fields imported`),
-        description: _(
-          msg`Imported ${result.fieldsCreated} field${result.fieldsCreated === 1 ? '' : 's'} from the PDF form. Review and reassign in the editor.`,
-        ),
-        duration: 5000,
+        title: plural(fieldsCreated, {
+          0: `No fields imported`,
+          one: `Field imported`,
+          other: `Fields imported`,
+        }),
+        description: plural(fieldsCreated, {
+          0: `The PDF form has no fields that can be imported.`,
+          one: `# field was imported from the PDF form.`,
+          other: `# fields were imported from the PDF form.`,
+        }),
       });
     } catch {
       toast({
         title: _(msg`Could not import fields`),
-        description: _(msg`Something went wrong while importing fields from the PDF.`),
+        description: _(msg`Something went wrong while importing the fields from the PDF form.`),
         variant: 'destructive',
-        duration: 5000,
       });
     }
   };
@@ -423,7 +415,7 @@ export const EnvelopeEditorFieldsPage = () => {
                   scrollParentRef={scrollableContainerRef}
                   errorMessage={PDF_VIEWER_ERROR_MESSAGES.editor}
                   toolbar={allowContents ? ['zoom', 'fields', 'contents'] : ['zoom', 'fields']}
-                  onAcroFormDetected={onAcroFormDetected}
+                  onAcroFormDetected={setHasAcroForm}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">
@@ -541,17 +533,18 @@ export const EnvelopeEditorFieldsPage = () => {
                       </>
                     )}
 
-                    {currentItemHasAcroForm && envelope.status === DocumentStatus.DRAFT && (
+                    {hasAcroForm && isDocument && !isEmbedded && envelope.status === DocumentStatus.DRAFT && (
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         className="mt-4 w-full"
-                        onClick={() => void onImportFromPdfClick()}
-                        disabled={isImportingFieldsFromPdf}
+                        onClick={() => void onImportAcroFormFieldsClick()}
+                        loading={isImportingAcroFormFields}
+                        disabled={!editorFields.selectedRecipient}
                       >
-                        <FormInputIcon className="mr-2 -ml-1 h-4 w-4" />
-                        {isImportingFieldsFromPdf ? <Trans>Importing...</Trans> : <Trans>Import from PDF form</Trans>}
+                        {!isImportingAcroFormFields && <FormInputIcon className="mr-2 -ml-1 h-4 w-4" />}
+                        <Trans>Import from PDF form</Trans>
                       </Button>
                     )}
                   </section>

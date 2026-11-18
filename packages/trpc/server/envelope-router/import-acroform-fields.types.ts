@@ -1,23 +1,13 @@
-import { ZEnvelopeFieldSchema } from '@documenso/lib/types/field';
 import { z } from 'zod';
 
 export const ZImportAcroFormFieldsRequestSchema = z.object({
   envelopeId: z.string(),
+  envelopeItemId: z.string(),
+  recipientId: z.number(),
 });
 
 export const ZImportAcroFormFieldsResponseSchema = z.object({
-  itemsProcessed: z.number().int().min(0),
-  fieldsCreated: z.number().int().min(0),
-  unsupportedCount: z.number().int().min(0),
-  signedSignatureCount: z.number().int().min(0),
-  skippedItems: z.array(
-    z.object({
-      envelopeItemId: z.string(),
-      envelopeItemTitle: z.string(),
-      reason: z.enum(['encrypted', 'xfa-hybrid', 'no-form', 'error']),
-    }),
-  ),
-  fields: z.array(ZEnvelopeFieldSchema),
+  fieldsCreated: z.number(),
 });
 
 export type TImportAcroFormFieldsRequest = z.infer<typeof ZImportAcroFormFieldsRequestSchema>;
