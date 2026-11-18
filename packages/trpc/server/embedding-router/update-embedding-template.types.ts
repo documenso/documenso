@@ -1,4 +1,4 @@
-import { ZDocumentEmailSettingsInputSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -66,7 +66,7 @@ export const ZUpdateEmbeddingTemplateRequestSchema = z.object({
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
-      emailSettings: ZDocumentEmailSettingsInputSchema.optional(),
+      emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
     .optional(),
 });

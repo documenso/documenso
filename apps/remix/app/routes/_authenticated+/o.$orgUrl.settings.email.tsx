@@ -35,7 +35,7 @@ export default function OrganisationSettingsGeneral() {
           emailId,
           emailReplyTo: emailReplyTo || null,
           // emailReplyToName,
-          emailDocumentSettings: emailDocumentSettings ?? undefined,
+          emailDocumentSettings,
           includeSenderDetails: includeSenderDetails ?? undefined,
         },
       });

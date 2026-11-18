@@ -14,7 +14,7 @@ export enum DocumentEmailEvents {
   OwnerDocumentCreated = 'ownerDocumentCreated',
 }
 
-export const ZDocumentEmailSettingsInputSchema = z
+export const ZDocumentEmailSettingsSchema = z
   .object({
     attachDocument: z
       .boolean()
@@ -61,13 +61,8 @@ export const ZDocumentEmailSettingsInputSchema = z
       .describe('Whether to send an email to the document owner when a document is created from a direct template.')
       .default(true),
   })
-  .strip();
-
-// Persisted settings may be absent or predate new options. API inputs must use
-// the input schema so invalid values cannot silently enable document attachments.
-export const ZDocumentEmailSettingsSchema = ZDocumentEmailSettingsInputSchema.catch(() => ({
-  ...DEFAULT_DOCUMENT_EMAIL_SETTINGS,
-}));
+  .strip()
+  .catch(() => ({ ...DEFAULT_DOCUMENT_EMAIL_SETTINGS }));
 
 export type TDocumentEmailSettings = z.infer<typeof ZDocumentEmailSettingsSchema>;
 

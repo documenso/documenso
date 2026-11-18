@@ -9,7 +9,7 @@ import { msg } from '@lingui/core/macro';
 import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 import { z } from 'zod';
 
-import { ZDocumentEmailSettingsInputSchema } from './document-email';
+import { ZDocumentEmailSettingsSchema } from './document-email';
 
 /**
  * The full document response schema.
@@ -125,7 +125,7 @@ export const ZDocumentMetaCreateSchema = z.object({
   drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
   emailId: z.string().nullish(),
   emailReplyTo: zEmail().nullish(),
-  emailSettings: ZDocumentEmailSettingsInputSchema.nullish(),
+  emailSettings: ZDocumentEmailSettingsSchema.nullish(),
   envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
   reminderSettings: ZEnvelopeReminderSettings.nullish(),
 });
