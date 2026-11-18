@@ -123,30 +123,28 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
           <Trans>Templates</Trans>
         </Link>
 
-        <div className="flex flex-wrap gap-x-4 gap-y-2 sm:shrink-0">
-          {isOwnTeamTemplate && (
-            <>
-              <TemplateDirectLinkDialog
-                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-                directLink={envelope.directLink}
-                recipients={envelope.recipients}
-                triggerSizeVariant="sm"
-              />
+        {isOwnTeamTemplate && (
+          <div className="flex flex-wrap gap-x-4 gap-y-2 sm:shrink-0">
+            <TemplateDirectLinkDialog
+              templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+              directLink={envelope.directLink}
+              recipients={envelope.recipients}
+              triggerSizeVariant="sm"
+            />
 
-              <TemplateBulkSendDialog
-                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-                recipients={envelope.recipients}
-              />
+            <TemplateBulkSendDialog
+              templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+              recipients={envelope.recipients}
+            />
 
-              <Button asChild size="sm">
-                <Link to={`${templateRootPath}/${envelope.id}/edit`}>
-                  <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
-                  <Trans>Edit Template</Trans>
-                </Link>
-              </Button>
-            </>
-          )}
-        </div>
+            <Button asChild size="sm">
+              <Link to={`${templateRootPath}/${envelope.id}/edit`}>
+                <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
+                <Trans>Edit Template</Trans>
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="min-w-0">
