@@ -27,6 +27,9 @@ type HandleOAuthAuthorizeUrlOptions = {
    * Optional prompt to pass to the authorization endpoint.
    */
   prompt?: 'none' | 'login' | 'consent' | 'select_account';
+
+  /** Generated when omitted. */
+  state?: string;
 };
 
 const isOidcPrompt = (value: unknown): value is HandleOAuthAuthorizeUrlOptions['prompt'] => {
@@ -51,7 +54,7 @@ export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOp
   const oAuthClient = new OAuth2Client(clientOptions.clientId, clientOptions.clientSecret, clientOptions.redirectUrl);
 
   const scopes = clientOptions.scope;
-  const state = generateState();
+  const state = options.state ?? generateState();
 
   const codeVerifier = generateCodeVerifier();
 

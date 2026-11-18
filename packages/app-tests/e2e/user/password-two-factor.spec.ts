@@ -8,7 +8,7 @@ import { expect, test } from '@playwright/test';
 import { base32 } from '@scure/base';
 import { generateHOTP } from 'oslo/otp';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 import { waitForHydration } from '../fixtures/hydration';
 
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
@@ -93,6 +93,7 @@ test('[USER] password update API rejects a missing 2FA code when 2FA is enabled'
   await enableTwoFactorAuthentication({ user: userWithSecret, code: await getCurrentTotpCode(user.id) });
 
   const response = await page.request.post('/api/auth/email-password/update-password', {
+    headers: WEBAPP_ORIGIN_HEADERS,
     data: { currentPassword: 'password', password: 'Test123!' },
   });
 
