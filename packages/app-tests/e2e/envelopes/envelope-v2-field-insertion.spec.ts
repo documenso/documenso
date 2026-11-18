@@ -5,7 +5,9 @@ import { expect, test } from '@playwright/test';
 import { DocumentStatus, FieldType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
-import { apiSeedPendingDocument, apiSeedTemplate } from '../fixtures/api-seeds';
+import { apiSeedPendingDocument } from '../fixtures/api-seeds';
+import { getCanvasBox, getPageCanvas } from '../fixtures/contents';
+import { getKonvaFieldTextForPage } from '../fixtures/konva';
 
 const PDF_PAGE_SELECTOR = 'img[data-page-number]';
 
@@ -253,80 +255,70 @@ test.describe('V2 envelope field insertion during signing', () => {
     }).toPass();
   });
 
-  test('clicking a prefilled text field opens it for editing instead of clearing it', async ({ page, request }) => {
-    const { envelope: template, token: apiToken } = await apiSeedTemplate(request, {
-      recipients: [{ email: 'prefill-signer@test.documenso.com', name: 'Prefill Signer' }],
+  test('an auto-inserted number field can be edited and removed', async ({ page, request }) => {
+    // The default value is inserted into the field when the document is sent.
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+      recipients: [{ email: 'signer-number@test.documenso.com', name: 'Number Signer' }],
       fieldsPerRecipient: [
         [
+          { type: FieldType.SIGNATURE, page: 1, positionX: 5, positionY: 5, width: 20, height: 5 },
           {
-            type: FieldType.TEXT,
+            type: FieldType.NUMBER,
             page: 1,
-            positionX: 10,
-            positionY: 10,
-            width: 20,
+            positionX: 5,
+            positionY: 20,
+            width: 30,
             height: 5,
-            fieldMeta: { type: 'text', label: 'Mailing Address' },
+            fieldMeta: { type: 'number', value: '144' },
           },
-          { type: FieldType.SIGNATURE, page: 1, positionX: 10, positionY: 30, width: 20, height: 5 },
         ],
       ],
     });
 
-    const [templateRecipient] = template.recipients;
-    const templateField = template.fields.find((field) => field.type === FieldType.TEXT);
+    const numberField = envelope.fields.find((field) => field.type === FieldType.NUMBER);
 
-    if (!templateField) {
-      throw new Error('Text field not found');
+    if (!numberField) {
+      throw new Error('Number field not found');
     }
 
-    const formData = new FormData();
-
-    formData.append(
-      'payload',
-      JSON.stringify({
-        envelopeId: template.id,
-        recipients: [{ id: templateRecipient.id, email: templateRecipient.email, name: templateRecipient.name }],
-        prefillFields: [{ id: templateField.id, type: 'text', label: 'Mailing Address', value: '144 Plymouth' }],
-        distributeDocument: true,
-      }),
-    );
-
-    const useResponse = await request.post('/api/v2/envelope/use', {
-      headers: { Authorization: `Bearer ${apiToken}` },
-      multipart: formData,
-    });
-
-    expect(useResponse.ok(), await useResponse.text()).toBeTruthy();
-
-    const { id: envelopeId } = await useResponse.json();
-
-    const recipient = await prisma.recipient.findFirstOrThrow({ where: { envelopeId } });
-
-    await page.goto(`/sign/${recipient.token}`);
+    await page.goto(`/sign/${distributeResult.recipients[0].token}`);
     await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
 
-    const canvas = page.locator('.konva-container canvas').first();
+    const canvas = getPageCanvas(page);
     await expect(canvas).toBeVisible({ timeout: 30_000 });
 
-    const canvasBox = await canvas.boundingBox();
+    const canvasBox = await getCanvasBox(page);
 
-    if (!canvasBox) {
-      throw new Error('Canvas bounding box not found');
-    }
+    // Field positions and sizes are percentages of the page.
+    const numberFieldCenter = {
+      x: ((Number(numberField.positionX) + Number(numberField.width) / 2) / 100) * canvasBox.width,
+      y: ((Number(numberField.positionY) + Number(numberField.height) / 2) / 100) * canvasBox.height,
+    };
 
-    await canvas.click({ position: { x: 0.2 * canvasBox.width, y: 0.125 * canvasBox.height } });
+    const dialog = page.getByRole('dialog');
+    const numberInput = dialog.getByRole('textbox');
 
-    const textInput = page.getByRole('dialog').getByRole('textbox');
-    await expect(textInput).toHaveValue('144 Plymouth');
+    await expect.poll(() => getKonvaFieldTextForPage(page, 1, numberField.id)).toBe('144');
 
-    await textInput.fill('145 Plymouth');
-    await page.getByRole('button', { name: 'Enter' }).click();
+    await canvas.click({ position: numberFieldCenter });
+    await expect(numberInput).toHaveValue('144');
+    await numberInput.fill('145');
+    await dialog.getByRole('button', { name: 'Save' }).click();
+    await expect.poll(() => getKonvaFieldTextForPage(page, 1, numberField.id)).toBe('145');
 
-    await expect(async () => {
-      const field = await prisma.field.findFirstOrThrow({ where: { envelopeId, type: FieldType.TEXT } });
+    const editedNumberField = await prisma.field.findUniqueOrThrow({ where: { id: numberField.id } });
 
-      expect(field.inserted).toBe(true);
-      expect(field.customText).toBe('145 Plymouth');
-    }).toPass();
+    expect(editedNumberField.inserted).toBe(true);
+    expect(editedNumberField.customText).toBe('145');
+
+    await canvas.click({ position: numberFieldCenter });
+    await expect(numberInput).toHaveValue('145');
+    await dialog.getByRole('button', { name: 'Remove' }).click();
+    await expect.poll(() => getKonvaFieldTextForPage(page, 1, numberField.id)).toBe('Number');
+
+    const removedNumberField = await prisma.field.findUniqueOrThrow({ where: { id: numberField.id } });
+
+    expect(removedNumberField.inserted).toBe(false);
+    expect(removedNumberField.customText).toBe('');
   });
 });
