@@ -121,7 +121,7 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
         return base;
       }
 
-      const flattened = await normalizePdf(Buffer.from(buffer), {
+      const { pdf: flattened } = await normalizePdf(Buffer.from(buffer), {
         flattenForm: true,
       });
 

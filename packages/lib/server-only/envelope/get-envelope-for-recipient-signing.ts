@@ -5,16 +5,20 @@ import EnvelopeSchema from '@documenso/prisma/generated/zod/modelSchema/Envelope
 import SignatureSchema from '@documenso/prisma/generated/zod/modelSchema/SignatureSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
-import { DocumentSigningOrder, DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
 import { z } from 'zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAuthMethods } from '../../types/document-auth';
+import { ZEnvelopeContentSchema } from '../../types/envelope-content';
 import { ZEnvelopeFieldSchema, ZFieldSchema } from '../../types/field';
 import { ZRecipientLiteSchema } from '../../types/recipient';
+import { isTspEnvelope } from '../../types/signature-level';
+import { isRecipientTurnBySigningOrder } from '../../utils/recipient-groups';
 import { isRecipientExpired } from '../../utils/recipients';
 import { isRecipientAuthorized } from '../document/is-recipient-authorized';
 import { getTeamSettings } from '../team/get-team-settings';
+import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 
 export type GetRecipientEnvelopeByTokenOptions = {
   token: string;
@@ -74,6 +78,8 @@ export const ZEnvelopeForSigningResponse = z.object({
         }).array(),
       })
       .array(),
+
+    contents: ZEnvelopeContentSchema.array(),
 
     envelopeItems: EnvelopeItemSchema.pick({
       envelopeId: true,
@@ -186,6 +192,7 @@ export const getEnvelopeForRecipientSigning = async ({
         },
       },
       documentMeta: true,
+      contents: true,
       recipients: {
         include: {
           fields: {
@@ -228,6 +235,8 @@ export const getEnvelopeForRecipientSigning = async ({
     });
   }
 
+  await assertSenderNotDisabled({ userId: envelope.userId });
+
   const documentAccessValid = await isRecipientAuthorized({
     type: 'ACCESS',
     documentAuthOptions: envelope.authOptions,
@@ -260,23 +269,9 @@ export const getEnvelopeForRecipientSigning = async ({
     },
   });
 
-  let isRecipientsTurn = true;
-
-  const currentRecipientIndex = envelope.recipients.findIndex((r) => r.token === token);
-
-  if (envelope.documentMeta.signingOrder === DocumentSigningOrder.SEQUENTIAL && currentRecipientIndex !== -1) {
-    for (let i = 0; i < currentRecipientIndex; i++) {
-      // CC recipients have no action to take, so they can never block the flow.
-      if (envelope.recipients[i].role === RecipientRole.CC) {
-        continue;
-      }
-
-      if (envelope.recipients[i].signingStatus !== SigningStatus.SIGNED) {
-        isRecipientsTurn = false;
-        break;
-      }
-    }
-  }
+  const isRecipientsTurn =
+    envelope.documentMeta.signingOrder !== DocumentSigningOrder.SEQUENTIAL ||
+    isRecipientTurnBySigningOrder(envelope.recipients, recipient, { strictlySequential: isTspEnvelope(envelope) });
 
   const sender = settings.includeSenderDetails
     ? {

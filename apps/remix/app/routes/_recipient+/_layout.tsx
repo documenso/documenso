@@ -1,3 +1,4 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -5,6 +6,7 @@ import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { ChevronLeft } from 'lucide-react';
+import { useEffect } from 'react';
 import { isRouteErrorResponse, Link, Outlet } from 'react-router';
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
@@ -48,7 +50,13 @@ export default function RecipientLayout({ matches }: Route.ComponentProps) {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  const analytics = useAnalytics();
+
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
+
+  useEffect(() => {
+    analytics.captureException(error, { source: 'signing', location: 'recipient_layout_boundary' });
+  }, [error]);
 
   return (
     <GenericErrorLayout

@@ -25,7 +25,7 @@ export const updateRecipient = async ({ id, name, email, role }: UpdateRecipient
     },
     data: {
       name,
-      email,
+      email: email?.toLowerCase(),
       role,
     },
   });

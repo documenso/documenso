@@ -18,6 +18,7 @@ export const EnvelopeEditorRenderProviderWrapper = ({
       envelope={envelope}
       envelopeItems={envelope.envelopeItems}
       fields={envelope.fields}
+      contents={envelope.contents}
       recipients={envelope.recipients}
       token={token}
       presignToken={presignedToken}
