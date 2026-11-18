@@ -3,6 +3,7 @@ import { prisma } from '@documenso/prisma';
 import { expect, type Page, test } from '@playwright/test';
 import { FieldType } from '@prisma/client';
 
+import { selectEditorTab } from '../fixtures/contents';
 import {
   addEnvelopeItemPdf,
   clickAddMyselfButton,
@@ -661,6 +662,11 @@ const runCopyPasteFieldFlow = async (surface: TEnvelopeEditorSurface): Promise<T
   await root.keyboard.press('ControlOrMeta+v');
 
   await expect.poll(async () => getKonvaElementCountForPage(root, 1, '.field-group')).toBe(3);
+
+  // The contents tab hides the fields, so a paste there must not add one.
+  await selectEditorTab(root, 'Contents');
+  await root.keyboard.press('ControlOrMeta+v');
+  await selectEditorTab(root, 'Fields');
 
   // Navigate away and back to persist changes.
   await clickEnvelopeEditorStep(root, 'upload');
