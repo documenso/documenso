@@ -3,7 +3,7 @@ import type { Context } from 'hono';
 import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
 import { z } from 'zod';
 
-import { CSC_OAUTH_FLOW_COOKIE_NAME, cscCookieBaseOptions, getCscCookieSecret } from './shared';
+import { CSC_OAUTH_FLOW_COOKIE_NAME, cscOAuthFlowCookieOptions, getCscCookieSecret } from './shared';
 
 /**
  * `csc_oauth_flow` — single-round-trip carrier across `/api/csc/oauth/authorize`
@@ -28,6 +28,8 @@ export const ZCscOAuthFlowPayloadSchema = z.object({
   recipientToken: z.string().min(1),
   /** CSC session id — present only on `credential`-scope flows (set at prep). */
   sessionId: z.string().min(1).optional(),
+  /** `sha256(nonce)` of the embed flow cookie; marks a round-trip started from the embed popup. */
+  embedNonceHash: z.string().min(1).optional(),
 });
 
 export type TCscOAuthFlowPayload = z.infer<typeof ZCscOAuthFlowPayloadSchema>;
@@ -41,7 +43,7 @@ export const setCscOAuthFlowCookie = async (options: SetCscOAuthFlowCookieOption
   const { c, payload } = options;
 
   await setSignedCookie(c, CSC_OAUTH_FLOW_COOKIE_NAME, JSON.stringify(payload), getCscCookieSecret(), {
-    ...cscCookieBaseOptions,
+    ...cscOAuthFlowCookieOptions,
     maxAge: CSC_OAUTH_FLOW_MAX_AGE_SECONDS,
   });
 };
@@ -81,5 +83,5 @@ export const getCscOAuthFlowCookie = async (c: Context): Promise<TCscOAuthFlowPa
 };
 
 export const clearCscOAuthFlowCookie = (c: Context): void => {
-  deleteCookie(c, CSC_OAUTH_FLOW_COOKIE_NAME, cscCookieBaseOptions);
+  deleteCookie(c, CSC_OAUTH_FLOW_COOKIE_NAME, cscOAuthFlowCookieOptions);
 };

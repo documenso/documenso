@@ -49,7 +49,7 @@ Use the `cssVars` prop on any embed component to override default colors, spacin
 | `widgetForeground`      | Widget text color                 |
 | `border`                | Default border color              |
 | `input`                 | Input field border color          |
-| `primary`               | Primary action/button color       |
+| `primary`               | Primary action/button color. The loading spinner on fields also uses this color. |
 | `primaryForeground`     | Primary action/button text color  |
 | `secondary`             | Secondary action/button color     |
 | `secondaryForeground`   | Secondary button text color       |
@@ -149,6 +149,7 @@ Fields expose data attributes for state-based styling:
 | `[data-field-type]` | `SIGNATURE`, `TEXT`, `CHECKBOX`, `RADIO`, etc. | The type of field                    |
 | `[data-inserted]`   | `true`, `false`                                | Whether the field has been filled    |
 | `[data-validate]`   | `true`, `false`                                | Whether the field is being validated |
+| `[data-readonly]`   | `true`, `false`                                | Whether the field is read-only       |
 
 ### Example
 
@@ -160,7 +161,7 @@ Fields expose data attributes for state-based styling:
 
 /* Style filled fields */
 .field--FieldRootContainer[data-inserted='true'] {
-  background-color: var(--primary);
+  background-color: hsl(var(--primary));
   opacity: 0.2;
 }
 

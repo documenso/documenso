@@ -44,6 +44,7 @@ import { EmbedClientLoading } from './embed-client-loading';
 import { EmbedDocumentCompleted } from './embed-document-completed';
 import { EmbedDocumentFields } from './embed-document-fields';
 import { EmbedDocumentRejected } from './embed-document-rejected';
+import { usePersistEmbedSignature } from './use-persist-embed-signature';
 
 export type EmbedSignDocumentV1ClientPageProps = {
   token: string;
@@ -59,6 +60,7 @@ export type EmbedSignDocumentV1ClientPageProps = {
   hidePoweredBy?: boolean;
   allowWhitelabelling?: boolean;
   allRecipients?: RecipientWithFields[];
+  clientUserId?: string | null;
 };
 
 export const EmbedSignDocumentV1ClientPage = ({
@@ -75,12 +77,19 @@ export const EmbedSignDocumentV1ClientPage = ({
   hidePoweredBy = false,
   allowWhitelabelling = false,
   allRecipients = [],
+  clientUserId = null,
 }: EmbedSignDocumentV1ClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const analytics = useAnalytics();
 
   const { fullName, email, signature, setFullName, setEmail, setSignature } = useRequiredDocumentSigningContext();
+
+  const { persistSignature } = usePersistEmbedSignature({
+    token,
+    clientUserId,
+    initialSignature: signature,
+  });
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
@@ -139,10 +148,31 @@ export const EmbedSignDocumentV1ClientPage = ({
         return;
       }
 
-      await completeDocumentWithToken({
+      const result = await completeDocumentWithToken({
         documentId,
         token,
       });
+
+      // TSP envelopes return a CSC authorize URL that only the v2 embed can run.
+      if (result.status === 'REDIRECT') {
+        if (window.parent) {
+          window.parent.postMessage(
+            {
+              action: 'document-error',
+              data: null,
+            },
+            '*',
+          );
+        }
+
+        toast({
+          title: _(msg`Unable to sign document`),
+          description: _(msg`Qualified electronic signatures are not supported in this embed.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
 
       if (window.parent) {
         window.parent.postMessage(
@@ -523,7 +553,10 @@ export const EmbedSignDocumentV1ClientPage = ({
                             disableAnimation
                             fullName={fullName}
                             value={signature ?? ''}
-                            onChange={(v) => setSignature(v ?? '')}
+                            onChange={(v) => {
+                              setSignature(v ?? '');
+                              persistSignature(v);
+                            }}
                             typedSignatureEnabled={metadata?.typedSignatureEnabled}
                             uploadSignatureEnabled={metadata?.uploadSignatureEnabled}
                             drawSignatureEnabled={metadata?.drawSignatureEnabled}
@@ -565,7 +598,7 @@ export const EmbedSignDocumentV1ClientPage = ({
           )}
 
           {/* Fields */}
-          <EmbedDocumentFields fields={fields} metadata={metadata} />
+          <EmbedDocumentFields fields={fields} metadata={metadata} onSignatureChanged={persistSignature} />
 
           {/* Completed fields */}
           <DocumentReadOnlyFields documentMeta={metadata || undefined} fields={completedFields} />

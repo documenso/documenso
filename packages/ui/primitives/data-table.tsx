@@ -10,6 +10,7 @@ import type {
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import type React from 'react';
 import { useMemo } from 'react';
+import { cn } from '../lib/utils';
 
 import { Skeleton } from './skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
@@ -19,6 +20,7 @@ export type DataTableChildren<TData> = (_table: TTable<TData>) => React.ReactNod
 export type { ColumnDef as DataTableColumnDef, RowSelectionState } from '@tanstack/react-table';
 
 export interface DataTableProps<TData, TValue> {
+  className?: string;
   columns: ColumnDef<TData, TValue>[];
   columnVisibility?: VisibilityState;
   data: TData[];
@@ -48,6 +50,7 @@ export interface DataTableProps<TData, TValue> {
 }
 
 export function DataTable<TData, TValue>({
+  className,
   columns,
   columnVisibility,
   data,
@@ -120,7 +123,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className={cn('rounded-md border', className)}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

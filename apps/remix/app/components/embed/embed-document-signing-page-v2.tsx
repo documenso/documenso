@@ -15,28 +15,38 @@ import { EmbedClientLoading } from './embed-client-loading';
 import { EmbedDocumentCompleted } from './embed-document-completed';
 import { EmbedDocumentRejected } from './embed-document-rejected';
 import { EmbedSigningProvider } from './embed-signing-context';
+import { usePersistEmbedSignature } from './use-persist-embed-signature';
 
 export type EmbedSignDocumentV2ClientPageProps = {
   hidePoweredBy?: boolean;
   allowWhitelabelling?: boolean;
+  clientUserId?: string | null;
 };
 
 export const EmbedSignDocumentV2ClientPage = ({
   hidePoweredBy = false,
   allowWhitelabelling = false,
+  clientUserId = null,
 }: EmbedSignDocumentV2ClientPageProps) => {
   const { _ } = useLingui();
   const analytics = useAnalytics();
 
-  const { envelope, recipient, envelopeData, setFullName, setEmail, fullName, email } =
+  const { envelope, recipient, envelopeData, setFullName, setEmail, fullName, email, signature } =
     useRequiredEnvelopeSigningContext();
 
   const { isCompleted, isRejected, recipientSignature } = envelopeData;
+
+  const { persistSignature } = usePersistEmbedSignature({
+    token: recipient.token,
+    clientUserId,
+    initialSignature: signature,
+  });
 
   // !: Not used at the moment, may be removed in the future.
   // const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [allowDocumentRejection, setAllowDocumentRejection] = useState(false);
+  const [allowDownloadPDF, setAllowDownloadPDF] = useState(true);
   const [isNameLocked, setIsNameLocked] = useState(false);
   const [isEmailLocked, setIsEmailLocked] = useState(envelope.type === EnvelopeType.DOCUMENT && !!email);
 
@@ -159,6 +169,7 @@ export const EmbedSignDocumentV2ClientPage = ({
       }
 
       setAllowDocumentRejection(!!data.allowDocumentRejection);
+      setAllowDownloadPDF(data.allowDownloadPDF);
 
       if (data.darkModeDisabled) {
         document.documentElement.classList.add('dark-mode-disabled');
@@ -260,12 +271,14 @@ export const EmbedSignDocumentV2ClientPage = ({
       isEmailLocked={isEmailLocked}
       hidePoweredBy={hidePoweredBy}
       allowDocumentRejection={allowDocumentRejection}
+      allowDownloadPDF={allowDownloadPDF}
       onDocumentCompleted={onDocumentCompleted}
       onDocumentError={onDocumentError}
       onDocumentRejected={onDocumentRejected}
       onDocumentReady={onDocumentReady}
       onFieldSigned={onFieldSigned}
       onFieldUnsigned={onFieldUnsigned}
+      onSignatureChanged={persistSignature}
     >
       <div className="embed--Root relative">
         {!hasFinishedInit && <EmbedClientLoading />}
