@@ -606,16 +606,24 @@ export const ZDocumentAuditLogEventDocumentRecipientRejectedSchema = z.object({
   }),
 });
 
+const ZAccessAuth2FADataSchema = z.object({
+  recipientEmail: z.string(),
+  recipientName: z.string(),
+  recipientId: z.number(),
+  /**
+   * Whether the sender got the token through the API and sent it to the
+   * recipient themselves, rather than Documenso emailing it or the recipient's
+   * authenticator generating it.
+   */
+  isExternal: z.boolean().optional(),
+});
+
 /**
  * Event: Document recipient requested a 2FA token.
  */
 export const ZDocumentAuditLogEventDocumentRecipientRequested2FAEmailSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED),
-  data: z.object({
-    recipientEmail: z.string(),
-    recipientName: z.string(),
-    recipientId: z.number(),
-  }),
+  data: ZAccessAuth2FADataSchema,
 });
 
 /**
@@ -623,11 +631,7 @@ export const ZDocumentAuditLogEventDocumentRecipientRequested2FAEmailSchema = z.
  */
 export const ZDocumentAuditLogEventDocumentRecipientValidated2FAEmailSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED),
-  data: z.object({
-    recipientEmail: z.string(),
-    recipientName: z.string(),
-    recipientId: z.number(),
-  }),
+  data: ZAccessAuth2FADataSchema,
 });
 
 /**
@@ -635,11 +639,7 @@ export const ZDocumentAuditLogEventDocumentRecipientValidated2FAEmailSchema = z.
  */
 export const ZDocumentAuditLogEventDocumentRecipientFailed2FAEmailSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED),
-  data: z.object({
-    recipientEmail: z.string(),
-    recipientName: z.string(),
-    recipientId: z.number(),
-  }),
+  data: ZAccessAuth2FADataSchema,
 });
 
 /**

@@ -491,6 +491,8 @@ The recipient enters the code to complete the document. Documenso accepts the co
 
 Each recipient can enter a maximum of 5 codes in one 15-minute period. After the fifth code, Documenso rejects all codes from that recipient until the next period starts. This rule also applies to a correct code.
 
+The audit log and the signing certificate record this as external 2FA, because Documenso did not send the code.
+
 ```
 POST /api/v2/envelope/recipient/{recipientId}/2fa-code
 ```

@@ -108,7 +108,14 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
         .exhaustive();
 
       if (!authLevel) {
-        const accessAuthMethod = extractedAuthMethods.derivedRecipientAccessAuth.at(0);
+        // The recipient chooses the 2FA method at completion, so only the audit log knows whether it was external.
+        const usedExternal2FA = auditLogs.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED.some(
+          (log) => log.data.recipientId === recipientId && log.data.isExternal,
+        );
+
+        const accessAuthMethod = usedExternal2FA
+          ? 'EXTERNAL_TWO_FACTOR_AUTH'
+          : extractedAuthMethods.derivedRecipientAccessAuth.find((method) => method !== 'EXTERNAL_TWO_FACTOR_AUTH');
 
         authLevel = match(accessAuthMethod)
           .with('ACCOUNT', () => i18n._(msg`Account Authentication`))

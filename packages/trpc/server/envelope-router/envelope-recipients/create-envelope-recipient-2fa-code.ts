@@ -75,6 +75,7 @@ export const createEnvelopeRecipient2FACodeRoute = authenticatedProcedure
           recipientEmail: recipient.email,
           recipientName: recipient.name,
           recipientId: recipient.id,
+          isExternal: true,
         },
       }),
     });

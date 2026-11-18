@@ -75,6 +75,7 @@ export const assertRecipientAccess2FA = async ({
     recipientId: recipient.id,
     recipientName: recipient.name,
     recipientEmail: recipient.email,
+    isExternal: accessAuthOptions.type === DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH,
   };
 
   if (!isValid) {
