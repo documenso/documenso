@@ -134,7 +134,7 @@ export const TemplatesTable = ({
                     </p>
                   </li>
                   <li>
-                    <div className="mb-2 flex w-fit flex-row items-center rounded border border-border bg-muted px-1.5 py-0.5 text-xs">
+                    <div className="mb-2 flex w-fit flex-row items-center rounded border border-neutral-300 bg-neutral-200 px-1.5 py-0.5 text-xs dark:border-neutral-500 dark:bg-neutral-600">
                       <Link2Icon className="mr-1 h-3 w-3" />
                       <Trans>direct link</Trans>
                     </div>
