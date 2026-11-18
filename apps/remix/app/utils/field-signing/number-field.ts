@@ -21,22 +21,37 @@ export const handleNumberFieldClick = async (
     });
   }
 
-  let numberToInsert = number;
-
-  if (!numberToInsert) {
-    numberToInsert = await SignFieldNumberDialog.call({
-      fieldMeta: field.fieldMeta,
-      defaultValue: field.inserted ? field.customText : undefined,
-    });
+  if (number && !field.inserted) {
+    return {
+      type: FieldType.NUMBER,
+      value: number,
+    };
   }
 
-  if (numberToInsert === null) {
+  // Inserted fields reopen the dialog with their current number so it can be edited or removed.
+  const result = await SignFieldNumberDialog.call({
+    fieldMeta: field.fieldMeta,
+    insertedNumber: field.inserted ? field.customText : undefined,
+  });
+
+  if (!result) {
     return null;
   }
 
-  // An empty value clears the field.
+  if (result.action === 'remove') {
+    return {
+      type: FieldType.NUMBER,
+      value: null,
+    };
+  }
+
+  // Avoid re-signing the field when the number has not changed.
+  if (field.inserted && result.number === field.customText) {
+    return null;
+  }
+
   return {
     type: FieldType.NUMBER,
-    value: numberToInsert || null,
+    value: result.number,
   };
 };
