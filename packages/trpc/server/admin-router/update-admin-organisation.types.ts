@@ -1,19 +1,21 @@
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { z } from 'zod';
 
-import { ZOrganisationNameSchema } from '../organisation-router/create-organisation.types';
 import { ZTeamUrlSchema } from '../team-router/schema';
 import { ZCreateSubscriptionClaimRequestSchema } from './create-subscription-claim.types';
 
 export const ZUpdateAdminOrganisationRequestSchema = z.object({
   organisationId: z.string(),
   data: z.object({
-    name: ZOrganisationNameSchema.optional(),
+    name: ZNameSchema.optional(),
     url: ZTeamUrlSchema.optional(),
     claims: ZCreateSubscriptionClaimRequestSchema.pick({
       teamCount: true,
       memberCount: true,
       envelopeItemCount: true,
       recipientCount: true,
+      envelopeContentCount: true,
+      envelopeContentImageCount: true,
       flags: true,
       documentRateLimits: true,
       documentQuota: true,
@@ -26,8 +28,11 @@ export const ZUpdateAdminOrganisationRequestSchema = z.object({
     customerId: z.string().optional(),
     originalSubscriptionClaimId: z.string().optional(),
   }),
+  notifyOrganisation: z.boolean().optional(),
 });
 
-export const ZUpdateAdminOrganisationResponseSchema = z.void();
+export const ZUpdateAdminOrganisationResponseSchema = z.object({
+  isNotificationSent: z.boolean(),
+});
 
 export type TUpdateAdminOrganisationRequest = z.infer<typeof ZUpdateAdminOrganisationRequestSchema>;

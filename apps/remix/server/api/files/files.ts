@@ -1,9 +1,8 @@
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getOptionalNonEmbedSession } from '@documenso/auth/server/lib/session/embed-session-restrictions';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
-import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { prisma } from '@documenso/prisma';
 import { sValidator } from '@hono/standard-validator';
 import type { Prisma } from '@prisma/client';
@@ -12,16 +11,16 @@ import { Hono } from 'hono';
 import type { HonoEnv } from '../../router';
 import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest, resolveFileUploadUserId } from './files.helpers';
 import {
-  isAllowedUploadContentType,
-  type TGetPresignedPostUrlResponse,
   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileRequestParamsSchema,
   ZGetEnvelopeItemFileRequestQuerySchema,
   ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileTokenRequestParamsSchema,
-  ZGetPresignedPostUrlRequestSchema,
   ZUploadPdfRequestSchema,
+  ZUploadPdfResponseSchema,
 } from './files.types';
+import getDataContentImageRoute from './routes/get-data-content-image';
+import getDataContentImageByTokenRoute from './routes/get-data-content-image-by-token';
 import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
 import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
 
@@ -53,35 +52,14 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'File too large' }, 400);
       }
 
-      const result = await putNormalizedPdfFileServerSide(file);
+      const { documentData } = await putNormalizedPdfFileServerSide(file);
 
-      return c.json(result);
+      // Parsed so the response cannot drift from the shape `putPdfFile` reads
+      // on the client, and so the file bytes are stripped rather than sent back.
+      return c.json(ZUploadPdfResponseSchema.parse(documentData));
     } catch (error) {
       console.error('Upload failed:', error);
       return c.json({ error: 'Upload failed' }, 500);
-    }
-  })
-  .post('/presigned-post-url', sValidator('json', ZGetPresignedPostUrlRequestSchema), async (c) => {
-    const userId = await resolveFileUploadUserId(c);
-
-    if (!userId) {
-      return c.json({ error: 'Unauthorized' }, 401);
-    }
-
-    const { fileName, contentType } = c.req.valid('json');
-
-    if (!isAllowedUploadContentType(contentType)) {
-      return c.json({ error: 'Unsupported content type' }, 400);
-    }
-
-    try {
-      const { key, url } = await getPresignPostUrl(fileName, contentType, userId);
-
-      return c.json({ key, url } satisfies TGetPresignedPostUrlResponse);
-    } catch (err) {
-      console.error(err);
-
-      throw new AppError(AppErrorCode.UNKNOWN_ERROR);
     }
   })
   .get(
@@ -92,7 +70,7 @@ export const filesRoute = new Hono<HonoEnv>()
       const { envelopeId, envelopeItemId } = c.req.valid('param');
       const { token } = c.req.query();
 
-      const session = await getOptionalSession(c);
+      const session = await getOptionalNonEmbedSession(c);
 
       let userId = session.user?.id;
 
@@ -168,7 +146,7 @@ export const filesRoute = new Hono<HonoEnv>()
       try {
         const { envelopeId, envelopeItemId, version } = c.req.valid('param');
 
-        const session = await getOptionalSession(c);
+        const session = await getOptionalNonEmbedSession(c);
 
         if (!session.user) {
           return c.json({ error: 'Unauthorized' }, 401);
@@ -369,3 +347,7 @@ export const filesRoute = new Hono<HonoEnv>()
 // Is different to the other file endpoints since it uses documentDataId for hard caching.
 filesRoute.route('/', getEnvelopeItemPdfRoute);
 filesRoute.route('/', getEnvelopeItemPdfByTokenRoute);
+
+// Content image routes for both tokens and auth based, hard cached by dataContentId.
+filesRoute.route('/', getDataContentImageRoute);
+filesRoute.route('/', getDataContentImageByTokenRoute);

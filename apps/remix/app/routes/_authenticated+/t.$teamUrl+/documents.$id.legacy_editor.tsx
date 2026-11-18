@@ -43,6 +43,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
+  if (document.internalVersion !== 1) {
+    throw redirect(`${documentRootPath}/${document.envelopeId}/edit`);
+  }
+
   const documentVisibility = document.visibility;
   const currentTeamMemberRole = team.currentTeamRole;
   const isRecipient = document.recipients.find((recipient) => recipient.email === user.email);

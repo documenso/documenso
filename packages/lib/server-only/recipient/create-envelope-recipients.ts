@@ -12,7 +12,9 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
+import { assignOmittedRecipientSigningOrders } from './assign-omitted-recipient-signing-orders';
 
 export interface CreateEnvelopeRecipientsOptions {
   userId: number;
@@ -46,7 +48,6 @@ export const createEnvelopeRecipients = async ({
   const envelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
     include: {
-      recipients: true,
       team: {
         select: {
           organisation: {
@@ -91,13 +92,31 @@ export const createEnvelopeRecipients = async ({
     });
   }
 
-  const normalizedRecipients = recipientsToCreate.map((recipient) => ({
-    ...recipient,
-    email: recipient.email.toLowerCase(),
-  }));
-
   const createdRecipients = await prisma.$transaction(async (tx) => {
+    // Lock the envelope so concurrent additions allocate distinct signing orders.
+    await tx.$queryRaw`SELECT "id" FROM "Envelope" WHERE "id" = ${envelope.id} FOR UPDATE`;
+
     await assertEnvelopeMutable(envelope, tx);
+
+    const existingRecipients = await tx.recipient.findMany({
+      where: {
+        envelopeId: envelope.id,
+      },
+    });
+
+    assertCompatibleRecipientGrouping({
+      signatureLevel: envelope.signatureLevel,
+      recipients: recipientsToCreate,
+      existingRecipients,
+    });
+
+    const normalizedRecipients = assignOmittedRecipientSigningOrders({
+      recipients: recipientsToCreate.map((recipient) => ({
+        ...recipient,
+        email: recipient.email.toLowerCase(),
+      })),
+      existingRecipients,
+    });
 
     return await Promise.all(
       normalizedRecipients.map(async (recipient) => {

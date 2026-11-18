@@ -64,7 +64,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     },
   });
 
-  if (!verificationToken || verificationToken.expires < new Date()) {
+  if (!verificationToken || verificationToken.completed || verificationToken.expires < new Date()) {
     throw data({
       type: 'invalid-token',
     });

@@ -47,7 +47,6 @@ type DocumentToSeed = {
 
 export const seedDocuments = async (documents: DocumentToSeed[]) => {
   await Promise.all(
-    // eslint-disable-next-line @typescript-eslint/require-await
     documents.map(async (document, i) =>
       match(document.type)
         .with(DocumentStatus.DRAFT, async () =>
@@ -67,7 +66,13 @@ export const seedDocuments = async (documents: DocumentToSeed[]) => {
             key: i,
             createDocumentOptions: document.documentOptions,
           }),
-        ),
+        )
+        // Ending the match returns the seeding promise for `Promise.all` to
+        // wait on. Without it the match object itself is returned, and the
+        // documents are still being written when this resolves.
+        .otherwise(() => {
+          throw new Error(`Seeding ${document.type} documents is not supported`);
+        }),
     ),
   );
 };
@@ -310,6 +315,9 @@ export const seedDraftDocument = async (
 
   const documentId = await incrementDocumentId();
 
+  const envelopeTitle =
+    typeof createDocumentOptions.title === 'string' ? createDocumentOptions.title : `[TEST] Document ${key} - Draft`;
+
   const document = await prisma.envelope.create({
     data: {
       id: prefixedId('envelope'),
@@ -320,12 +328,12 @@ export const seedDraftDocument = async (
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
       teamId,
-      title: `[TEST] Document ${key} - Draft`,
+      title: envelopeTitle,
       status: DocumentStatus.DRAFT,
       envelopeItems: {
         create: {
           id: prefixedId('envelope_item'),
-          title: `[TEST] Document ${key} - Draft`,
+          title: envelopeTitle,
           documentDataId: documentData.id,
           order: 1,
         },

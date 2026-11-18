@@ -41,11 +41,16 @@ When a limit is reached, requests return a `429 Too Many Requests` response with
 
 | Action | Limit | Window |
 | --- | --- | --- |
-| API requests (v1 and v2) | 100 requests | 1 minute |
+| API requests (v1 and v2) | 1000 requests | 1 minute |
 | File uploads | 20 requests | 1 minute |
 | AI features | 3 requests | 1 minute |
 
 Authentication endpoints (login, signup, password reset, etc.) are also rate-limited to protect against abuse.
+
+<Callout type="info">
+  The API request limit above is the global per-IP ceiling. Individual organisations also have their
+  own rate limits, which may be configured below this value.
+</Callout>
 
 <Callout type="info">
   Rate limits may vary by plan. Enterprise plans can include higher or custom limits. Contact

@@ -65,7 +65,7 @@ export const TeamUpdateForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
       });
 
       if (url !== teamUrl) {
-        await navigate(`/t/${url}/settings`);
+        await navigate(`/t/${url}/settings/general`);
       }
     } catch (err) {
       const error = AppError.parseError(err);

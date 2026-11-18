@@ -42,8 +42,8 @@ Documenso is an open-source document signing platform built as a **monorepo** us
 | Package                    | Description                                              | Port |
 | -------------------------- | -------------------------------------------------------- | ---- |
 | `@documenso/remix`         | Main application - React Router (Remix) with Hono server | 3000 |
-| `@documenso/documentation` | Documentation site (Next.js + Nextra)                    | 3002 |
 | `@documenso/openpage-api`  | Public analytics API                                     | 3003 |
+| `@documenso/docs`          | Documentation site                                       | 3004 |
 
 ### Core Packages (`packages/`)
 
@@ -344,7 +344,6 @@ npm run test:e2e
 | --------------- | ---------- |
 | PostgreSQL      | 54320      |
 | Inbucket (Mail) | 9000       |
-| MinIO (S3)      | 9001, 9002 |
 
 ## Environment Variables Summary
 

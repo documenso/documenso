@@ -32,8 +32,6 @@ export default function SettingsProfile() {
       <AvatarImageForm className="mb-8 max-w-xl" />
       <ProfileForm className="mb-8 max-w-xl" />
 
-      <hr className="my-4 max-w-xl" />
-
       <div className="max-w-xl space-y-8">
         <AnimatePresence>
           {(!isPersonalLayoutMode || user.email !== teamEmail?.email) && teamEmail && (

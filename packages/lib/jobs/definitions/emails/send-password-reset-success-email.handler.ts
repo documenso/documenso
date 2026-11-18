@@ -4,5 +4,6 @@ import type { TSendPasswordResetSuccessEmailJobDefinition } from './send-passwor
 export const run = async ({ payload }: { payload: TSendPasswordResetSuccessEmailJobDefinition }) => {
   await sendResetPassword({
     userId: payload.userId,
+    source: payload.source ?? 'RESET',
   });
 };

@@ -1,6 +1,8 @@
 import * as TabsComponents from 'fumadocs-ui/components/tabs';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import type { MDXComponents } from 'mdx/types';
+import { EnvelopeWarning } from '@/components/mdx/envelope-warning';
+import { Included, NotIncluded } from '@/components/mdx/feature-availability';
 import { Mermaid } from '@/components/mdx/mermaid';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -9,6 +11,9 @@ export function getMDXComponents(components?: MDXComponents): any {
     ...defaultMdxComponents,
     ...TabsComponents,
     Mermaid,
+    EnvelopeWarning,
+    Included,
+    NotIncluded,
     ...components,
   };
 }

@@ -7,7 +7,7 @@ import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
 import { toCheckboxCustomText } from '@documenso/lib/utils/fields';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
+import { extractFullInitials } from '@documenso/lib/utils/recipient-formatter';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
@@ -22,6 +22,7 @@ import { match } from 'ts-pattern';
 import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 
+import { EnvelopeEditorInvalidDirectTemplateAlert } from './envelope-editor-invalid-direct-template-alert';
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 
 export const EnvelopeEditorPreviewPage = () => {
@@ -120,7 +121,7 @@ export const EnvelopeEditorPreviewPage = () => {
           })
           .with({ type: FieldType.INITIALS }, () => {
             return {
-              customText: extractInitials(recipientName),
+              customText: extractFullInitials(recipientName),
             };
           })
           .with({ type: FieldType.RADIO }, ({ fieldMeta }) => {
@@ -214,6 +215,7 @@ export const EnvelopeEditorPreviewPage = () => {
       envelopeItems={envelope.envelopeItems}
       token={undefined}
       fields={fieldsWithPlaceholders}
+      contents={envelope.contents}
       recipients={envelope.recipients.map((recipient) => ({
         ...recipient,
         signingStatus: SigningStatus.SIGNED,
@@ -224,9 +226,11 @@ export const EnvelopeEditorPreviewPage = () => {
       }}
     >
       <div className="relative flex h-full">
-        <div className="flex h-full w-full flex-col overflow-y-auto px-2" ref={scrollableContainerRef}>
+        <div className="flex h-full w-full flex-col overflow-x-auto overflow-y-auto px-2" ref={scrollableContainerRef}>
           {/* Horizontal envelope item selector */}
           <EnvelopeRendererFileSelector className="px-0" fields={editorFields.localFields} />
+
+          <EnvelopeEditorInvalidDirectTemplateAlert className="mb-4" />
 
           <Alert variant="warning" className="mx-auto max-w-[800px]">
             <AlertTitle>
@@ -244,6 +248,7 @@ export const EnvelopeEditorPreviewPage = () => {
                 customPageRenderer={EnvelopeGenericPageRenderer}
                 scrollParentRef={scrollableContainerRef}
                 errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
+                toolbar={['zoom']}
               />
             ) : (
               <div className="flex flex-col items-center justify-center py-32">

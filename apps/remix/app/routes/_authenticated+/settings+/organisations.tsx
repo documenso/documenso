@@ -14,6 +14,7 @@ export default function TeamsSettingsPage() {
       <SettingsHeader
         title={_(msg`Organisations`)}
         subtitle={_(msg`Manage all organisations you are currently associated with.`)}
+        hideDivider
       >
         <OrganisationCreateDialog />
       </SettingsHeader>

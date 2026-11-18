@@ -22,6 +22,7 @@ export const getApiTokens = async ({ userId, teamId }: GetApiTokensOptions) => {
       name: true,
       createdAt: true,
       expires: true,
+      lastUsedAt: true,
     },
     orderBy: {
       createdAt: 'desc',

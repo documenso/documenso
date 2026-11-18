@@ -128,8 +128,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
   }, [profile.enabled]);
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <SettingsHeader
+        hideDivider
         title={t`Public Profile`}
         subtitle={t`You can choose to enable or disable the profile for public view.`}
       >
@@ -189,9 +190,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
 
       <div className="mt-4">
         <SettingsHeader
+          hideDivider
           title={t`Templates`}
           subtitle={t`Show templates in your public profile for your audience to sign and get started quickly`}
-          hideDivider={true}
           className="mt-8 [&>*>h3]:text-base"
         >
           <ManagePublicTemplateDialog

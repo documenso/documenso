@@ -8,7 +8,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=documenso
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U documenso']
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 1s
       timeout: 5s
       retries: 5

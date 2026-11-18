@@ -94,11 +94,21 @@ export const EnvelopeEditorFieldDragDrop = ({
   selectedRecipientId,
   selectedEnvelopeItemId,
 }: EnvelopeEditorFieldDragDropProps) => {
-  const { envelope, editorFields, isTemplate, getRecipientColorKey } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, isTemplate, getRecipientColorKey, setIsPlacingItem } = useCurrentEnvelopeEditor();
 
   const { t } = useLingui();
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
+
+  // Let the canvas know a field is being placed, so it can get its selection
+  // out of the way of the placement click.
+  useEffect(() => {
+    setIsPlacingItem(selectedField !== null);
+
+    return () => {
+      setIsPlacingItem(false);
+    };
+  }, [selectedField, setIsPlacingItem]);
 
   const { isWithinPageBounds, getPage } = useDocumentElement();
 
@@ -270,7 +280,7 @@ export const EnvelopeEditorFieldDragDrop = ({
       {selectedField && (
         <div
           className={cn(
-            'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white font-noto text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted-background',
+            'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white font-noto text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted',
             selectedRecipientStyles.base,
             selectedField === FieldType.SIGNATURE && 'font-signature',
             {

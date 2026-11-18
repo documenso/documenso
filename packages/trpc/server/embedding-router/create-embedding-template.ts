@@ -56,7 +56,7 @@ export const createEmbeddingTemplateRoute = procedure
           const createdRecipient = await prisma.recipient.create({
             data: {
               envelopeId: template.id,
-              email: recipient.email,
+              email: recipient.email.toLowerCase(),
               name: recipient.name || '',
               role: recipient.role || 'SIGNER',
               token: `template-${template.id}-${recipient.email}`,

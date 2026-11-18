@@ -28,12 +28,17 @@ export const OrganisationTeamsTable = () => {
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isLoadingError } = trpc.team.find.useQuery({
-    organisationId: organisation.id,
-    query: parsedSearchParams.query,
-    page: parsedSearchParams.page,
-    perPage: parsedSearchParams.perPage,
-  });
+  const { data, isLoading, isLoadingError } = trpc.team.find.useQuery(
+    {
+      organisationId: organisation.id,
+      query: parsedSearchParams.query,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({
@@ -76,7 +81,7 @@ export const OrganisationTeamsTable = () => {
         cell: ({ row }) => (
           <div className="flex justify-end space-x-2">
             <Button variant="outline" asChild>
-              <Link to={`/t/${row.original.url}/settings`}>
+              <Link to={`/t/${row.original.url}/settings/general`}>
                 <Trans>Manage</Trans>
               </Link>
             </Button>

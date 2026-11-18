@@ -14,9 +14,22 @@ import { getLoadContext } from './hono/server/load-context.js';
 import server from './hono/server/router.js';
 import * as build from './index.js';
 
+// Sub-path the app is served under (e.g. "/ESign"). Empty = root.
+// Must match the basePath used by the Hono router and the Vite `base`/RR
+// `basename` so that hashed asset URLs like `/ESign/assets/app-xxx.css`
+// resolve to files on disk at `build/client/assets/app-xxx.css`.
+const basePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? '').replace(/\/$/, '');
+
 server.use(
   serveStatic({
     root: 'build/client',
+    rewriteRequestPath: (path) => {
+      if (basePath && (path === basePath || path.startsWith(`${basePath}/`))) {
+        const stripped = path.slice(basePath.length);
+        return stripped === '' ? '/' : stripped;
+      }
+      return path;
+    },
     onFound: (path, c) => {
       if (path.startsWith('build/client/assets')) {
         // Hard cache assets with hashed file names.

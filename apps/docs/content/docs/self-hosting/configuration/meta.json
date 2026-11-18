@@ -2,12 +2,14 @@
   "title": "Configuration",
   "pages": [
     "environment",
+    "license",
     "database",
     "email",
     "storage",
     "background-jobs",
     "signing-certificate",
     "telemetry",
+    "organisation-limits",
     "advanced"
   ]
 }

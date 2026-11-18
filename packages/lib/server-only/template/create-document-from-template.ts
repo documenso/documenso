@@ -1,6 +1,6 @@
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
+import type { DocumentDistributionMethod, DocumentSigningOrder, Prisma } from '@prisma/client';
 import {
   DocumentSource,
   EnvelopeType,
@@ -32,7 +32,13 @@ import type {
   TRadioFieldMeta,
   TTextFieldMeta,
 } from '../../types/field-meta';
-import { ZCheckboxFieldMeta, ZDropdownFieldMeta, ZFieldMetaSchema, ZRadioFieldMeta } from '../../types/field-meta';
+import {
+  ZBaseFieldMeta,
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZFieldMetaSchema,
+  ZRadioFieldMeta,
+} from '../../types/field-meta';
 import { ZSignatureLevelSchema } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
@@ -47,11 +53,15 @@ import {
 } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { buildEnvelopeContentCopyData } from '../../utils/envelope-content';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { assignOmittedRecipientSigningOrders } from '../recipient/assign-omitted-recipient-signing-orders';
+import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
+import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -92,6 +102,8 @@ export type CreateDocumentFromTemplateOptions = {
     data: string;
     type?: 'link';
   }>;
+
+  includeContents?: boolean;
 
   /**
    * Values that will override the predefined values in the template.
@@ -136,6 +148,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
   // We've already validated that the field types match at a higher level
   // Start with the existing field meta or an empty object
   const existingMeta = field.fieldMeta || {};
+  const existingBaseMeta = ZBaseFieldMeta.safeParse(existingMeta).data;
 
   // Apply type-specific updates based on the prefill field type using ts-pattern
   return match(prefillField)
@@ -149,8 +162,8 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TTextFieldMeta = {
         ...existingMeta,
         type: 'text',
-        label: field.label,
-        placeholder: field.placeholder,
+        label: field.label ?? existingBaseMeta?.label,
+        placeholder: field.placeholder ?? existingBaseMeta?.placeholder,
         text: field.value,
       };
 
@@ -166,8 +179,8 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TNumberFieldMeta = {
         ...existingMeta,
         type: 'number',
-        label: field.label,
-        placeholder: field.placeholder,
+        label: field.label ?? existingBaseMeta?.label,
+        placeholder: field.placeholder ?? existingBaseMeta?.placeholder,
         value: field.value,
       };
 
@@ -207,7 +220,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TRadioFieldMeta = {
         ...existingMeta,
         type: 'radio',
-        label: field.label,
+        label: field.label ?? existingBaseMeta?.label,
         values: newValues,
         direction: radioMeta.direction ?? 'vertical',
       };
@@ -252,7 +265,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TCheckboxFieldMeta = {
         ...existingMeta,
         type: 'checkbox',
-        label: field.label,
+        label: field.label ?? existingBaseMeta?.label,
         values: newValues,
         direction: checkboxMeta.direction ?? 'vertical',
       };
@@ -282,7 +295,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TDropdownFieldMeta = {
         ...existingMeta,
         type: 'dropdown',
-        label: field.label,
+        label: field.label ?? existingBaseMeta?.label,
         defaultValue: field.value,
       };
 
@@ -303,6 +316,7 @@ export const createDocumentFromTemplate = async ({
   folderId,
   prefillFields,
   attachments,
+  includeContents = true,
   formValues,
 }: CreateDocumentFromTemplateOptions) => {
   const templateInclude = {
@@ -310,12 +324,18 @@ export const createDocumentFromTemplate = async ({
       include: {
         fields: true,
       },
+      // Unordered template recipients are numbered in this sequence.
+      orderBy: [
+        { signingOrder: { sort: 'asc', nulls: 'last' } },
+        { id: 'asc' },
+      ] satisfies Prisma.RecipientOrderByWithRelationInput[],
     },
     envelopeItems: {
       include: {
         documentData: true,
       },
     },
+    contents: true,
     documentMeta: true,
   } as const;
 
@@ -431,11 +451,13 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
-  const allFinalRecipients = [...finalRecipients, ...defaultRecipientsFinal];
-
   // Key = original envelope item ID
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
+
+  // Only items given a custom file are tracked, since the template's own files
+  // have the pages its contents were placed on.
+  const replacedEnvelopeItemPageCounts = new Map<string, number>();
 
   // Duplicate the envelope item data.
   // Note: This is duplicated in createDocumentFromDirectTemplate
@@ -480,19 +502,20 @@ export const createDocumentFromTemplate = async ({
         });
       }
 
-      const duplicatedFile = await putNormalizedPdfFileServerSide({
-        name: titleToUse,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(buffer),
-      });
-
-      const newDocumentData = await prisma.documentData.create({
-        data: {
-          type: duplicatedFile.type,
-          data: duplicatedFile.data,
+      const { documentData: newDocumentData, filePageCount } = await putNormalizedPdfFileServerSide(
+        {
+          name: titleToUse,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(buffer),
+        },
+        {
           initialData: documentDataToDuplicate.data,
         },
-      });
+      );
+
+      if (foundCustomDocumentData) {
+        replacedEnvelopeItemPageCounts.set(item.id, filePageCount);
+      }
 
       const newEnvelopeItemId = prefixedId('envelope_item');
 
@@ -525,6 +548,26 @@ export const createDocumentFromTemplate = async ({
     strict: false,
   });
 
+  const requestedOrderRecipients = finalRecipients.filter((finalRecipient) => {
+    const override = recipients.find((recipient) => recipient.id === finalRecipient.templateRecipientId);
+
+    return typeof override?.signingOrder === 'number';
+  });
+
+  assertCompatibleRecipientGrouping({
+    signatureLevel,
+    recipients: requestedOrderRecipients,
+    existingRecipients: finalRecipients.filter((recipient) => !requestedOrderRecipients.includes(recipient)),
+  });
+
+  const allFinalRecipients = assignOmittedRecipientSigningOrders({
+    recipients: [...finalRecipients, ...defaultRecipientsFinal],
+  });
+
+  for (const recipient of allFinalRecipients) {
+    assertCompatibleRecipientRole({ signatureLevel, role: recipient.role });
+  }
+
   const documentMeta = await prisma.documentMeta.create({
     data: extractDerivedDocumentMeta(
       settings,
@@ -549,10 +592,26 @@ export const createDocumentFromTemplate = async ({
     ),
   });
 
+  const envelopeId = prefixedId('envelope');
+
+  const contentsToCopy = template.contents.filter((content) => {
+    const replacedPageCount = replacedEnvelopeItemPageCounts.get(content.envelopeItemId);
+
+    return replacedPageCount === undefined || content.contentMeta.page <= replacedPageCount;
+  });
+
+  const contentsToCreate = includeContents
+    ? buildEnvelopeContentCopyData({
+        contents: contentsToCopy,
+        envelopeId,
+        envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
+      })
+    : [];
+
   const { envelope, createdEnvelope } = await prisma.$transaction(async (tx) => {
     const envelope = await tx.envelope.create({
       data: {
-        id: prefixedId('envelope'),
+        id: envelopeId,
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
         internalVersion: template.internalVersion,
@@ -584,7 +643,7 @@ export const createDocumentFromTemplate = async ({
               const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
 
               return {
-                email: recipient.email,
+                email: recipient.email.toLowerCase(),
                 name: recipient.name,
                 role: recipient.role,
                 authOptions: createRecipientAuthOptions({
@@ -613,6 +672,12 @@ export const createDocumentFromTemplate = async ({
         },
       },
     });
+
+    if (contentsToCreate.length > 0) {
+      await tx.envelopeContent.createMany({
+        data: contentsToCreate,
+      });
+    }
 
     let fieldsToCreate: Omit<Field, 'id' | 'secondaryId'>[] = [];
 
@@ -699,7 +764,7 @@ export const createDocumentFromTemplate = async ({
                 }
 
                 payload.customText = DateTime.fromJSDate(date).toFormat(
-                  template.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+                  documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
                 );
 
                 payload.inserted = true;

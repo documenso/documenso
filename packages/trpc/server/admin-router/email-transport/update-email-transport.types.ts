@@ -4,6 +4,7 @@ import {
   ZSmtpApiConfigSchema,
   ZSmtpAuthConfigSchema,
 } from '@documenso/lib/server-only/email/email-transport-config';
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { z } from 'zod';
 
 // Reuses the canonical transport config schemas, but relaxes the secret field so
@@ -21,8 +22,8 @@ const ZUpdateConfigSchema = z.discriminatedUnion('type', [
 export const ZUpdateEmailTransportRequestSchema = z.object({
   id: z.string(),
   data: z.object({
-    name: z.string().min(1),
-    fromName: z.string().min(1),
+    name: ZNameSchema,
+    fromName: ZNameSchema,
     fromAddress: z.string().email(),
     config: ZUpdateConfigSchema,
   }),

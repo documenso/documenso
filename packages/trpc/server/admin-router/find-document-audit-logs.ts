@@ -3,7 +3,7 @@ import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { parseDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { unsafeBuildEnvelopeIdQuery } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType, type Prisma } from '@prisma/client';
 
 import { adminProcedure } from '../trpc';
 import {
@@ -15,7 +15,14 @@ export const findDocumentAuditLogsRoute = adminProcedure
   .input(ZFindDocumentAuditLogsRequestSchema)
   .output(ZFindDocumentAuditLogsResponseSchema)
   .query(async ({ input }) => {
-    const { envelopeId, page = 1, perPage = 50, orderByColumn = 'createdAt', orderByDirection = 'desc' } = input;
+    const {
+      envelopeId,
+      recipientId,
+      page = 1,
+      perPage = 50,
+      orderByColumn = 'createdAt',
+      orderByDirection = 'desc',
+    } = input;
 
     const envelope = await prisma.envelope.findFirst({
       where: unsafeBuildEnvelopeIdQuery(
@@ -33,9 +40,20 @@ export const findDocumentAuditLogsRoute = adminProcedure
       });
     }
 
+    const whereClause: Prisma.DocumentAuditLogWhereInput = {
+      envelopeId: envelope.id,
+    };
+
+    if (recipientId !== undefined) {
+      whereClause.data = {
+        path: ['recipientId'],
+        equals: recipientId,
+      };
+    }
+
     const [data, count] = await Promise.all([
       prisma.documentAuditLog.findMany({
-        where: { envelopeId: envelope.id },
+        where: whereClause,
         skip: Math.max(page - 1, 0) * perPage,
         take: perPage,
         orderBy: {
@@ -43,7 +61,7 @@ export const findDocumentAuditLogsRoute = adminProcedure
         },
       }),
       prisma.documentAuditLog.count({
-        where: { envelopeId: envelope.id },
+        where: whereClause,
       }),
     ]);
 

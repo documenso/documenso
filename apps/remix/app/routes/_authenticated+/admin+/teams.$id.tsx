@@ -287,7 +287,11 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
               </AccordionTrigger>
               <AccordionContent>
                 <div className="mt-4">
-                  <AdminGlobalSettingsSection settings={team.teamGlobalSettings} isTeam />
+                  <AdminGlobalSettingsSection
+                    settings={team.teamGlobalSettings}
+                    inheritedSettings={team.organisation.organisationGlobalSettings}
+                    isTeam
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>

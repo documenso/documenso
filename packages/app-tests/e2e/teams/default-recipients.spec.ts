@@ -110,14 +110,11 @@ test.describe('Default Recipients', () => {
     await page.getByRole('button', { name: 'Add Signer' }).click();
 
     // Add a regular signer using the v2 editor
-    await page.getByTestId('signer-email-input').last().fill('regular-signer@documenso.com');
+    await page.getByTestId('signer-email-input').first().fill('regular-signer@documenso.com');
     await page
       .getByPlaceholder(/Recipient/)
       .first()
       .fill('Regular Signer');
-
-    // Wait for autosave to complete
-    await page.waitForTimeout(3000);
 
     // Verify that default recipient is present in the database
     await expect(async () => {
@@ -208,9 +205,6 @@ test.describe('Default Recipients', () => {
       .getByPlaceholder(/Recipient/)
       .first()
       .fill('Regular Signer');
-
-    // Wait for autosave to complete
-    await page.waitForTimeout(3000);
 
     // Wait for recipients to be saved
     await expect(async () => {

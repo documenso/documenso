@@ -370,7 +370,7 @@ export const OrganisationMemberInviteDialog = ({ trigger, ...props }: Organisati
                           <button
                             type="button"
                             className={cn(
-                              'justify-left inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
+                              'inline-flex h-10 w-10 items-center justify-start text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
                               index === 0 ? 'mt-8' : 'mt-0',
                             )}
                             disabled={organisationMemberInvites.length === 1}

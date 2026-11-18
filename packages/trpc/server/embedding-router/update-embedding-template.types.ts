@@ -20,7 +20,7 @@ import {
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
-import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
+import { ZRecipientEmailSchema, ZRecipientSigningOrderSchema } from '@documenso/lib/types/recipient';
 import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
@@ -36,7 +36,7 @@ export const ZUpdateEmbeddingTemplateRequestSchema = z.object({
       email: ZRecipientEmailSchema,
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
-      signingOrder: z.number().optional(),
+      signingOrder: ZRecipientSigningOrderSchema.optional(),
       // We have an any cast so any changes here you need to update it in the embeding document edit page
       // Search: "map<any>" to find it
       fields: ZFieldAndMetaSchema.and(

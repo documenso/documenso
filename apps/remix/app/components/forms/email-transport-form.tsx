@@ -1,3 +1,4 @@
+import { ZNameSchema } from '@documenso/lib/types/name';
 import {
   Form,
   FormControl,
@@ -15,8 +16,8 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const ZEmailTransportFormSchema = z.object({
-  name: z.string().min(1),
-  fromName: z.string().min(1),
+  name: ZNameSchema,
+  fromName: ZNameSchema,
   fromAddress: z.string().email(),
   type: z.enum(['SMTP_AUTH', 'SMTP_API', 'RESEND', 'MAILCHANNELS']),
   host: z.string().optional(),

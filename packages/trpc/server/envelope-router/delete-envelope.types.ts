@@ -8,12 +8,13 @@ export const deleteEnvelopeMeta: TrpcRouteMeta = {
     method: 'POST',
     path: '/envelope/delete',
     summary: 'Delete envelope',
+    description: 'Delete an envelope',
     tags: ['Envelope'],
   },
 };
 
 export const ZDeleteEnvelopeRequestSchema = z.object({
-  envelopeId: z.string(),
+  envelopeId: z.string().describe('The ID of the envelope to delete.'),
 });
 
 export const ZDeleteEnvelopeResponseSchema = ZSuccessResponseSchema;
