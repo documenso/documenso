@@ -44,6 +44,13 @@ export enum AppErrorCode {
   ENVELOPE_TSP_LOCKED = 'ENVELOPE_TSP_LOCKED',
 
   /**
+   * Recipient action on an envelope whose sender's account is disabled.
+   * Distinct from `ACCOUNT_DISABLED` so the UI can show a "sender disabled"
+   * page rather than treating the recipient's own account as disabled.
+   */
+  SENDER_DISABLED = 'SENDER_DISABLED',
+
+  /**
    * A completion request was made for a recipient that has already signed.
    * Thrown for retried, stale or concurrent duplicate submissions so callers
    * can resolve them idempotently instead of surfacing an error.
@@ -119,6 +126,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.ENVELOPE_CANCELLED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_LEGACY]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_TSP_LOCKED]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.SENDER_DISABLED]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.MISSING_SIGNATURE_FIELD]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.RECIPIENT_OUT_OF_TURN]: { code: 'BAD_REQUEST', status: 400 },
@@ -341,7 +349,7 @@ export class AppError extends Error {
         () => 400 as const,
       )
       .with(AppErrorCode.UNAUTHORIZED, () => 401 as const)
-      .with(AppErrorCode.FORBIDDEN, AppErrorCode.CSC_UNLICENSED, () => 403 as const)
+      .with(AppErrorCode.FORBIDDEN, AppErrorCode.SENDER_DISABLED, AppErrorCode.CSC_UNLICENSED, () => 403 as const)
       .with(AppErrorCode.NOT_FOUND, () => 404 as const)
       .with(AppErrorCode.NOT_IMPLEMENTED, () => 501 as const)
       .otherwise(() => 500 as const);

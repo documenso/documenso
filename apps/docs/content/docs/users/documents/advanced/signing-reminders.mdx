@@ -170,6 +170,15 @@ A configured reminder will not be sent in the following cases:
   use **Don't repeat**, or configure [recipient expiration](/docs/users/documents/advanced/recipient-expiration).
 </Callout>
 
+<Callout type="warn">
+  A recipient receives a **maximum of 5 automated reminders**, regardless of the repeat interval or
+  the 30-day window. This limit is not configurable per organisation, team, or document. Manually
+  **resending** the document to the recipient resets the count and re-arms reminders.
+
+  Factor this in when choosing a repeat interval — for example, a daily interval stops after 5
+  days, whereas the default **every 2 days** covers roughly 1.5 weeks.
+</Callout>
+
 <Callout type="info">
   Reminders are dispatched by a background sweep that runs every 15 minutes, so the actual send time
   may be up to ~15 minutes after the scheduled time.
@@ -181,9 +190,9 @@ A configured reminder will not be sent in the following cases:
 | --------------------------- | ---------------------------------------- | -------------------------------------------------------------------- |
 | **Mode**                    | Enabled / No reminders / Inherit         | Inherit is only available at the team and document levels            |
 | **Send first reminder after** | 1+ days, weeks, or months              | Measured from when the recipient receives the initial signing email. Reminders past 30 days from that moment are skipped. |
-| **Then repeat every**       | Custom interval (1+ days/weeks/months) or Don't repeat | Custom interval keeps reminding until the recipient signs or the 30-day cap is reached |
+| **Then repeat every**       | Custom interval (1+ days/weeks/months) or Don't repeat | Custom interval keeps reminding until the recipient signs, 5 reminders have been sent, or the 30-day cap is reached |
 
-The organisation default out of the box is **first reminder after 5 days, repeating every 2 days**, which falls well inside the 30-day cap.
+The organisation default out of the box is **first reminder after 5 days, repeating every 2 days**, which falls well inside the 30-day cap and uses the full 5-reminder allowance.
 
 ---
 

@@ -51,7 +51,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
@@ -943,6 +951,10 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                   onValueChange={field.onChange}
                                 />
                               </FormControl>
+
+                              <FormDescription>
+                                <Trans>The document owner and assigned recipients will always have access.</Trans>
+                              </FormDescription>
                             </FormItem>
                           )}
                         />

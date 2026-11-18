@@ -128,7 +128,7 @@ export const extractFieldInsertionValues = ({
 
       if (errors.length > 0) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
-          message: 'Invalid email',
+          message: 'Invalid text',
         });
       }
 

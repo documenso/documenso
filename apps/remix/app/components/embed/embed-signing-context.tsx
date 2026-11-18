@@ -3,6 +3,7 @@ import { createContext, useContext } from 'react';
 export type EmbedSigningContextValue = {
   isEmbed: true;
   allowDocumentRejection: boolean;
+  allowDownloadPDF: boolean;
   isNameLocked: boolean;
   isEmailLocked: boolean;
   hidePoweredBy: boolean;
@@ -18,6 +19,7 @@ export type EmbedSigningContextValue = {
   onDocumentReady: () => void;
   onFieldSigned: (data: { fieldId?: number; value?: string; isBase64?: boolean }) => void;
   onFieldUnsigned: (data: { fieldId?: number }) => void;
+  onSignatureChanged: (signature: string | null) => void;
 };
 
 const EmbedSigningContext = createContext<EmbedSigningContextValue | null>(null);
@@ -38,6 +40,7 @@ export const useRequiredEmbedSigningContext = () => {
 
 export type EmbedSigningProviderProps = {
   allowDocumentRejection?: boolean;
+  allowDownloadPDF?: boolean;
   isNameLocked?: boolean;
   isEmailLocked?: boolean;
   hidePoweredBy?: boolean;
@@ -53,11 +56,13 @@ export type EmbedSigningProviderProps = {
   onDocumentReady: () => void;
   onFieldSigned: (data: { fieldId?: number; value?: string; isBase64?: boolean }) => void;
   onFieldUnsigned: (data: { fieldId?: number }) => void;
+  onSignatureChanged: (signature: string | null) => void;
   children: React.ReactNode;
 };
 
 export const EmbedSigningProvider = ({
   allowDocumentRejection = false,
+  allowDownloadPDF = true,
   isNameLocked = false,
   isEmailLocked = true,
   hidePoweredBy = false,
@@ -67,6 +72,7 @@ export const EmbedSigningProvider = ({
   onDocumentReady,
   onFieldSigned,
   onFieldUnsigned,
+  onSignatureChanged,
   children,
 }: EmbedSigningProviderProps) => {
   return (
@@ -74,6 +80,7 @@ export const EmbedSigningProvider = ({
       value={{
         isEmbed: true,
         allowDocumentRejection,
+        allowDownloadPDF,
         isNameLocked,
         isEmailLocked,
         hidePoweredBy,
@@ -83,6 +90,7 @@ export const EmbedSigningProvider = ({
         onDocumentReady,
         onFieldSigned,
         onFieldUnsigned,
+        onSignatureChanged,
       }}
     >
       {children}

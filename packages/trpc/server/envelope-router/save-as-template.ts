@@ -23,6 +23,7 @@ export const saveAsTemplateRoute = authenticatedProcedure
         type: 'envelopeId',
         id: envelopeId,
       },
+      requestMetadata: ctx.metadata,
       overrides: {
         duplicateAsTemplate: true,
         includeRecipients,

@@ -32,6 +32,30 @@ export type AssertUserNotDisabledByIdOptions = {
  * cannot continue to act through a stale session or token.
  */
 export const assertUserNotDisabledById = async ({ userId }: AssertUserNotDisabledByIdOptions): Promise<void> => {
+  const user = await getUserDisabledStatus({ userId });
+
+  assertUserNotDisabled(user);
+};
+
+export type AssertSenderNotDisabledOptions = {
+  userId: number;
+};
+
+/**
+ * Recipient-side counterpart to `assertUserNotDisabledById`, keyed on `envelope.userId`.
+ */
+export const assertSenderNotDisabled = async ({ userId }: AssertSenderNotDisabledOptions): Promise<void> => {
+  const user = await getUserDisabledStatus({ userId });
+
+  if (user.disabled) {
+    throw new AppError(AppErrorCode.SENDER_DISABLED, {
+      message: 'Sender account disabled',
+      statusCode: 403,
+    });
+  }
+};
+
+const getUserDisabledStatus = async ({ userId }: { userId: number }) => {
   const user = await prisma.user.findFirst({
     where: { id: userId },
     select: { disabled: true },
@@ -44,5 +68,5 @@ export const assertUserNotDisabledById = async ({ userId }: AssertUserNotDisable
     });
   }
 
-  assertUserNotDisabled(user);
+  return user;
 };
