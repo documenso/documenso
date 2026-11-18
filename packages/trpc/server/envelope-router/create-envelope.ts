@@ -8,6 +8,7 @@ import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { assertEnvelopeContentSaveWithinLimits } from '@documenso/lib/utils/envelope-content';
+import { EnvelopeType } from '@prisma/client';
 import type { Logger } from 'pino';
 import { match, P } from 'ts-pattern';
 
@@ -141,8 +142,10 @@ export const createEnvelopeRouteCaller = async ({
         });
       }
 
+      // A document without form values keeps its PDF form until sealing, so that
+      // the editor can import the form fields.
       const { pdf: normalized } = await normalizePdf(pdf, {
-        flattenForm: false,
+        flattenForm: type !== EnvelopeType.TEMPLATE && Boolean(formValues),
       });
 
       // Todo: Embeds - Might need to add this for client-side embeds in the future.
