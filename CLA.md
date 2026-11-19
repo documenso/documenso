@@ -1,6 +1,6 @@
 # Documenso Contributors License Agreement
 
-This Contributors License Agreement ("CLA") is entered into between the Contributor, and Documenso Inc. ("Documenso"), collectively referred to as the "Parties."
+This Contributors License Agreement ("CLA") is entered into between the Contributor, and Documenso Inc ("Documenso"), collectively referred to as the "Parties."
 
 ## Background:
 
