@@ -8,6 +8,8 @@ const PROCESS_SIGNING_REMINDER_JOB_DEFINITION_SCHEMA = z.object({
   recipientId: z.number(),
 });
 
+// Done changes
+
 export type TProcessSigningReminderJobDefinition = z.infer<typeof PROCESS_SIGNING_REMINDER_JOB_DEFINITION_SCHEMA>;
 
 export const PROCESS_SIGNING_REMINDER_JOB_DEFINITION = {
