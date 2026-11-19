@@ -2,6 +2,7 @@ import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipien
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
+import { SigningOrderConfirmation } from '@documenso/ui/primitives/document-flow/signing-order-confirmation';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
@@ -14,7 +15,7 @@ import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { GripVertical, HelpCircle, Plus, Trash } from 'lucide-react';
 import { nanoid } from 'nanoid';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type { Control } from 'react-hook-form';
 import { useFieldArray, useFormContext, useFormState } from 'react-hook-form';
 
@@ -25,6 +26,10 @@ import type { TConfigureEmbedFormSchema } from './configure-document-view.types'
 
 // Define a type for signer items
 type SignerItem = TConfigureEmbedFormSchema['signers'][number];
+
+// An assistant who has already signed can no longer be changed, and has done
+// their part, so they do not need sequential signing.
+const isEditableAssistant = (signer: SignerItem) => signer.role === RecipientRole.ASSISTANT && !signer.disabled;
 
 export interface ConfigureDocumentRecipientsProps {
   control: Control<TConfigureEmbedFormSchema>;
@@ -50,6 +55,8 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
   });
 
   const { getValues, watch, setValue } = useFormContext<TConfigureEmbedFormSchema>();
+
+  const [showSigningOrderConfirmation, setShowSigningOrderConfirmation] = useState(false);
 
   const signingOrder = watch('meta.signingOrder');
 
@@ -136,6 +143,18 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
     }
   };
 
+  const onSigningOrderDisable = () => {
+    setShowSigningOrderConfirmation(false);
+
+    getValues('signers').forEach((signer, index) => {
+      if (isEditableAssistant(signer)) {
+        setValue(`signers.${index}.role`, RecipientRole.SIGNER);
+      }
+    });
+
+    onSigningOrderChange(DocumentSigningOrder.PARALLEL);
+  };
+
   return (
     <div>
       <h3 className="mb-1 font-medium text-foreground text-lg">
@@ -156,9 +175,17 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
                 {...field}
                 id="signingOrder"
                 checked={field.value === DocumentSigningOrder.SEQUENTIAL}
-                onCheckedChange={(checked) =>
-                  onSigningOrderChange(checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL)
-                }
+                onCheckedChange={(checked) => {
+                  const hasEditableAssistant = getValues('signers').some(isEditableAssistant);
+
+                  if (!checked && hasEditableAssistant) {
+                    setShowSigningOrderConfirmation(true);
+
+                    return;
+                  }
+
+                  onSigningOrderChange(checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL);
+                }}
                 disabled={isSubmitting}
               />
             </FormControl>
@@ -383,6 +410,12 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
           <Trans>Add Signer</Trans>
         </Button>
       </div>
+
+      <SigningOrderConfirmation
+        open={showSigningOrderConfirmation}
+        onOpenChange={setShowSigningOrderConfirmation}
+        onConfirm={onSigningOrderDisable}
+      />
     </div>
   );
 };

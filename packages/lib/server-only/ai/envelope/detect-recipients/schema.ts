@@ -4,8 +4,9 @@ import { z } from 'zod';
 export const ZDetectedRecipientSchema = z.object({
   name: z.string().describe('The detected recipient name, leave blank if unknown'),
   email: z.string().describe('The detected recipient email, leave blank if unknown'),
+  // ASSISTANT is left out: it needs sequential signing, which detection does not turn on.
   role: z
-    .nativeEnum(RecipientRole)
+    .enum([RecipientRole.SIGNER, RecipientRole.APPROVER, RecipientRole.CC, RecipientRole.VIEWER])
     .optional()
     .default(RecipientRole.SIGNER)
     .describe(

@@ -1,7 +1,7 @@
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { DocumentDataType, DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
+import { DocumentDataType, DocumentSigningOrder, DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
 import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 import '@documenso/lib/constants/time-zones';
@@ -18,6 +18,7 @@ import { getEnvelopeById, getEnvelopeWhereInput } from '@documenso/lib/server-on
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
 import { updateEnvelopeFields } from '@documenso/lib/server-only/field/update-envelope-fields';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
+import { assertAssistantSigningOrder } from '@documenso/lib/server-only/recipient/assert-assistant-signing-order';
 import { deleteEnvelopeRecipient } from '@documenso/lib/server-only/recipient/delete-envelope-recipient';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
@@ -348,6 +349,17 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
   createDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body } = args;
+
+    // Checked before anything is created, since the recipients are only added
+    // once the document exists.
+    try {
+      assertAssistantSigningOrder({
+        signingOrder: body.meta.signingOrder ?? DocumentSigningOrder.PARALLEL,
+        recipients: body.recipients,
+      });
+    } catch (err) {
+      return AppError.toRestAPIError(err);
+    }
 
     try {
       if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
@@ -1175,12 +1187,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         },
       };
     } catch (err) {
-      return {
-        status: 500,
-        body: {
-          message: 'An error has occured while creating the recipient',
-        },
-      };
+      return AppError.toRestAPIError(err);
     }
   }),
 
@@ -1225,45 +1232,49 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    const updatedRecipient = await updateEnvelopeRecipients({
-      userId: user.id,
-      teamId: team.id,
-      id: {
-        type: 'envelopeId',
-        id: envelope.id,
-      },
-      recipients: [
-        {
-          id: Number(recipientId),
-          email,
-          name,
-          role,
-          signingOrder,
-          actionAuth: authOptions?.actionAuth ?? [],
+    try {
+      const { recipients } = await updateEnvelopeRecipients({
+        userId: user.id,
+        teamId: team.id,
+        id: {
+          type: 'envelopeId',
+          id: envelope.id,
         },
-      ],
-      requestMetadata: metadata,
-    })
-      .then(({ recipients }) => recipients[0])
-      .catch(null);
+        recipients: [
+          {
+            id: Number(recipientId),
+            email,
+            name,
+            role,
+            signingOrder,
+            actionAuth: authOptions?.actionAuth ?? [],
+          },
+        ],
+        requestMetadata: metadata,
+      });
 
-    if (!updatedRecipient) {
+      const updatedRecipient = recipients[0];
+
+      if (!updatedRecipient) {
+        return {
+          status: 404,
+          body: {
+            message: 'Recipient not found',
+          },
+        };
+      }
+
       return {
-        status: 404,
+        status: 200,
         body: {
-          message: 'Recipient not found',
+          ...updatedRecipient,
+          documentId: Number(documentId),
+          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${updatedRecipient.token}`,
         },
       };
+    } catch (err) {
+      return AppError.toRestAPIError(err);
     }
-
-    return {
-      status: 200,
-      body: {
-        ...updatedRecipient,
-        documentId: Number(documentId),
-        signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${updatedRecipient.token}`,
-      },
-    };
   }),
 
   deleteRecipient: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
