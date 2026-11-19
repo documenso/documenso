@@ -111,7 +111,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     meta: envelope.documentMeta,
   });
 
-  // Don't send signing invitations if the organisation has email sending disabled or the owner is disabled (e.g. banned).
+  // Don't send signing invitations if the organisation has email sending disabled or the owner is disabled (e.g. banned). I have done changes
   if (envelope.user.disabled || emailsDisabled) {
     return;
   }
