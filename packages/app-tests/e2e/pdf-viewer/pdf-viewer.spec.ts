@@ -295,7 +295,7 @@ test.describe('PDF Viewer Rendering', () => {
       // document blocks the whole bundle, the same as an unsupported signature level does.
       await page.goto(`/embed/v1/multisign?token=${recipientsV1[0].token}&token=${recipientsV2[0].token}`);
 
-      await expect(page.getByText('One or more of these documents cannot be signed in this embed.')).toBeVisible({
+      await expect(page.getByText('Envelopes are not supported in this embed.')).toBeVisible({
         timeout: 15_000,
       });
       await expect(page.getByText('Sign Documents')).toHaveCount(0);

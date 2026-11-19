@@ -1,12 +1,12 @@
+import { prisma } from '@documenso/prisma';
+import { expect, type Route, test } from '@playwright/test';
+import { DocumentStatus } from '@prisma/client';
 import {
   FIELD_GROUP_EXTERNAL_IDS,
   FIELD_GROUPS,
   FIELD_GROUPS_TEST_FIELDS,
   findFieldGroupTestField,
-} from '@documenso/lib/constants/test-pdfs/field-groups-pdf';
-import { prisma } from '@documenso/prisma';
-import { expect, type Route, test } from '@playwright/test';
-import { DocumentStatus } from '@prisma/client';
+} from '../../constants/field-groups-pdf';
 import { apiSeedFieldGroupsDocument } from '../fixtures/api-seeds';
 import {
   clickSigningField,

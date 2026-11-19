@@ -3,18 +3,19 @@
  *
  * Run with: `npx tsx packages/app-tests/scripts/generate-field-groups-pdf.ts`
  *
- * The layout is driven by `@documenso/lib/constants/test-pdfs/field-groups-pdf-layout.ts`, which is also used to
- * position the fields, so regenerate the PDF whenever that layout changes.
+ * The layout is driven by `constants/field-groups-pdf-layout.ts`, which is also used to position
+ * the fields, so regenerate the PDF whenever that layout changes.
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { PDF, rgb } from '@libpdf/core';
+
 import {
   calculateFieldGroupsPdfCell,
   FIELD_GROUPS_PDF_GRID,
   FIELD_GROUPS_PDF_PAGE,
   FIELD_GROUPS_PDF_PAGES,
-} from '@documenso/lib/constants/test-pdfs/field-groups-pdf-layout';
-import { PDF, rgb } from '@libpdf/core';
+} from '../constants/field-groups-pdf-layout';
 
 const OUTPUT_PATH = path.join(__dirname, '../../../assets/field-groups.pdf');
 const FONT_DIR = path.join(__dirname, '../../../apps/remix/public/fonts');

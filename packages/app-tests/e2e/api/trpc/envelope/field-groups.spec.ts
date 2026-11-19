@@ -6,7 +6,7 @@ import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { type APIRequestContext, expect, test } from '@playwright/test';
-import { FieldType } from '@prisma/client';
+import { FieldType, SendStatus } from '@prisma/client';
 
 import {
   apiCreateEnvelopeItem,
@@ -484,6 +484,27 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
 
     expect(insertedUngroupedCheckbox.inserted).toBe(false);
     expect(insertedUngroupedRadio).toMatchObject({ inserted: true, customText: '1' });
+
+    // Field settings are still checked when the document is sent again to a recipient who
+    // already has it, and an unknown checkbox rule is rejected with nothing pre-checked.
+    await prisma.recipient.updateMany({
+      where: { envelopeId: envelope.id },
+      data: { sendStatus: SendStatus.SENT },
+    });
+
+    await prisma.field.update({
+      where: { id: ungroupedCheckbox.id },
+      data: {
+        fieldMeta: checkboxMeta([option(1, 'U1'), option(2, 'U2')], {
+          validationRule: 'Select between',
+          validationLength: 2,
+        }),
+      },
+    });
+
+    const resendResponse = await postApi(request, token, '/envelope/distribute', { envelopeId: envelope.id });
+
+    expect(resendResponse.status(), await resendResponse.text()).toBe(400);
   });
 
   test('signing and completion treat a group as a single field', async ({ request }) => {
@@ -924,6 +945,61 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     const matchingResponse = await createDocument('Acme Inc', 'Acme Inc');
 
     expect(matchingResponse.ok(), await matchingResponse.text()).toBeTruthy();
+  });
+
+  test('direct template rejects a checkbox value which is not a list of its options', async ({ request }) => {
+    const { envelope, directLink } = await apiSeedDirectTemplate(request, {
+      fieldsPerRecipient: [
+        [
+          SIGNATURE_FIELD,
+          {
+            type: FieldType.CHECKBOX,
+            page: 1,
+            positionX: 5,
+            positionY: 10,
+            ...FIELD_SIZE,
+            externalId: 'checkbox-direct',
+            fieldMeta: {
+              type: 'checkbox',
+              values: [option(1, 'A'), option(2, 'B')],
+              validationRule: 'Select at least',
+              validationLength: 1,
+            },
+          },
+        ],
+      ],
+    });
+
+    const { updatedAt } = await prisma.envelope.findUniqueOrThrow({ where: { id: envelope.id } });
+
+    const signatureField = envelope.fields.find((field) => field.type === FieldType.SIGNATURE);
+    const checkbox = findFieldByExternalId(envelope.fields, 'checkbox-direct');
+
+    const createDocument = async (checkboxValue: string) =>
+      await request.post(`${WEBAPP_BASE_URL}/api/trpc/template.createDocumentFromDirectTemplate`, {
+        headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
+        data: JSON.stringify({
+          json: {
+            directTemplateToken: directLink.token,
+            directRecipientEmail: `direct-checkbox-${Date.now()}@test.documenso.com`,
+            templateUpdatedAt: updatedAt.toISOString(),
+            signedFieldValues: [
+              { token: '', fieldId: signatureField?.id, value: 'Direct Signer', isBase64: false },
+              { token: '', fieldId: checkbox.id, value: checkboxValue, isBase64: false },
+            ],
+          },
+          meta: { values: { templateUpdatedAt: ['Date'] } },
+        }),
+      });
+
+    // Not JSON, not a list, and an option which does not exist.
+    expect((await createDocument('abc')).status()).toBe(400);
+    expect((await createDocument('{"0":true}')).status()).toBe(400);
+    expect((await createDocument('[5]')).status()).toBe(400);
+
+    const validResponse = await createDocument('[0]');
+
+    expect(validResponse.ok(), await validResponse.text()).toBeTruthy();
   });
 
   test('direct template radio groups accept a selection in only one field', async ({ request }) => {

@@ -322,14 +322,15 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     }
 
     for (const recipient of envelope.recipients) {
-      // Only auto-insert fields if the recipient has not been sent the document yet.
-      if (recipient.sendStatus === SendStatus.SENT) {
-        continue;
-      }
-
       const recipientFields = envelope.fields.filter((field) => field.recipientId === recipient.id);
 
-      fieldsToAutoInsert.push(...extractRecipientAutoInsertValues(recipientFields, recipient));
+      // Run for every recipient, since it also validates the field settings.
+      const recipientAutoInsertValues = extractRecipientAutoInsertValues(recipientFields, recipient);
+
+      // Only auto-insert fields if the recipient has not been sent the document yet.
+      if (recipient.sendStatus !== SendStatus.SENT) {
+        fieldsToAutoInsert.push(...recipientAutoInsertValues);
+      }
     }
   }
 
@@ -663,6 +664,16 @@ const extractGroupedOptionFieldAutoInsertValues = (items: Field[]): { fieldId: n
   if (firstItem.type === FieldType.CHECKBOX) {
     const { validationRule, validationLength } = ZCheckboxFieldMeta.parse(firstItem.fieldMeta);
 
+    const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
+
+    // Checked before counting the pre-checked options, so an unknown rule is rejected
+    // even when nothing is pre-checked.
+    if (validationRule && validationLength && !validation) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Invalid checkbox validation rule',
+      });
+    }
+
     const itemCheckedIndices = items.map((item) => {
       const { values = [] } = ZCheckboxFieldMeta.parse(item.fieldMeta);
 
@@ -675,18 +686,12 @@ const extractGroupedOptionFieldAutoInsertValues = (items: Field[]): { fieldId: n
       return [];
     }
 
-    if (validationRule && validationLength) {
-      const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
-
-      if (!validation) {
-        throw new AppError(AppErrorCode.INVALID_REQUEST, {
-          message: 'Invalid checkbox validation rule',
-        });
-      }
-
-      if (!validateCheckboxLength(totalCheckedCount, validation.value, validationLength)) {
-        return [];
-      }
+    if (
+      validation &&
+      validationLength &&
+      !validateCheckboxLength(totalCheckedCount, validation.value, validationLength)
+    ) {
+      return [];
     }
 
     return items.map((item, index) => ({

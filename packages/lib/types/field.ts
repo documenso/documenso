@@ -67,7 +67,7 @@ export const ZFieldGroupIdSchema = z
   .max(FIELD_GROUP_ID_MAX_LENGTH)
   .nullish()
   .describe(
-    'An optional ID used to group fields together. Fields sharing a group ID act as a single logical field: they are inserted together and share validation rules. Must be unique per recipient and field type. Not available for signature, initials or date fields.',
+    'An optional ID used to group fields together. Fields sharing a group ID act as a single logical field: they are inserted together and share validation rules. Every field in a group must belong to the same recipient and be of the same type.',
   );
 
 export const ZFieldExternalIdSchema = z

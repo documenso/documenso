@@ -7,10 +7,10 @@ import {
   getContentAlignmentCell,
 } from '@documenso/app-tests/constants/content-alignment-pdf';
 import { ALIGNMENT_TEST_FIELDS } from '@documenso/app-tests/constants/field-alignment-pdf';
+import { FIELD_GROUPS_TEST_FIELDS } from '@documenso/app-tests/constants/field-groups-pdf';
 import { FIELD_META_TEST_FIELDS } from '@documenso/app-tests/constants/field-meta-pdf';
 import { OVERFLOW_TEST_FIELDS } from '@documenso/app-tests/constants/field-overflow-pdf';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
-import { FIELD_GROUPS_TEST_FIELDS } from '@documenso/lib/constants/test-pdfs/field-groups-pdf';
 import { createDataContentImage } from '@documenso/lib/server-only/data-content/create-data-content-image';
 import { incrementDocumentId, incrementTemplateId } from '@documenso/lib/server-only/envelope/increment-id';
 import { ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';
