@@ -240,8 +240,6 @@ msgid "{0, plural, one {1 field will be deleted because the new PDF has fewer pa
 msgstr "{0, plural, other {새 PDF의 페이지 수가 현재 PDF보다 적어서 필드 #개가 삭제됩니다.}}"
 
 #. placeholder {0}: fields.filter((field) => field.envelopeItemId === doc.id).length
-#. placeholder {0}: remainingFields.filter((field) => field.envelopeItemId === doc.id).length
-#: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-file-selector.tsx
 msgid "{0, plural, one {1 Field} other {# Fields}}"
 msgstr "{0, plural, other {필드 #개}}"
@@ -2937,7 +2935,6 @@ msgstr "누군가를 찾을 수 없나요?"
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-dialog.tsx
 msgid "Cancel"
 msgstr "취소"
@@ -5225,7 +5222,6 @@ msgstr "계정이 없으신가요? <0>가입하기</0>"
 msgid "Don't repeat"
 msgstr "반복 안 함"
 
-#: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Don't transfer (Delete all documents)"
 msgstr "전송하지 않음(모든 문서 삭제)"
@@ -11024,8 +11020,6 @@ msgstr "셀렉터"
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 msgid "Send"
 msgstr "보내기"
 
@@ -11048,7 +11042,6 @@ msgstr "문서 보내기"
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 msgid "Send Document"
 msgstr "문서 보내기"
 
@@ -15540,10 +15533,6 @@ msgstr "다음 사용자를 팀 <0>{teamName}</0>에서 제거하려고 합니�
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "You are about to revoke access for team <0>{0}</0> ({1}) to use your email."
 msgstr "팀 <0>{0}</0>({1})이(가) 귀하의 이메일을 사용하도록 허용한 접근 권한을 철회하려고 합니다."
-
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
-msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
-msgstr "지금 이 문서를 수신자에게 전송하려고 합니다. 계속하시겠습니까?"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "You are about to subscribe to the {planName}"

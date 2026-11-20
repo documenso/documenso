@@ -240,8 +240,6 @@ msgid "{0, plural, one {1 field will be deleted because the new PDF has fewer pa
 msgstr "{0, plural, one {1 champ sera supprimé, car le nouveau PDF contient moins de pages que l’actuel.} other {# champs seront supprimés, car le nouveau PDF contient moins de pages que l’actuel.}}"
 
 #. placeholder {0}: fields.filter((field) => field.envelopeItemId === doc.id).length
-#. placeholder {0}: remainingFields.filter((field) => field.envelopeItemId === doc.id).length
-#: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-file-selector.tsx
 msgid "{0, plural, one {1 Field} other {# Fields}}"
 msgstr "{0, plural, one {1 Champ} other {# Champs}}"
@@ -2937,7 +2935,6 @@ msgstr "Vous ne trouvez pas quelqu’un ?"
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-dialog.tsx
 msgid "Cancel"
 msgstr "Annuler"
@@ -5225,7 +5222,6 @@ msgstr "Vous n'avez pas de compte? <0>Inscrivez-vous</0>"
 msgid "Don't repeat"
 msgstr "Ne pas répéter"
 
-#: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Don't transfer (Delete all documents)"
 msgstr "Ne pas transférer (supprimer tous les documents)"
@@ -11024,8 +11020,6 @@ msgstr "Sélecteur"
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 msgid "Send"
 msgstr "Envoyer"
 
@@ -11048,7 +11042,6 @@ msgstr "Envoyer le document"
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 msgid "Send Document"
 msgstr "Envoyer le document"
 
@@ -15540,10 +15533,6 @@ msgstr "Vous êtes sur le point de retirer l’utilisateur suivant de l’équip
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "You are about to revoke access for team <0>{0}</0> ({1}) to use your email."
 msgstr "Vous êtes sur le point de révoquer l'accès de l'équipe <0>{0}</0> ({1}) à votre e-mail."
-
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
-msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
-msgstr "Vous êtes sur le point d'envoyer ce document aux destinataires. Êtes-vous sûr de vouloir continuer ?"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "You are about to subscribe to the {planName}"

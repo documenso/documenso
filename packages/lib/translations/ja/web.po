@@ -240,8 +240,6 @@ msgid "{0, plural, one {1 field will be deleted because the new PDF has fewer pa
 msgstr "{0, plural, other {新しいPDFのページ数が現在のものより少ないため、# 個のフィールドが削除されます。}}"
 
 #. placeholder {0}: fields.filter((field) => field.envelopeItemId === doc.id).length
-#. placeholder {0}: remainingFields.filter((field) => field.envelopeItemId === doc.id).length
-#: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-file-selector.tsx
 msgid "{0, plural, one {1 Field} other {# Fields}}"
 msgstr "{0, plural, other {# 個のフィールド}}"
@@ -2937,7 +2935,6 @@ msgstr "メンバーが見つかりませんか？"
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-dialog.tsx
 msgid "Cancel"
 msgstr "キャンセル"
@@ -5225,7 +5222,6 @@ msgstr "アカウントをお持ちでないですか？<0>サインアップ</0
 msgid "Don't repeat"
 msgstr "繰り返さない"
 
-#: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Don't transfer (Delete all documents)"
 msgstr "転送しない（すべてのドキュメントを削除）"
@@ -11024,8 +11020,6 @@ msgstr "セレクター"
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 msgid "Send"
 msgstr "送信"
 
@@ -11048,7 +11042,6 @@ msgstr "文書を送信"
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 msgid "Send Document"
 msgstr "ドキュメントを送信"
 
@@ -15540,10 +15533,6 @@ msgstr "次のユーザーをチーム <0>{teamName}</0> から削除しよう�
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "You are about to revoke access for team <0>{0}</0> ({1}) to use your email."
 msgstr "チーム <0>{0}</0> ({1}) によるあなたのメールアドレスの利用を取り消そうとしています。"
-
-#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
-msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
-msgstr "このドキュメントを受信者に送信しようとしています。続行してもよろしいですか？"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "You are about to subscribe to the {planName}"
