@@ -1,6 +1,7 @@
 import type { WebhookTriggerEvents } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+
 import { jobs } from '../../jobs/client';
 import { getWebhookById } from './get-webhook-by-id';
 import { generateSampleWebhookPayload } from './trigger/generate-sample-data';
@@ -29,6 +30,8 @@ export const triggerTestWebhook = async ({ id, event, userId, teamId }: TriggerT
 
   const samplePayload = generateSampleWebhookPayload(event, webhook.webhookUrl);
 
+  // FIX: Only dispatch to the specific webhook identified by 'id'.
+  // Previously, this logic incorrectly filtered all enabled webhooks in the team for the event.
   await jobs.triggerJob({
     name: 'internal.execute-webhook',
     payload: {
