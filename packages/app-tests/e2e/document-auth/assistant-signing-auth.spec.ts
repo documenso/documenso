@@ -24,6 +24,9 @@ type SeededEnvelopes = {
 const seedTwoPendingEnvelopes = async (request: APIRequestContext): Promise<SeededEnvelopes> => {
   const envelopeA = await apiSeedPendingDocument(request, {
     title: '[TEST] Envelope A',
+    meta: {
+      signingOrder: 'SEQUENTIAL',
+    },
     recipients: [
       {
         email: `assistant-${Date.now()}@documenso.com`,

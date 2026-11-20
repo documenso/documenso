@@ -6,7 +6,7 @@ import { AppError } from '@documenso/lib/errors/app-error';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { getContentsMissingImages, resolveEnvelopeContentLimits } from '@documenso/lib/utils/envelope-content';
 import { hasOverlappingFields } from '@documenso/lib/utils/fields-overlap';
-import { getRecipientsWithMissingFields } from '@documenso/lib/utils/recipients';
+import { getRecipientsWithMissingFields, hasAssistantWithoutSequentialSigning } from '@documenso/lib/utils/recipients';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc, trpc as trpcReact } from '@documenso/trpc/react';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
@@ -189,6 +189,17 @@ export const EnvelopeDistributeDialog = ({
       return 'MISSING_REQUIRED_EMAIL';
     }
 
+    // The server refuses to send this. A draft can still hold it when it predates
+    // that rule, or when a default recipient was saved as an assistant.
+    if (
+      hasAssistantWithoutSequentialSigning({
+        recipients: envelope.recipients,
+        signingOrder: envelope.documentMeta?.signingOrder,
+      })
+    ) {
+      return 'ASSISTANT_WITHOUT_SIGNING_ORDER';
+    }
+
     if (contentsMissingImages.length > 0) {
       return 'MISSING_CONTENT_IMAGES';
     }
@@ -204,6 +215,7 @@ export const EnvelopeDistributeDialog = ({
     return null;
   }, [
     envelope.recipients,
+    envelope.documentMeta?.signingOrder,
     recipientsMissingRequiredEmail,
     recipientsMissingSignatureFields,
     contentsMissingImages,
@@ -550,6 +562,14 @@ export const EnvelopeDistributeDialog = ({
                         </li>
                       ))}
                     </ul>
+                  </AlertDescription>
+                ))
+                .with('ASSISTANT_WITHOUT_SIGNING_ORDER', () => (
+                  <AlertDescription>
+                    <Trans>
+                      An assistant can only be used when signing order is enabled. Enable signing order, or change the
+                      assistant's role.
+                    </Trans>
                   </AlertDescription>
                 ))
                 .with('MISSING_CONTENT_IMAGES', () => (

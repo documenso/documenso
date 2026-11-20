@@ -57,6 +57,10 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 | `CC`        | Receives a copy of the completed document. No action required. |
 | `ASSISTANT` | Can fill in fields on behalf of another recipient.             |
 
+<Callout type="warn">
+The `ASSISTANT` role requires sequential signing. Adding an assistant to an envelope whose `signingOrder` is `PARALLEL` (the default), or switching an envelope that has an assistant to `PARALLEL`, returns a `400` error. A draft that already combines the two cannot be distributed until one of them is changed.
+</Callout>
+
 ---
 
 ## Get Recipient

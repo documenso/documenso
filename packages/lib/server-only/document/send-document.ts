@@ -51,6 +51,7 @@ import {
   renderContentsIntoEnvelopeItem,
 } from '../envelope-content/insert-contents-into-envelope-item';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+import { assertAssistantSigningOrder } from '../recipient/assert-assistant-signing-order';
 import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -165,6 +166,15 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     signingOrder = DocumentSigningOrder.SEQUENTIAL;
 
     envelope.documentMeta.signingOrder = DocumentSigningOrder.SEQUENTIAL;
+  }
+
+  // Drafts only, so a document that was already sent with an assistant on
+  // parallel signing can still be sent again.
+  if (envelope.status === DocumentStatus.DRAFT) {
+    assertAssistantSigningOrder({
+      signingOrder,
+      recipients: envelope.recipients,
+    });
   }
 
   let recipientsToNotify = envelope.recipients;

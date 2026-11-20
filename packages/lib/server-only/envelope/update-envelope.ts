@@ -4,7 +4,7 @@ import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/do
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, FolderType, WebhookTriggerEvents } from '@prisma/client';
+import { DocumentSigningOrder, DocumentStatus, EnvelopeType, FolderType, WebhookTriggerEvents } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
@@ -14,6 +14,7 @@ import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
+import { assertAssistantSigningOrder } from '../recipient/assert-assistant-signing-order';
 import { recomputeNextReminderForEnvelope } from '../recipient/update-recipient-next-reminder';
 import { assertCompatibleDictateNextSigner } from '../signature-level/assert-compatible-dictate-next-signer';
 import { assertCompatibleSigningOrder } from '../signature-level/assert-compatible-signing-order';
@@ -85,6 +86,36 @@ export const updateEnvelope = async ({
     assertCompatibleSigningOrder({
       signatureLevel: envelope.signatureLevel,
       signingOrder: meta.signingOrder,
+    });
+  }
+
+  // Only a change from sequential to parallel is checked. Sending PARALLEL again
+  // for an envelope that is already parallel isn't a change, so envelopes saved
+  // before this rule was introduced can still be updated.
+  const isSwitchingToParallel =
+    meta.signingOrder === DocumentSigningOrder.PARALLEL &&
+    envelope.documentMeta.signingOrder !== DocumentSigningOrder.PARALLEL;
+
+  // The app is exempt: its editors save the signing order and the demoted
+  // assistants in two requests, and the embed update routes, which have no
+  // session, save the signing order before the recipients. Either way the
+  // switch can arrive before the assistants are gone. `source` alone is not
+  // enough, since /api/trpc also accepts API tokens.
+  const isAppRequest = requestMetadata.source === 'app' && requestMetadata.auth !== 'api';
+
+  if (isSwitchingToParallel && !isAppRequest) {
+    const recipients = await prisma.recipient.findMany({
+      where: {
+        envelopeId: envelope.id,
+      },
+      select: {
+        role: true,
+      },
+    });
+
+    assertAssistantSigningOrder({
+      signingOrder: DocumentSigningOrder.PARALLEL,
+      recipients,
     });
   }
 

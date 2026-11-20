@@ -417,7 +417,9 @@ export const DocumentPreferencesForm = ({ settings, onFormSubmit, canInherit }: 
                               className="flex-1"
                             />
                             <div className="flex items-center gap-2">
+                              {/* An assistant needs signing order, which a new envelope does not start with. */}
                               <RecipientRoleSelect
+                                hideAssistantRole
                                 value={recipient.role}
                                 onValueChange={(role: RecipientRole) => {
                                   field.onChange(

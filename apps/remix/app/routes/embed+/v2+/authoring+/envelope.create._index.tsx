@@ -24,7 +24,15 @@ import type { TCreateEmbeddingEnvelopePayload } from '@documenso/trpc/server/emb
 import { Spinner } from '@documenso/ui/primitives/spinner';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
+import {
+  DocumentSigningOrder,
+  DocumentStatus,
+  EnvelopeType,
+  ReadStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@prisma/client';
 import { CheckCircle2Icon } from 'lucide-react';
 import { useLayoutEffect, useMemo, useState } from 'react';
 
@@ -403,6 +411,11 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       documentMeta: {
         id: '',
         ...defaultDocumentMeta,
+        // A default recipient saved as an assistant needs sequential signing,
+        // otherwise the server refuses to create the envelope.
+        signingOrder: recipients.some((recipient) => recipient.role === RecipientRole.ASSISTANT)
+          ? DocumentSigningOrder.SEQUENTIAL
+          : defaultDocumentMeta.signingOrder,
       },
       recipients,
       fields: [],

@@ -405,4 +405,28 @@ test.describe('Default Recipients', () => {
     expect(defaultRecipient).toBeDefined();
     expect(defaultRecipient?.role).toBe(RecipientRole.CC);
   });
+
+  // An assistant needs signing order, which a new document does not start with.
+  test('[DEFAULT_RECIPIENTS]: the assistant role is not offered for default recipients', async ({ page }) => {
+    const { team, owner } = await seedTeam();
+
+    await setTeamDefaultRecipients(team.id, [
+      {
+        email: 'default-recipient@documenso.com',
+        name: 'Default Recipient',
+        role: RecipientRole.CC,
+      },
+    ]);
+
+    await apiSignin({
+      page,
+      email: owner.email,
+      redirectPath: `/t/${team.url}/settings/document`,
+    });
+
+    await page.getByTestId('inheritable-default-recipients').locator('button[role="combobox"][title="CC"]').click();
+
+    await expect(page.getByRole('option', { name: 'Needs to sign' })).toBeVisible();
+    await expect(page.getByRole('option', { name: 'Can prepare' })).toHaveCount(0);
+  });
 });
