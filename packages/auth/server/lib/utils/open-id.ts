@@ -36,7 +36,7 @@ export const getOpenIdConfiguration = async (
 
   const unsupportedScopes = requiredScopes.filter((scope) => !supportedScopes.includes(scope));
 
-  if (unsupportedScopes.length > 0) {
+  if (config.scopes_supported !== undefined && unsupportedScopes.length > 0) {
     throw new Error(`Requested scopes not supported by provider: ${unsupportedScopes.join(', ')}`);
   }
 
