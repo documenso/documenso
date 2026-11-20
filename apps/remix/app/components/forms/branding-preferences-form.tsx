@@ -5,6 +5,7 @@ import {
   BRANDING_LOGO_MAX_SIZE_BYTES,
   BRANDING_LOGO_MAX_SIZE_MB,
 } from '@documenso/lib/constants/branding';
+import { BRANDING_LOGO_SIZE_OPTIONS, ZBrandingLogoSizeSchema } from '@documenso/lib/constants/organisations';
 import { DEFAULT_BRAND_COLORS, DEFAULT_BRAND_RADIUS } from '@documenso/lib/constants/theme';
 import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';
 import { normalizeBrandingColors } from '@documenso/lib/utils/normalize-branding-colors';
@@ -63,7 +64,13 @@ export type TBrandingPreferencesFormSchema = z.infer<typeof ZBrandingPreferences
 
 type SettingsSubset = Pick<
   TeamGlobalSettings,
-  'brandingEnabled' | 'brandingLogo' | 'brandingUrl' | 'brandingCompanyDetails' | 'brandingColors' | 'brandingCss'
+  | 'brandingEnabled'
+  | 'brandingLogo'
+  | 'brandingUrl'
+  | 'brandingCompanyDetails'
+  | 'brandingColors'
+  | 'brandingCss'
+  | 'brandingLogoSize'
 >;
 
 export type BrandingPreferencesFormProps = {
@@ -93,6 +100,7 @@ export function BrandingPreferencesForm({
 
   const parsedColors = ZCssVarsSchema.safeParse(settings.brandingColors);
   const initialColors = parsedColors.success ? parsedColors.data : {};
+  const logoSizeDefault = ZBrandingLogoSizeSchema.safeParse(settings.brandingLogoSize).data;
 
   // The saved state the form maps to. Used both as the reactive `values` source and as
   // the explicit target for a Reset (see handleReset).
@@ -100,6 +108,7 @@ export function BrandingPreferencesForm({
     brandingEnabled: settings.brandingEnabled ?? null,
     brandingUrl: settings.brandingUrl ?? '',
     brandingLogo: undefined,
+    brandingLogoSize: logoSizeDefault,
     brandingCompanyDetails: settings.brandingCompanyDetails ?? '',
     brandingColors: initialColors,
     brandingCss: settings.brandingCss ?? '',
@@ -363,6 +372,45 @@ export function BrandingPreferencesForm({
                     </FormDescription>
 
                     <FormMessage />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="brandingLogoSize"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            <Trans>Logo Size</Trans>
+                          </FormLabel>
+
+                          <FormControl>
+                            <Select
+                              {...field}
+                              value={field.value ?? ''}
+                              onValueChange={(value) => field.onChange(value)}
+                              disabled={!isBrandingEnabled}
+                            >
+                              <SelectTrigger className="bg-background text-muted-foreground">
+                                <SelectValue />
+                              </SelectTrigger>
+
+                              <SelectContent className="z-[9999]">
+                                {BRANDING_LOGO_SIZE_OPTIONS.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+
+                          <FormDescription>
+                            <Trans>Select the size for your branding logo in emails</Trans>
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </InheritableField>
               )}

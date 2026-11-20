@@ -1,5 +1,5 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-import { NEXT_PUBLIC_WEBAPP_URL, getBasePath } from '../constants/app';
+import { getBasePath, NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { env } from '../utils/env';
 
 export const getBaseUrl = () => {
