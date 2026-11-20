@@ -2,6 +2,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentDistributionMethod, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
 import { resolveNextReminderAt, ZEnvelopeReminderSettings } from '../../constants/envelope-reminder';
+import { isRecipientEmailValidForSending } from '../../utils/recipients';
 
 /**
  * Compute and store `nextReminderAt` for a single recipient.
@@ -81,15 +82,16 @@ export const recomputeNextReminderForEnvelope = async (envelopeId: string) => {
       sendStatus: SendStatus.SENT,
       sentAt: { not: null },
       role: { not: RecipientRole.CC },
+      email: { not: '' },
       // Don't reschedule reminders for recipients whose deadline has passed.
       OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
     },
-    select: { id: true, sentAt: true, lastReminderSentAt: true, reminderCount: true },
+    select: { id: true, email: true, sentAt: true, lastReminderSentAt: true, reminderCount: true },
   });
 
   await Promise.all(
     recipients.map(async (recipient) => {
-      if (!recipient.sentAt) {
+      if (!recipient.sentAt || !isRecipientEmailValidForSending(recipient)) {
         return;
       }
 
