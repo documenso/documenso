@@ -83,8 +83,14 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
 
   const { user: owner } = envelope;
 
+  const emailSettings = extractDerivedDocumentEmailSettings(envelope.documentMeta);
+  const isDocumentCompletedEmailEnabled = emailSettings.documentCompleted;
+  const isOwnerDocumentCompletedEmailEnabled = emailSettings.ownerDocumentCompleted;
+
+  const envelopeItemsToAttach = emailSettings.attachDocument ? envelope.envelopeItems : [];
+
   const completedDocumentEmailAttachments = await Promise.all(
-    envelope.envelopeItems.map(async (envelopeItem) => {
+    envelopeItemsToAttach.map(async (envelopeItem) => {
       const file = await getFileServerSide(envelopeItem.documentData);
 
       // Use the envelope title for version 1, and the envelope item title for version 2.
@@ -107,10 +113,6 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
   if (envelope.team?.url) {
     documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${envelope.team.url}/documents/${envelope.id}`;
   }
-
-  const emailSettings = extractDerivedDocumentEmailSettings(envelope.documentMeta);
-  const isDocumentCompletedEmailEnabled = emailSettings.documentCompleted;
-  const isOwnerDocumentCompletedEmailEnabled = emailSettings.ownerDocumentCompleted;
 
   // Send email to document owner if:
   // 1. Owner document completed emails are enabled AND

@@ -16,6 +16,12 @@ export enum DocumentEmailEvents {
 
 export const ZDocumentEmailSettingsSchema = z
   .object({
+    attachDocument: z
+      .boolean()
+      .describe(
+        'Whether to attach the completed document PDFs to emails sent to the owner and recipients. Document links are always included.',
+      )
+      .default(true),
     recipientSigningRequest: z
       .boolean()
       .describe('Whether to send an email to all recipients that the document is ready for them to sign.')
@@ -68,6 +74,7 @@ export const extractDerivedDocumentEmailSettings = (documentMeta?: DocumentMeta 
   }
 
   return {
+    attachDocument: emailSettings.attachDocument,
     recipientSigningRequest: false,
     recipientRemoved: false,
     recipientSigned: false,
@@ -81,6 +88,7 @@ export const extractDerivedDocumentEmailSettings = (documentMeta?: DocumentMeta 
 };
 
 export const DEFAULT_DOCUMENT_EMAIL_SETTINGS: TDocumentEmailSettings = {
+  attachDocument: true,
   recipientSigningRequest: true,
   recipientRemoved: true,
   recipientSigned: true,
