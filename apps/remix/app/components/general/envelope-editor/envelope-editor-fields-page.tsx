@@ -1,4 +1,5 @@
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
+import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import type { EnvelopeEditorTab } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
@@ -28,6 +29,7 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
 import { Tabs, TabsContent } from '@documenso/ui/primitives/tabs';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -43,6 +45,7 @@ import {
   SparklesIcon,
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
@@ -117,6 +120,7 @@ export const EnvelopeEditorFieldsPage = () => {
   const { currentEnvelopeItem, setCurrentEnvelopeItem, viewerControls } = useCurrentEnvelopeRender();
 
   const { _ } = useLingui();
+  const { toast } = useToast();
 
   // Fields are hidden on the contents tab so the page reads as the document itself.
   const onEditorTabChange = (tab: EnvelopeEditorTab) => {
@@ -140,6 +144,35 @@ export const EnvelopeEditorFieldsPage = () => {
     () => structuredClone(editorContents.selectedContent),
     [editorContents.selectedContent],
   );
+
+  const [copiedField, setCopiedField] = useState<TLocalField | null>(null);
+
+  useHotkeys(['ctrl+c', 'meta+c'], (event) => {
+    // Keep the native copy when the user has selected text.
+    if (!selectedField || window.getSelection()?.toString()) {
+      return;
+    }
+
+    event.preventDefault();
+    setCopiedField(selectedField);
+
+    toast({
+      title: _(msg`Copied field`),
+      description: _(msg`Copied field to clipboard`),
+    });
+  });
+
+  useHotkeys(['ctrl+v', 'meta+v'], (event) => {
+    // A paste on the contents tab or on another envelope item would add a field that is out of view.
+    if (!copiedField || selectedEditorTab !== 'fields' || copiedField.envelopeItemId !== currentEnvelopeItem?.id) {
+      return;
+    }
+
+    event.preventDefault();
+
+    // Paste the next copy offset from the last one, so repeated pastes do not stack.
+    setCopiedField(editorFields.duplicateField(copiedField));
+  });
 
   /**
    * Debounce the fields used for overlap detection so we don't recompute on every

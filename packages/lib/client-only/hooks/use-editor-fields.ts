@@ -133,8 +133,10 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
         ...structuredClone(field),
         id: undefined,
         formId: createLocalFormId(),
-        positionX: field.positionX + EDITOR_DUPLICATE_ITEM_OFFSET,
-        positionY: field.positionY + EDITOR_DUPLICATE_ITEM_OFFSET,
+        // A copy of a copy moves by one offset each time, and the server rejects positions
+        // over 100, so stop at the page edge.
+        positionX: Math.min(field.positionX + EDITOR_DUPLICATE_ITEM_OFFSET, 100 - field.width),
+        positionY: Math.min(field.positionY + EDITOR_DUPLICATE_ITEM_OFFSET, 100 - field.height),
       };
 
       fieldsArray.appendItems([newField]);
