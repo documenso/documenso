@@ -72,7 +72,7 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
     transformer.forceUpdate();
   }, [applyTransformerConfig]);
 
-  const applySelection = useCallback((nextSelection: EnvelopeCanvasSelection) => {
+  const applySelection = useCallback((nextSelection: EnvelopeCanvasSelection, { notify = true } = {}) => {
     const transformer = transformerRef.current;
 
     if (transformer) {
@@ -90,7 +90,10 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
     transformer?.moveToTop();
 
     setSelectionState(nextSelection);
-    onChangeRef.current(nextSelection);
+
+    if (notify) {
+      onChangeRef.current(nextSelection);
+    }
   }, []);
 
   const select = useCallback(
@@ -122,6 +125,15 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
 
   const clear = useCallback(() => {
     applySelection(null);
+  }, [applySelection]);
+
+  /**
+   * Clears this page without calling `onChange`. The editor keeps one
+   * selection for all pages, so when it moves to another page, a call to
+   * `onChange` from this page would clear the new selection too.
+   */
+  const release = useCallback(() => {
+    applySelection(null, { notify: false });
   }, [applySelection]);
 
   const isSelected = useCallback((node: Konva.Node) => {
@@ -226,6 +238,7 @@ export const useEnvelopeCanvasSelection = ({ getTransformerConfig, onChange }: U
     select,
     toggle,
     clear,
+    release,
     isSelected,
     refreshTransformer,
   };

@@ -82,9 +82,10 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     selectedEditorTab === 'contents' && canContentBeChanged(envelope) && contentsVisibility === 'visible';
 
   const syncEditorSelection = (selection: EnvelopeCanvasSelection) => {
-    const singleFormId = selection?.groups.length === 1 ? selection.groups[0].id() : null;
+    const formIds = selection?.groups.map((group) => group.id()) ?? [];
+    const singleFormId = formIds.length === 1 ? formIds[0] : null;
 
-    editorFields.setSelectedField(selection?.kind === 'field' ? singleFormId : null);
+    editorFields.setSelectedFields(selection?.kind === 'field' ? formIds : []);
     editorContents.setSelectedContent(selection?.kind === 'content' ? singleFormId : null);
   };
 
