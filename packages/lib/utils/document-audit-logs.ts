@@ -624,21 +624,51 @@ export const formatDocumentAuditLogAction = (i18n: I18n, auditLog: TDocumentAudi
         user: msg`${user} rejected the document`,
       };
     })
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED }, () => ({
-      anonymous: msg`Recipient requested a 2FA token for the document`,
-      you: msg`You requested a 2FA token for the document`,
-      user: msg`${user} requested a 2FA token for the document`,
-    }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED }, () => ({
-      anonymous: msg`Recipient validated a 2FA token for the document`,
-      you: msg`You validated a 2FA token for the document`,
-      user: msg`${user} validated a 2FA token for the document`,
-    }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED }, () => ({
-      anonymous: msg`Recipient failed to validate a 2FA token for the document`,
-      you: msg`You failed to validate a 2FA token for the document`,
-      user: msg`${user} failed to validate a 2FA token for the document`,
-    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED }, ({ data }) => {
+      if (data.isExternal) {
+        return {
+          anonymous: msg`An external 2FA token was requested for ${data.recipientEmail}`,
+          you: msg`You requested an external 2FA token for ${data.recipientEmail}`,
+          user: msg`${user} requested an external 2FA token for ${data.recipientEmail}`,
+        };
+      }
+
+      return {
+        anonymous: msg`Recipient requested a 2FA token for the document`,
+        you: msg`You requested a 2FA token for the document`,
+        user: msg`${user} requested a 2FA token for the document`,
+      };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED }, ({ data }) => {
+      if (data.isExternal) {
+        return {
+          anonymous: msg`Recipient validated an external 2FA token for the document`,
+          you: msg`You validated an external 2FA token for the document`,
+          user: msg`${user} validated an external 2FA token for the document`,
+        };
+      }
+
+      return {
+        anonymous: msg`Recipient validated a 2FA token for the document`,
+        you: msg`You validated a 2FA token for the document`,
+        user: msg`${user} validated a 2FA token for the document`,
+      };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED }, ({ data }) => {
+      if (data.isExternal) {
+        return {
+          anonymous: msg`Recipient failed to validate an external 2FA token for the document`,
+          you: msg`You failed to validate an external 2FA token for the document`,
+          user: msg`${user} failed to validate an external 2FA token for the document`,
+        };
+      }
+
+      return {
+        anonymous: msg`Recipient failed to validate a 2FA token for the document`,
+        you: msg`You failed to validate a 2FA token for the document`,
+        user: msg`${user} failed to validate a 2FA token for the document`,
+      };
+    })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT }, ({ data }) => {
       if (data.isResending) {
         return {

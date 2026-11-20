@@ -10,16 +10,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { ArrowLeftIcon, KeyIcon, MailIcon } from 'lucide-react';
+import { ArrowLeftIcon, KeyIcon, MailIcon, SmartphoneIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 
 type FormStep = 'method-selection' | 'code-input';
-type TwoFactorMethod = 'email' | 'authenticator';
+type TwoFactorMethod = 'email' | 'authenticator' | 'external';
 
 const ZAccessAuth2FAFormSchema = z.object({
   token: z.string().length(6, { message: 'Token must be 6 characters long' }),
@@ -34,15 +35,18 @@ export type AccessAuth2FAFormProps = {
 };
 
 export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormProps) => {
-  const { user } = useRequiredDocumentSigningAuthContext();
+  const { user, derivedRecipientAccessAuth } = useRequiredDocumentSigningAuthContext();
 
-  // Email is always available, so without an authenticator there is no method to choose.
+  const allowsTwoFactorAuth = derivedRecipientAccessAuth.includes('TWO_FACTOR_AUTH');
+  const allowsExternal2FA = derivedRecipientAccessAuth.includes('EXTERNAL_TWO_FACTOR_AUTH');
   const hasAuthenticatorEnabled = user?.twoFactorEnabled === true;
 
-  const [step, setStep] = useState<FormStep>(hasAuthenticatorEnabled ? 'method-selection' : 'code-input');
-  const [selectedMethod, setSelectedMethod] = useState<TwoFactorMethod | null>(
-    hasAuthenticatorEnabled ? null : 'email',
-  );
+  // Email always comes with TWO_FACTOR_AUTH, so a choice exists only when a second method does.
+  const hasMethodChoice = allowsTwoFactorAuth && (hasAuthenticatorEnabled || allowsExternal2FA);
+  const onlyMethod: TwoFactorMethod = allowsTwoFactorAuth ? 'email' : 'external';
+
+  const [step, setStep] = useState<FormStep>(hasMethodChoice ? 'method-selection' : 'code-input');
+  const [selectedMethod, setSelectedMethod] = useState<TwoFactorMethod | null>(hasMethodChoice ? null : onlyMethod);
 
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
   const [millisecondsRemaining, setMillisecondsRemaining] = useState<number | null>(null);
@@ -95,11 +99,10 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
     }
 
     // Prepare the auth options for the completion attempt
-    const accessAuthOptions: TRecipientAccessAuth = {
-      type: 'TWO_FACTOR_AUTH',
-      token: data.token, // Just the user's code - backend will validate using method type
-      method: selectedMethod,
-    };
+    const accessAuthOptions: TRecipientAccessAuth =
+      selectedMethod === 'external'
+        ? { type: 'EXTERNAL_TWO_FACTOR_AUTH', token: data.token }
+        : { type: 'TWO_FACTOR_AUTH', token: data.token, method: selectedMethod };
 
     onSubmit(accessAuthOptions);
   };
@@ -147,7 +150,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
   // Deferred so StrictMode's dev-only effect re-run cancels the first call. Calling it
   // directly sends two emails, and a ref guard leaves isPending stuck on true.
   useEffect(() => {
-    if (hasAuthenticatorEnabled) {
+    if (hasMethodChoice || onlyMethod !== 'email') {
       return;
     }
 
@@ -213,6 +216,26 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
                 </div>
               </Button>
             )}
+
+            {allowsExternal2FA && (
+              <Button
+                type="button"
+                variant="outline"
+                className="flex h-auto w-full justify-start gap-3 p-4"
+                onClick={async () => onMethodSelect('external')}
+                disabled={isRequesting2FAEmail}
+              >
+                <SmartphoneIcon className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">
+                    <Trans>Code from the sender</Trans>
+                  </div>
+                  <div className="text-muted-foreground text-sm">
+                    <Trans>Enter a code that the sender of this document sent to you</Trans>
+                  </div>
+                </div>
+              </Button>
+            )}
           </div>
         </div>
       )}
@@ -220,7 +243,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
       {step === 'code-input' && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            {hasAuthenticatorEnabled && (
+            {hasMethodChoice && (
               <Button type="button" variant="ghost" size="sm" onClick={onGoBack}>
                 <ArrowLeftIcon className="h-4 w-4" />
               </Button>
@@ -232,13 +255,18 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
           </div>
 
           <div className="text-muted-foreground text-sm">
-            {selectedMethod === 'email' ? (
-              <Trans>
-                We've sent a 6-digit verification code to your email. Please enter it below to complete the document.
-              </Trans>
-            ) : (
-              <Trans>Please open your authenticator app and enter the 6-digit code for this document.</Trans>
-            )}
+            {match(selectedMethod)
+              .with('email', () => (
+                <Trans>
+                  We've sent a 6-digit verification code to your email. Please enter it below to complete the document.
+                </Trans>
+              ))
+              .with('external', () => (
+                <Trans>Enter the 6-digit code that the sender of this document sent to you.</Trans>
+              ))
+              .otherwise(() => (
+                <Trans>Please open your authenticator app and enter the 6-digit code for this document.</Trans>
+              ))}
           </div>
 
           <Form {...form}>
