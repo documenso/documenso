@@ -60,6 +60,13 @@ type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
 };
 
+/**
+ * What a field was last drawn from. The field is only redrawn when one of these changes.
+ */
+type CachedRenderField = Pick<Field, 'inserted' | 'customText'> & {
+  isHighlightedAsPending: boolean;
+};
+
 const IS_GROUP_NAVIGABLE_ATTR = 'isGroupNavigable';
 
 export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
@@ -111,8 +118,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
     signature.current = signatureState;
   }, [fullNameState, emailState, signatureState]);
 
-  const cachedRenderFields = useRef<Map<number, Field & { signature?: Signature | null }>>(new Map());
-  const prevShowPendingFieldTooltip = useRef(showPendingFieldTooltip);
+  const cachedRenderFields = useRef<Map<number, CachedRenderField>>(new Map());
 
   const { onFieldSigned, onFieldUnsigned, onSignatureChanged } = useEmbedSigningContext() || {};
 
@@ -153,15 +159,17 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
 
   const nextPendingSigningItem = pendingRecipientSigningItems[0];
 
+  const isFieldHighlightedAsPending = (fieldId: number) => showPendingFieldTooltip && pendingFieldIds.has(fieldId);
+
   /**
-   * Fields on the signing page are green, orange while being pointed out as pending.
+   * Fields on the signing page are green, orange while highlighted as pending.
    */
   const getSigningFieldColor = (field: Pick<Field, 'id' | 'fieldMeta'>): TRecipientColor => {
     if (ZFieldMetaSchema.safeParse(field.fieldMeta).data?.readOnly) {
       return 'readOnly';
     }
 
-    return showPendingFieldTooltip && pendingFieldIds.has(field.id) ? 'orange' : 'green';
+    return isFieldHighlightedAsPending(field.id) ? 'orange' : 'green';
   };
 
   /**
@@ -271,7 +279,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
 
     const fieldToRender = ZFullFieldSchema.parse(unparsedField);
 
-    const isValidating = showPendingFieldTooltip && pendingFieldIds.has(fieldToRender.id);
+    const isValidating = isFieldHighlightedAsPending(fieldToRender.id);
 
     const color = getSigningFieldColor(fieldToRender);
 
@@ -297,7 +305,9 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
     });
 
     syncFieldSpinner(fieldGroup, signingFieldIds.has(fieldToRender.id));
-    syncFieldGroupHighlight(fieldGroup, groupHighlightLevelsRef.current.get(fieldToRender.id) ?? null);
+    syncFieldGroupHighlight(fieldGroup, groupHighlightLevelsRef.current.get(fieldToRender.id) ?? null, {
+      isAnimated: false,
+    });
 
     const handleFieldGroupClick = (e: KonvaEventObject<Event>) => {
       const currentTarget = e.currentTarget as Konva.Group;
@@ -529,15 +539,22 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
     for (const field of localPageFields) {
       const existingCachedField = cachedRenderFields.current.get(field.id);
       const isFieldCurrentlyRendered = pageLayer.current.findOne(`#${field.id}`);
+      const isHighlightedAsPending = isFieldHighlightedAsPending(field.id);
 
       if (
         !isFieldCurrentlyRendered ||
         !existingCachedField ||
         existingCachedField.inserted !== field.inserted ||
-        existingCachedField.customText !== field.customText
+        existingCachedField.customText !== field.customText ||
+        existingCachedField.isHighlightedAsPending !== isHighlightedAsPending
       ) {
         renderFieldOnLayer(field, fieldCanvasStyleCache);
-        cachedRenderFields.current.set(field.id, field);
+
+        cachedRenderFields.current.set(field.id, {
+          inserted: field.inserted,
+          customText: field.customText,
+          isHighlightedAsPending,
+        });
       }
     }
 
@@ -679,15 +696,6 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
   useEffect(() => {
     if (!pageLayer.current || !stage.current) {
       return;
-    }
-
-    // When the pending-field tooltip toggles, all unsigned required fields need to
-    // be re-rendered so their stroke color updates (green <-> orange). Field-level
-    // properties like `inserted` and `customText` haven't changed, so the cache
-    // would otherwise skip them — clear it to force a fresh render.
-    if (prevShowPendingFieldTooltip.current !== showPendingFieldTooltip || showPendingFieldTooltip) {
-      cachedRenderFields.current.clear();
-      prevShowPendingFieldTooltip.current = showPendingFieldTooltip;
     }
 
     renderFields();

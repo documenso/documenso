@@ -249,6 +249,39 @@ export const getKonvaFieldGroupHighlightAt = async (
 };
 
 /**
+ * How a field's background is currently drawn on the page's canvas. Every redraw of a field
+ * creates a new rect, so a changed `rectId` means the field was redrawn.
+ */
+export const getKonvaFieldBackground = async (page: Page, pageNumber: number, fieldId: number) => {
+  return await page.evaluate(
+    ({ pageNumber, fieldId }) => {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const konva: typeof Konva = (window as unknown as { Konva: typeof Konva }).Konva;
+
+      const stage = konva.stages.find((stage) => stage.attrs.id === `page-${pageNumber}`);
+      const fieldGroup = stage?.findOne(`#${fieldId}`);
+
+      if (!fieldGroup || !(fieldGroup instanceof konva.Group)) {
+        return null;
+      }
+
+      const fieldRect = fieldGroup.findOne<Konva.Rect>('.field-rect');
+
+      if (!fieldRect) {
+        return null;
+      }
+
+      return {
+        rectId: fieldRect._id,
+        fill: fieldRect.fill(),
+        mouseEnterListenerCount: fieldGroup.eventListeners.mouseenter?.length ?? 0,
+      };
+    },
+    { pageNumber, fieldId },
+  );
+};
+
+/**
  * Whether a field on the signing page canvas currently shows its loading spinner.
  */
 export const hasKonvaFieldSpinner = async (page: Page, pageNumber: number, fieldId: number): Promise<boolean> => {

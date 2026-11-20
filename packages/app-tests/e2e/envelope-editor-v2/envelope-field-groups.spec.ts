@@ -495,6 +495,9 @@ const runGroupInvalidationFlow = async (surface: TEnvelopeEditorSurface): Promis
   await expectToastTextToBeVisible(root, TEST_VALUES.validationRemovedToast);
   await root.getByTestId('toast-close').click();
 
+  // The open settings form shows the rule as removed.
+  await expect(root.getByTestId('field-form-validationLength')).toContainText('Pick a number');
+
   // Changing the type of a grouped field removes it from the group.
   await selectFieldOnCanvas(root, POSITIONS.rowTwo);
   await changeSelectedFieldType(root, 'Text');

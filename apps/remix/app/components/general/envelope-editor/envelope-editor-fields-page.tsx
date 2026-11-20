@@ -150,34 +150,6 @@ export const EnvelopeEditorFieldsPage = () => {
   );
 
   /**
-   * The settings form is uncontrolled, so it must be remounted whenever the selected
-   * field's meta is changed from outside the form, such as when the field adopts the meta
-   * of a group it joins or a group's validation rule is removed.
-   *
-   * Changes emitted by the form itself are tracked so they don't cause a remount.
-   */
-  const lastEmittedFieldMetaRef = useRef<{ formId: string; fieldMeta: TFieldMetaSchema } | null>(null);
-  const [externalFieldMetaVersion, setExternalFieldMetaVersion] = useState(0);
-
-  useEffect(() => {
-    if (!selectedField) {
-      lastEmittedFieldMetaRef.current = null;
-      return;
-    }
-
-    const lastEmitted = lastEmittedFieldMetaRef.current;
-
-    const isSameField = lastEmitted?.formId === selectedField.formId;
-    const isExternalChange = isSameField && !isDeepEqual(lastEmitted.fieldMeta, selectedField.fieldMeta);
-
-    lastEmittedFieldMetaRef.current = { formId: selectedField.formId, fieldMeta: selectedField.fieldMeta };
-
-    if (isExternalChange) {
-      setExternalFieldMetaVersion((version) => version + 1);
-    }
-  }, [selectedField?.formId, selectedField?.fieldMeta]);
-
-  /**
    * Debounce the fields used for overlap detection so we don't recompute on every
    * small drag/resize movement, which is expensive on large field counts and can
    * bog down lower-end devices.
@@ -214,8 +186,6 @@ export const EnvelopeEditorFieldsPage = () => {
     if (isMetaSame) {
       return;
     }
-
-    lastEmittedFieldMetaRef.current = { formId: selectedField.formId, fieldMeta };
 
     // Group reconciliation (syncing shared meta to siblings) is handled by the editor fields hook.
     editorFields.updateFieldByFormId(selectedField.formId, { fieldMeta });
@@ -632,7 +602,7 @@ export const EnvelopeEditorFieldsPage = () => {
                             {_(FieldSettingsTypeTranslations[selectedField.type])}
                           </h3>
 
-                          <div key={externalFieldMetaVersion}>
+                          <div key={editorFields.getFieldMetaRewriteCount(selectedField.formId)}>
                             {match(selectedField.type)
                               .with(FieldType.SIGNATURE, () => (
                                 <EditorFieldSignatureForm

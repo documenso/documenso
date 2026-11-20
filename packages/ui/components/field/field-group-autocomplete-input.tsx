@@ -87,10 +87,6 @@ export const FieldGroupAutoCompleteInput = ({
     onGroupIdChange(trimmedGroupId);
   };
 
-  const markSelectingSuggestion = () => {
-    bypassBlurCommitRef.current = true;
-  };
-
   const handleSearchQueryChange = (nextValue: string) => {
     setSearchQuery(nextValue);
     setIsOpen(true);
@@ -141,6 +137,7 @@ export const FieldGroupAutoCompleteInput = ({
             disabled={disabled}
             autoComplete="off"
             onFocus={() => setIsOpen(true)}
+            onClick={() => setIsOpen(true)}
             onChange={(e) => handleSearchQueryChange(e.target.value)}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
@@ -155,7 +152,12 @@ export const FieldGroupAutoCompleteInput = ({
             e.preventDefault();
           }}
         >
-          <CommandGroup className="max-h-[250px] overflow-y-auto" onMouseDown={markSelectingSuggestion}>
+          <CommandGroup
+            className="max-h-[250px] overflow-y-auto"
+            // Keeps the focus in the input. Otherwise pressing on a suggestion would blur the
+            // input, which commits the typed query before the suggestion is picked.
+            onMouseDown={(event) => event.preventDefault()}
+          >
             {filteredOptions.map((option) => (
               <CommandItem
                 key={option.groupId}

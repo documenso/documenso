@@ -47,11 +47,13 @@ describe('resolveEditorFieldGroupChanges', () => {
     const existing = groupedCheckbox('a', 'A', { required: true });
     const joiner = createLocalField({ formId: 'b', type: FieldType.CHECKBOX, fieldMeta: checkboxMeta(['B']) });
 
-    const { reconciledFields } = resolveEditorFieldGroupChanges({
+    const { reconciledFields, rewrittenFormIds } = resolveEditorFieldGroupChanges({
       previousFields: [existing, joiner],
       nextFields: [existing, { ...joiner, groupId: 'g' }],
       changedFormIds: new Set(['b']),
     });
+
+    expect(rewrittenFormIds).toEqual(['b']);
 
     const reconciledJoiner = reconciledFields.find((field) => field.formId === 'b');
 
@@ -63,6 +65,42 @@ describe('resolveEditorFieldGroupChanges', () => {
 
     // The existing field is untouched.
     expect(reconciledFields.find((field) => field.formId === 'a')).toBe(existing);
+  });
+
+  it('reports the fields whose meta it rewrote, but not an edit it kept as is', () => {
+    const atLeastThree = { validationRule: 'Select at least', validationLength: 3 };
+
+    const a = createLocalField({
+      formId: 'a',
+      type: FieldType.CHECKBOX,
+      groupId: 'g',
+      fieldMeta: checkboxMeta(['A1', 'A2'], atLeastThree),
+    });
+    const b = createLocalField({
+      formId: 'b',
+      type: FieldType.CHECKBOX,
+      groupId: 'g',
+      fieldMeta: checkboxMeta(['B'], atLeastThree),
+    });
+
+    // A new label on A is copied to B, while A keeps its own edit.
+    const relabelled = resolveEditorFieldGroupChanges({
+      previousFields: [a, b],
+      nextFields: [{ ...a, fieldMeta: checkboxMeta(['A1', 'A2'], { ...atLeastThree, label: 'Pick' }) }, b],
+      changedFormIds: new Set(['a']),
+    });
+
+    expect(relabelled.rewrittenFormIds).toEqual(['b']);
+
+    // Removing an option from A leaves the group short of its rule, so the rule is also
+    // removed from A.
+    const trimmed = resolveEditorFieldGroupChanges({
+      previousFields: [a, b],
+      nextFields: [{ ...a, fieldMeta: checkboxMeta(['A1'], atLeastThree) }, b],
+      changedFormIds: new Set(['a']),
+    });
+
+    expect([...trimmed.rewrittenFormIds].sort()).toEqual(['a', 'b']);
   });
 
   it('removes the validation rule from the remaining fields when a field is removed', () => {

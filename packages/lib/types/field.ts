@@ -72,6 +72,8 @@ export const ZFieldGroupIdSchema = z
 
 export const ZFieldExternalIdSchema = z
   .string()
+  .trim()
+  .min(1)
   .max(FIELD_EXTERNAL_ID_MAX_LENGTH)
   .nullish()
   .describe('An optional external identifier for the field. Not validated or used internally.');

@@ -28,6 +28,10 @@ export type ResolveEditorFieldGroupChangesOptions = {
 export type ResolveEditorFieldGroupChangesResult = {
   reconciledFields: TLocalField[];
   /**
+   * Form IDs of the fields whose meta was rewritten to keep their groups valid and in sync.
+   */
+  rewrittenFormIds: string[];
+  /**
    * Groups which had their validation rule removed to remain valid.
    */
   validationRemovedGroupIds: string[];
@@ -161,5 +165,9 @@ export const resolveEditorFieldGroupChanges = ({
     return { ...field, fieldMeta: reconciledMetaByFormId.get(field.formId) };
   });
 
-  return { reconciledFields, validationRemovedGroupIds: Array.from(validationRemovedGroupIds) };
+  return {
+    reconciledFields,
+    rewrittenFormIds: Array.from(reconciledMetaByFormId.keys()),
+    validationRemovedGroupIds: Array.from(validationRemovedGroupIds),
+  };
 };

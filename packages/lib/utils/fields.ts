@@ -2,7 +2,9 @@ import { PDF_VIEWER_CONTENT_SELECTOR } from '@documenso/lib/constants/pdf-viewer
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { type Envelope, type Field, FieldType } from '@prisma/client';
+import { z } from 'zod';
 
+import { AppError, AppErrorCode } from '../errors/app-error';
 import { extractLegacyIds } from '../universal/id';
 
 /**
@@ -103,6 +105,23 @@ export const parseCheckboxCustomText = (customText: string): number[] => {
   }
 
   return JSON.parse(customText);
+};
+
+const ZSubmittedCheckboxCustomTextSchema = z.array(z.number().int().nonnegative());
+
+/**
+ * Parses a V2 checkbox value received from a client, before it is stored.
+ *
+ * Throws if the value is not a list of indices. It does not check that the options exist.
+ */
+export const parseSubmittedCheckboxCustomText = (customText: string): number[] => {
+  try {
+    return ZSubmittedCheckboxCustomTextSchema.parse(JSON.parse(customText));
+  } catch {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Invalid checkbox values',
+    });
+  }
 };
 
 export const toCheckboxCustomText = (checkedValues: number[]): string => {

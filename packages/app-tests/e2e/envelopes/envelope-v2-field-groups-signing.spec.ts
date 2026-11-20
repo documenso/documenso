@@ -20,10 +20,16 @@ import {
   getCompleteButton,
   getGroupBar,
   getNextFieldButton,
+  hoverSigningField,
   openSigningPage,
   setupTypedSignature,
 } from '../fixtures/envelope-signing';
-import { clickKonvaFieldOption, getKonvaCheckedCheckboxIndices, getKonvaFieldTextForPage } from '../fixtures/konva';
+import {
+  clickKonvaFieldOption,
+  getKonvaCheckedCheckboxIndices,
+  getKonvaFieldBackground,
+  getKonvaFieldTextForPage,
+} from '../fixtures/konva';
 
 const FIELD_SIZE = { width: 20, height: 5 };
 
@@ -143,8 +149,9 @@ test.describe('V2 envelope field groups during signing', () => {
     ]);
     await expectFieldsRemaining(page, 3);
 
-    // Clearing the other field clears the whole group.
+    // Removing the value from the other field clears the whole group.
     await clickSigningField(canvas, textB);
+    await page.getByRole('dialog').getByRole('button', { name: 'Remove' }).click();
 
     await expectFieldsInDatabase([
       { fieldId: textA.id, inserted: false, customText: '' },
@@ -309,6 +316,69 @@ test.describe('V2 envelope field groups during signing', () => {
 
       expect(dbEnvelope.status).toBe(DocumentStatus.COMPLETED);
     }).toPass();
+  });
+
+  test('a redrawn field keeps its hover tint and leaves the other fields alone', async ({ page, request }) => {
+    const checkboxField = (externalId: string, positionY: number) => ({
+      type: FieldType.CHECKBOX,
+      page: 1,
+      positionX: 5,
+      positionY,
+      ...FIELD_SIZE,
+      externalId,
+      fieldMeta: { type: 'checkbox', required: true, values: [option(1, 'One'), option(2, 'Two')] },
+    });
+
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+      recipients: [{ email: 'signer-redraw@test.documenso.com', name: 'Redraw Signer' }],
+      fieldsPerRecipient: [[SIGNATURE_FIELD, checkboxField('checkbox-a', 10), checkboxField('checkbox-b', 30)]],
+    });
+
+    const { token } = distributeResult.recipients[0];
+
+    const checkboxA = findFieldByExternalId(envelope.fields, 'checkbox-a');
+    const checkboxB = findFieldByExternalId(envelope.fields, 'checkbox-b');
+
+    const canvas = await openSigningPage(page, `/sign/${token}`);
+
+    const restingBackground = await getKonvaFieldBackground(page, 1, checkboxA.id);
+
+    await hoverSigningField(canvas, checkboxA);
+    await expect
+      .poll(async () => (await getKonvaFieldBackground(page, 1, checkboxA.id))?.fill)
+      .not.toBe(restingBackground?.fill);
+
+    // Ticking redraws the field under the pointer, which has not moved.
+    await clickKonvaFieldOption(page, 1, checkboxA.id, { type: 'checkbox', index: 0 });
+    await expectFieldsInDatabase([{ fieldId: checkboxA.id, inserted: true, customText: '[0]' }]);
+    await expect
+      .poll(async () => (await getKonvaFieldBackground(page, 1, checkboxA.id))?.rectId)
+      .not.toBe(restingBackground?.rectId);
+
+    const redrawnBackground = await getKonvaFieldBackground(page, 1, checkboxA.id);
+
+    expect(redrawnBackground?.fill).not.toBe(restingBackground?.fill);
+    expect(redrawnBackground?.mouseEnterListenerCount).toBe(1);
+
+    // The tint goes once the pointer leaves the field.
+    await hoverSigningField(canvas, checkboxB);
+    await expect
+      .poll(async () => (await getKonvaFieldBackground(page, 1, checkboxA.id))?.fill)
+      .toBe(restingBackground?.fill);
+
+    // While pending fields are pointed out, a change to one field does not redraw the rest.
+    await getNextFieldButton(page).click();
+    await expect(page.getByText('Click to insert field')).toBeVisible();
+
+    const otherBackground = await getKonvaFieldBackground(page, 1, checkboxB.id);
+
+    await clickKonvaFieldOption(page, 1, checkboxA.id, { type: 'checkbox', index: 1 });
+    await expectFieldsInDatabase([{ fieldId: checkboxA.id, inserted: true, customText: '[0,1]' }]);
+    await expect
+      .poll(async () => (await getKonvaFieldBackground(page, 1, checkboxA.id))?.rectId)
+      .not.toBe(redrawnBackground?.rectId);
+
+    expect((await getKonvaFieldBackground(page, 1, checkboxB.id))?.rectId).toBe(otherBackground?.rectId);
   });
 
   test('direct template completion enforces grouped checkbox rules', async ({ page, request }) => {

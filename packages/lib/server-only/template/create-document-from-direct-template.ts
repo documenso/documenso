@@ -47,7 +47,9 @@ import {
   buildEnvelopeContentCopyData,
   getContentsMissingImages,
 } from '../../utils/envelope-content';
+import { extractFieldInsertionValues } from '../../utils/envelope-signing';
 import { groupFieldsByGroupId } from '../../utils/field-groups';
+import { parseSubmittedCheckboxCustomText } from '../../utils/fields';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import {
   getRecipientsWithMissingFields,
@@ -422,6 +424,20 @@ export const createDocumentFromDirectTemplate = async ({
           message: `Only one field in radio group "${groupId}" can have a selection`,
         });
       }
+    }
+
+    // Checkbox values are stored as submitted, so they are put through the same checks as
+    // a checkbox signed on a document: a list of indices, each one an option of the field.
+    for (const { templateField, customText } of createDirectRecipientFieldArgs) {
+      if (templateField.type !== FieldType.CHECKBOX || !customText) {
+        continue;
+      }
+
+      extractFieldInsertionValues({
+        fieldValue: { type: FieldType.CHECKBOX, value: parseSubmittedCheckboxCustomText(customText) },
+        field: templateField,
+        documentMeta: derivedDocumentMeta,
+      });
     }
 
     assertRecipientFieldsComplete({

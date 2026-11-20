@@ -792,7 +792,7 @@ export const createFieldSettingsGroup = async (root: Page): Promise<string> => {
 
   await root.getByRole('option', { name: 'Create Group' }).click();
 
-  await expect(input).toHaveValue(/^grp_[a-z]{4}$/);
+  await expect(input).toHaveValue(/^grp_[a-z]{6}$/);
 
   return await input.inputValue();
 };

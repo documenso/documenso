@@ -66,6 +66,7 @@ type UseEditorFieldsResponse = {
 
   // Field utilities
   getFieldByFormId: (formId: string) => TLocalField | undefined;
+  getFieldMetaRewriteCount: (formId: string) => number;
 
   // Selected recipient
   selectedRecipient: TEditorEnvelope['recipients'][number] | null;
@@ -79,6 +80,12 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
   const { toast } = useToast();
 
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
+
+  /**
+   * How many times the field's meta has been rewritten to keep its group valid and in sync,
+   * such as when it takes on the shared meta of a group it joins.
+   */
+  const [fieldMetaRewriteCounts, setFieldMetaRewriteCounts] = useState<Record<string, number>>({});
 
   const fieldsArray = useEditorFormArray<TLocalField, Field>({
     schema: ZLocalFieldSchema,
@@ -199,11 +206,18 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
         })
         .concat(newFields);
 
-      const { reconciledFields, validationRemovedGroupIds } = resolveEditorFieldGroupChanges({
+      const { reconciledFields, rewrittenFormIds, validationRemovedGroupIds } = resolveEditorFieldGroupChanges({
         previousFields,
         nextFields,
         changedFormIds,
       });
+
+      if (rewrittenFormIds.length > 0) {
+        setFieldMetaRewriteCounts((counts) => ({
+          ...counts,
+          ...Object.fromEntries(rewrittenFormIds.map((formId) => [formId, (counts[formId] ?? 0) + 1])),
+        }));
+      }
 
       const appendedFields: TLocalField[] = [];
       const updatedFields: TLocalField[] = [];
@@ -377,6 +391,11 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
     [applyFieldChanges],
   );
 
+  const getFieldMetaRewriteCount = useCallback(
+    (formId: string) => fieldMetaRewriteCounts[formId] ?? 0,
+    [fieldMetaRewriteCounts],
+  );
+
   const selectedRecipient = useMemo(() => {
     return envelope.recipients.find((recipient) => recipient.id === selectedRecipientId) || null;
   }, [selectedRecipientId, envelope.recipients]);
@@ -396,6 +415,7 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
 
     // Field utilities
     getFieldByFormId: fieldsArray.findItem,
+    getFieldMetaRewriteCount,
 
     // Selected field
     selectedField: fieldsArray.selectedItem,

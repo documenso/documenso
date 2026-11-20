@@ -19,6 +19,9 @@ const FIELD_FILL_FADE_SECONDS = 0.3;
 const FIELD_FILL_TWEEN_ATTR = 'fillTween';
 const FIELD_FILL_PROGRESS_ATTR = 'fillProgress';
 
+const FIELD_HOVER_EVENT_NAME = 'fieldHover';
+const FIELD_IS_HOVERED_ATTR = 'isFieldHovered';
+
 const FIELD_GROUP_HIGHLIGHT_OPACITY: Record<FieldGroupHighlightLevel, number> = {
   primary: 0.3,
   secondary: 0.06,
@@ -270,10 +273,61 @@ export const createFieldHoverInteraction = ({ options, fieldGroup, fieldRect }: 
 
   const hoverColor = getRecipientColorStyles(options.color).baseRingHover;
 
-  fieldGroup.on('mouseenter', () => tweenFieldRectFill(fieldRect, hoverColor));
-  fieldGroup.on('mouseleave', () => tweenFieldRectFill(fieldRect, DEFAULT_RECT_BACKGROUND));
-  fieldGroup.on('transformstart', () => tweenFieldRectFill(fieldRect, hoverColor));
-  fieldGroup.on('transformend', () => tweenFieldRectFill(fieldRect, DEFAULT_RECT_BACKGROUND));
+  const setIsHovered = (isHovered: boolean) => {
+    fieldGroup.setAttr(FIELD_IS_HOVERED_ATTR, isHovered);
+    tweenFieldRectFill(fieldRect, isHovered ? hoverColor : DEFAULT_RECT_BACKGROUND);
+  };
+
+  // This runs on every render of the field, so the listeners of the last render are removed.
+  fieldGroup.off(`.${FIELD_HOVER_EVENT_NAME}`);
+
+  fieldGroup.on(`mouseenter.${FIELD_HOVER_EVENT_NAME}`, () => setIsHovered(true));
+  fieldGroup.on(`mouseleave.${FIELD_HOVER_EVENT_NAME}`, () => setIsHovered(false));
+  fieldGroup.on(`transformstart.${FIELD_HOVER_EVENT_NAME}`, () => tweenFieldRectFill(fieldRect, hoverColor));
+  fieldGroup.on(`transformend.${FIELD_HOVER_EVENT_NAME}`, () => tweenFieldRectFill(fieldRect, DEFAULT_RECT_BACKGROUND));
+
+  const stage = fieldGroup.getStage();
+
+  if (!stage || fieldGroup.getAttr(FIELD_IS_HOVERED_ATTR) !== true) {
+    return;
+  }
+
+  // The field was redrawn while hovered. Konva only reports the pointer entering the new
+  // rect once it moves, so the rect starts in the hover colour to keep the tint.
+  fieldRect.fill(hoverColor);
+
+  // Konva tracked the pointer through a shape which this render removed, so it will not
+  // report the pointer leaving. The next pointer event settles whether it is still here.
+  const stageEventName = `${FIELD_HOVER_EVENT_NAME}-${fieldGroup.id()}`;
+
+  stage.off(`.${stageEventName}`);
+
+  stage.on(`mousemove.${stageEventName} mouseleave.${stageEventName}`, (event) => {
+    stage.off(`.${stageEventName}`);
+
+    const hasPointerLeft = event.type === 'mouseleave' || !isPointerOverNode(stage, fieldGroup);
+
+    if (hasPointerLeft) {
+      setIsHovered(false);
+    }
+  });
+};
+
+const isPointerOverNode = (stage: Konva.Stage, node: Konva.Node): boolean => {
+  const pointerPosition = stage.getPointerPosition();
+
+  if (!pointerPosition) {
+    return false;
+  }
+
+  const { x, y, width, height } = node.getClientRect();
+
+  return (
+    pointerPosition.x >= x &&
+    pointerPosition.x <= x + width &&
+    pointerPosition.y >= y &&
+    pointerPosition.y <= y + height
+  );
 };
 
 /**
