@@ -45,7 +45,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   const isOIDCOnlyTransport =
     isOIDCSSOEnabled && !isEmailPasswordSigninEnabled && !isGoogleSSOEnabled && !isMicrosoftSSOEnabled;
 
-  const shouldAutoRedirectToOIDC = isOIDCOnlyTransport && !IS_OIDC_AUTO_REDIRECT_DISABLED;
+  // An error param means we just came back from the IdP; redirecting again would loop forever.
+  const hasErrorParam = new URL(request.url).searchParams.has('error');
+
+  const shouldAutoRedirectToOIDC = isOIDCOnlyTransport && !IS_OIDC_AUTO_REDIRECT_DISABLED && !hasErrorParam;
 
   const oidcProviderLabel = OIDC_PROVIDER_LABEL;
 
