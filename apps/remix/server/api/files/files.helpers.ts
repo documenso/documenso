@@ -5,14 +5,18 @@ import { generatePartialSignedPdf } from '@documenso/lib/server-only/pdf/generat
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+import { getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipient-queries';
 import { prisma } from '@documenso/prisma';
 import {
   type DocumentDataType,
   DocumentStatus,
   type EnvelopeType,
   EnvelopeType as EnvelopeTypeEnum,
-  type RecipientRole,
-  type SigningStatus,
+  FieldType,
+  type Prisma,
+  type Recipient,
+  RecipientRole,
+  SigningStatus,
   type TemplateType,
   TemplateType as TemplateTypeEnum,
 } from '@prisma/client';
@@ -55,17 +59,15 @@ type EnvelopeForPendingDownload = {
   id: string;
   status: DocumentStatus;
   internalVersion: number;
-  recipients: Array<{
-    role: RecipientRole;
-    signingStatus: SigningStatus;
-  }>;
 };
+
+type PendingDownloadRecipient = Pick<Recipient, 'id' | 'role' | 'signingOrder' | 'envelopeId'>;
 
 /**
  * Options shape varies by `version`:
  * - `signed` / `original`: serves stored bytes; only needs envelope `status` for cache headers.
  * - `pending`: generates a fresh PDF with currently-inserted fields burned in; needs the
- *   full envelope (id, status, internalVersion, recipients) plus envelopeItemId to query fields.
+ *   envelope (id, status, internalVersion) plus envelopeItemId to query fields.
  */
 type HandleEnvelopeItemFileRequestOptions = {
   title: string;
@@ -81,6 +83,13 @@ type HandleEnvelopeItemFileRequestOptions = {
       version: 'pending';
       envelopeItemId: string;
       envelope: EnvelopeForPendingDownload;
+
+      /**
+       * Limits the PDF to fields visible to this recipient. Assistants can also
+       * see non-signature fields for unsigned recipients after them.
+       */
+      recipientToken?: string;
+      recipient?: PendingDownloadRecipient;
     }
 );
 
@@ -165,6 +174,8 @@ const handlePendingFileRequest = async ({
   envelopeItemId,
   envelope,
   documentData,
+  recipientToken,
+  recipient,
   context: c,
 }: PendingFileRequestOptions) => {
   if (envelope.status !== DocumentStatus.PENDING) {
@@ -187,10 +198,43 @@ const handlePendingFileRequest = async ({
     });
   }
 
+  let visibleFieldWhere: Prisma.FieldWhereInput = {};
+
+  if (recipient?.role === RecipientRole.ASSISTANT) {
+    visibleFieldWhere = {
+      OR: [
+        {
+          recipient: {
+            signingStatus: SigningStatus.SIGNED,
+          },
+        },
+        {
+          recipientId: recipient.id,
+        },
+        {
+          type: {
+            not: FieldType.SIGNATURE,
+          },
+          recipient: getRecipientFieldsWhereInput({
+            recipient,
+            allowAssistantAccessToOtherRecipients: true,
+          }),
+        },
+      ],
+    };
+  } else if (recipientToken) {
+    visibleFieldWhere = {
+      recipient: {
+        OR: [{ signingStatus: SigningStatus.SIGNED }, { token: recipientToken }],
+      },
+    };
+  }
+
   const fields = await prisma.field.findMany({
     where: {
       envelopeItemId,
       inserted: true,
+      ...visibleFieldWhere,
     },
     include: {
       signature: true,
