@@ -296,8 +296,9 @@ test('[TEMPLATE]: should create a document from a template with custom document'
 
   const firstDocumentData = document.envelopeItems[0].documentData;
 
-  const expectedDocumentDataType =
-    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3' ? DocumentDataType.S3_PATH : DocumentDataType.BYTES_64;
+  const expectedDocumentDataType = ['s3', 'neon'].includes(process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT ?? '')
+    ? DocumentDataType.S3_PATH
+    : DocumentDataType.BYTES_64;
 
   expect(document.title).toEqual('TEMPLATE_WITH_CUSTOM_DOC');
   expect(firstDocumentData.type).toEqual(expectedDocumentDataType);
@@ -389,8 +390,9 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
     },
   });
 
-  const expectedDocumentDataType =
-    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3' ? DocumentDataType.S3_PATH : DocumentDataType.BYTES_64;
+  const expectedDocumentDataType = ['s3', 'neon'].includes(process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT ?? '')
+    ? DocumentDataType.S3_PATH
+    : DocumentDataType.BYTES_64;
 
   const firstDocumentData = document.envelopeItems[0].documentData;
 
