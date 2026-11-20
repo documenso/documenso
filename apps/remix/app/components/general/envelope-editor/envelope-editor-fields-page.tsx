@@ -22,14 +22,16 @@ import {
 import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { getOverlappingFieldPairs } from '@documenso/lib/utils/fields-overlap';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
+import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
 import { Tabs, TabsContent } from '@documenso/ui/primitives/tabs';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
@@ -37,6 +39,7 @@ import { TabsList, TabsTrigger } from '@radix-ui/react-tabs';
 import {
   AlertTriangleIcon,
   FileTextIcon,
+  FormInputIcon,
   LayoutGridIcon,
   MousePointerIcon,
   PencilIcon,
@@ -112,6 +115,11 @@ export const EnvelopeEditorFieldsPage = () => {
     editorConfig,
     selectedEditorTab,
     setSelectedEditorTab,
+    isDocument,
+    isEmbedded,
+    flushAutosave,
+    syncEnvelope,
+    registerPendingMutation,
   } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem, setCurrentEnvelopeItem, viewerControls } = useCurrentEnvelopeRender();
@@ -127,7 +135,12 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
+  const [hasAcroForm, setHasAcroForm] = useState(false);
   const { revalidate } = useRevalidator();
+  const { toast } = useToast();
+
+  const { mutateAsync: importAcroFormFields, isPending: isImportingAcroFormFields } =
+    trpc.envelope.field.importFromPdf.useMutation();
 
   const envelopeItemPermissions = useMemo(
     () => getEnvelopeItemPermissions(envelope, envelope.recipients),
@@ -257,6 +270,49 @@ export const EnvelopeEditorFieldsPage = () => {
     });
   };
 
+  const onImportAcroFormFieldsClick = async () => {
+    if (!currentEnvelopeItem || !editorFields.selectedRecipient) {
+      return;
+    }
+
+    try {
+      // A pending field autosave does not have the imported fields. Send it first,
+      // so that it cannot land after the import and delete them.
+      await flushAutosave();
+
+      const importPromise = importAcroFormFields({
+        envelopeId: envelope.id,
+        envelopeItemId: currentEnvelopeItem.id,
+        recipientId: editorFields.selectedRecipient.id,
+      });
+
+      registerPendingMutation(importPromise);
+
+      const { fieldsCreated } = await importPromise;
+
+      await syncEnvelope();
+
+      toast({
+        title: plural(fieldsCreated, {
+          0: `No fields imported`,
+          one: `Field imported`,
+          other: `Fields imported`,
+        }),
+        description: plural(fieldsCreated, {
+          0: `The PDF form has no fields that can be imported.`,
+          one: `# field was imported from the PDF form.`,
+          other: `# fields were imported from the PDF form.`,
+        }),
+      });
+    } catch {
+      toast({
+        title: _(msg`Could not import fields`),
+        description: _(msg`Something went wrong while importing the fields from the PDF form.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
   const { allowContents } = editorConfig.actions;
 
   if (!editorConfig.general.allowAddFieldsStep) {
@@ -359,6 +415,7 @@ export const EnvelopeEditorFieldsPage = () => {
                   scrollParentRef={scrollableContainerRef}
                   errorMessage={PDF_VIEWER_ERROR_MESSAGES.editor}
                   toolbar={allowContents ? ['zoom', 'fields', 'contents'] : ['zoom', 'fields']}
+                  onAcroFormDetected={setHasAcroForm}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">
@@ -474,6 +531,21 @@ export const EnvelopeEditorFieldsPage = () => {
                           onEnabled={onAiFeaturesEnabled}
                         />
                       </>
+                    )}
+
+                    {hasAcroForm && isDocument && !isEmbedded && envelope.status === DocumentStatus.DRAFT && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="mt-4 w-full"
+                        onClick={() => void onImportAcroFormFieldsClick()}
+                        loading={isImportingAcroFormFields}
+                        disabled={!editorFields.selectedRecipient}
+                      >
+                        {!isImportingAcroFormFields && <FormInputIcon className="mr-2 -ml-1 h-4 w-4" />}
+                        <Trans>Import from PDF form</Trans>
+                      </Button>
                     )}
                   </section>
 

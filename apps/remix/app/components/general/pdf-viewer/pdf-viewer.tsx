@@ -57,6 +57,11 @@ export type PDFViewerProps = {
   onDocumentLoad?: () => void;
 
   /**
+   * Called on each document load with whether the PDF has form fields.
+   */
+  onAcroFormDetected?: (hasFormFields: boolean) => void;
+
+  /**
    * Values above 1 can overflow the container horizontally, so the scroll
    * parent should allow horizontal scrolling.
    */
@@ -76,6 +81,7 @@ export default function PDFViewer({
   data,
   scrollParentRef,
   onDocumentLoad,
+  onAcroFormDetected,
   zoom = 1,
   maxPageWidth,
   customPageRenderer,
@@ -139,6 +145,14 @@ export default function PDFViewer({
 
         // eslint-disable-next-line require-atomic-updates
         pdfRef.current = loadedPdf;
+
+        if (onAcroFormDetected) {
+          const fieldObjects = await loadedPdf.getFieldObjects().catch(() => null);
+
+          if (!isCancelled) {
+            onAcroFormDetected(Object.keys(fieldObjects ?? {}).length > 0);
+          }
+        }
 
         // Fetch the pages
         const pages = await pMap(Array.from({ length: loadedPdf.numPages }), async (_, pageIndex) => {
