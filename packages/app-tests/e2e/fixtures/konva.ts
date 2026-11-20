@@ -50,6 +50,45 @@ export const getKonvaTransformerNodeCountForPage = async (page: Page, pageNumber
 };
 
 /**
+ * Returns a Konva node's bounding box in canvas pixels, so it can be clicked
+ * through Playwright's mouse.
+ */
+export const getKonvaNodeClientRectForPage = async (page: Page, pageNumber: number, selector: string) => {
+  await page.locator('.konva-container canvas').first().waitFor({ state: 'visible' });
+
+  return await page.evaluate(
+    ({ pageNumber, selector }) => {
+      const konva: typeof Konva = (window as unknown as { Konva: typeof Konva }).Konva;
+
+      const stage = konva.stages.find((stage) => stage.attrs.id === `page-${pageNumber}`);
+      const node = stage?.findOne(selector);
+
+      if (!node) {
+        throw new Error(`Konva node ${selector} not found on page ${pageNumber}`);
+      }
+
+      return node.getClientRect({ skipStroke: true });
+    },
+    { pageNumber, selector },
+  );
+};
+
+export const isKonvaNodeVisibleForPage = async (page: Page, pageNumber: number, selector: string) => {
+  await page.locator('.konva-container canvas').first().waitFor({ state: 'visible' });
+
+  return await page.evaluate(
+    ({ pageNumber, selector }) => {
+      const konva: typeof Konva = (window as unknown as { Konva: typeof Konva }).Konva;
+
+      const stage = konva.stages.find((stage) => stage.attrs.id === `page-${pageNumber}`);
+
+      return stage?.findOne(selector)?.visible() ?? null;
+    },
+    { pageNumber, selector },
+  );
+};
+
+/**
  * Returns the text a field renders on the page's canvas: its inserted value once
  * signed, otherwise its label or field type name.
  */

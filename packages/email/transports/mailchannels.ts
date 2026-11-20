@@ -1,13 +1,12 @@
 import { env } from '@documenso/lib/utils/env';
 import type { SentMessageInfo, Transport } from 'nodemailer';
-import type { Address } from 'nodemailer/lib/mailer';
 import type MailMessage from 'nodemailer/lib/mailer/mail-message';
 
 import { normalizeMailHeaders } from './normalize-headers';
 
 const VERSION = '1.0.0';
 
-type NodeMailerAddress = string | Address | Array<string | Address> | undefined;
+type NodeMailerAddress = MailMessage['data']['to'];
 
 interface MailChannelsAddress {
   email: string;
@@ -46,9 +45,9 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
     };
   }
 
-  public send(mail: MailMessage, callback: (_err: Error | null, _info: SentMessageInfo) => void) {
+  public send(mail: MailMessage, callback: (_err: Error | null, _info?: SentMessageInfo) => void) {
     if (!mail.data.to || !mail.data.from) {
-      return callback(new Error('Missing required fields "to" or "from"'), null);
+      return callback(new Error('Missing required fields "to" or "from"'));
     }
 
     const mailTo = this.toMailChannelsAddresses(mail.data.to);
@@ -59,7 +58,7 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
     const [replyTo] = this.toMailChannelsAddresses(mail.data.replyTo);
 
     if (!from) {
-      return callback(new Error('Missing required field "from"'), null);
+      return callback(new Error('Missing required field "from"'));
     }
 
     const requestHeaders: Record<string, string> = {
@@ -105,10 +104,10 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
           return callback(null, {
             messageId: '',
             envelope: {
-              from: mail.data.from,
-              to: mail.data.to,
+              from: from.email,
+              to: mailTo.map((address) => address.email),
             },
-            accepted: mail.data.to,
+            accepted: mailTo.map((address) => address.email),
             rejected: [],
             pending: [],
           });
@@ -116,11 +115,11 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
 
         res
           .json()
-          .then((data) => callback(new Error(`MailChannels error: ${data.message}`), null))
-          .catch((err) => callback(err, null));
+          .then((data) => callback(new Error(`MailChannels error: ${data.message}`)))
+          .catch((err) => callback(err));
       })
       .catch((err) => {
-        return callback(err, null);
+        return callback(err);
       });
   }
 
@@ -137,16 +136,15 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
     }
 
     if (Array.isArray(address)) {
-      return address.map((address) => {
-        if (typeof address === 'string') {
-          return { email: address };
-        }
+      return address.flatMap((item) => this.toMailChannelsAddresses(item));
+    }
 
-        return {
-          email: address.address,
-          name: address.name,
-        };
-      });
+    if (address.group) {
+      return this.toMailChannelsAddresses(address.group);
+    }
+
+    if (!address.address) {
+      return [];
     }
 
     return [
