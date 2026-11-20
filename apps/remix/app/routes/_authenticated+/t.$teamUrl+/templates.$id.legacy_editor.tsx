@@ -90,7 +90,7 @@ export default function TemplateEditPage() {
           </div>
         </div>
 
-        <div className="mt-2 flex items-center gap-2 sm:mt-0 sm:self-end">
+        <div className="mt-2 flex flex-wrap items-center gap-2 sm:mt-0 sm:self-end">
           <DocumentAttachmentsPopover envelopeId={template.envelopeId} />
 
           <TemplateDirectLinkDialog

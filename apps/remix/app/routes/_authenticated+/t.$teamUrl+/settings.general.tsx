@@ -132,8 +132,9 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
 
             <hr className="mt-2 border-border/50" />
 
-            <div className="flex flex-row items-center justify-between pt-4">
+            <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
               <AvatarWithText
+                className="min-w-0"
                 avatarClass="h-12 w-12"
                 avatarSrc={formatAvatarUrl(team.avatarImageId)}
                 avatarFallback={extractInitials((teamEmail?.name || emailVerification?.name) ?? '')}
@@ -145,7 +146,7 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
                 secondaryText={<span className="text-sm">{teamEmail?.email || emailVerification?.email}</span>}
               />
 
-              <div className="flex flex-row items-center pr-2">
+              <div className="flex shrink-0 flex-row items-center justify-between pr-2">
                 <div className="mr-4 flex flex-row items-center text-muted-foreground text-sm xl:mr-8">
                   {match({
                     teamEmail,

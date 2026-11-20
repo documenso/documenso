@@ -98,7 +98,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
           )}
         </div>
 
-        <div className="flex gap-4 sm:flex-row sm:justify-end">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 sm:flex-row sm:justify-end">
           <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
 
           {/* If you delete this, delete the component as well. */}
