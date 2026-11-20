@@ -148,7 +148,7 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
       return;
     }
 
-    const targetRole = role as OrganisationMemberRole;
+    const targetRole = role;
 
     if (currentOrganisationRole === targetRole) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
