@@ -14,8 +14,8 @@ import { DocumentSigningOrder, SendStatus } from '@prisma/client';
  *      signed — one member finishing must not advance the flow.
  *
  * These drive `completeDocumentWithToken` directly rather than the browser, so
- * the side effects (`sendStatus`, `sentAt`, signing-request jobs) can be
- * asserted precisely, and without the cost of four UI signing flows.
+ * the side effects (signing-request jobs, and the `sendStatus` and `sentAt` they
+ * set) can be asserted precisely, and without the cost of four UI signing flows.
  */
 
 const expectSigningRequestJobCount = async (recipientId: number, expected: number) => {
@@ -30,6 +30,30 @@ const expectSigningRequestJobCount = async (recipientId: number, expected: numbe
   });
 
   expect(jobs.length).toBe(expected);
+};
+
+// The signing email job marks the recipient as sent once it has run on the app server.
+const expectRecipientToBeSent = async (recipientId: number) => {
+  await expect
+    .poll(
+      async () => {
+        const recipient = await prisma.recipient.findUniqueOrThrow({
+          where: {
+            id: recipientId,
+          },
+        });
+
+        return {
+          sendStatus: recipient.sendStatus,
+          hasSentAt: recipient.sentAt !== null,
+        };
+      },
+      { timeout: 15_000 },
+    )
+    .toEqual({
+      sendStatus: SendStatus.SENT,
+      hasSentAt: true,
+    });
 };
 
 /**
@@ -49,8 +73,8 @@ const seedGroupedDocument = async () => {
     recipientsCreateOptions: [
       { signingOrder: 1, sendStatus: SendStatus.SENT },
       // The seed marks every recipient SENT by default, but a real SEQUENTIAL
-      // document leaves later steps NOT_SENT until their step unlocks. Without
-      // this, `sendStatus` would be meaningless as an "activated" signal.
+      // document leaves later steps NOT_SENT until their signing request is sent.
+      // Without this, checking that a step becomes SENT would prove nothing.
       { signingOrder: 2, sendStatus: SendStatus.NOT_SENT },
       { signingOrder: 2, sendStatus: SendStatus.NOT_SENT },
       { signingOrder: 3, sendStatus: SendStatus.NOT_SENT },
@@ -93,20 +117,20 @@ test('[SIGNING_GROUPS]: unlocking a step activates every member of that step, an
     id: { type: 'envelopeId', id: first.envelopeId },
   });
 
-  const groupAAfter = await prisma.recipient.findUniqueOrThrow({ where: { id: groupA.id } });
-  const groupBAfter = await prisma.recipient.findUniqueOrThrow({ where: { id: groupB.id } });
-  const lastAfter = await prisma.recipient.findUniqueOrThrow({ where: { id: last.id } });
-
   // Both members of step 2 are activated together.
-  expect(groupAAfter.sendStatus).toBe(SendStatus.SENT);
-  expect(groupAAfter.sentAt).not.toBeNull();
   await expectSigningRequestJobCount(groupA.id, 1);
+  await expectRecipientToBeSent(groupA.id);
 
-  expect(groupBAfter.sendStatus).toBe(SendStatus.SENT);
-  expect(groupBAfter.sentAt).not.toBeNull();
   await expectSigningRequestJobCount(groupB.id, 1);
+  await expectRecipientToBeSent(groupB.id);
 
   // Step 3 is not pulled forward with them.
+  const lastAfter = await prisma.recipient.findUniqueOrThrow({
+    where: {
+      id: last.id,
+    },
+  });
+
   expect(lastAfter.sendStatus).toBe(SendStatus.NOT_SENT);
   expect(lastAfter.sentAt).toBeNull();
   await expectSigningRequestJobCount(last.id, 0);
@@ -127,7 +151,9 @@ test('[SIGNING_GROUPS]: the next step stays locked until every member of the gro
   });
 
   const lastWhileGroupPending = await prisma.recipient.findUniqueOrThrow({
-    where: { id: last.id },
+    where: {
+      id: last.id,
+    },
   });
 
   expect(lastWhileGroupPending.sendStatus).toBe(SendStatus.NOT_SENT);
@@ -143,11 +169,6 @@ test('[SIGNING_GROUPS]: the next step stays locked until every member of the gro
     id: { type: 'envelopeId', id: groupB.envelopeId },
   });
 
-  const lastAfterGroupComplete = await prisma.recipient.findUniqueOrThrow({
-    where: { id: last.id },
-  });
-
-  expect(lastAfterGroupComplete.sendStatus).toBe(SendStatus.SENT);
-  expect(lastAfterGroupComplete.sentAt).not.toBeNull();
   await expectSigningRequestJobCount(last.id, 1);
+  await expectRecipientToBeSent(last.id);
 });
