@@ -1,7 +1,9 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { AppErrorCode } from '@documenso/lib/errors/app-error';
+import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
-import { DocumentVisibility, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentStatus, DocumentVisibility, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
 import { seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -87,6 +89,61 @@ test.describe('Reject recipient on behalf of', () => {
     expect(auditLog!.userId).toBe(user.id);
     expect(auditLog!.email).toBe(user.email);
     expect(auditData.onBehalfOfUserEmail).toBeUndefined();
+  });
+
+  test('should reject the envelope in the same request and lock out the other recipients', async ({ request }) => {
+    const envelope = await seedPendingDocument(user, team.id, [
+      'rejecter@test.documenso.com',
+      'bystander@test.documenso.com',
+    ]);
+
+    const rejecter = envelope.recipients.find((recipient) => recipient.email === 'rejecter@test.documenso.com');
+    const bystander = envelope.recipients.find((recipient) => recipient.email === 'bystander@test.documenso.com');
+
+    if (!rejecter || !bystander) {
+      throw new Error('Seeded recipients not found');
+    }
+
+    const { documentData } = envelope.envelopeItems[0];
+
+    // The seal job cannot read this PDF and never finishes, so the status
+    // asserted below can only have been written by the rejection itself.
+    await prisma.documentData.update({
+      where: { id: documentData.id },
+      data: { data: 'not-a-pdf', initialData: 'not-a-pdf' },
+    });
+
+    const res = await rejectRecipient(request, token, envelope.id, rejecter.id, 'Declined out of band');
+
+    expect(res.status()).toBe(200);
+
+    const envelopeRes = await request.get(`${baseUrl}/envelope/${envelope.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    expect(envelopeRes.status()).toBe(200);
+    expect((await envelopeRes.json()).status).toBe(DocumentStatus.REJECTED);
+
+    // Put the PDF back, or the seal sweep of a long-running server keeps
+    // retrying this envelope every 15 minutes for 6 hours.
+    await prisma.documentData.update({
+      where: { id: documentData.id },
+      data: { data: documentData.data, initialData: documentData.initialData },
+    });
+
+    const bystanderRejectRes = await rejectRecipient(request, token, envelope.id, bystander.id, 'Too late');
+
+    expect(bystanderRejectRes.status()).toBe(400);
+
+    await expect(
+      completeDocumentWithToken({ token: bystander.token, id: { type: 'envelopeId', id: envelope.id } }),
+    ).rejects.toMatchObject({ code: AppErrorCode.ENVELOPE_REJECTED });
+
+    const untouchedBystander = await prisma.recipient.findUniqueOrThrow({
+      where: { id: bystander.id },
+    });
+
+    expect(untouchedBystander.signingStatus).toBe(SigningStatus.NOT_SIGNED);
   });
 
   test('should attribute the rejection to the elected team member when actAsEmail is supplied', async ({ request }) => {

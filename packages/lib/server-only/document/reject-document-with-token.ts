@@ -18,6 +18,7 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { assertRecipientNotExpired } from '../../utils/recipients';
 import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
+import { commitRecipientRejection } from './commit-recipient-rejection';
 
 export type RejectDocumentWithTokenOptions = {
   token: string;
@@ -62,19 +63,14 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
 
   assertRecipientNotExpired(recipient);
 
-  // Update the recipient status to rejected
-  const [updatedRecipient] = await prisma.$transaction([
-    prisma.recipient.update({
-      where: {
-        id: recipient.id,
-      },
-      data: {
-        signedAt: new Date(),
-        signingStatus: SigningStatus.REJECTED,
-        rejectionReason: reason,
-      },
-    }),
-    prisma.documentAuditLog.create({
+  const updatedRecipient = await prisma.$transaction(async (tx) => {
+    const rejectedRecipient = await commitRecipientRejection(tx, {
+      envelopeId: envelope.id,
+      recipientId: recipient.id,
+      reason,
+    });
+
+    await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         envelopeId: envelope.id,
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED,
@@ -91,8 +87,10 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
         },
         requestMetadata,
       }),
-    }),
-  ]);
+    });
+
+    return rejectedRecipient;
+  });
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 

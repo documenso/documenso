@@ -13,6 +13,7 @@ import { isDeepEqual } from 'remeda';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import { isDocumentCompleted } from '../../utils/document';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
@@ -78,7 +79,7 @@ export const setDocumentRecipients = async ({
 
   assertEnvelopeMutable(envelope);
 
-  if (envelope.completedAt) {
+  if (isDocumentCompleted(envelope)) {
     throw new Error('Document already complete');
   }
 

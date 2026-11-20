@@ -1,7 +1,7 @@
-import { kyselyPrisma, sql } from '@documenso/prisma';
-import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
+import { sql } from '@documenso/prisma';
 
 import type { FindResultResponse } from '../../types/search-params';
+import { selectUnsealedEnvelopes } from '../document/select-unsealed-envelopes';
 
 export type AdminUnsealedDocument = {
   id: string;
@@ -28,35 +28,7 @@ export const adminFindUnsealedDocuments = async ({
 }: AdminFindUnsealedDocumentsOptions): Promise<FindResultResponse<AdminUnsealedDocument[]>> => {
   const offset = Math.max(page - 1, 0) * perPage;
 
-  const baseQuery = kyselyPrisma.$kysely
-    .selectFrom('Envelope')
-    .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
-    .where('Envelope.type', '=', sql.lit(EnvelopeType.DOCUMENT))
-    .where('Envelope.deletedAt', 'is', null)
-    // Must have at least one recipient.
-    .where((eb) => eb.exists(eb.selectFrom('Recipient').whereRef('Recipient.envelopeId', '=', 'Envelope.id')))
-    // Document is ready to seal: all recipients are SIGNED/CC, or any recipient REJECTED.
-    .where((eb) =>
-      eb.or([
-        // Case 1: All recipients are either SIGNED or CC.
-        eb.not(
-          eb.exists(
-            eb
-              .selectFrom('Recipient')
-              .whereRef('Recipient.envelopeId', '=', 'Envelope.id')
-              .where('Recipient.signingStatus', '!=', sql.lit(SigningStatus.SIGNED))
-              .where('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
-          ),
-        ),
-        // Case 2: Any recipient has rejected.
-        eb.exists(
-          eb
-            .selectFrom('Recipient')
-            .whereRef('Recipient.envelopeId', '=', 'Envelope.id')
-            .where('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
-        ),
-      ]),
-    );
+  const baseQuery = selectUnsealedEnvelopes();
 
   const [data, countResult] = await Promise.all([
     baseQuery

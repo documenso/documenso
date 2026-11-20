@@ -93,7 +93,13 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
       },
     });
 
+    // Rejecting sets the envelope status in the same transaction as the recipient,
+    // so the status alone is the record of a rejection: the recipient who rejected
+    // may since have been edited or removed.
+    const isEnvelopeRejected = envelope.status === DocumentStatus.REJECTED;
+
     const isComplete =
+      isEnvelopeRejected ||
       envelope.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
       envelope.recipients.every(
         (recipient) => recipient.signingStatus === SigningStatus.SIGNED || recipient.role === RecipientRole.CC,
@@ -115,12 +121,12 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
 
     const recipientsWithoutCCers = envelope.recipients.filter((recipient) => recipient.role !== RecipientRole.CC);
 
-    // Determine if the document has been rejected by checking if any recipient has rejected it
+    // A rejection recorded before rejecting set the envelope status only marked the recipient.
     const rejectedRecipient = recipientsWithoutCCers.find(
       (recipient) => recipient.signingStatus === SigningStatus.REJECTED,
     );
 
-    const isRejected = Boolean(rejectedRecipient);
+    const isRejected = isEnvelopeRejected || Boolean(rejectedRecipient);
 
     // Get the rejection reason from the rejected recipient
     const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
@@ -351,7 +357,7 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
 
   let shouldSendCompletedEmail = sendEmail && !isResealing && !isRejected;
 
-  if (isResealing && !isDocumentCompleted(envelopeStatus)) {
+  if (isResealing && !isRejected && !isDocumentCompleted(envelopeStatus)) {
     shouldSendCompletedEmail = sendEmail;
   }
 

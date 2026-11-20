@@ -61,7 +61,7 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
     }
 
     // A cancelled document was never sealed/completed, so a signing certificate
-    // must not be generated for it. REJECTED and COMPLETED keep their prior behavior.
+    // must not be generated for it.
     if (!isDocumentCompleted(envelope.status) || envelope.status === DocumentStatus.CANCELLED) {
       throw new AppError('DOCUMENT_NOT_COMPLETE');
     }

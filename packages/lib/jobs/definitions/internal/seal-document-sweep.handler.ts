@@ -1,7 +1,6 @@
-import { kyselyPrisma, sql } from '@documenso/prisma';
-import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 
+import { selectUnsealedEnvelopes } from '../../../server-only/document/select-unsealed-envelopes';
 import { mapSecondaryIdToDocumentId } from '../../../utils/envelope';
 import { jobs } from '../../client';
 import type { JobRunIO } from '../../client/_internal/job';
@@ -12,46 +11,12 @@ export const run = async ({ io }: { payload: TSealDocumentSweepJobDefinition; io
   const fifteenMinutesAgo = now.minus({ minutes: 15 }).toJSDate();
   const sixHoursAgo = now.minus({ hours: 6 }).toJSDate();
 
-  // Find all PENDING envelopes that should have been sealed but weren't.
-  //
-  // A document is ready to seal when either:
-  //   1. All recipients are SIGNED or have role CC (normal completion)
-  //   2. Any recipient has REJECTED (rejection triggers immediate seal)
-  //
   // We only look at documents where the last action was between 15 minutes
   // and 6 hours ago. The lower bound avoids racing with the normal seal-document
   // job that fires on completion. The upper bound stops us from endlessly retrying
   // documents that are stuck due to a deeper issue (e.g. corrupt PDF).
-  const unsealedEnvelopes = await kyselyPrisma.$kysely
-    .selectFrom('Envelope')
+  const unsealedEnvelopes = await selectUnsealedEnvelopes()
     .select(['Envelope.id', 'Envelope.secondaryId'])
-    .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
-    .where('Envelope.type', '=', sql.lit(EnvelopeType.DOCUMENT))
-    .where('Envelope.deletedAt', 'is', null)
-    // Ensure there is at least one recipient.
-    .where((eb) => eb.exists(eb.selectFrom('Recipient').whereRef('Recipient.envelopeId', '=', 'Envelope.id')))
-    // Document is ready to seal: all recipients are SIGNED/CC, or any recipient REJECTED.
-    .where((eb) =>
-      eb.or([
-        // Case 1: All recipients are either SIGNED or CC.
-        eb.not(
-          eb.exists(
-            eb
-              .selectFrom('Recipient')
-              .whereRef('Recipient.envelopeId', '=', 'Envelope.id')
-              .where('Recipient.signingStatus', '!=', sql.lit(SigningStatus.SIGNED))
-              .where('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
-          ),
-        ),
-        // Case 2: Any recipient has rejected.
-        eb.exists(
-          eb
-            .selectFrom('Recipient')
-            .whereRef('Recipient.envelopeId', '=', 'Envelope.id')
-            .where('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
-        ),
-      ]),
-    )
     // Exclude envelopes where a recipient signed/rejected within the last 15 minutes
     // to avoid racing with the standard completion flow.
     .where((eb) =>

@@ -5,6 +5,7 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { Envelope } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentStatus,
@@ -115,21 +116,7 @@ export const completeDocumentWithToken = async ({
     });
   }
 
-  if (envelope.status !== DocumentStatus.PENDING) {
-    const envelopeStatusErrorCode: Record<DocumentStatus, AppErrorCode> = {
-      [DocumentStatus.DRAFT]: AppErrorCode.ENVELOPE_DRAFT,
-      [DocumentStatus.COMPLETED]: AppErrorCode.ENVELOPE_COMPLETED,
-      [DocumentStatus.REJECTED]: AppErrorCode.ENVELOPE_REJECTED,
-      [DocumentStatus.CANCELLED]: AppErrorCode.ENVELOPE_CANCELLED,
-      // Unreachable: guarded by the status check above.
-      [DocumentStatus.PENDING]: AppErrorCode.INVALID_REQUEST,
-    };
-
-    throw new AppError(envelopeStatusErrorCode[envelope.status], {
-      message: `Document ${envelope.id} must be pending to be completed, found ${envelope.status}`,
-      statusCode: 400,
-    });
-  }
+  assertEnvelopePending(envelope);
 
   assertRecipientNotExpired(recipient);
 
@@ -319,15 +306,14 @@ export const completeDocumentWithToken = async ({
   }
 
   await prisma.$transaction(async (tx) => {
-    // Conditional update so two concurrent completion requests can't both
-    // proceed: only the request that transitions the recipient to SIGNED
-    // continues, the loser sees a count of 0 and aborts.
+    // Conditional update so a concurrent completion or rejection for this
+    // recipient can't both be recorded: only the request that moves the
+    // recipient on from NOT_SIGNED continues, the loser sees a count of 0 and
+    // aborts.
     const { count: updatedRecipientCount } = await tx.recipient.updateMany({
       where: {
         id: recipient.id,
-        signingStatus: {
-          not: SigningStatus.SIGNED,
-        },
+        signingStatus: SigningStatus.NOT_SIGNED,
       },
       data: {
         signingStatus: SigningStatus.SIGNED,
@@ -337,15 +323,40 @@ export const completeDocumentWithToken = async ({
       },
     });
 
-    // A concurrent request completed the recipient between our initial read
-    // and this transaction. Abort so the winning request handles all side
-    // effects, the router resolves this code idempotently.
     if (updatedRecipientCount === 0) {
+      const currentRecipient = await tx.recipient.findUnique({
+        where: { id: recipient.id },
+        select: { signingStatus: true },
+      });
+
+      // A rejection for this recipient committed between our initial read and
+      // this transaction, and rejected the envelope with it.
+      if (currentRecipient?.signingStatus === SigningStatus.REJECTED) {
+        throw new AppError(AppErrorCode.ENVELOPE_REJECTED, {
+          message: `Recipient ${recipient.id} rejected document ${envelope.id} before the completion was recorded`,
+          statusCode: 400,
+        });
+      }
+
+      // A concurrent request completed the recipient between our initial read
+      // and this transaction. Abort so the winning request handles all side
+      // effects, the router resolves this code idempotently.
       throw new AppError(AppErrorCode.RECIPIENT_ALREADY_SIGNED, {
         message: `Recipient ${recipient.id} has already signed`,
         statusCode: 400,
       });
     }
+
+    // The status guard at the top ran on a read made before this transaction,
+    // which can also come from a lagging read replica. Checked again here, on
+    // the primary, so a completion is not recorded once the envelope has been
+    // rejected or cancelled.
+    assertEnvelopePending(
+      await tx.envelope.findUniqueOrThrow({
+        where: { id: envelope.id },
+        select: { id: true, status: true },
+      }),
+    );
 
     if (recipientEmail !== recipient.email || recipientName !== recipient.name) {
       await tx.documentAuditLog.create({
@@ -591,5 +602,23 @@ export const completeDocumentWithToken = async ({
     data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedDocument)),
     userId: updatedDocument.userId,
     teamId: updatedDocument.teamId ?? undefined,
+  });
+};
+
+const assertEnvelopePending = ({ id, status }: Pick<Envelope, 'id' | 'status'>) => {
+  if (status === DocumentStatus.PENDING) {
+    return;
+  }
+
+  const envelopeStatusErrorCode: Record<Exclude<DocumentStatus, typeof DocumentStatus.PENDING>, AppErrorCode> = {
+    [DocumentStatus.DRAFT]: AppErrorCode.ENVELOPE_DRAFT,
+    [DocumentStatus.COMPLETED]: AppErrorCode.ENVELOPE_COMPLETED,
+    [DocumentStatus.REJECTED]: AppErrorCode.ENVELOPE_REJECTED,
+    [DocumentStatus.CANCELLED]: AppErrorCode.ENVELOPE_CANCELLED,
+  };
+
+  throw new AppError(envelopeStatusErrorCode[status], {
+    message: `Document ${id} must be pending to be completed, found ${status}`,
+    statusCode: 400,
   });
 };

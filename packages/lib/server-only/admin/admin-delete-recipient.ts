@@ -13,6 +13,7 @@ import { jobs } from '../../jobs/client';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { isTspEnvelope } from '../../types/signature-level';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { isDocumentCompleted } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { getRecipientsInActiveSigningStep, isRecipientTurnBySigningOrder } from '../../utils/recipient-groups';
@@ -68,7 +69,7 @@ export const adminDeleteRecipient = async ({ recipientId, reason, requestMetadat
     });
   }
 
-  if (envelope.completedAt) {
+  if (isDocumentCompleted(envelope)) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });
