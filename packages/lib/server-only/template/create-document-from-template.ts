@@ -120,6 +120,7 @@ export type CreateDocumentFromTemplateOptions = {
     language?: SupportedLanguageCodes;
     distributionMethod?: DocumentDistributionMethod;
     allowDictateNextSigner?: boolean;
+    includeAuditLog?: boolean;
     emailSettings?: TDocumentEmailSettings;
     typedSignatureEnabled?: boolean;
     uploadSignatureEnabled?: boolean;
@@ -577,6 +578,7 @@ export const createDocumentFromTemplate = async ({
         dateFormat: override?.dateFormat || template.documentMeta?.dateFormat,
         redirectUrl: override?.redirectUrl || template.documentMeta?.redirectUrl,
         distributionMethod: override?.distributionMethod || template.documentMeta?.distributionMethod,
+        includeAuditLog: override?.includeAuditLog ?? template.documentMeta?.includeAuditLog,
         emailSettings: override?.emailSettings || template.documentMeta?.emailSettings,
         signingOrder: override?.signingOrder || template.documentMeta?.signingOrder,
         language: override?.language || template.documentMeta?.language || settings.documentLanguage,

@@ -245,6 +245,9 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
     await selectMultiSelectOption(root, 'documentActionSelectValue', TEST_SETTINGS_VALUES.actionAuth);
   }
 
+  await expect(root.locator('#include-audit-log')).toHaveAttribute('aria-checked', 'false');
+  await root.locator('#include-audit-log').click();
+
   if (isEmbedded) {
     await expect(root.locator('[data-testid="documentVisibilitySelectValue"]')).toHaveCount(0);
   } else {
@@ -324,6 +327,8 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
     );
   }
 
+  await expect(root.locator('#include-audit-log')).toHaveAttribute('aria-checked', 'true');
+
   if (isEmbedded) {
     await expect(root.locator('[data-testid="documentVisibilitySelectValue"]')).toHaveCount(0);
   } else {
@@ -377,6 +382,7 @@ const assertEnvelopeSettingsPersistedInDatabase = async ({
   expect(envelope.documentMeta.distributionMethod).toBe(DB_EXPECTED_VALUES.distributionMethod);
   expect(envelope.documentMeta.envelopeExpirationPeriod).toEqual(DB_EXPECTED_VALUES.envelopeExpirationPeriod);
   expect(envelope.documentMeta.reminderSettings).toEqual(DB_EXPECTED_VALUES.reminderSettings);
+  expect(envelope.documentMeta.includeAuditLog).toBe(true);
   expect(envelope.documentMeta.redirectUrl).toBe(TEST_SETTINGS_VALUES.redirectUrl);
   expect(envelope.documentMeta.emailReplyTo).toBe(TEST_SETTINGS_VALUES.replyTo);
   expect(envelope.documentMeta.subject).toBe(TEST_SETTINGS_VALUES.subject);
