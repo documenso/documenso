@@ -36,7 +36,7 @@ export type TrpcRouteMeta = {
    * `maybeAuthenticatedProcedure`) unless the route opts in here.
    */
   allowEmbedSession?: boolean;
-} & Record<string, unknown>;
+};
 
 const t = initTRPC
   .meta<TrpcRouteMeta>()
