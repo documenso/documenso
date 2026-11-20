@@ -49,6 +49,12 @@ export const ZCreateEnvelopePayloadSchema = z.object({
       'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
     )
     .optional(),
+  targetFolderId: z
+    .string()
+    .describe(
+      'The ID of the folder where documents created from this template will be placed by default. Only applicable for template envelopes.',
+    )
+    .optional(),
   recipients: z
     .array(
       ZCreateEnvelopeRecipientSchema.extend({

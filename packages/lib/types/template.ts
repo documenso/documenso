@@ -136,6 +136,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   publicTitle: true,
   publicDescription: true,
   folderId: true,
+  targetFolderId: true,
   useLegacyFieldInsertion: true,
 }).extend({
   envelopeId: z.string(),

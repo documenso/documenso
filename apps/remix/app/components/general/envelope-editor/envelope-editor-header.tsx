@@ -223,6 +223,7 @@ export default function EnvelopeEditorHeader() {
               <TemplateUseDialog
                 envelopeId={envelope.id}
                 templateSigningOrder={envelope.documentMeta?.signingOrder}
+                targetFolderId={envelope.internalVersion === 2 ? envelope.targetFolderId : null}
                 recipients={envelope.recipients}
                 documentRootPath={relativePath.documentRootPath}
                 trigger={

@@ -25,6 +25,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -32,7 +33,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
+import { DocumentDistributionMethod, DocumentSigningOrder, FolderType } from '@prisma/client';
 import { FileTextIcon, InfoIcon, Plus, UploadCloudIcon, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -68,6 +69,7 @@ const ZAddRecipientsForNewDocumentSchema = z
     distributeDocument: z.boolean(),
     includeContents: z.boolean().default(true),
     useCustomDocument: z.boolean().default(false),
+    folderId: z.string().nullish(),
     documentNameSource: z.enum([
       DOCUMENT_NAME_SOURCE.TEMPLATE,
       DOCUMENT_NAME_SOURCE.UPLOAD,
@@ -105,6 +107,7 @@ type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDoc
 export type TemplateUseDialogProps = {
   envelopeId: string;
   templateSigningOrder?: DocumentSigningOrder | null;
+  targetFolderId?: string | null;
   recipients: TRecipientLite[];
   documentDistributionMethod?: DocumentDistributionMethod;
   documentRootPath: string;
@@ -117,6 +120,7 @@ export function TemplateUseDialog({
   documentRootPath,
   envelopeId,
   templateSigningOrder,
+  targetFolderId,
   trigger,
 }: TemplateUseDialogProps) {
   const { toast } = useToast();
@@ -141,11 +145,24 @@ export function TemplateUseDialog({
 
   const envelopeItems = response?.data ?? [];
 
+  const { data: foldersData, isLoading: isLoadingFolders } = trpc.folder.findFoldersInternal.useQuery(
+    {
+      type: FolderType.DOCUMENT,
+    },
+    {
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      enabled: open,
+    },
+  );
+
+  const documentFolders = foldersData?.data ?? [];
+
   const generateDefaultFormValues = () => {
     return {
       distributeDocument: false,
       includeContents: true,
       useCustomDocument: false,
+      folderId: targetFolderId ?? null,
       documentNameSource: DOCUMENT_NAME_SOURCE.TEMPLATE,
       customDocumentName: '',
       customDocumentData: envelopeItems.map((item) => ({
@@ -221,6 +238,7 @@ export function TemplateUseDialog({
       // items by index, which is robust against duplicate file names.
       const payload: TUseEnvelopePayload = {
         envelopeId,
+        folderId: data.folderId ?? null,
         recipients: data.recipients,
         distributeDocument: data.distributeDocument,
         includeContents: data.includeContents,
@@ -276,11 +294,17 @@ export function TemplateUseDialog({
   const canUseUploadedDocumentName = Boolean(lastUploadedFile);
 
   useEffect(() => {
-    if (open) {
+    if (!open) {
       form.reset(generateDefaultFormValues());
       setLastUploadedFile(undefined);
     }
-  }, [open, form]);
+  }, [open, form, targetFolderId]);
+
+  useEffect(() => {
+    if (foldersData && targetFolderId && !foldersData.data.some((folder) => folder.id === targetFolderId)) {
+      form.setValue('folderId', null);
+    }
+  }, [foldersData, targetFolderId, form]);
 
   useEffect(() => {
     if (envelopeItems.length > 0 && localCustomDocumentData.length === 0) {
@@ -803,6 +827,63 @@ export function TemplateUseDialog({
                     )}
                   />
                 )}
+
+                <FormField
+                  control={form.control}
+                  name="folderId"
+                  render={({ field }) => {
+                    const selectedFolderValue =
+                      field.value && (!foldersData || documentFolders.some((folder) => folder.id === field.value))
+                        ? field.value
+                        : '-1';
+
+                    return (
+                      <FormItem>
+                        <FormLabel className="flex flex-row items-center">
+                          <Trans>Target Folder</Trans>
+                          <Tooltip>
+                            <TooltipTrigger type="button">
+                              <InfoIcon className="mx-1 h-4 w-4 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent className="z-[99999] max-w-xs text-muted-foreground">
+                              <Trans>Select the folder where the created document will be placed.</Trans>
+                            </TooltipContent>
+                          </Tooltip>
+                        </FormLabel>
+
+                        <FormControl>
+                          <Select
+                            value={selectedFolderValue}
+                            disabled={field.disabled}
+                            onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
+                          >
+                            <SelectTrigger
+                              data-testid="templateUseTargetFolderSelectValue"
+                              loading={isLoadingFolders}
+                              className="bg-background"
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent className="z-[99999]">
+                              <SelectItem value="-1">
+                                <Trans>Home (No Folder)</Trans>
+                              </SelectItem>
+
+                              {documentFolders.map((folder) => (
+                                <SelectItem key={folder.id} value={folder.id}>
+                                  {folder.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
               </div>
 
               <DialogFooter className="mt-4">
