@@ -35,7 +35,7 @@ import { PublicLegalLinks } from '~/components/general/public-legal-links';
 
 import { BrandingLogo } from '../branding-logo';
 import { DocumentSigningAttachmentsPopover } from '../document-signing/document-signing-attachments-popover';
-import { EnvelopeItemSelector } from '../envelope-editor/envelope-file-selector';
+import { EnvelopeRendererFileSelector } from '../envelope-editor/envelope-file-selector';
 import EnvelopeSignerForm from '../envelope-signing/envelope-signer-form';
 import { EnvelopeSignerHeader } from '../envelope-signing/envelope-signer-header';
 import { DocumentSigningMobileWidget } from './document-signing-mobile-widget';
@@ -43,7 +43,7 @@ import { DocumentSigningRejectDialog } from './document-signing-reject-dialog';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
 
 export const DocumentSigningPageViewV2 = () => {
-  const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
+  const { envelopeItems, currentEnvelopeItem } = useCurrentEnvelopeRender();
 
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -248,24 +248,7 @@ export const DocumentSigningPageViewV2 = () => {
           <div className="flex flex-col">
             {/* Horizontal envelope item selector */}
             {envelopeItems.length > 1 && (
-              <div className="flex h-fit space-x-2 overflow-x-auto p-2 pt-4 sm:p-4">
-                {envelopeItems.map((doc, i) => (
-                  <EnvelopeItemSelector
-                    key={doc.id}
-                    number={i + 1}
-                    primaryText={doc.title}
-                    secondaryText={
-                      <Plural
-                        one="1 Field"
-                        other="# Fields"
-                        value={remainingFields.filter((field) => field.envelopeItemId === doc.id).length}
-                      />
-                    }
-                    isSelected={currentEnvelopeItem?.id === doc.id}
-                    buttonProps={{ onClick: () => setCurrentEnvelopeItem(doc.id) }}
-                  />
-                ))}
-              </div>
+              <EnvelopeRendererFileSelector fields={remainingFields} className="px-2 pt-4 pb-0 sm:px-4 sm:pb-1.5" />
             )}
 
             {/* Document View */}
