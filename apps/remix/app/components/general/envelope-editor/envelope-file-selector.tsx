@@ -1,5 +1,6 @@
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { cn } from '@documenso/ui/lib/utils';
+import { ScrollArea, ScrollBar } from '@documenso/ui/primitives/scroll-area';
 import { Plural } from '@lingui/react/macro';
 
 type EnvelopeItemSelectorProps = {
@@ -67,28 +68,34 @@ export const EnvelopeRendererFileSelector = ({
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
   return (
-    <div className={cn('scrollbar-hidden flex h-fit flex-shrink-0 space-x-2 overflow-x-auto p-4', className)}>
-      {envelopeItems.map((doc, i) => (
-        <EnvelopeItemSelector
-          key={doc.id}
-          number={i + 1}
-          primaryText={doc.title}
-          secondaryText={
-            secondaryOverride ?? (
-              <Plural
-                one="1 Field"
-                other="# Fields"
-                value={fields.filter((field) => field.envelopeItemId === doc.id).length}
-              />
-            )
-          }
-          isSelected={currentEnvelopeItem?.id === doc.id}
-          buttonProps={{
-            onClick: () => setCurrentEnvelopeItem(doc.id),
-          }}
-          actionSlot={renderItemAction?.(doc)}
-        />
-      ))}
-    </div>
+    <ScrollArea className={cn('h-fit w-full flex-shrink-0 px-4 pt-4 pb-1.5', className)}>
+      <div className="flex w-max space-x-2 pb-2.5">
+        {envelopeItems.map((doc, i) => (
+          <EnvelopeItemSelector
+            key={doc.id}
+            number={i + 1}
+            primaryText={doc.title}
+            secondaryText={
+              secondaryOverride ?? (
+                <Plural
+                  one="1 Field"
+                  other="# Fields"
+                  value={fields.filter((field) => field.envelopeItemId === doc.id).length}
+                />
+              )
+            }
+            isSelected={currentEnvelopeItem?.id === doc.id}
+            buttonProps={{
+              onClick: () => setCurrentEnvelopeItem(doc.id),
+            }}
+            actionSlot={renderItemAction?.(doc)}
+          />
+        ))}
+      </div>
+      <ScrollBar
+        orientation="horizontal"
+        className="h-2 [&>div]:bg-muted-foreground/35 hover:[&>div]:bg-muted-foreground/55"
+      />
+    </ScrollArea>
   );
 };
