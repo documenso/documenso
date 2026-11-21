@@ -2,7 +2,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppErrorCode } from '@documenso/lib/errors/app-error';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { TCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
+import type { TCheckboxFieldMeta, TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
@@ -363,6 +363,56 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     const { fields: savedFields } = await saveFields();
 
     expect(savedFields).toHaveLength(envelope.fields.length);
+  });
+
+  test('set fields validates ungrouped field meta and checks grouped checkbox rules across the group', async ({
+    request,
+  }) => {
+    const { envelope, user, team } = await apiSeedDraftDocument(request, {
+      recipients: [{ email: 'set-fields-meta@test.documenso.com', name: 'Set Fields Signer' }],
+      fieldsPerRecipient: [[SIGNATURE_FIELD]],
+    });
+
+    const saveFields = async (fields: { type: FieldType; fieldMeta: TFieldMetaSchema; groupId?: string }[]) =>
+      await setFieldsForDocument({
+        userId: user.id,
+        teamId: team.id,
+        id: { type: 'envelopeId', id: envelope.id },
+        fields: fields.map((field, index) => ({
+          ...field,
+          envelopeItemId: envelope.envelopeItems[0].id,
+          recipientId: envelope.recipients[0].id,
+          pageNumber: 1,
+          pageX: 5,
+          pageY: 10 + index * 10,
+          pageWidth: FIELD_SIZE.width,
+          pageHeight: FIELD_SIZE.height,
+        })),
+        requestMetadata: { requestMetadata: {}, source: 'app', auth: 'session' },
+      });
+
+    const groupedCheckbox = (value: string) => ({
+      type: FieldType.CHECKBOX,
+      groupId: 'grp_set_fields',
+      fieldMeta: checkboxMeta([option(1, value)], atLeastTwo),
+    });
+
+    await expect(
+      saveFields([
+        { type: FieldType.TEXT, fieldMeta: { type: 'text', text: 'Fixed', required: true, readOnly: true } },
+      ]),
+    ).rejects.toThrow(/cannot be both read-only and required/);
+
+    await expect(saveFields([{ type: FieldType.TEXT, fieldMeta: checkboxMeta([option(1, 'A1')]) }])).rejects.toThrow(
+      /does not match the field type/,
+    );
+
+    // Each grouped checkbox holds a single option, so "at least 2" can only be met across the group.
+    await expect(saveFields([groupedCheckbox('A1')])).rejects.toThrow(/at least 2 options/);
+
+    const { fields } = await saveFields([groupedCheckbox('A1'), groupedCheckbox('B1')]);
+
+    expect(fields).toHaveLength(2);
   });
 
   test('deleting a file removes a group rule which can no longer be satisfied', async ({ request }) => {

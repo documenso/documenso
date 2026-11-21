@@ -1,4 +1,3 @@
-import { validateFieldMetaConfiguration } from '@documenso/lib/advanced-fields-validation/validate-field-meta-configuration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldAndMeta } from '@documenso/lib/types/field-meta';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -17,6 +16,7 @@ import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { type BoundingBox, whiteoutRegions } from '../pdf/auto-place-fields';
+import { assertFieldMetaValid } from './validate-field-meta';
 
 type CoordinatePosition = {
   page: number;
@@ -167,14 +167,6 @@ export const createEnvelopeFields = async ({
       });
     }
 
-    const fieldMetaErrors = validateFieldMetaConfiguration(field.fieldMeta);
-
-    if (fieldMetaErrors.length > 0) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Invalid field meta for ${field.type} field: ${fieldMetaErrors.join(', ')}`,
-      });
-    }
-
     const envelopeItemId = field.envelopeItemId || firstEnvelopeItem.id;
 
     const groupId = field.groupId ?? null;
@@ -186,6 +178,10 @@ export const createEnvelopeFields = async ({
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Field groups are only supported for V2 envelopes',
       });
+    }
+
+    if (field.fieldMeta) {
+      assertFieldMetaValid({ type: field.type, fieldMeta: field.fieldMeta, groupId });
     }
 
     /*

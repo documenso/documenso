@@ -1,4 +1,3 @@
-import { validateFieldMetaConfiguration } from '@documenso/lib/advanced-fields-validation/validate-field-meta-configuration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
@@ -18,6 +17,7 @@ import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertFieldMetaValid } from './validate-field-meta';
 
 export interface UpdateEnvelopeFieldsOptions {
   userId: number;
@@ -143,11 +143,13 @@ export const updateEnvelopeFields = async ({
       });
     }
 
-    const fieldMetaErrors = validateFieldMetaConfiguration(field.fieldMeta);
-
-    if (fieldMetaErrors.length > 0) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Invalid field meta for field ${field.id}: ${fieldMetaErrors.join(', ')}`,
+    if (field.fieldMeta) {
+      assertFieldMetaValid({
+        type: fieldType,
+        fieldMeta: field.fieldMeta,
+        groupId,
+        fieldId: field.id,
+        allowTypeMismatch: envelope.internalVersion !== 2,
       });
     }
 

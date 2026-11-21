@@ -1,9 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
+import { updateEnvelopeFields as updateEnvelopeFieldsServerSide } from '@documenso/lib/server-only/field/update-envelope-fields';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType, FieldType, RecipientRole } from '@documenso/prisma/client';
+import { seedDraftDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type {
   TCreateEnvelopePayload,
@@ -241,6 +244,7 @@ test.describe('Field meta configuration validation', () => {
 
     const errorResponse = await res.json();
     expect(errorResponse.message).toContain('A field cannot be both read-only and required');
+    expect(errorResponse.message).toContain(`TEXT field ${fieldId}`);
 
     const dbField = await prisma.field.findUniqueOrThrow({
       where: { id: fieldId },
@@ -289,5 +293,66 @@ test.describe('Field meta configuration validation', () => {
     });
 
     expect(dbField.fieldMeta).toMatchObject(readOnlyMeta);
+  });
+
+  test('V1 envelopes accept field meta for another field type, V2 envelopes reject it', async () => {
+    // Both metas break the rules of their own type (read-only without a value), so a save only
+    // succeeds when meta for another field type is left unvalidated.
+    const legacyTextMeta = { type: 'text', readOnly: true } as const;
+    const legacyNumberMeta = { type: 'number', readOnly: true } as const;
+
+    const saveSignatureField = async (internalVersion: number) => {
+      const document = await seedDraftDocument(user, team.id, ['v1-compat@test.documenso.com'], { internalVersion });
+
+      const recipient = await prisma.recipient.findFirstOrThrow({
+        where: { envelopeId: document.id },
+      });
+
+      await setFieldsForDocument({
+        userId: user.id,
+        teamId: team.id,
+        id: { type: 'envelopeId', id: document.id },
+        fields: [
+          {
+            type: FieldType.SIGNATURE,
+            fieldMeta: legacyTextMeta,
+            envelopeItemId: document.envelopeItems[0].id,
+            recipientId: recipient.id,
+            pageNumber: 1,
+            pageX: 5,
+            pageY: 10,
+            pageWidth: 20,
+            pageHeight: 5,
+          },
+        ],
+        requestMetadata: { requestMetadata: {}, source: 'app', auth: 'session' },
+      });
+
+      return document;
+    };
+
+    await expect(saveSignatureField(2)).rejects.toThrow(/does not match the field type/);
+
+    const legacyDocument = await saveSignatureField(1);
+
+    const legacyField = await prisma.field.findFirstOrThrow({
+      where: { envelopeId: legacyDocument.id },
+    });
+
+    expect(legacyField).toMatchObject({ type: FieldType.SIGNATURE, fieldMeta: legacyTextMeta });
+
+    await updateEnvelopeFieldsServerSide({
+      userId: user.id,
+      teamId: team.id,
+      id: { type: 'envelopeId', id: legacyDocument.id },
+      fields: [{ id: legacyField.id, fieldMeta: legacyNumberMeta }],
+      requestMetadata: { requestMetadata: {}, source: 'app', auth: 'session' },
+    });
+
+    const updatedField = await prisma.field.findUniqueOrThrow({
+      where: { id: legacyField.id },
+    });
+
+    expect(updatedField.fieldMeta).toMatchObject(legacyNumberMeta);
   });
 });

@@ -146,11 +146,14 @@ export const setFieldsForDocument = async ({
       ? ZFieldMetaSchema.parse(field.fieldMeta)
       : FIELD_META_DEFAULT_VALUES[field.type];
 
-    assertFieldMetaValid({
-      type: field.type,
-      fieldMeta: field.fieldMeta,
-      groupId,
-    });
+    if (field.fieldMeta) {
+      assertFieldMetaValid({
+        type: field.type,
+        fieldMeta: field.fieldMeta,
+        groupId,
+        allowTypeMismatch: envelope.internalVersion !== 2,
+      });
+    }
 
     return {
       ...field,
