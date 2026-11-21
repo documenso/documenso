@@ -1,0 +1,121 @@
+diff --git a/node_modules/file-selector/dist/es2015/file-selector.js b/node_modules/file-selector/dist/es2015/file-selector.js
+index 57d9185..8e429b1 100644
+--- a/node_modules/file-selector/dist/es2015/file-selector.js
++++ b/node_modules/file-selector/dist/es2015/file-selector.js
+@@ -109,6 +109,7 @@ function flatten(items) {
+ function fromDataTransferItem(item, entry) {
+     return __awaiter(this, void 0, void 0, function* () {
+         var _a;
++        const syncFile = typeof item.getAsFile === 'function' ? item.getAsFile() : null;
+         // Check if we're in a secure context; due to a bug in Chrome (as far as we know)
+         // the browser crashes when calling this API (yet to be confirmed as a consistent behaviour).
+         //
+@@ -123,12 +124,17 @@ function fromDataTransferItem(item, entry) {
+             // It seems that the handle can be `undefined` (see https://github.com/react-dropzone/file-selector/issues/120),
+             // so we check if it isn't; if it is, the code path continues to the next API (`getAsFile`).
+             if (h !== undefined) {
+-                const file = yield h.getFile();
+-                file.handle = h;
+-                return toFileWithPath(file);
++                try {
++                    const file = syncFile !== null && syncFile !== void 0 ? syncFile : (yield h.getFile());
++                    file.handle = h;
++                    return toFileWithPath(file);
++                }
++                catch (_b) {
++                    // SecurityError in Chromium 157+ for restricted directory drops
++                }
+             }
+         }
+-        const file = item.getAsFile();
++        const file = syncFile !== null && syncFile !== void 0 ? syncFile : (typeof item.getAsFile === 'function' ? item.getAsFile() : null);
+         if (!file) {
+             throw new Error(`${item} is not a File`);
+         }
+diff --git a/node_modules/file-selector/dist/file-selector.js b/node_modules/file-selector/dist/file-selector.js
+index 1ed4150..2a2c92d 100644
+--- a/node_modules/file-selector/dist/file-selector.js
++++ b/node_modules/file-selector/dist/file-selector.js
+@@ -182,26 +182,38 @@ function flatten(items) {
+ }
+ function fromDataTransferItem(item, entry) {
+     return __awaiter(this, void 0, void 0, function () {
+-        var h, file_2, file, fwp;
++        var syncFile, h, file_2, file, fwp, _b;
+         var _a;
+-        return __generator(this, function (_b) {
+-            switch (_b.label) {
++        return __generator(this, function (_c) {
++            switch (_c.label) {
+                 case 0:
+-                    if (!(globalThis.isSecureContext && typeof item.getAsFileSystemHandle === 'function')) return [3 /*break*/, 3];
++                    syncFile = typeof item.getAsFile === 'function' ? item.getAsFile() : null;
++                    if (!(globalThis.isSecureContext && typeof item.getAsFileSystemHandle === 'function')) return [3 /*break*/, 7];
+                     return [4 /*yield*/, item.getAsFileSystemHandle()];
+                 case 1:
+-                    h = _b.sent();
++                    h = _c.sent();
+                     if (h === null) {
+                         throw new Error("".concat(item, " is not a File"));
+                     }
+-                    if (!(h !== undefined)) return [3 /*break*/, 3];
+-                    return [4 /*yield*/, h.getFile()];
++                    if (!(h !== undefined)) return [3 /*break*/, 7];
++                    _c.label = 2;
+                 case 2:
+-                    file_2 = _b.sent();
++                    _c.trys.push([2, 5, , 6]);
++                    if (!syncFile) return [3 /*break*/, 3];
++                    file_2 = syncFile;
++                    return [3 /*break*/, 4];
++                case 3:
++                    return [4 /*yield*/, h.getFile()];
++                case 4:
++                    file_2 = _c.sent();
+                     file_2.handle = h;
+                     return [2 /*return*/, (0, file_1.toFileWithPath)(file_2)];
+-                case 3:
+-                    file = item.getAsFile();
++                case 5:
++                    _b = _c.sent();
++                    return [3 /*break*/, 6];
++                case 6: return [3 /*break*/, 7];
++                case 7:
++                    file = syncFile !== null && syncFile !== void 0 ? syncFile : (typeof item.getAsFile === 'function' ? item.getAsFile() : null);
+                     if (!file) {
+                         throw new Error("".concat(item, " is not a File"));
+                     }
+diff --git a/node_modules/file-selector/src/file-selector.ts b/node_modules/file-selector/src/file-selector.ts
+index 33717d7..42b87c8 100644
+--- a/node_modules/file-selector/src/file-selector.ts
++++ b/node_modules/file-selector/src/file-selector.ts
+@@ -121,6 +121,7 @@ function flatten<T>(items: any[]): T[] {
+ }
+ 
+ async function fromDataTransferItem(item: DataTransferItem, entry?: FileSystemEntry | null) {
++    const syncFile = typeof item.getAsFile === 'function' ? item.getAsFile() : null;
+     // Check if we're in a secure context; due to a bug in Chrome (as far as we know)
+     // the browser crashes when calling this API (yet to be confirmed as a consistent behaviour).
+     //
+@@ -135,12 +136,17 @@ async function fromDataTransferItem(item: DataTransferItem, entry?: FileSystemEn
+         // It seems that the handle can be `undefined` (see https://github.com/react-dropzone/file-selector/issues/120),
+         // so we check if it isn't; if it is, the code path continues to the next API (`getAsFile`).
+         if (h !== undefined) {
+-            const file = await h.getFile();
+-            file.handle = h;
+-            return toFileWithPath(file);
++            try {
++                const file = syncFile ?? (await h.getFile());
++                file.handle = h;
++                return toFileWithPath(file);
++            } catch {
++                // In Chromium 157+, handle.getFile() throws SecurityError for files in
++                // restricted directories (e.g., Outlook drag-out attachments in %LOCALAPPDATA%).
++            }
+         }
+     }
+-    const file = item.getAsFile();
++    const file = syncFile ?? (typeof item.getAsFile === 'function' ? item.getAsFile() : null);
+     if (!file) {
+         throw new Error(`${item} is not a File`);
+     }
