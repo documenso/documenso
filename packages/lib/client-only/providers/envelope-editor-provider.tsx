@@ -806,13 +806,7 @@ const mapLocalFieldsToFields = ({
   envelope,
   localFields,
 }: MapLocalFieldsToFieldsOptions): TSetEnvelopeFieldsResponse['data'] => {
-  let smallestFieldId = localFields.reduce((min, field) => {
-    if (field.id && field.id < min) {
-      return field.id;
-    }
-
-    return min;
-  }, -1);
+  let nextFieldId = Math.min(0, ...localFields.flatMap((field) => (field.id === undefined ? [] : [field.id]))) - 1;
 
   return localFields.map((field) => {
     const foundField = envelope.fields.find((envelopeField) => envelopeField.id === field.id);
@@ -820,8 +814,8 @@ const mapLocalFieldsToFields = ({
     let fieldId = field.id;
 
     if (fieldId === undefined) {
-      fieldId = smallestFieldId;
-      smallestFieldId--;
+      fieldId = nextFieldId;
+      nextFieldId--;
     }
 
     return {
@@ -840,6 +834,8 @@ const mapLocalFieldsToFields = ({
       inserted: foundField?.inserted || false,
       customText: foundField?.customText || '',
       fieldMeta: field.fieldMeta || null,
+      groupId: field.groupId ?? null,
+      externalId: field.externalId ?? null,
     };
   });
 };

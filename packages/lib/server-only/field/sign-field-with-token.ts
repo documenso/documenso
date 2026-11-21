@@ -95,6 +95,12 @@ export const signFieldWithToken = async ({
 
   await assertSenderNotDisabled({ userId: envelope.userId });
 
+  if (envelope.internalVersion !== 1) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Envelope ${envelope.id} is not a version 1 envelope`,
+    });
+  }
+
   if (envelope.deletedAt) {
     throw new Error(`Document ${envelope.id} has been deleted`);
   }

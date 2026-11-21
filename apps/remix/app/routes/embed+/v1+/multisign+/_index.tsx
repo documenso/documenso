@@ -47,6 +47,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   // The CSC popup flow is only implemented by the v2 embed.
   const hasUnsupportedTspEnvelope = IS_INSTANCE_CSC_MODE() && envelopes.some(({ document }) => isTspEnvelope(document));
 
+  // This embed signs through the legacy field routes, which reject V2 envelopes since
+  // they write one field at a time and cannot keep a field group in sync.
+  const hasUnsupportedEnvelopeVersion = envelopes.some(({ document }) => document.internalVersion !== 1);
+
   // Check the first envelope for whitelabelling settings (assuming all docs are from same team)
   const firstDocument = envelopes[0]?.document;
 
@@ -66,6 +70,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       hidePoweredBy: false,
       allowWhitelabelling: false,
       hasUnsupportedTspEnvelope,
+      hasUnsupportedEnvelopeVersion,
     });
   }
 
@@ -103,12 +108,19 @@ export async function loader({ request }: Route.LoaderArgs) {
     hidePoweredBy,
     allowWhitelabelling,
     hasUnsupportedTspEnvelope,
+    hasUnsupportedEnvelopeVersion,
   });
 }
 
 export default function MultisignPage() {
-  const { envelopes, user, hidePoweredBy, allowWhitelabelling, hasUnsupportedTspEnvelope } =
-    useSuperLoaderData<typeof loader>();
+  const {
+    envelopes,
+    user,
+    hidePoweredBy,
+    allowWhitelabelling,
+    hasUnsupportedTspEnvelope,
+    hasUnsupportedEnvelopeVersion,
+  } = useSuperLoaderData<typeof loader>();
 
   const revalidator = useRevalidator();
 
@@ -273,6 +285,18 @@ export default function MultisignPage() {
         <Alert variant="destructive" className="w-full max-w-md">
           <AlertDescription>
             <Trans>Qualified electronic signatures are not supported in this embed.</Trans>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (hasUnsupportedEnvelopeVersion) {
+    return (
+      <div className="flex min-h-[100dvh] w-full items-center justify-center p-4">
+        <Alert variant="destructive" className="w-full max-w-md">
+          <AlertDescription>
+            <Trans>Envelopes are not supported in this embed.</Trans>
           </AlertDescription>
         </Alert>
       </div>

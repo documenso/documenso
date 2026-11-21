@@ -8,6 +8,7 @@ import { type Envelope, type EnvelopeContent, EnvelopeType, type Field, type Rec
 
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { assertContentCanBeChanged } from '../envelope-content/assert-content-can-be-changed';
+import { reconcileEnvelopeFieldGroups } from '../field/reconcile-envelope-field-groups';
 import { convertPlaceholdersToFieldInputs, extractPdfPlaceholders } from '../pdf/auto-place-fields';
 import { findRecipientByPlaceholder } from '../pdf/helpers';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
@@ -132,6 +133,9 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
 
     if (deletedFieldCount > 0) {
       didFieldsChange = true;
+
+      // Losing those fields can leave the rest of a group with a rule it can no longer satisfy.
+      await reconcileEnvelopeFieldGroups({ envelopeId: envelope.id, tx });
     }
 
     const itemContents = await tx.envelopeContent.findMany({

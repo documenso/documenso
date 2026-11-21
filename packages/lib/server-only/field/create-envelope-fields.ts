@@ -1,4 +1,3 @@
-import { validateFieldMetaConfiguration } from '@documenso/lib/advanced-fields-validation/validate-field-meta-configuration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldAndMeta } from '@documenso/lib/types/field-meta';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -11,11 +10,13 @@ import { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { assertFieldGroupAllowedForType, assertFieldGroupsValid } from '../../utils/field-groups';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { type BoundingBox, whiteoutRegions } from '../pdf/auto-place-fields';
+import { assertFieldMetaValid } from './validate-field-meta';
 
 type CoordinatePosition = {
   page: number;
@@ -47,6 +48,8 @@ export type CreateEnvelopeFieldInput = TFieldAndMeta & {
   envelopeItemId?: string;
 
   recipientId: number;
+  groupId?: string | null;
+  externalId?: string | null;
 } & FieldPosition;
 
 export interface CreateEnvelopeFieldsOptions {
@@ -164,15 +167,22 @@ export const createEnvelopeFields = async ({
       });
     }
 
-    const fieldMetaErrors = validateFieldMetaConfiguration(field.fieldMeta);
+    const envelopeItemId = field.envelopeItemId || firstEnvelopeItem.id;
 
-    if (fieldMetaErrors.length > 0) {
+    const groupId = field.groupId ?? null;
+    const externalId = field.externalId ?? null;
+
+    assertFieldGroupAllowedForType(field.type, groupId);
+
+    if (groupId && envelope.internalVersion !== 2) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Invalid field meta for ${field.type} field: ${fieldMetaErrors.join(', ')}`,
+        message: 'Field groups are only supported for V2 envelopes',
       });
     }
 
-    const envelopeItemId = field.envelopeItemId || firstEnvelopeItem.id;
+    if (field.fieldMeta) {
+      assertFieldMetaValid({ type: field.type, fieldMeta: field.fieldMeta, groupId });
+    }
 
     /*
       Resolve field position(s). Placeholder fields are resolved by searching the
@@ -235,6 +245,8 @@ export const createEnvelopeFields = async ({
           positionY: (topLeftY / page.height) * 100,
           width: widthPercent,
           height: heightPercent,
+          groupId,
+          externalId,
         };
       });
     }
@@ -250,8 +262,18 @@ export const createEnvelopeFields = async ({
       positionY: field.positionY,
       width: field.width,
       height: field.height,
+      groupId,
+      externalId,
     };
   });
+
+  const newGroupIds = new Set(validatedFields.flatMap((field) => (field.groupId ? [field.groupId] : [])));
+
+  if (newGroupIds.size > 0) {
+    const existingGroupedFields = envelope.fields.filter((field) => field.groupId && newGroupIds.has(field.groupId));
+
+    assertFieldGroupsValid([...existingGroupedFields, ...validatedFields]);
+  }
 
   const createdFields = await prisma.$transaction(async (tx) => {
     await assertEnvelopeMutable(envelope, tx);
@@ -270,6 +292,8 @@ export const createEnvelopeFields = async ({
         envelopeId: envelope.id,
         envelopeItemId: field.envelopeItemId,
         recipientId: field.recipientId,
+        groupId: field.groupId,
+        externalId: field.externalId,
       })),
     });
 

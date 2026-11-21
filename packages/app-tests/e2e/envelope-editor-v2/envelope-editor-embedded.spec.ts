@@ -2,6 +2,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
@@ -144,23 +145,21 @@ const assertDarkModeDisabled = async (surface: TEnvelopeEditorSurface) => {
 };
 
 /**
- * Open an embedded create editor with a pre-seeded user. This is needed for folderId
- * tests where the folder must exist before the hash is built.
+ * Create an API token for the user and exchange it for an embedding presign token.
  */
-const openEmbeddedCreateWithUser = async (
+const createPresignToken = async (
   page: Page,
-  user: { id: number; email: string; name: string | null },
+  user: { id: number },
   team: { id: number },
-  options: { folderId?: string; tokenNamePrefix?: string },
-): Promise<TEnvelopeEditorSurface> => {
+  options: { tokenName: string; scope?: string },
+): Promise<string> => {
   const { token } = await createApiToken({
     userId: user.id,
     teamId: team.id,
-    tokenName: `${options.tokenNamePrefix ?? 'e2e-embed-folder'}-document`,
+    tokenName: options.tokenName,
     expiresIn: null,
   });
 
-  // Exchange API token for presign token.
   const response = await page
     .context()
     .request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/v2/embedding/create-presign-token`, {
@@ -168,7 +167,7 @@ const openEmbeddedCreateWithUser = async (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      data: {},
+      data: options.scope ? { scope: options.scope } : {},
     });
 
   const data: unknown = await response.json();
@@ -182,6 +181,23 @@ const openEmbeddedCreateWithUser = async (
   if (typeof presignToken !== 'string' || presignToken.length === 0) {
     throw new Error(`Unexpected presign response: ${JSON.stringify(data)}`);
   }
+
+  return presignToken;
+};
+
+/**
+ * Open an embedded create editor with a pre-seeded user. This is needed for folderId
+ * tests where the folder must exist before the hash is built.
+ */
+const openEmbeddedCreateWithUser = async (
+  page: Page,
+  user: { id: number; email: string; name: string | null },
+  team: { id: number },
+  options: { folderId?: string; tokenNamePrefix?: string },
+): Promise<TEnvelopeEditorSurface> => {
+  const presignToken = await createPresignToken(page, user, team, {
+    tokenName: `${options.tokenNamePrefix ?? 'e2e-embed-folder'}-document`,
+  });
 
   const hash = createEmbeddedEnvelopeCreateHash({
     envelopeType: 'DOCUMENT',
@@ -400,6 +416,24 @@ test.describe('embedded create', () => {
 
     // darkModeDisabled should still be applied after reload.
     await assertDarkModeDisabled(surface);
+  });
+});
+
+test.describe('embedded edit - envelope version', () => {
+  test('does not open a V1 envelope in the V2 editor', async ({ page }) => {
+    const { user, team } = await seedUser();
+
+    const legacyDocument = await seedBlankDocument(user, team.id, { internalVersion: 1 });
+
+    const presignToken = await createPresignToken(page, user, team, {
+      tokenName: 'e2e-embed-edit-v1',
+      scope: `envelopeId:${legacyDocument.id}`,
+    });
+
+    await page.goto(`/embed/v2/authoring/envelope/edit/${legacyDocument.id}?token=${encodeURIComponent(presignToken)}`);
+
+    await expect(page).toHaveURL(/\/embed\/v2\/authoring\/error\/not-found/);
+    await expect(page.getByRole('heading', { name: 'Documents' })).not.toBeVisible();
   });
 });
 

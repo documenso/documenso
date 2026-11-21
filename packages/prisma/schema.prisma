@@ -709,6 +709,8 @@ enum FieldType {
 model Field {
   id             Int          @id @default(autoincrement())
   secondaryId    String       @unique @default(cuid())
+  externalId     String?      @db.VarChar(255)
+  groupId        String?      @db.VarChar(255)
   envelopeId     String
   envelopeItemId String
   recipientId    Int

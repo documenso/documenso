@@ -80,6 +80,12 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
     throw redirect(`/embed/v2/authoring/error/not-found`);
   }
 
+  // V1 envelopes belong to the V1 embed editor. The V2 editor offers settings, such as field
+  // groups, which the server rejects for V1 envelopes, so saving could never succeed.
+  if (envelope.internalVersion !== 2) {
+    throw redirect(`/embed/v2/authoring/error/not-found`);
+  }
+
   const organisationEmails = await prisma.organisationEmail.findMany({
     where: {
       organisationId: envelope.team.organisationId,
@@ -214,6 +220,8 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
         positionY: Number(field.positionY),
         width: Number(field.width),
         height: Number(field.height),
+        groupId: field.groupId,
+        externalId: field.externalId,
         ...({
           type: field.type,
           fieldMeta: field.fieldMeta ?? undefined,

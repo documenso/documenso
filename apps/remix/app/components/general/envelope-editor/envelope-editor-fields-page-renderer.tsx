@@ -11,7 +11,7 @@ import { DEFAULT_TRANSFORMER_SELECTION_CONFIG } from '@documenso/lib/universal/k
 import { canContentBeChanged } from '@documenso/lib/utils/envelope';
 import { resolveEnvelopeContentLimits } from '@documenso/lib/utils/envelope-content';
 import { useLingui } from '@lingui/react/macro';
-import type Konva from 'konva';
+import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { CopyPlusIcon, TrashIcon } from 'lucide-react';
 import { useEffect } from 'react';
@@ -188,6 +188,26 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
     currentStage.on('dragstart', onDragStartOrEnd);
     currentStage.on('dragend', onDragStartOrEnd);
+
+    // Hover is resolved from whatever is under the pointer on every move, rather than from
+    // per field enter and leave events, because Konva never reports the pointer leaving a
+    // field which was re-rendered underneath it.
+    currentStage.on('mousemove', (event) => {
+      const parent = event.target.getParent();
+
+      // The transformer is drawn over the selected field, so the pointer hits it instead.
+      const hoveredFieldGroup =
+        event.target.findAncestor(`.${ENVELOPE_CANVAS_GROUP_NAMES.field}`, true) ??
+        (parent instanceof Konva.Transformer && parent.nodes().length === 1 ? parent.nodes()[0] : null);
+
+      // This handler is bound once when the stage is created, which is safe here because
+      // the lookup reads the live form values rather than a render's copy of the fields.
+      const hoveredField = hoveredFieldGroup ? editorFields.getFieldByFormId(hoveredFieldGroup.id()) : undefined;
+
+      fields.setHoveredGroupedFieldFormId(hoveredField?.groupId ? hoveredField.formId : null);
+    });
+
+    currentStage.on('mouseleave', () => fields.setHoveredGroupedFieldFormId(null));
 
     currentPageLayer.batchDraw();
   };

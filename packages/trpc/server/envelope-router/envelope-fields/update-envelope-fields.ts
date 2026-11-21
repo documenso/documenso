@@ -39,6 +39,8 @@ export const updateEnvelopeFieldsRoute = authenticatedProcedure
         height: field.height,
         fieldMeta: field.fieldMeta,
         envelopeItemId: field.envelopeItemId,
+        groupId: field.groupId,
+        externalId: field.externalId,
       })),
       requestMetadata: ctx.metadata,
     });
