@@ -186,6 +186,16 @@ export const signEnvelopeFieldRoute = procedure
         }));
       });
 
+    // Signing a field of a group writes every field in the group. Only the field which was
+    // signed, and the fields whose value changes with it, are recorded in the audit log.
+    const fieldIdsToLog = fieldInsertionValues
+      .filter((insertionValues) => {
+        const previousField = groupFields.find((groupField) => groupField.id === insertionValues.fieldId);
+
+        return insertionValues.fieldId === field.id || insertionValues.customText !== previousField?.customText;
+      })
+      .map((insertionValues) => insertionValues.fieldId);
+
     const isUninserting = fieldInsertionValues.every((insertionValues) => !insertionValues.inserted);
 
     // Early return for uninserting fields.
@@ -211,9 +221,11 @@ export const signEnvelopeFieldRoute = procedure
           },
         });
 
+        const uninsertedFields = updatedFields.filter((updatedField) => fieldIdsToLog.includes(updatedField.id));
+
         if (recipient.role !== RecipientRole.ASSISTANT) {
           await tx.documentAuditLog.createMany({
-            data: updatedFields.map((uninsertedField) =>
+            data: uninsertedFields.map((uninsertedField) =>
               createDocumentAuditLogData({
                 type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
                 envelopeId: envelope.id,
@@ -316,8 +328,20 @@ export const signEnvelopeFieldRoute = procedure
         });
       }
 
+      // A field can lose its value while its group stays answered, such as a radio whose
+      // selection moved to another field of the group. It is logged as unsigned.
+      const clearedFields = updatedFields.filter((updatedField) => {
+        const previousField = groupFields.find((groupField) => groupField.id === updatedField.id);
+
+        return Boolean(previousField?.customText) && !updatedField.customText;
+      });
+
+      const insertedFields = updatedFields.filter(
+        (updatedField) => fieldIdsToLog.includes(updatedField.id) && !clearedFields.includes(updatedField),
+      );
+
       await tx.documentAuditLog.createMany({
-        data: updatedFields.map((insertedField) =>
+        data: insertedFields.map((insertedField) =>
           createDocumentAuditLogData({
             type:
               assistant && field.recipientId !== assistant.id
@@ -358,6 +382,28 @@ export const signEnvelopeFieldRoute = procedure
           }),
         ),
       });
+
+      // Clearing a field is not logged for assistants. Not sure why, just basing this off
+      // how it was previously done.
+      if (!assistant) {
+        await tx.documentAuditLog.createMany({
+          data: clearedFields.map((clearedField) =>
+            createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
+              envelopeId: envelope.id,
+              user: {
+                name: recipient.name,
+                email: recipient.email,
+              },
+              requestMetadata: metadata.requestMetadata,
+              data: {
+                field: clearedField.type,
+                fieldId: clearedField.secondaryId,
+              },
+            }),
+          ),
+        });
+      }
 
       return {
         signedFields: updatedFields,

@@ -143,6 +143,36 @@ describe('resolveEditorFieldGroupChanges', () => {
     expect(reconciledB.fieldMeta.validationRule).toBeUndefined();
   });
 
+  it('removes the validation rule only from a leaving field which cannot satisfy it on its own', () => {
+    const remaining = createLocalField({
+      formId: 'a',
+      type: FieldType.CHECKBOX,
+      groupId: 'g',
+      fieldMeta: checkboxMeta(['A1', 'A2'], atLeastTwo),
+    });
+
+    const leaving = groupedCheckbox('b', 'B');
+
+    const { reconciledFields, validationRemovedGroupIds, validationRemovedLeavingFields } =
+      resolveEditorFieldGroupChanges({
+        previousFields: [remaining, leaving],
+        nextFields: [remaining, { ...leaving, groupId: null }],
+        changedFormIds: new Set(['b']),
+      });
+
+    expect(validationRemovedGroupIds).toEqual([]);
+    expect(validationRemovedLeavingFields).toEqual([{ formId: 'b', groupId: 'g' }]);
+
+    const reconciledA = reconciledFields.find((field) => field.formId === 'a');
+    const reconciledB = reconciledFields.find((field) => field.formId === 'b');
+
+    assert(reconciledA?.fieldMeta?.type === 'checkbox');
+    expect(reconciledA.fieldMeta.validationRule).toBe('Select at least');
+
+    assert(reconciledB?.fieldMeta?.type === 'checkbox');
+    expect(reconciledB.fieldMeta.validationRule).toBeUndefined();
+  });
+
   it('keeps the validation rule on a leaving field which satisfies it on its own', () => {
     const leaving = createLocalField({
       formId: 'b',

@@ -274,6 +274,7 @@ export const getKonvaFieldBackground = async (page: Page, pageNumber: number, fi
       return {
         rectId: fieldRect._id,
         fill: fieldRect.fill(),
+        stroke: fieldRect.stroke(),
         mouseEnterListenerCount: fieldGroup.eventListeners.mouseenter?.length ?? 0,
       };
     },

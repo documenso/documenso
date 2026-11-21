@@ -15,7 +15,7 @@ Conditions for a group to be valid:
 - Not available for signature, initials or date fields.
 - Not allowing a group to span recipients or field types.
 - Not syncing visual settings across a group (font size, alignment, etc). Only validation and value settings are shared.
-- Not blocking edits that would invalidate a group. Deleting a field, removing an option or moving a field out of a group removes the group's validation rule.
+- Not blocking edits in the editor that would invalidate a group. Deleting a field, file, removing an option or moving a field out of a group removes the group's validation rule instead. Field API routes reject such edits.
 - Not locking the envelope when a file is deleted. Deleting two files at the same moment can fail one of the deletes, or leave a group with a validation rule it can no longer satisfy.
 - Not renaming a group for all its fields. Changing the Group ID on a field only moves that field.
 - Not enforcing checkbox validation rules while signing. Any options can be selected, and the rules are checked when the recipient completes the document.

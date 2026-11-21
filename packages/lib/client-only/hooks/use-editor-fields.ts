@@ -206,11 +206,12 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
         })
         .concat(newFields);
 
-      const { reconciledFields, rewrittenFormIds, validationRemovedGroupIds } = resolveEditorFieldGroupChanges({
-        previousFields,
-        nextFields,
-        changedFormIds,
-      });
+      const { reconciledFields, rewrittenFormIds, validationRemovedGroupIds, validationRemovedLeavingFields } =
+        resolveEditorFieldGroupChanges({
+          previousFields,
+          nextFields,
+          changedFormIds,
+        });
 
       if (rewrittenFormIds.length > 0) {
         setFieldMetaRewriteCounts((counts) => ({
@@ -245,6 +246,24 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
       }
 
       notifyGroupValidationRemoved(validationRemovedGroupIds);
+
+      // A field which leaves a group is validated on its own, so a rule it cannot meet alone
+      // is removed from that field only. If the group lost its rule as well, the group's
+      // message already covers it.
+      const leavingFields = validationRemovedLeavingFields.filter(
+        ({ groupId }) => !validationRemovedGroupIds.includes(groupId),
+      );
+
+      if (leavingFields.length > 0) {
+        toast({
+          title: t`Field validation removed`,
+          description:
+            leavingFields.length === 1
+              ? t`The field left group "${leavingFields[0].groupId}" and cannot satisfy its validation rule on its own, so the rule has been removed from the field.`
+              : t`${leavingFields.length} fields left their groups and cannot satisfy the validation rules on their own, so the rules have been removed from those fields.`,
+          duration: 7500,
+        });
+      }
 
       return reconciledFields;
     },

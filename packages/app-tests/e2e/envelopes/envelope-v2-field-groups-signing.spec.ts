@@ -381,6 +381,56 @@ test.describe('V2 envelope field groups during signing', () => {
     expect((await getKonvaFieldBackground(page, 1, checkboxB.id))?.rectId).toBe(otherBackground?.rectId);
   });
 
+  test.describe('with custom field CSS', () => {
+    // Custom CSS can only set field colours on an embed, but the signing page reads the
+    // field colours the same way, so the CSS is added to the page directly. The page's
+    // Content Security Policy blocks inline styles, so it is bypassed here.
+    test.use({ bypassCSP: true });
+
+    test('custom field colours switch off the hover tint', async ({ page, request }) => {
+      await page.addInitScript(() => {
+        document.addEventListener('DOMContentLoaded', () => {
+          const style = document.createElement('style');
+          style.textContent = '.field--FieldRootContainer { border: 2px solid rgb(255, 0, 0); }';
+          document.head.appendChild(style);
+        });
+      });
+
+      const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+        recipients: [{ email: 'signer-custom-colours@test.documenso.com', name: 'Custom Colours Signer' }],
+        fieldsPerRecipient: [
+          [
+            SIGNATURE_FIELD,
+            {
+              type: FieldType.CHECKBOX,
+              page: 1,
+              positionX: 5,
+              positionY: 10,
+              ...FIELD_SIZE,
+              externalId: 'checkbox',
+              fieldMeta: { type: 'checkbox', required: true, values: [option(1, 'One')] },
+            },
+          ],
+        ],
+      });
+
+      const checkbox = findFieldByExternalId(envelope.fields, 'checkbox');
+
+      const canvas = await openSigningPage(page, `/sign/${distributeResult.recipients[0].token}`);
+
+      const restingBackground = await getKonvaFieldBackground(page, 1, checkbox.id);
+
+      expect(restingBackground?.stroke).toBe('rgb(255, 0, 0)');
+
+      await hoverSigningField(canvas, checkbox);
+
+      // The tint fades in over 0.3s when it is on.
+      await page.waitForTimeout(500);
+
+      expect((await getKonvaFieldBackground(page, 1, checkbox.id))?.fill).toBe(restingBackground?.fill);
+    });
+  });
+
   test('direct template completion enforces grouped checkbox rules', async ({ page, request }) => {
     const checkboxGroupId = 'grp_direct_checkbox';
     const atLeastTwo = { validationRule: 'Select at least', validationLength: 2 };

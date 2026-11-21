@@ -261,13 +261,17 @@ type CreateFieldHoverInteractionOptions = {
  * from one of the field's shapes to another and would restart the fade each time.
  */
 export const createFieldHoverInteraction = ({ options, fieldGroup, fieldRect }: CreateFieldHoverInteractionOptions) => {
-  const { mode } = options;
+  // This runs on every render of the field, so the listeners of the last render are removed.
+  fieldGroup.off(`.${FIELD_HOVER_EVENT_NAME}`);
+
+  const { mode, fieldCanvasStyle } = options;
 
   if (mode === 'export' || !options.color) {
     return;
   }
 
-  if (options.fieldCanvasStyle?.backgroundColor) {
+  // Do not tint if custom colors are passed in.
+  if (fieldCanvasStyle?.backgroundColor || fieldCanvasStyle?.borderColor) {
     return;
   }
 
@@ -277,9 +281,6 @@ export const createFieldHoverInteraction = ({ options, fieldGroup, fieldRect }: 
     fieldGroup.setAttr(FIELD_IS_HOVERED_ATTR, isHovered);
     tweenFieldRectFill(fieldRect, isHovered ? hoverColor : DEFAULT_RECT_BACKGROUND);
   };
-
-  // This runs on every render of the field, so the listeners of the last render are removed.
-  fieldGroup.off(`.${FIELD_HOVER_EVENT_NAME}`);
 
   fieldGroup.on(`mouseenter.${FIELD_HOVER_EVENT_NAME}`, () => setIsHovered(true));
   fieldGroup.on(`mouseleave.${FIELD_HOVER_EVENT_NAME}`, () => setIsHovered(false));

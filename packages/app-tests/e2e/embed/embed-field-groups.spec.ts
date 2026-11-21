@@ -95,8 +95,9 @@ test('embed signing emits field events for every field in a group', async ({ pag
     expect(signedEvents.every((event) => event.data.value === JSON.stringify('Acme Inc'))).toBe(true);
   }).toPass();
 
-  // Clearing one field emits an unsigned event for each field.
+  // Removing the value from one field emits an unsigned event for each field.
   await clickSigningField(canvas, textB);
+  await page.getByRole('dialog').getByRole('button', { name: 'Remove' }).click();
 
   await expectFieldsInDatabase([
     { fieldId: textA.id, inserted: false },

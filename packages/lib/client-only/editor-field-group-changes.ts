@@ -35,13 +35,18 @@ export type ResolveEditorFieldGroupChangesResult = {
    * Groups which had their validation rule removed to remain valid.
    */
   validationRemovedGroupIds: string[];
+  /**
+   * Fields which left a group and had its validation rule removed, because they cannot
+   * satisfy it on their own. The group itself keeps the rule unless it is also listed above.
+   */
+  validationRemovedLeavingFields: { formId: string; groupId: string }[];
 };
 
 /**
  * Keeps every field group valid and consistent after a change in the editor.
  *
- * Returns the updated fields, plus the groups whose validation rule had to be removed so
- * the user can be told.
+ * Returns the updated fields, plus the groups and fields whose validation rule had to be
+ * removed so the user can be told.
  */
 export const resolveEditorFieldGroupChanges = ({
   previousFields,
@@ -107,7 +112,11 @@ export const resolveEditorFieldGroupChanges = ({
 
   const reconciledMetaByFormId = new Map<string, TLocalField['fieldMeta']>();
   const validationRemovedGroupIds = new Set<string>();
+  const validationRemovedLeavingFields: { formId: string; groupId: string }[] = [];
 
+  /**
+   * Returns whether the validation rule had to be removed.
+   */
   const reconcile = (groupId: string, items: TLocalField[], sourceFormId?: string) => {
     const { updates, isValidationRemoved } = reconcileFieldGroup({ groupId, items, sourceFormId });
 
@@ -115,9 +124,7 @@ export const resolveEditorFieldGroupChanges = ({
       reconciledMetaByFormId.set(item.formId, fieldMeta);
     }
 
-    if (isValidationRemoved) {
-      validationRemovedGroupIds.add(groupId);
-    }
+    return isValidationRemoved;
   };
 
   // Step 3: bring each touched group back in sync by copying settings from one field
@@ -142,7 +149,9 @@ export const resolveEditorFieldGroupChanges = ({
       sourceFormId = items.find(wasInGroup)?.formId;
     }
 
-    reconcile(groupId, items, sourceFormId);
+    if (reconcile(groupId, items, sourceFormId)) {
+      validationRemovedGroupIds.add(groupId);
+    }
   }
 
   // Step 4: check fields that just left a group on their own.
@@ -153,7 +162,9 @@ export const resolveEditorFieldGroupChanges = ({
     const previousGroupId = getPreviousGroupId(field.formId);
 
     if (changedFormIds.has(field.formId) && previousGroupId && !field.groupId) {
-      reconcile(previousGroupId, [field]);
+      if (reconcile(previousGroupId, [field])) {
+        validationRemovedLeavingFields.push({ formId: field.formId, groupId: previousGroupId });
+      }
     }
   }
 
@@ -169,5 +180,6 @@ export const resolveEditorFieldGroupChanges = ({
     reconciledFields,
     rewrittenFormIds: Array.from(reconciledMetaByFormId.keys()),
     validationRemovedGroupIds: Array.from(validationRemovedGroupIds),
+    validationRemovedLeavingFields,
   };
 };

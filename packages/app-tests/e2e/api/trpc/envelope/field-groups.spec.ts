@@ -1,6 +1,7 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppErrorCode } from '@documenso/lib/errors/app-error';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
 import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
@@ -627,6 +628,36 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     });
 
     expect(secondTickResponse.ok(), await secondTickResponse.text()).toBeTruthy();
+
+    const getLoggedFieldIds = async (type: string) => {
+      const auditLogs = await prisma.documentAuditLog.findMany({ where: { envelopeId: envelope.id, type } });
+
+      return auditLogs.map((auditLog) => (auditLog.data as { fieldId: string }).fieldId).sort();
+    };
+
+    // Each tick writes both checkbox fields, but only the ticked one changed, so each field
+    // is logged once. Both text fields are logged, since both took the value.
+    expect(await getLoggedFieldIds(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED)).toEqual(
+      [textA, textB, signatureField, checkboxA, checkboxB].map((field) => field.secondaryId).sort(),
+    );
+
+    // Unticking A clears it while B keeps the group answered. A is logged as cleared.
+    const untickResponse = await postTrpc(request, 'envelope.field.sign', {
+      token: recipientToken,
+      fieldId: checkboxA.id,
+      fieldValue: { type: FieldType.CHECKBOX, value: [] },
+    });
+
+    expect(untickResponse.ok(), await untickResponse.text()).toBeTruthy();
+    expect(await getLoggedFieldIds(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED)).toEqual([checkboxA.secondaryId]);
+
+    const retickResponse = await postTrpc(request, 'envelope.field.sign', {
+      token: recipientToken,
+      fieldId: checkboxA.id,
+      fieldValue: { type: FieldType.CHECKBOX, value: [0] },
+    });
+
+    expect(retickResponse.ok(), await retickResponse.text()).toBeTruthy();
 
     const completeResponse = await postTrpc(request, 'recipient.completeDocumentWithToken', {
       token: recipientToken,
