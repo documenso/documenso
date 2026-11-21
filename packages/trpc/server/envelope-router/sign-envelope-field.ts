@@ -144,6 +144,9 @@ export const signEnvelopeFieldRoute = procedure
           groupId: field.groupId,
           type: field.type,
         },
+        orderBy: {
+          id: 'asc',
+        },
       });
     }
 

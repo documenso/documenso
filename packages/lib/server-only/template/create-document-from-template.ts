@@ -1,10 +1,12 @@
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import type { DocumentDistributionMethod, DocumentSigningOrder, Prisma } from '@prisma/client';
 import {
   DocumentSource,
   EnvelopeType,
   type Field,
+  FieldType,
   FolderType,
   type Recipient,
   RecipientRole,
@@ -15,6 +17,7 @@ import {
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
+import { validateCheckboxLength } from '../../advanced-fields-validation/validate-checkbox';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { TEnvelopeExpirationPeriod } from '../../constants/envelope-expiration';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
@@ -726,58 +729,115 @@ export const createDocumentFromTemplate = async ({
         throw new Error('Recipient not found.');
       }
 
-      fieldsToCreate = fieldsToCreate.concat(
-        fields.map((field) => {
-          const prefillField = prefillFields?.find((value) => value.id === field.id);
+      // A radio or checkbox group acts as one field, so the prefilled fields of a group replace
+      // its selection, and the options of the group's other fields are cleared.
+      const prefilledOptionGroupIds = fields
+        .filter(
+          (field) =>
+            (field.type === FieldType.RADIO || field.type === FieldType.CHECKBOX) &&
+            prefillFields?.some((value) => value.id === field.id),
+        )
+        .map((field) => field.groupId);
 
-          const payload = {
-            envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[field.envelopeItemId],
-            envelopeId: envelope.id,
-            recipientId: recipient.id,
-            type: field.type,
-            page: field.page,
-            positionX: field.positionX,
-            positionY: field.positionY,
-            width: field.width,
-            height: field.height,
-            customText: '',
-            inserted: false,
-            fieldMeta: field.fieldMeta,
-            groupId: field.groupId,
-            externalId: field.externalId,
-          };
+      const recipientFieldsToCreate = fields.map((field) => {
+        const prefillField = prefillFields?.find((value) => value.id === field.id);
 
-          if (prefillField) {
-            match(prefillField)
-              .with({ type: 'date' }, (selector) => {
-                if (!selector.value) {
-                  throw new AppError(AppErrorCode.INVALID_BODY, {
-                    message: `Date value is required for field ${field.id}`,
-                  });
-                }
+        const payload = {
+          envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[field.envelopeItemId],
+          envelopeId: envelope.id,
+          recipientId: recipient.id,
+          type: field.type,
+          page: field.page,
+          positionX: field.positionX,
+          positionY: field.positionY,
+          width: field.width,
+          height: field.height,
+          customText: '',
+          inserted: false,
+          fieldMeta: field.fieldMeta,
+          groupId: field.groupId,
+          externalId: field.externalId,
+        };
 
-                const date = new Date(selector.value);
+        if (prefillField) {
+          match(prefillField)
+            .with({ type: 'date' }, (selector) => {
+              if (!selector.value) {
+                throw new AppError(AppErrorCode.INVALID_BODY, {
+                  message: `Date value is required for field ${field.id}`,
+                });
+              }
 
-                if (isNaN(date.getTime())) {
-                  throw new AppError(AppErrorCode.INVALID_BODY, {
-                    message: `Invalid date value for field ${field.id}: ${selector.value}`,
-                  });
-                }
+              const date = new Date(selector.value);
 
-                payload.customText = DateTime.fromJSDate(date).toFormat(
-                  documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
-                );
+              if (isNaN(date.getTime())) {
+                throw new AppError(AppErrorCode.INVALID_BODY, {
+                  message: `Invalid date value for field ${field.id}: ${selector.value}`,
+                });
+              }
 
-                payload.inserted = true;
-              })
-              .otherwise((selector) => {
-                payload.fieldMeta = getUpdatedFieldMeta(field, selector);
-              });
+              payload.customText = DateTime.fromJSDate(date).toFormat(
+                documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+              );
+
+              payload.inserted = true;
+            })
+            .otherwise((selector) => {
+              payload.fieldMeta = getUpdatedFieldMeta(field, selector);
+            });
+        }
+
+        if (!prefillField && field.groupId && prefilledOptionGroupIds.includes(field.groupId)) {
+          const fieldMeta = ZFieldMetaSchema.safeParse(field.fieldMeta).data;
+
+          if (fieldMeta?.type === 'radio' || fieldMeta?.type === 'checkbox') {
+            payload.fieldMeta = {
+              ...fieldMeta,
+              values: fieldMeta.values?.map((value) => ({ ...value, checked: false })),
+            };
+          }
+        }
+
+        return payload;
+      });
+
+      // Options which break a checkbox's rule are left out when the document is sent, so a
+      // prefill which does that is rejected rather than lost. The options are counted across
+      // the field's group.
+      if (template.internalVersion === 2) {
+        for (const [index, field] of fields.entries()) {
+          if (field.type !== FieldType.CHECKBOX || !prefillFields?.some((value) => value.id === field.id)) {
+            continue;
           }
 
-          return payload;
-        }),
-      );
+          const { validationRule, validationLength } = ZCheckboxFieldMeta.parse(
+            recipientFieldsToCreate[index].fieldMeta,
+          );
+
+          const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
+
+          const groupFieldsToCreate = field.groupId
+            ? recipientFieldsToCreate.filter((fieldToCreate) => fieldToCreate.groupId === field.groupId)
+            : [recipientFieldsToCreate[index]];
+
+          const checkedCount = groupFieldsToCreate
+            .flatMap((fieldToCreate) => ZCheckboxFieldMeta.safeParse(fieldToCreate.fieldMeta).data?.values ?? [])
+            .filter((value) => value.checked).length;
+
+          if (
+            checkedCount > 0 &&
+            validation &&
+            validationLength &&
+            !validateCheckboxLength(checkedCount, validation.value, validationLength)
+          ) {
+            throw new AppError(AppErrorCode.INVALID_BODY, {
+              message: `The prefilled options for CHECKBOX field ${field.id} do not meet its validation rule`,
+            });
+          }
+        }
+      }
+
+      fieldsToCreate = fieldsToCreate.concat(recipientFieldsToCreate);
     });
 
     assertFieldGroupsValid(fieldsToCreate);

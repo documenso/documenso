@@ -28,12 +28,23 @@ interface EnvelopeFieldToolTipProps extends VariantProps<typeof tooltipVariants>
    * inserted, which does not cover inserted fields that still need attention.
    */
   open?: boolean;
+  /**
+   * The side of the field the tooltip is shown on. Defaults to above it.
+   */
+  side?: 'top' | 'bottom';
 }
 
 /**
  * Renders a tooltip for a given field.
  */
-export function EnvelopeFieldToolTip({ children, color, className = '', field, open }: EnvelopeFieldToolTipProps) {
+export function EnvelopeFieldToolTip({
+  children,
+  color,
+  className = '',
+  field,
+  open,
+  side = 'top',
+}: EnvelopeFieldToolTipProps) {
   const coords = useFieldPageCoords(field, { relativeToPage: true });
 
   return (
@@ -51,7 +62,11 @@ export function EnvelopeFieldToolTip({ children, color, className = '', field, o
         <Tooltip delayDuration={0} open={open ?? (!field.inserted || !field.fieldMeta)}>
           <TooltipTrigger className="absolute inset-0 w-full"></TooltipTrigger>
 
-          <TooltipContent className={tooltipVariants({ color, className: cn(className, 'z-40') })} sideOffset={2}>
+          <TooltipContent
+            className={tooltipVariants({ color, className: cn(className, 'z-40') })}
+            side={side}
+            sideOffset={2}
+          >
             {children}
             <TooltipArrow />
           </TooltipContent>

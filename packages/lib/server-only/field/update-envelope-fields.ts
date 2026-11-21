@@ -322,7 +322,7 @@ export const updateEnvelopeFields = async ({
       }),
     );
 
-    const syncedSiblingUpdates = await Promise.all(
+    await Promise.all(
       Array.from(siblingUpdates.values()).map(async ({ originalField, fieldMeta }) => {
         const updatedField = await tx.field.update({
           where: {
@@ -341,7 +341,7 @@ export const updateEnvelopeFields = async ({
       }),
     );
 
-    return [...primaryUpdates, ...syncedSiblingUpdates];
+    return primaryUpdates;
   });
 
   return {

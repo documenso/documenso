@@ -244,7 +244,7 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
 
     expect(changeTypeResponse.ok()).toBeFalsy();
 
-    // Updating the rule on one field syncs it to the sibling and returns both.
+    // Updating the rule on one field syncs it to the sibling, and returns only the field sent.
     const updateResponse = await postApi(request, token, '/envelope/field/update-many', {
       envelopeId: envelope.id,
       data: [
@@ -268,12 +268,11 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
       data: Array<{ id: number; fieldMeta: Record<string, unknown> }>;
     };
 
-    expect(updatedFields.map((field) => field.id).sort()).toEqual([checkboxA.id, checkboxB.id].sort());
+    expect(updatedFields.map((field) => field.id)).toEqual([checkboxA.id]);
 
-    for (const field of updatedFields) {
-      expect(field.fieldMeta.validationLength).toBe(1);
-      expect(field.fieldMeta.required).toBe(true);
-    }
+    const syncedSibling = await prisma.field.findUniqueOrThrow({ where: { id: checkboxB.id } });
+
+    expect(syncedSibling.fieldMeta).toMatchObject({ validationLength: 1, required: true });
 
     // Deleting a field which leaves the group unable to satisfy its rule is rejected.
     const restoreRuleResponse = await postApi(request, token, '/envelope/field/update-many', {
@@ -883,6 +882,88 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     }
   });
 
+  test('prefilled radio and checkbox fields replace the selection of their group', async ({ request }) => {
+    const optionField = (
+      type: FieldType,
+      externalId: string,
+      positionY: number,
+      fieldMeta: Record<string, unknown>,
+    ) => ({
+      type,
+      page: 1,
+      positionX: 5,
+      positionY,
+      ...FIELD_SIZE,
+      groupId: `grp_prefill_${type.toLowerCase()}`,
+      externalId,
+      fieldMeta,
+    });
+
+    const { envelope, token } = await apiSeedTemplate(request, {
+      recipients: [{ email: 'template-option-prefill@test.documenso.com', name: 'Template Signer' }],
+      fieldsPerRecipient: [
+        [
+          SIGNATURE_FIELD,
+          optionField(FieldType.RADIO, 'radio-a', 10, { type: 'radio', values: [option(1, 'A1'), option(2, 'A2')] }),
+          optionField(FieldType.RADIO, 'radio-b', 20, { type: 'radio', values: [option(1, 'B1', true)] }),
+          optionField(
+            FieldType.CHECKBOX,
+            'checkbox-a',
+            30,
+            checkboxMeta([option(1, 'A1'), option(2, 'A2')], atLeastTwo),
+          ),
+          optionField(FieldType.CHECKBOX, 'checkbox-b', 40, checkboxMeta([option(1, 'B1', true)], atLeastTwo)),
+        ],
+      ],
+    });
+
+    const useTemplate = async (checkboxValue: string[]) => {
+      const formData = new FormData();
+
+      formData.append(
+        'payload',
+        JSON.stringify({
+          envelopeId: envelope.id,
+          recipients: envelope.recipients.map((recipient) => ({ id: recipient.id, email: recipient.email })),
+          distributeDocument: true,
+          prefillFields: [
+            { id: findFieldByExternalId(envelope.fields, 'radio-a').id, type: 'radio', value: 'A1' },
+            { id: findFieldByExternalId(envelope.fields, 'checkbox-a').id, type: 'checkbox', value: checkboxValue },
+          ],
+        }),
+      );
+
+      return await request.post(`${API_BASE_URL}/envelope/use`, {
+        headers: { Authorization: `Bearer ${token}` },
+        multipart: formData,
+      });
+    };
+
+    // The template pre-selects B in both groups. The prefills replace that, so only A is selected.
+    const response = await useTemplate(['A1', 'A2']);
+
+    expect(response.ok(), await response.text()).toBeTruthy();
+
+    const { id: documentEnvelopeId } = (await response.json()) as { id: string };
+
+    const documentFields = await prisma.field.findMany({
+      where: { envelopeId: documentEnvelopeId, groupId: { not: null } },
+      orderBy: { positionY: 'asc' },
+    });
+
+    expect(documentFields.map(({ inserted, customText }) => ({ inserted, customText }))).toEqual([
+      { inserted: true, customText: '0' },
+      { inserted: true, customText: '' },
+      { inserted: true, customText: '[0,1]' },
+      { inserted: true, customText: '' },
+    ]);
+
+    // One option is short of "at least 2" for the group, so the prefill is rejected.
+    const invalidResponse = await useTemplate(['A1']);
+
+    expect(invalidResponse.status(), await invalidResponse.text()).toBe(400);
+  });
+
   test('prefilled values which leave a group invalid are rejected', async ({ request }) => {
     const radioField = (externalId: string, positionY: number, values: ReturnType<typeof option>[]) => ({
       type: FieldType.RADIO,
@@ -901,12 +982,13 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
         [
           SIGNATURE_FIELD,
           radioField('radio-a', 10, [option(1, 'A1'), option(2, 'A2')]),
-          radioField('radio-b', 20, [option(1, 'B1', true)]),
+          radioField('radio-b', 20, [option(1, 'B1')]),
         ],
       ],
     });
 
     const radioA = findFieldByExternalId(envelope.fields, 'radio-a');
+    const radioB = findFieldByExternalId(envelope.fields, 'radio-b');
 
     const formData = new FormData();
 
@@ -915,8 +997,11 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
       JSON.stringify({
         envelopeId: envelope.id,
         recipients: envelope.recipients.map((recipient) => ({ id: recipient.id, email: recipient.email })),
-        // Selecting on A while B is already selected would give the group two selections.
-        prefillFields: [{ id: radioA.id, type: 'radio', value: 'A1' }],
+        // Selecting on both fields would give the group two selections.
+        prefillFields: [
+          { id: radioA.id, type: 'radio', value: 'A1' },
+          { id: radioB.id, type: 'radio', value: 'B1' },
+        ],
       }),
     );
 

@@ -757,6 +757,8 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
             field={nextPendingSigningItem.primaryField}
             color="warning"
             open={true}
+            // A grouped field shows its group bar above it, so the tooltip goes below.
+            side={nextPendingSigningItem.groupId ? 'bottom' : 'top'}
           >
             <SigningItemTooltipMessage item={nextPendingSigningItem} />
           </EnvelopeFieldToolTip>
