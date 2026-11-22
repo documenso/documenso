@@ -7,6 +7,7 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { getCompletedDocumentAttachmentFilename } from '../../../utils/completed-document-attachment';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
@@ -88,10 +89,16 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
       const file = await getFileServerSide(envelopeItem.documentData);
 
       // Use the envelope title for version 1, and the envelope item title for version 2.
-      const fileNameToUse = envelope.internalVersion === 1 ? envelope.title : envelopeItem.title + '.pdf';
+      // The web editor keeps the uploaded file name (including a trailing `.pdf`) as the
+      // item title, so only append the extension when it is missing to avoid `*.pdf.pdf`.
+      const fileNameToUse = getCompletedDocumentAttachmentFilename({
+        internalVersion: envelope.internalVersion,
+        envelopeTitle: envelope.title,
+        envelopeItemTitle: envelopeItem.title,
+      });
 
       return {
-        filename: fileNameToUse.endsWith('.pdf') ? fileNameToUse : fileNameToUse + '.pdf',
+        filename: fileNameToUse,
         content: Buffer.from(file),
         contentType: 'application/pdf',
       };
