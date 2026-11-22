@@ -11,7 +11,7 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { assertFieldGroupAllowedForType, assertFieldGroupsValid } from '../../utils/field-groups';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
-import { assertFieldMetaValid } from './validate-field-meta';
+import { assertFieldMetaProvided, assertFieldMetaValid } from './validate-field-meta';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
@@ -133,6 +133,10 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
     const parsedFieldMeta = field.fieldMeta
       ? ZFieldMetaSchema.parse(field.fieldMeta)
       : FIELD_META_DEFAULT_VALUES[field.type];
+
+    if (envelope.internalVersion === 1) {
+      assertFieldMetaProvided(field.type, field.fieldMeta);
+    }
 
     if (field.fieldMeta) {
       assertFieldMetaValid({

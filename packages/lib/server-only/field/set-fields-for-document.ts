@@ -16,7 +16,7 @@ import { assertFieldGroupAllowedForType, assertFieldGroupsValid } from '../../ut
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
-import { assertFieldMetaValid } from './validate-field-meta';
+import { assertFieldMetaProvided, assertFieldMetaValid } from './validate-field-meta';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
@@ -145,6 +145,10 @@ export const setFieldsForDocument = async ({
     const parsedFieldMeta = field.fieldMeta
       ? ZFieldMetaSchema.parse(field.fieldMeta)
       : FIELD_META_DEFAULT_VALUES[field.type];
+
+    if (envelope.internalVersion === 1) {
+      assertFieldMetaProvided(field.type, field.fieldMeta);
+    }
 
     if (field.fieldMeta) {
       assertFieldMetaValid({

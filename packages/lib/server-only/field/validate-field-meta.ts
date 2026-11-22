@@ -3,11 +3,38 @@ import { validateDropdownField } from '@documenso/lib/advanced-fields-validation
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
-import type { TFieldMetaNotOptionalSchema } from '@documenso/lib/types/field-meta';
-import type { FieldType } from '@prisma/client';
+import type { TFieldMetaNotOptionalSchema, TFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { FieldType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+
+const FIELD_META_REQUIRED_LABELS: Partial<Record<FieldType, string>> = {
+  [FieldType.CHECKBOX]: 'Checkbox',
+  [FieldType.RADIO]: 'Radio',
+  [FieldType.DROPDOWN]: 'Dropdown',
+};
+
+/**
+ * Rejects a checkbox, radio or dropdown field saved without field meta, since its options are
+ * stored there. The V1 editor's autosave can send one before its options are set, and falling
+ * back to the default meta would store an option with no label.
+ *
+ * Only used for V1 envelopes. V2 envelopes fall back to the default meta, which is what the V2
+ * editor creates for a new field anyway.
+ */
+export const assertFieldMetaProvided = (type: FieldType, fieldMeta: TFieldMetaSchema | null | undefined): void => {
+  const label = FIELD_META_REQUIRED_LABELS[type];
+
+  if (fieldMeta || !label) {
+    return;
+  }
+
+  throw new AppError(AppErrorCode.INVALID_REQUEST, {
+    message: `To proceed further, please set at least one value for the ${label} field`,
+    userMessage: `To proceed further, please set at least one value for the ${label} field`,
+  });
+};
 
 type ValidateFieldMetaOptions = {
   type: FieldType;
