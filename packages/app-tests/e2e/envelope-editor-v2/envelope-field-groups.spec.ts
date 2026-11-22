@@ -414,6 +414,9 @@ const assertSharedSettingsPersisted = async (
     expect(fieldMeta.validationRule).toBe(SHARED_SETTINGS_VALUES.validationRule);
     expect(fieldMeta.validationLength).toBe(SHARED_SETTINGS_VALUES.validationLength);
     expect(fieldMeta.required).toBe(true);
+
+    // The group's three options already satisfy the rule, so none were added to the edited field.
+    expect(fieldMeta.values).toHaveLength(1);
   }
 
   // Only the edited field carries the visual change.
@@ -466,10 +469,9 @@ const runGroupInvalidationFlow = async (surface: TEnvelopeEditorSurface): Promis
   await root.getByTestId('field-form-validationLength').click();
   await root.getByRole('option', { name: '3', exact: true }).click();
 
-  // Selecting a length adds options to the edited field to satisfy the rule on its own,
-  // so trim it back to one option to rely on the rest of the group.
-  await root.getByTestId('field-form-values-2-remove').click();
-  await root.getByTestId('field-form-values-1-remove').click();
+  // The group's three options already satisfy the rule, so the edited field gains none.
+  await expect(root.getByTestId('field-form-values-0-value')).toBeVisible();
+  await expect(root.getByTestId('field-form-values-1-value')).toHaveCount(0);
 
   // Deleting a field drops the group's options below the rule, so the rule is removed.
   await selectFieldOnCanvas(root, POSITIONS.rowThree);
@@ -481,14 +483,15 @@ const runGroupInvalidationFlow = async (surface: TEnvelopeEditorSurface): Promis
   await selectFieldOnCanvas(root, POSITIONS.rowOne);
   await expect(root.getByTestId('field-form-validationLength')).toContainText('Pick a number');
 
-  // Re-apply "at least 3". The edited field gains two options so the group has four, then
-  // removing options in the sidebar drops the group below the rule again.
+  // Re-apply "at least 3". The group has two options left, so the edited field gains only the
+  // one option it is short, then removing it in the sidebar drops the group below the rule again.
   await root.getByTestId('field-form-validationRule').click();
   await root.getByRole('option', { name: 'Select at least' }).click();
   await root.getByTestId('field-form-validationLength').click();
   await root.getByRole('option', { name: '3', exact: true }).click();
 
-  await root.getByTestId('field-form-values-2-remove').click();
+  await expect(root.getByTestId('field-form-values-1-value')).toBeVisible();
+  await expect(root.getByTestId('field-form-values-2-value')).toHaveCount(0);
   await expect(root.getByText(TEST_VALUES.validationRemovedToast)).toHaveCount(0);
 
   await root.getByTestId('field-form-values-1-remove').click();

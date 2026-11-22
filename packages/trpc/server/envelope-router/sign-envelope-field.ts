@@ -331,13 +331,20 @@ export const signEnvelopeFieldRoute = procedure
         });
       }
 
-      // A field can lose its value while its group stays answered, such as a radio whose
-      // selection moved to another field of the group. It is logged as unsigned.
-      const clearedFields = updatedFields.filter((updatedField) => {
-        const previousField = groupFields.find((groupField) => groupField.id === updatedField.id);
+      const isOptionGroup =
+        Boolean(field.groupId) && (field.type === FieldType.RADIO || field.type === FieldType.CHECKBOX);
 
-        return Boolean(previousField?.customText) && !updatedField.customText;
-      });
+      // A field of a radio or checkbox group can lose its value while its group stays answered,
+      // such as a radio whose selection moved to another field of the group. It is logged as
+      // unsigned. Any other field signed with an empty value is still inserted, so it is logged
+      // as an insertion.
+      const clearedFields = isOptionGroup
+        ? updatedFields.filter((updatedField) => {
+            const previousField = groupFields.find((groupField) => groupField.id === updatedField.id);
+
+            return Boolean(previousField?.customText) && !updatedField.customText;
+          })
+        : [];
 
       const insertedFields = updatedFields.filter(
         (updatedField) => fieldIdsToLog.includes(updatedField.id) && !clearedFields.includes(updatedField),

@@ -1,4 +1,5 @@
 import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
+import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import {
   type TCheckboxFieldMeta as CheckboxFieldMeta,
   DEFAULT_FIELD_FONT_SIZE,
@@ -75,6 +76,24 @@ export const EditorFieldCheckboxForm = ({
   },
   onValueChange,
 }: EditorFieldCheckboxFormProps) => {
+  const { editorFields } = useCurrentEnvelopeEditor();
+  const { selectedField, localFields } = editorFields;
+
+  const siblingValues = useMemo(() => {
+    if (!selectedField?.groupId) {
+      return [];
+    }
+
+    return localFields.flatMap((field) => {
+      const isSibling =
+        field.formId !== selectedField.formId &&
+        field.groupId === selectedField.groupId &&
+        field.recipientId === selectedField.recipientId;
+
+      return isSibling && field.fieldMeta?.type === 'checkbox' ? (field.fieldMeta.values ?? []) : [];
+    });
+  }, [localFields, selectedField?.formId, selectedField?.groupId, selectedField?.recipientId]);
+
   const form = useForm<TCheckboxFieldFormSchema>({
     resolver: zodResolver(ZCheckboxFieldFormSchema),
     mode: 'onChange',
@@ -135,7 +154,7 @@ export const EditorFieldCheckboxForm = ({
   }, [formValues]);
 
   const isValidationRuleMetForPreselectedValues = useMemo(() => {
-    const preselectedValues = (formValues.values || [])?.filter((value) => value.checked);
+    const preselectedValues = [...(formValues.values || []), ...siblingValues].filter((value) => value?.checked);
 
     if (formValues.validationLength && formValues.validationRule && preselectedValues.length > 0) {
       const validationRule = checkboxValidationSigns.find((sign) => sign.label === formValues.validationRule);
@@ -148,7 +167,7 @@ export const EditorFieldCheckboxForm = ({
     }
 
     return true;
-  }, [formValues]);
+  }, [formValues, siblingValues]);
 
   return (
     <Form {...form}>
@@ -233,7 +252,8 @@ export const EditorFieldCheckboxForm = ({
 
                           const currentValues = formValues.values || [];
 
-                          const minimumNumberOfValuesRequired = validationNumber - currentValues.length;
+                          const minimumNumberOfValuesRequired =
+                            validationNumber - currentValues.length - siblingValues.length;
 
                           if (!formValues.validationRule) {
                             form.setValue('validationRule', checkboxValidationRules[0]);

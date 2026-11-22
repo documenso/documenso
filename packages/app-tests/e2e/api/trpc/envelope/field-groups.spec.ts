@@ -716,6 +716,59 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     expect(completeResponse.ok(), await completeResponse.text()).toBeTruthy();
   });
 
+  test('signing an optional field with an empty value is logged as an insertion', async ({ request }) => {
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+      recipients: [{ email: 'empty-value-sign@test.documenso.com', name: 'Empty Value Signer' }],
+      fieldsPerRecipient: [
+        [
+          SIGNATURE_FIELD,
+          {
+            type: FieldType.TEXT,
+            page: 1,
+            positionX: 5,
+            positionY: 10,
+            ...FIELD_SIZE,
+            externalId: 'optional-text',
+            fieldMeta: { type: 'text', required: false },
+          },
+        ],
+      ],
+    });
+
+    const { token: recipientToken } = distributeResult.recipients[0];
+    const textField = findFieldByExternalId(envelope.fields, 'optional-text');
+
+    for (const value of ['Acme Inc', '']) {
+      const response = await postTrpc(request, 'envelope.field.sign', {
+        token: recipientToken,
+        fieldId: textField.id,
+        fieldValue: { type: FieldType.TEXT, value },
+      });
+
+      expect(response.ok(), await response.text()).toBeTruthy();
+    }
+
+    const storedField = await prisma.field.findUniqueOrThrow({ where: { id: textField.id } });
+
+    expect(storedField.inserted).toBe(true);
+    expect(storedField.customText).toBe('');
+
+    const auditLogs = await prisma.documentAuditLog.findMany({
+      where: {
+        envelopeId: envelope.id,
+        type: {
+          in: [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED, DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED],
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    expect(auditLogs.map((auditLog) => auditLog.type)).toEqual([
+      DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+      DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+    ]);
+  });
+
   test('a qualified signature envelope cannot be completed with a broken checkbox rule', async ({ request }) => {
     const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
       recipients: [{ email: 'group-tsp@test.documenso.com', name: 'Group TSP Signer' }],
