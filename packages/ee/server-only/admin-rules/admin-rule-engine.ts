@@ -12,6 +12,7 @@ import { ZClaimFlagsSchema } from '@documenso/lib/types/subscription';
 import type { ApiRequestMetadata, RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { evaluateAdminRuleWithLoaders } from '@documenso/lib/utils/admin-rules';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { logger } from '@documenso/lib/utils/logger';
 import { prisma } from '@documenso/prisma';
 import type { AdminRule } from '@prisma/client';
@@ -310,6 +311,21 @@ export class AdminRuleEngine {
       })
       .with('disable_user', async () => {
         const userId = getSubjectUserId(subject);
+
+        const user = await prisma.user.findFirst({
+          where: {
+            id: userId,
+          },
+          select: {
+            roles: true,
+          },
+        });
+
+        // A disabled admin can't open the rules UI, so a rule that is too broad would lock the
+        // admins out of turning it off.
+        if (user && isAdmin(user)) {
+          throw new Error('Admin accounts cannot be disabled by a rule');
+        }
 
         await disableUser({ id: userId });
       })

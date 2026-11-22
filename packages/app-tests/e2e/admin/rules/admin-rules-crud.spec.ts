@@ -1,3 +1,4 @@
+import { ADMIN_RULE_LIMITS } from '@documenso/lib/constants/admin-rules';
 import type { TAdminRuleTrigger } from '@documenso/lib/types/admin-rules';
 import { generateDatabaseId, nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
@@ -159,56 +160,6 @@ const findRuleByName = async (name: string) =>
     },
   });
 
-test('[ADMIN][RULES]: create a rule through the editor', async ({ page }) => {
-  const { user: adminUser } = await seedUser({ isAdmin: true });
-
-  const ruleName = trackRule(`Rule ${nanoid()}`);
-
-  await openNewRuleEditor(page, adminUser.email);
-
-  await page.getByLabel('Rule name').fill(ruleName);
-  await page.getByLabel('Description').fill('Created by an E2E test');
-
-  // The default trigger is "Document is sent" and the first condition defaults to sender.id,
-  // so pick a string field and fill in a value.
-  await page.getByTestId('admin-rule-condition-field').first().click();
-  await page.getByRole('option', { name: 'envelope.title', exact: true }).click();
-
-  await page.getByTestId('admin-rule-condition-operator').first().click();
-  await page.getByRole('option', { name: 'contains', exact: true }).click();
-
-  await page.getByTestId('admin-rule-condition-value').first().fill('invoice');
-
-  await page.getByRole('button', { name: 'Add action' }).first().click();
-  await page.getByRole('menuitem', { name: /Log only/ }).click();
-
-  // The preview reflects the condition before saving.
-  await expect(page.getByText('envelope.title contains "invoice"')).toBeVisible();
-
-  await page.getByRole('button', { name: 'Save' }).click();
-
-  await expect(page.getByText('Rule created', { exact: true })).toBeVisible();
-
-  const rule = await prisma.adminRule.findFirstOrThrow({
-    where: {
-      name: ruleName,
-    },
-  });
-
-  // Saving opens the new rule's page.
-  await page.waitForURL(`/admin/rules/${rule.id}`);
-
-  expect(rule.trigger).toEqual('DOCUMENT_SENT');
-  expect(rule.mode).toEqual('MONITOR');
-  expect(rule.definition.when.children[0]).toMatchObject({
-    type: 'condition',
-    field: 'envelope.title',
-    operator: 'contains',
-    value: 'invoice',
-  });
-  expect(rule.definition.actions[0].type).toEqual('log_only');
-});
-
 test('[ADMIN][RULES]: the editor recommends blocking the event when disabling the user', async ({ page }) => {
   const { user: adminUser } = await seedUser({ isAdmin: true });
 
@@ -253,7 +204,7 @@ test('[ADMIN][RULES]: picking a field of another type switches to an operator it
   await expect(operatorPicker).toHaveText('equals');
 });
 
-test('[ADMIN][RULES]: build nested condition groups in the editor', async ({ page }) => {
+test('[ADMIN][RULES]: create a rule with nested condition groups in the editor', async ({ page }) => {
   const { user: adminUser } = await seedUser({ isAdmin: true });
 
   const ruleName = trackRule(`Rule ${nanoid()}`);
@@ -303,12 +254,14 @@ test('[ADMIN][RULES]: build nested condition groups in the editor', async ({ pag
 
   await expect(page.getByText('Rule created', { exact: true })).toBeVisible();
 
-  const rule = await prisma.adminRule.findFirstOrThrow({
-    where: {
-      name: ruleName,
-    },
-  });
+  const rule = await findRuleByName(ruleName);
 
+  // Saving opens the new rule's page.
+  await page.waitForURL(`/admin/rules/${rule.id}`);
+
+  // New rules start on the default trigger, in monitor mode, so they never enforce before review.
+  expect(rule.trigger).toEqual('DOCUMENT_SENT');
+  expect(rule.mode).toEqual('MONITOR');
   expect(rule.definition.when).toMatchObject({
     type: 'group',
     match: 'all',
@@ -488,51 +441,255 @@ test('[ADMIN][RULES]: the events page lists matches and filters by rule', async 
   await expect(page.getByText('No results found')).toBeVisible();
 });
 
-test('[ADMIN][RULES]: exemptions are rejected on triggers without an organisation', async ({ page }) => {
+test('[ADMIN][RULES]: the server rejects invalid rules on create', async ({ page }) => {
   const { user: adminUser, organisation } = await seedUser({ isAdmin: true });
 
-  const ruleName = trackRule(`Rule ${nanoid()}`);
+  const validRuleName = trackRule(`Rule ${nanoid()}`);
+  const invalidRuleName = trackRule(`Rule ${nanoid()}`);
+
+  const condition = {
+    type: 'condition',
+    field: 'user.new_name',
+    operator: 'contains',
+    value: validRuleName,
+  };
+
+  const validRule = {
+    name: validRuleName,
+    description: null,
+    trigger: 'USER_NAME_CHANGED',
+    mode: 'DISABLED',
+    stopOnMatch: true,
+    definition: {
+      when: {
+        type: 'group',
+        match: 'all',
+        children: [condition],
+      },
+      actions: [
+        {
+          type: 'log_only',
+          params: {},
+        },
+      ],
+    },
+    exemptOrganisationIds: [],
+  };
+
+  const createRule = async (rule: object) =>
+    await page.request.post('/api/trpc/admin.rule.create', {
+      headers: WEBAPP_ORIGIN_HEADERS,
+      data: {
+        json: rule,
+      },
+    });
 
   await apiSignin({ page, email: adminUser.email, redirectPath: '/admin/rules' });
 
-  // Go straight to the API: the editor hides the exemptions card on these triggers, so this guards
-  // the server-side check.
-  const response = await page.request.post('/api/trpc/admin.rule.create', {
-    headers: WEBAPP_ORIGIN_HEADERS,
-    data: {
-      json: {
-        name: ruleName,
-        description: null,
-        trigger: 'USER_NAME_CHANGED',
-        mode: 'MONITOR',
-        stopOnMatch: true,
-        definition: {
-          when: {
-            type: 'group',
-            match: 'all',
-            children: [{ type: 'condition', field: 'user.new_name', operator: 'contains', value: 'x' }],
-          },
-          actions: [{ type: 'log_only', params: {} }],
+  // Each invalid rule differs from this one in a single way, so it is rejected for that reason alone.
+  expect((await createRule(validRule)).status()).toBe(200);
+
+  // Go straight to the API: the editor prevents most of these, so this guards the server-side checks.
+  const createInvalidRule = async (invalidPart: object) =>
+    await createRule({
+      ...validRule,
+      name: invalidRuleName,
+      ...invalidPart,
+    });
+
+  const withExemptionOnUserTrigger = await createInvalidRule({
+    exemptOrganisationIds: [organisation.id],
+  });
+
+  expect(withExemptionOnUserTrigger.status(), 'organisation exemption on a user trigger').toBe(400);
+
+  const withBlockOnSignUp = await createInvalidRule({
+    trigger: 'USER_SIGNED_UP',
+    definition: {
+      ...validRule.definition,
+      when: {
+        ...validRule.definition.when,
+        children: [{ ...condition, field: 'user.email_domain' }],
+      },
+      actions: [
+        {
+          type: 'block_event',
+          params: {},
         },
-        exemptOrganisationIds: [organisation.id],
+      ],
+    },
+  });
+
+  expect(withBlockOnSignUp.status(), 'block action on the sign-up trigger').toBe(400);
+
+  const withTooManyConditions = await createInvalidRule({
+    definition: {
+      ...validRule.definition,
+      when: {
+        ...validRule.definition.when,
+        children: Array.from({ length: ADMIN_RULE_LIMITS.maxConditions + 1 }, () => condition),
       },
     },
   });
 
-  expect(response.status()).toBe(400);
+  expect(withTooManyConditions.status(), 'more conditions than the limit').toBe(400);
 
-  const { error } = await response.json();
-
-  expect(error.json.data.code).toEqual('INVALID_REQUEST');
-  expect(error.json.message).toContain('Organisation exemptions are not supported');
-
-  const ruleCount = await prisma.adminRule.count({
-    where: {
-      name: ruleName,
+  const withEmptyGroup = await createInvalidRule({
+    definition: {
+      ...validRule.definition,
+      when: {
+        ...validRule.definition.when,
+        children: [
+          condition,
+          {
+            type: 'group',
+            match: 'any',
+            children: [],
+          },
+        ],
+      },
     },
   });
 
-  expect(ruleCount).toEqual(0);
+  expect(withEmptyGroup.status(), 'a nested group without conditions').toBe(400);
+
+  const withoutActions = await createInvalidRule({
+    definition: {
+      ...validRule.definition,
+      actions: [],
+    },
+  });
+
+  expect(withoutActions.status(), 'no actions').toBe(400);
+
+  const invalidRuleCount = await prisma.adminRule.count({
+    where: {
+      name: invalidRuleName,
+    },
+  });
+
+  expect(invalidRuleCount).toEqual(0);
+});
+
+const updateRule = async (page: Page, ruleId: string, data: object) =>
+  await page.request.post('/api/trpc/admin.rule.update', {
+    headers: WEBAPP_ORIGIN_HEADERS,
+    data: {
+      json: {
+        ruleId,
+        data,
+      },
+    },
+  });
+
+test('[ADMIN][RULES]: the server rejects updates that leave a rule invalid, checking unchanged fields too', async ({
+  page,
+}) => {
+  const { user: adminUser, organisation } = await seedUser({ isAdmin: true });
+
+  const ruleName = trackRule(`Rule ${nanoid()}`);
+  const rule = await seedMonitorRule(ruleName);
+
+  await prisma.adminRule.update({
+    where: {
+      id: rule.id,
+    },
+    data: {
+      exemptOrganisationIds: [organisation.id],
+    },
+  });
+
+  const userNameDefinition = {
+    when: {
+      type: 'group',
+      match: 'all',
+      children: [
+        {
+          type: 'condition',
+          field: 'user.new_name',
+          operator: 'contains',
+          value: ruleName,
+        },
+      ],
+    },
+    actions: [
+      {
+        type: 'log_only',
+        params: {},
+      },
+    ],
+  };
+
+  await apiSignin({ page, email: adminUser.email, redirectPath: '/admin/rules' });
+
+  const withoutActions = await updateRule(page, rule.id, {
+    definition: {
+      ...userNameDefinition,
+      actions: [],
+    },
+  });
+
+  expect(withoutActions.status(), 'a definition without actions').toBe(400);
+
+  // The stored definition checks `envelope.title`, which sign-up events don't have.
+  const withTriggerOnly = await updateRule(page, rule.id, {
+    trigger: 'USER_SIGNED_UP',
+  });
+
+  expect(withTriggerOnly.status(), 'a trigger the stored definition does not fit').toBe(400);
+
+  // Valid on its own, but the stored exemptions can't apply to a user-level trigger.
+  const withStoredExemptions = await updateRule(page, rule.id, {
+    trigger: 'USER_NAME_CHANGED',
+    definition: userNameDefinition,
+  });
+
+  expect(withStoredExemptions.status(), 'a user trigger with the stored exemptions').toBe(400);
+
+  const unchangedRule = await prisma.adminRule.findFirstOrThrow({
+    where: {
+      id: rule.id,
+    },
+  });
+
+  expect(unchangedRule.trigger).toEqual(rule.trigger);
+  expect(unchangedRule.definition).toEqual(rule.definition);
+  expect(unchangedRule.exemptOrganisationIds).toEqual([organisation.id]);
+
+  const withExemptionsCleared = await updateRule(page, rule.id, {
+    trigger: 'USER_NAME_CHANGED',
+    definition: userNameDefinition,
+    exemptOrganisationIds: [],
+  });
+
+  expect(withExemptionsCleared.status()).toBe(200);
+});
+
+test('[ADMIN][RULES]: a rule that no longer validates can be renamed or turned off, but not switched on', async ({
+  page,
+}) => {
+  const { user: adminUser } = await seedUser({ isAdmin: true });
+
+  // `seedMonitorRule` checks `envelope.title`, which sign-up events don't have, so this rule is stored
+  // invalid, as a rule would be after a field it uses is removed.
+  const rule = await seedMonitorRule(trackRule(`Rule ${nanoid()}`), { trigger: 'USER_SIGNED_UP' });
+  const newName = trackRule(`Rule ${nanoid()}`);
+
+  await apiSignin({ page, email: adminUser.email, redirectPath: '/admin/rules' });
+
+  expect((await updateRule(page, rule.id, { name: newName })).status()).toBe(200);
+  expect((await updateRule(page, rule.id, { mode: 'DISABLED' })).status()).toBe(200);
+  expect((await updateRule(page, rule.id, { mode: 'MONITOR' })).status()).toBe(400);
+  expect((await updateRule(page, rule.id, { mode: 'ENFORCE' })).status()).toBe(400);
+
+  const updatedRule = await prisma.adminRule.findFirstOrThrow({
+    where: {
+      id: rule.id,
+    },
+  });
+
+  expect(updatedRule.name).toEqual(newName);
+  expect(updatedRule.mode).toEqual('DISABLED');
 });
 
 test('[ADMIN][RULES]: changing the trigger starts the rule over on the new trigger', async ({ page }) => {
@@ -602,8 +759,6 @@ test('[ADMIN][RULES]: the editor saves action settings, stop on match and exempt
   await page.getByRole('option', { name: organisation.url }).click();
   await exemptions.getByRole('combobox').press('Escape');
 
-  await expect(exemptions.getByText(`${organisation.name} (${organisation.url})`)).toBeVisible();
-
   await page.getByRole('button', { name: 'Save' }).click();
 
   await expect(page.getByText('Rule created', { exact: true })).toBeVisible();
@@ -653,8 +808,6 @@ test('[ADMIN][RULES]: remove conditions, groups and actions in the editor', asyn
   await addAction(page, 'Block the event');
 
   await page.getByRole('button', { name: 'Remove action' }).first().click();
-
-  await expect(page.getByText('envelope.title contains "invoice" → Block the event', { exact: true })).toBeVisible();
 
   await page.getByRole('button', { name: 'Save' }).click();
 

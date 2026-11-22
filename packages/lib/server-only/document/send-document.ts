@@ -147,10 +147,12 @@ export const sendDocument = async ({
         select: {
           id: true,
           url: true,
+          name: true,
           organisation: {
             select: {
               id: true,
               type: true,
+              name: true,
               organisationClaim: {
                 select: {
                   recipientCount: true,
@@ -273,7 +275,7 @@ export const sendDocument = async ({
   if (!bypassAdminRules) {
     await assertAdminRulesAllowSend({ envelope, sender, recipientsToNotify, requestMetadata });
   }
-  
+
   // The items are only pointed at the rendered copies inside the transaction
   // that moves the envelope on from DRAFT, so a failure anywhere before that
   // leaves every item on its original file rather than some on a rendered one

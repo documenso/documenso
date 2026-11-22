@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { OrganisationGroupType, OrganisationMemberRole, Prisma, TeamMemberRole } from '@prisma/client';
@@ -6,6 +7,7 @@ import { match } from 'ts-pattern';
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { LOWEST_ORGANISATION_ROLE, ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/organisations';
 import { TEAM_INTERNAL_GROUPS } from '../../constants/teams';
+import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { generateDatabaseId } from '../../universal/id';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { generateDefaultTeamSettings } from '../../utils/teams';
@@ -45,9 +47,25 @@ export type CreateTeamOptions = {
     id: string;
     role: TeamMemberRole;
   }[];
+
+  /**
+   * Skips the admin rules, for teams the system names itself, as the personal team created at
+   * sign-up is.
+   */
+  bypassAdminRules?: boolean;
+
+  requestMetadata?: ApiRequestMetadata;
 };
 
-export const createTeam = async ({ userId, teamName, teamUrl, organisationId, inheritMembers }: CreateTeamOptions) => {
+export const createTeam = async ({
+  userId,
+  teamName,
+  teamUrl,
+  organisationId,
+  inheritMembers,
+  bypassAdminRules,
+  requestMetadata,
+}: CreateTeamOptions) => {
   const organisation = await prisma.organisation.findFirst({
     where: buildOrganisationWhereQuery({
       organisationId,
@@ -120,6 +138,51 @@ export const createTeam = async ({ userId, teamName, teamUrl, organisationId, in
         }))
         .exhaustive(),
     );
+
+  // Checked up front so admin rules never run for a team the unique constraint would reject.
+  const existingTeamWithUrl = await prisma.team.findFirst({
+    where: {
+      url: teamUrl,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (existingTeamWithUrl) {
+    throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+      message: 'Team URL already exists',
+    });
+  }
+
+  if (!bypassAdminRules) {
+    const user = await prisma.user.findFirstOrThrow({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        twoFactorEnabled: true,
+      },
+    });
+
+    const adminRuleEngine = new AdminRuleEngine({
+      requestMetadata: requestMetadata?.requestMetadata,
+      requestSource: requestMetadata?.source,
+    });
+
+    await adminRuleEngine.runAndAssert({
+      trigger: 'TEAM_NAME_CHANGED',
+      user,
+      organisation,
+      team: null,
+      newName: teamName,
+      newUrl: teamUrl,
+    });
+  }
 
   await prisma
     .$transaction(

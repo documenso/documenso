@@ -20,6 +20,8 @@ export const ADMIN_RULE_TRIGGER_MAP: Record<TAdminRuleTrigger, MessageDescriptor
   USER_SIGNED_UP: msg`User signs up`,
   DOCUMENT_SENT: msg`Document is sent`,
   EMAIL_SENT: msg`Email is sent`,
+  TEAM_NAME_CHANGED: msg`Team is created or renamed`,
+  ORGANISATION_NAME_CHANGED: msg`Organisation is created or renamed`,
 };
 
 export const ADMIN_RULE_TRIGGER_DESCRIPTION_MAP: Record<TAdminRuleTrigger, MessageDescriptor> = {
@@ -27,6 +29,8 @@ export const ADMIN_RULE_TRIGGER_DESCRIPTION_MAP: Record<TAdminRuleTrigger, Messa
   USER_SIGNED_UP: msg`Runs after a new account is created through email, OAuth or SSO sign-up.`,
   DOCUMENT_SENT: msg`Runs before a document is distributed to its recipients.`,
   EMAIL_SENT: msg`Runs before a signing request, reminder, completion or rejection email is sent.`,
+  TEAM_NAME_CHANGED: msg`Runs before a team is created or its name is changed.`,
+  ORGANISATION_NAME_CHANGED: msg`Runs before an organisation is created or its name is changed.`,
 };
 
 export const ADMIN_RULE_MODE_MAP: Record<TAdminRuleMode, MessageDescriptor> = {

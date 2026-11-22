@@ -149,11 +149,13 @@ export const createDocumentFromDirectTemplate = async ({
         select: {
           id: true,
           url: true,
+          name: true,
           organisationId: true,
           organisation: {
             select: {
               id: true,
               type: true,
+              name: true,
               organisationClaim: {
                 select: {
                   recipientCount: true,
@@ -469,8 +471,6 @@ export const createDocumentFromDirectTemplate = async ({
   });
 
   const incrementedDocumentId = await incrementDocumentId();
-
-  const envelopeId = prefixedId('envelope');
 
   const contentsToCreate = buildEnvelopeContentCopyData({
     contents: directTemplateEnvelope.contents,

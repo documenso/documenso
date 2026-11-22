@@ -2,7 +2,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { generateDatabaseId, nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
-import { expect, type Page, test } from '@playwright/test';
+import { type APIResponse, expect, type Page, test } from '@playwright/test';
 
 import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../../../fixtures/authentication';
 
@@ -89,6 +89,14 @@ const reorderRules = async (page: Page, ruleIds: string[]) =>
     data: JSON.stringify({ json: { ruleIds } }),
   });
 
+const expectInvalidRequest = async (res: APIResponse) => {
+  expect(res.status()).toBe(400);
+
+  const { error } = await res.json();
+
+  expect(error.json.data.code).toEqual('INVALID_REQUEST');
+};
+
 test('[ADMIN][TRPC][REORDER_RULES]: rules are saved in the order given', async ({ page }) => {
   const { user: adminUser } = await seedUser({ isAdmin: true });
 
@@ -117,30 +125,7 @@ test('[ADMIN][TRPC][REORDER_RULES]: rules are saved in the order given', async (
   }
 });
 
-test('[ADMIN][TRPC][REORDER_RULES]: an unknown rule id is rejected with 400', async ({ page }) => {
-  const { user: adminUser } = await seedUser({ isAdmin: true });
-
-  const rule = await seedDisabledRule();
-
-  try {
-    // Every rule but one, which is swapped for an id that doesn't exist, so only the id is wrong.
-    const ruleIds = (await findAllRuleIds()).map((id) => (id === rule.id ? generateDatabaseId('admin_rule') : id));
-
-    await apiSignin({ page, email: adminUser.email });
-
-    const res = await reorderRules(page, ruleIds);
-
-    expect(res.status()).toBe(400);
-
-    const { error } = await res.json();
-
-    expect(error.json.data.code).toEqual('INVALID_REQUEST');
-  } finally {
-    await deleteRules([rule.id]);
-  }
-});
-
-test('[ADMIN][TRPC][REORDER_RULES]: a list that leaves out or repeats a rule is rejected with 400', async ({
+test('[ADMIN][TRPC][REORDER_RULES]: a list that is not exactly every rule once is rejected with 400', async ({
   page,
 }) => {
   const { user: adminUser } = await seedUser({ isAdmin: true });
@@ -153,20 +138,19 @@ test('[ADMIN][TRPC][REORDER_RULES]: a list that leaves out or repeats a rule is 
 
     const withoutFirstRule = ruleIds.filter((id) => id !== firstRule.id);
 
-    // The same length as the full list, with the first rule in place of the second.
+    // The same length as the full list, so only the ids are wrong.
     const withFirstRuleTwice = ruleIds.map((id) => (id === secondRule.id ? firstRule.id : id));
+    const withUnknownRule = ruleIds.map((id) => (id === secondRule.id ? generateDatabaseId('admin_rule') : id));
 
     await apiSignin({ page, email: adminUser.email });
 
-    for (const invalidRuleIds of [withoutFirstRule, withFirstRuleTwice]) {
-      const res = await reorderRules(page, invalidRuleIds);
+    await expectInvalidRequest(await reorderRules(page, withoutFirstRule));
+    await expectInvalidRequest(await reorderRules(page, withFirstRuleTwice));
+    await expectInvalidRequest(await reorderRules(page, withUnknownRule));
 
-      expect(res.status()).toBe(400);
+    const ruleIdsAfter = await findAllRuleIds();
 
-      const { error } = await res.json();
-
-      expect(error.json.data.code).toEqual('INVALID_REQUEST');
-    }
+    expect(ruleIdsAfter.indexOf(firstRule.id)).toBeLessThan(ruleIdsAfter.indexOf(secondRule.id));
   } finally {
     await deleteRules([firstRule.id, secondRule.id]);
   }

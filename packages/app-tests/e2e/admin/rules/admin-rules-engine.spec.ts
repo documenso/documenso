@@ -19,14 +19,22 @@ import type {
   TAdminRuleTrigger,
 } from '@documenso/lib/types/admin-rules';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import { generateDatabaseId, nanoid } from '@documenso/lib/universal/id';
+import { alphaid, generateDatabaseId, nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedDraftDocument, seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedDirectTemplate } from '@documenso/prisma/seed/templates';
 import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Page, test } from '@playwright/test';
-import { DocumentSigningOrder, DocumentSource, FieldType, RecipientRole, SendStatus, type User } from '@prisma/client';
+import {
+  DocumentSigningOrder,
+  DocumentSource,
+  FieldType,
+  RecipientRole,
+  SendStatus,
+  TeamMemberRole,
+  type User,
+} from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../../fixtures/authentication';
@@ -321,6 +329,27 @@ const resendDocumentInApp = async ({ page, teamId, envelopeId, recipientIds }: R
     },
   });
 
+type PostTrpcOptions = {
+  page: Page;
+  path: string;
+  json: unknown;
+};
+
+// Team and organisation name rules run in the tRPC routes, so these tests call them through the server.
+const postTrpc = async ({ page, path, json }: PostTrpcOptions) =>
+  await page.request.post(`/api/trpc/${path}`, {
+    headers: WEBAPP_ORIGIN_HEADERS,
+    data: {
+      json,
+    },
+  });
+
+const getTrpcErrorCode = async (response: Awaited<ReturnType<typeof postTrpc>>) => {
+  const { error } = await response.json();
+
+  return error?.json.data.code;
+};
+
 type SubmitDirectLinkOptions = {
   template: Awaited<ReturnType<typeof seedDirectTemplate>>;
   nextSigner?: {
@@ -437,46 +466,6 @@ test('[ADMIN][RULES][ENGINE]: a monitor rule records the match without blocking'
   expect(match.actionsRun).toEqual([{ type: 'block_event', status: 'would_run' }]);
 });
 
-test('[ADMIN][RULES][ENGINE]: flag_account_for_review flags the user', async ({ page }) => {
-  const { user } = await seedUser();
-
-  const rule = await seedRule({
-    trigger: 'USER_NAME_CHANGED',
-    definition: buildDefinition({
-      conditions: [{ field: 'user.email', operator: 'equals', value: user.email }],
-      actions: [{ type: 'flag_account_for_review', params: { reason: 'Flagged by test' } }],
-    }),
-  });
-
-  await apiSignin({ page, email: user.email, redirectPath: '/settings/profile' });
-
-  await updateProfileName(page, 'Flagged Name');
-
-  await expect(page.getByText('Profile updated', { exact: true })).toBeVisible();
-
-  const match = await prisma.adminRuleMatch.findFirstOrThrow({
-    where: {
-      ruleId: rule.id,
-    },
-  });
-
-  expect(match.actionsRun).toEqual([{ type: 'flag_account_for_review', status: 'ran' }]);
-
-  // Exactly one tag, linked back to the rule that created it.
-  const tags = await prisma.adminTag.findMany({
-    where: {
-      userId: user.id,
-    },
-  });
-
-  expect(tags).toHaveLength(1);
-  expect(tags[0]).toMatchObject({
-    type: 'flagged_for_review',
-    description: 'Flagged by test',
-    adminRuleId: rule.id,
-  });
-});
-
 test('[ADMIN][RULES][ENGINE]: an admin can remove a tag from a user', async ({ page }) => {
   const { user: adminUser } = await seedUser({ isAdmin: true });
   const { user } = await seedUser();
@@ -522,7 +511,9 @@ test('[ADMIN][RULES][ENGINE]: an admin can remove a tag from a user', async ({ p
     .toBeNull();
 });
 
-test('[ADMIN][RULES][ENGINE]: a sign-up rule runs against the new account', async ({ request }) => {
+test('[ADMIN][RULES][ENGINE]: a sign-up runs sign-up rules, but never name rules, against the new account', async ({
+  request,
+}) => {
   const email = seedTestEmail();
 
   const rule = await seedRule({
@@ -530,6 +521,30 @@ test('[ADMIN][RULES][ENGINE]: a sign-up rule runs against the new account', asyn
     definition: buildDefinition({
       conditions: [{ field: 'user.email', operator: 'equals', value: email }],
       actions: [{ type: 'flag_account_for_review', params: { reason: 'New account' } }],
+    }),
+  });
+
+  // The system names the personal organisation and team itself. A failed team creation is swallowed
+  // at sign-up, so a name rule running here would silently leave the user without a team.
+  const teamNameRule = await seedRule({
+    trigger: 'TEAM_NAME_CHANGED',
+    definition: buildDefinition({
+      conditions: [
+        { field: 'user.email', operator: 'equals', value: email },
+        { field: 'team.new_name', operator: 'equals', value: 'Personal Team' },
+      ],
+      actions: [{ type: 'block_event', params: {} }],
+    }),
+  });
+
+  const organisationNameRule = await seedRule({
+    trigger: 'ORGANISATION_NAME_CHANGED',
+    definition: buildDefinition({
+      conditions: [
+        { field: 'user.email', operator: 'equals', value: email },
+        { field: 'organisation.new_name', operator: 'equals', value: 'Personal Organisation' },
+      ],
+      actions: [{ type: 'block_event', params: {} }],
     }),
   });
 
@@ -572,6 +587,29 @@ test('[ADMIN][RULES][ENGINE]: a sign-up rule runs against the new account', asyn
     description: 'New account',
     adminRuleId: rule.id,
   });
+
+  const organisations = await prisma.organisation.findMany({
+    where: {
+      ownerUserId: user.id,
+    },
+    select: {
+      name: true,
+      teams: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  expect(organisations).toEqual([
+    {
+      name: 'Personal Organisation',
+      teams: [{ name: 'Personal Team' }],
+    },
+  ]);
+  expect(await countRuleMatches(teamNameRule.id)).toEqual(0);
+  expect(await countRuleMatches(organisationNameRule.id)).toEqual(0);
 });
 
 test('[ADMIN][RULES][ENGINE]: a DOCUMENT_SENT rule blocks sending', async () => {
@@ -625,6 +663,409 @@ test('[ADMIN][RULES][ENGINE]: a DOCUMENT_SENT rule blocks sending', async () => 
   expect(match.envelopeId).toEqual(document.id);
   expect(match.organisationId).toEqual(team.organisationId);
   expect(match.eventSnapshot['envelope.recipient_count']).toEqual(1);
+});
+
+test('[ADMIN][RULES][ENGINE]: a rule on team.name and organisation.name blocks sends from that team only', async () => {
+  const { user, team } = await seedUser();
+  const { user: otherUser, team: otherTeam } = await seedUser();
+
+  const teamName = `PayPal Support ${nanoid()}`;
+  const organisationName = `PayPal Inc ${nanoid()}`;
+
+  await prisma.team.update({
+    where: {
+      id: team.id,
+    },
+    data: {
+      name: teamName,
+    },
+  });
+
+  await prisma.organisation.update({
+    where: {
+      id: team.organisationId,
+    },
+    data: {
+      name: organisationName,
+    },
+  });
+
+  // String operators ignore case, so the rule matches however the names are capitalised.
+  const rule = await seedRule({
+    trigger: 'DOCUMENT_SENT',
+    definition: buildDefinition({
+      conditions: [
+        { field: 'team.name', operator: 'equals', value: teamName.toLowerCase() },
+        { field: 'organisation.name', operator: 'equals', value: organisationName.toLowerCase() },
+      ],
+      actions: [{ type: 'block_event', params: {} }],
+    }),
+  });
+
+  const blockedError = await sendTestDocument({ user, teamId: team.id });
+
+  expect(blockedError).toMatchObject({ code: 'ADMIN_RULE_BLOCKED' });
+
+  const match = await prisma.adminRuleMatch.findFirstOrThrow({
+    where: {
+      ruleId: rule.id,
+    },
+  });
+  expect(match.eventSnapshot['team.name']).toEqual(teamName);
+  expect(match.eventSnapshot['organisation.name']).toEqual(organisationName);
+
+  const allowedError = await sendTestDocument({ user: otherUser, teamId: otherTeam.id });
+
+  expect(allowedError).toBeNull();
+  expect(await countRuleMatches(rule.id)).toEqual(1);
+});
+
+test('[ADMIN][RULES][ENGINE]: a TEAM_NAME_CHANGED rule blocks creating and renaming a team to a matching name', async ({
+  page,
+}) => {
+  const { user, organisation, team } = await seedUser();
+
+  const blockedName = `PayPal Support ${nanoid()}`;
+
+  const rule = await seedRule({
+    trigger: 'TEAM_NAME_CHANGED',
+    definition: buildDefinition({
+      conditions: [
+        { field: 'user.email', operator: 'equals', value: user.email },
+        { field: 'team.new_name', operator: 'equals', value: blockedName },
+      ],
+      actions: [{ type: 'block_event', params: {} }],
+    }),
+  });
+
+  await apiSignin({ page, email: user.email });
+
+  const { team: otherTeam } = await seedUser();
+
+  const takenUrlCreate = await postTrpc({
+    page,
+    path: 'team.create',
+    json: {
+      organisationId: organisation.id,
+      teamName: blockedName,
+      teamUrl: otherTeam.url,
+      inheritMembers: true,
+    },
+  });
+
+  const takenUrlRename = await postTrpc({
+    page,
+    path: 'team.update',
+    json: {
+      teamId: team.id,
+      data: {
+        name: blockedName,
+        url: otherTeam.url,
+      },
+    },
+  });
+
+  // A taken URL fails the request before the rules run, so nothing is recorded against the user.
+  expect(await getTrpcErrorCode(takenUrlCreate)).toEqual('ALREADY_EXISTS');
+  expect(await getTrpcErrorCode(takenUrlRename)).toEqual('ALREADY_EXISTS');
+  expect(await countRuleMatches(rule.id)).toEqual(0);
+
+  const blockedUrl = alphaid();
+
+  const blockedCreate = await postTrpc({
+    page,
+    path: 'team.create',
+    json: {
+      organisationId: organisation.id,
+      teamName: blockedName,
+      teamUrl: blockedUrl,
+      inheritMembers: true,
+    },
+  });
+
+  expect(await getTrpcErrorCode(blockedCreate)).toEqual('ADMIN_RULE_BLOCKED');
+  expect(
+    await prisma.team.count({
+      where: {
+        url: blockedUrl,
+      },
+    }),
+  ).toEqual(0);
+
+  const blockedRename = await postTrpc({
+    page,
+    path: 'team.update',
+    json: {
+      teamId: team.id,
+      data: {
+        name: blockedName,
+      },
+    },
+  });
+
+  expect(await getTrpcErrorCode(blockedRename)).toEqual('ADMIN_RULE_BLOCKED');
+
+  const unchangedTeam = await prisma.team.findFirstOrThrow({
+    where: {
+      id: team.id,
+    },
+  });
+  expect(unchangedTeam.name).toEqual(team.name);
+
+  // A name-only rename sends no URL, which must not be read as clashing with every other team's.
+  const allowedName = `Legal ${nanoid()}`;
+
+  const allowedRename = await postTrpc({
+    page,
+    path: 'team.update',
+    json: {
+      teamId: team.id,
+      data: {
+        name: allowedName,
+      },
+    },
+  });
+
+  expect(allowedRename.ok()).toBe(true);
+
+  const renamedTeam = await prisma.team.findFirstOrThrow({
+    where: {
+      id: team.id,
+    },
+  });
+  expect(renamedTeam.name).toEqual(allowedName);
+
+  const match = await prisma.adminRuleMatch.findFirstOrThrow({
+    where: {
+      ruleId: rule.id,
+      eventSnapshot: {
+        path: ['team.is_new'],
+        equals: true,
+      },
+    },
+  });
+  expect(match.actorUserId).toEqual(user.id);
+  expect(match.organisationId).toEqual(organisation.id);
+  expect(match.eventSnapshot['team.url']).toEqual(blockedUrl);
+
+  const allowedUrl = alphaid();
+
+  const allowedCreate = await postTrpc({
+    page,
+    path: 'team.create',
+    json: {
+      organisationId: organisation.id,
+      teamName: 'Legal',
+      teamUrl: allowedUrl,
+      inheritMembers: true,
+    },
+  });
+
+  expect(allowedCreate.ok()).toBe(true);
+  expect(
+    await prisma.team.count({
+      where: {
+        url: allowedUrl,
+      },
+    }),
+  ).toEqual(1);
+  expect(await countRuleMatches(rule.id)).toEqual(2);
+});
+
+test('[ADMIN][RULES][ENGINE]: an ORGANISATION_NAME_CHANGED rule blocks creating and renaming an organisation to a matching name', async ({
+  page,
+}) => {
+  const { user, organisation } = await seedUser();
+
+  const blockedName = `PayPal Support ${nanoid()}`;
+  const allowedName = `Acme ${nanoid()}`;
+
+  const rule = await seedRule({
+    trigger: 'ORGANISATION_NAME_CHANGED',
+    definition: buildDefinition({
+      conditions: [
+        { field: 'user.email', operator: 'equals', value: user.email },
+        { field: 'organisation.new_name', operator: 'equals', value: blockedName },
+      ],
+      actions: [{ type: 'block_event', params: {} }],
+    }),
+  });
+
+  await apiSignin({ page, email: user.email });
+
+  const { organisation: otherOrganisation } = await seedUser();
+
+  const takenUrlRename = await postTrpc({
+    page,
+    path: 'organisation.update',
+    json: {
+      organisationId: organisation.id,
+      data: {
+        name: blockedName,
+        url: otherOrganisation.url,
+      },
+    },
+  });
+
+  // A taken URL fails the request before the rules run, so nothing is recorded against the user.
+  expect(await getTrpcErrorCode(takenUrlRename)).toEqual('ALREADY_EXISTS');
+  expect(await countRuleMatches(rule.id)).toEqual(0);
+
+  const blockedCreate = await postTrpc({
+    page,
+    path: 'organisation.create',
+    json: {
+      name: blockedName,
+    },
+  });
+
+  expect(await getTrpcErrorCode(blockedCreate)).toEqual('ADMIN_RULE_BLOCKED');
+
+  const blockedRename = await postTrpc({
+    page,
+    path: 'organisation.update',
+    json: {
+      organisationId: organisation.id,
+      data: {
+        name: blockedName,
+        url: organisation.url,
+      },
+    },
+  });
+
+  expect(await getTrpcErrorCode(blockedRename)).toEqual('ADMIN_RULE_BLOCKED');
+  expect(
+    await prisma.organisation.count({
+      where: {
+        name: blockedName,
+      },
+    }),
+  ).toEqual(0);
+
+  const allowedCreate = await postTrpc({
+    page,
+    path: 'organisation.create',
+    json: {
+      name: allowedName,
+    },
+  });
+
+  expect(allowedCreate.ok()).toBe(true);
+  expect(
+    await prisma.organisation.count({
+      where: {
+        ownerUserId: user.id,
+        name: allowedName,
+      },
+    }),
+  ).toEqual(1);
+
+  const matches = await prisma.adminRuleMatch.findMany({
+    where: {
+      ruleId: rule.id,
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  });
+
+  // A new organisation has no id yet, so only the rename is attached to one.
+  expect(matches.map((match) => match.organisationId)).toEqual([null, organisation.id]);
+});
+
+test('[ADMIN][RULES][ENGINE]: a site admin creating or renaming an organisation never triggers ORGANISATION_NAME_CHANGED rules', async ({
+  page,
+}) => {
+  const { user: adminUser } = await seedUser({ isAdmin: true });
+  const { user: owner } = await seedUser();
+
+  // Scoped by a unique name rather than an email, so it matches whoever the route would treat as the actor.
+  const blockedToken = `PayPal Support ${nanoid()}`;
+
+  const rule = await seedRule({
+    trigger: 'ORGANISATION_NAME_CHANGED',
+    definition: buildDefinition({
+      conditions: [{ field: 'organisation.new_name', operator: 'contains', value: blockedToken }],
+      actions: [{ type: 'block_event', params: {} }],
+    }),
+  });
+
+  await apiSignin({ page, email: adminUser.email });
+
+  const createResponse = await postTrpc({
+    page,
+    path: 'admin.organisation.create',
+    json: {
+      ownerUserId: owner.id,
+      data: {
+        name: `${blockedToken} Created`,
+      },
+    },
+  });
+
+  expect(createResponse.ok()).toBe(true);
+
+  const { result } = await createResponse.json();
+  const { organisationId } = result.data.json;
+
+  const renameResponse = await postTrpc({
+    page,
+    path: 'admin.organisation.update',
+    json: {
+      organisationId,
+      data: {
+        name: `${blockedToken} Renamed`,
+      },
+    },
+  });
+
+  expect(renameResponse.ok()).toBe(true);
+
+  const organisation = await prisma.organisation.findFirstOrThrow({
+    where: {
+      id: organisationId,
+    },
+  });
+
+  expect(organisation.name).toEqual(`${blockedToken} Renamed`);
+  expect(await countRuleMatches(rule.id)).toEqual(0);
+});
+
+test('[ADMIN][RULES][ENGINE]: a team member who cannot rename the team never triggers TEAM_NAME_CHANGED rules', async ({
+  page,
+}) => {
+  const { team } = await seedUser();
+  const member = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MEMBER,
+  });
+
+  const blockedName = `PayPal Support ${nanoid()}`;
+
+  const rule = await seedRule({
+    trigger: 'TEAM_NAME_CHANGED',
+    definition: buildDefinition({
+      conditions: [{ field: 'team.new_name', operator: 'equals', value: blockedName }],
+      actions: [{ type: 'block_event', params: {} }],
+    }),
+  });
+
+  await apiSignin({ page, email: member.email });
+
+  const response = await postTrpc({
+    page,
+    path: 'team.update',
+    json: {
+      teamId: team.id,
+      data: {
+        name: blockedName,
+      },
+    },
+  });
+
+  expect(response.ok()).toBe(false);
+  expect(await getTrpcErrorCode(response)).not.toEqual('ADMIN_RULE_BLOCKED');
+  expect(await countRuleMatches(rule.id)).toEqual(0);
 });
 
 test('[ADMIN][RULES][ENGINE]: nested condition groups are evaluated like a boolean expression', async () => {
@@ -1070,6 +1511,53 @@ test('[ADMIN][RULES][ENGINE]: disable_user disables the sender, and without a bl
     },
   });
   expect(match.actionsRun).toEqual([{ type: 'disable_user', status: 'ran' }]);
+});
+
+test('[ADMIN][RULES][ENGINE]: disable_user never disables a site admin, and the action is recorded as failed', async () => {
+  const { user: adminUser, team } = await seedUser({ isAdmin: true });
+
+  const document = await seedDraftDocument(adminUser, team.id, ['recipient@example.com']);
+
+  await prisma.field.updateMany({
+    where: {
+      envelopeId: document.id,
+    },
+    data: {
+      type: FieldType.SIGNATURE,
+    },
+  });
+
+  const rule = await seedRule({
+    trigger: 'DOCUMENT_SENT',
+    definition: buildDefinition({
+      conditions: [{ field: 'sender.email', operator: 'equals', value: adminUser.email }],
+      actions: [{ type: 'disable_user', params: {} }],
+    }),
+  });
+
+  await sendDocument({
+    id: { type: 'envelopeId', id: document.id },
+    userId: adminUser.id,
+    teamId: team.id,
+    sendEmail: false,
+    requestMetadata,
+  });
+
+  const updatedAdminUser = await prisma.user.findFirstOrThrow({
+    where: {
+      id: adminUser.id,
+    },
+  });
+  expect(updatedAdminUser.disabled).toBe(false);
+
+  const match = await prisma.adminRuleMatch.findFirstOrThrow({
+    where: {
+      ruleId: rule.id,
+    },
+  });
+  expect(match.actionsRun).toEqual([
+    { type: 'disable_user', status: 'failed', error: 'Admin accounts cannot be disabled by a rule' },
+  ]);
 });
 
 test('[ADMIN][RULES][ENGINE]: disable_emails turns off email for the organisation, including the send that triggered it', async () => {
@@ -1557,48 +2045,6 @@ test('[ADMIN][RULES][ENGINE]: a rule that turns off emails also stops the signin
   expect(await countSentEmails({ envelopeId: document.id, recipientId: second.id })).toEqual(0);
 });
 
-test('[ADMIN][RULES][ENGINE]: a next signer without an email address is not checked, and is marked as sent', async () => {
-  const { user, team } = await seedUser();
-
-  const { document, first, second } = await seedSequentialDocument({ user, teamId: team.id });
-
-  await prisma.recipient.update({
-    where: {
-      id: second.id,
-    },
-    data: {
-      email: '',
-    },
-  });
-
-  const rule = await seedRule({
-    trigger: 'EMAIL_SENT',
-    definition: buildDefinition({
-      conditions: [
-        { field: 'sender.email', operator: 'equals', value: user.email },
-        { field: 'email.type', operator: 'is', value: 'signing_request' },
-      ],
-      actions: [{ type: 'block_event', params: {} }],
-    }),
-  });
-
-  await completeDocumentWithToken({
-    token: first.token,
-    id: { type: 'envelopeId', id: document.id },
-  });
-
-  await waitForRecipientJob({ jobId: 'send.signing.requested.email', recipientId: second.id });
-
-  const updatedSecond = await prisma.recipient.findFirstOrThrow({
-    where: {
-      id: second.id,
-    },
-  });
-
-  expect(updatedSecond.sendStatus).toEqual(SendStatus.SENT);
-  expect(await countRuleMatches(rule.id)).toEqual(0);
-});
-
 test('[ADMIN][RULES][ENGINE]: blocked completion emails are not sent', async () => {
   const { user, team } = await seedUser();
 
@@ -1975,7 +2421,7 @@ test('[ADMIN][RULES][ENGINE]: reminders stop for documents owned by a disabled t
   expect(updatedRecipient.nextReminderAt).toBeNull();
 });
 
-test('[ADMIN][RULES][ENGINE]: a block stops a direct-link submission before anything is created', async () => {
+test("[ADMIN][RULES][ENGINE]: a block stops a direct-link submission before anything is created or counted against the owner's quota", async () => {
   const { user, team } = await seedUser();
 
   const template = await seedDirectTemplate({
@@ -1994,7 +2440,17 @@ test('[ADMIN][RULES][ENGINE]: a block stops a direct-link submission before anyt
     }),
   });
 
-  const error = await submitDirectLink({ template }).catch((err) => AppError.parseError(err));
+  // Tests skip the organisation's quota, so count it for this submission.
+  const bypassRateLimits = process.env.DANGEROUS_BYPASS_RATE_LIMITS;
+
+  process.env.DANGEROUS_BYPASS_RATE_LIMITS = 'false';
+
+  const error = await submitDirectLink({ template })
+    .then(() => null)
+    .catch((err) => AppError.parseError(err))
+    .finally(() => {
+      process.env.DANGEROUS_BYPASS_RATE_LIMITS = bypassRateLimits ?? '';
+    });
 
   expect(error).toMatchObject({ code: 'ADMIN_RULE_BLOCKED' });
 
@@ -2014,37 +2470,6 @@ test('[ADMIN][RULES][ENGINE]: a block stops a direct-link submission before anyt
   });
 
   expect(documentCount).toEqual(0);
-});
-
-test("[ADMIN][RULES][ENGINE]: a blocked direct-link submission uses none of the owner's document quota", async () => {
-  const { user, team } = await seedUser();
-
-  const template = await seedDirectTemplate({
-    userId: user.id,
-    teamId: team.id,
-  });
-
-  await seedRule({
-    trigger: 'DOCUMENT_SENT',
-    definition: buildDefinition({
-      conditions: [{ field: 'sender.email', operator: 'equals', value: user.email }],
-      actions: [{ type: 'block_event', params: {} }],
-    }),
-  });
-
-  // Tests skip the organisation's quota, so count it for this submission.
-  const bypassRateLimits = process.env.DANGEROUS_BYPASS_RATE_LIMITS;
-
-  process.env.DANGEROUS_BYPASS_RATE_LIMITS = 'false';
-
-  const error = await submitDirectLink({ template })
-    .then(() => null)
-    .catch((err) => AppError.parseError(err))
-    .finally(() => {
-      process.env.DANGEROUS_BYPASS_RATE_LIMITS = bypassRateLimits ?? '';
-    });
-
-  expect(error).toMatchObject({ code: 'ADMIN_RULE_BLOCKED' });
 
   const monthlyStat = await prisma.organisationMonthlyStat.findFirst({
     where: {

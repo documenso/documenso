@@ -37,6 +37,8 @@ export const ADMIN_RULE_TRIGGER_SUPPORTS_ORGANISATION_EXEMPTIONS: Record<TAdminR
   USER_SIGNED_UP: false,
   DOCUMENT_SENT: true,
   EMAIL_SENT: true,
+  TEAM_NAME_CHANGED: true,
+  ORGANISATION_NAME_CHANGED: true,
 };
 
 export const ADMIN_RULE_MAX_REGEX_LENGTH = 256;
@@ -111,6 +113,8 @@ const SENDER_FIELDS: AdminRuleField[] = [
 const TEAM_FIELDS: AdminRuleField[] = [
   { key: 'team.id', type: 'number' },
   { key: 'team.url', type: 'string' },
+  { key: 'team.name', type: 'string' },
+  { key: 'organisation.name', type: 'string' },
 ];
 
 export const ADMIN_RULE_TRIGGER_FIELDS: Record<TAdminRuleTrigger, AdminRuleField[]> = {
@@ -144,6 +148,23 @@ export const ADMIN_RULE_TRIGGER_FIELDS: Record<TAdminRuleTrigger, AdminRuleField
     { key: 'email.has_custom_subject', type: 'boolean' },
     { key: 'email.has_custom_message', type: 'boolean' },
     ...ENVELOPE_FIELDS,
+    ...TEAM_FIELDS,
+  ],
+  TEAM_NAME_CHANGED: [
+    ...buildUserFields('user'),
+    { key: 'team.old_name', type: 'string' },
+    { key: 'team.new_name', type: 'string' },
+    { key: 'team.url', type: 'string' },
+    { key: 'team.is_new', type: 'boolean' },
+    { key: 'organisation.name', type: 'string' },
+    ...REQUEST_FIELDS,
+  ],
+  ORGANISATION_NAME_CHANGED: [
+    ...buildUserFields('user'),
+    { key: 'organisation.old_name', type: 'string' },
+    { key: 'organisation.new_name', type: 'string' },
+    { key: 'organisation.is_new', type: 'boolean' },
+    ...REQUEST_FIELDS,
   ],
 };
 
@@ -193,7 +214,8 @@ export const ADMIN_RULE_ACTIONS: Record<TAdminRuleActionType, AdminRuleActionDef
   },
   disable_emails: {
     // Turns off email for the document's organisation. User-level events (sign-ups, name changes)
-    // belong to no single organisation, so the action is not offered on them.
+    // belong to no single organisation, so the action is not offered on them. Team and organisation
+    // name changes do have one, but are not about email; blocking or flagging fits them instead.
     allowedTriggers: ['DOCUMENT_SENT', 'EMAIL_SENT'],
     params: [{ key: 'reason', kind: 'text' }],
   },
@@ -263,6 +285,8 @@ const SENDER_SAMPLE_EVENT: TAdminRuleContext = {
 const TEAM_SAMPLE_EVENT: TAdminRuleContext = {
   'team.id': 7,
   'team.url': 'acme',
+  'team.name': 'Acme Legal',
+  'organisation.name': 'Acme Inc.',
 };
 
 /**
@@ -299,5 +323,22 @@ export const ADMIN_RULE_SAMPLE_EVENTS: Record<TAdminRuleTrigger, TAdminRuleConte
     'email.has_custom_subject': true,
     'email.has_custom_message': true,
     ...ENVELOPE_SAMPLE_EVENT,
+    ...TEAM_SAMPLE_EVENT,
+  },
+  TEAM_NAME_CHANGED: {
+    ...buildUserSampleEvent('user'),
+    'team.old_name': '',
+    'team.new_name': 'PayPal Support',
+    'team.url': 'paypal-support',
+    'team.is_new': true,
+    'organisation.name': 'Acme Inc.',
+    ...REQUEST_SAMPLE_EVENT,
+  },
+  ORGANISATION_NAME_CHANGED: {
+    ...buildUserSampleEvent('user'),
+    'organisation.old_name': 'Acme Inc.',
+    'organisation.new_name': 'PayPal Support',
+    'organisation.is_new': false,
+    ...REQUEST_SAMPLE_EVENT,
   },
 };

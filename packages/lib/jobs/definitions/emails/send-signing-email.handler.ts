@@ -100,6 +100,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     emailLanguage,
     settings,
     organisationType,
+    organisationName,
     senderEmail,
     replyToEmail,
     organisationId,
@@ -144,9 +145,11 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
           team: {
             id: team.id,
             url: team.url,
+            name: team.name,
             organisation: {
               id: organisationId,
               type: organisationType,
+              name: organisationName,
               organisationClaim: claims,
             },
           },

@@ -80,6 +80,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
     replyToEmail,
     organisationId,
     organisationType,
+    organisationName,
     claims,
     emailsDisabled,
     emailTransport,
@@ -110,9 +111,11 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
         team: {
           id: envelope.team.id,
           url: envelope.team.url,
+          name: envelope.team.name,
           organisation: {
             id: organisationId,
             type: organisationType,
+            name: organisationName,
             organisationClaim: claims,
           },
         },

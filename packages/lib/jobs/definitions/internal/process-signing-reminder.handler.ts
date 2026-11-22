@@ -119,6 +119,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
     branding,
     emailLanguage,
     organisationType,
+    organisationName,
     senderEmail,
     replyToEmail,
     organisationId,
@@ -156,6 +157,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
         organisation: {
           id: organisationId,
           type: organisationType,
+          name: organisationName,
           organisationClaim: claims,
         },
       },

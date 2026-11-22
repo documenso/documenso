@@ -85,6 +85,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
             select: {
               id: true,
               type: true,
+              name: true,
               organisationClaim: {
                 select: {
                   recipientCount: true,

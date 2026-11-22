@@ -8,7 +8,14 @@ import { z } from 'zod';
  * available triggers, fields, operators and actions lives in `constants/admin-rules.ts`.
  */
 
-export const ZAdminRuleTriggerSchema = z.enum(['USER_NAME_CHANGED', 'USER_SIGNED_UP', 'DOCUMENT_SENT', 'EMAIL_SENT']);
+export const ZAdminRuleTriggerSchema = z.enum([
+  'USER_NAME_CHANGED',
+  'USER_SIGNED_UP',
+  'DOCUMENT_SENT',
+  'EMAIL_SENT',
+  'TEAM_NAME_CHANGED',
+  'ORGANISATION_NAME_CHANGED',
+]);
 
 export type TAdminRuleTrigger = z.infer<typeof ZAdminRuleTriggerSchema>;
 

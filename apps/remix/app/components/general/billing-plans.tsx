@@ -2,6 +2,7 @@ import type { InternalClaimPlans } from '@documenso/ee/server-only/stripe/get-in
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
@@ -184,7 +185,19 @@ const BillingDialog = ({ priceId, planName, claim }: { priceId: string; planName
       }
 
       window.location.href = redirectUrl;
-    } catch (_err) {
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      if (error.code === 'ADMIN_RULE_BLOCKED') {
+        toast({
+          title: t`Organisation creation blocked`,
+          description: t`This change is blocked. Please contact support if you believe this is a mistake.`,
+          variant: 'destructive',
+        });
+
+        return;
+      }
+
       toast({
         title: t`Something went wrong`,
         description: t`An error occurred while trying to create a checkout session.`,

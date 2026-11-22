@@ -10,6 +10,7 @@ import type {
   AdminRuleEvent,
   AdminRuleEventEnvelope,
   AdminRuleEventOrganisation,
+  AdminRuleEventTeam,
   AdminRuleEventUser,
   AdminRuleSubject,
 } from './admin-rule-event';
@@ -37,8 +38,7 @@ export const buildAdminRuleContext = ({
     .with({ trigger: 'DOCUMENT_SENT' }, ({ envelope, sender }) => ({
       ...buildSenderContext({ sender, organisation: envelope.team.organisation, now }),
       ...buildEnvelopeContext(envelope, requestSource),
-      'team.id': envelope.team.id,
-      'team.url': envelope.team.url,
+      ...buildTeamContext(envelope.team),
       ...requestContext,
     }))
     .with({ trigger: 'EMAIL_SENT' }, ({ envelope, sender, emailType, recipients }) => ({
@@ -51,6 +51,7 @@ export const buildAdminRuleContext = ({
       'email.has_custom_subject': Boolean(envelope.documentMeta?.subject),
       'email.has_custom_message': Boolean(envelope.documentMeta?.message),
       ...buildEnvelopeContext(envelope, requestSource),
+      ...buildTeamContext(envelope.team),
     }))
     .with({ trigger: 'USER_NAME_CHANGED' }, ({ user, newName }) => ({
       ...buildUserContext({ prefix: 'user', user, now }),
@@ -63,6 +64,22 @@ export const buildAdminRuleContext = ({
       'user.email_domain': getEmailDomain(user.email),
       'user.name': user.name ?? '',
       'user.signup_method': signupMethod,
+      ...requestContext,
+    }))
+    .with({ trigger: 'TEAM_NAME_CHANGED' }, ({ user, organisation, team, newName, newUrl }) => ({
+      ...buildUserContext({ prefix: 'user', user, now }),
+      'team.old_name': team?.name ?? '',
+      'team.new_name': newName,
+      'team.url': newUrl,
+      'team.is_new': team === null,
+      'organisation.name': organisation.name,
+      ...requestContext,
+    }))
+    .with({ trigger: 'ORGANISATION_NAME_CHANGED' }, ({ user, organisation, newName }) => ({
+      ...buildUserContext({ prefix: 'user', user, now }),
+      'organisation.old_name': organisation?.name ?? '',
+      'organisation.new_name': newName,
+      'organisation.is_new': organisation === null,
       ...requestContext,
     }))
     .exhaustive();
@@ -85,7 +102,13 @@ export const getAdminRuleFieldLoaders = ({ event, now }: GetAdminRuleFieldLoader
       'sender.documents_sent_last_7d': async () =>
         await countDocumentsSentByUser(sender.id, DateTime.fromJSDate(now).minus({ days: 7 }).toJSDate()),
     }))
-    .with({ trigger: 'USER_NAME_CHANGED' }, { trigger: 'USER_SIGNED_UP' }, () => ({}))
+    .with(
+      { trigger: 'USER_NAME_CHANGED' },
+      { trigger: 'USER_SIGNED_UP' },
+      { trigger: 'TEAM_NAME_CHANGED' },
+      { trigger: 'ORGANISATION_NAME_CHANGED' },
+      () => ({}),
+    )
     .exhaustive();
 
 /**
@@ -102,6 +125,11 @@ export const getAdminRuleEventSubject = (event: AdminRuleEvent): AdminRuleSubjec
     .with({ trigger: 'USER_NAME_CHANGED' }, { trigger: 'USER_SIGNED_UP' }, ({ user }) => ({
       userId: user.id,
       organisationId: null,
+      envelopeId: null,
+    }))
+    .with({ trigger: 'TEAM_NAME_CHANGED' }, { trigger: 'ORGANISATION_NAME_CHANGED' }, ({ user, organisation }) => ({
+      userId: user.id,
+      organisationId: organisation?.id ?? null,
       envelopeId: null,
     }))
     .exhaustive();
@@ -185,6 +213,13 @@ const buildEnvelopeContext = (
     ...(source ? { 'envelope.source': source } : {}),
   };
 };
+
+const buildTeamContext = (team: AdminRuleEventTeam): TAdminRuleContext => ({
+  'team.id': team.id,
+  'team.url': team.url,
+  'team.name': team.name,
+  'organisation.name': team.organisation.name,
+});
 
 /**
  * `null` when it can't be known: emails sent by background jobs have no request to take it from.

@@ -1,25 +1,24 @@
 import { describe, expect, it } from 'vitest';
 
 import { ADMIN_RULE_LIMITS, ADMIN_RULE_MAX_REGEX_LENGTH } from '../constants/admin-rules';
-import {
-  type TAdminRuleAction,
-  type TAdminRuleCondition,
-  type TAdminRuleConditionGroup,
-  type TAdminRuleConditionNode,
-  type TAdminRuleContext,
-  type TAdminRuleContextValue,
-  type TAdminRuleDefinition,
-  type TAdminRuleOperator,
-  ZAdminRuleDefinitionSchema,
-  ZAdminRuleOperatorSchema,
+import type {
+  TAdminRuleAction,
+  TAdminRuleCondition,
+  TAdminRuleConditionGroup,
+  TAdminRuleConditionNode,
+  TAdminRuleContext,
+  TAdminRuleContextValue,
+  TAdminRuleDefinition,
+  TAdminRuleOperator,
+  TAdminRuleTrigger,
 } from '../types/admin-rules';
 import {
-  evaluateAdminRule,
+  type AdminRuleDefinitionIssue,
+  type AdminRuleDefinitionIssueCode,
   evaluateAdminRuleCondition,
   evaluateAdminRuleConditionGroup,
   evaluateAdminRuleWithLoaders,
   getAdminRuleDefinitionIssues,
-  getAdminRuleGroupConditions,
 } from './admin-rules';
 
 const condition = (field: string, operator: TAdminRuleCondition['operator'], value = ''): TAdminRuleCondition => ({
@@ -96,72 +95,107 @@ describe('evaluateAdminRuleConditionGroup', () => {
 });
 
 describe('evaluateAdminRuleCondition', () => {
-  // The operator, the condition's value, the event's value, and whether the condition holds.
-  const cases: Array<[TAdminRuleOperator, string, TAdminRuleContextValue, boolean]> = [
-    // String operators ignore case.
-    ['equals', 'Jane Doe', 'jane doe', true],
-    ['equals', 'Jane', 'Jane Doe', false],
-    ['equals', '42', 42, true],
-    ['equals', '42', 43, false],
-    ['contains', 'invoice', 'Your Invoice #1042', true],
-    ['contains', 'contract', 'Invoice #1042', false],
-    // On a list, contains matches a whole item.
-    ['contains', 'GMAIL.COM', ['gmail.com', 'example.com'], true],
-    ['contains', 'gmail', ['gmail.com'], false],
-    ['starts_with', 'invoice', 'Invoice #1042', true],
-    ['starts_with', '#1042', 'Invoice #1042', false],
-    ['ends_with', '#1042', 'Invoice #1042', true],
-    ['ends_with', 'invoice', 'Invoice #1042', false],
-    ['matches_regex', '^(admin|support)', 'Support team', true],
-    ['matches_regex', '^(admin|support)', 'Jane Doe', false],
-    ['in_list', 'gmail.com, yahoo.com', 'Yahoo.com', true],
-    ['in_list', 'gmail.com, yahoo.com', 'example.com', false],
-    ['is_empty', '', '  ', true],
-    ['is_empty', '', [], true],
-    ['is_empty', '', 'Jane', false],
-    ['is_empty', '', ['gmail.com'], false],
-    // Number operators.
-    ['greater_than', '10', 11, true],
-    ['greater_than', '10', 10, false],
-    ['greater_than', '10', 'not a number', false],
-    ['greater_than_or_equal', '10', 10, true],
-    ['greater_than_or_equal', '10', 9, false],
-    ['less_than', '10', 9, true],
-    ['less_than', '10', 10, false],
-    ['less_than_or_equal', '10', 10, true],
-    ['less_than_or_equal', '10', 11, false],
-    // Both bounds are included, and a range needs both.
-    ['between', '5, 10', 5, true],
-    ['between', '5, 10', 10, true],
-    ['between', '5, 10', 11, false],
-    ['between', '5', 5, false],
-    // Boolean operators.
-    ['is_true', '', true, true],
-    ['is_true', '', false, false],
-    ['is_false', '', false, true],
-    ['is_false', '', true, false],
-    // Enum operators.
-    ['is', 'free', 'FREE', true],
-    ['is', 'free', 'team', false],
-    // List operators.
-    ['any_matches_regex', '^gmail\\.', ['example.com', 'gmail.com'], true],
-    ['any_matches_regex', '^gmail\\.', ['example.com'], false],
-    ['all_in_list', 'gmail.com, example.com', ['gmail.com', 'example.com'], true],
-    ['all_in_list', 'gmail.com', ['gmail.com', 'example.com'], false],
-    // An empty list never matches.
-    ['all_in_list', 'gmail.com', [], false],
-    ['any_in_list', 'gmail.com, yahoo.com', ['example.com', 'gmail.com'], true],
-    ['any_in_list', 'gmail.com, yahoo.com', ['example.com'], false],
-    ['count_greater_than', '1', ['gmail.com', 'example.com'], true],
-    ['count_greater_than', '2', ['gmail.com', 'example.com'], false],
-  ];
+  const matches = (operator: TAdminRuleOperator, value: string, eventValue: TAdminRuleContextValue) =>
+    evaluateAdminRuleCondition(condition('field', operator, value), { field: eventValue });
 
-  it('has cases for every operator', () => {
-    expect(new Set(cases.map(([operator]) => operator))).toEqual(new Set(ZAdminRuleOperatorSchema.options));
+  it('string operators ignore case and surrounding whitespace', () => {
+    expect(matches('equals', 'Jane Doe', 'jane doe')).toBe(true);
+    expect(matches('equals', 'admin', '  Admin ')).toBe(true);
+    expect(matches('starts_with', 'invoice', ' Invoice #1042')).toBe(true);
+    expect(matches('in_list', 'gmail.com, yahoo.com', 'Yahoo.com')).toBe(true);
+    expect(matches('is', ' Free ', 'FREE')).toBe(true);
   });
 
-  it.each(cases)('%s %j against %j is %s', (operator, value, eventValue, expected) => {
-    expect(evaluateAdminRuleCondition(condition('field', operator, value), { field: eventValue })).toBe(expected);
+  it('equals needs the whole value, and compares numbers as numbers', () => {
+    expect(matches('equals', 'Jane', 'Jane Doe')).toBe(false);
+    expect(matches('equals', '42', 42)).toBe(true);
+    expect(matches('equals', '42', 43)).toBe(false);
+  });
+
+  it('contains, starts_with and ends_with match part of a string', () => {
+    expect(matches('contains', 'invoice', 'Your Invoice #1042')).toBe(true);
+    expect(matches('contains', 'contract', 'Invoice #1042')).toBe(false);
+    expect(matches('starts_with', '#1042', 'Invoice #1042')).toBe(false);
+    expect(matches('ends_with', '#1042', 'Invoice #1042')).toBe(true);
+    expect(matches('ends_with', 'invoice', 'Invoice #1042')).toBe(false);
+  });
+
+  it('contains on a list matches a whole item, not a substring', () => {
+    expect(matches('contains', 'GMAIL.COM', ['gmail.com', 'example.com'])).toBe(true);
+    expect(matches('contains', 'gmail', ['gmail.com'])).toBe(false);
+  });
+
+  it('matches_regex tests the pattern against the value', () => {
+    expect(matches('matches_regex', '^(admin|support)', 'Support team')).toBe(true);
+    expect(matches('matches_regex', '^(admin|support)', 'Jane Doe')).toBe(false);
+  });
+
+  it('in_list matches only a value that is one of the listed items', () => {
+    expect(matches('in_list', 'gmail.com, yahoo.com', 'example.com')).toBe(false);
+  });
+
+  it('is_empty matches blank strings and empty lists', () => {
+    expect(matches('is_empty', '', '  ')).toBe(true);
+    expect(matches('is_empty', '', [])).toBe(true);
+    expect(matches('is_empty', '', 'Jane')).toBe(false);
+    expect(matches('is_empty', '', ['gmail.com'])).toBe(false);
+  });
+
+  it('number operators compare the value against the number in the condition', () => {
+    expect(matches('greater_than', '10', 11)).toBe(true);
+    expect(matches('greater_than', '10', 10)).toBe(false);
+    expect(matches('greater_than_or_equal', '10', 10)).toBe(true);
+    expect(matches('greater_than_or_equal', '10', 9)).toBe(false);
+    expect(matches('less_than', '10', 9)).toBe(true);
+    expect(matches('less_than', '10', 10)).toBe(false);
+    expect(matches('less_than_or_equal', '10', 10)).toBe(true);
+    expect(matches('less_than_or_equal', '10', 11)).toBe(false);
+  });
+
+  it('number operators never match a value that is not a number', () => {
+    expect(matches('greater_than', '10', 'not a number')).toBe(false);
+  });
+
+  it('between includes both bounds and needs exactly two numbers', () => {
+    expect(matches('between', '5, 10', 5)).toBe(true);
+    expect(matches('between', '5, 10', 10)).toBe(true);
+    expect(matches('between', '5, 10', 11)).toBe(false);
+    expect(matches('between', '5', 5)).toBe(false);
+  });
+
+  it('is_true and is_false match the boolean value', () => {
+    expect(matches('is_true', '', true)).toBe(true);
+    expect(matches('is_true', '', false)).toBe(false);
+    expect(matches('is_false', '', false)).toBe(true);
+    expect(matches('is_false', '', true)).toBe(false);
+  });
+
+  it('is matches only the same enum value', () => {
+    expect(matches('is', 'free', 'team')).toBe(false);
+  });
+
+  it('any_matches_regex matches when at least one item matches the pattern', () => {
+    expect(matches('any_matches_regex', '^gmail\\.', ['example.com', 'gmail.com'])).toBe(true);
+    expect(matches('any_matches_regex', '^gmail\\.', ['example.com'])).toBe(false);
+  });
+
+  it('all_in_list matches only when every item is in the list', () => {
+    expect(matches('all_in_list', 'gmail.com, example.com', ['gmail.com', 'example.com'])).toBe(true);
+    expect(matches('all_in_list', 'gmail.com', ['gmail.com', 'example.com'])).toBe(false);
+  });
+
+  it('an empty list never matches all_in_list', () => {
+    expect(matches('all_in_list', 'gmail.com', [])).toBe(false);
+  });
+
+  it('any_in_list matches when at least one item is in the list', () => {
+    expect(matches('any_in_list', 'gmail.com, yahoo.com', ['example.com', 'gmail.com'])).toBe(true);
+    expect(matches('any_in_list', 'gmail.com, yahoo.com', ['example.com'])).toBe(false);
+  });
+
+  it('count_greater_than compares the number of items', () => {
+    expect(matches('count_greater_than', '1', ['gmail.com', 'example.com'])).toBe(true);
+    expect(matches('count_greater_than', '2', ['gmail.com', 'example.com'])).toBe(false);
   });
 
   it('never matches an invalid regex, or one over the length limit', () => {
@@ -178,146 +212,129 @@ describe('evaluateAdminRuleCondition', () => {
   });
 });
 
-describe('evaluateAdminRule', () => {
-  it('matches only when the conditions hold for the event', () => {
-    const rule = definition(all(condition('envelope.recipient_count', 'greater_than', '10')));
-
-    expect(evaluateAdminRule(rule, { 'envelope.recipient_count': 20 })).toBe(true);
-    expect(evaluateAdminRule(rule, { 'envelope.recipient_count': 5 })).toBe(false);
-  });
-
-  it('ignores case and surrounding whitespace in both the value and the event', () => {
-    const isPlan = definition(all(condition('sender.plan', 'is', ' Free ')));
-    const equalsName = definition(all(condition('user.new_name', 'equals', 'admin')));
-    const startsWithTitle = definition(all(condition('envelope.title', 'starts_with', 'invoice')));
-
-    expect(evaluateAdminRule(isPlan, { 'sender.plan': 'free' })).toBe(true);
-    expect(evaluateAdminRule(equalsName, { 'user.new_name': '  Admin ' })).toBe(true);
-    expect(evaluateAdminRule(startsWithTitle, { 'envelope.title': ' Invoice #1042' })).toBe(true);
-  });
-});
-
-describe('getAdminRuleGroupConditions', () => {
-  it('flattens conditions from every nesting level in order', () => {
-    const group = all(
-      condition('envelope.title', 'contains', 'a'),
-      any(condition('envelope.title', 'contains', 'b')),
-      condition('envelope.title', 'contains', 'c'),
-    );
-
-    expect(getAdminRuleGroupConditions(group).map((item) => item.value)).toEqual(['a', 'b', 'c']);
-  });
-});
-
 describe('getAdminRuleDefinitionIssues', () => {
-  it('accepts a valid nested definition', () => {
-    const rule = definition(
-      all(
-        condition('sender.plan', 'is', 'free'),
-        any(condition('envelope.recipient_count', 'greater_than', '20'), condition('envelope.title', 'is_empty')),
-      ),
+  // A valid condition for each trigger used below.
+  const conditionByTrigger = {
+    DOCUMENT_SENT: condition('envelope.title', 'contains', 'x'),
+    USER_NAME_CHANGED: condition('user.new_name', 'contains', 'x'),
+    USER_SIGNED_UP: condition('user.email_domain', 'equals', 'example.com'),
+  } satisfies Partial<Record<TAdminRuleTrigger, TAdminRuleCondition>>;
+
+  const getNestedConditionIssues = (nestedCondition: TAdminRuleCondition) =>
+    getAdminRuleDefinitionIssues(
+      'DOCUMENT_SENT',
+      definition(all(condition('sender.plan', 'is', 'free'), any(nestedCondition))),
     );
 
-    expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', rule)).toEqual([]);
+  const nestedConditionIssue = (key: string, code: AdminRuleDefinitionIssueCode): AdminRuleDefinitionIssue => ({
+    path: ['when', 'children', 1, 'children', 0, key],
+    code,
   });
 
-  it('reports issues on nested conditions with their full path', () => {
-    const rule = definition(all(condition('sender.plan', 'is', 'free'), any(condition('envelope.title', 'contains'))));
+  const getActionIssues = (trigger: keyof typeof conditionByTrigger, action: TAdminRuleAction) =>
+    getAdminRuleDefinitionIssues(trigger, definition(all(conditionByTrigger[trigger]), [action]));
 
-    expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', rule)).toEqual([
-      { path: ['when', 'children', 1, 'children', 0, 'value'], code: 'VALUE_REQUIRED' },
+  const actionTypeUnavailable: AdminRuleDefinitionIssue = { path: ['actions', 0, 'type'], code: 'ACTION_UNAVAILABLE' };
+
+  it('accepts valueless operators, decimal numbers and a range with equal bounds', () => {
+    expect(getNestedConditionIssues(condition('envelope.title', 'is_empty'))).toEqual([]);
+    expect(getNestedConditionIssues(condition('envelope.recipient_count', 'greater_than', '2.5'))).toEqual([]);
+    expect(getNestedConditionIssues(condition('envelope.recipient_count', 'between', '5, 5'))).toEqual([]);
+  });
+
+  it('reports a field the trigger does not provide', () => {
+    expect(getNestedConditionIssues(condition('user.new_name', 'contains', 'x'))).toEqual([
+      nestedConditionIssue('field', 'FIELD_INVALID'),
     ]);
   });
 
-  it('requires a number for number comparisons and list counts', () => {
-    const notANumber = [{ path: ['when', 'children', 0, 'value'], code: 'VALUE_NOT_A_NUMBER' }];
-
-    const greaterThan = definition(all(condition('envelope.recipient_count', 'greater_than', 'abc')));
-    const countGreaterThan = definition(all(condition('envelope.recipient_domains', 'count_greater_than', 'x')));
-    const decimal = definition(all(condition('envelope.recipient_count', 'greater_than', '2.5')));
-
-    expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', greaterThan)).toEqual(notANumber);
-    expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', countGreaterThan)).toEqual(notANumber);
-    expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', decimal)).toEqual([]);
-  });
-
-  it('requires two numbers, smallest first, for between', () => {
-    const notARange = [{ path: ['when', 'children', 0, 'value'], code: 'VALUE_NOT_A_RANGE' }];
-
-    for (const value of ['5', '10, 5', '1, x', '1, 2, 3']) {
-      const rule = definition(all(condition('envelope.recipient_count', 'between', value)));
-
-      expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', rule)).toEqual(notARange);
-    }
-
-    const sameBounds = definition(all(condition('envelope.recipient_count', 'between', '5, 5')));
-
-    expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', sameBounds)).toEqual([]);
-  });
-
-  it('rejects block actions on sign-up rules, which run after the account exists', () => {
-    const when = all(condition('user.email_domain', 'equals', 'example.com'));
-
-    expect(getAdminRuleDefinitionIssues('USER_SIGNED_UP', definition(when, [block]))).toEqual([
-      { path: ['actions', 0, 'type'], code: 'ACTION_UNAVAILABLE' },
+  it('reports an operator that does not suit the field type', () => {
+    expect(getNestedConditionIssues(condition('envelope.title', 'greater_than', '5'))).toEqual([
+      nestedConditionIssue('operator', 'OPERATOR_INVALID'),
     ]);
-
-    expect(getAdminRuleDefinitionIssues('USER_SIGNED_UP', definition(when, [flag]))).toEqual([]);
   });
 
-  it('only offers disable emails on triggers whose event belongs to an organisation', () => {
-    const unavailable = [{ path: ['actions', 0, 'type'], code: 'ACTION_UNAVAILABLE' }];
+  it('reports a blank value', () => {
+    expect(getNestedConditionIssues(condition('envelope.title', 'contains', ' '))).toEqual([
+      nestedConditionIssue('value', 'VALUE_REQUIRED'),
+    ]);
+  });
 
-    const nameChange = definition(all(condition('user.new_name', 'contains', 'x')), [disableEmails]);
-    const signUp = definition(all(condition('user.email_domain', 'equals', 'x.com')), [disableEmails]);
-    const documentSent = definition(all(condition('envelope.title', 'contains', 'x')), [disableEmails]);
+  it('reports a value that is not a number on number fields and count_greater_than', () => {
+    expect(getNestedConditionIssues(condition('envelope.recipient_count', 'greater_than', 'abc'))).toEqual([
+      nestedConditionIssue('value', 'VALUE_NOT_A_NUMBER'),
+    ]);
+    expect(getNestedConditionIssues(condition('envelope.recipient_domains', 'count_greater_than', 'x'))).toEqual([
+      nestedConditionIssue('value', 'VALUE_NOT_A_NUMBER'),
+    ]);
+  });
 
-    expect(getAdminRuleDefinitionIssues('USER_NAME_CHANGED', nameChange)).toEqual(unavailable);
-    expect(getAdminRuleDefinitionIssues('USER_SIGNED_UP', signUp)).toEqual(unavailable);
-    expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', documentSent)).toEqual([]);
+  it('reports a between value that is not two ascending numbers', () => {
+    expect(getNestedConditionIssues(condition('envelope.recipient_count', 'between', '5'))).toEqual([
+      nestedConditionIssue('value', 'VALUE_NOT_A_RANGE'),
+    ]);
+    expect(getNestedConditionIssues(condition('envelope.recipient_count', 'between', '10, 5'))).toEqual([
+      nestedConditionIssue('value', 'VALUE_NOT_A_RANGE'),
+    ]);
+    expect(getNestedConditionIssues(condition('envelope.recipient_count', 'between', '1, x'))).toEqual([
+      nestedConditionIssue('value', 'VALUE_NOT_A_RANGE'),
+    ]);
+    expect(getNestedConditionIssues(condition('envelope.recipient_count', 'between', '1, 2, 3'))).toEqual([
+      nestedConditionIssue('value', 'VALUE_NOT_A_RANGE'),
+    ]);
+  });
+
+  it('reports an invalid regex', () => {
+    expect(getNestedConditionIssues(condition('envelope.title', 'matches_regex', '(unclosed'))).toEqual([
+      nestedConditionIssue('value', 'REGEX_INVALID'),
+    ]);
+  });
+
+  // Sign-up rules run after the account exists, so there is nothing left to block.
+  it('sign-up rules cannot block the event but can flag the account', () => {
+    expect(getActionIssues('USER_SIGNED_UP', block)).toEqual([actionTypeUnavailable]);
+    expect(getActionIssues('USER_SIGNED_UP', flag)).toEqual([]);
+  });
+
+  // Disabling emails needs an organisation, which user-level events don't belong to.
+  it('disabling emails is only available on events that belong to an organisation', () => {
+    expect(getActionIssues('USER_SIGNED_UP', disableEmails)).toEqual([actionTypeUnavailable]);
+    expect(getActionIssues('USER_NAME_CHANGED', disableEmails)).toEqual([actionTypeUnavailable]);
+    expect(getActionIssues('DOCUMENT_SENT', disableEmails)).toEqual([]);
+  });
+
+  it('flagging an account for review needs a reason', () => {
+    expect(getActionIssues('DOCUMENT_SENT', { type: 'flag_account_for_review', params: { reason: ' ' } })).toEqual([
+      { path: ['actions', 0, 'params', 'reason'], code: 'PARAM_REQUIRED' },
+    ]);
   });
 
   it('rejects groups nested deeper than the limit', () => {
-    let tooDeep = all(condition('envelope.title', 'contains', 'x'));
+    let atLimit = all(condition('envelope.title', 'contains', 'x'));
 
-    for (let depth = 1; depth <= ADMIN_RULE_LIMITS.maxGroupDepth; depth++) {
-      tooDeep = all(tooDeep);
+    for (let depth = 1; depth < ADMIN_RULE_LIMITS.maxGroupDepth; depth++) {
+      atLimit = all(atLimit);
     }
 
-    const issues = getAdminRuleDefinitionIssues('DOCUMENT_SENT', definition(tooDeep));
+    expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', definition(atLimit))).toEqual([]);
+
+    const issues = getAdminRuleDefinitionIssues('DOCUMENT_SENT', definition(all(atLimit)));
 
     expect(issues).toHaveLength(1);
     expect(issues[0].code).toEqual('GROUP_TOO_DEEP');
   });
 
-  it('rejects more conditions than the limit', () => {
-    const conditions = Array.from({ length: ADMIN_RULE_LIMITS.maxConditions + 1 }, () =>
-      condition('envelope.title', 'contains', 'x'),
-    );
+  it('counts conditions at every nesting level against the limit', () => {
+    const conditions = (count: number) =>
+      Array.from({ length: count }, () => condition('envelope.title', 'contains', 'x'));
 
-    const issues = getAdminRuleDefinitionIssues('DOCUMENT_SENT', definition(all(...conditions)));
+    const atLimit = all(...conditions(1), any(...conditions(ADMIN_RULE_LIMITS.maxConditions - 1)));
+    const overLimit = all(...conditions(1), any(...conditions(ADMIN_RULE_LIMITS.maxConditions)));
 
-    expect(issues).toEqual([{ path: ['when'], code: 'TOO_MANY_CONDITIONS' }]);
-  });
-});
-
-describe('ZAdminRuleDefinitionSchema', () => {
-  it('parses nested groups and rejects empty ones', () => {
-    const nested = definition(
-      all(condition('envelope.title', 'contains', 'x'), any(condition('envelope.title', 'is_empty'))),
-    );
-
-    expect(ZAdminRuleDefinitionSchema.safeParse(nested).success).toBe(true);
-
-    const empty = definition(all(condition('envelope.title', 'contains', 'x'), any()));
-
-    expect(ZAdminRuleDefinitionSchema.safeParse(empty).success).toBe(false);
-  });
-
-  it('rejects a rule without actions', () => {
-    const noActions = definition(all(condition('envelope.title', 'contains', 'x')), []);
-
-    expect(ZAdminRuleDefinitionSchema.safeParse(noActions).success).toBe(false);
+    expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', definition(atLimit))).toEqual([]);
+    expect(getAdminRuleDefinitionIssues('DOCUMENT_SENT', definition(overLimit))).toEqual([
+      { path: ['when'], code: 'TOO_MANY_CONDITIONS' },
+    ]);
   });
 });
 
@@ -345,30 +362,28 @@ describe('evaluateAdminRuleWithLoaders', () => {
     return { fieldLoaders, loadedFields };
   };
 
-  it('loads nothing when the known fields already settle the rule', async () => {
-    const { fieldLoaders, loadedFields } = createFieldLoaders({ 'sender.documents_sent_last_24h': 25 });
+  it('loads a field only when the known fields cannot settle the rule', async () => {
+    const paidPlan = createFieldLoaders({ 'sender.documents_sent_last_24h': 25 });
 
-    const isMatch = await evaluateAdminRuleWithLoaders({
+    const isPaidPlanMatch = await evaluateAdminRuleWithLoaders({
       definition: volumeRule,
       context: { 'sender.plan': 'team' },
-      fieldLoaders,
+      fieldLoaders: paidPlan.fieldLoaders,
     });
 
-    expect(isMatch).toBe(false);
-    expect(loadedFields).toEqual([]);
-  });
+    expect(isPaidPlanMatch).toBe(false);
+    expect(paidPlan.loadedFields).toEqual([]);
 
-  it('loads a field once the known fields cannot settle the rule', async () => {
-    const { fieldLoaders, loadedFields } = createFieldLoaders({ 'sender.documents_sent_last_24h': 25 });
+    const freePlan = createFieldLoaders({ 'sender.documents_sent_last_24h': 25 });
 
-    const isMatch = await evaluateAdminRuleWithLoaders({
+    const isFreePlanMatch = await evaluateAdminRuleWithLoaders({
       definition: volumeRule,
       context: { 'sender.plan': 'free' },
-      fieldLoaders,
+      fieldLoaders: freePlan.fieldLoaders,
     });
 
-    expect(isMatch).toBe(true);
-    expect(loadedFields).toEqual(['sender.documents_sent_last_24h']);
+    expect(isFreePlanMatch).toBe(true);
+    expect(freePlan.loadedFields).toEqual(['sender.documents_sent_last_24h']);
   });
 
   it('skips fields in groups that are already settled', async () => {

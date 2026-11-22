@@ -8,11 +8,11 @@ import type { DocumentMeta, Envelope, Organisation, OrganisationClaim, Recipient
 
 export type AdminRuleEventUser = Pick<User, 'id' | 'email' | 'name' | 'createdAt' | 'twoFactorEnabled'>;
 
-export type AdminRuleEventOrganisation = Pick<Organisation, 'id' | 'type'> & {
+export type AdminRuleEventOrganisation = Pick<Organisation, 'id' | 'type' | 'name'> & {
   organisationClaim: Pick<OrganisationClaim, 'originalSubscriptionClaimId'>;
 };
 
-export type AdminRuleEventTeam = Pick<Team, 'id' | 'url'> & {
+export type AdminRuleEventTeam = Pick<Team, 'id' | 'url' | 'name'> & {
   organisation: AdminRuleEventOrganisation;
 };
 
@@ -50,6 +50,26 @@ export type AdminRuleEvent =
        */
       user: Pick<User, 'id' | 'email' | 'name'>;
       signupMethod: TUserAuthMethod;
+    }
+  | {
+      trigger: 'TEAM_NAME_CHANGED';
+      user: AdminRuleEventUser;
+      organisation: Pick<Organisation, 'id' | 'name'>;
+      /**
+       * The team before the change, `null` when it is being created.
+       */
+      team: Pick<Team, 'name'> | null;
+      newName: string;
+      newUrl: string;
+    }
+  | {
+      trigger: 'ORGANISATION_NAME_CHANGED';
+      user: AdminRuleEventUser;
+      /**
+       * The organisation before the change, `null` when it is being created and so has no id yet.
+       */
+      organisation: Pick<Organisation, 'id' | 'name'> | null;
+      newName: string;
     };
 
 /**
