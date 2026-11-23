@@ -109,10 +109,6 @@ export const toCheckboxCustomText = (checkedValues: number[]): string => {
   return JSON.stringify(checkedValues);
 };
 
-export const parseRadioCustomText = (customText: string): number => {
-  return Number(customText);
-};
-
 export const toRadioCustomText = (value: number): string => {
   return value.toString();
 };

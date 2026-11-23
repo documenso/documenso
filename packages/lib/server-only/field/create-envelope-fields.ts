@@ -1,3 +1,4 @@
+import { validateFieldMetaConfiguration } from '@documenso/lib/advanced-fields-validation/validate-field-meta-configuration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldAndMeta } from '@documenso/lib/types/field-meta';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -160,6 +161,14 @@ export const createEnvelopeFields = async ({
     if (!canRecipientFieldsBeModified(recipient, envelope.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Recipient type cannot have fields, or they have already interacted with the document.',
+      });
+    }
+
+    const fieldMetaErrors = validateFieldMetaConfiguration(field.fieldMeta);
+
+    if (fieldMetaErrors.length > 0) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Invalid field meta for ${field.type} field: ${fieldMetaErrors.join(', ')}`,
       });
     }
 
