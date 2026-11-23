@@ -3,6 +3,7 @@ import { nanoid } from '@documenso/lib/universal/id';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
+import { isDeepEqual } from 'remeda';
 import { z } from 'zod';
 
 import { useLatestRef } from './use-latest-ref';
@@ -50,7 +51,7 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
   mapSource,
   onChange,
 }: UseEditorFormArrayOptions<TItem, TSource>) => {
-  const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
+  const [selectedFormIds, setSelectedFormIds] = useState<string[]>([]);
 
   // Keeps every operation below referentially stable for the long lived Konva
   // handlers which capture them.
@@ -99,16 +100,22 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
     void onChangeRef.current(getItems);
   }, [getItems]);
 
+  // Keeps the current array when the selection does not change, so that the
+  // consumers of `selectedItems` do not render again.
+  const setSelectedItems = useCallback((formIds: string[]) => {
+    setSelectedFormIds((current) => (isDeepEqual(current, formIds) ? current : formIds));
+  }, []);
+
   const setSelected = useCallback(
     (formId: string | null, bypassCheck = false) => {
       if (!formId || bypassCheck) {
-        setSelectedFormId(formId);
+        setSelectedItems(formId ? [formId] : []);
         return;
       }
 
-      setSelectedFormId(findItem(formId)?.formId ?? null);
+      setSelectedItems(findItem(formId) ? [formId] : []);
     },
-    [findItem],
+    [findItem, setSelectedItems],
   );
 
   const appendItems = useCallback(
@@ -161,13 +168,18 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
     [findIndex, getItems, update, triggerChange],
   );
 
-  const selectedItem = useMemo(() => items.find((item) => item.formId === selectedFormId), [items, selectedFormId]);
+  const selectedItems = useMemo(
+    () => items.filter((item) => selectedFormIds.includes(item.formId)),
+    [items, selectedFormIds],
+  );
+
+  const selectedItem = selectedItems.length === 1 ? selectedItems[0] : undefined;
 
   useEffect(() => {
-    if (selectedFormId && !items.some((item) => item.formId === selectedFormId)) {
-      setSelectedFormId(null);
+    if (selectedItems.length !== selectedFormIds.length) {
+      setSelectedFormIds(selectedItems.map((item) => item.formId));
     }
-  }, [items, selectedFormId]);
+  }, [selectedItems, selectedFormIds]);
 
   const sourcesRef = useLatestRef(sources);
 
@@ -186,7 +198,9 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
     removeByFormId,
     updateByFormId,
     selectedItem,
+    selectedItems,
     setSelected,
+    setSelectedItems,
     resetForm,
   };
 };

@@ -337,15 +337,22 @@ export const useEnvelopeCanvasFieldsLayer = ({
       selection.select('field', liveSelectedGroups);
     }
 
-    syncEditorSelectionToCanvas({
-      layer,
-      kind: 'field',
-      editorFormId: editorFields.selectedField?.formId ?? null,
-      isOnPage,
-      selectedGroups,
-      select: selection.select,
-      clear: selection.clear,
-    });
+    const editorFormIds = new Set(editorFields.selectedFields.map((field) => field.formId));
+
+    // The editor selection moved off this page, for example to a field on another page.
+    if (liveSelectedGroups.some((group) => !editorFormIds.has(group.id()))) {
+      selection.release();
+    } else {
+      syncEditorSelectionToCanvas({
+        layer,
+        kind: 'field',
+        editorFormId: editorFields.selectedField?.formId ?? null,
+        isOnPage,
+        selectedGroups,
+        select: selection.select,
+        clear: selection.clear,
+      });
+    }
 
     applyPageItemsVisibility();
 
@@ -357,7 +364,7 @@ export const useEnvelopeCanvasFieldsLayer = ({
     selectedGroups,
     overlappingFieldFormIds,
     isTransforming,
-    editorFields.selectedField?.formId,
+    editorFields.selectedFields,
     fieldsVisibility,
   ]);
 
