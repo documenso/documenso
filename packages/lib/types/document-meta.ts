@@ -93,6 +93,10 @@ export const ZDocumentMetaDistributionMethodSchema = z
   .nativeEnum(DocumentDistributionMethod)
   .describe('The distribution method to use when sending the document to the recipients.');
 
+export const ZDocumentMetaIncludeAuditLogSchema = z
+  .boolean()
+  .describe('Whether to include the audit logs in the sealed document PDF.');
+
 export const ZDocumentMetaTypedSignatureEnabledSchema = z
   .boolean()
   .describe('Whether to allow recipients to sign using a typed signature.');
@@ -116,6 +120,7 @@ export const ZDocumentMetaCreateSchema = z.object({
   timezone: ZDocumentMetaTimezoneSchema.optional(),
   dateFormat: ZDocumentMetaDateFormatSchema.optional(),
   distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
+  includeAuditLog: ZDocumentMetaIncludeAuditLogSchema.optional(),
   signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
   allowDictateNextSigner: z.boolean().optional(),
   redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
