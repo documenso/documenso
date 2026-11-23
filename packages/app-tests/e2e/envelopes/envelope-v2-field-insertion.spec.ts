@@ -6,6 +6,8 @@ import { DocumentStatus, FieldType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { apiSeedPendingDocument } from '../fixtures/api-seeds';
+import { getCanvasBox, getPageCanvas } from '../fixtures/contents';
+import { getKonvaFieldTextForPage } from '../fixtures/konva';
 
 const PDF_PAGE_SELECTOR = 'img[data-page-number]';
 
@@ -251,5 +253,72 @@ test.describe('V2 envelope field insertion during signing', () => {
 
       expect(dbEnvelope.status).toBe(DocumentStatus.COMPLETED);
     }).toPass();
+  });
+
+  test('an auto-inserted number field can be edited and removed', async ({ page, request }) => {
+    // The default value is inserted into the field when the document is sent.
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+      recipients: [{ email: 'signer-number@test.documenso.com', name: 'Number Signer' }],
+      fieldsPerRecipient: [
+        [
+          { type: FieldType.SIGNATURE, page: 1, positionX: 5, positionY: 5, width: 20, height: 5 },
+          {
+            type: FieldType.NUMBER,
+            page: 1,
+            positionX: 5,
+            positionY: 20,
+            width: 30,
+            height: 5,
+            fieldMeta: { type: 'number', value: '144' },
+          },
+        ],
+      ],
+    });
+
+    const numberField = envelope.fields.find((field) => field.type === FieldType.NUMBER);
+
+    if (!numberField) {
+      throw new Error('Number field not found');
+    }
+
+    await page.goto(`/sign/${distributeResult.recipients[0].token}`);
+    await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
+
+    const canvas = getPageCanvas(page);
+    await expect(canvas).toBeVisible({ timeout: 30_000 });
+
+    const canvasBox = await getCanvasBox(page);
+
+    // Field positions and sizes are percentages of the page.
+    const numberFieldCenter = {
+      x: ((Number(numberField.positionX) + Number(numberField.width) / 2) / 100) * canvasBox.width,
+      y: ((Number(numberField.positionY) + Number(numberField.height) / 2) / 100) * canvasBox.height,
+    };
+
+    const dialog = page.getByRole('dialog');
+    const numberInput = dialog.getByRole('textbox');
+
+    await expect.poll(() => getKonvaFieldTextForPage(page, 1, numberField.id)).toBe('144');
+
+    await canvas.click({ position: numberFieldCenter });
+    await expect(numberInput).toHaveValue('144');
+    await numberInput.fill('145');
+    await dialog.getByRole('button', { name: 'Save' }).click();
+    await expect.poll(() => getKonvaFieldTextForPage(page, 1, numberField.id)).toBe('145');
+
+    const editedNumberField = await prisma.field.findUniqueOrThrow({ where: { id: numberField.id } });
+
+    expect(editedNumberField.inserted).toBe(true);
+    expect(editedNumberField.customText).toBe('145');
+
+    await canvas.click({ position: numberFieldCenter });
+    await expect(numberInput).toHaveValue('145');
+    await dialog.getByRole('button', { name: 'Remove' }).click();
+    await expect.poll(() => getKonvaFieldTextForPage(page, 1, numberField.id)).toBe('Number');
+
+    const removedNumberField = await prisma.field.findUniqueOrThrow({ where: { id: numberField.id } });
+
+    expect(removedNumberField.inserted).toBe(false);
+    expect(removedNumberField.customText).toBe('');
   });
 });
