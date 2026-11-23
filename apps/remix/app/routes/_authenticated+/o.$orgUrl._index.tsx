@@ -109,7 +109,7 @@ export default function OrganisationSettingsTeamsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex flex-row justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:justify-between">
         <div>
           <h1 className="font-semibold text-2xl tracking-tight">
             <Trans>{organisation.name} Teams</Trans>
@@ -150,10 +150,10 @@ export default function OrganisationSettingsTeamsPage() {
                     </AvatarFallback>
                   </Avatar>
 
-                  <div className="flex-1">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">{team.name}</h3>
+                      <div className="min-w-0">
+                        <h3 className="truncate font-medium">{team.name}</h3>
                         <div className="truncate text-muted-foreground text-xs">{formatTeamUrl(team.url)}</div>
                       </div>
 

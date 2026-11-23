@@ -117,36 +117,34 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
         <Link to={templateRootPath} className="flex items-center text-documenso-700 hover:opacity-80">
           <ChevronLeft className="mr-2 inline-block h-5 w-5" />
           <Trans>Templates</Trans>
         </Link>
 
-        <div className="flex shrink-0 flex-row space-x-4">
-          {isOwnTeamTemplate && (
-            <>
-              <TemplateDirectLinkDialog
-                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-                directLink={envelope.directLink}
-                recipients={envelope.recipients}
-                triggerSizeVariant="sm"
-              />
+        {isOwnTeamTemplate && (
+          <div className="flex flex-wrap gap-x-4 gap-y-2 sm:shrink-0">
+            <TemplateDirectLinkDialog
+              templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+              directLink={envelope.directLink}
+              recipients={envelope.recipients}
+              triggerSizeVariant="sm"
+            />
 
-              <TemplateBulkSendDialog
-                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-                recipients={envelope.recipients}
-              />
+            <TemplateBulkSendDialog
+              templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+              recipients={envelope.recipients}
+            />
 
-              <Button asChild size="sm">
-                <Link to={`${templateRootPath}/${envelope.id}/edit`}>
-                  <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
-                  <Trans>Edit Template</Trans>
-                </Link>
-              </Button>
-            </>
-          )}
-        </div>
+            <Button asChild size="sm">
+              <Link to={`${templateRootPath}/${envelope.id}/edit`}>
+                <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
+                <Trans>Edit Template</Trans>
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="min-w-0">
@@ -167,7 +165,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
         </div>
       </div>
 
-      <div className="mt-6 grid w-full grid-cols-12 gap-8">
+      <div className="mt-6 grid w-full grid-cols-12 gap-y-8 lg:gap-x-8">
         {envelope.internalVersion === 2 ? (
           <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
             <EnvelopeRenderProvider
