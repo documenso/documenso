@@ -36,6 +36,44 @@ const expectRecipientUpdatedAuditLogCount = async (envelopeId: string, expected:
   expect(auditLogs.length).toBe(expected);
 };
 
+const expectSigningRequestJobCount = async (recipientId: number, expected: number) => {
+  const jobs = await prisma.backgroundJob.findMany({
+    where: {
+      jobId: 'send.signing.requested.email',
+      payload: {
+        path: ['recipientId'],
+        equals: recipientId,
+      },
+    },
+  });
+
+  expect(jobs.length).toBe(expected);
+};
+
+// The signing email job marks the recipient as sent once it has run on the app server.
+const expectRecipientToBeSent = async (recipientId: number) => {
+  await expect
+    .poll(
+      async () => {
+        const recipient = await prisma.recipient.findUniqueOrThrow({
+          where: {
+            id: recipientId,
+          },
+        });
+
+        return {
+          sendStatus: recipient.sendStatus,
+          hasSentAt: recipient.sentAt !== null,
+        };
+      },
+      { timeout: 15_000 },
+    )
+    .toEqual({
+      sendStatus: SendStatus.SENT,
+      hasSentAt: true,
+    });
+};
+
 const seedDictationDocument = async (signingOrders: number[]) => {
   const { user, team } = await seedUser();
 
@@ -48,7 +86,7 @@ const seedDictationDocument = async (signingOrders: number[]) => {
     recipientsCreateOptions: signingOrders.map((signingOrder) => ({
       signingOrder,
       // The seed defaults every recipient to SENT; later steps of a real
-      // SEQUENTIAL document are NOT_SENT until their step unlocks.
+      // SEQUENTIAL document are NOT_SENT until their signing request is sent.
       sendStatus: signingOrder === 1 ? SendStatus.SENT : SendStatus.NOT_SENT,
     })),
     // No fields, so completion is not blocked by unsigned required fields.
@@ -110,8 +148,11 @@ test('[NEXT_RECIPIENT_DICTATION]: dictation is ignored when the next step is a g
   await expectRecipientUpdatedAuditLogCount(first.envelopeId, 0);
 
   // The group is still activated as normal — only the rewrite is suppressed.
-  expect(groupAAfter.sendStatus).toBe(SendStatus.SENT);
-  expect(groupBAfter.sendStatus).toBe(SendStatus.SENT);
+  await expectSigningRequestJobCount(groupA.id, 1);
+  await expectRecipientToBeSent(groupA.id);
+
+  await expectSigningRequestJobCount(groupB.id, 1);
+  await expectRecipientToBeSent(groupB.id);
 });
 
 test('[NEXT_RECIPIENT_DICTATION]: a group member cannot dictate while a peer is still unsigned', async () => {
@@ -133,6 +174,7 @@ test('[NEXT_RECIPIENT_DICTATION]: a group member cannot dictate while a peer is 
   expect(lastWhilePeerPending.email).toBe(last.email);
   expect(lastWhilePeerPending.name).toBe(last.name);
   expect(lastWhilePeerPending.sendStatus).toBe(SendStatus.NOT_SENT);
+  await expectSigningRequestJobCount(last.id, 0);
   await expectRecipientUpdatedAuditLogCount(groupA.envelopeId, 0);
 
   // The peer completing the group *does* advance to a single-recipient step,
@@ -149,6 +191,7 @@ test('[NEXT_RECIPIENT_DICTATION]: a group member cannot dictate while a peer is 
 
   expect(lastAfterGroupComplete.email).toBe(DICTATED_SIGNER.email);
   expect(lastAfterGroupComplete.name).toBe(DICTATED_SIGNER.name);
-  expect(lastAfterGroupComplete.sendStatus).toBe(SendStatus.SENT);
+  await expectSigningRequestJobCount(last.id, 1);
+  await expectRecipientToBeSent(last.id);
   await expectRecipientUpdatedAuditLogCount(groupA.envelopeId, 1);
 });

@@ -103,6 +103,16 @@ export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDia
         return;
       }
 
+      if (error.code === 'ADMIN_RULE_BLOCKED') {
+        toast({
+          title: _(msg`Team creation blocked`),
+          description: _(msg`This change is blocked. Please contact support if you believe this is a mistake.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
+
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(msg`We encountered an unknown error while attempting to create a team. Please try again later.`),

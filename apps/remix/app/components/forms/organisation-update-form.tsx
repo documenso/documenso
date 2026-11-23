@@ -81,6 +81,16 @@ export const OrganisationUpdateForm = () => {
         return;
       }
 
+      if (error.code === 'ADMIN_RULE_BLOCKED') {
+        toast({
+          title: _(msg`Organisation update blocked`),
+          description: _(msg`This change is blocked. Please contact support if you believe this is a mistake.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
+
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(

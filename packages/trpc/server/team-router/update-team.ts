@@ -27,6 +27,7 @@ export const updateTeamRoute = authenticatedProcedure
           name,
           url,
         },
+        requestMetadata: ctx.metadata,
       });
     }
 
