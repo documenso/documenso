@@ -142,8 +142,10 @@ export const createEnvelopeRouteCaller = async ({
         });
       }
 
+      // A document without form values keeps its PDF form until sealing, so that
+      // the editor can import the form fields.
       const { pdf: normalized } = await normalizePdf(pdf, {
-        flattenForm: type !== EnvelopeType.TEMPLATE,
+        flattenForm: type !== EnvelopeType.TEMPLATE && Boolean(formValues),
       });
 
       // Todo: Embeds - Might need to add this for client-side embeds in the future.

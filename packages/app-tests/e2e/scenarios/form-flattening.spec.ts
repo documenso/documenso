@@ -145,7 +145,7 @@ test.describe('Form Flattening', () => {
       expect(hasFormFields).toBe(false);
     });
 
-    test('should flatten form fields when creating a DOCUMENT envelope without formValues', async ({ request }) => {
+    test('should keep form fields when creating a DOCUMENT envelope without formValues', async ({ request }) => {
       const { user, team } = await seedUser();
       const { token } = await createApiToken({
         userId: user.id,
@@ -157,7 +157,7 @@ test.describe('Form Flattening', () => {
       const payload: TCreateEnvelopePayload = {
         type: EnvelopeType.DOCUMENT,
         title: 'Document without Form Values',
-        // No formValues - but form should still be flattened for DOCUMENT type
+        // No formValues - the form stays so that the editor can import its fields
       };
 
       const formData = new FormData();
@@ -184,13 +184,13 @@ test.describe('Form Flattening', () => {
         },
       });
 
-      // Get the PDF and verify form fields are flattened
+      // Get the PDF and verify form fields are kept
       const documentData = envelope.envelopeItems[0].documentData;
       const pdfBuffer = await getFileServerSide(documentData);
 
       const hasFormFields = await pdfHasFormFields(pdfBuffer);
 
-      expect(hasFormFields).toBe(false);
+      expect(hasFormFields).toBe(true);
     });
   });
 

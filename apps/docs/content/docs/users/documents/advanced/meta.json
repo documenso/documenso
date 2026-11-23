@@ -3,6 +3,7 @@
   "pages": [
     "...index",
     "pdf-placeholders",
+    "pdf-form-fields",
     "ai-detection",
     "default-recipients",
     "document-visibility",

@@ -53,8 +53,10 @@ export const UNSAFE_createEnvelopeItems = async ({
         buffer = await insertFormValuesInPdf({ pdf: buffer, formValues: envelope.formValues });
       }
 
+      // A document without form values keeps its PDF form until sealing, so that
+      // the editor can import the form fields.
       const { pdf: normalized } = await normalizePdf(buffer, {
-        flattenForm: envelope.type !== 'TEMPLATE',
+        flattenForm: envelope.type !== 'TEMPLATE' && Boolean(envelope.formValues),
       });
 
       const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
