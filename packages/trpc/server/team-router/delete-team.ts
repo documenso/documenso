@@ -38,6 +38,18 @@ export const deleteTeamRoute = authenticatedProcedure
         })
       : undefined;
 
+    // Being a member of the target team is not enough: a user can belong to teams in several
+    // organisations, and documents must not leave the organisation that owns them.
+    //
+    // The target cannot be the team being deleted either. Moving a team's documents to itself moves
+    // nothing, and because a target was given orphanEnvelopes never runs, so the pending and
+    // completed documents it would have kept are deleted together with the team.
+    if (transferTeam && (transferTeam.id === team.id || transferTeam.organisationId !== team.organisationId)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Invalid transfer team ID',
+      });
+    }
+
     if (transferTeam) {
       await transferTeamEnvelopes({
         sourceTeamId: teamId,

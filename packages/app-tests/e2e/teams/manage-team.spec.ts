@@ -2,11 +2,13 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createTeam } from '@documenso/lib/server-only/team/create-team';
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import { seedBlankDocument } from '@documenso/prisma/seed/documents';
+import { seedBlankDocument, seedPendingDocument } from '@documenso/prisma/seed/documents';
+import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
+import { TeamMemberRole } from '@prisma/client';
 
-import { apiSignin } from '../fixtures/authentication';
+import { apiSignin, WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 import { expectTextToBeVisible } from '../fixtures/generic';
 
 test('[TEAMS]: create team', async ({ page }) => {
@@ -110,6 +112,43 @@ test('[TEAMS]: delete team and transfer documents to another team', async ({ pag
   expect(transferredDocument?.teamId).toBe(otherTeam.id);
 });
 
+test('[TEAMS]: delete team cannot transfer documents to another organisation', async ({ page }) => {
+  const { user: owner, team } = await seedUser();
+  const document = await seedBlankDocument(owner, team.id);
+
+  // seedTeamMember goes through seedUser, so the attacker also owns an organisation with its own team.
+  const attacker = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.ADMIN });
+  const attackerTeam = await prisma.team.findFirstOrThrow({
+    where: { organisation: { ownerUserId: attacker.id } },
+  });
+
+  await apiSignin({ page, email: attacker.email });
+
+  const response = await requestTeamDelete(page, { teamId: team.id, transferTeamId: attackerTeam.id });
+
+  expect(response.status()).toBe(400);
+  expect(await prisma.team.findUnique({ where: { id: team.id } })).not.toBeNull();
+
+  const untouchedDocument = await prisma.envelope.findUnique({ where: { id: document.id } });
+
+  expect(untouchedDocument?.teamId).toBe(team.id);
+});
+
+test('[TEAMS]: delete team cannot transfer documents to itself', async ({ page }) => {
+  const { user, team } = await seedUser();
+  const document = await seedPendingDocument(user, team.id, ['signer@test.documenso.com']);
+
+  await apiSignin({ page, email: user.email });
+
+  const response = await requestTeamDelete(page, { teamId: team.id, transferTeamId: team.id });
+
+  expect(response.status()).toBe(400);
+
+  const untouchedDocument = await prisma.envelope.findUnique({ where: { id: document.id } });
+
+  expect(untouchedDocument?.teamId).toBe(team.id);
+});
+
 test('[TEAMS]: update team', async ({ page }) => {
   const { user, team } = await seedUser();
 
@@ -149,4 +188,12 @@ const seedSiblingTeam = async (userId: number, organisationId: string) => {
   });
 
   return await prisma.team.findUniqueOrThrow({ where: { url: teamUrl } });
+};
+
+// The delete dialog never offers these transfer targets, so the request has to be crafted.
+const requestTeamDelete = async (page: Page, input: { teamId: number; transferTeamId: number }) => {
+  return await page.context().request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/team.delete`, {
+    headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
+    data: JSON.stringify({ json: input }),
+  });
 };
