@@ -657,7 +657,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                     <TooltipContent className="max-w-xs text-muted-foreground">
                                       <Trans>
                                         Select the folder where documents created from this template or its direct link
-                                        will be placed by default.
+                                        will be placed by default. Only folders from Documents are listed.
                                       </Trans>
                                     </TooltipContent>
                                   </Tooltip>

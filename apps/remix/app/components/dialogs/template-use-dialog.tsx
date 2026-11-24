@@ -294,17 +294,25 @@ export function TemplateUseDialog({
   const canUseUploadedDocumentName = Boolean(lastUploadedFile);
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
       form.reset(generateDefaultFormValues());
       setLastUploadedFile(undefined);
     }
-  }, [open, form, targetFolderId]);
+  }, [open, form]);
 
+  // Runs after the reset above so a target folder the user cannot see falls back to the root folder,
+  // including when the dialog is reopened with cached folder data.
   useEffect(() => {
-    if (foldersData && targetFolderId && !foldersData.data.some((folder) => folder.id === targetFolderId)) {
+    if (
+      open &&
+      foldersData &&
+      targetFolderId &&
+      form.getValues('folderId') === targetFolderId &&
+      !foldersData.data.some((folder) => folder.id === targetFolderId)
+    ) {
       form.setValue('folderId', null);
     }
-  }, [foldersData, targetFolderId, form]);
+  }, [open, foldersData, targetFolderId, form]);
 
   useEffect(() => {
     if (envelopeItems.length > 0 && localCustomDocumentData.length === 0) {
@@ -846,7 +854,9 @@ export function TemplateUseDialog({
                               <InfoIcon className="mx-1 h-4 w-4 text-muted-foreground" />
                             </TooltipTrigger>
                             <TooltipContent className="z-[99999] max-w-xs text-muted-foreground">
-                              <Trans>Select the folder where the created document will be placed.</Trans>
+                              <Trans>
+                                Select the folder where the created document from this template will be placed.
+                              </Trans>
                             </TooltipContent>
                           </Tooltip>
                         </FormLabel>

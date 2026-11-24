@@ -18,6 +18,7 @@ import { match } from 'ts-pattern';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { TEnvelopeExpirationPeriod } from '../../constants/envelope-expiration';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { ZDefaultRecipientsSchema } from '../../types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -394,11 +395,15 @@ export const createDocumentFromTemplate = async ({
   ) {
     // Only fall back to the template's target folder when `folderId` is omitted;
     // an explicit `null` means the caller chose the root folder override.
-    const targetFolder = await prisma.folder.findUnique({
+    // Fall back to the root folder if the caller cannot see the target folder.
+    const targetFolder = await prisma.folder.findFirst({
       where: {
         id: template.targetFolderId,
         type: FolderType.DOCUMENT,
         team: buildTeamWhereQuery({ teamId, userId }),
+        visibility: {
+          in: TEAM_DOCUMENT_VISIBILITY_MAP[callerTeam.currentTeamRole],
+        },
       },
     });
 
