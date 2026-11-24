@@ -78,6 +78,7 @@ export type EmailContextResponse = {
    */
   emailsDisabled: boolean;
   organisationId: string;
+  organisationName: string;
   organisationType: OrganisationType;
   emailTransport: Transporter;
   senderEmail: {
@@ -236,6 +237,7 @@ const handleOrganisationEmailContext = async (organisationId: string) => {
     claims,
     emailsDisabled: organisation.owner.disabled || claims.flags.disableEmails === true,
     organisationId: organisation.id,
+    organisationName: organisation.name,
     organisationType: organisation.type,
   };
 };
@@ -296,6 +298,7 @@ const handleTeamEmailContext = async (teamId: number) => {
     claims,
     emailsDisabled: organisation.owner.disabled || claims.flags.disableEmails === true,
     organisationId: organisation.id,
+    organisationName: organisation.name,
     organisationType: organisation.type,
   };
 };

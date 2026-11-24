@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { stripe } from '@documenso/lib/server-only/stripe';
@@ -35,6 +36,52 @@ export const updateOrganisationRoute = authenticatedProcedure
     if (!existingOrganisation) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Organisation not found',
+      });
+    }
+
+    // Checked up front so rules never run for a rename the unique constraint would reject.
+    const organisationWithUrl = await prisma.organisation.findFirst({
+      where: {
+        url: data.url,
+        id: {
+          not: organisationId,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (organisationWithUrl) {
+      throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+        message: 'Organisation URL already exists.',
+      });
+    }
+
+    if (existingOrganisation.name !== data.name) {
+      const actingUser = await prisma.user.findFirstOrThrow({
+        where: {
+          id: userId,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          createdAt: true,
+          twoFactorEnabled: true,
+        },
+      });
+
+      const adminRuleEngine = new AdminRuleEngine({
+        requestMetadata: ctx.metadata.requestMetadata,
+        requestSource: ctx.metadata.source,
+      });
+
+      await adminRuleEngine.runAndAssert({
+        trigger: 'ORGANISATION_NAME_CHANGED',
+        user: actingUser,
+        organisation: existingOrganisation,
+        newName: data.name,
       });
     }
 
