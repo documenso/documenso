@@ -11,7 +11,6 @@ import {
   EnvelopeType,
   FieldType,
   RecipientRole,
-  SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
@@ -481,8 +480,6 @@ export const completeDocumentWithToken = async ({
             await tx.recipient.update({
               where: { id: nextRecipient.id },
               data: {
-                sendStatus: SendStatus.SENT,
-                sentAt: new Date(),
                 name: dictatedNextSigner.name,
                 email: dictatedNextSigner.email.toLowerCase(),
               },
@@ -517,18 +514,6 @@ export const completeDocumentWithToken = async ({
                 },
               }),
             });
-          });
-        } else {
-          await prisma.recipient.updateMany({
-            where: {
-              id: {
-                in: nextRecipients.map((nextRecipient) => nextRecipient.id),
-              },
-            },
-            data: {
-              sendStatus: SendStatus.SENT,
-              sentAt: new Date(),
-            },
           });
         }
 

@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -42,8 +43,6 @@ export const createOrganisationRoute = authenticatedProcedure
       }
     }
 
-    // Create the organisation upfront, then redirect to checkout for payment.
-    // The webhook sync will attach the real subscription and claim after payment.
     if (IS_BILLING_ENABLED() && priceId) {
       const pendingOrganisation = await prisma.organisation.findFirst({
         where: {
@@ -69,7 +68,36 @@ export const createOrganisationRoute = authenticatedProcedure
           message: 'You have a pending organisation awaiting payment. Complete or remove it before creating a new one.',
         });
       }
+    }
 
+    const actingUser = await prisma.user.findFirstOrThrow({
+      where: {
+        id: user.id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        twoFactorEnabled: true,
+      },
+    });
+
+    const adminRuleEngine = new AdminRuleEngine({
+      requestMetadata: ctx.metadata.requestMetadata,
+      requestSource: ctx.metadata.source,
+    });
+
+    await adminRuleEngine.runAndAssert({
+      trigger: 'ORGANISATION_NAME_CHANGED',
+      user: actingUser,
+      organisation: null,
+      newName: name,
+    });
+
+    // Create the organisation upfront, then redirect to checkout for payment.
+    // The webhook sync will attach the real subscription and claim after payment.
+    if (IS_BILLING_ENABLED() && priceId) {
       const freeSubscriptionClaim = await getSubscriptionClaim(INTERNAL_CLAIM_ID.FREE);
 
       const organisation = await createOrganisation({
