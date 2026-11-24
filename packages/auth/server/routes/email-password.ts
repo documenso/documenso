@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import {
   isDisposableEmail,
   isEmailDomainAllowedForSignup,
@@ -34,6 +35,7 @@ import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/serv
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
+import { UserAuthMethod } from '@documenso/lib/types/user-auth-method';
 import { prisma } from '@documenso/prisma';
 import { sValidator } from '@hono/standard-validator';
 import { compare } from '@node-rs/bcrypt';
@@ -76,7 +78,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const loginLimitResult = await loginRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
-      identifier: email,
+      identifier: email.toLowerCase(),
     });
 
     const loginLimited = rateLimitResponse(c, loginLimitResult);
@@ -236,6 +238,14 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       throw err;
     });
 
+    const adminRuleEngine = new AdminRuleEngine({ requestMetadata });
+
+    await adminRuleEngine.run({
+      trigger: 'USER_SIGNED_UP',
+      user,
+      signupMethod: UserAuthMethod.PASSWORD,
+    });
+
     await jobsClient.triggerJob({
       name: 'send.signup.confirmation.email',
       payload: {
@@ -349,7 +359,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const resendLimitResult = await resendVerifyEmailRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
-      identifier: email,
+      identifier: email.toLowerCase(),
     });
 
     const resendLimited = rateLimitResponse(c, resendLimitResult);
@@ -385,7 +395,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const forgotLimitResult = await forgotPasswordRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
-      identifier: email,
+      identifier: email.toLowerCase(),
     });
 
     const forgotLimited = rateLimitResponse(c, forgotLimitResult);

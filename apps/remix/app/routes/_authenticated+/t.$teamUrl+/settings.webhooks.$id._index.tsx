@@ -217,7 +217,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
       >
         <div className="flex gap-2">
           <WebhookTestDialog webhook={webhook}>
-            <Button variant="outline">
+            <Button variant="outline" disabled={!webhook.enabled}>
               <TerminalIcon className="mr-2 h-4 w-4" />
               <Trans>Test</Trans>
             </Button>

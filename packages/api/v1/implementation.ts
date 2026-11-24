@@ -18,6 +18,7 @@ import { getEnvelopeById, getEnvelopeWhereInput } from '@documenso/lib/server-on
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
 import { updateEnvelopeFields } from '@documenso/lib/server-only/field/update-envelope-fields';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
+import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
 import { deleteEnvelopeRecipient } from '@documenso/lib/server-only/recipient/delete-envelope-recipient';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
@@ -26,7 +27,6 @@ import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
-import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { extractDerivedDocumentEmailSettings } from '@documenso/lib/types/document-email';
 import {
   ZCheckboxFieldMeta,
@@ -1122,7 +1122,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       teamId: team.id,
     });
 
-    const recipientAlreadyExists = recipients.some((recipient) => recipient.email === email);
+    const recipientAlreadyExists = recipients.some((recipient) => recipient.email === email.toLowerCase());
 
     if (recipientAlreadyExists) {
       return {
@@ -1134,7 +1134,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
 
     try {
-      const { recipients: newRecipients } = await setDocumentRecipients({
+      const { recipients: newRecipients } = await createEnvelopeRecipients({
         id: {
           type: 'documentId',
           id: Number(documentId),
@@ -1142,13 +1142,6 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         userId: user.id,
         teamId: team.id,
         recipients: [
-          ...recipients.map((recipient) => ({
-            email: recipient.email,
-            name: recipient.name,
-            role: recipient.role,
-            signingOrder: recipient.signingOrder,
-            actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? [],
-          })),
           {
             email,
             name,
@@ -1160,7 +1153,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         requestMetadata: metadata,
       });
 
-      const newRecipient = newRecipients.find((recipient) => recipient.email === email);
+      const newRecipient = newRecipients.find((recipient) => recipient.email === email.toLowerCase());
 
       if (!newRecipient) {
         throw new Error('Recipient not found');

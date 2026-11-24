@@ -3,6 +3,7 @@ import { createApiToken } from '@documenso/lib/server-only/public-api/create-api
 import {
   FIELD_DATE_META_DEFAULT_VALUES,
   type TCheckboxFieldMeta,
+  type TFieldMetaSchema,
   type TRadioFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import {
@@ -635,6 +636,157 @@ test.describe('Template Field Prefill API v2', () => {
     });
 
     expect(document.fields[0]).toMatchObject({ inserted: true, customText: '13/10/2026' });
+  });
+
+  test('should keep template labels and placeholders when prefill omits them', async ({ request }) => {
+    const { user, team } = await seedUser();
+
+    const { token } = await createApiToken({
+      userId: user.id,
+      teamId: team.id,
+      tokenName: 'test-token',
+      expiresIn: null,
+    });
+
+    const template = await seedBlankTemplate(user, team.id, {
+      createTemplateOptions: {
+        title: 'Template for Value-Only Prefill V2',
+      },
+    });
+
+    const firstEnvelopeItem = template.envelopeItems[0];
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        envelopeId: template.id,
+        email: 'recipient@example.com',
+        name: 'Test Recipient',
+        role: RecipientRole.SIGNER,
+        token: 'test-token',
+        readStatus: 'NOT_OPENED',
+        sendStatus: 'NOT_SENT',
+        signingStatus: 'NOT_SIGNED',
+      },
+    });
+
+    const fieldsToCreate: { type: FieldType; fieldMeta: TFieldMetaSchema }[] = [
+      {
+        type: FieldType.TEXT,
+        fieldMeta: { type: 'text', label: 'Company name', placeholder: 'e.g. Acme Inc.' },
+      },
+      {
+        type: FieldType.NUMBER,
+        fieldMeta: { type: 'number', label: 'Employee count', placeholder: 'e.g. 42' },
+      },
+      {
+        type: FieldType.RADIO,
+        fieldMeta: {
+          type: 'radio',
+          label: 'Plan',
+          direction: 'vertical',
+          values: [
+            { id: 1, value: 'Option A', checked: false },
+            { id: 2, value: 'Option B', checked: false },
+          ],
+        },
+      },
+      {
+        type: FieldType.CHECKBOX,
+        fieldMeta: {
+          type: 'checkbox',
+          label: 'Add-ons',
+          direction: 'vertical',
+          values: [
+            { id: 1, value: 'Check A', checked: false },
+            { id: 2, value: 'Check B', checked: false },
+          ],
+        },
+      },
+      {
+        type: FieldType.DROPDOWN,
+        fieldMeta: {
+          type: 'dropdown',
+          label: 'Region',
+          values: [{ value: 'Select A' }, { value: 'Select B' }],
+        },
+      },
+    ];
+
+    const [textField, numberField, radioField, checkboxField, dropdownField] = await Promise.all(
+      fieldsToCreate.map(async ({ type, fieldMeta }, index) =>
+        prisma.field.create({
+          data: {
+            envelopeId: template.id,
+            envelopeItemId: firstEnvelopeItem.id,
+            recipientId: recipient.id,
+            type,
+            page: 1,
+            positionX: 5,
+            positionY: 5 + index * 10,
+            width: 20,
+            height: 5,
+            customText: '',
+            inserted: false,
+            fieldMeta,
+          },
+        }),
+      ),
+    );
+
+    const response = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/use`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
+        recipients: [
+          {
+            id: recipient.id,
+            email: 'recipient@example.com',
+            name: 'Test Recipient',
+          },
+        ],
+        prefillFields: [
+          { id: textField.id, type: 'text', value: 'Acme' },
+          { id: numberField.id, type: 'number', value: '12' },
+          { id: radioField.id, type: 'radio', value: 'Option B' },
+          { id: checkboxField.id, type: 'checkbox', value: ['Check A'] },
+          { id: dropdownField.id, type: 'dropdown', value: 'Select A' },
+        ],
+      },
+    });
+
+    expect(response.status()).toBe(200);
+
+    const responseData = await response.json();
+
+    const document = await prisma.envelope.findUniqueOrThrow({
+      where: {
+        secondaryId: mapDocumentIdToSecondaryId(responseData.id),
+      },
+      include: {
+        fields: true,
+      },
+    });
+
+    const findFieldMeta = (type: FieldType) => document.fields.find((field) => field.type === type)?.fieldMeta;
+
+    expect(findFieldMeta(FieldType.TEXT)).toMatchObject({
+      label: 'Company name',
+      placeholder: 'e.g. Acme Inc.',
+      text: 'Acme',
+    });
+
+    expect(findFieldMeta(FieldType.NUMBER)).toMatchObject({
+      label: 'Employee count',
+      placeholder: 'e.g. 42',
+      value: '12',
+    });
+
+    expect(findFieldMeta(FieldType.RADIO)).toMatchObject({ label: 'Plan' });
+    expect(findFieldMeta(FieldType.CHECKBOX)).toMatchObject({ label: 'Add-ons' });
+    expect(findFieldMeta(FieldType.DROPDOWN)).toMatchObject({ label: 'Region', defaultValue: 'Select A' });
   });
 
   test('should handle invalid field prefill values', async ({ request }) => {

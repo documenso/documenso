@@ -1,3 +1,4 @@
+import { validateFieldMetaConfiguration } from '@documenso/lib/advanced-fields-validation/validate-field-meta-configuration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
@@ -113,6 +114,14 @@ export const updateEnvelopeFields = async ({
     if (field.envelopeItemId && !envelope.envelopeItems.some((item) => item.id === field.envelopeItemId)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Envelope item not found',
+      });
+    }
+
+    const fieldMetaErrors = validateFieldMetaConfiguration(field.fieldMeta);
+
+    if (fieldMetaErrors.length > 0) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Invalid field meta for field ${field.id}: ${fieldMetaErrors.join(', ')}`,
       });
     }
 

@@ -419,8 +419,10 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
         .exhaustive();
     };
 
-    fieldGroup.off('pointerdown');
-    fieldGroup.on('pointerdown', handleFieldGroupClick);
+    // Not pointerdown: the dialog would mount and focus its input, then the browser's mousedown
+    // default action would move focus to <body>.
+    fieldGroup.off('pointerclick');
+    fieldGroup.on('pointerclick', handleFieldGroupClick);
   };
 
   const renderFieldOnLayer = (

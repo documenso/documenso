@@ -1,9 +1,12 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import { sendOrganisationAccountLinkConfirmationEmail } from '@documenso/ee/server-only/lib/send-organisation-account-link-confirmation-email';
 import { formatPath } from '@documenso/lib/constants/app';
 import { isDisposableEmail, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
+import { UserAuthMethod } from '@documenso/lib/types/user-auth-method';
+import { findUserByProvidedEmail } from '@documenso/lib/server-only/user/find-user-by-provided-email';
 import { formatOrganisationLoginUrl } from '@documenso/lib/utils/organisation-authentication-portal';
 import { prisma } from '@documenso/prisma';
 import type { Context } from 'hono';
@@ -36,7 +39,11 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
 
   const allowedDomains = organisation.organisationAuthenticationPortal.allowedDomains;
 
-  if (allowedDomains.length > 0 && !allowedDomains.some((domain) => email.endsWith(`@${domain}`))) {
+  const isEmailDomainAllowed = allowedDomains.some((domain) =>
+    email.toLowerCase().endsWith(`@${domain.toLowerCase()}`),
+  );
+
+  if (allowedDomains.length > 0 && !isEmailDomainAllowed) {
     throw new AppError(AuthenticationErrorCode.InvalidRequest, {
       message: 'Email domain not allowed',
     });
@@ -60,11 +67,7 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
     return c.redirect(formatPath(`/o/${orgUrl}`), 302);
   }
 
-  let userToLink = await prisma.user.findFirst({
-    where: {
-      email,
-    },
-  });
+  let userToLink = await findUserByProvidedEmail({ email });
 
   // Handle new user.
   if (!userToLink) {
@@ -89,7 +92,7 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
 
     userToLink = await prisma.user.create({
       data: {
-        email: email,
+        email: email.toLowerCase(),
         name: name,
         emailVerified: null, // Do not verify email.
       },
@@ -100,6 +103,14 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
     }).catch((err) => {
       // Todo: (RR7) Add logging.
       console.error(err);
+    });
+
+    const adminRuleEngine = new AdminRuleEngine({ requestMetadata: c.get('requestMetadata') });
+
+    await adminRuleEngine.run({
+      trigger: 'USER_SIGNED_UP',
+      user: userToLink,
+      signupMethod: UserAuthMethod.ORGANISATION_SSO,
     });
   }
 

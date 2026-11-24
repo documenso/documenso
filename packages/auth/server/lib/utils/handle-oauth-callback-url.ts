@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import { formatPath, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import {
   isDisposableEmail,
@@ -9,10 +10,12 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { exchangeAuthorizationCode } from '@documenso/lib/server-only/auth/exchange-authorization-code';
 import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
+import { findUserByProvidedEmail } from '@documenso/lib/server-only/user/find-user-by-provided-email';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { logger } from '@documenso/lib/utils/logger';
+import { OAUTH_PROVIDER_AUTH_METHODS } from '@documenso/lib/utils/user-auth-methods';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { decodeIdToken } from 'arctic';
@@ -109,15 +112,7 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
     return c.redirect(redirectPath, 302);
   }
 
-  const userWithSameEmail = await prisma.user.findFirst({
-    where: {
-      email: email,
-    },
-    select: {
-      id: true,
-      emailVerified: true,
-    },
-  });
+  const userWithSameEmail = await findUserByProvidedEmail({ email });
 
   // Handle existing user but no account.
   if (userWithSameEmail) {
@@ -187,7 +182,7 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
   const createdUser = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: {
-        email: email,
+        email: email.toLowerCase(),
         name: name,
         emailVerified: new Date(),
       },
@@ -212,6 +207,14 @@ const handleOAuthCallback = async (options: HandleOAuthCallbackUrlOptions) => {
   await onCreateUserHook(createdUser).catch((err) => {
     // Todo: (RR7) Add logging.
     console.error(err);
+  });
+
+  const adminRuleEngine = new AdminRuleEngine({ requestMetadata: requestMeta });
+
+  await adminRuleEngine.run({
+    trigger: 'USER_SIGNED_UP',
+    user: createdUser,
+    signupMethod: OAUTH_PROVIDER_AUTH_METHODS[clientOptions.id],
   });
 
   await onAuthorize({ userId: createdUser.id }, c);
