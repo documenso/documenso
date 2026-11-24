@@ -372,11 +372,14 @@ export const createDocumentFromTemplate = async ({
   let resolvedFolderId: string | null = null;
 
   if (folderId) {
-    const folder = await prisma.folder.findUnique({
+    const folder = await prisma.folder.findFirst({
       where: {
         id: folderId,
         type: FolderType.DOCUMENT,
         team: buildTeamWhereQuery({ teamId, userId }),
+        visibility: {
+          in: TEAM_DOCUMENT_VISIBILITY_MAP[callerTeam.currentTeamRole],
+        },
       },
     });
 
@@ -395,7 +398,8 @@ export const createDocumentFromTemplate = async ({
   ) {
     // Only fall back to the template's target folder when `folderId` is omitted;
     // an explicit `null` means the caller chose the root folder override.
-    // Fall back to the root folder if the caller cannot see the target folder.
+    // A target folder hidden from the caller's role resolves to the root folder instead of erroring,
+    // so members can still use templates an admin pointed at an admin-only folder.
     const targetFolder = await prisma.folder.findFirst({
       where: {
         id: template.targetFolderId,

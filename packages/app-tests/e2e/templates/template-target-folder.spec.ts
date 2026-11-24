@@ -7,10 +7,11 @@ import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
+import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedDirectTemplate } from '@documenso/prisma/seed/templates';
 import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
-import { FolderType } from '@prisma/client';
+import { DocumentVisibility, FolderType, TeamMemberRole } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 import { getEnvelopeEditorSettingsTrigger } from '../fixtures/envelope-editor';
@@ -325,4 +326,83 @@ test('[TEMPLATE_TARGET_FOLDER]: rejects non-document folders, cross-team folders
   });
 
   expect(rootOverrideDoc.folderId).toBeNull();
+});
+
+test('[TEMPLATE_TARGET_FOLDER]: members cannot target or use folders hidden from their role', async () => {
+  const { user: admin, team } = await seedUser();
+  const member = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.MEMBER });
+
+  const adminOnlyFolder = await seedBlankFolder(admin, team.id, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      type: FolderType.DOCUMENT,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  const template = await seedDirectTemplate({
+    title: 'Admin only target template',
+    userId: admin.id,
+    teamId: team.id,
+    internalVersion: 2,
+  });
+
+  const recipients = template.recipients.map((r) => ({
+    id: r.id,
+    name: 'Recipient',
+    email: seedTestEmail(),
+  }));
+
+  await expect(
+    updateEnvelope({
+      userId: member.id,
+      teamId: team.id,
+      id: { type: 'envelopeId', id: template.id },
+      data: { targetFolderId: adminOnlyFolder.id },
+      requestMetadata,
+    }),
+  ).rejects.toMatchObject({
+    code: AppErrorCode.NOT_FOUND,
+  });
+
+  await updateEnvelope({
+    userId: admin.id,
+    teamId: team.id,
+    id: { type: 'envelopeId', id: template.id },
+    data: { targetFolderId: adminOnlyFolder.id },
+    requestMetadata,
+  });
+
+  await expect(
+    createDocumentFromTemplate({
+      id: { type: 'envelopeId', id: template.id },
+      userId: member.id,
+      teamId: team.id,
+      folderId: adminOnlyFolder.id,
+      recipients,
+      requestMetadata,
+    }),
+  ).rejects.toMatchObject({
+    code: AppErrorCode.NOT_FOUND,
+  });
+
+  const memberDocument = await createDocumentFromTemplate({
+    id: { type: 'envelopeId', id: template.id },
+    userId: member.id,
+    teamId: team.id,
+    recipients,
+    requestMetadata,
+  });
+
+  expect(memberDocument.folderId).toBeNull();
+
+  const adminDocument = await createDocumentFromTemplate({
+    id: { type: 'envelopeId', id: template.id },
+    userId: admin.id,
+    teamId: team.id,
+    recipients,
+    requestMetadata,
+  });
+
+  expect(adminDocument.folderId).toBe(adminOnlyFolder.id);
 });
