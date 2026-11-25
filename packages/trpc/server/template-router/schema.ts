@@ -70,12 +70,20 @@ export const ZTemplateMetaUpsertSchema = z.object({
   allowDictateNextSigner: z.boolean().optional(),
 });
 
+// Not trimmed, so a V2 value is compared with the field's options exactly as signing does,
+// such as a dropdown option ending in a space. V1 values are trimmed when they are used.
+export const ZDirectTemplateSignedFieldValueSchema = ZSignFieldWithTokenMutationSchema.extend({
+  value: z.string().optional(),
+});
+
+export type TDirectTemplateSignedFieldValue = z.infer<typeof ZDirectTemplateSignedFieldValueSchema>;
+
 export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
   directRecipientName: z.string().max(255).optional(),
   directRecipientEmail: zEmail().max(254),
   directTemplateToken: z.string().min(1),
   directTemplateExternalId: z.string().optional(),
-  signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
+  signedFieldValues: z.array(ZDirectTemplateSignedFieldValueSchema),
   templateUpdatedAt: z.date(),
   nextSigner: z
     .object({

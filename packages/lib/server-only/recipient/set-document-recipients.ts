@@ -14,9 +14,11 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { assertRecipientIdsUnique } from '../../utils/fields';
 import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { lockEnvelope } from '../envelope/lock-envelope';
 import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 import { resolveReplacedRecipientSigningOrders } from './assign-omitted-recipient-signing-orders';
@@ -36,6 +38,8 @@ export const setDocumentRecipients = async ({
   recipients,
   requestMetadata,
 }: SetDocumentRecipientsOptions) => {
+  assertRecipientIdsUnique(recipients);
+
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
     type: EnvelopeType.DOCUMENT,
@@ -46,7 +50,6 @@ export const setDocumentRecipients = async ({
   const envelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
     include: {
-      fields: true,
       documentMeta: true,
       team: {
         select: {
@@ -57,7 +60,6 @@ export const setDocumentRecipients = async ({
           },
         },
       },
-      recipients: true,
     },
   });
 
@@ -100,52 +102,78 @@ export const setDocumentRecipients = async ({
     });
   }
 
-  const existingRecipients = envelope.recipients;
+  const { existingRecipients, removedRecipients, persistedRecipients } = await prisma.$transaction(async (tx) => {
+    await lockEnvelope(tx, envelope.id);
 
-  const { recipients: normalizedRecipients, requestedOrderRecipients } = resolveReplacedRecipientSigningOrders({
-    recipients: recipients.map((recipient) => ({
-      ...recipient,
-      email: recipient.email.toLowerCase(),
-    })),
-    existingRecipients,
-  });
+    const lockedEnvelope = await tx.envelope.findFirstOrThrow({
+      where: {
+        id: envelope.id,
+      },
+      include: {
+        recipients: true,
+        fields: true,
+      },
+    });
 
-  assertCompatibleRecipientGrouping({
-    signatureLevel: envelope.signatureLevel,
-    recipients: requestedOrderRecipients,
-    existingRecipients: normalizedRecipients.filter((recipient) => !requestedOrderRecipients.includes(recipient)),
-  });
+    await assertEnvelopeMutable(lockedEnvelope);
 
-  const removedRecipients = existingRecipients.filter(
-    (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
-  );
-
-  const linkedRecipients = normalizedRecipients.map((recipient) => {
-    const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
-
-    const canPersistedRecipientBeModified = existing && canRecipientBeModified(existing, envelope.fields);
-
-    if (
-      existing &&
-      hasRecipientBeenChanged(existing, recipient) &&
-      !canRecipientBeModified(existing, envelope.fields)
-    ) {
+    if (lockedEnvelope.completedAt) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Cannot modify a recipient who has already interacted with the document',
+        message: 'Document already complete',
       });
     }
 
-    return {
-      ...recipient,
-      _persisted: existing,
-      canPersistedRecipientBeModified,
-    };
-  });
+    const existingRecipients = lockedEnvelope.recipients;
 
-  const persistedRecipients = await prisma.$transaction(async (tx) => {
-    await assertEnvelopeMutable(envelope, tx);
+    const { recipients: normalizedRecipients, requestedOrderRecipients } = resolveReplacedRecipientSigningOrders({
+      recipients: recipients.map((recipient) => ({
+        ...recipient,
+        email: recipient.email.toLowerCase(),
+      })),
+      existingRecipients,
+    });
 
-    return await Promise.all(
+    assertCompatibleRecipientGrouping({
+      signatureLevel: envelope.signatureLevel,
+      recipients: requestedOrderRecipients,
+      existingRecipients: normalizedRecipients.filter((recipient) => !requestedOrderRecipients.includes(recipient)),
+    });
+
+    const removedRecipients = existingRecipients.filter(
+      (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
+    );
+
+    for (const removedRecipient of removedRecipients) {
+      if (!canRecipientBeModified(removedRecipient, lockedEnvelope.fields)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Recipient has already interacted with the document.',
+        });
+      }
+    }
+
+    const linkedRecipients = normalizedRecipients.map((recipient) => {
+      const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
+
+      const canPersistedRecipientBeModified = existing && canRecipientBeModified(existing, lockedEnvelope.fields);
+
+      if (
+        existing &&
+        hasRecipientBeenChanged(existing, recipient) &&
+        !canRecipientBeModified(existing, lockedEnvelope.fields)
+      ) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Cannot modify a recipient who has already interacted with the document',
+        });
+      }
+
+      return {
+        ...recipient,
+        _persisted: existing,
+        canPersistedRecipientBeModified,
+      };
+    });
+
+    const persistedRecipients = await Promise.all(
       linkedRecipients.map(async (recipient) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
 
@@ -252,10 +280,8 @@ export const setDocumentRecipients = async ({
         };
       }),
     );
-  });
 
-  if (removedRecipients.length > 0) {
-    await prisma.$transaction(async (tx) => {
+    if (removedRecipients.length > 0) {
       await tx.recipient.deleteMany({
         where: {
           id: {
@@ -279,8 +305,16 @@ export const setDocumentRecipients = async ({
           }),
         ),
       });
-    });
+    }
 
+    return {
+      existingRecipients,
+      removedRecipients,
+      persistedRecipients,
+    };
+  });
+
+  if (removedRecipients.length > 0) {
     const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).recipientRemoved;
 
     if (isRecipientRemovedEmailEnabled) {
@@ -346,8 +380,12 @@ type RecipientDataWithClientId = Recipient & {
 const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: RecipientData) => {
   const authOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
-  const newRecipientAccessAuth = newRecipientData.accessAuth || [];
-  const newRecipientActionAuth = newRecipientData.actionAuth || [];
+  // Omitted auth keeps the stored value when written, so it is not a change. The editors never
+  // send `accessAuth`, which would otherwise lock every save once a recipient with it has signed.
+  const hasAccessAuthChanged =
+    newRecipientData.accessAuth !== undefined && !isDeepEqual(authOptions.accessAuth, newRecipientData.accessAuth);
+  const hasActionAuthChanged =
+    newRecipientData.actionAuth !== undefined && !isDeepEqual(authOptions.actionAuth, newRecipientData.actionAuth);
 
   return (
     recipient.email !== newRecipientData.email ||
@@ -356,7 +394,7 @@ const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: Recipie
     // Null and undefined both mean "no order": the request schema cannot
     // carry null, so a persisted null arrives as undefined
     (recipient.signingOrder ?? null) !== (newRecipientData.signingOrder ?? null) ||
-    !isDeepEqual(authOptions.accessAuth, newRecipientAccessAuth) ||
-    !isDeepEqual(authOptions.actionAuth, newRecipientActionAuth)
+    hasAccessAuthChanged ||
+    hasActionAuthChanged
   );
 };

@@ -11,7 +11,10 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import type { CompletedField } from '@documenso/lib/types/fields';
-import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import {
+  fieldsContainUnsignedRequiredField,
+  isFieldUnsignedAndRequired,
+} from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
@@ -292,7 +295,7 @@ export const DocumentSigningPageViewV1 = ({
                         <DocumentSigningCompleteDialog
                           isSubmitting={isSubmitting}
                           documentTitle={document.title}
-                          fields={fields}
+                          isComplete={!fieldsContainUnsignedRequiredField(fields)}
                           fieldsValidated={fieldsValidated}
                           disabled={!isRecipientsTurn}
                           onSignatureComplete={async (nextSigner) => completeDocument({ nextSigner })}

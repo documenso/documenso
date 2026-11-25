@@ -1,7 +1,7 @@
 import type { AdminRuleEventTeam } from '@documenso/ee/server-only/admin-rules/admin-rule-event';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
+import type { TDirectTemplateSignedFieldValue } from '@documenso/trpc/server/template-router/schema';
 import type { DocumentMeta, Envelope, Field, Recipient, Signature } from '@prisma/client';
 import {
   DocumentSigningOrder,
@@ -20,6 +20,8 @@ import pMap from 'p-map';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { isFieldGroupValueShared } from '../../constants/field-groups';
+import { isBase64Image } from '../../constants/signatures';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '../../types/document-audit-logs';
@@ -47,6 +49,9 @@ import {
   buildEnvelopeContentCopyData,
   getContentsMissingImages,
 } from '../../utils/envelope-content';
+import { extractFieldInsertionValues, parseCustomTextAsFieldValue } from '../../utils/envelope-signing';
+import { groupFieldsByGroupId } from '../../utils/field-groups';
+import { assertLegacyFieldValueAllowed, getLegacyReadOnlyFieldValue } from '../../utils/legacy-field-signing';
 import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import type { PositionedRecipient } from '../../utils/recipients';
 import {
@@ -54,8 +59,14 @@ import {
   isRecipientBefore,
   sortRecipientsBySigningPosition,
 } from '../../utils/recipients';
+import { assertRecipientFieldsComplete } from '../../utils/signing-items';
 import { loadContentImages } from '../data-content/load-content-images';
-import { assertAdminRulesAllowSend, getSigningRequestRecipients, sendDocument } from '../document/send-document';
+import {
+  assertAdminRulesAllowSend,
+  extractRecipientAutoInsertValues,
+  getSigningRequestRecipients,
+  sendDocument,
+} from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
 import {
@@ -74,7 +85,7 @@ export type CreateDocumentFromDirectTemplateOptions = {
   directRecipientEmail: string;
   directTemplateToken: string;
   directTemplateExternalId?: string;
-  signedFieldValues: TSignFieldWithTokenMutationSchema[];
+  signedFieldValues: TDirectTemplateSignedFieldValue[];
   templateUpdatedAt: Date;
   requestMetadata: ApiRequestMetadata;
   user?: {
@@ -174,6 +185,8 @@ export const createDocumentFromDirectTemplate = async ({
   if (!directTemplateEnvelope?.directLink?.enabled) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Invalid or missing template' });
   }
+
+  const isEnvelopeV2 = directTemplateEnvelope.internalVersion === 2;
 
   // Mirrors the check in `sendDocument`, which runs too late here: its errors are swallowed once the
   // document has been created.
@@ -299,6 +312,19 @@ export const createDocumentFromDirectTemplate = async ({
     });
   }
 
+  // The same values the signing page shows the signer for read only fields.
+  const readOnlyValueByFieldId = new Map(
+    isEnvelopeV2
+      ? extractRecipientAutoInsertValues(directTemplateRecipient.fields, directTemplateRecipient).map(
+          ({ fieldId, customText }) => [fieldId, customText],
+        )
+      : directTemplateRecipient.fields.flatMap((templateField) => {
+          const readOnlyValue = getLegacyReadOnlyFieldValue(templateField);
+
+          return readOnlyValue === null ? [] : [[templateField.id, readOnlyValue] as const];
+        }),
+  );
+
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   // Only process fields that are either required or have been signed by the user
   const fieldsToProcess = directTemplateRecipient.fields.filter((templateField) => {
@@ -306,26 +332,36 @@ export const createDocumentFromDirectTemplate = async ({
 
     // Custom logic for V2 to include all fields, since v1 excludes read only
     // and prefilled fields.
-    if (directTemplateEnvelope.internalVersion === 2) {
+    if (isEnvelopeV2) {
       return true;
     }
 
-    // Include if it's required or has a signed value
-    return isRequiredField(templateField) || signedFieldValue !== undefined;
+    // Include if it's required, has a signed value, or is read only with a value set by the sender.
+    return (
+      isRequiredField(templateField) || signedFieldValue !== undefined || readOnlyValueByFieldId.has(templateField.id)
+    );
   });
 
   const createDirectRecipientFieldArgs = await Promise.all(
     fieldsToProcess.map(async (templateField) => {
       const signedFieldValue = signedFieldValues.find((value) => value.fieldId === templateField.id);
 
-      if (isRequiredField(templateField) && !signedFieldValue) {
+      const { type: fieldType } = templateField;
+
+      const isSignatureField = fieldType === FieldType.SIGNATURE || fieldType === FieldType.FREE_SIGNATURE;
+
+      const isReadOnlyField = isEnvelopeV2
+        ? !isSignatureField && fieldType !== FieldType.DATE && Boolean(templateField.fieldMeta?.readOnly)
+        : readOnlyValueByFieldId.has(templateField.id);
+
+      if (isRequiredField(templateField) && !signedFieldValue && !isReadOnlyField) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
           message: 'Invalid, missing or changed fields',
         });
       }
 
       if (templateField.type === FieldType.NAME && directRecipientName === undefined) {
-        directRecipientName = signedFieldValue?.value;
+        directRecipientName = signedFieldValue?.value?.trim();
       }
 
       const derivedRecipientActionAuth = await validateFieldAuth({
@@ -340,6 +376,17 @@ export const createDocumentFromDirectTemplate = async ({
         authOptions: signedFieldValue?.authOptions,
       });
 
+      // The submitted value is ignored rather than rejected, so a client sending a stale or
+      // missing read only value can still complete.
+      if (isReadOnlyField) {
+        return {
+          templateField,
+          customText: readOnlyValueByFieldId.get(templateField.id) ?? '',
+          derivedRecipientActionAuth,
+          signature: null,
+        };
+      }
+
       if (!signedFieldValue) {
         return {
           templateField,
@@ -349,37 +396,158 @@ export const createDocumentFromDirectTemplate = async ({
         };
       }
 
-      const { value, isBase64 } = signedFieldValue;
+      // V1 has always trimmed the submitted values, as V1 signing does. Dropdown and radio values
+      // are option labels, kept as sent so an option starting or ending in a space still matches.
+      const isValueTrimmed = !isEnvelopeV2 && fieldType !== FieldType.DROPDOWN && fieldType !== FieldType.RADIO;
 
-      const isSignatureField =
-        templateField.type === FieldType.SIGNATURE || templateField.type === FieldType.FREE_SIGNATURE;
+      const value = isValueTrimmed ? signedFieldValue.value?.trim() : signedFieldValue.value;
 
-      let customText = !isSignatureField ? value : '';
+      if (isSignatureField) {
+        if (!value?.trim()) {
+          throw new AppError(AppErrorCode.INVALID_BODY, {
+            message: 'Signature field must have a signature',
+          });
+        }
 
-      const signatureImageAsBase64 = isSignatureField && isBase64 ? value : undefined;
-      const typedSignature = isSignatureField && !isBase64 ? value : undefined;
+        // Decided from the value, not the flag the client sends, since sealing embeds an image
+        // signature as a PNG.
+        const isSignatureImage = isBase64Image(value);
 
-      if (templateField.type === FieldType.DATE) {
-        customText = DateTime.now().setZone(derivedDocumentMeta.timezone).toFormat(derivedDocumentMeta.dateFormat);
+        if (isEnvelopeV2) {
+          extractFieldInsertionValues({
+            fieldValue: { type: FieldType.SIGNATURE, value },
+            field: templateField,
+            documentMeta: derivedDocumentMeta,
+          });
+        } else {
+          assertLegacyFieldValueAllowed({
+            field: templateField,
+            value,
+            isBase64: isSignatureImage,
+            typedSignatureEnabled: derivedDocumentMeta.typedSignatureEnabled,
+          });
+        }
+
+        return {
+          templateField,
+          customText: '',
+          derivedRecipientActionAuth,
+          signature: {
+            signatureImageAsBase64: isSignatureImage ? value : undefined,
+            typedSignature: isSignatureImage ? undefined : value,
+          },
+        };
       }
 
-      if (isSignatureField && !signatureImageAsBase64 && !typedSignature) {
-        throw new Error('Signature field must have a signature');
+      if (fieldType === FieldType.DATE) {
+        return {
+          templateField,
+          customText: DateTime.now().setZone(derivedDocumentMeta.timezone).toFormat(derivedDocumentMeta.dateFormat),
+          derivedRecipientActionAuth,
+          signature: null,
+        };
       }
+
+      // V1 clients send radio and checkbox values as option labels, which the V2 validation
+      // cannot check, so V1 values are checked as V1 signing checks them.
+      if (!isEnvelopeV2) {
+        const customText = value ?? '';
+
+        // Signing leaves an optional field blank by not inserting it, so blank skips the checks.
+        if (customText !== '' || isRequiredField(templateField)) {
+          assertLegacyFieldValueAllowed({
+            field: templateField,
+            value: customText,
+          });
+        }
+
+        return {
+          templateField,
+          customText,
+          derivedRecipientActionAuth,
+          signature: null,
+        };
+      }
+
+      const { customText } = extractFieldInsertionValues({
+        fieldValue: parseCustomTextAsFieldValue(fieldType, value ?? ''),
+        field: templateField,
+        documentMeta: derivedDocumentMeta,
+      });
 
       return {
         templateField,
         customText,
         derivedRecipientActionAuth,
-        signature: isSignatureField
-          ? {
-              signatureImageAsBase64,
-              typedSignature,
-            }
-          : null,
+        signature: null,
       };
     }),
   );
+
+  /**
+   * Whether a submitted field should be marked as inserted. On V2, fields in a group act
+   * as one field, so every field is inserted once any field has a value.
+   */
+  const isDirectRecipientFieldInserted = (templateField: Field, customText: string | undefined): boolean => {
+    if (!isEnvelopeV2) {
+      return true;
+    }
+
+    if (customText) {
+      return true;
+    }
+
+    if (!templateField.groupId) {
+      return false;
+    }
+
+    return createDirectRecipientFieldArgs.some(
+      (arg) => arg.templateField.groupId === templateField.groupId && Boolean(arg.customText),
+    );
+  };
+
+  // V1 relies on the required field check made while mapping the submitted values above.
+  if (isEnvelopeV2) {
+    // Every field in a group which shares its value is marked as inserted once any of them
+    // has a value, so a field submitted blank or with another value would end up wrong on
+    // the signed document.
+    const sharedValueFields = createDirectRecipientFieldArgs
+      .filter(({ templateField }) => isFieldGroupValueShared(templateField.type))
+      .map(({ templateField, customText }) => ({ groupId: templateField.groupId, customText: customText ?? '' }));
+
+    for (const [groupId, groupFields] of groupFieldsByGroupId(sharedValueFields)) {
+      if (new Set(groupFields.map((field) => field.customText)).size > 1) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Fields in group "${groupId}" must all have the same value`,
+        });
+      }
+    }
+
+    // A radio group allows one selection across all of its fields. Signing enforces this
+    // by clearing the other fields when one is selected, but these values arrive together,
+    // so a submission selecting in several fields has to be rejected.
+    const radioFields = createDirectRecipientFieldArgs
+      .filter(({ templateField }) => templateField.type === FieldType.RADIO)
+      .map(({ templateField, customText }) => ({ groupId: templateField.groupId, customText: customText ?? '' }));
+
+    for (const [groupId, groupFields] of groupFieldsByGroupId(radioFields)) {
+      if (groupFields.filter((field) => field.customText !== '').length > 1) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Only one field in radio group "${groupId}" can have a selection`,
+        });
+      }
+    }
+
+    assertRecipientFieldsComplete({
+      internalVersion: directTemplateEnvelope.internalVersion,
+      recipientId: directTemplateRecipient.id,
+      fields: createDirectRecipientFieldArgs.map(({ templateField, customText, signature }) => ({
+        ...templateField,
+        customText: customText ?? '',
+        inserted: signature !== null || isDirectRecipientFieldInserted(templateField, customText),
+      })),
+    });
+  }
 
   const directTemplateNonSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature === null);
 
@@ -568,6 +736,8 @@ export const createDocumentFromDirectTemplate = async ({
           customText: '',
           inserted: false,
           fieldMeta: field.fieldMeta,
+          groupId: field.groupId,
+          externalId: field.externalId,
         })),
       );
     });
@@ -598,12 +768,7 @@ export const createDocumentFromDirectTemplate = async ({
         fields: {
           createMany: {
             data: directTemplateNonSignatureFields.map(({ templateField, customText }) => {
-              let inserted = true;
-
-              // Custom logic for V2 to only insert if values exist.
-              if (directTemplateEnvelope.internalVersion === 2) {
-                inserted = customText !== '';
-              }
+              const inserted = isDirectRecipientFieldInserted(templateField, customText);
 
               return {
                 envelopeId: createdEnvelope.id,
@@ -617,6 +782,8 @@ export const createDocumentFromDirectTemplate = async ({
                 customText: customText ?? '',
                 inserted,
                 fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
+                groupId: templateField.groupId,
+                externalId: templateField.externalId,
               };
             }),
           },
@@ -649,6 +816,7 @@ export const createDocumentFromDirectTemplate = async ({
             customText: '',
             inserted: true,
             fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
+            externalId: templateField.externalId,
             signature: {
               create: {
                 recipientId: createdDirectRecipient.id,

@@ -1,3 +1,4 @@
+import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import type { TNumberFieldMeta } from '@documenso/lib/types/field-meta';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -9,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,40 +26,39 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
   ({ call, fieldMeta }) => {
     const { t } = useLingui();
 
-    // Needs to be inside dialog for translation purposes.
+    // Needs to be inside dialog for translation purposes. Matches on the validator's English
+    // error text to pick a translated message, so keep the two in sync.
     const createNumberFieldSchema = (fieldMeta: TNumberFieldMeta) => {
       const { numberFormat, minValue, maxValue } = fieldMeta;
 
-      if (numberFormat) {
-        const foundRegex = numberFormatValues.find((item) => item.value === numberFormat)?.regex;
-
-        if (foundRegex) {
-          return z.string().refine(
-            (value) => {
-              return foundRegex.test(value.toString());
-            },
-            {
-              message: t`Number needs to be formatted as ${numberFormat}`,
-            },
-          );
-        }
-      }
-
-      // Not gong to work with min/max numbers + number format
-      // Since currently doesn't work in V1 going to ignore for now.
       return z.string().superRefine((value, ctx) => {
-        const isValidNumber = /^[0-9,.]+$/.test(value.toString());
+        const errors = validateNumberField(value, fieldMeta, true);
 
-        if (!isValidNumber) {
+        if (errors.length === 0) {
+          return;
+        }
+
+        const hasError = (text: string) => errors.some((error) => error.includes(text));
+
+        if (hasError('does not match the number format')) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: t`Please enter a valid number`,
+            message: t`Number needs to be formatted as ${numberFormat}`,
           });
 
           return;
         }
 
-        if (typeof minValue === 'number' && parseFloat(value) < minValue) {
+        if (hasError('could be read as')) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t`This number could be read in more than one way. Please write it without a thousands separator.`,
+          });
+
+          return;
+        }
+
+        if (typeof minValue === 'number' && hasError('is less than the minimum value')) {
           ctx.addIssue({
             code: z.ZodIssueCode.too_small,
             minimum: minValue,
@@ -70,7 +69,7 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
           return;
         }
 
-        if (typeof maxValue === 'number' && parseFloat(value) > maxValue) {
+        if (typeof maxValue === 'number' && hasError('is greater than the maximum value')) {
           ctx.addIssue({
             code: z.ZodIssueCode.too_big,
             maximum: maxValue,
@@ -80,6 +79,11 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
 
           return;
         }
+
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t`Please enter a valid number`,
+        });
       });
     };
 
@@ -98,7 +102,7 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{fieldMeta.label || <Trans>Enter Number</Trans>}</DialogTitle>
+            <DialogTitle>{fieldMeta?.label || <Trans>Enter Number</Trans>}</DialogTitle>
 
             <DialogDescription className="mt-4">
               <Trans>Please enter a number</Trans>
@@ -106,7 +110,7 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit((data) => call.end(data.number))}>
+            <form onSubmit={form.handleSubmit((data) => call.end(data.number.trim()))}>
               <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
                 <FormField
                   control={form.control}

@@ -84,8 +84,9 @@ export const EnvelopeItemEditDialog = ({
       });
 
       if (fields) {
-        setLocalEnvelope({ fields });
-        editorFields.resetForm(fields);
+        const resetFields = editorFields.resetForm(fields);
+
+        setLocalEnvelope({ fields: resetFields });
       }
 
       // The server deletes contents on pages the new PDF no longer has. The
@@ -167,8 +168,8 @@ export const EnvelopeItemEditDialog = ({
         const arrayBuffer = await file.arrayBuffer();
         const fileData = new Uint8Array(arrayBuffer.slice(0));
 
-        const remainingFields = envelope.fields.filter(
-          (field) => field.envelopeItemId !== envelopeItem.id || field.page <= pageCount,
+        const remainingFields = editorFields.resetForm(
+          envelope.fields.filter((field) => field.envelopeItemId !== envelopeItem.id || field.page <= pageCount),
         );
 
         const remainingContents = envelope.contents.filter(
@@ -183,7 +184,6 @@ export const EnvelopeItemEditDialog = ({
           contents: remainingContents,
         });
 
-        editorFields.resetForm(remainingFields);
         editorContents.resetForm(remainingContents);
       } else {
         const payload = {

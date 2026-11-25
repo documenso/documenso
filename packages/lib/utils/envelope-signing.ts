@@ -1,4 +1,3 @@
-import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
@@ -14,15 +13,63 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import { toCheckboxCustomText, toRadioCustomText } from '@documenso/lib/utils/fields';
+import {
+  parseCheckboxCustomText,
+  parseSubmittedCheckboxCustomText,
+  toCheckboxCustomText,
+  toRadioCustomText,
+} from '@documenso/lib/utils/fields';
 import { zEmail } from '@documenso/lib/utils/zod';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
-import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import type { Field } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match, P } from 'ts-pattern';
 import { z } from 'zod';
+
+export type CustomTextFieldType = Exclude<
+  FieldType,
+  typeof FieldType.SIGNATURE | typeof FieldType.FREE_SIGNATURE | typeof FieldType.DATE
+>;
+
+/**
+ * Converts a direct link's value, sent in the stored custom text format, into the value
+ * `extractFieldInsertionValues` validates. Does not check that radio or checkbox options exist.
+ */
+export const parseCustomTextAsFieldValue = (type: CustomTextFieldType, customText: string): TSignEnvelopeFieldValue => {
+  const isBlank = customText.trim() === '';
+
+  return match(type)
+    .with(FieldType.CHECKBOX, (type) => ({
+      type,
+      value: isBlank ? [] : parseSubmittedCheckboxCustomText(customText),
+    }))
+    .with(FieldType.RADIO, (type) => {
+      if (!isBlank && !/^\d+$/.test(customText)) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Invalid radio value',
+        });
+      }
+
+      return {
+        type,
+        value: isBlank ? null : Number(customText),
+      };
+    })
+    .with(
+      FieldType.NUMBER,
+      FieldType.EMAIL,
+      FieldType.NAME,
+      FieldType.INITIALS,
+      FieldType.TEXT,
+      FieldType.DROPDOWN,
+      (type) => ({
+        type,
+        value: isBlank ? null : customText,
+      }),
+    )
+    .exhaustive();
+};
 
 export type ExtractFieldInsertionValuesOptions = {
   fieldValue: TSignEnvelopeFieldValue;
@@ -110,8 +157,9 @@ export const extractFieldInsertionValues = ({
         });
       }
 
+      // A number without a format may be sent padded, which the validator accepts.
       return {
-        customText: fieldValue.value,
+        customText: fieldValue.value.trim(),
         inserted: true,
       };
     })
@@ -180,25 +228,8 @@ export const extractFieldInsertionValues = ({
         });
       }
 
-      const { validationRule, validationLength } = parsedCheckboxFieldParsedMeta;
-
-      if (validationRule && validationLength) {
-        const checkboxValidationRule = checkboxValidationSigns.find((sign) => sign.label === validationRule);
-
-        if (checkboxValidationRule) {
-          const isValid = validateCheckboxLength(selectedValues.length, checkboxValidationRule.value, validationLength);
-
-          if (!isValid) {
-            throw new AppError(AppErrorCode.INVALID_BODY, {
-              message: 'Checkbox values failed length validation',
-            });
-          }
-        } else {
-          // Should throw an error, but we don't want to throw configuration errors during signing.
-          // Todo: Logging.
-        }
-      }
-
+      // The validation rule is deliberately not enforced here. Recipients may select
+      // any options while signing, and the rule is enforced when they complete the document.
       return {
         customText: toCheckboxCustomText(fieldValue.value),
         inserted: true,
@@ -250,4 +281,134 @@ export const extractFieldInsertionValues = ({
       };
     })
     .exhaustive();
+};
+
+export type FieldInsertionValues = {
+  fieldId: number;
+  customText: string;
+  inserted: boolean;
+};
+
+export type ExtractGroupedRadioInsertionValuesOptions = {
+  /**
+   * Every field in the radio group.
+   */
+  fields: Field[];
+  /**
+   * The field which the option was selected on.
+   */
+  selectedFieldId: number;
+  /**
+   * The index of the selected option on the selected field, or null to uninsert the group.
+   */
+  selectedIndex: number | null;
+};
+
+/**
+ * Resolves the insertion values for a group of radio fields.
+ *
+ * Only one option can be selected across the group, so selecting an option on one
+ * field clears every other field.
+ */
+export const extractGroupedRadioInsertionValues = ({
+  fields,
+  selectedFieldId,
+  selectedIndex,
+}: ExtractGroupedRadioInsertionValuesOptions): FieldInsertionValues[] => {
+  const selectedField = fields.find((field) => field.id === selectedFieldId);
+
+  if (!selectedField) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `Field ${selectedFieldId} not found in group`,
+    });
+  }
+
+  // If the selected index is null, clear all fields in the group.
+  if (selectedIndex === null) {
+    return fields.map((field) => ({
+      fieldId: field.id,
+      customText: '',
+      inserted: false,
+    }));
+  }
+
+  const parsedRadioFieldMeta = ZRadioFieldMeta.parse(selectedField.fieldMeta);
+  const radioFieldValues = parsedRadioFieldMeta.values || [];
+
+  if (!radioFieldValues[selectedIndex]) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Invalid radio value',
+    });
+  }
+
+  return fields.map((field) => ({
+    fieldId: field.id,
+    customText: field.id === selectedFieldId ? toRadioCustomText(selectedIndex) : '',
+    inserted: true,
+  }));
+};
+
+export type ExtractGroupedCheckboxInsertionValuesOptions = {
+  /**
+   * Every field in the group.
+   */
+  fields: Field[];
+  selectedFieldId: number;
+  selectedIndices: number[];
+};
+
+/**
+ * Resolves the insertion values for a group of checkbox fields.
+ *
+ * Every field is marked as inserted once the group has any selection so the group is
+ * treated as a single answered field.
+ */
+export const extractGroupedCheckboxInsertionValues = ({
+  fields,
+  selectedFieldId,
+  selectedIndices,
+}: ExtractGroupedCheckboxInsertionValuesOptions): FieldInsertionValues[] => {
+  if (!fields.some((field) => field.id === selectedFieldId)) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `Field ${selectedFieldId} not found in group`,
+    });
+  }
+
+  const itemSelections = fields.map((field) => {
+    const parsedCheckboxFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
+    const checkboxFieldValues = parsedCheckboxFieldMeta.values || [];
+
+    const currentIndices = field.customText ? parseCheckboxCustomText(field.customText) : [];
+    const fieldSelectedIndices = field.id === selectedFieldId ? selectedIndices : currentIndices;
+
+    if (fieldSelectedIndices.some((index) => !checkboxFieldValues[index])) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Invalid checkbox values',
+      });
+    }
+
+    return {
+      field,
+      selectedIndices: fieldSelectedIndices,
+    };
+  });
+
+  const totalSelectedCheckboxes = itemSelections.reduce((prev, curr) => prev + curr.selectedIndices.length, 0);
+
+  // If no checkboxes are selected, mark all fields as not inserted.
+  if (totalSelectedCheckboxes === 0) {
+    return fields.map((field) => ({
+      fieldId: field.id,
+      customText: '',
+      inserted: false,
+    }));
+  }
+
+  // The validation rule is deliberately not enforced here. Recipients may select any
+  // options while signing, and the rule is enforced when they complete the document.
+  return itemSelections.map(({ field, selectedIndices }) => ({
+    fieldId: field.id,
+    customText: selectedIndices.length > 0 ? toCheckboxCustomText(selectedIndices) : '',
+    inserted: true,
+  }));
 };

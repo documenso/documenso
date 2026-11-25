@@ -7,7 +7,7 @@ import { DocumentAccessAuth, type TDocumentAuthMethods } from '../../types/docum
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { getContentsMissingImages } from '../../utils/envelope-content';
 import { getRecipientsWithMissingFields } from '../../utils/recipients';
-import { extractFieldAutoInsertValues } from '../document/send-document';
+import { extractRecipientAutoInsertValues } from '../document/send-document';
 import { getTeamSettings } from '../team/get-team-settings';
 import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 import type { EnvelopeForSigningResponse } from './get-envelope-for-recipient-signing';
@@ -163,22 +163,31 @@ export const getEnvelopeForDirectTemplateSigning = async ({
         name: envelope.team.name || '',
       };
 
+  const autoInsertTextByFieldId = new Map(
+    extractRecipientAutoInsertValues(recipient.fields, recipient).map(({ fieldId, customText }) => [
+      fieldId,
+      customText,
+    ]),
+  );
+
   return ZEnvelopeForSigningResponse.parse({
     envelope,
     recipient: {
       ...recipient,
       directToken: envelope.directLink?.token || '',
       fields: recipient.fields.map((field) => {
-        const autoInsertValue = extractFieldAutoInsertValues(field, recipient);
+        const autoInsertText = autoInsertTextByFieldId.get(field.id);
 
-        if (!autoInsertValue) {
+        // Not a falsy check, since grouped fields without a pre-checked option are inserted
+        // with an empty value.
+        if (autoInsertText === undefined) {
           return field;
         }
 
         return {
           ...field,
           inserted: true,
-          customText: autoInsertValue.customText,
+          customText: autoInsertText,
         };
       }),
     },
