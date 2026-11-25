@@ -6,7 +6,7 @@ import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 import '@documenso/lib/constants/time-zones';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
@@ -15,6 +15,7 @@ import { createDocumentData } from '@documenso/lib/server-only/document-data/cre
 import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { getEnvelopeById, getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import { lockEnvelope } from '@documenso/lib/server-only/envelope/lock-envelope';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
 import { updateEnvelopeFields } from '@documenso/lib/server-only/field/update-envelope-fields';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
@@ -1354,6 +1355,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     try {
       const createdFields = await prisma.$transaction(async (tx) => {
+        const lockedEnvelope = await lockEnvelope(tx, envelope.id);
+
+        if (isDocumentCompleted(lockedEnvelope.status)) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'Document is already completed',
+          });
+        }
+
         return Promise.all(
           fields.map(async (fieldData) => {
             const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY, fieldMeta } = fieldData;

@@ -1,15 +1,20 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { nanoid } from '@documenso/lib/universal/id';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { FieldType, SigningStatus } from '@prisma/client';
 
+import { apiSeedPendingDocument } from '../fixtures/api-seeds';
+import { WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 import {
   addEnvelopeItemPdf,
   createEmbeddedEnvelopeCreateHash,
+  createEmbeddedEnvelopeEditHash,
   getEnvelopeEditorSettingsTrigger,
   openEmbeddedEnvelopeEditor,
   persistEmbeddedEnvelope,
@@ -466,5 +471,100 @@ test.describe('embedded edit', () => {
 
     // darkModeDisabled should still be applied after reload.
     await assertDarkModeDisabled(surface);
+  });
+
+  test('saving a partly signed document keeps its recipients and their signatures', async ({ page, request }) => {
+    const { envelope, user, team } = await apiSeedPendingDocument(request, {
+      recipients: [
+        { email: seedTestEmail(), name: 'Signer A' },
+        { email: seedTestEmail(), name: 'Signer B' },
+      ],
+    });
+
+    const signerA = await prisma.recipient.findFirstOrThrow({
+      where: {
+        envelopeId: envelope.id,
+        name: 'Signer A',
+      },
+      include: {
+        fields: true,
+      },
+    });
+
+    const [signatureA] = signerA.fields;
+
+    const postAsSignerA = async (procedure: string, json: Record<string, unknown>) =>
+      await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/${procedure}`, {
+        headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
+        data: JSON.stringify({ json: { token: signerA.token, ...json } }),
+      });
+
+    const signResponse = await postAsSignerA('envelope.field.sign', {
+      fieldId: signatureA.id,
+      fieldValue: { type: FieldType.SIGNATURE, value: 'Signature A' },
+    });
+
+    const completeResponse = await postAsSignerA('recipient.completeDocumentWithToken', {
+      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+    });
+
+    expect(signResponse.status()).toBe(200);
+    expect(completeResponse.status()).toBe(200);
+
+    const findRecipients = async () =>
+      await prisma.recipient.findMany({
+        where: {
+          envelopeId: envelope.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          token: true,
+          signingStatus: true,
+        },
+        orderBy: {
+          id: 'asc',
+        },
+      });
+
+    const recipientsBefore = await findRecipients();
+
+    expect(recipientsBefore.map((recipient) => [recipient.name, recipient.signingStatus])).toEqual([
+      ['Signer A', SigningStatus.SIGNED],
+      ['Signer B', SigningStatus.NOT_SIGNED],
+    ]);
+
+    const presignToken = await createPresignToken(page, user, team, {
+      tokenName: 'e2e-embed-edit-partly-signed',
+      scope: `envelopeId:${envelope.id}`,
+    });
+
+    await page.goto(
+      `/embed/v2/authoring/envelope/edit/${envelope.id}?token=${encodeURIComponent(presignToken)}#${createEmbeddedEnvelopeEditHash({})}`,
+    );
+
+    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
+
+    await persistEmbeddedEnvelope({
+      root: page,
+      isEmbedded: true,
+      envelopeType: 'DOCUMENT',
+      userId: user.id,
+      userEmail: user.email,
+      userName: user.name ?? '',
+      teamId: team.id,
+    });
+
+    // Sent without their ids, the recipients would be deleted and created again, which takes
+    // the signature of anyone who has signed with them.
+    expect(await findRecipients()).toEqual(recipientsBefore);
+
+    const storedSignatureA = await prisma.field.findUniqueOrThrow({
+      where: {
+        id: signatureA.id,
+      },
+    });
+
+    expect(storedSignatureA.inserted).toBe(true);
   });
 });

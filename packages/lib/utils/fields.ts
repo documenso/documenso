@@ -99,6 +99,34 @@ export const mapFieldToLegacyField = (field: Field, envelope: Pick<Envelope, 'ty
   };
 };
 
+/**
+ * Routes which check a list of fields and then write each entry would check both entries of a
+ * duplicate but store only the last.
+ */
+export const assertFieldIdsUnique = (fields: Array<{ id?: number | null }>) => {
+  const ids = fields.flatMap((field) => (typeof field.id === 'number' ? [field.id] : []));
+
+  const duplicateIds = new Set(ids.filter((id, index) => ids.indexOf(id) !== index));
+
+  if (duplicateIds.size > 0) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Fields listed more than once: ${Array.from(duplicateIds).join(', ')}`,
+    });
+  }
+};
+
+export const assertRecipientIdsUnique = (recipients: Array<{ id?: number | null }>) => {
+  const ids = recipients.flatMap((recipient) => (typeof recipient.id === 'number' ? [recipient.id] : []));
+
+  const duplicateIds = new Set(ids.filter((id, index) => ids.indexOf(id) !== index));
+
+  if (duplicateIds.size > 0) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Recipients listed more than once: ${Array.from(duplicateIds).join(', ')}`,
+    });
+  }
+};
+
 export const parseCheckboxCustomText = (customText: string): number[] => {
   if (!customText) {
     return [];

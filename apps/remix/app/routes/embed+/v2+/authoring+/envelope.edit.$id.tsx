@@ -229,6 +229,9 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
       }));
 
       return {
+        // Unsaved recipients have negative placeholder ids. Without the id of a saved one, the
+        // server deletes and recreates it, which wipes a signature already made.
+        id: recipient.id > 0 ? recipient.id : undefined,
         email: recipient.email,
         name: recipient.name,
         role: recipient.role,

@@ -22,6 +22,7 @@ import {
   WebhookTriggerEvents,
 } from '@prisma/client';
 import pMap from 'p-map';
+import { isDeepEqual } from 'remeda';
 
 import { validateCheckboxLength } from '../../advanced-fields-validation/validate-checkbox';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '../../constants/direct-templates';
@@ -50,6 +51,7 @@ import { getRecipientsInActiveSigningStep } from '../../utils/recipient-groups';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { loadContentImages } from '../data-content/load-content-images';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { lockEnvelope } from '../envelope/lock-envelope';
 import {
   commitRenderedEnvelopeItems,
   RENDER_CONTENTS_CONCURRENCY,
@@ -258,18 +260,7 @@ export const sendDocument = async ({
     envelope.team.organisation.organisationClaim,
   );
 
-  // Validate that recipients who require fields (e.g., signers need signature fields) have them.
-  const recipientsWithMissingFields = getRecipientsWithMissingFields(envelope.recipients, envelope.fields);
-
-  if (recipientsWithMissingFields.length > 0) {
-    const missingRecipientDescriptions = recipientsWithMissingFields
-      .map((r) => (r.name ? `${r.name} (${r.email}, id: ${r.id})` : `${r.email} (id: ${r.id})`))
-      .join(', ');
-
-    throw new AppError(AppErrorCode.MISSING_SIGNATURE_FIELD, {
-      message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
-    });
-  }
+  assertRecipientsHaveRequiredFields(envelope);
 
   const recipientsToNotify = getSigningRequestRecipients({ envelope, sendEmail });
 
@@ -315,6 +306,18 @@ export const sendDocument = async ({
           renderedEnvelopeItems,
         });
 
+        const lockedEnvelope = await lockEnvelope(tx, envelope.id);
+
+        assertStatusUnchangedSinceRead(envelope, lockedEnvelope.status);
+
+        const lockedRecipients = await tx.recipient.findMany({
+          where: {
+            envelopeId: envelope.id,
+          },
+        });
+
+        assertRecipientsUnchangedSinceRead(envelope, lockedRecipients);
+
         await tx.envelope.update({
           where: {
             id: envelope.id,
@@ -346,35 +349,8 @@ export const sendDocument = async ({
     });
   }
 
-  const fieldsToAutoInsert: { fieldId: number; customText: string }[] = [];
-
-  // Validate and autoinsert fields for V2 envelopes.
-  if (envelope.internalVersion === 2) {
-    // Grouped fields must be in a valid state before the document can be sent.
-    assertFieldGroupsValid(envelope.fields);
-
-    const hasFieldWithoutRecipient = envelope.fields.some(
-      (field) => !envelope.recipients.some((recipient) => recipient.id === field.recipientId),
-    );
-
-    if (hasFieldWithoutRecipient) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Recipient not found',
-      });
-    }
-
-    for (const recipient of envelope.recipients) {
-      const recipientFields = envelope.fields.filter((field) => field.recipientId === recipient.id);
-
-      // Run for every recipient, since it also validates the field settings.
-      const recipientAutoInsertValues = extractRecipientAutoInsertValues(recipientFields, recipient);
-
-      // Only auto-insert fields if the recipient has not been sent the document yet.
-      if (recipient.sendStatus !== SendStatus.SENT) {
-        fieldsToAutoInsert.push(...recipientAutoInsertValues);
-      }
-    }
-  }
+  // Fails fast before the slow work below. The values come from the re-run under the lock.
+  resolveFieldsToAutoInsert(envelope);
 
   if (isTspEnvelope(envelope) && envelope.status === DocumentStatus.DRAFT) {
     await materializeTspAnchorsForEnvelope({
@@ -392,7 +368,14 @@ export const sendDocument = async ({
         contents: envelope.contents,
         renderedEnvelopeItems,
       });
+    }
 
+    // For a draft, `commitRenderedEnvelopeItems` above has already taken this lock first.
+    const { status: lockedStatus } = await lockEnvelope(tx, envelope.id);
+
+    assertStatusUnchangedSinceRead(envelope, lockedStatus);
+
+    if (envelope.status === DocumentStatus.DRAFT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
@@ -402,6 +385,23 @@ export const sendDocument = async ({
         }),
       });
     }
+
+    const lockedEnvelope = await tx.envelope.findFirstOrThrow({
+      where: {
+        id: envelope.id,
+      },
+      select: {
+        internalVersion: true,
+        recipients: true,
+        fields: true,
+      },
+    });
+
+    assertRecipientsUnchangedSinceRead(envelope, lockedEnvelope.recipients);
+
+    assertRecipientsHaveRequiredFields(lockedEnvelope);
+
+    const fieldsToAutoInsert = resolveFieldsToAutoInsert(lockedEnvelope);
 
     if (envelope.internalVersion === 2) {
       const autoInsertedFields = await Promise.all(
@@ -493,6 +493,97 @@ export const sendDocument = async ({
   });
 
   return updatedEnvelope;
+};
+
+const assertStatusUnchangedSinceRead = (envelope: Pick<Envelope, 'id' | 'status'>, lockedStatus: DocumentStatus) => {
+  if (lockedStatus !== envelope.status) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Document ${envelope.id} was changed by another request while it was being sent, try again`,
+      statusCode: 409,
+    });
+  }
+};
+
+/**
+ * Who is emailed, the auth checks and the admin rules are all decided from the read made before
+ * the lock, since the admin rules are too slow to run under it.
+ */
+const assertRecipientsUnchangedSinceRead = (
+  envelope: Pick<Envelope, 'id'> & { recipients: Recipient[] },
+  lockedRecipients: Recipient[],
+) => {
+  const toSendDecisionInput = (recipient: Recipient) => ({
+    id: recipient.id,
+    email: recipient.email,
+    role: recipient.role,
+    signingOrder: recipient.signingOrder,
+    signingStatus: recipient.signingStatus,
+    authOptions: recipient.authOptions,
+  });
+
+  const sortById = (recipients: Recipient[]) =>
+    [...recipients].sort((a, b) => a.id - b.id).map((recipient) => toSendDecisionInput(recipient));
+
+  if (!isDeepEqual(sortById(envelope.recipients), sortById(lockedRecipients))) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Document ${envelope.id} was changed by another request while it was being sent, try again`,
+      statusCode: 409,
+    });
+  }
+};
+
+type SendFieldsSnapshot = Pick<Envelope, 'internalVersion'> & {
+  recipients: Recipient[];
+  fields: Field[];
+};
+
+const assertRecipientsHaveRequiredFields = ({ recipients, fields }: SendFieldsSnapshot) => {
+  const recipientsWithMissingFields = getRecipientsWithMissingFields(recipients, fields);
+
+  if (recipientsWithMissingFields.length > 0) {
+    const missingRecipientDescriptions = recipientsWithMissingFields
+      .map((r) => (r.name ? `${r.name} (${r.email}, id: ${r.id})` : `${r.email} (id: ${r.id})`))
+      .join(', ');
+
+    throw new AppError(AppErrorCode.MISSING_SIGNATURE_FIELD, {
+      message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
+    });
+  }
+};
+
+const resolveFieldsToAutoInsert = ({ internalVersion, recipients, fields }: SendFieldsSnapshot) => {
+  const fieldsToAutoInsert: { fieldId: number; customText: string }[] = [];
+
+  if (internalVersion !== 2) {
+    return fieldsToAutoInsert;
+  }
+
+  // Grouped fields must be in a valid state before the document can be sent.
+  assertFieldGroupsValid(fields);
+
+  const hasFieldWithoutRecipient = fields.some(
+    (field) => !recipients.some((recipient) => recipient.id === field.recipientId),
+  );
+
+  if (hasFieldWithoutRecipient) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Recipient not found',
+    });
+  }
+
+  for (const recipient of recipients) {
+    const recipientFields = fields.filter((field) => field.recipientId === recipient.id);
+
+    // Run for every recipient, since it also validates the field settings.
+    const recipientAutoInsertValues = extractRecipientAutoInsertValues(recipientFields, recipient);
+
+    // Only auto-insert fields if the recipient has not been sent the document yet.
+    if (recipient.sendStatus !== SendStatus.SENT) {
+      fieldsToAutoInsert.push(...recipientAutoInsertValues);
+    }
+  }
+
+  return fieldsToAutoInsert;
 };
 
 type SigningRequestRecipient = Pick<Recipient, 'role' | 'signingOrder' | 'signingStatus' | 'sendStatus'>;

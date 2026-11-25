@@ -9,8 +9,9 @@ import { EnvelopeType, type FieldType } from '@prisma/client';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { assertFieldGroupAllowedForType, assertFieldGroupsValid } from '../../utils/field-groups';
-import { mapFieldToLegacyField } from '../../utils/fields';
+import { assertFieldIdsUnique, mapFieldToLegacyField } from '../../utils/fields';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { lockEnvelope } from '../envelope/lock-envelope';
 import { assertFieldMetaProvided, assertFieldMetaValid } from './validate-field-meta';
 
 export type SetFieldsForTemplateOptions = {
@@ -41,6 +42,8 @@ export type SetFieldsForTemplateOptions = {
 };
 
 export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFieldsForTemplateOptions) => {
+  assertFieldIdsUnique(fields);
+
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
     type: EnvelopeType.TEMPLATE,
@@ -48,197 +51,218 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
     teamId,
   });
 
-  const envelope = await prisma.envelope.findFirst({
+  const unlockedEnvelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
-    include: {
-      recipients: true,
-      envelopeItems: {
-        select: {
-          id: true,
-        },
-      },
-      fields: {
-        include: {
-          recipient: true,
-        },
-      },
+    select: {
+      id: true,
     },
   });
 
-  if (!envelope) {
+  if (!unlockedEnvelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  const existingFields = envelope.fields;
+  const { envelope, existingFields, removedFields, persistedFields } = await prisma.$transaction(async (tx) => {
+    await lockEnvelope(tx, unlockedEnvelope.id);
 
-  const removedFields = existingFields.filter(
-    (existingField) => !fields.find((field) => field.id === existingField.id),
-  );
+    const envelope = await tx.envelope.findFirst({
+      where: envelopeWhereInput,
+      include: {
+        recipients: true,
+        envelopeItems: {
+          select: {
+            id: true,
+          },
+        },
+        fields: {
+          include: {
+            recipient: true,
+          },
+        },
+      },
+    });
 
-  const linkedFields = fields.map((field) => {
-    const existing = existingFields.find((existingField) => existingField.id === field.id);
-
-    const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
-
-    // Check whether the field is being attached to an allowed envelope item.
-    const foundEnvelopeItem = envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === field.envelopeItemId);
-
-    if (!foundEnvelopeItem) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Envelope item ${field.envelopeItemId} not found`,
+    if (!envelope) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Document not found',
       });
     }
 
-    // Each field MUST have a recipient associated with it.
-    if (!recipient) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Recipient not found for field ${field.id}`,
-      });
-    }
+    const existingFields = envelope.fields;
 
-    // An omitted value keeps the stored one, an explicit null clears it.
-    const groupId = field.groupId === undefined ? (existing?.groupId ?? null) : field.groupId;
-    const externalId = field.externalId === undefined ? (existing?.externalId ?? null) : field.externalId;
+    const removedFields = existingFields.filter(
+      (existingField) => !fields.find((field) => field.id === existingField.id),
+    );
 
-    assertFieldGroupAllowedForType(field.type, groupId);
+    const linkedFields = fields.map((field) => {
+      const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-    // The type of a grouped field can never be changed since it would desync the group.
-    if (existing && existing.type !== field.type && (existing.groupId || groupId)) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Cannot change the type of field ${existing.id} because it belongs to a group`,
-      });
-    }
+      const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
 
-    // An update never moves a field to another recipient or envelope item, so the stored
-    // ones stay. Groups are validated with the values from this payload, which would then
-    // pass for a group which does not match what is stored.
-    const isMovingExistingField =
-      existing !== undefined &&
-      (existing.recipientId !== field.recipientId || existing.envelopeItemId !== field.envelopeItemId);
+      // Check whether the field is being attached to an allowed envelope item.
+      const foundEnvelopeItem = envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === field.envelopeItemId);
 
-    if (isMovingExistingField && (existing.groupId || groupId)) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Cannot change the recipient or envelope item of field ${existing.id} because it belongs to a group`,
-      });
-    }
+      if (!foundEnvelopeItem) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Envelope item ${field.envelopeItemId} not found`,
+        });
+      }
 
-    if (groupId && envelope.internalVersion !== 2) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Field groups are only supported for V2 envelopes',
-      });
-    }
+      // Each field MUST have a recipient associated with it.
+      if (!recipient) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Recipient not found for field ${field.id}`,
+        });
+      }
 
-    const parsedFieldMeta = field.fieldMeta
-      ? ZFieldMetaSchema.parse(field.fieldMeta)
-      : FIELD_META_DEFAULT_VALUES[field.type];
+      // An omitted value keeps the stored one, an explicit null clears it.
+      const groupId = field.groupId === undefined ? (existing?.groupId ?? null) : field.groupId;
+      const externalId = field.externalId === undefined ? (existing?.externalId ?? null) : field.externalId;
 
-    if (envelope.internalVersion === 1) {
-      assertFieldMetaProvided(field.type, field.fieldMeta);
-    }
+      assertFieldGroupAllowedForType(field.type, groupId);
 
-    if (field.fieldMeta) {
-      assertFieldMetaValid({
-        type: field.type,
-        fieldMeta: field.fieldMeta,
+      // The type of a grouped field can never be changed since it would desync the group.
+      if (existing && existing.type !== field.type && (existing.groupId || groupId)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Cannot change the type of field ${existing.id} because it belongs to a group`,
+        });
+      }
+
+      // An update never moves a field to another recipient or envelope item, so the stored
+      // ones stay. Groups are validated with the values from this payload, which would then
+      // pass for a group which does not match what is stored.
+      const isMovingExistingField =
+        existing !== undefined &&
+        (existing.recipientId !== field.recipientId || existing.envelopeItemId !== field.envelopeItemId);
+
+      if (isMovingExistingField && (existing.groupId || groupId)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Cannot change the recipient or envelope item of field ${existing.id} because it belongs to a group`,
+        });
+      }
+
+      if (groupId && envelope.internalVersion !== 2) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Field groups are only supported for V2 envelopes',
+        });
+      }
+
+      const parsedFieldMeta = field.fieldMeta
+        ? ZFieldMetaSchema.parse(field.fieldMeta)
+        : FIELD_META_DEFAULT_VALUES[field.type];
+
+      if (envelope.internalVersion === 1) {
+        assertFieldMetaProvided(field.type, field.fieldMeta);
+      }
+
+      if (field.fieldMeta) {
+        assertFieldMetaValid({
+          type: field.type,
+          fieldMeta: field.fieldMeta,
+          groupId,
+          allowTypeMismatch: envelope.internalVersion !== 2,
+        });
+      }
+
+      return {
+        ...field,
         groupId,
-        allowTypeMismatch: envelope.internalVersion !== 2,
+        externalId,
+        _parsedFieldMeta: parsedFieldMeta,
+        _persisted: existing,
+        _recipient: recipient,
+      };
+    });
+
+    // Since this is a full replace, the payload represents the final state of every field.
+    assertFieldGroupsValid(
+      linkedFields.map((field) => ({
+        id: field.id,
+        type: field.type,
+        recipientId: field.recipientId,
+        groupId: field.groupId,
+        fieldMeta: field._parsedFieldMeta,
+      })),
+    );
+
+    const persistedFields = await Promise.all(
+      linkedFields.map(async (field) => {
+        const parsedFieldMeta = field._parsedFieldMeta;
+
+        const upsertedField = await tx.field.upsert({
+          where: {
+            id: field._persisted?.id ?? -1,
+            envelopeId: envelope.id,
+            envelopeItemId: field.envelopeItemId,
+          },
+          update: {
+            page: field.pageNumber,
+            positionX: field.pageX,
+            positionY: field.pageY,
+            width: field.pageWidth,
+            height: field.pageHeight,
+            fieldMeta: parsedFieldMeta,
+            groupId: field.groupId,
+            externalId: field.externalId,
+          },
+          create: {
+            type: field.type,
+            page: field.pageNumber,
+            positionX: field.pageX,
+            positionY: field.pageY,
+            width: field.pageWidth,
+            height: field.pageHeight,
+            customText: '',
+            inserted: false,
+            fieldMeta: parsedFieldMeta,
+            groupId: field.groupId,
+            externalId: field.externalId,
+            envelope: {
+              connect: {
+                id: envelope.id,
+              },
+            },
+            envelopeItem: {
+              connect: {
+                id: field.envelopeItemId,
+                envelopeId: envelope.id,
+              },
+            },
+            recipient: {
+              connect: {
+                id: field._recipient.id,
+                envelopeId: envelope.id,
+              },
+            },
+          },
+        });
+
+        return {
+          ...upsertedField,
+          formId: field.formId,
+        };
+      }),
+    );
+
+    if (removedFields.length > 0) {
+      await tx.field.deleteMany({
+        where: {
+          id: {
+            in: removedFields.map((field) => field.id),
+          },
+        },
       });
     }
 
     return {
-      ...field,
-      groupId,
-      externalId,
-      _parsedFieldMeta: parsedFieldMeta,
-      _persisted: existing,
-      _recipient: recipient,
+      envelope,
+      existingFields,
+      removedFields,
+      persistedFields,
     };
   });
-
-  // Since this is a full replace, the payload represents the final state of every field.
-  assertFieldGroupsValid(
-    linkedFields.map((field) => ({
-      id: field.id,
-      type: field.type,
-      recipientId: field.recipientId,
-      groupId: field.groupId,
-      fieldMeta: field._parsedFieldMeta,
-    })),
-  );
-
-  const persistedFields = await Promise.all(
-    // Disabling as wrapping promises here causes type issues
-    // eslint-disable-next-line @typescript-eslint/promise-function-async
-    linkedFields.map(async (field) => {
-      const parsedFieldMeta = field._parsedFieldMeta;
-
-      // Proceed with upsert operation
-      const upsertedField = await prisma.field.upsert({
-        where: {
-          id: field._persisted?.id ?? -1,
-          envelopeId: envelope.id,
-          envelopeItemId: field.envelopeItemId,
-        },
-        update: {
-          page: field.pageNumber,
-          positionX: field.pageX,
-          positionY: field.pageY,
-          width: field.pageWidth,
-          height: field.pageHeight,
-          fieldMeta: parsedFieldMeta,
-          groupId: field.groupId,
-          externalId: field.externalId,
-        },
-        create: {
-          type: field.type,
-          page: field.pageNumber,
-          positionX: field.pageX,
-          positionY: field.pageY,
-          width: field.pageWidth,
-          height: field.pageHeight,
-          customText: '',
-          inserted: false,
-          fieldMeta: parsedFieldMeta,
-          groupId: field.groupId,
-          externalId: field.externalId,
-          envelope: {
-            connect: {
-              id: envelope.id,
-            },
-          },
-          envelopeItem: {
-            connect: {
-              id: field.envelopeItemId,
-              envelopeId: envelope.id,
-            },
-          },
-          recipient: {
-            connect: {
-              id: field._recipient.id,
-              envelopeId: envelope.id,
-            },
-          },
-        },
-      });
-
-      return {
-        ...upsertedField,
-        formId: field.formId,
-      };
-    }),
-  );
-
-  if (removedFields.length > 0) {
-    await prisma.field.deleteMany({
-      where: {
-        id: {
-          in: removedFields.map((field) => field.id),
-        },
-      },
-    });
-  }
 
   // Filter out fields that have been removed or have been updated.
   const filteredFields = existingFields.filter((field) => {

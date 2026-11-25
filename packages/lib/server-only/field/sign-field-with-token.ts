@@ -1,34 +1,21 @@
-import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
-import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
-import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
-import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
-import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
-import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
-import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
-import { AUTO_SIGNABLE_FIELD_TYPES } from '../../constants/autosign';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuth } from '../../types/document-auth';
-import {
-  ZCheckboxFieldMeta,
-  ZDropdownFieldMeta,
-  ZNumberFieldMeta,
-  ZRadioFieldMeta,
-  ZTextFieldMeta,
-} from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { assertLegacyFieldValueAllowed } from '../../utils/legacy-field-signing';
 import { getRecipientFieldsWhereInput } from '../../utils/recipient-queries';
 import { assertRecipientNotExpired } from '../../utils/recipients';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
+import { lockFieldForSigning } from './lock-field-for-signing';
 
 export type SignFieldWithTokenOptions = {
   token: string;
@@ -46,7 +33,8 @@ export type SignFieldWithTokenOptions = {
  * Content within this function has been duplicated in the
  * createDocumentFromDirectTemplate file.
  *
- * Any update to this should be reflected in the other file if required.
+ * Any update to this should be reflected in the other file if required. Which values a field
+ * accepts is shared through `assertLegacyFieldValueAllowed`.
  *
  * Todo: Extract common logic.
  */
@@ -134,52 +122,20 @@ export const signFieldWithToken = async ({
     });
   }
 
-  if (field.type === FieldType.NUMBER && field.fieldMeta) {
-    const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
-    const errors = validateNumberField(value, numberFieldParsedMeta, true);
+  const documentMeta = await prisma.documentMeta.findFirst({
+    where: {
+      envelope: {
+        id: envelope.id,
+      },
+    },
+  });
 
-    if (errors.length > 0) {
-      throw new Error(errors.join(', '));
-    }
-  }
-
-  if (field.type === FieldType.TEXT && field.fieldMeta) {
-    const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
-    const errors = validateTextField(value, textFieldParsedMeta, true);
-
-    if (errors.length > 0) {
-      throw new Error(errors.join(', '));
-    }
-  }
-
-  if (field.type === FieldType.CHECKBOX && field.fieldMeta) {
-    const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
-    const checkboxFieldValues: string[] = fromCheckboxValue(value);
-
-    const errors = validateCheckboxField(checkboxFieldValues, checkboxFieldParsedMeta, true);
-
-    if (errors.length > 0) {
-      throw new Error(errors.join(', '));
-    }
-  }
-
-  if (field.type === FieldType.RADIO && field.fieldMeta) {
-    const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
-    const errors = validateRadioField(value, radioFieldParsedMeta, true);
-
-    if (errors.length > 0) {
-      throw new Error(errors.join(', '));
-    }
-  }
-
-  if (field.type === FieldType.DROPDOWN && field.fieldMeta) {
-    const dropdownFieldParsedMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
-    const errors = validateDropdownField(value, dropdownFieldParsedMeta, true);
-
-    if (errors.length > 0) {
-      throw new Error(errors.join(', '));
-    }
-  }
+  assertLegacyFieldValueAllowed({
+    field,
+    value,
+    isBase64,
+    typedSignatureEnabled: documentMeta?.typedSignatureEnabled,
+  });
 
   const derivedRecipientActionAuth = await validateFieldAuth({
     documentAuthOptions: envelope.authOptions,
@@ -187,14 +143,6 @@ export const signFieldWithToken = async ({
     field,
     userId,
     authOptions,
-  });
-
-  const documentMeta = await prisma.documentMeta.findFirst({
-    where: {
-      envelope: {
-        id: envelope.id,
-      },
-    },
   });
 
   const isSignatureField = field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE;
@@ -210,40 +158,21 @@ export const signFieldWithToken = async ({
       .toFormat(documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
   }
 
-  if (isSignatureField && !signatureImageAsBase64 && !typedSignature) {
-    throw new Error('Signature field must have a signature');
-  }
-
-  if (isSignatureField && documentMeta?.typedSignatureEnabled === false && typedSignature) {
-    throw new Error('Typed signatures are not allowed. Please draw your signature');
-  }
-
-  if (field.fieldMeta?.readOnly && !AUTO_SIGNABLE_FIELD_TYPES.includes(field.type)) {
-    // !: This is a bit of a hack at the moment, readonly fields with default values
-    // !: should be inserted with their default value on document creation instead of
-    // !: this weird programattic approach. Until that's fixed though this will verify
-    // !: that the programmatic signed value is only that of its default.
-    const isAutomaticSigningValueValid = match(field.fieldMeta)
-      .with({ type: 'text' }, (meta) => customText === meta.text)
-      .with({ type: 'number' }, (meta) => customText === meta.value)
-      .with({ type: 'checkbox' }, (meta) =>
-        isDeepEqual(
-          fromCheckboxValue(customText ?? ''),
-          meta.values?.filter((v) => v.checked).map((v) => v.value) ?? [],
-        ),
-      )
-      .with({ type: 'radio' }, (meta) => customText === meta.values?.find((v) => v.checked)?.value)
-      .with({ type: 'dropdown' }, (meta) => customText === meta.defaultValue)
-      .otherwise(() => false);
-
-    if (!isAutomaticSigningValueValid) {
-      throw new Error('Field is read only and only accepts its default value for signing.');
-    }
-  }
-
   const assistant = recipient.role === RecipientRole.ASSISTANT ? recipient : undefined;
 
   return await prisma.$transaction(async (tx) => {
+    const { field: lockedField } = await lockFieldForSigning(tx, {
+      envelopeId: envelope.id,
+      fieldId: field.id,
+      recipientId: recipient.id,
+    });
+
+    if (lockedField.inserted) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Field ${fieldId} has already been inserted`,
+      });
+    }
+
     const updatedField = await tx.field.update({
       where: {
         id: field.id,

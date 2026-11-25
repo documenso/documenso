@@ -1,5 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import { lockEnvelope } from '@documenso/lib/server-only/envelope/lock-envelope';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { assertFieldGroupsValid } from '@documenso/lib/utils/field-groups';
@@ -54,51 +55,66 @@ export const deleteEnvelopeFieldRoute = authenticatedProcedure
       teamId,
     });
 
-    const envelope = await prisma.envelope.findUnique({
+    const unlockedEnvelope = await prisma.envelope.findUnique({
       where: envelopeWhereInput,
-      include: {
-        recipients: {
-          include: {
-            fields: true,
-          },
-        },
+      select: {
+        id: true,
       },
     });
 
-    const recipientWithFields = envelope?.recipients.find((recipient) =>
-      recipient.fields.some((field) => field.id === fieldId),
-    );
-    const fieldToDelete = recipientWithFields?.fields.find((field) => field.id === fieldId);
-
-    if (!envelope || !recipientWithFields || !fieldToDelete) {
+    if (!unlockedEnvelope) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Field not found',
       });
     }
 
-    if (envelope.completedAt) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Envelope already complete',
-      });
-    }
-
-    // Check whether the recipient associated with the field can have new fields created.
-    if (!canRecipientFieldsBeModified(recipientWithFields, recipientWithFields.fields)) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Recipient has already interacted with the document.',
-      });
-    }
-
-    // Removing a field from a group must not leave the remaining group in an invalid state.
-    if (fieldToDelete.groupId) {
-      const remainingGroupedFields = recipientWithFields.fields.filter(
-        (field) => field.groupId === fieldToDelete.groupId && field.id !== fieldToDelete.id,
-      );
-
-      assertFieldGroupsValid(remainingGroupedFields);
-    }
-
     await prisma.$transaction(async (tx) => {
+      await lockEnvelope(tx, unlockedEnvelope.id);
+
+      const envelope = await tx.envelope.findUnique({
+        where: envelopeWhereInput,
+        include: {
+          recipients: {
+            include: {
+              fields: true,
+            },
+          },
+        },
+      });
+
+      const recipientWithFields = envelope?.recipients.find((recipient) =>
+        recipient.fields.some((field) => field.id === fieldId),
+      );
+      const fieldToDelete = recipientWithFields?.fields.find((field) => field.id === fieldId);
+
+      if (!envelope || !recipientWithFields || !fieldToDelete) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Field not found',
+        });
+      }
+
+      if (envelope.completedAt) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Envelope already complete',
+        });
+      }
+
+      // Check whether the recipient associated with the field can have new fields created.
+      if (!canRecipientFieldsBeModified(recipientWithFields, recipientWithFields.fields)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Recipient has already interacted with the document.',
+        });
+      }
+
+      // Removing a field from a group must not leave the remaining group in an invalid state.
+      if (fieldToDelete.groupId) {
+        const remainingGroupedFields = recipientWithFields.fields.filter(
+          (field) => field.groupId === fieldToDelete.groupId && field.id !== fieldToDelete.id,
+        );
+
+        assertFieldGroupsValid(remainingGroupedFields);
+      }
+
       const deletedField = await tx.field.delete({
         where: {
           id: fieldToDelete.id,

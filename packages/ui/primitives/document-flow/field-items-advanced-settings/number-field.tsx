@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@documenso/ui/primitives/switch';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { numberFormatValues } from './constants';
 
@@ -25,6 +25,22 @@ export const NumberFieldAdvancedSettings = ({
   const { t } = useLingui();
 
   const [showValidation, setShowValidation] = useState(false);
+
+  // Inputs validate in their event handlers. This covers changes which do not come from an input,
+  // such as the stored settings loading after the panel opens.
+  useEffect(() => {
+    handleErrors(
+      validateNumberField(String(fieldState.value ?? 0), {
+        minValue: Number(fieldState.minValue ?? 0),
+        maxValue: Number(fieldState.maxValue ?? 0),
+        readOnly: Boolean(fieldState.readOnly),
+        required: Boolean(fieldState.required),
+        numberFormat: fieldState.numberFormat ?? '',
+        fontSize: Number(fieldState.fontSize ?? 14),
+        type: 'number',
+      }),
+    );
+  }, [fieldState]);
 
   const handleInput = (field: keyof NumberFieldMeta, value: string | boolean) => {
     const userValue = field === 'value' ? value : (fieldState.value ?? 0);

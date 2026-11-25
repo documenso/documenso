@@ -415,6 +415,65 @@ test.describe('[ENVELOPE_FIELD_GROUPS]', () => {
     expect(fields).toHaveLength(2);
   });
 
+  test('set fields rejects a field listed twice without changing it', async ({ request }) => {
+    const groupedCheckbox = (externalId: string, positionY: number) => ({
+      type: FieldType.CHECKBOX,
+      page: 1,
+      positionX: 5,
+      positionY,
+      ...FIELD_SIZE,
+      groupId: 'grp_listed_twice',
+      externalId,
+      fieldMeta: checkboxMeta([option(1, externalId)], { required: true, ...atLeastTwo }),
+    });
+
+    const { envelope, user, team } = await apiSeedDraftDocument(request, {
+      recipients: [{ email: 'listed-twice@test.documenso.com', name: 'Listed Twice Signer' }],
+      fieldsPerRecipient: [[SIGNATURE_FIELD, groupedCheckbox('checkbox-a', 20), groupedCheckbox('checkbox-b', 35)]],
+    });
+
+    const toFieldData = (field: (typeof envelope.fields)[number]) => ({
+      id: field.id,
+      envelopeItemId: field.envelopeItemId,
+      type: field.type,
+      recipientId: field.recipientId,
+      pageNumber: field.page,
+      pageX: Number(field.positionX),
+      pageY: Number(field.positionY),
+      pageWidth: Number(field.width),
+      pageHeight: Number(field.height),
+      fieldMeta: field.fieldMeta ?? undefined,
+    });
+
+    const checkboxA = findFieldByExternalId(envelope.fields, 'checkbox-a');
+
+    const ungroupedCheckboxA = {
+      ...toFieldData(checkboxA),
+      groupId: null,
+      fieldMeta: checkboxMeta([option(1, 'checkbox-a')]),
+    };
+
+    // The first entry keeps checkbox A in its group, which is what lets "at least 2" pass. The
+    // second takes it out, and is the one which would be stored.
+    await expect(
+      setFieldsForDocument({
+        userId: user.id,
+        teamId: team.id,
+        id: { type: 'envelopeId', id: envelope.id },
+        fields: [...envelope.fields.map(toFieldData), ungroupedCheckboxA],
+        requestMetadata: { requestMetadata: {}, source: 'app', auth: 'session' },
+      }),
+    ).rejects.toThrow(/listed more than once/);
+
+    const storedCheckboxA = await prisma.field.findUniqueOrThrow({
+      where: {
+        id: checkboxA.id,
+      },
+    });
+
+    expect(storedCheckboxA.groupId).toBe('grp_listed_twice');
+  });
+
   test('deleting a file removes a group rule which can no longer be satisfied', async ({ request }) => {
     const { envelope, token, envelopeItems } = await seedGroupAcrossFiles(request, 2);
 

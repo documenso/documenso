@@ -13,7 +13,12 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import { parseCheckboxCustomText, toCheckboxCustomText, toRadioCustomText } from '@documenso/lib/utils/fields';
+import {
+  parseCheckboxCustomText,
+  parseSubmittedCheckboxCustomText,
+  toCheckboxCustomText,
+  toRadioCustomText,
+} from '@documenso/lib/utils/fields';
 import { zEmail } from '@documenso/lib/utils/zod';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import type { Field } from '@prisma/client';
@@ -21,6 +26,50 @@ import { FieldType } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match, P } from 'ts-pattern';
 import { z } from 'zod';
+
+export type CustomTextFieldType = Exclude<
+  FieldType,
+  typeof FieldType.SIGNATURE | typeof FieldType.FREE_SIGNATURE | typeof FieldType.DATE
+>;
+
+/**
+ * Converts a direct link's value, sent in the stored custom text format, into the value
+ * `extractFieldInsertionValues` validates. Does not check that radio or checkbox options exist.
+ */
+export const parseCustomTextAsFieldValue = (type: CustomTextFieldType, customText: string): TSignEnvelopeFieldValue => {
+  const isBlank = customText.trim() === '';
+
+  return match(type)
+    .with(FieldType.CHECKBOX, (type) => ({
+      type,
+      value: isBlank ? [] : parseSubmittedCheckboxCustomText(customText),
+    }))
+    .with(FieldType.RADIO, (type) => {
+      if (!isBlank && !/^\d+$/.test(customText)) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Invalid radio value',
+        });
+      }
+
+      return {
+        type,
+        value: isBlank ? null : Number(customText),
+      };
+    })
+    .with(
+      FieldType.NUMBER,
+      FieldType.EMAIL,
+      FieldType.NAME,
+      FieldType.INITIALS,
+      FieldType.TEXT,
+      FieldType.DROPDOWN,
+      (type) => ({
+        type,
+        value: isBlank ? null : customText,
+      }),
+    )
+    .exhaustive();
+};
 
 export type ExtractFieldInsertionValuesOptions = {
   fieldValue: TSignEnvelopeFieldValue;
@@ -108,8 +157,9 @@ export const extractFieldInsertionValues = ({
         });
       }
 
+      // A number without a format may be sent padded, which the validator accepts.
       return {
-        customText: fieldValue.value,
+        customText: fieldValue.value.trim(),
         inserted: true,
       };
     })

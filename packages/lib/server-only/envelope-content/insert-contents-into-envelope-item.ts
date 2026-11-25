@@ -7,6 +7,7 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import type { EnvelopeContentSnapshot } from '../../utils/envelope-content';
 import { areEnvelopeContentsEqual } from '../../utils/envelope-content';
+import { lockEnvelope } from '../envelope/lock-envelope';
 import { generatePartialSignedPdf } from '../pdf/generate-partial-signed-pdf';
 import type { OverlayContent } from '../pdf/insert-field-in-pdf-v2';
 
@@ -121,7 +122,7 @@ type CommitRenderedEnvelopeItemsOptions = {
  * write can land in between. The write's own status check
  * (`assertContentCanBeChanged`) only catches the case where the send has
  * already committed; the check here catches the other order. Both sides take
- * the same `FOR UPDATE` lock on the envelope row, so whichever gets it second
+ * the same lock on the envelope row (`lockEnvelope`), so whichever gets it second
  * sees the other's committed state and fails.
  *
  * Each switch is guarded by the document data the item pointed at when it was
@@ -162,7 +163,7 @@ const assertEnvelopeContentsUnchanged = async (
   tx: Prisma.TransactionClient,
   { envelopeId, contents }: AssertEnvelopeContentsUnchangedOptions,
 ) => {
-  await tx.$queryRaw`SELECT "id" FROM "Envelope" WHERE "id" = ${envelopeId} FOR UPDATE`;
+  await lockEnvelope(tx, envelopeId);
 
   const currentContents = await tx.envelopeContent.findMany({
     where: {

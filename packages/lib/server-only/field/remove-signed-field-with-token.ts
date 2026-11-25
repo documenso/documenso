@@ -8,6 +8,8 @@ import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 
+import { lockFieldForSigning } from './lock-field-for-signing';
+
 export type RemovedSignedFieldWithTokenOptions = {
   token: string;
   fieldId: number;
@@ -69,6 +71,12 @@ export const removeSignedFieldWithToken = async ({
   }
 
   await prisma.$transaction(async (tx) => {
+    await lockFieldForSigning(tx, {
+      envelopeId: envelope.id,
+      fieldId: field.id,
+      recipientId: recipient.id,
+    });
+
     await tx.field.update({
       where: {
         id: field.id,

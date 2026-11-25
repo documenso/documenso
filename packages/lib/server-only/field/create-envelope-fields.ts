@@ -15,6 +15,7 @@ import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { lockEnvelope } from '../envelope/lock-envelope';
 import { type BoundingBox, whiteoutRegions } from '../pdf/auto-place-fields';
 import { assertFieldMetaValid } from './validate-field-meta';
 
@@ -267,16 +268,52 @@ export const createEnvelopeFields = async ({
     };
   });
 
-  const newGroupIds = new Set(validatedFields.flatMap((field) => (field.groupId ? [field.groupId] : [])));
-
-  if (newGroupIds.size > 0) {
-    const existingGroupedFields = envelope.fields.filter((field) => field.groupId && newGroupIds.has(field.groupId));
-
-    assertFieldGroupsValid([...existingGroupedFields, ...validatedFields]);
-  }
-
   const createdFields = await prisma.$transaction(async (tx) => {
-    await assertEnvelopeMutable(envelope, tx);
+    await lockEnvelope(tx, envelope.id);
+
+    const lockedEnvelope = await tx.envelope.findFirstOrThrow({
+      where: {
+        id: envelope.id,
+      },
+      include: {
+        recipients: true,
+        fields: true,
+      },
+    });
+
+    await assertEnvelopeMutable(lockedEnvelope);
+
+    if (lockedEnvelope.type === EnvelopeType.DOCUMENT && lockedEnvelope.completedAt) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Envelope already complete',
+      });
+    }
+
+    for (const field of validatedFields) {
+      const recipient = lockedEnvelope.recipients.find((recipient) => recipient.id === field.recipientId);
+
+      if (!recipient) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Recipient ${field.recipientId} not found`,
+        });
+      }
+
+      if (!canRecipientFieldsBeModified(recipient, lockedEnvelope.fields)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Recipient type cannot have fields, or they have already interacted with the document.',
+        });
+      }
+    }
+
+    const newGroupIds = new Set(validatedFields.flatMap((field) => (field.groupId ? [field.groupId] : [])));
+
+    if (newGroupIds.size > 0) {
+      const existingGroupedFields = lockedEnvelope.fields.filter(
+        (field) => field.groupId && newGroupIds.has(field.groupId),
+      );
+
+      assertFieldGroupsValid([...existingGroupedFields, ...validatedFields]);
+    }
 
     const newlyCreatedFields = await tx.field.createManyAndReturn({
       data: validatedFields.map((field) => ({
