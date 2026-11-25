@@ -47,7 +47,7 @@ export const EnvelopeSignerCompleteDialog = () => {
 
   const { currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
-  const { onDocumentCompleted, onDocumentError } = useEmbedSigningContext() || {};
+  const { onDocumentCompleted, onDocumentError, onBeforeComplete } = useEmbedSigningContext() || {};
 
   const isFramed = useIsFramed();
 
@@ -209,6 +209,8 @@ export const EnvelopeSignerCompleteDialog = () => {
     };
 
     try {
+      await onBeforeComplete?.();
+
       const result = await completeDocument({
         token: recipient.token,
         documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),

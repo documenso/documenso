@@ -1,3 +1,4 @@
+import { formatPath } from '@documenso/lib/constants/app';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { trpc } from '@documenso/trpc/react';
 import { useCallback, useEffect, useRef } from 'react';
@@ -15,15 +16,62 @@ export const usePersistEmbedSignature = ({
   initialSignature,
   debounceMs = 500,
 }: UsePersistEmbedSignatureOptions) => {
-  const { mutate } = trpc.embeddingPresign.persistEmbedSignature.useMutation({
+  const { mutateAsync } = trpc.embeddingPresign.persistEmbedSignature.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   });
 
   const lastPersistedSignature = useRef(initialSignature || null);
   const pendingSignature = useRef<string | null>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inFlightPromise = useRef<Promise<void> | null>(null);
 
-  const flushPendingSignature = useCallback(() => {
+  const flushPendingSignature = useCallback(async () => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+      debounceTimer.current = null;
+    }
+
+    const nextSignature = pendingSignature.current;
+    if (!clientUserId || !nextSignature || nextSignature === lastPersistedSignature.current) {
+      pendingSignature.current = null;
+      if (inFlightPromise.current) {
+        await inFlightPromise.current;
+      }
+      return;
+    }
+
+    pendingSignature.current = null;
+
+    const currentPromise = (async () => {
+      try {
+        if (inFlightPromise.current) {
+          await inFlightPromise.current;
+        }
+
+        await mutateAsync({
+          token,
+          clientUserId,
+          signature: nextSignature,
+        });
+
+        lastPersistedSignature.current = nextSignature;
+      } catch {
+        // Ignore persistence errors so completion and navigation never fail.
+      }
+    })();
+
+    inFlightPromise.current = currentPromise;
+
+    try {
+      await currentPromise;
+    } finally {
+      if (inFlightPromise.current === currentPromise) {
+        inFlightPromise.current = null;
+      }
+    }
+  }, [token, clientUserId, mutateAsync]);
+
+  const flushPendingSignatureOnUnload = useCallback(() => {
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
       debounceTimer.current = null;
@@ -36,30 +84,44 @@ export const usePersistEmbedSignature = ({
     }
 
     pendingSignature.current = null;
-    mutate(
-      {
-        token,
-        clientUserId,
-        signature: nextSignature,
-      },
-      {
-        onSuccess: () => {
-          lastPersistedSignature.current = nextSignature;
+
+    if (typeof fetch === 'function') {
+      void fetch(formatPath('/api/trpc/embeddingPresign.persistEmbedSignature'), {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
         },
-        onError: () => null,
-      },
-    );
-  }, [token, clientUserId, mutate]);
+        body: JSON.stringify({
+          json: {
+            token,
+            clientUserId,
+            signature: nextSignature,
+          },
+        }),
+        credentials: 'include',
+        keepalive: true,
+      })
+        .then((response) => {
+          if (response.ok) {
+            lastPersistedSignature.current = nextSignature;
+          }
+        })
+        .catch(() => null);
+      return;
+    }
+
+    void flushPendingSignature();
+  }, [token, clientUserId, flushPendingSignature]);
 
   useEffect(() => {
     const handleVisibilityOrPageHide = () => {
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
-        flushPendingSignature();
+        flushPendingSignatureOnUnload();
       }
     };
 
     const handlePageHide = () => {
-      flushPendingSignature();
+      flushPendingSignatureOnUnload();
     };
 
     if (typeof window !== 'undefined') {
@@ -72,9 +134,9 @@ export const usePersistEmbedSignature = ({
         window.removeEventListener('pagehide', handlePageHide);
         window.removeEventListener('visibilitychange', handleVisibilityOrPageHide);
       }
-      flushPendingSignature();
+      void flushPendingSignature();
     };
-  }, [flushPendingSignature]);
+  }, [flushPendingSignature, flushPendingSignatureOnUnload]);
 
   const persistSignature = useCallback(
     (signature: string | null | undefined) => {
@@ -96,7 +158,7 @@ export const usePersistEmbedSignature = ({
       }
 
       debounceTimer.current = setTimeout(() => {
-        flushPendingSignature();
+        void flushPendingSignature();
       }, debounceMs);
     },
     [clientUserId, debounceMs, flushPendingSignature],
