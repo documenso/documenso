@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { logger } from '../../utils/logger';
 
 type WindowUnit = 's' | 'm' | 'h' | 'd';
@@ -10,6 +11,8 @@ type RateLimitConfig = {
   max: number;
   globalMax?: number;
   window: WindowStr;
+  /** Refuse verification when the attempt counters cannot be persisted. */
+  failClosed?: boolean;
 };
 
 type CheckParams = {
@@ -179,6 +182,19 @@ export const createRateLimit = (config: RateLimitConfig) => {
           reset,
         };
       } catch (error) {
+        if (config.failClosed) {
+          logger.error({
+            msg: 'Rate limit check failed, refusing verification',
+            action: config.action,
+            error,
+          });
+
+          throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+            message: 'Verification temporarily unavailable, please try again later.',
+            statusCode: 503,
+          });
+        }
+
         // Fail-open: if the rate limit DB query fails, allow the request through.
         logger.error({
           msg: 'Rate limit check failed, failing open',

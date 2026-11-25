@@ -252,7 +252,11 @@ export const EnvelopeSignerCompleteDialog = () => {
 
       const error = AppError.parseError(err);
 
-      if (error.code !== AppErrorCode.TWO_FACTOR_AUTH_FAILED) {
+      const isTwoFactorRetry =
+        error.code === AppErrorCode.TWO_FACTOR_AUTH_FAILED ||
+        (error.code === AppErrorCode.TOO_MANY_REQUESTS && Boolean(accessAuthOptions));
+
+      if (!isTwoFactorRetry) {
         analytics.captureException(err, {
           source: 'signing',
           location: 'complete_document',
