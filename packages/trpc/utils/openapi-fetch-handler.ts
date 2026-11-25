@@ -10,7 +10,7 @@ const CONTENT_TYPE_MULTIPART = 'multipart/form-data';
 const getUrlEncodedBody = async (req: Request) => {
   const params = new URLSearchParams(await req.text());
 
-  const data: Record<string, unknown> = {};
+  const data: Record<string, string[]> = {};
 
   for (const key of params.keys()) {
     data[key] = params.getAll(key);
@@ -22,7 +22,7 @@ const getUrlEncodedBody = async (req: Request) => {
 const getMultipartBody = async (req: Request) => {
   const formData = await req.formData();
 
-  const data: Record<string, unknown> = {};
+  const data: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {};
 
   for (const [key, value] of formData.entries()) {
     // !: Handles cases where our generated SDKs send key[] syntax for arrays.

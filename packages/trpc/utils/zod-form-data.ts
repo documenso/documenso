@@ -71,7 +71,7 @@ export const zfdContentImageFile = () => {
 export const zodFormData = <T extends ZodRawShape>(schema: T) => {
   return z.preprocess((data) => {
     if (data instanceof FormData) {
-      const formData: Record<string, unknown> = {};
+      const formData: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {};
 
       for (const key of data.keys()) {
         const values = data.getAll(key);
