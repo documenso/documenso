@@ -90,6 +90,29 @@ export const isPrivateUrl = (url: string): boolean => {
       return isPrivateUrl(`http://${ipv4}`);
     }
 
+    // IPv4-compatible IPv6, dotted form (e.g. ::127.0.0.1). RFC 4291 §2.5.5.1
+    // defines ::/96 as IPv4-compatible. `new URL()` normalizes it to the hex
+    // form below, but check the dotted form as well for completeness.
+    const v4CompatDotted = normalizedHost.match(/^::(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+
+    if (v4CompatDotted) {
+      return isPrivateUrl(`http://${v4CompatDotted[1]}`);
+    }
+
+    // IPv4-compatible IPv6, hex form (e.g. ::7f00:1 for ::127.0.0.1). Without
+    // this, `http://[::127.0.0.1]` or `http://[::169.254.169.254]` slips past
+    // every check above and reaches loopback or cloud metadata services
+    // (SSRF, see #3451).
+    const v4CompatHex = normalizedHost.match(/^::([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i);
+
+    if (v4CompatHex) {
+      const high = parseInt(v4CompatHex[1], 16);
+      const low = parseInt(v4CompatHex[2], 16);
+      const ipv4 = [high >> 8, high & 0xff, low >> 8, low & 0xff].join('.');
+
+      return isPrivateUrl(`http://${ipv4}`);
+    }
+
     return false;
   } catch {
     return false;
