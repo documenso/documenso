@@ -20,7 +20,12 @@ import {
 } from '@prisma/client';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
-import { checkDocumentCounts, checkDocumentTabCount, toggleDocumentSenderFilter } from '../fixtures/documents';
+import {
+  checkDocumentCounts,
+  checkDocumentTabCount,
+  selectDocumentStatusFilter,
+  toggleDocumentSenderFilter,
+} from '../fixtures/documents';
 
 test.describe.configure({
   mode: 'parallel',
@@ -1176,6 +1181,99 @@ test.describe('Find Documents UI - Sender Filter', () => {
     // Should only show member1's doc
     await checkDocumentTabCount(page, 'All', 1);
     await expect(page.getByRole('link', { name: 'Member1 Sent Doc' })).toBeVisible();
+  });
+
+  test('paginating preserves active status, sender, period, and search filters', async ({ page }) => {
+    const { team, owner } = await seedTeam();
+    const member = await seedTeamMember({
+      teamId: team.id,
+      name: 'Filter Signer',
+      role: TeamMemberRole.MEMBER,
+    });
+    const { user: recipient } = await seedUser();
+
+    await seedDocuments([
+      {
+        sender: member,
+        teamId: team.id,
+        recipients: [recipient],
+        type: DocumentStatus.COMPLETED,
+        documentOptions: {
+          title: 'Quarterly Agreement 1',
+        },
+      },
+      {
+        sender: member,
+        teamId: team.id,
+        recipients: [recipient],
+        type: DocumentStatus.COMPLETED,
+        documentOptions: {
+          title: 'Quarterly Agreement 2',
+        },
+      },
+      {
+        sender: member,
+        teamId: team.id,
+        recipients: [recipient],
+        type: DocumentStatus.COMPLETED,
+        documentOptions: {
+          title: 'Quarterly Agreement 3',
+        },
+      },
+      {
+        sender: owner,
+        teamId: team.id,
+        recipients: [],
+        type: DocumentStatus.DRAFT,
+        documentOptions: {
+          title: 'Draft Noise Doc',
+        },
+      },
+      {
+        sender: owner,
+        teamId: team.id,
+        recipients: [recipient],
+        type: DocumentStatus.COMPLETED,
+        documentOptions: {
+          title: 'Quarterly Agreement Owner Noise',
+        },
+      },
+    ]);
+
+    await apiSignin({
+      page,
+      email: owner.email,
+      redirectPath: `/t/${team.url}/documents?perPage=2`,
+    });
+
+    await selectDocumentStatusFilter(page, 'Completed');
+    await page.waitForURL((url) => url.searchParams.get('status') === 'COMPLETED');
+
+    await toggleDocumentSenderFilter(page, 'Filter Signer');
+    await page.waitForURL((url) => url.searchParams.get('senderIds') === String(member.id));
+
+    await page.getByTestId('documents-table-period-filter').click();
+    await page.getByRole('option', { name: 'Last 30 days' }).click();
+    await page.waitForURL((url) => url.searchParams.get('period') === '30d');
+
+    await page.getByPlaceholder('Search documents...').fill('Quarterly');
+    await page.waitForURL((url) => url.searchParams.get('query') === 'Quarterly');
+
+    await expect(page.getByTestId('data-table-count')).toContainText('Showing 2 results');
+
+    await page.getByRole('button', { name: 'Go to next page' }).click();
+    await page.waitForURL((url) => url.searchParams.get('page') === '2');
+
+    const page2Url = new URL(page.url());
+    expect(page2Url.searchParams.get('status')).toBe('COMPLETED');
+    expect(page2Url.searchParams.get('senderIds')).toBe(String(member.id));
+    expect(page2Url.searchParams.get('period')).toBe('30d');
+    expect(page2Url.searchParams.get('query')).toBe('Quarterly');
+
+    await expect(page.getByTestId('data-table-count')).toContainText('Showing 1 result');
+    await expect(page.getByTestId('documents-table-status-filter')).toContainText('Completed');
+    await expect(page.getByRole('link', { name: 'Draft Noise Doc', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Quarterly Agreement Owner Noise', exact: true })).not.toBeVisible();
   });
 });
 

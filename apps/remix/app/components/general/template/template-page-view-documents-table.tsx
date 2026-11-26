@@ -15,8 +15,8 @@ import { Trans } from '@lingui/react/macro';
 import { DocumentSource, DocumentStatus as DocumentStatusEnum } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
+import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7';
 import { useMemo } from 'react';
-import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 
 import { SearchParamSelector } from '~/components/forms/search-param-selector';
@@ -54,7 +54,7 @@ type TemplatePageViewDocumentsTableProps = {
 export const TemplatePageViewDocumentsTable = ({ templateId }: TemplatePageViewDocumentsTableProps) => {
   const { _, i18n } = useLingui();
 
-  const [searchParams] = useSearchParams();
+  const searchParams = useOptimisticSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
   const team = useCurrentTeam();

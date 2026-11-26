@@ -163,6 +163,56 @@ test.describe('Inbox - Search & Status Filter', () => {
 
     await expect(page.getByText(COMPLETED_EMPTY_STATE)).toBeVisible();
   });
+
+  test('should preserve status filter when paginating', async ({ page }) => {
+    const { user: sender, team: senderTeam } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    await Promise.all([
+      seedCompletedDocument(sender, senderTeam.id, [recipient], {
+        createDocumentOptions: {
+          title: 'Inbox Completed 1',
+        },
+      }),
+      seedCompletedDocument(sender, senderTeam.id, [recipient], {
+        createDocumentOptions: {
+          title: 'Inbox Completed 2',
+        },
+      }),
+      seedCompletedDocument(sender, senderTeam.id, [recipient], {
+        createDocumentOptions: {
+          title: 'Inbox Completed 3',
+        },
+      }),
+      seedPendingDocument(sender, senderTeam.id, [recipient], {
+        createDocumentOptions: {
+          title: 'Inbox Pending Noise 1',
+        },
+      }),
+      seedPendingDocument(sender, senderTeam.id, [recipient], {
+        createDocumentOptions: {
+          title: 'Inbox Pending Noise 2',
+        },
+      }),
+    ]);
+
+    await apiSignin({
+      page,
+      email: recipient.email,
+      redirectPath: '/inbox?perPage=2',
+    });
+
+    await selectInboxStatus(page, DocumentStatus.COMPLETED);
+    await expect(page.getByTestId('data-table-count')).toContainText('Showing 2 results');
+
+    await page.getByRole('button', { name: 'Go to next page' }).click();
+    await page.waitForURL((url) => url.searchParams.get('page') === '2');
+
+    expect(new URL(page.url()).searchParams.get('status')).toBe(DocumentStatus.COMPLETED);
+    await expect(page.getByTestId('data-table-count')).toContainText('Showing 1 result');
+    await expect(inboxRow(page, 'Inbox Pending Noise 1')).not.toBeVisible();
+    await expect(inboxRow(page, 'Inbox Pending Noise 2')).not.toBeVisible();
+  });
 });
 
 // ─── Adversarial ─────────────────────────────────────────────────────────────

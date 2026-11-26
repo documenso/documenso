@@ -1,5 +1,4 @@
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import type { TFindTemplatesResponse } from '@documenso/trpc/server/template-router/schema';
@@ -15,11 +14,13 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { AlertTriangle, Building2Icon, Globe2Icon, InfoIcon, Link2Icon, Loader, LockIcon } from 'lucide-react';
+import { useQueryStates } from 'nuqs';
 import { useMemo, useTransition } from 'react';
 import { Link } from 'react-router';
 
 import { TemplateType } from '~/components/general/template/template-type';
 import { useCurrentTeam } from '~/providers/team';
+import { templatesSearchParams } from '~/utils/templates-search-params';
 
 import { TemplateUseDialog } from '../dialogs/template-use-dialog';
 import { TemplateDirectLinkBadge } from '../general/template/template-direct-link-badge';
@@ -56,7 +57,13 @@ export const TemplatesTable = ({
 
   const [isPending, startTransition] = useTransition();
 
-  const updateSearchParams = useUpdateSearchParams();
+  const [, setPaginationSearchParams] = useQueryStates(
+    {
+      page: templatesSearchParams.page,
+      perPage: templatesSearchParams.perPage,
+    },
+    { history: 'push' },
+  );
 
   const formatTemplateLink = (row: TemplatesTableRow) => {
     const path = formatTemplatesPath(team.url);
@@ -227,7 +234,7 @@ export const TemplatesTable = ({
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
-      updateSearchParams({
+      void setPaginationSearchParams({
         page,
         perPage,
       });

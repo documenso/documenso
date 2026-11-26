@@ -4,7 +4,11 @@ export const useUpdateSearchParams = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   return (params: Record<string, string | number | boolean | null | undefined>) => {
-    const nextSearchParams = new URLSearchParams(searchParams?.toString() ?? '');
+    // Shallow nuqs updates mutate history without notifying React Router, so read
+    // the live query string instead of React Router's snapshot.
+    const nextSearchParams = new URLSearchParams(
+      typeof window !== 'undefined' ? window.location.search : (searchParams?.toString() ?? ''),
+    );
 
     Object.entries(params).forEach(([key, value]) => {
       if (value === undefined || value === null) {
