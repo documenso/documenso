@@ -16,6 +16,7 @@ import {
   AdminRuleTriggerFilter,
   adminRulesSearchParams,
 } from '~/components/general/admin-rules/admin-rule-trigger-filter';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminRulesTable } from '~/components/tables/admin-rules-table';
 import { appMetaTags } from '~/utils/meta';
 
@@ -59,20 +60,16 @@ export default function AdminRulesPage() {
 
   return (
     <div>
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-        <div className="min-w-0">
-          <h2 className="font-semibold text-4xl">
-            <Trans>Rules</Trans>
-          </h2>
-
-          <p className="mt-2 text-muted-foreground text-sm">
-            <Trans>
-              Run checks when something happens on the platform. Rules run top to bottom, and an enforced rule set to
-              stop on match skips the rules below it.
-            </Trans>
-          </p>
-        </div>
-
+      <SettingsHeader
+        hideDivider
+        title={<Trans>Rules</Trans>}
+        subtitle={
+          <Trans>
+            Run checks when something happens on the platform. Rules run top to bottom, and an enforced rule set to stop
+            on match skips the rules below it.
+          </Trans>
+        }
+      >
         <div className="flex shrink-0 items-center gap-2">
           <Button asChild variant="outline">
             <Link to="/admin/rules/events">
@@ -88,9 +85,9 @@ export default function AdminRulesPage() {
             </Link>
           </Button>
         </div>
-      </div>
+      </SettingsHeader>
 
-      <div className="mt-8 space-y-4">
+      <div className="mt-4 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <RadioGroupSegmented

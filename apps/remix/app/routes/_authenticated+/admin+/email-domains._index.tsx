@@ -17,6 +17,8 @@ import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
+import { SettingsHeader } from '~/components/general/settings-header';
+
 export default function AdminEmailDomainsPage() {
   const { _, i18n } = useLingui();
 
@@ -137,11 +139,13 @@ export default function AdminEmailDomainsPage() {
 
   return (
     <div>
-      <h2 className="font-semibold text-4xl">
-        <Trans>Email Domains</Trans>
-      </h2>
+      <SettingsHeader
+        hideDivider
+        title={<Trans>Email Domains</Trans>}
+        subtitle={<Trans>Search and manage all email domains</Trans>}
+      />
 
-      <div className="mt-8">
+      <div className="mt-4">
         <div className="flex flex-col gap-4 sm:flex-row">
           <Input
             className="flex-1"

@@ -13,6 +13,7 @@ import { AdminRuleDeleteDialog } from '~/components/dialogs/admin-rule-delete-di
 import { AdminRuleForm, type TAdminRuleFormSchema } from '~/components/forms/admin-rule-form';
 import { AdminRuleModeBadge } from '~/components/general/admin-rules/admin-rule-badges';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminRuleMatchesTable } from '~/components/tables/admin-rule-matches-table';
 import { appMetaTags } from '~/utils/meta';
 import type { Route } from './+types/rules.$id';
@@ -101,27 +102,23 @@ export default function AdminRuleEditPage({ params }: Route.ComponentProps) {
 
   return (
     <div>
-      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-        <h2 className="flex min-w-0 flex-wrap items-center gap-3 font-semibold text-4xl">
-          <span className="min-w-0 [overflow-wrap:anywhere]">{rule.name}</span>
-          <AdminRuleModeBadge mode={rule.mode} />
-        </h2>
-
+      <SettingsHeader
+        hideDivider
+        title={rule.name}
+        badge={<AdminRuleModeBadge mode={rule.mode} />}
+        subtitle={rule.description || <Trans>Edit the rule's trigger, conditions and actions</Trans>}
+      >
         <AdminRuleDeleteDialog ruleId={rule.id} ruleName={rule.name} onDeleted={() => void navigate('/admin/rules')} />
-      </div>
+      </SettingsHeader>
 
       <AdminRuleForm key={rule.id} rule={rule} onSubmit={onSubmit} onCancel={() => void navigate('/admin/rules')} />
 
       <div className="mt-16">
-        <div className="mb-4">
-          <h2 className="font-bold text-xl">
-            <Trans>Recent matches</Trans>
-          </h2>
-
-          <p className="text-muted-foreground text-sm md:mt-2">
-            <Trans>Events this rule matched recently, including monitor mode evaluations.</Trans>
-          </p>
-        </div>
+        <SettingsHeader
+          hideDivider
+          title={<Trans>Recent matches</Trans>}
+          subtitle={<Trans>Events this rule matched recently, including monitor mode evaluations.</Trans>}
+        />
 
         <AdminRuleMatchesTable
           filters={{ ruleId }}

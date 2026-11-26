@@ -5,6 +5,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
+import { SettingsHeader } from '~/components/general/settings-header';
 import { OrganisationInsightsTable } from '~/components/tables/organisation-insights-table';
 
 import type { Route } from './+types/organisation-insights.$id';
@@ -45,16 +46,19 @@ export default function OrganisationInsights({ loaderData }: Route.ComponentProp
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-4xl">{organisationName}</h2>
+      <SettingsHeader
+        hideDivider
+        title={organisationName}
+        subtitle={<Trans>Signing activity for this organisation's teams, users and documents</Trans>}
+      >
         <Button variant="outline" asChild>
           <Link to={`/admin/organisations/${organisationId}`}>
             <Trans>Manage organisation</Trans>
           </Link>
         </Button>
-      </div>
+      </SettingsHeader>
 
-      <div className="mt-8">
+      <div className="mt-4">
         <OrganisationInsightsTable
           insights={insights}
           page={page}
