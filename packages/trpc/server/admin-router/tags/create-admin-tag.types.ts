@@ -1,37 +1,40 @@
+import { ADMIN_TAG_DESCRIPTION_MAX_LENGTH } from '@documenso/lib/constants/admin-tags';
 import { ZAdminTagTypeSchema } from '@documenso/lib/types/admin-tags';
 import AdminTagSchema from '@documenso/prisma/generated/zod/modelSchema/AdminTagSchema';
 import { z } from 'zod';
 
-export const ZCreateAdminTagRequestSchema = z
-  .object({
-    userId: z.number().optional(),
-    organisationId: z.string().optional(),
-    type: ZAdminTagTypeSchema,
-    description: z.string().trim().min(1).max(500),
-  })
-  .refine(
-    (data) => {
-      const hasUserId = data.userId !== undefined;
-      const hasOrganisationId = data.organisationId !== undefined;
+export const ZAdminTagDataSchema = z.object({
+  type: ZAdminTagTypeSchema,
+  description: z.string().trim().min(1, { message: 'Add a description' }).max(ADMIN_TAG_DESCRIPTION_MAX_LENGTH),
+});
 
-      // A tag can't belong to both a user and an organisation.
-      if (hasUserId && hasOrganisationId) {
-        return false;
-      }
+export const ZCreateAdminTagRequestSchema = ZAdminTagDataSchema.extend({
+  userId: z.number().optional(),
+  organisationId: z.string().optional(),
+}).refine(
+  (data) => {
+    const hasUserId = data.userId !== undefined;
+    const hasOrganisationId = data.organisationId !== undefined;
 
-      // A tag has to belong to one of them.
-      if (!hasUserId && !hasOrganisationId) {
-        return false;
-      }
+    // A tag can't belong to both a user and an organisation.
+    if (hasUserId && hasOrganisationId) {
+      return false;
+    }
 
-      return true;
-    },
-    {
-      message: 'Exactly one of user or organisation is required',
-    },
-  );
+    // A tag has to belong to one of them.
+    if (!hasUserId && !hasOrganisationId) {
+      return false;
+    }
+
+    return true;
+  },
+  {
+    message: 'Exactly one of user or organisation is required',
+  },
+);
 
 export const ZCreateAdminTagResponseSchema = AdminTagSchema;
 
+export type TAdminTagData = z.infer<typeof ZAdminTagDataSchema>;
 export type TCreateAdminTagRequest = z.infer<typeof ZCreateAdminTagRequestSchema>;
 export type TCreateAdminTagResponse = z.infer<typeof ZCreateAdminTagResponseSchema>;

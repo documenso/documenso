@@ -18,7 +18,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
 
 export type AdminTagDeleteDialogProps = {
-  tag: Pick<TGetAdminTagsResponse[number], 'id' | 'type' | 'description' | 'adminRule'>;
+  tag: Pick<TGetAdminTagsResponse[number], 'id' | 'type' | 'description' | 'organisationId' | 'adminRule'>;
   trigger?: React.ReactNode;
 };
 
@@ -68,13 +68,15 @@ export const AdminTagDeleteDialog = ({ tag, trigger }: AdminTagDeleteDialogProps
           </DialogTitle>
 
           <DialogDescription className="mt-4">
-            {tag.adminRule ? (
-              <Trans>
-                You are about to remove the following tag from this user. The rule that added it can tag them again the
-                next time it matches.
-              </Trans>
+            {tag.organisationId ? (
+              <Trans>You are about to remove the following tag from this organisation.</Trans>
             ) : (
-              <Trans>You are about to remove the following tag from this user. This can't be undone.</Trans>
+              <Trans>You are about to remove the following tag from this user.</Trans>
+            )}{' '}
+            {tag.adminRule ? (
+              <Trans>The rule that added it can add it again the next time it matches.</Trans>
+            ) : (
+              <Trans>This can't be undone.</Trans>
             )}
           </DialogDescription>
         </DialogHeader>
@@ -85,7 +87,7 @@ export const AdminTagDeleteDialog = ({ tag, trigger }: AdminTagDeleteDialogProps
               {t(ADMIN_TAG_TYPE_MAP[tag.type])}
             </Badge>
 
-            <span className="text-foreground [overflow-wrap:anywhere]">{tag.description}</span>
+            <span className="whitespace-pre-wrap text-foreground [overflow-wrap:anywhere]">{tag.description}</span>
           </AlertDescription>
         </Alert>
 

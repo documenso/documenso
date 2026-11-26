@@ -20,7 +20,7 @@ import { AdminUserDeleteDialog } from '~/components/dialogs/admin-user-delete-di
 import { AdminUserDisableDialog } from '~/components/dialogs/admin-user-disable-dialog';
 import { AdminUserEnableDialog } from '~/components/dialogs/admin-user-enable-dialog';
 import { AdminUserResetTwoFactorDialog } from '~/components/dialogs/admin-user-reset-two-factor-dialog';
-import { AdminUserTagsSection } from '~/components/general/admin-user-tags-section';
+import { AdminTagsSection } from '~/components/general/admin-tags-section';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminOrganisationsTable } from '~/components/tables/admin-organisations-table';
@@ -186,6 +186,10 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
 
       <hr className="my-8" />
 
+      <AdminTagsSection subject={{ type: 'user', userId: user.id }} />
+
+      <hr className="my-8" />
+
       <div>
         <div className="mb-4 flex items-center justify-between">
           <div>
@@ -233,7 +237,6 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
       </Accordion>
 
       <div className="mt-16 flex flex-col gap-4">
-        <AdminUserTagsSection user={user} />
         {user && user.twoFactorEnabled && <AdminUserResetTwoFactorDialog user={user} />}
         {user && user.disabled && <AdminUserEnableDialog userToEnable={user} />}
         {user && !user.disabled && <AdminUserDisableDialog userToDisable={user} />}

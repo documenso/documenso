@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-
+import type { Prisma } from '@prisma/client';
 import { adminProcedure } from '../../trpc';
 import { ZGetAdminTagsRequestSchema, ZGetAdminTagsResponseSchema } from './get-admin-tags.types';
 
@@ -7,12 +7,17 @@ export const getAdminTagsRoute = adminProcedure
   .input(ZGetAdminTagsRequestSchema)
   .output(ZGetAdminTagsResponseSchema)
   .query(async ({ input }) => {
-    const { userId } = input;
+    const whereClause: Prisma.AdminTagWhereInput =
+      input.type === 'user'
+        ? {
+            userId: input.userId,
+          }
+        : {
+            organisationId: input.organisationId,
+          };
 
     return await prisma.adminTag.findMany({
-      where: {
-        userId,
-      },
+      where: whereClause,
       include: {
         createdByUser: {
           select: {

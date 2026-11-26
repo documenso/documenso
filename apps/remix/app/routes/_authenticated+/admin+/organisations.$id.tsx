@@ -44,6 +44,7 @@ import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { AdminOrganisationSyncSubscriptionDialog } from '~/components/dialogs/admin-organisation-sync-subscription-dialog';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
+import { AdminTagsSection } from '~/components/general/admin-tags-section';
 import { ClaimLimitFields } from '~/components/general/claim-limit-fields';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { OrganisationUsagePanel } from '~/components/general/organisation-usage-panel';
@@ -271,6 +272,8 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       </SettingsHeader>
 
       <GenericOrganisationAdminForm organisation={organisation} />
+
+      <AdminTagsSection subject={{ type: 'organisation', organisationId: organisation.id }} className="my-10" />
 
       <SettingsHeader
         hideDivider

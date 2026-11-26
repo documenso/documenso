@@ -51,6 +51,7 @@ import { syncOrganisationSubscriptionRoute } from './sync-organisation-subscript
 import { createAdminTagRoute } from './tags/create-admin-tag';
 import { deleteAdminTagRoute } from './tags/delete-admin-tag';
 import { getAdminTagsRoute } from './tags/get-admin-tags';
+import { updateAdminTagRoute } from './tags/update-admin-tag';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
 import { updateOrganisationMemberRoleRoute } from './update-organisation-member-role';
 import { updateRecipientRoute } from './update-recipient';
@@ -116,6 +117,7 @@ export const adminRouter = router({
   tag: {
     getMany: getAdminTagsRoute,
     create: createAdminTagRoute,
+    update: updateAdminTagRoute,
     delete: deleteAdminTagRoute,
   },
   document: {
