@@ -518,7 +518,6 @@ model Envelope {
   @@index([userId])
   @@index([teamId])
   @@index([folderId])
-  @@index([targetFolderId])
   @@index([createdAt])
 }
 
