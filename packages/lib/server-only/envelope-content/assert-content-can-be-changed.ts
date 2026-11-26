@@ -1,7 +1,8 @@
-import type { DocumentStatus, Envelope, Prisma } from '@prisma/client';
+import type { Envelope, Prisma } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canContentBeChanged } from '../../utils/envelope';
+import { lockEnvelope } from '../envelope/lock-envelope';
 
 /**
  * Contents are rendered into the PDF when the envelope is sent, so from then on
@@ -18,23 +19,7 @@ export const assertContentCanBeChanged = async (
   envelope: Pick<Envelope, 'id' | 'status'>,
   tx?: Prisma.TransactionClient,
 ) => {
-  let current: Pick<Envelope, 'status'> = envelope;
-
-  if (tx) {
-    const rows = await tx.$queryRaw<
-      { status: DocumentStatus }[]
-    >`SELECT "status" FROM "Envelope" WHERE "id" = ${envelope.id} FOR UPDATE`;
-
-    const row = rows[0];
-
-    if (!row) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Envelope not found',
-      });
-    }
-
-    current = row;
-  }
+  const current = tx ? await lockEnvelope(tx, envelope.id) : envelope;
 
   if (canContentBeChanged(current)) {
     return;

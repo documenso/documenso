@@ -18,6 +18,7 @@ import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { assertRecipientNotExpired } from '../../utils/recipients';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { lockEnvelope } from '../envelope/lock-envelope';
 import { findUserByProvidedEmail } from '../user/find-user-by-provided-email';
 
 export type RejectDocumentOnBehalfOfOptions = {
@@ -113,8 +114,29 @@ export async function rejectDocumentOnBehalfOf({
 
   // Update the recipient status to rejected and record an external rejection
   // audit log within the same transaction.
-  const [updatedRecipient] = await prisma.$transaction([
-    prisma.recipient.update({
+  const updatedRecipient = await prisma.$transaction(async (tx) => {
+    const lockedEnvelope = await lockEnvelope(tx, envelope.id);
+
+    const lockedRecipient = await tx.recipient.findFirst({
+      where: {
+        id: recipient.id,
+        envelopeId: envelope.id,
+      },
+    });
+
+    if (lockedEnvelope.status !== DocumentStatus.PENDING) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Document ${envelope.id} must be pending to reject`,
+      });
+    }
+
+    if (lockedRecipient?.signingStatus !== SigningStatus.NOT_SIGNED) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient ${recipient.id} has already actioned this document`,
+      });
+    }
+
+    const updatedRecipient = await tx.recipient.update({
       where: {
         id: recipient.id,
       },
@@ -123,8 +145,9 @@ export async function rejectDocumentOnBehalfOf({
         signingStatus: SigningStatus.REJECTED,
         rejectionReason: reason,
       },
-    }),
-    prisma.documentAuditLog.create({
+    });
+
+    await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         envelopeId: envelope.id,
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED,
@@ -144,8 +167,10 @@ export async function rejectDocumentOnBehalfOf({
           onBehalfOfUserName: electedUser?.name,
         },
       }),
-    }),
-  ]);
+    });
+
+    return updatedRecipient;
+  });
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 

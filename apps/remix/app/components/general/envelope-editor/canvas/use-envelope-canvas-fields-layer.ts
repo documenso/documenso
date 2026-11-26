@@ -1,10 +1,15 @@
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
+import { useLatestRef } from '@documenso/lib/client-only/hooks/use-latest-ref';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import type { EnvelopePageItemsVisibility } from '@documenso/lib/types/envelope-page-items-visibility';
 import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
+import {
+  type FieldGroupHighlightLevel,
+  syncFieldGroupHighlight,
+} from '@documenso/lib/universal/field-renderer/field-generic-items';
 import { MIN_FIELD_HEIGHT_PX, MIN_FIELD_WIDTH_PX } from '@documenso/lib/universal/field-renderer/field-renderer';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
@@ -14,7 +19,7 @@ import { useLingui } from '@lingui/react/macro';
 import type { FieldType } from '@prisma/client';
 import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { EnvelopeCanvas, EnvelopeCanvasBox } from './envelope-canvas-types';
 import { ENVELOPE_CANVAS_GROUP_NAMES } from './envelope-canvas-types';
@@ -46,6 +51,8 @@ export const useEnvelopeCanvasFieldsLayer = ({
   const analytics = useAnalytics();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
+
+  const [hoveredGroupedFieldFormId, setHoveredGroupedFieldFormId] = useState<string | null>(null);
 
   const { stage, pageLayer, scale, pageNumber, unscaledViewport, scaledViewport } = canvas;
   const { fieldGroups: selectedGroups, isTransforming } = selection;
@@ -88,6 +95,37 @@ export const useEnvelopeCanvasFieldsLayer = ({
 
     return formIds;
   }, [debouncedPageFields]);
+
+  /**
+   * How strongly each field on this page is tinted to show which fields act together.
+   * Hovering a grouped field highlights the rest of its group on this page, and the rest
+   * of the selected field's group keeps a light tint.
+   */
+  const groupHighlightLevels = useMemo(() => {
+    const levels = new Map<string, FieldGroupHighlightLevel>();
+
+    const { selectedField } = editorFields;
+
+    const hoveredGroupId = localPageFields.find((field) => field.formId === hoveredGroupedFieldFormId)?.groupId;
+
+    for (const field of localPageFields) {
+      if (!field.groupId) {
+        continue;
+      }
+
+      if (field.groupId === hoveredGroupId && field.formId !== hoveredGroupedFieldFormId) {
+        levels.set(field.formId, 'primary');
+      } else if (field.groupId === selectedField?.groupId && field.formId !== selectedField.formId) {
+        levels.set(field.formId, 'secondary');
+      }
+    }
+
+    return levels;
+  }, [hoveredGroupedFieldFormId, editorFields.selectedField, localPageFields]);
+
+  // Read through a ref so the render path, which may run from a stale closure when the
+  // stage is created, always paints the current highlight.
+  const groupHighlightLevelsRef = useLatestRef(groupHighlightLevels);
 
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
     const isDragEvent = event.type === 'dragend';
@@ -218,6 +256,10 @@ export const useEnvelopeCanvasFieldsLayer = ({
     });
 
     syncOverlapHighlight(fieldGroup, overlappingFieldFormIds.has(field.formId));
+
+    syncFieldGroupHighlight(fieldGroup, groupHighlightLevelsRef.current.get(field.formId) ?? null, {
+      isAnimated: false,
+    });
 
     if (!isFieldEditable) {
       return;
@@ -361,6 +403,28 @@ export const useEnvelopeCanvasFieldsLayer = ({
     fieldsVisibility,
   ]);
 
+  /**
+   * Highlights don't change the field data, so sync them directly whenever they change.
+   * Full re-renders pick them up through the render path.
+   */
+  useEffect(() => {
+    const layer = pageLayer.current;
+
+    if (!layer) {
+      return;
+    }
+
+    for (const field of localPageFields) {
+      const fieldGroup = layer.findOne(`#${field.formId}`);
+
+      if (fieldGroup instanceof Konva.Group) {
+        syncFieldGroupHighlight(fieldGroup, groupHighlightLevels.get(field.formId) ?? null);
+      }
+    }
+
+    layer.batchDraw();
+  }, [groupHighlightLevels, localPageFields]);
+
   // Otherwise the transformer and floating toolbars would remain anchored to hidden fields.
   useEffect(() => {
     if (fieldsVisibility !== 'visible' && (selectedGroups.length > 0 || pending.pendingCreation)) {
@@ -394,29 +458,29 @@ export const useEnvelopeCanvasFieldsLayer = ({
   };
 
   const changeSelectedRecipient = (recipientId: number) => {
-    for (const field of getSelectedFields()) {
-      if (field.recipientId !== recipientId) {
-        editorFields.updateFieldByFormId(field.formId, { recipientId, id: undefined });
-      }
-    }
+    const fieldsToUpdate = getSelectedFields().filter((field) => field.recipientId !== recipientId);
+
+    editorFields.updateFieldsByFormId(
+      fieldsToUpdate.map((field) => ({ formId: field.formId, updates: { recipientId, id: undefined } })),
+    );
   };
 
   const changeSelectedType = (type: FieldType) => {
-    for (const field of getSelectedFields()) {
-      if (field.type !== type) {
-        editorFields.updateFieldByFormId(field.formId, {
-          type,
-          fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[type]),
-          id: undefined,
-        });
-      }
-    }
+    const fieldsToUpdate = getSelectedFields().filter((field) => field.type !== type);
+
+    editorFields.updateFieldsByFormId(
+      fieldsToUpdate.map((field) => ({
+        formId: field.formId,
+        updates: { type, fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[type]), id: undefined },
+      })),
+    );
   };
 
   return {
     localPageFields,
     renderAll,
     selectInBox,
+    setHoveredGroupedFieldFormId,
     pendingCreation: pending.pendingCreation,
     createFromPending,
     clearPending: pending.clearPending,

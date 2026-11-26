@@ -35,6 +35,8 @@ import type { TCreateEnvelopeRecipientsResponse } from '@documenso/trpc/server/e
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
 import { type APIRequestContext, expect } from '@playwright/test';
 
+import { FIELD_GROUPS_TEST_FIELDS } from '../../constants/field-groups-pdf';
+
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
@@ -43,6 +45,7 @@ const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const API_BASE_URL = `${WEBAPP_BASE_URL}/api/v2-beta`;
 
 const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../assets/example.pdf'));
+const fieldGroupsPdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../assets/field-groups.pdf'));
 
 // ---------------------------------------------------------------------------
 // Types
@@ -67,6 +70,8 @@ export type ApiField = {
   width?: number;
   height?: number;
   fieldMeta?: Record<string, unknown>;
+  groupId?: string;
+  externalId?: string;
   placeholder?: string;
   matchAll?: boolean;
 };
@@ -98,6 +103,8 @@ export type ApiSeedEnvelopeOptions = {
         width?: number;
         height?: number;
         fieldMeta?: Record<string, unknown>;
+        groupId?: string;
+        externalId?: string;
       }>;
     }
   >;
@@ -224,6 +231,14 @@ export const apiCreateEnvelope = async (
             fieldPayload.fieldMeta = f.fieldMeta;
           }
 
+          if (f.groupId !== undefined) {
+            fieldPayload.groupId = f.groupId;
+          }
+
+          if (f.externalId !== undefined) {
+            fieldPayload.externalId = f.externalId;
+          }
+
           return fieldPayload;
         });
       }
@@ -246,6 +261,27 @@ export const apiCreateEnvelope = async (
   expect(res.ok(), `envelope/create failed: ${await res.text()}`).toBeTruthy();
 
   return (await res.json()) as TCreateEnvelopeResponse;
+};
+
+/**
+ * Add another PDF to an envelope as a new envelope item via API V2.
+ */
+export const apiCreateEnvelopeItem = async (
+  request: APIRequestContext,
+  token: string,
+  envelopeId: string,
+  fileName: string,
+): Promise<void> => {
+  const formData = new FormData();
+  formData.append('payload', JSON.stringify({ envelopeId }));
+  formData.append('files', new File([examplePdfBuffer], fileName, { type: 'application/pdf' }));
+
+  const res = await request.post(`${API_BASE_URL}/envelope/item/create-many`, {
+    headers: authHeader(token),
+    multipart: formData,
+  });
+
+  expect(res.ok(), `envelope/item/create-many failed: ${await res.text()}`).toBeTruthy();
 };
 
 /**
@@ -337,6 +373,14 @@ export const apiCreateFields = async (
 
       if (f.fieldMeta !== undefined) {
         fieldPayload.fieldMeta = f.fieldMeta;
+      }
+
+      if (f.groupId !== undefined) {
+        fieldPayload.groupId = f.groupId;
+      }
+
+      if (f.externalId !== undefined) {
+        fieldPayload.externalId = f.externalId;
       }
 
       if (f.placeholder) {
@@ -478,6 +522,8 @@ export type ApiSeedDocumentOptions = {
       width?: number;
       height?: number;
       fieldMeta?: Record<string, unknown>;
+      groupId?: string;
+      externalId?: string;
     }>
   >;
   /** External ID for the envelope. */
@@ -841,6 +887,47 @@ export const apiSeedDirectTemplate = async (
     envelope,
     directLink,
   };
+};
+
+/**
+ * Seed a pending document using `assets/field-groups.pdf` with every grouped field
+ * defined in `constants/field-groups-pdf.ts` attached to a single signer.
+ *
+ * @example
+ * ```ts
+ * const { envelope, distributeResult } = await apiSeedFieldGroupsDocument(request);
+ * const textA = findFieldGroupTestField(envelope.fields, FIELD_GROUP_EXTERNAL_IDS.textA);
+ * ```
+ */
+export const apiSeedFieldGroupsDocument = async (
+  request: APIRequestContext,
+  options: { recipient?: ApiRecipient; context?: ApiSeedContext } = {},
+): Promise<ApiSeedResult & { distributeResult: TDistributeEnvelopeResponse }> => {
+  const recipient = options.recipient ?? {
+    email: `field-groups-signer-${Date.now()}@test.documenso.com`,
+    name: 'Field Groups Signer',
+    role: 'SIGNER' as const,
+  };
+
+  return await apiSeedPendingDocument(request, {
+    context: options.context,
+    title: '[TEST] Field groups',
+    pdfFile: { name: 'field-groups.pdf', data: fieldGroupsPdfBuffer },
+    recipients: [recipient],
+    fieldsPerRecipient: [
+      FIELD_GROUPS_TEST_FIELDS.map((field) => ({
+        type: field.type,
+        page: field.page,
+        positionX: field.positionX,
+        positionY: field.positionY,
+        width: field.width,
+        height: field.height,
+        fieldMeta: field.fieldMeta,
+        groupId: field.groupId ?? undefined,
+        externalId: field.externalId,
+      })),
+    ],
+  });
 };
 
 /**

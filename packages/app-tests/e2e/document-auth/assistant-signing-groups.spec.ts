@@ -29,7 +29,10 @@ type SeededGroupEnvelope = {
  * steps — never their own group peers — and never insert SIGNATURE fields
  * belonging to anyone else.
  */
-const seedGroupedAssistantEnvelope = async (request: APIRequestContext): Promise<SeededGroupEnvelope> => {
+const seedGroupedAssistantEnvelope = async (
+  request: APIRequestContext,
+  { internalVersion = 2 }: { internalVersion?: 1 | 2 } = {},
+): Promise<SeededGroupEnvelope> => {
   const timestamp = Date.now();
 
   const peerEmail = `peer-signer-${timestamp}@documenso.com`;
@@ -81,6 +84,14 @@ const seedGroupedAssistantEnvelope = async (request: APIRequestContext): Promise
     throw new Error('Seeded recipients not found');
   }
 
+  // The API only creates V2 envelopes, and the legacy token routes reject those.
+  if (internalVersion === 1) {
+    await prisma.envelope.update({
+      where: { id: envelope.id },
+      data: { internalVersion: 1 },
+    });
+  }
+
   const fields = await prisma.field.findMany({
     where: { envelopeId: envelope.id },
   });
@@ -114,7 +125,7 @@ const trpcMutation = async (request: APIRequestContext, procedure: string, input
 
 test.describe('[ASSISTANT_SIGNING_GROUPS]: same-step (group peer) field access', () => {
   test('field.signFieldWithToken (V1) rejects a group peer field', async ({ request }) => {
-    const { assistantToken, peerTextFieldId } = await seedGroupedAssistantEnvelope(request);
+    const { assistantToken, peerTextFieldId } = await seedGroupedAssistantEnvelope(request, { internalVersion: 1 });
 
     const res = await trpcMutation(request, 'field.signFieldWithToken', {
       token: assistantToken,
@@ -134,7 +145,7 @@ test.describe('[ASSISTANT_SIGNING_GROUPS]: same-step (group peer) field access',
   });
 
   test('field.removeSignedFieldWithToken (V1) rejects a group peer field', async ({ request }) => {
-    const { assistantToken, peerTextFieldId } = await seedGroupedAssistantEnvelope(request);
+    const { assistantToken, peerTextFieldId } = await seedGroupedAssistantEnvelope(request, { internalVersion: 1 });
 
     // Pre-insert the peer's field so a successful (incorrect) uninsert is detectable.
     await prisma.field.update({
@@ -203,7 +214,9 @@ test.describe('[ASSISTANT_SIGNING_GROUPS]: same-step (group peer) field access',
 
 test.describe('[ASSISTANT_SIGNING_GROUPS]: signature fields of other recipients', () => {
   test('field.signFieldWithToken (V1) rejects inserting a later recipient signature field', async ({ request }) => {
-    const { assistantToken, laterSignatureFieldId } = await seedGroupedAssistantEnvelope(request);
+    const { assistantToken, laterSignatureFieldId } = await seedGroupedAssistantEnvelope(request, {
+      internalVersion: 1,
+    });
 
     const res = await trpcMutation(request, 'field.signFieldWithToken', {
       token: assistantToken,
@@ -226,7 +239,9 @@ test.describe('[ASSISTANT_SIGNING_GROUPS]: signature fields of other recipients'
 
 test.describe('[ASSISTANT_SIGNING_GROUPS]: preserved assistant abilities', () => {
   test('field.signFieldWithToken (V1) still allows filling the assistant own field', async ({ request }) => {
-    const { assistantToken, assistantOwnTextFieldId } = await seedGroupedAssistantEnvelope(request);
+    const { assistantToken, assistantOwnTextFieldId } = await seedGroupedAssistantEnvelope(request, {
+      internalVersion: 1,
+    });
 
     const res = await trpcMutation(request, 'field.signFieldWithToken', {
       token: assistantToken,
@@ -246,7 +261,7 @@ test.describe('[ASSISTANT_SIGNING_GROUPS]: preserved assistant abilities', () =>
   });
 
   test('field.signFieldWithToken (V1) still allows prefilling a later recipient text field', async ({ request }) => {
-    const { assistantToken, laterTextFieldId } = await seedGroupedAssistantEnvelope(request);
+    const { assistantToken, laterTextFieldId } = await seedGroupedAssistantEnvelope(request, { internalVersion: 1 });
 
     const res = await trpcMutation(request, 'field.signFieldWithToken', {
       token: assistantToken,

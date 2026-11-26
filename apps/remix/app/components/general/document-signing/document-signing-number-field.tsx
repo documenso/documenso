@@ -36,6 +36,7 @@ type ValidationErrors = {
   minValue: string[];
   maxValue: string[];
   numberFormat: string[];
+  ambiguous: string[];
 };
 
 export type DocumentSigningNumberFieldProps = {
@@ -66,6 +67,7 @@ export const DocumentSigningNumberField = ({ field, onSignField, onUnsignField }
     minValue: [],
     maxValue: [],
     numberFormat: [],
+    ambiguous: [],
   };
 
   const [errors, setErrors] = useState(initialErrors);
@@ -92,6 +94,7 @@ export const DocumentSigningNumberField = ({ field, onSignField, onUnsignField }
         minValue: validationErrors.filter((error) => error.includes('minimum value')),
         maxValue: validationErrors.filter((error) => error.includes('maximum value')),
         numberFormat: validationErrors.filter((error) => error.includes('number format')),
+        ambiguous: validationErrors.filter((error) => error.includes('could be read as')),
       });
     } else {
       const validationErrors = validateNumberField(text);
@@ -176,6 +179,7 @@ export const DocumentSigningNumberField = ({ field, onSignField, onUnsignField }
         minValue: validationErrors.filter((error) => error.includes('minimum value')),
         maxValue: validationErrors.filter((error) => error.includes('maximum value')),
         numberFormat: validationErrors.filter((error) => error.includes('number format')),
+        ambiguous: validationErrors.filter((error) => error.includes('could be read as')),
       });
     }
 
@@ -300,6 +304,11 @@ export const DocumentSigningNumberField = ({ field, onSignField, onUnsignField }
                 </p>
               ))}
               {errors.numberFormat?.map((error, index) => (
+                <p key={index} className="mt-2 text-red-500 text-sm">
+                  {error}
+                </p>
+              ))}
+              {errors.ambiguous?.map((error, index) => (
                 <p key={index} className="mt-2 text-red-500 text-sm">
                   {error}
                 </p>
