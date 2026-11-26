@@ -38,6 +38,12 @@ export const FolderSelectCombobox = ({
   const homeLabel = t`Home (No Folder)`;
   const selectedFolder = folders.find((folder) => folder.id === value);
 
+  // The saved folder can be hidden from this user's role. Showing Home here would invite them to
+  // "confirm" Home and silently clear a folder someone else chose.
+  const isRestrictedFolder = Boolean(value) && !selectedFolder;
+
+  const triggerLabel = selectedFolder?.name ?? (isRestrictedFolder ? t`Restricted folder` : homeLabel);
+
   const onSelect = (folderId: string | null) => {
     onChange(folderId);
     setOpen(false);
@@ -59,7 +65,7 @@ export const FolderSelectCombobox = ({
             <Loader className="mx-auto h-5 w-5 animate-spin text-muted-foreground" />
           ) : (
             <>
-              <span className="truncate">{selectedFolder?.name ?? homeLabel}</span>
+              <span className={cn('truncate', isRestrictedFolder && 'text-muted-foreground')}>{triggerLabel}</span>
               <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </>
           )}
@@ -80,7 +86,7 @@ export const FolderSelectCombobox = ({
 
           <CommandGroup className="max-h-[250px] overflow-y-auto">
             <CommandItem value={HOME_FOLDER_VALUE} keywords={[homeLabel]} onSelect={() => onSelect(null)}>
-              <CheckIcon className={cn('mr-2 h-4 w-4', selectedFolder ? 'opacity-0' : 'opacity-100')} />
+              <CheckIcon className={cn('mr-2 h-4 w-4', value ? 'opacity-0' : 'opacity-100')} />
               {homeLabel}
             </CommandItem>
 

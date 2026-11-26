@@ -6,6 +6,7 @@ import {
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION, SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { type TRecipientLite, ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
+import { canAccessTeamDocument } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { DOCUMENT_TITLE_MAX_LENGTH } from '@documenso/trpc/server/document-router/schema';
 import type { TUseEnvelopePayload } from '@documenso/trpc/server/envelope-router/use-envelope.types';
@@ -39,6 +40,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import * as z from 'zod';
 import { FolderSelectCombobox } from '~/components/general/folder/folder-select-combobox';
+import { useCurrentTeam } from '~/providers/team';
 import { getTemplateUseErrorMessage } from '~/utils/toast-error-messages';
 
 const DOCUMENT_NAME_SOURCE = {
@@ -127,6 +129,7 @@ export function TemplateUseDialog({
   const { _ } = useLingui();
 
   const navigate = useNavigate();
+  const team = useCurrentTeam();
 
   const [open, setOpen] = useState(false);
   const [lastUploadedFile, setLastUploadedFile] = useState<File>();
@@ -155,7 +158,10 @@ export function TemplateUseDialog({
     },
   );
 
-  const documentFolders = foldersData?.data ?? [];
+  // Owned folders are listed even when hidden from the user's role, but the server rejects them.
+  const documentFolders = (foldersData?.data ?? []).filter((folder) =>
+    canAccessTeamDocument(team.currentTeamRole, folder.visibility),
+  );
 
   const generateDefaultFormValues = () => {
     return {
@@ -238,7 +244,9 @@ export function TemplateUseDialog({
       // items by index, which is robust against duplicate file names.
       const payload: TUseEnvelopePayload = {
         envelopeId,
-        folderId: data.folderId ?? null,
+        // Omitting the folder lets the server resolve the template's target folder, falling back to
+        // the root folder when it is hidden from the user, so submitting before folders load is safe.
+        folderId: targetFolderId && data.folderId === targetFolderId ? undefined : (data.folderId ?? null),
         recipients: data.recipients,
         distributeDocument: data.distributeDocument,
         includeContents: data.includeContents,
@@ -308,11 +316,13 @@ export function TemplateUseDialog({
       foldersData &&
       targetFolderId &&
       form.getValues('folderId') === targetFolderId &&
-      !foldersData.data.some((folder) => folder.id === targetFolderId)
+      !foldersData.data.some(
+        (folder) => folder.id === targetFolderId && canAccessTeamDocument(team.currentTeamRole, folder.visibility),
+      )
     ) {
       form.setValue('folderId', null);
     }
-  }, [open, foldersData, targetFolderId, form]);
+  }, [open, foldersData, team.currentTeamRole, targetFolderId, form]);
 
   useEffect(() => {
     if (envelopeItems.length > 0 && localCustomDocumentData.length === 0) {

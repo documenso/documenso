@@ -406,3 +406,95 @@ test('[TEMPLATE_TARGET_FOLDER]: members cannot target or use folders hidden from
 
   expect(adminDocument.folderId).toBe(adminOnlyFolder.id);
 });
+
+test('[TEMPLATE_TARGET_FOLDER]: member sees a restricted target and only folders their role can use', async ({
+  page,
+}) => {
+  const { user: admin, team } = await seedUser();
+  const member = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.MEMBER });
+
+  const adminOnlyFolder = await seedBlankFolder(admin, team.id, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      type: FolderType.DOCUMENT,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankFolder(member, team.id, {
+    createFolderOptions: {
+      name: 'Member Hidden Folder',
+      type: FolderType.DOCUMENT,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankFolder(member, team.id, {
+    createFolderOptions: {
+      name: 'Member Visible Folder',
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  const template = await seedDirectTemplate({
+    title: 'Restricted target template',
+    userId: admin.id,
+    teamId: team.id,
+    internalVersion: 2,
+  });
+
+  await updateEnvelope({
+    userId: admin.id,
+    teamId: team.id,
+    id: {
+      type: 'envelopeId',
+      id: template.id,
+    },
+    data: {
+      targetFolderId: adminOnlyFolder.id,
+    },
+    requestMetadata,
+  });
+
+  await apiSignin({
+    page,
+    email: member.email,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+  });
+
+  await getEnvelopeEditorSettingsTrigger(page).click();
+
+  const targetFolderSelect = page.getByTestId('templateTargetFolderSelectValue');
+  await expect(targetFolderSelect).toContainText('Restricted folder');
+
+  await targetFolderSelect.click();
+  await expect(page.getByRole('option', { name: 'Member Visible Folder' })).toBeVisible();
+  await expect(page.getByRole('option', { name: 'Member Hidden Folder' })).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+
+  await page.goto(`/t/${team.url}/templates`);
+  await page.getByRole('button', { name: 'Use Template' }).click();
+  await expect(page.getByTestId('templateUseTargetFolderSelectValue')).toContainText('Home (No Folder)');
+  await page.getByRole('button', { name: 'Create as draft' }).click();
+
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
+
+  const createdEnvelopeId = page.url().split('/').pop()?.split('?')[0];
+
+  const createdEnvelope = await prisma.envelope.findFirstOrThrow({
+    where: {
+      id: createdEnvelopeId,
+    },
+  });
+
+  expect(createdEnvelope.folderId).toBeNull();
+
+  const unchangedTemplate = await prisma.envelope.findFirstOrThrow({
+    where: {
+      id: template.id,
+    },
+  });
+
+  expect(unchangedTemplate.targetFolderId).toBe(adminOnlyFolder.id);
+});

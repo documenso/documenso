@@ -256,7 +256,10 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
     },
   );
 
-  const documentFolders = foldersData?.data ?? [];
+  // Owned folders are listed even when hidden from the user's role, but the server rejects them.
+  const documentFolders = (foldersData?.data ?? []).filter((folder) =>
+    canAccessTeamDocument(team.currentTeamRole, folder.visibility),
+  );
 
   const canUpdateVisibility = canAccessTeamDocument(team.currentTeamRole, envelope.visibility);
 
