@@ -28,6 +28,7 @@ import { findOrganisationStatsRoute } from './find-organisation-stats';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { findUnsealedDocumentsRoute } from './find-unsealed-documents';
 import { findUserTeamsRoute } from './find-user-teams';
+import { findUsersRoute } from './find-users';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
 import { getAdminTeamRoute } from './get-admin-team';
 import { getEmailDomainRoute } from './get-email-domain';
@@ -91,6 +92,7 @@ export const adminRouter = router({
     resync: resyncLicenseRoute,
   },
   user: {
+    find: findUsersRoute,
     get: getUserRoute,
     create: createUserRoute,
     update: updateUserRoute,
