@@ -3,7 +3,7 @@ import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animat
 import { Input } from '@documenso/ui/primitives/input';
 import { useLingui } from '@lingui/react/macro';
 import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { debounce, parseAsString, useQueryState } from 'nuqs';
+import { debounce, parseAsInteger, parseAsString, useQueryState } from 'nuqs';
 
 import { TeamGroupCreateDialog } from '~/components/dialogs/team-group-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
@@ -20,6 +20,7 @@ export default function TeamsSettingsGroupsPage() {
     'query',
     parseAsString.withDefault('').withOptions({ shallow: false, limitUrlUpdates: debounce(500) }),
   );
+  const [, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
 
   const everyoneGroupQuery = trpc.team.group.find.useQuery({
     teamId: team.id,
@@ -38,7 +39,10 @@ export default function TeamsSettingsGroupsPage() {
 
       <Input
         value={searchQuery}
-        onChange={(e) => void setSearchQuery(e.target.value || null)}
+        onChange={(e) => {
+          void setSearchQuery(e.target.value || null);
+          void setPage(null);
+        }}
         placeholder={t`Search`}
         className="mb-4"
       />
