@@ -25,7 +25,12 @@ export const ZFindEnvelopesRequestSchema = ZFindSearchParamsSchema.extend({
     .describe('Filter for envelopes that have at least one recipient whose signing link has expired.')
     .transform((value) => value === 'true')
     .optional(),
-  folderId: z.string().describe('Filter envelopes by folder ID.').optional(),
+  folderId: z
+    .string()
+    .describe(
+      'Filter envelopes by folder ID. When omitted, only root-level envelopes (not in any folder) are returned.',
+    )
+    .optional(),
   orderByColumn: z.enum(['createdAt']).optional(),
   orderByDirection: z.enum(['asc', 'desc']).describe('Sort direction.').default('desc'),
 });

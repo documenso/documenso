@@ -286,6 +286,90 @@ test.describe('Find Envelopes API - Basic', () => {
     expect(json!.data[1].title).toBe('Second Created');
   });
 
+  test('should paginate deterministically when createdAt timestamps tie', async ({ request }) => {
+    const tiedTimestamp = new Date('2026-01-01T00:00:00.000Z');
+    const suffixes = ['c', 'a', 'f', 'b', 'e', 'd'];
+    const ids = suffixes.map((suffix) => `envelope_${teamA.id}_${suffix}`);
+
+    for (const id of ids) {
+      await seedDraftDocument(userA, teamA.id, [], {
+        createDocumentOptions: {
+          id,
+          title: `Tied Doc ${id}`,
+          createdAt: tiedTimestamp,
+        },
+      });
+    }
+
+    const expectedAscIds = [...ids].sort();
+    const expectedDescIds = [...expectedAscIds].reverse();
+
+    const descPage1 = await findEnvelopes(request, tokenA, {
+      page: '1',
+      perPage: '2',
+      orderByColumn: 'createdAt',
+      orderByDirection: 'desc',
+    });
+
+    // Updating a row moves its heap tuple in Postgres; pagination must remain stable.
+    await prisma.envelope.update({
+      where: {
+        id: expectedDescIds[0],
+      },
+      data: {
+        title: `Updated ${expectedDescIds[0]}`,
+      },
+    });
+
+    const descPage2 = await findEnvelopes(request, tokenA, {
+      page: '2',
+      perPage: '2',
+      orderByColumn: 'createdAt',
+      orderByDirection: 'desc',
+    });
+    const descPage3 = await findEnvelopes(request, tokenA, {
+      page: '3',
+      perPage: '2',
+      orderByColumn: 'createdAt',
+      orderByDirection: 'desc',
+    });
+
+    const descIds = [
+      ...descPage1.json!.data.map((d) => d.id),
+      ...descPage2.json!.data.map((d) => d.id),
+      ...descPage3.json!.data.map((d) => d.id),
+    ];
+
+    expect(descIds).toEqual(expectedDescIds);
+
+    const ascPage1 = await findEnvelopes(request, tokenA, {
+      page: '1',
+      perPage: '2',
+      orderByColumn: 'createdAt',
+      orderByDirection: 'asc',
+    });
+    const ascPage2 = await findEnvelopes(request, tokenA, {
+      page: '2',
+      perPage: '2',
+      orderByColumn: 'createdAt',
+      orderByDirection: 'asc',
+    });
+    const ascPage3 = await findEnvelopes(request, tokenA, {
+      page: '3',
+      perPage: '2',
+      orderByColumn: 'createdAt',
+      orderByDirection: 'asc',
+    });
+
+    const ascIds = [
+      ...ascPage1.json!.data.map((d) => d.id),
+      ...ascPage2.json!.data.map((d) => d.id),
+      ...ascPage3.json!.data.map((d) => d.id),
+    ];
+
+    expect(ascIds).toEqual(expectedAscIds);
+  });
+
   test('should filter by folderId and show root-level when no folderId', async ({ request }) => {
     const folder = await prisma.folder.create({
       data: {

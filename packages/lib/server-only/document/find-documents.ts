@@ -510,7 +510,11 @@ export const findDocuments = async ({
   const offset = Math.max(page - 1, 0) * perPage;
 
   // Data query: paginated, executed directly via Kysely query builder
-  const dataQuery = filteredQuery.orderBy(`Envelope.${orderByColumn}`, orderByDirection).limit(perPage).offset(offset);
+  const dataQuery = filteredQuery
+    .orderBy(`Envelope.${orderByColumn}`, orderByDirection)
+    .orderBy('Envelope.id', orderByDirection)
+    .limit(perPage)
+    .offset(offset);
 
   // Count query: either windowed (fast, capped) or full (exact, for API consumers).
   const baseCountQuery = filteredQuery.clearSelect().select('Envelope.id');

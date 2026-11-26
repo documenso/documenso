@@ -92,9 +92,14 @@ export const findTemplates = async ({
       include: templateInclude,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [
+        {
+          createdAt: 'desc',
+        },
+        {
+          id: 'desc',
+        },
+      ],
     }),
     prisma.envelope.count({ where }),
   ]);
