@@ -31,7 +31,7 @@ test.describe('Unified Settings', () => {
     const sidebar = page.getByTestId('unified-settings-sidebar');
     await expect(sidebar).toBeVisible();
 
-    const groups = sidebar.getByTestId('unified-settings-sidebar-group');
+    const groups = sidebar.getByTestId('settings-sidebar-group');
     // Organisation + Team groups, plus the always-visible Account group.
     await expect(groups).toHaveCount(3);
 
@@ -41,10 +41,10 @@ test.describe('Unified Settings', () => {
     // Nav item labels are lingui `msg` descriptors resolved to strings at render —
     // assert the visible text so a broken translation (blank / [object Object])
     // would fail here. Test ids are scope-qualified because item keys repeat across groups.
-    await expect(sidebar.getByTestId('unified-settings-nav-team-members')).toContainText('Members');
-    await expect(sidebar.getByTestId('unified-settings-nav-team-preferences')).toContainText('Preferences');
-    await expect(sidebar.getByTestId('unified-settings-nav-organisation-members')).toContainText('Members');
-    await expect(sidebar.getByTestId('unified-settings-nav-account-profile')).toContainText('Profile');
+    await expect(sidebar.getByTestId('settings-nav-team-members')).toContainText('Members');
+    await expect(sidebar.getByTestId('settings-nav-team-preferences')).toContainText('Preferences');
+    await expect(sidebar.getByTestId('settings-nav-organisation-members')).toContainText('Members');
+    await expect(sidebar.getByTestId('settings-nav-account-profile')).toContainText('Profile');
   });
 
   test('shows both groups for the team owner at org scope (team-fallback)', async ({ page }) => {
@@ -59,7 +59,7 @@ test.describe('Unified Settings', () => {
     const sidebar = page.getByTestId('unified-settings-sidebar');
     await expect(sidebar).toBeVisible();
 
-    const groups = sidebar.getByTestId('unified-settings-sidebar-group');
+    const groups = sidebar.getByTestId('settings-sidebar-group');
     // Organisation + Team groups, plus the always-visible Account group.
     await expect(groups).toHaveCount(3);
 
@@ -113,7 +113,7 @@ test.describe('Unified Settings', () => {
     await apiSignin({ page, email: owner.email });
     await page.goto(`/o/${organisation.url}/settings`);
 
-    const content = page.getByTestId('unified-settings-content');
+    const content = page.getByTestId('settings-content');
     await expect(content).toBeVisible();
 
     const contentBox = await content.boundingBox();
@@ -200,7 +200,7 @@ test.describe('Unified Settings', () => {
 
     // Account scope has no organisation in the URL either, so it must not silently jump
     // back to whichever organisation happens to be first.
-    await sidebar.getByTestId('unified-settings-nav-account-profile').click();
+    await sidebar.getByTestId('settings-nav-account-profile').click();
     await page.waitForURL('/settings/profile');
     await expect(page.getByTestId('settings-scope-breadcrumb-chip')).toContainText('Account Settings');
 
@@ -243,7 +243,7 @@ test.describe('Unified Settings', () => {
 
     // Organisation scope has no team in the URL, so the sidebar has to remember which team
     // the user picked rather than falling back to whichever one happens to be first.
-    await sidebar.getByTestId('unified-settings-nav-organisation-general').click();
+    await sidebar.getByTestId('settings-nav-organisation-general').click();
     await page.waitForURL(`/o/${organisation.url}/settings/general`);
 
     // Wait for the organisation page to actually render — asserting straight after
@@ -367,7 +367,7 @@ test.describe('Unified Settings', () => {
 
     // Org + team groups render via the manageable-organisation fallback, and the
     // Account group is always present.
-    await expect(sidebar.getByTestId('unified-settings-sidebar-group')).toHaveCount(3);
+    await expect(sidebar.getByTestId('settings-sidebar-group')).toHaveCount(3);
 
     await expect(page.getByTestId('settings-scope-breadcrumb-chip')).toContainText('Account Settings');
   });
@@ -403,7 +403,7 @@ test.describe('Unified Settings', () => {
     await expect(page.getByTestId('document-language-trigger')).toBeVisible();
 
     // The content pane is the <main> wrapping the content container.
-    const contentPane = page.getByTestId('unified-settings-content').locator('..');
+    const contentPane = page.getByTestId('settings-content').locator('..');
 
     // Scroll the pane down (the document preferences page overflows it).
     await contentPane.evaluate((el) => el.scrollTo(0, el.scrollHeight));
@@ -443,9 +443,9 @@ test.describe('Unified Settings', () => {
     // The Organisation group still renders so it can host the switcher — that's the only
     // way this user can move between organisations — but it exposes no pages.
     await expect(sidebar.getByTestId('settings-org-switcher-trigger')).toContainText(organisation.name);
-    await expect(sidebar.getByTestId('unified-settings-nav-organisation-general')).toHaveCount(0);
-    await expect(sidebar.getByTestId('unified-settings-nav-organisation-members')).toHaveCount(0);
-    await expect(sidebar.getByTestId('unified-settings-nav-organisation-billing')).toHaveCount(0);
+    await expect(sidebar.getByTestId('settings-nav-organisation-general')).toHaveCount(0);
+    await expect(sidebar.getByTestId('settings-nav-organisation-members')).toHaveCount(0);
+    await expect(sidebar.getByTestId('settings-nav-organisation-billing')).toHaveCount(0);
 
     // An empty group would just look broken, so it explains itself directly under the switcher.
     const emptyState = sidebar.getByTestId('unified-settings-organisation-empty-state');
@@ -453,9 +453,9 @@ test.describe('Unified Settings', () => {
     await expect(emptyState).toContainText(/permission to manage this organization/i);
 
     // Team and account pages remain navigable.
-    await expect(sidebar.getByTestId('unified-settings-nav-team-general')).toBeVisible();
-    await expect(sidebar.getByTestId('unified-settings-nav-team-members')).toBeVisible();
-    await expect(sidebar.getByTestId('unified-settings-nav-account-profile')).toBeVisible();
+    await expect(sidebar.getByTestId('settings-nav-team-general')).toBeVisible();
+    await expect(sidebar.getByTestId('settings-nav-team-members')).toBeVisible();
+    await expect(sidebar.getByTestId('settings-nav-account-profile')).toBeVisible();
   });
 
   test('team-only access is rejected from organisation settings', async ({ page }) => {
@@ -498,9 +498,9 @@ test.describe('Unified Settings', () => {
     const sidebar = page.getByTestId('unified-settings-sidebar');
     await expect(sidebar).toBeVisible();
 
-    await expect(sidebar.getByTestId('unified-settings-sidebar-group')).toHaveCount(1);
-    await expect(sidebar.getByTestId('unified-settings-nav-account-profile')).toBeVisible();
-    await expect(sidebar.getByTestId('unified-settings-nav-account-security')).toBeVisible();
+    await expect(sidebar.getByTestId('settings-sidebar-group')).toHaveCount(1);
+    await expect(sidebar.getByTestId('settings-nav-account-profile')).toBeVisible();
+    await expect(sidebar.getByTestId('settings-nav-account-security')).toBeVisible();
 
     // No organisation in context means no switcher and no scoped groups.
     await expect(sidebar.getByTestId('settings-org-switcher-trigger')).toHaveCount(0);

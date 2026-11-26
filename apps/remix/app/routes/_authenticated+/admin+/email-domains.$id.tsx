@@ -26,6 +26,7 @@ import { useMemo } from 'react';
 import { Link, redirect } from 'react-router';
 import { match } from 'ts-pattern';
 
+import { SettingsHeader } from '~/components/general/settings-header';
 import type { Route } from './+types/email-domains.$id';
 
 export function loader({ params }: Route.LoaderArgs) {
@@ -103,12 +104,7 @@ export default function AdminEmailDomainDetailPage({ loaderData }: Route.Compone
   if (isLoading || !emailDomain) {
     return (
       <div>
-        <h2 className="font-semibold text-4xl">
-          <Trans>Email Domain</Trans>
-        </h2>
-        <p className="mt-4 text-muted-foreground">
-          <Trans>Loading...</Trans>
-        </p>
+        <SettingsHeader hideDivider title={<Trans>Email Domain</Trans>} subtitle={<Trans>Loading...</Trans>} />
       </div>
     );
   }
@@ -120,31 +116,31 @@ export default function AdminEmailDomainDetailPage({ loaderData }: Route.Compone
 
   return (
     <div>
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-x-4">
-          <h2 className="font-semibold text-2xl">{emailDomain.domain}</h2>
+      <SettingsHeader
+        hideDivider
+        title={emailDomain.domain}
+        badge={match(emailDomain.status)
+          .with(EmailDomainStatus.ACTIVE, () => (
+            <Badge>
+              <CheckCircle2Icon className="mr-2 h-4 w-4 text-green-500 dark:text-green-300" />
+              <Trans>Active</Trans>
+            </Badge>
+          ))
+          .with(EmailDomainStatus.PENDING, () => (
+            <Badge variant="warning">
+              <ClockIcon className="mr-2 h-4 w-4 text-yellow-500 dark:text-yellow-200" />
+              <Trans>Pending</Trans>
+            </Badge>
+          ))
+          .exhaustive()}
+        subtitle={
+          <>
+            <Trans>ID</Trans>: {emailDomain.id}
+          </>
+        }
+      />
 
-          {match(emailDomain.status)
-            .with(EmailDomainStatus.ACTIVE, () => (
-              <Badge>
-                <CheckCircle2Icon className="mr-2 h-4 w-4 text-green-500 dark:text-green-300" />
-                <Trans>Active</Trans>
-              </Badge>
-            ))
-            .with(EmailDomainStatus.PENDING, () => (
-              <Badge variant="warning">
-                <ClockIcon className="mr-2 h-4 w-4 text-yellow-500 dark:text-yellow-200" />
-                <Trans>Pending</Trans>
-              </Badge>
-            ))
-            .exhaustive()}
-        </div>
-      </div>
-
-      <div className="mt-4 text-muted-foreground text-sm">
-        <div>
-          <Trans>ID</Trans>: {emailDomain.id}
-        </div>
+      <div className="text-muted-foreground text-sm">
         <div>
           <Trans>Organisation</Trans>:{' '}
           <Link to={`/admin/organisations/${emailDomain.organisation.id}`} className="hover:underline">

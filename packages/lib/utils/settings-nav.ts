@@ -2,19 +2,28 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import type { OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
 import {
+  AlertTriangleIcon,
+  BarChart3Icon,
   BracesIcon,
   Building2Icon,
   CreditCardIcon,
+  FileStackIcon,
   Globe2Icon,
   GroupIcon,
+  LineChartIcon,
   LockIcon,
   MailboxIcon,
+  MailIcon,
   Settings2Icon,
   SettingsIcon,
   ShieldCheckIcon,
+  TrophyIcon,
   UserIcon,
   Users2Icon,
+  UsersIcon,
+  Wallet2Icon,
   WebhookIcon,
+  WorkflowIcon,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { FaUsers } from 'react-icons/fa6';
@@ -22,11 +31,16 @@ import { IS_BILLING_ENABLED, IS_DOCUMENSO_CLOUD } from '../constants/app';
 import { canExecuteOrganisationAction } from './organisations';
 import { canExecuteTeamAction } from './teams';
 
-export type SettingsNavScope = 'organisation' | 'team' | 'account';
+export type SettingsNavScope = 'organisation' | 'team' | 'account' | 'admin';
 
 export type SettingsNavItem = {
   key: string;
   path: string;
+
+  /**
+   * Other paths whose pages belong to this item, for pages with no nav item of their own.
+   */
+  activeOnPaths?: string[];
   label: MessageDescriptor;
   icon?: ComponentType<{ className?: string }>;
   isSubNav?: boolean;
@@ -35,6 +49,11 @@ export type SettingsNavItem = {
 
 export type SettingsNavGroup = {
   scope: SettingsNavScope;
+  /**
+   * Heading for scopes split into several groups, such as admin. The organisation, team and
+   * account headings are rendered by the sidebar itself, next to their switchers.
+   */
+  label?: MessageDescriptor;
   items: SettingsNavItem[];
 };
 
@@ -43,6 +62,8 @@ export type SettingsNavGroups = {
   team: SettingsNavGroup | null;
   account: SettingsNavGroup;
 };
+
+export type UnifiedSettingsScope = keyof SettingsNavGroups;
 
 export type GetSettingsNavGroupsArgs = {
   organisation: {
@@ -296,4 +317,190 @@ export const getSettingsNavGroups = ({
   };
 
   return { organisation: orgGroup, team: teamGroup, account: accountGroup };
+};
+
+export const getAdminNavGroups = (): SettingsNavGroup[] => [
+  {
+    scope: 'admin',
+    label: msg`Insights`,
+    items: [
+      {
+        key: 'stats',
+        path: '/admin/stats',
+        label: msg`Stats`,
+        icon: BarChart3Icon,
+      },
+      {
+        key: 'organisation-insights',
+        path: '/admin/organisation-insights',
+        label: msg`Organisation Insights`,
+        icon: TrophyIcon,
+      },
+      {
+        key: 'organisation-stats',
+        path: '/admin/organisation-stats',
+        label: msg`Organisation Stats`,
+        icon: LineChartIcon,
+      },
+    ],
+  },
+  {
+    scope: 'admin',
+    label: msg`Accounts`,
+    items: [
+      {
+        key: 'organisations',
+        path: '/admin/organisations',
+        activeOnPaths: ['/admin/teams'],
+        label: msg`Organisations`,
+        icon: Building2Icon,
+      },
+      {
+        key: 'users',
+        path: '/admin/users',
+        label: msg`Users`,
+        icon: UsersIcon,
+      },
+      {
+        key: 'claims',
+        path: '/admin/claims',
+        label: msg`Claims`,
+        icon: Wallet2Icon,
+      },
+    ],
+  },
+  {
+    scope: 'admin',
+    label: msg`Documents`,
+    items: [
+      {
+        key: 'documents',
+        path: '/admin/documents',
+        label: msg`Documents`,
+        icon: FileStackIcon,
+      },
+      {
+        key: 'unsealed-documents',
+        path: '/admin/unsealed-documents',
+        label: msg`Unsealed Documents`,
+        icon: AlertTriangleIcon,
+      },
+    ],
+  },
+  {
+    scope: 'admin',
+    label: msg`Platform`,
+    items: [
+      {
+        key: 'email-transports',
+        path: '/admin/email-transports',
+        label: msg`Email Transports`,
+        icon: MailIcon,
+      },
+      {
+        key: 'email-domains',
+        path: '/admin/email-domains',
+        label: msg`Email Domains`,
+        icon: MailboxIcon,
+      },
+      ...(IS_DOCUMENSO_CLOUD()
+        ? [
+            {
+              key: 'rules',
+              path: '/admin/rules',
+              label: msg`Rules`,
+              icon: WorkflowIcon,
+            },
+          ]
+        : []),
+      {
+        key: 'site-settings',
+        path: '/admin/site-settings',
+        label: msg`Site Settings`,
+        icon: SettingsIcon,
+      },
+    ],
+  },
+];
+
+const isPathWithin = (pathname: string, path: string) => pathname === path || pathname.startsWith(`${path}/`);
+
+/**
+ * Find the nav item for the current page: the item whose path is the pathname or one of its
+ * parents, preferring the longest so `/settings/security/passkeys` resolves to Security. Sub-nav
+ * parents are skipped because they share their first child's path.
+ */
+export const findActiveSettingsNavItem = (items: SettingsNavItem[], pathname: string): SettingsNavItem | null => {
+  let activeItem: SettingsNavItem | null = null;
+  let activeMatchLength = 0;
+
+  for (const item of items) {
+    if (item.isSubNavParent) {
+      continue;
+    }
+
+    for (const path of [item.path, ...(item.activeOnPaths ?? [])]) {
+      if (isPathWithin(pathname, path) && path.length > activeMatchLength) {
+        activeItem = item;
+        activeMatchLength = path.length;
+      }
+    }
+  }
+
+  return activeItem;
+};
+
+/**
+ * The parent a sub-nav item is listed under: the nearest `isSubNavParent` before it, which is
+ * how the sidebar groups them.
+ */
+export const findSettingsNavParent = (items: SettingsNavItem[], target: SettingsNavItem): SettingsNavItem | null => {
+  let parent: SettingsNavItem | null = null;
+
+  for (const item of items) {
+    if (item.isSubNavParent) {
+      parent = item;
+    } else if (!item.isSubNav) {
+      parent = null;
+    }
+
+    if (item === target) {
+      return item.isSubNav ? parent : null;
+    }
+  }
+
+  return null;
+};
+
+export type ActiveSettingsNav = {
+  group: SettingsNavGroup;
+  item: SettingsNavItem;
+};
+
+/**
+ * The nav item for the current page across all of a layout's groups, with the group it is in.
+ * Layouts work this out once so the sidebar, section picker and breadcrumb can't disagree.
+ */
+export const findActiveSettingsNav = (groups: SettingsNavGroup[], pathname: string): ActiveSettingsNav | null => {
+  const item = findActiveSettingsNavItem(
+    groups.flatMap((group) => group.items),
+    pathname,
+  );
+
+  const group = item ? groups.find((candidate) => candidate.items.includes(item)) : undefined;
+
+  return item && group ? { group, item } : null;
+};
+
+/**
+ * Breadcrumb labels for the current page, e.g. `['Preferences', 'Branding']` or `['Members']`.
+ */
+export const getSettingsNavCrumbs = (activeNav: ActiveSettingsNav | null): MessageDescriptor[] => {
+  if (!activeNav) {
+    return [];
+  }
+
+  const parent = findSettingsNavParent(activeNav.group.items, activeNav.item);
+
+  return parent ? [parent.label, activeNav.item.label] : [activeNav.item.label];
 };

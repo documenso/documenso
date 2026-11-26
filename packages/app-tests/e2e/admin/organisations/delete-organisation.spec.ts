@@ -428,7 +428,7 @@ test('[ADMIN][DELETE_ORG]: non-admin user cannot access /admin/organisations/$id
 
   // The admin layout loader redirects non-admins to "/". They must not see the
   // admin panel or any Delete affordance.
-  await expect(page.getByRole('heading', { name: 'Admin Panel' })).not.toBeVisible();
+  await expect(page).not.toHaveURL(/\/admin/);
   await expect(page.getByRole('heading', { name: 'Danger Zone' })).not.toBeVisible();
   await expect(page.getByRole('button', { name: 'Delete' })).not.toBeVisible();
 

@@ -18,6 +18,7 @@ import { Link, redirect } from 'react-router';
 
 import { AdminDocumentDeleteDialog } from '~/components/dialogs/admin-document-delete-dialog';
 import { DocumentStatus } from '~/components/general/document/document-status';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminDocumentJobsTable } from '~/components/tables/admin-document-jobs-table';
 import { AdminDocumentLogsTable } from '~/components/tables/admin-document-logs-table';
 import { AdminDocumentRecipientsTable } from '~/components/tables/admin-document-recipients-table';
@@ -91,24 +92,28 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
 
   return (
     <div>
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-x-4">
-          <h1 className="font-semibold text-2xl">{envelope.title}</h1>
-          <DocumentStatus status={envelope.status} />
-        </div>
+      <SettingsHeader
+        hideDivider
+        title={envelope.title}
+        badge={
+          <>
+            <DocumentStatus status={envelope.status} className="text-sm" />
 
-        {envelope.deletedAt && (
-          <Badge size="large" variant="destructive">
-            <Trans>Deleted</Trans>
-          </Badge>
-        )}
-      </div>
+            {envelope.deletedAt && (
+              <Badge variant="destructive">
+                <Trans>Deleted</Trans>
+              </Badge>
+            )}
+          </>
+        }
+        subtitle={
+          <>
+            <Trans>Document ID</Trans>: {mapSecondaryIdToDocumentId(envelope.secondaryId)}
+          </>
+        }
+      />
 
-      <div className="mt-4 text-muted-foreground text-sm">
-        <div>
-          <Trans>Document ID</Trans>: {mapSecondaryIdToDocumentId(envelope.secondaryId)}
-        </div>
-
+      <div className="text-muted-foreground text-sm">
         <div>
           <Trans>Created on</Trans>: {i18n.date(envelope.createdAt, DateTime.DATETIME_MED)}
         </div>
