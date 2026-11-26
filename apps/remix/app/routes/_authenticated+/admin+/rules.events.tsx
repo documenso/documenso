@@ -19,6 +19,7 @@ import {
   adminRulesSearchParams,
 } from '~/components/general/admin-rules/admin-rule-trigger-filter';
 import { FilterPill } from '~/components/general/filter-pill';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminRuleMatchesTable } from '~/components/tables/admin-rule-matches-table';
 import { appMetaTags } from '~/utils/meta';
 
@@ -77,17 +78,15 @@ export default function AdminRuleEventsPage() {
 
   return (
     <div>
-      <div className="min-w-0">
-        <h2 className="font-semibold text-4xl">
-          <Trans>Rule events</Trans>
-        </h2>
-
-        <p className="mt-2 text-muted-foreground text-sm">
+      <SettingsHeader
+        hideDivider
+        title={<Trans>Rule events</Trans>}
+        subtitle={
           <Trans>Every time a rule matched an event, including monitor mode evaluations that took no action.</Trans>
-        </p>
-      </div>
+        }
+      />
 
-      <div className="mt-8 space-y-4">
+      <div className="mt-4 space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Input
             type="search"

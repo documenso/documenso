@@ -1,23 +1,26 @@
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
-import { getSettingsNavGroups, type SettingsNavGroup, type SettingsNavItem } from '@documenso/lib/utils/settings-nav';
+import {
+  findActiveSettingsNav,
+  getSettingsNavCrumbs,
+  getSettingsNavGroups,
+  type UnifiedSettingsScope,
+} from '@documenso/lib/utils/settings-nav';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { Button } from '@documenso/ui/primitives/button';
-import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router';
 import { match } from 'ts-pattern';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { useOptionalCurrentTeam } from '~/providers/team';
+import { SettingsLayoutShell } from './settings-layout-shell';
 import { SettingsScopeBreadcrumb } from './settings-scope-breadcrumb';
 import { UnifiedSettingsSidebar } from './unified-settings-sidebar';
 import { UnifiedSettingsSidebarMobile } from './unified-settings-sidebar-mobile';
-
-export type UnifiedSettingsScope = 'organisation' | 'team' | 'account';
 
 export type UnifiedSettingsLayoutProps = {
   activeScope: UnifiedSettingsScope;
@@ -30,42 +33,6 @@ export type UnifiedSettingsLayoutProps = {
   preferredTeamUrl?: string | null;
 };
 
-/**
- * Walk a group's items and find the item (and its parent if it's a sub-nav child)
- * that matches the current pathname most specifically. Returns the labels to use
- * as breadcrumb crumbs (e.g. ['Preferences', 'Document'] or just ['Members']).
- */
-const findActiveCrumbs = (group: SettingsNavGroup | null, pathname: string): MessageDescriptor[] => {
-  if (!group) {
-    return [];
-  }
-
-  let bestMatch: SettingsNavItem | null = null;
-
-  for (const item of group.items) {
-    if (item.isSubNavParent) {
-      continue;
-    }
-
-    if (pathname === item.path || pathname.startsWith(`${item.path}/`)) {
-      if (!bestMatch || item.path.length > bestMatch.path.length) {
-        bestMatch = item;
-      }
-    }
-  }
-
-  if (!bestMatch) {
-    return [];
-  }
-
-  if (bestMatch.isSubNav) {
-    const parent = group.items.find((it) => it.isSubNavParent);
-    return parent ? [parent.label, bestMatch.label] : [bestMatch.label];
-  }
-
-  return [bestMatch.label];
-};
-
 export const UnifiedSettingsLayout = ({ activeScope, preferredTeamUrl = null }: UnifiedSettingsLayoutProps) => {
   const { _ } = useLingui();
   const { organisations } = useSession();
@@ -73,13 +40,6 @@ export const UnifiedSettingsLayout = ({ activeScope, preferredTeamUrl = null }: 
 
   const currentOrganisation = useOptionalCurrentOrganisation();
   const team = useOptionalCurrentTeam();
-
-  const contentPaneRef = useRef<HTMLElement>(null);
-
-  // Scroll back to the top when navigating between settings pages.
-  useEffect(() => {
-    contentPaneRef.current?.scrollTo(0, 0);
-  }, [pathname]);
 
   // An organisation is worth showing in the sidebar if it has settings the user can reach —
   // either the organisation's own, or those of a team inside it.
@@ -173,39 +133,37 @@ export const UnifiedSettingsLayout = ({ activeScope, preferredTeamUrl = null }: 
     .with('team', () => team?.name ?? organisation?.name ?? '')
     .exhaustive();
 
-  const activeGroup =
-    activeScope === 'account' ? groups.account : activeScope === 'organisation' ? groups.organisation : groups.team;
+  const activeNav = findActiveSettingsNav(
+    [groups.organisation, groups.team, groups.account].filter((group) => group !== null),
+    pathname,
+  );
 
-  const crumbs = findActiveCrumbs(activeGroup, pathname).map((label) => _(label));
+  const activeItem = activeNav?.item ?? null;
+
+  const crumbs = getSettingsNavCrumbs(activeNav).map((label) => _(label));
 
   return (
-    <div className="flex flex-col md:min-h-0 md:flex-1 md:flex-row">
-      <aside className="hover-scrollbar w-full shrink-0 border-b bg-background md:w-80 md:overflow-y-auto md:border-r md:border-b-0">
-        <div className="flex h-full flex-col">
-          <div className="hidden md:block">
-            <UnifiedSettingsSidebar
-              groups={groups}
-              currentOrgUrl={organisation?.url ?? null}
-              currentTeamUrl={teamForSidebar?.url ?? null}
-            />
-          </div>
-          <div className="md:hidden">
-            <UnifiedSettingsSidebarMobile
-              groups={groups}
-              activeScope={activeScope}
-              currentOrgUrl={organisation?.url ?? null}
-              currentTeamUrl={teamForSidebar?.url ?? null}
-            />
-          </div>
-        </div>
-      </aside>
-
-      <main ref={contentPaneRef} className="relative flex-1 px-4 md:overflow-y-auto md:px-12 lg:px-16">
-        <div className="mx-auto w-full max-w-3xl py-6 md:py-8" data-testid="unified-settings-content">
-          <SettingsScopeBreadcrumb scope={activeScope} scopeName={scopeName} crumbs={crumbs} />
-          <Outlet />
-        </div>
-      </main>
-    </div>
+    <SettingsLayoutShell
+      sidebar={
+        <UnifiedSettingsSidebar
+          groups={groups}
+          activeItem={activeItem}
+          currentOrgUrl={organisation?.url ?? null}
+          currentTeamUrl={teamForSidebar?.url ?? null}
+        />
+      }
+      mobileSidebar={
+        <UnifiedSettingsSidebarMobile
+          groups={groups}
+          activeItem={activeItem}
+          activeScope={activeScope}
+          currentOrgUrl={organisation?.url ?? null}
+          currentTeamUrl={teamForSidebar?.url ?? null}
+        />
+      }
+    >
+      <SettingsScopeBreadcrumb scope={activeScope} scopeName={scopeName} crumbs={crumbs} />
+      <Outlet />
+    </SettingsLayoutShell>
   );
 };

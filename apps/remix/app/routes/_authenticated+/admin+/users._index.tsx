@@ -2,6 +2,7 @@ import { findUsers } from '@documenso/lib/server-only/user/get-all-users';
 import { Trans } from '@lingui/react/macro';
 
 import { AdminUserCreateDialog } from '~/components/dialogs/admin-user-create-dialog';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminDashboardUsersTable } from '~/components/tables/admin-dashboard-users-table';
 
 import type { Route } from './+types/users._index';
@@ -28,13 +29,13 @@ export default function AdminManageUsersPage({ loaderData }: Route.ComponentProp
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="font-semibold text-4xl">
-          <Trans>Manage users</Trans>
-        </h2>
-
+      <SettingsHeader
+        hideDivider
+        title={<Trans>Manage users</Trans>}
+        subtitle={<Trans>Search and manage all users</Trans>}
+      >
         <AdminUserCreateDialog />
-      </div>
+      </SettingsHeader>
 
       <AdminDashboardUsersTable users={users} totalPages={totalPages} page={page} perPage={perPage} />
     </div>
