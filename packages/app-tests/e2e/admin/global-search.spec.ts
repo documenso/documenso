@@ -233,8 +233,55 @@ test('[ADMIN][GLOBAL_SEARCH]: capped admin groups offer a view all link', async 
 
   await expect(viewAllOption.getByRole('link')).toHaveAttribute(
     'href',
-    `/admin/users?search=${encodeURIComponent(namePrefix)}`,
+    `/admin/users?query=${encodeURIComponent(namePrefix)}`,
   );
+
+  await viewAllOption.click();
+
+  await page.waitForURL((url) => url.pathname === '/admin/users');
+
+  await expect(page.getByPlaceholder('Search by name or email')).toHaveValue(namePrefix);
+  await expect(page.getByRole('cell', { name: `${namePrefix}-0` })).toBeVisible();
+});
+
+test('[ADMIN][GLOBAL_SEARCH]: view all results updates the users page when already on it', async ({ page }) => {
+  const { user: adminUser } = await seedUser({ isAdmin: true });
+
+  const namePrefix = `viewall-live-${nanoid()}`;
+
+  for (let i = 0; i < 5; i++) {
+    await seedUser({ name: `${namePrefix}-${i}` });
+  }
+
+  // Searched on the page before navigating: if this stale term is written back
+  // over the navigated query, this user is listed instead of the prefix matches.
+  const staleName = `viewall-stale-${nanoid()}`;
+  const { user: staleUser } = await seedUser({ name: staleName });
+
+  await apiSignin({ page, email: adminUser.email, redirectPath: '/admin/users' });
+
+  const searchInput = page.getByPlaceholder('Search by name or email');
+
+  await searchInput.fill(staleName);
+
+  await expect(page.getByRole('cell', { name: staleUser.email })).toBeVisible();
+
+  // The command menu shortcut is ignored while an input has focus.
+  await searchInput.blur();
+
+  await openCommandMenu(page, ADMIN_PROMPT_PLACEHOLDER);
+
+  await page.getByPlaceholder(ADMIN_PROMPT_PLACEHOLDER).first().fill(namePrefix);
+
+  await expect(page.getByText('Global Users', { exact: true })).toBeVisible();
+
+  await page.getByRole('option').filter({ hasText: 'View all results' }).first().click();
+
+  await page.waitForURL((url) => url.searchParams.get('query') === namePrefix);
+
+  await expect(searchInput).toHaveValue(namePrefix);
+  await expect(page.getByRole('cell', { name: `${namePrefix}-0` })).toBeVisible();
+  await expect(page.getByRole('cell', { name: staleUser.email })).toHaveCount(0);
 });
 
 test('[ADMIN][GLOBAL_SEARCH]: first result is highlighted after every search', async ({ page }) => {

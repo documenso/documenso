@@ -24,7 +24,7 @@ const seedAdminAndMember = async () => {
   return { token, adminUser, memberUser };
 };
 
-test('[ADMIN][FILTER_USERS]: filtering by the admin role only lists admins', async ({ page }) => {
+test('[ADMIN][FILTER_USERS]: filtering by admins only lists admins', async ({ page }) => {
   const { token, adminUser, memberUser } = await seedAdminAndMember();
 
   await apiSignin({
@@ -39,31 +39,31 @@ test('[ADMIN][FILTER_USERS]: filtering by the admin role only lists admins', asy
   await expect(page.getByRole('cell', { name: memberUser.email })).toBeVisible();
 
   await page.getByRole('combobox', { name: 'Filter by role' }).click();
-  await page.getByRole('option', { name: 'Admin' }).click();
+  await page.getByRole('option', { name: 'Admins' }).click();
 
   await expect(page).toHaveURL(/role=ADMIN/);
   await expect(page.getByRole('cell', { name: adminUser.email })).toBeVisible();
   await expect(page.getByRole('cell', { name: memberUser.email })).not.toBeVisible();
 
   await page.getByRole('combobox', { name: 'Filter by role' }).click();
-  await page.getByRole('option', { name: 'All roles' }).click();
+  await page.getByRole('option', { name: 'All users' }).click();
 
   await expect(page).not.toHaveURL(/role=/);
+  await expect(page.getByRole('cell', { name: adminUser.email })).toBeVisible();
   await expect(page.getByRole('cell', { name: memberUser.email })).toBeVisible();
 });
 
-test('[ADMIN][FILTER_USERS]: an unknown role param is ignored instead of filtering', async ({ page }) => {
+test('[ADMIN][FILTER_USERS]: malformed filter params fall back to defaults instead of erroring', async ({ page }) => {
   const { token, adminUser, memberUser } = await seedAdminAndMember();
 
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: '/admin/users?role=SUPERUSER',
+    redirectPath: `/admin/users?query=${token}&role=USER&page=0&perPage=500`,
   });
 
-  await expect(page.getByRole('combobox', { name: 'Filter by role' })).toHaveText('All roles');
-
-  await page.getByPlaceholder('Search by name or email').fill(token);
+  await expect(page.getByRole('combobox', { name: 'Filter by role' })).toHaveText('All users');
+  await expect(page.getByPlaceholder('Search by name or email')).toHaveValue(token);
 
   await expect(page.getByRole('cell', { name: adminUser.email })).toBeVisible();
   await expect(page.getByRole('cell', { name: memberUser.email })).toBeVisible();

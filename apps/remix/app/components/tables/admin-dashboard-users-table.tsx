@@ -1,4 +1,5 @@
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
+import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
@@ -10,19 +11,18 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Role } from '@prisma/client';
-import { EditIcon } from 'lucide-react';
-import { parseAsInteger, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';
-import { useEffect, useMemo, useState } from 'react';
+import { EditIcon, LoaderIcon } from 'lucide-react';
+import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
+import { useMemo } from 'react';
 import { Link } from 'react-router';
-import { match } from 'ts-pattern';
 
 export const AdminDashboardUsersTable = () => {
   const { t } = useLingui();
 
-  const [{ query, role, page, perPage }, setSearchParams] = useQueryStates(
+  const [searchParams, setSearchParams] = useQueryStates(
     {
-      query: parseAsString,
-      role: parseAsStringEnum(Object.values(Role)),
+      query: parseAsString.withDefault(''),
+      role: parseAsStringLiteral([Role.ADMIN]),
       page: parseAsInteger,
       perPage: parseAsInteger,
     },
@@ -31,25 +31,21 @@ export const AdminDashboardUsersTable = () => {
     },
   );
 
-  const [searchTerm, setSearchTerm] = useState(query ?? '');
-  const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
+  const debouncedQuery = useDebouncedValue(searchParams.query, 500);
 
-  useEffect(() => {
-    if (debouncedSearchTerm !== (query ?? '')) {
-      // Reset pagination so a new search never lands on an empty page.
-      void setSearchParams({
-        query: debouncedSearchTerm || null,
-        page: null,
-      });
-    }
-  }, [debouncedSearchTerm, query, setSearchParams]);
+  // Hand-edited values such as `?page=0` or `?perPage=500` would otherwise fail
+  // request validation and leave the table stuck in its error state.
+  const { page, perPage } = ZUrlSearchParamsSchema.parse({
+    page: searchParams.page ?? undefined,
+    perPage: searchParams.perPage ?? undefined,
+  });
 
-  const { data, isLoading, isLoadingError } = trpc.admin.user.find.useQuery(
+  const { data, isLoading, isLoadingError, isPlaceholderData } = trpc.admin.user.find.useQuery(
     {
-      query: query ?? undefined,
-      role: role ?? undefined,
-      page: page ?? undefined,
-      perPage: perPage ?? undefined,
+      query: debouncedQuery || undefined,
+      role: searchParams.role ?? undefined,
+      page,
+      perPage,
     },
     {
       placeholderData: (previousData) => previousData,
@@ -113,9 +109,23 @@ export const AdminDashboardUsersTable = () => {
     });
   };
 
+  const onSearchChange = (value: string) => {
+    // Replace so typing doesn't add a history entry per keystroke, and reset
+    // pagination so a new search never lands on an empty page.
+    void setSearchParams(
+      {
+        query: value,
+        page: null,
+      },
+      {
+        history: 'replace',
+      },
+    );
+  };
+
   const onRoleChange = (value: string) => {
     void setSearchParams({
-      role: Object.values(Role).find((roleOption) => roleOption === value) ?? null,
+      role: value === Role.ADMIN ? Role.ADMIN : null,
       page: null,
     });
   };
@@ -127,69 +137,72 @@ export const AdminDashboardUsersTable = () => {
           className="flex-1"
           type="text"
           placeholder={t`Search by name or email`}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchParams.query}
+          onChange={(e) => onSearchChange(e.target.value)}
         />
 
-        <Select value={role ?? ALL_ROLES_VALUE} onValueChange={onRoleChange}>
+        <Select value={searchParams.role ?? ALL_ROLES_VALUE} onValueChange={onRoleChange}>
           <SelectTrigger className="w-full sm:w-48" aria-label={t`Filter by role`}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={ALL_ROLES_VALUE}>
-              <Trans>All roles</Trans>
+              <Trans>All users</Trans>
             </SelectItem>
-            {Object.values(Role).map((roleOption) => (
-              <SelectItem key={roleOption} value={roleOption}>
-                {match(roleOption)
-                  .with(Role.ADMIN, () => <Trans>Admin</Trans>)
-                  .with(Role.USER, () => <Trans>User</Trans>)
-                  .exhaustive()}
-              </SelectItem>
-            ))}
+            <SelectItem value={Role.ADMIN}>
+              <Trans>Admins</Trans>
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={results.data}
-        perPage={results.perPage}
-        currentPage={results.currentPage}
-        totalPages={results.totalPages}
-        onPaginationChange={onPaginationChange}
-        error={{
-          enable: isLoadingError,
-        }}
-        skeleton={{
-          enable: isLoading,
-          rows: 3,
-          component: (
-            <>
-              <TableCell className="py-4 pr-4">
-                <Skeleton className="h-4 w-8 rounded-full" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-24 rounded-full" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-32 rounded-full" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-12 rounded-full" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-8 rounded-full" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-10 w-24 rounded" />
-              </TableCell>
-            </>
-          ),
-        }}
-      >
-        {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
-      </DataTable>
+      <div className="relative">
+        <DataTable
+          columns={columns}
+          data={results.data}
+          perPage={results.perPage}
+          currentPage={results.currentPage}
+          totalPages={results.totalPages}
+          onPaginationChange={onPaginationChange}
+          error={{
+            enable: isLoadingError,
+          }}
+          skeleton={{
+            enable: isLoading,
+            rows: 3,
+            component: (
+              <>
+                <TableCell className="py-4 pr-4">
+                  <Skeleton className="h-4 w-8 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-32 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-12 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-8 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-10 w-24 rounded" />
+                </TableCell>
+              </>
+            ),
+          }}
+        >
+          {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
+        </DataTable>
+
+        {isPlaceholderData && (
+          <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+            <LoaderIcon className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

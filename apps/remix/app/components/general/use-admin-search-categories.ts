@@ -44,7 +44,7 @@ const ADMIN_GROUP_ICONS: Record<TAdminSearchResultType, LucideIcon> = {
  */
 const ADMIN_GROUP_LIST_PATHS: Partial<Record<TAdminSearchResultType, (_query: string) => string>> = {
   document: (query) => `/admin/documents?term=${encodeURIComponent(query)}`,
-  user: (query) => `/admin/users?search=${encodeURIComponent(query)}`,
+  user: (query) => `/admin/users?query=${encodeURIComponent(query)}`,
   organisation: (query) => `/admin/organisations?query=${encodeURIComponent(query)}`,
   recipient: (query) => `/admin/documents?term=${encodeURIComponent(`recipient:${query}`)}`,
 };

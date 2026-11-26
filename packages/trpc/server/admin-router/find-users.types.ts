@@ -1,10 +1,10 @@
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import RoleSchema from '@documenso/prisma/generated/zod/inputTypeSchemas/RoleSchema';
 import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
+import { Role } from '@prisma/client';
 import { z } from 'zod';
 
 export const ZFindUsersRequestSchema = ZFindSearchParamsSchema.extend({
-  role: RoleSchema.optional(),
+  role: z.literal(Role.ADMIN).optional(),
 });
 
 export const ZFindUsersResponseSchema = ZFindResultResponse.extend({

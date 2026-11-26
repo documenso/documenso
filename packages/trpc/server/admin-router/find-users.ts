@@ -41,6 +41,9 @@ export const findUsersRoute = adminProcedure
         where: whereClause,
         skip: Math.max(page - 1, 0) * perPage,
         take: perPage,
+        orderBy: {
+          id: 'desc',
+        },
         select: {
           id: true,
           name: true,
