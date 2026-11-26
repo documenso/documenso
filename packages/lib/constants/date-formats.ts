@@ -34,6 +34,8 @@ export const VALID_DATE_FORMAT_VALUES = [
 
 export type ValidDateFormat = (typeof VALID_DATE_FORMAT_VALUES)[number];
 
+export const toLuxonDateFormat = (dateFormat: string): string => dateFormat.replaceAll('XXX', 'ZZ');
+
 export const DATE_FORMATS = [
   {
     key: 'yyyy-MM-dd_HH:mm_12H',
@@ -180,25 +182,32 @@ export const convertToLocalSystemFormat = ({
   const coalescedDateFormat = dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT;
   const coalescedTimezone = timezone ?? DEFAULT_DOCUMENT_TIME_ZONE;
 
-  const parsedDate = DateTime.fromFormat(customText, coalescedDateFormat, {
+  const luxonDateFormat = toLuxonDateFormat(coalescedDateFormat);
+  let parsedDate = DateTime.fromFormat(customText, luxonDateFormat, {
     zone: coalescedTimezone,
   });
+
+  if (!parsedDate.isValid && luxonDateFormat !== coalescedDateFormat) {
+    parsedDate = DateTime.fromFormat(customText, coalescedDateFormat, {
+      zone: coalescedTimezone,
+    });
+  }
 
   if (!parsedDate.isValid) {
     return 'Invalid date';
   }
 
-  const hasHour = DateTime.fromFormatExplain(customText, coalescedDateFormat).tokens.some(
+  const hasHour = DateTime.fromFormatExplain(customText, luxonDateFormat).tokens.some(
     ({ literal, val }) => !literal && ['h', 'hh', 'H', 'HH'].includes(val),
   );
 
   // Formats without an hour are calendar dates, not moments, so converting them to the viewer's timezone could
   // only shift the day.
   if (!hasHour) {
-    return parsedDate.toFormat(coalescedDateFormat);
+    return parsedDate.toFormat(luxonDateFormat);
   }
 
-  return parsedDate.toLocal().toFormat(coalescedDateFormat);
+  return parsedDate.toLocal().toFormat(luxonDateFormat);
 };
 
 export const isValidDateFormat = (dateFormat: unknown): dateFormat is ValidDateFormat => {

@@ -16,6 +16,7 @@ import {
   WebhookTriggerEvents,
 } from '@prisma/client';
 import { DateTime } from 'luxon';
+import { toLuxonDateFormat } from '@documenso/lib/constants/date-formats';
 import pMap from 'p-map';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
@@ -442,7 +443,9 @@ export const createDocumentFromDirectTemplate = async ({
       if (fieldType === FieldType.DATE) {
         return {
           templateField,
-          customText: DateTime.now().setZone(derivedDocumentMeta.timezone).toFormat(derivedDocumentMeta.dateFormat),
+          customText: DateTime.now()
+            .setZone(derivedDocumentMeta.timezone)
+            .toFormat(toLuxonDateFormat(derivedDocumentMeta.dateFormat)),
           derivedRecipientActionAuth,
           signature: null,
         };

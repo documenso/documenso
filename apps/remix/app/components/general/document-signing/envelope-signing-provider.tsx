@@ -1,5 +1,5 @@
 import { useLatestRef } from '@documenso/lib/client-only/hooks/use-latest-ref';
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { DEFAULT_DOCUMENT_DATE_FORMAT, toLuxonDateFormat } from '@documenso/lib/constants/date-formats';
 import { isFieldGroupValueShared } from '@documenso/lib/constants/field-groups';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
@@ -131,7 +131,7 @@ const prefillDateFields = (data: EnvelopeForSigningResponse): EnvelopeForSigning
 
   const formattedDate = DateTime.now()
     .setZone(timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
-    .toFormat(dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+    .toFormat(toLuxonDateFormat(dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT));
 
   const prefillField = <T extends { type: FieldType; inserted: boolean; customText: string; fieldMeta: unknown }>(
     field: T,
