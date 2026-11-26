@@ -119,7 +119,11 @@ test('[TEAMS]: delete team cannot transfer documents to another organisation', a
   // seedTeamMember goes through seedUser, so the attacker also owns an organisation with its own team.
   const attacker = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.ADMIN });
   const attackerTeam = await prisma.team.findFirstOrThrow({
-    where: { organisation: { ownerUserId: attacker.id } },
+    where: {
+      organisation: {
+        ownerUserId: attacker.id,
+      },
+    },
   });
 
   await apiSignin({ page, email: attacker.email });
@@ -127,9 +131,20 @@ test('[TEAMS]: delete team cannot transfer documents to another organisation', a
   const response = await requestTeamDelete(page, { teamId: team.id, transferTeamId: attackerTeam.id });
 
   expect(response.status()).toBe(400);
-  expect(await prisma.team.findUnique({ where: { id: team.id } })).not.toBeNull();
 
-  const untouchedDocument = await prisma.envelope.findUnique({ where: { id: document.id } });
+  const untouchedTeam = await prisma.team.findUnique({
+    where: {
+      id: team.id,
+    },
+  });
+
+  expect(untouchedTeam).not.toBeNull();
+
+  const untouchedDocument = await prisma.envelope.findUnique({
+    where: {
+      id: document.id,
+    },
+  });
 
   expect(untouchedDocument?.teamId).toBe(team.id);
 });
@@ -144,7 +159,11 @@ test('[TEAMS]: delete team cannot transfer documents to itself', async ({ page }
 
   expect(response.status()).toBe(400);
 
-  const untouchedDocument = await prisma.envelope.findUnique({ where: { id: document.id } });
+  const untouchedDocument = await prisma.envelope.findUnique({
+    where: {
+      id: document.id,
+    },
+  });
 
   expect(untouchedDocument?.teamId).toBe(team.id);
 });
