@@ -315,13 +315,15 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     });
   });
 
-  // Compute the first reminder time based on the envelope's effective settings.
-  await updateRecipientNextReminder({
-    recipientId: recipient.id,
-    envelopeId: envelope.id,
-    sentAt,
-    lastReminderSentAt: null,
-  });
+  if (isRecipientEmailValidForSending(recipient)) {
+    // Compute the first reminder time based on the envelope's effective settings.
+    await updateRecipientNextReminder({
+      recipientId: recipient.id,
+      envelopeId: envelope.id,
+      sentAt,
+      lastReminderSentAt: null,
+    });
+  }
 
   await prisma.documentAuditLog.create({
     data: createDocumentAuditLogData({
