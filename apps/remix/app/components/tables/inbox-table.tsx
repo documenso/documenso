@@ -1,6 +1,7 @@
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
 import type { TFindInboxResponse } from '@documenso/trpc/server/document-router/find-inbox.types';
 import { Button } from '@documenso/ui/primitives/button';
@@ -32,6 +33,7 @@ type DocumentsTableRow = TFindInboxResponse['data'][number];
 export const InboxTable = () => {
   const { _, i18n } = useLingui();
 
+  const { user } = useSession();
   const team = useOptionalCurrentTeam();
   const [isPending, startTransition] = useTransition();
 
@@ -86,7 +88,7 @@ export const InboxTable = () => {
       {
         header: _(msg`Status`),
         accessorKey: 'status',
-        cell: ({ row }) => <DocumentStatus status={row.original.status} />,
+        cell: ({ row }) => <DocumentStatus status={getInboxStatus(row.original, user.email)} />,
         size: 140,
       },
       {
@@ -94,7 +96,7 @@ export const InboxTable = () => {
         cell: ({ row }) => <InboxTableActionButton row={row.original} />,
       },
     ] satisfies DataTableColumnDef<DocumentsTableRow>[];
-  }, [team]);
+  }, [team, user.email]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
@@ -134,6 +136,9 @@ export const InboxTable = () => {
                 .with({ hasSearchQuery: true }, () => <Trans>No documents match your search</Trans>)
                 .with({ status: DocumentStatusEnum.COMPLETED }, () => (
                   <Trans>Documents that you have completed will appear here</Trans>
+                ))
+                .with({ status: ExtendedDocumentStatus.PARTIALLY_APPROVED }, () => (
+                  <Trans>Documents that are waiting on other recipients will appear here</Trans>
                 ))
                 .with({ status: DocumentStatusEnum.REJECTED }, () => (
                   <Trans>Documents that have been rejected will appear here</Trans>
@@ -263,4 +268,17 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
       />
     ))
     .otherwise(() => <div></div>);
+};
+
+const getInboxStatus = (row: DocumentsTableRow, email: string) => {
+  const isWaitingOnOthers =
+    row.status === DocumentStatusEnum.PENDING &&
+    row.recipients.every(
+      (recipient) =>
+        recipient.email !== email ||
+        recipient.role === RecipientRole.CC ||
+        recipient.signingStatus === SigningStatus.SIGNED,
+    );
+
+  return isWaitingOnOthers ? ExtendedDocumentStatus.PARTIALLY_APPROVED : row.status;
 };
