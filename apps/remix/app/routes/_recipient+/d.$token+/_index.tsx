@@ -92,7 +92,6 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     template: {
       ...template,
       folder: null,
-      targetFolderId: null,
     },
     directTemplateRecipient,
   } as const;

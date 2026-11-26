@@ -221,7 +221,6 @@ A template object contains the following properties:
 | `userId`            | number         | Owner's user ID                                        |
 | `teamId`            | number \| null | Team ID if team-owned                                  |
 | `folderId`          | string \| null | Folder containing the template                         |
-| `targetFolderId`    | string \| null | Default folder for documents created from this template. Always `null` for v1 templates. |
 | `createdAt`         | string         | ISO 8601 timestamp                                     |
 | `updatedAt`         | string         | ISO 8601 timestamp                                     |
 | `recipients`        | array          | Predefined recipients with roles and fields            |
@@ -244,7 +243,6 @@ A template object contains the following properties:
   "userId": 1,
   "teamId": 5,
   "folderId": null,
-  "targetFolderId": null,
   "createdAt": "2025-01-10T08:00:00.000Z",
   "updatedAt": "2025-01-10T08:30:00.000Z",
   "recipients": [
@@ -451,7 +449,7 @@ POST /template/use
 | `recipients`        | array   | Yes      | Recipient details (maps to template recipients)            |
 | `distributeDocument`| boolean | No       | If `true`, immediately send the document to recipients     |
 | `externalId`        | string  | No       | Your custom identifier for the created document            |
-| `folderId`          | string \| null | No | Folder ID to create the document in. If omitted, the template's target folder is used when set, otherwise Home. Pass `null` to always use Home. |
+| `folderId`          | string  | No       | Folder ID to create the document in                        |
 | `prefillFields`     | array   | No       | Pre-fill field values before sending                       |
 | `override`          | object  | No       | Override template settings for this document               |
 | `formValues`        | object  | No       | PDF form values to insert                                  |
@@ -808,8 +806,6 @@ POST /template/update
 | `templateId` | number | Yes      | Template ID                          |
 | `data`       | object | No       | Template properties to update        |
 | `meta`       | object | No       | Email and signing settings to update |
-
-`data.targetFolderId` (string | null) sets the default Documents folder for documents created from this template. Pass `null` to clear it. Only supported for v2 templates.
 
 ### Code Examples
 

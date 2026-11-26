@@ -31,7 +31,6 @@ export const TemplateSchema = z.object({
   userId: z.number(),
   teamId: z.number(),
   folderId: z.string().nullable(),
-  targetFolderId: z.string().nullable(),
 });
 
 export type Template = z.infer<typeof TemplateSchema>;

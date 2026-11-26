@@ -2,6 +2,7 @@ import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
+import type { TFindTemplatesInternalResponse } from '@documenso/trpc/server/template-router/find-templates-internal.types';
 import type { TFindTemplatesResponse } from '@documenso/trpc/server/template-router/schema';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
@@ -26,7 +27,7 @@ import { TemplateDirectLinkBadge } from '../general/template/template-direct-lin
 import { TemplatesTableActionDropdown } from './templates-table-action-dropdown';
 
 type TemplatesTableProps = {
-  data?: TFindTemplatesResponse;
+  data?: TFindTemplatesInternalResponse | TFindTemplatesResponse;
   isLoading?: boolean;
   isLoadingError?: boolean;
   documentRootPath: string;
@@ -36,7 +37,7 @@ type TemplatesTableProps = {
   onRowSelectionChange?: (selection: RowSelectionState) => void;
 };
 
-type TemplatesTableRow = TFindTemplatesResponse['data'][number];
+type TemplatesTableRow = TFindTemplatesInternalResponse['data'][number] | TFindTemplatesResponse['data'][number];
 
 export const TemplatesTable = ({
   data,
@@ -211,7 +212,11 @@ export const TemplatesTable = ({
                 envelopeId={row.original.envelopeId}
                 templateSigningOrder={row.original.templateMeta?.signingOrder}
                 documentDistributionMethod={row.original.templateMeta?.distributionMethod}
-                targetFolderId={row.original.teamId === team?.id ? row.original.targetFolderId : null}
+                targetFolderId={
+                  row.original.teamId === team?.id && 'targetFolderId' in row.original
+                    ? row.original.targetFolderId
+                    : null
+                }
                 recipients={row.original.recipients}
                 documentRootPath={documentRootPath}
               />
