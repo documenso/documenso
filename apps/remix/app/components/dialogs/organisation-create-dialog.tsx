@@ -106,6 +106,16 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
 
       console.error(error);
 
+      if (error.code === 'ADMIN_RULE_BLOCKED') {
+        toast({
+          title: t`Organisation creation blocked`,
+          description: t`This change is blocked. Please contact support if you believe this is a mistake.`,
+          variant: 'destructive',
+        });
+
+        return;
+      }
+
       toast({
         title: t`An unknown error occurred`,
         description: t`We encountered an unknown error while attempting to create a organisation. Please try again later.`,

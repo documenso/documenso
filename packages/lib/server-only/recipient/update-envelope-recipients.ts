@@ -10,10 +10,11 @@ import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractLegacyIds } from '../../universal/id';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { mapFieldToLegacyField } from '../../utils/fields';
+import { assertRecipientIdsUnique, mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { lockEnvelope } from '../envelope/lock-envelope';
 import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
@@ -40,6 +41,8 @@ export const updateEnvelopeRecipients = async ({
   recipients,
   requestMetadata,
 }: UpdateEnvelopeRecipientsOptions) => {
+  assertRecipientIdsUnique(recipients);
+
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
     type: null,
@@ -50,8 +53,6 @@ export const updateEnvelopeRecipients = async ({
   const envelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
     include: {
-      fields: true,
-      recipients: true,
       team: {
         select: {
           organisation: {
@@ -100,47 +101,67 @@ export const updateEnvelopeRecipients = async ({
     });
   }
 
-  const orderUpdates = recipients.flatMap((update) => {
-    const existingRecipient = envelope.recipients.find((recipient) => recipient.id === update.id);
-
-    if (!existingRecipient || update.signingOrder === undefined) {
-      return [];
-    }
-
-    return [{ ...existingRecipient, ...update }];
-  });
-
-  const orderUpdateIds = new Set(orderUpdates.map((recipient) => recipient.id));
-
-  assertCompatibleRecipientGrouping({
-    signatureLevel: envelope.signatureLevel,
-    recipients: orderUpdates,
-    existingRecipients: envelope.recipients.filter((recipient) => !orderUpdateIds.has(recipient.id)),
-  });
-
-  const recipientsToUpdate = recipients.map((recipient) => {
-    const originalRecipient = envelope.recipients.find((existingRecipient) => existingRecipient.id === recipient.id);
-
-    if (!originalRecipient) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: `Recipient with id ${recipient.id} not found`,
-      });
-    }
-
-    if (!canRecipientBeModified(originalRecipient, envelope.fields)) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Cannot modify a recipient who has already interacted with the document',
-      });
-    }
-
-    return {
-      originalRecipient,
-      updateData: recipient,
-    };
-  });
-
   const updatedRecipients = await prisma.$transaction(async (tx) => {
-    await assertEnvelopeMutable(envelope, tx);
+    await lockEnvelope(tx, envelope.id);
+
+    const lockedEnvelope = await tx.envelope.findFirstOrThrow({
+      where: {
+        id: envelope.id,
+      },
+      include: {
+        recipients: true,
+        fields: true,
+      },
+    });
+
+    await assertEnvelopeMutable(lockedEnvelope);
+
+    if (lockedEnvelope.completedAt) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Envelope already complete',
+      });
+    }
+
+    const orderUpdates = recipients.flatMap((update) => {
+      const existingRecipient = lockedEnvelope.recipients.find((recipient) => recipient.id === update.id);
+
+      if (!existingRecipient || update.signingOrder === undefined) {
+        return [];
+      }
+
+      return [{ ...existingRecipient, ...update }];
+    });
+
+    const orderUpdateIds = new Set(orderUpdates.map((recipient) => recipient.id));
+
+    assertCompatibleRecipientGrouping({
+      signatureLevel: lockedEnvelope.signatureLevel,
+      recipients: orderUpdates,
+      existingRecipients: lockedEnvelope.recipients.filter((recipient) => !orderUpdateIds.has(recipient.id)),
+    });
+
+    const recipientsToUpdate = recipients.map((recipient) => {
+      const originalRecipient = lockedEnvelope.recipients.find(
+        (existingRecipient) => existingRecipient.id === recipient.id,
+      );
+
+      if (!originalRecipient) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: `Recipient with id ${recipient.id} not found`,
+        });
+      }
+
+      if (!canRecipientBeModified(originalRecipient, lockedEnvelope.fields)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Cannot modify a recipient who has already interacted with the document',
+        });
+      }
+
+      return {
+        originalRecipient,
+        updateData: recipient,
+      };
+    });
 
     return await Promise.all(
       recipientsToUpdate.map(async ({ originalRecipient, updateData }) => {
@@ -165,7 +186,7 @@ export const updateEnvelopeRecipients = async ({
           },
           data: {
             name: mergedRecipient.name,
-            email: mergedRecipient.email,
+            email: mergedRecipient.email.toLowerCase(),
             role: mergedRecipient.role,
             signingOrder: mergedRecipient.signingOrder,
             envelopeId: envelope.id,

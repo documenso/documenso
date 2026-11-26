@@ -15,6 +15,7 @@ export const FIELD_MIN_LETTER_SPACING = 0;
 export const FIELD_MAX_LETTER_SPACING = 100;
 
 export const DEFAULT_FIELD_FONT_SIZE = 12;
+export const DEFAULT_HANDWRITING_INITIALS_FONT_SIZE = 18;
 
 export const DEFAULT_SIGNATURE_OVERFLOW_MODE = 'auto';
 export const DEFAULT_DATE_OVERFLOW_MODE = 'auto';
@@ -43,7 +44,8 @@ export const resolveFieldOverflowMode = (fieldMeta?: { overflow?: TFieldOverflow
 };
 
 /**
- * Grouped field types that use the same generic text rendering function.
+ * Metas of the field types rendered by the generic text field renderer. Keep in sync with
+ * the generic text field branch in `renderField`.
  */
 export type GenericTextFieldTypeMetas =
   | TInitialsFieldMeta
@@ -53,17 +55,37 @@ export type GenericTextFieldTypeMetas =
   | TTextFieldMeta
   | TNumberFieldMeta;
 
+export const resolveFieldFontSize = (fieldMeta?: GenericTextFieldTypeMetas | null): number => {
+  if (fieldMeta?.fontSize !== undefined) {
+    return fieldMeta.fontSize;
+  }
+
+  if (fieldMeta?.type === 'initials' && fieldMeta.fontFamily === 'handwriting') {
+    return DEFAULT_HANDWRITING_INITIALS_FONT_SIZE;
+  }
+
+  return DEFAULT_FIELD_FONT_SIZE;
+};
+
 const ZFieldMetaLineHeight = z.coerce
   .number()
   .min(FIELD_MIN_LINE_HEIGHT)
   .max(FIELD_MAX_LINE_HEIGHT)
   .describe('The line height of the text');
-const ZFieldMetaLetterSpacing = z.coerce
+
+export const ZFieldMetaLetterSpacing = z.coerce
   .number()
   .min(FIELD_MIN_LETTER_SPACING)
   .max(FIELD_MAX_LETTER_SPACING)
   .describe('The spacing between each character');
+
 const ZFieldMetaVerticalAlign = z.enum(['top', 'middle', 'bottom']).describe('The vertical alignment of the text');
+
+const ZFieldMetaFontFamily = z
+  .enum(['sans-serif', 'handwriting'])
+  .describe(
+    'The font family of the text, handwriting uses a cursive font. Only applied on envelopes, legacy documents ignore this value.',
+  );
 
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
@@ -83,6 +105,7 @@ export type TFieldTextAlignSchema = z.infer<typeof ZFieldTextAlignSchema>;
 export const ZInitialsFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('initials'),
   textAlign: ZFieldTextAlignSchema.optional(),
+  fontFamily: ZFieldMetaFontFamily.optional(),
 });
 
 export type TInitialsFieldMeta = z.infer<typeof ZInitialsFieldMeta>;
@@ -136,8 +159,14 @@ export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
 
 export type TNumberFieldMeta = z.infer<typeof ZNumberFieldMeta>;
 
+const ZHideOptionLabels = z
+  .boolean()
+  .nullish()
+  .describe('Whether to hide the text next to each option when rendering the field.');
+
 export const ZRadioFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('radio'),
+  hideLabel: ZHideOptionLabels,
   values: z
     .array(
       z.object({
@@ -154,6 +183,7 @@ export type TRadioFieldMeta = z.infer<typeof ZRadioFieldMeta>;
 
 export const ZCheckboxFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('checkbox'),
+  hideLabel: ZHideOptionLabels,
   values: z
     .array(
       z.object({

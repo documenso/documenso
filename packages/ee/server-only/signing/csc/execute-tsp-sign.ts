@@ -10,13 +10,13 @@ import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.s
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { assertRecipientFieldsComplete } from '@documenso/lib/utils/signing-items';
 import { prisma } from '@documenso/prisma';
 import { PDF } from '@libpdf/core';
 import {
   type DocumentDataType,
   EnvelopeType,
   RecipientRole,
-  SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
@@ -191,6 +191,21 @@ export const executeTspSign = async (opts: ExecuteTspSignOptions): Promise<Execu
       recipients: true,
       documentMeta: true,
     },
+  });
+
+  // Fields can still be changed between prep and now. Checked again before the signature
+  // is requested, since the seal job would otherwise refuse the envelope after it is signed.
+  const recipientFields = await prisma.field.findMany({
+    where: {
+      envelopeId: envelope.id,
+      recipientId: recipient.id,
+    },
+  });
+
+  assertRecipientFieldsComplete({
+    internalVersion: envelope.internalVersion,
+    recipientId: recipient.id,
+    fields: recipientFields,
   });
 
   // Capture pass: iterate session.items in order so the resulting hash array
@@ -485,14 +500,6 @@ export const executeTspSign = async (opts: ExecuteTspSignOptions): Promise<Execu
     // fires when pending recipients exist. No `nextSigner` dictation path
     // — `prepareCscRecipientSigning` doesn't accept one.
     const [nextRecipient] = pendingRecipients;
-
-    await prisma.recipient.update({
-      where: { id: nextRecipient.id },
-      data: {
-        sendStatus: SendStatus.SENT,
-        sentAt: new Date(),
-      },
-    });
 
     await jobs.triggerJob({
       name: 'send.signing.requested.email',

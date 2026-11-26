@@ -320,8 +320,6 @@ test('[TEAMS]: can create a template folder', async ({ page }) => {
   await page.getByLabel('Folder name').fill('Team template folder');
   await page.getByRole('button', { name: 'Create' }).click();
 
-  await page.waitForTimeout(1000);
-
   await expect(page.getByText('Team template folder')).toBeVisible();
 
   await page.goto(`/t/${team.url}/templates`);
@@ -352,8 +350,6 @@ test('[TEAMS]: can create a template subfolder inside a template folder', async 
 
   await page.getByLabel('Folder name').fill('Team Contract Templates');
   await page.getByRole('button', { name: 'Create' }).click();
-
-  await page.waitForTimeout(1000);
 
   await expect(page.getByText('Team Contract Templates')).toBeVisible();
 });
@@ -922,7 +918,6 @@ test('[TEAMS]: documents are properly organized within folders', async ({ page }
   await expect(page.getByText('Folder Document')).not.toBeVisible();
 
   await page.getByText('Team Folder').click();
-  await page.waitForTimeout(1000);
 
   await expect(page.getByText('Folder Document')).toBeVisible();
 });
@@ -1010,8 +1005,7 @@ test('[TEAMS]: team member can move documents to everyone folder', async ({ page
   await page.getByRole('button', { name: 'Everyone Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(3000);
-  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible({ timeout: 10_000 });
 
   await page.goto(`/t/${team.url}/documents`);
   await page.waitForTimeout(3000);
@@ -1063,8 +1057,6 @@ test('[TEAMS]: team manager can move manager document to manager folder', async 
   await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
   await page.getByRole('button', { name: 'Manager Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
-
-  await page.waitForTimeout(1000);
 
   await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
 
@@ -1119,8 +1111,6 @@ test('[TEAMS]: team manager can move manager document to everyone folder', async
   await page.getByRole('button', { name: 'Everyone Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
-
   await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1173,8 +1163,6 @@ test('[TEAMS]: team manager can move everyone document to manager folder', async
   await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
   await page.getByRole('button', { name: 'Manager Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
-
-  await page.waitForTimeout(1000);
 
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
@@ -1229,7 +1217,6 @@ test('[TEAMS]: team admin can move admin document to admin folder', async ({ pag
   await page.getByRole('button', { name: 'Admin Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1282,7 +1269,6 @@ test('[TEAMS]: team admin can move admin document to manager folder', async ({ p
   await page.getByRole('button', { name: 'Manager Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1335,7 +1321,6 @@ test('[TEAMS]: team admin can move admin document to everyone folder', async ({ 
   await page.getByRole('button', { name: 'Everyone Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1388,7 +1373,6 @@ test('[TEAMS]: team admin can move manager document to admin folder', async ({ p
   await page.getByRole('button', { name: 'Admin Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1441,7 +1425,6 @@ test('[TEAMS]: team admin can move manager document to manager folder', async ({
   await page.getByRole('button', { name: 'Manager Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1494,7 +1477,6 @@ test('[TEAMS]: team admin can move manager document to everyone folder', async (
   await page.getByRole('button', { name: 'Everyone Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1547,7 +1529,6 @@ test('[TEAMS]: team admin can move everyone document to admin folder', async ({ 
   await page.getByRole('button', { name: 'Admin Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1600,7 +1581,6 @@ test('[TEAMS]: team admin can move everyone document to manager folder', async (
   await page.getByRole('button', { name: 'Manager Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1653,7 +1633,6 @@ test('[TEAMS]: team admin can move everyone document to everyone folder', async 
   await page.getByRole('button', { name: 'Everyone Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1700,7 +1679,6 @@ test('[TEAMS]: team owner can move admin document to admin folder', async ({ pag
   await page.getByRole('button', { name: 'Admin Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1747,7 +1725,6 @@ test('[TEAMS]: team owner can move admin document to manager folder', async ({ p
   await page.getByRole('button', { name: 'Manager Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1794,7 +1771,6 @@ test('[TEAMS]: team owner can move admin document to everyone folder', async ({ 
   await page.getByRole('button', { name: 'Everyone Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1841,7 +1817,6 @@ test('[TEAMS]: team owner can move manager document to admin folder', async ({ p
   await page.getByRole('button', { name: 'Admin Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1888,7 +1863,6 @@ test('[TEAMS]: team owner can move manager document to manager folder', async ({
   await page.getByRole('button', { name: 'Manager Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1935,7 +1909,6 @@ test('[TEAMS]: team owner can move manager document to everyone folder', async (
   await page.getByRole('button', { name: 'Everyone Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -1982,7 +1955,6 @@ test('[TEAMS]: team owner can move everyone document to admin folder', async ({ 
   await page.getByRole('button', { name: 'Admin Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -2029,7 +2001,6 @@ test('[TEAMS]: team owner can move everyone document to manager folder', async (
   await page.getByRole('button', { name: 'Manager Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
@@ -2076,7 +2047,6 @@ test('[TEAMS]: team owner can move everyone document to everyone folder', async 
   await page.getByRole('button', { name: 'Everyone Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(1000);
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);

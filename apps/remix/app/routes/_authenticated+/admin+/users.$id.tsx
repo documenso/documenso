@@ -20,7 +20,9 @@ import { AdminUserDeleteDialog } from '~/components/dialogs/admin-user-delete-di
 import { AdminUserDisableDialog } from '~/components/dialogs/admin-user-disable-dialog';
 import { AdminUserEnableDialog } from '~/components/dialogs/admin-user-enable-dialog';
 import { AdminUserResetTwoFactorDialog } from '~/components/dialogs/admin-user-reset-two-factor-dialog';
+import { AdminUserTagsSection } from '~/components/general/admin-user-tags-section';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminOrganisationsTable } from '~/components/tables/admin-organisations-table';
 import { AdminUserTeamsTable } from '~/components/tables/admin-user-teams-table';
 
@@ -115,12 +117,15 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
 
   return (
     <div>
-      <h2 className="font-semibold text-4xl">
-        <Trans>Manage {user?.name}'s profile</Trans>
-      </h2>
+      <SettingsHeader
+        hideDivider
+        title={<Trans>Manage {user?.name}'s profile</Trans>}
+        subtitle={<Trans>Update the user's details and roles</Trans>}
+      />
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <fieldset className="mt-6 flex w-full flex-col gap-y-4">
+          <fieldset className="mt-4 flex w-full flex-col gap-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -228,6 +233,7 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
       </Accordion>
 
       <div className="mt-16 flex flex-col gap-4">
+        <AdminUserTagsSection user={user} />
         {user && user.twoFactorEnabled && <AdminUserResetTwoFactorDialog user={user} />}
         {user && user.disabled && <AdminUserEnableDialog userToEnable={user} />}
         {user && !user.disabled && <AdminUserDisableDialog userToDisable={user} />}

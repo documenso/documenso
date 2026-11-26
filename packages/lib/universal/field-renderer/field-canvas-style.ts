@@ -1,9 +1,11 @@
 import {
   FIELD_PROBE_ANCHOR_SELECTOR,
+  FIELD_ROOT_CONTAINER_DEFAULT_BACKGROUND,
   FIELD_ROOT_CONTAINER_PROBE_CLASS_NAME,
 } from '@documenso/ui/lib/field-root-container-classes';
 import { colord } from 'colord';
 
+import { KONVA_TRANSPARENT_FILL } from '../konva/constants';
 import type { FieldCanvasStyle, FieldRenderMode, FieldToRender } from './field-renderer';
 
 export type FieldCanvasStyleCache = Map<string, FieldCanvasStyle | undefined>;
@@ -33,12 +35,6 @@ export const getOpacityValue = (value: string) => {
   return Math.max(0, Math.min(parsedValue, 1));
 };
 
-// Canonical value Konva paints as fully transparent. We normalize transparent
-// inputs to this so the renderer can tell "customer asked for transparent"
-// (honored — paint nothing) apart from "no custom style" (undefined — fall back
-// to the renderer default).
-export const TRANSPARENT_COLOR = 'rgba(0, 0, 0, 0)';
-
 export const getRenderableColor = (value: string | undefined) => {
   if (!value) {
     return undefined;
@@ -52,13 +48,15 @@ export const getRenderableColor = (value: string | undefined) => {
   // sufficient here. The `transparent` keyword is the one exception colord
   // reports as invalid; we treat it as an explicit transparent request.
   if (!color.isValid()) {
-    return value.trim().toLowerCase() === 'transparent' ? TRANSPARENT_COLOR : undefined;
+    return value.trim().toLowerCase() === 'transparent' ? KONVA_TRANSPARENT_FILL : undefined;
   }
 
   // A fully transparent color is a deliberate choice — honor it by painting
-  // nothing rather than falling back to the default background/border.
+  // nothing rather than falling back to the default background/border. It is
+  // normalized to the canonical transparent fill so the renderer can tell
+  // "customer asked for transparent" apart from "no custom style" (undefined).
   if (color.alpha() === 0) {
-    return TRANSPARENT_COLOR;
+    return KONVA_TRANSPARENT_FILL;
   }
 
   return value;
@@ -98,6 +96,13 @@ const createFieldProbeElement = (field: FieldToRender): HTMLElement => {
   return $probe;
 };
 
+/**
+ * Whether a probed background is the one the probe has without any custom CSS.
+ */
+export const isDefaultFieldBackground = (color: string) => {
+  return colord(color).isEqual(FIELD_ROOT_CONTAINER_DEFAULT_BACKGROUND);
+};
+
 const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyle | undefined => {
   if (typeof document === 'undefined' || typeof window === 'undefined') {
     return undefined;
@@ -125,8 +130,10 @@ const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyl
     const hasBorderStyle = computedStyle.borderTopStyle !== 'none' && Boolean(borderWidth);
     const borderRadius = getPixelValue(computedStyle.borderTopLeftRadius);
 
+    const backgroundColor = getRenderableColor(computedStyle.backgroundColor);
+
     return {
-      backgroundColor: getRenderableColor(computedStyle.backgroundColor),
+      backgroundColor: backgroundColor && isDefaultFieldBackground(backgroundColor) ? undefined : backgroundColor,
       borderColor: hasBorderStyle ? borderColor : undefined,
       borderRadius,
       borderWidth: hasBorderStyle ? borderWidth : undefined,
@@ -165,4 +172,20 @@ export const resolveFieldCanvasStyle = (
   cache?.set(cacheKey, style);
 
   return style;
+};
+
+/**
+ * Resolve the `--primary` color from the same cascade as the fields, so canvas
+ * elements such as the loading spinner follow team and embed branding.
+ */
+export const resolvePrimaryColor = () => {
+  const $anchor = document.querySelector(FIELD_PROBE_ANCHOR_SELECTOR);
+
+  if (!$anchor) {
+    return undefined;
+  }
+
+  const color = colord(`hsl(${window.getComputedStyle($anchor).getPropertyValue('--primary')})`);
+
+  return color.isValid() ? color.toRgbString() : undefined;
 };

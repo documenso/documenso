@@ -16,14 +16,6 @@ export type SanitizeBrandingCssResult = {
   warnings: SanitizeBrandingCssWarning[];
 };
 
-/**
- * The class name the sanitised CSS will be wrapped in at render time using
- * CSS nesting (`.documenso-branded { <user css> }`). The sanitiser itself
- * does NOT prefix selectors — the wrapper is applied by `RecipientBranding`
- * on every render so we keep the user's original CSS intact in the database.
- */
-export const SANITIZE_BRANDING_SCOPE_CLASS = 'documenso-branded';
-
 const BLOCKED_PROPERTIES = new Set([
   'display',
   'visibility',

@@ -176,6 +176,7 @@ export const createPersonalOrganisation = async ({
       teamUrl: prefixedId('personal'),
       organisationId: organisation.id,
       inheritMembers,
+      bypassAdminRules: true,
     }).catch((err) => {
       console.error(err);
 
@@ -197,6 +198,8 @@ export const createOrganisationClaimUpsertData = (
       },
       envelopeItemCount: subscriptionClaim.envelopeItemCount,
       recipientCount: subscriptionClaim.recipientCount,
+      envelopeContentCount: subscriptionClaim.envelopeContentCount,
+      envelopeContentImageCount: subscriptionClaim.envelopeContentImageCount,
       teamCount: subscriptionClaim.teamCount,
       memberCount: subscriptionClaim.memberCount,
       documentRateLimits: subscriptionClaim.documentRateLimits ?? [],

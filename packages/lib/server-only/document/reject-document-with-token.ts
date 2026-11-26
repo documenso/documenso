@@ -17,6 +17,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { assertRecipientNotExpired } from '../../utils/recipients';
+import { lockEnvelope } from '../envelope/lock-envelope';
 import { assertSenderNotDisabled } from '../user/assert-user-not-disabled';
 
 export type RejectDocumentWithTokenOptions = {
@@ -63,8 +64,29 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
   assertRecipientNotExpired(recipient);
 
   // Update the recipient status to rejected
-  const [updatedRecipient] = await prisma.$transaction([
-    prisma.recipient.update({
+  const updatedRecipient = await prisma.$transaction(async (tx) => {
+    const lockedEnvelope = await lockEnvelope(tx, envelope.id);
+
+    const lockedRecipient = await tx.recipient.findFirst({
+      where: {
+        id: recipient.id,
+        envelopeId: envelope.id,
+      },
+    });
+
+    if (lockedEnvelope.status !== DocumentStatus.PENDING) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Document ${envelope.id} must be pending to reject`,
+      });
+    }
+
+    if (lockedRecipient?.signingStatus !== SigningStatus.NOT_SIGNED) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient ${recipient.id} has already actioned this document`,
+      });
+    }
+
+    const updatedRecipient = await tx.recipient.update({
       where: {
         id: recipient.id,
       },
@@ -73,8 +95,9 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
         signingStatus: SigningStatus.REJECTED,
         rejectionReason: reason,
       },
-    }),
-    prisma.documentAuditLog.create({
+    });
+
+    await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         envelopeId: envelope.id,
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED,
@@ -91,8 +114,10 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
         },
         requestMetadata,
       }),
-    }),
-  ]);
+    });
+
+    return updatedRecipient;
+  });
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 

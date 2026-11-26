@@ -8,6 +8,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { lockEnvelope } from '../envelope/lock-envelope';
 
 export interface DeleteDocumentFieldOptions {
   userId: number;
@@ -40,51 +41,83 @@ export const deleteDocumentField = async ({ userId, teamId, fieldId, requestMeta
     teamId,
   });
 
-  const envelope = await prisma.envelope.findUnique({
+  const unlockedEnvelope = await prisma.envelope.findUnique({
     where: envelopeWhereInput,
-    include: {
-      recipients: {
-        where: {
-          id: field.recipientId,
-        },
-        include: {
-          fields: true,
-        },
-      },
+    select: {
+      id: true,
     },
   });
 
-  if (!envelope) {
+  if (!unlockedEnvelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  assertEnvelopeMutable(envelope);
-
-  if (envelope.completedAt) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Document already complete',
-    });
-  }
-
-  const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
-
-  if (!recipient) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: `Recipient for field ${fieldId} not found`,
-    });
-  }
-
-  // Check whether the recipient associated with the field can have new fields created.
-  if (!canRecipientFieldsBeModified(recipient, recipient.fields)) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Recipient has already interacted with the document.',
-    });
-  }
-
   return await prisma.$transaction(async (tx) => {
-    await assertEnvelopeMutable(envelope, tx);
+    await lockEnvelope(tx, unlockedEnvelope.id);
+
+    const lockedField = await tx.field.findFirst({
+      where: {
+        id: fieldId,
+        envelopeId: unlockedEnvelope.id,
+      },
+    });
+
+    if (!lockedField) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Field not found',
+      });
+    }
+
+    const envelope = await tx.envelope.findUnique({
+      where: envelopeWhereInput,
+      include: {
+        recipients: {
+          where: {
+            id: lockedField.recipientId,
+          },
+          include: {
+            fields: true,
+          },
+        },
+      },
+    });
+
+    if (!envelope) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Document not found',
+      });
+    }
+
+    await assertEnvelopeMutable(envelope);
+
+    if (envelope.completedAt) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Document already complete',
+      });
+    }
+
+    const recipient = envelope.recipients.find((recipient) => recipient.id === lockedField.recipientId);
+
+    if (!recipient) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient for field ${fieldId} not found`,
+      });
+    }
+
+    // Check whether the recipient associated with the field can have new fields created.
+    if (!canRecipientFieldsBeModified(recipient, recipient.fields)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Recipient has already interacted with the document.',
+      });
+    }
+
+    if (lockedField.groupId) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Fields in a group cannot be deleted through this endpoint. Use /envelope/field/delete instead.',
+      });
+    }
 
     const deletedField = await tx.field.delete({
       where: {

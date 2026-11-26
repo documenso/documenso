@@ -2,7 +2,9 @@ import { PDF_VIEWER_CONTENT_SELECTOR } from '@documenso/lib/constants/pdf-viewer
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { type Envelope, type Field, FieldType } from '@prisma/client';
+import { z } from 'zod';
 
+import { AppError, AppErrorCode } from '../errors/app-error';
 import { extractLegacyIds } from '../universal/id';
 
 /**
@@ -97,6 +99,34 @@ export const mapFieldToLegacyField = (field: Field, envelope: Pick<Envelope, 'ty
   };
 };
 
+/**
+ * Routes which check a list of fields and then write each entry would check both entries of a
+ * duplicate but store only the last.
+ */
+export const assertFieldIdsUnique = (fields: Array<{ id?: number | null }>) => {
+  const ids = fields.flatMap((field) => (typeof field.id === 'number' ? [field.id] : []));
+
+  const duplicateIds = new Set(ids.filter((id, index) => ids.indexOf(id) !== index));
+
+  if (duplicateIds.size > 0) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Fields listed more than once: ${Array.from(duplicateIds).join(', ')}`,
+    });
+  }
+};
+
+export const assertRecipientIdsUnique = (recipients: Array<{ id?: number | null }>) => {
+  const ids = recipients.flatMap((recipient) => (typeof recipient.id === 'number' ? [recipient.id] : []));
+
+  const duplicateIds = new Set(ids.filter((id, index) => ids.indexOf(id) !== index));
+
+  if (duplicateIds.size > 0) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Recipients listed more than once: ${Array.from(duplicateIds).join(', ')}`,
+    });
+  }
+};
+
 export const parseCheckboxCustomText = (customText: string): number[] => {
   if (!customText) {
     return [];
@@ -105,12 +135,25 @@ export const parseCheckboxCustomText = (customText: string): number[] => {
   return JSON.parse(customText);
 };
 
-export const toCheckboxCustomText = (checkedValues: number[]): string => {
-  return JSON.stringify(checkedValues);
+const ZSubmittedCheckboxCustomTextSchema = z.array(z.number().int().nonnegative());
+
+/**
+ * Parses a V2 checkbox value received from a client, before it is stored.
+ *
+ * Throws if the value is not a list of indices. It does not check that the options exist.
+ */
+export const parseSubmittedCheckboxCustomText = (customText: string): number[] => {
+  try {
+    return ZSubmittedCheckboxCustomTextSchema.parse(JSON.parse(customText));
+  } catch {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Invalid checkbox values',
+    });
+  }
 };
 
-export const parseRadioCustomText = (customText: string): number => {
-  return Number(customText);
+export const toCheckboxCustomText = (checkedValues: number[]): string => {
+  return JSON.stringify(checkedValues);
 };
 
 export const toRadioCustomText = (value: number): string => {

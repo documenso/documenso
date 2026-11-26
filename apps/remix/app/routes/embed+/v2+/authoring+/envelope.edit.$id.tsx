@@ -11,7 +11,11 @@ import {
   ZEmbedEditEnvelopeAuthoringSchema,
 } from '@documenso/lib/types/envelope-editor';
 import type { TEnvelopeFieldAndMeta } from '@documenso/lib/types/field-meta';
-import { buildEmbeddedEditorOptions, PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
+import {
+  buildEmbeddedEditorOptions,
+  getPendingEmbedImagesToUpload,
+  PRESIGNED_ENVELOPE_ITEM_ID_PREFIX,
+} from '@documenso/lib/utils/embed-config';
 import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
 import type { TUpdateEmbeddingEnvelopePayload } from '@documenso/trpc/server/embedding-router/update-embedding-envelope.types';
@@ -73,6 +77,12 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   ]);
 
   if (!envelope) {
+    throw redirect(`/embed/v2/authoring/error/not-found`);
+  }
+
+  // V1 envelopes belong to the V1 embed editor. The V2 editor offers settings, such as field
+  // groups, which the server rejects for V1 envelopes, so saving could never succeed.
+  if (envelope.internalVersion !== 2) {
     throw redirect(`/embed/v2/authoring/error/not-found`);
   }
 
@@ -173,7 +183,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
 
   const buildUpdateEnvelopeRequest = (
     envelope: TEditorEnvelope,
-  ): { payload: TUpdateEmbeddingEnvelopePayload; files: File[] } => {
+  ): { payload: TUpdateEmbeddingEnvelopePayload; files: File[]; contentImages: File[] } => {
     const files: File[] = [];
 
     const envelopeItems = envelope.envelopeItems.map((item) => {
@@ -210,6 +220,8 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
         positionY: Number(field.positionY),
         width: Number(field.width),
         height: Number(field.height),
+        groupId: field.groupId,
+        externalId: field.externalId,
         ...({
           type: field.type,
           fieldMeta: field.fieldMeta ?? undefined,
@@ -217,6 +229,9 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
       }));
 
       return {
+        // Unsaved recipients have negative placeholder ids. Without the id of a saved one, the
+        // server deletes and recreates it, which wipes a signature already made.
+        id: recipient.id > 0 ? recipient.id : undefined,
         email: recipient.email,
         name: recipient.name,
         role: recipient.role,
@@ -224,6 +239,24 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
         accessAuth: recipient.authOptions?.accessAuth ?? [],
         actionAuth: recipient.authOptions?.actionAuth ?? [],
         fields,
+      };
+    });
+
+    // Removes duplicate content images, and gets the files to upload.
+    const imagesToUpload = getPendingEmbedImagesToUpload(envelope.contents);
+
+    const contentImages = imagesToUpload.map((image) => image.file);
+
+    const contents = envelope.contents.map((content) => {
+      const image = imagesToUpload.find((imageToUpload) => imageToUpload.id === content.dataContentId);
+
+      // A new image is referenced by its index, an uploaded one by its ID.
+      return {
+        id: content.id,
+        envelopeItemId: content.envelopeItemId,
+        contentMeta: content.contentMeta,
+        dataContentId: image ? null : content.dataContentId,
+        imageIndex: image?.index,
       };
     });
 
@@ -239,6 +272,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
         recipients,
         envelopeItems,
         attachments: envelope.attachments,
+        contents,
       },
       meta: {
         ...envelope.documentMeta,
@@ -257,7 +291,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
       },
     };
 
-    return { payload, files };
+    return { payload, files, contentImages };
   };
 
   const updateEmbeddedEnvelope = async (envelope: TEditorEnvelope) => {
@@ -268,13 +302,17 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
     setIsUpdatingEnvelope(true);
 
     try {
-      const { payload, files } = buildUpdateEnvelopeRequest(envelope);
+      const { payload, files, contentImages } = buildUpdateEnvelopeRequest(envelope);
 
       const formData = new FormData();
       formData.append('payload', JSON.stringify(payload));
 
       for (const file of files) {
         formData.append('files', file);
+      }
+
+      for (const contentImage of contentImages) {
+        formData.append('contentImages', contentImage);
       }
 
       await updateEmbeddingEnvelope(formData);
@@ -332,7 +370,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
   return (
     <div className="relative min-h-screen min-w-screen">
       {isUpdatingEnvelope && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background">
           <Spinner />
 
           <p className="mt-2 text-muted-foreground text-sm">
@@ -346,7 +384,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
       )}
 
       {updatedEnvelope && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background">
           <div className="mx-auto w-full max-w-md text-center">
             <CheckCircle2Icon className="mx-auto h-16 w-16 text-primary" />
 

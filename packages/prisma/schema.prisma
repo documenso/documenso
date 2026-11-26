@@ -74,6 +74,10 @@ model User {
   passkeys           Passkey[]
   avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
+  adminRuleMatches AdminRuleMatch[]
+  adminTags        AdminTag[]       @relation("AdminTagSubject")
+  createdAdminTags AdminTag[]       @relation("AdminTagCreator")
+
   @@index([email])
 }
 
@@ -266,10 +270,12 @@ model SubscriptionClaim {
   name   String
   locked Boolean @default(false)
 
-  teamCount         Int
-  memberCount       Int
-  envelopeItemCount Int
-  recipientCount    Int
+  teamCount                 Int
+  memberCount               Int
+  envelopeItemCount         Int
+  recipientCount            Int
+  envelopeContentCount      Int
+  envelopeContentImageCount Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 
@@ -295,10 +301,12 @@ model OrganisationClaim {
   originalSubscriptionClaimId String?
   organisation                Organisation?
 
-  teamCount         Int
-  memberCount       Int
-  envelopeItemCount Int
-  recipientCount    Int
+  teamCount                 Int
+  memberCount               Int
+  envelopeItemCount         Int
+  recipientCount            Int
+  envelopeContentCount      Int
+  envelopeContentImageCount Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 
@@ -471,6 +479,7 @@ model Envelope {
   envelopeItems EnvelopeItem[]
   recipients    Recipient[]
   fields        Field[]
+  contents      EnvelopeContent[]
   shareLinks    DocumentShareLink[]
   auditLogs     DocumentAuditLog[]
 
@@ -522,7 +531,8 @@ model EnvelopeItem {
   envelopeId String
   envelope   Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
 
-  field Field[]
+  field    Field[]
+  contents EnvelopeContent[]
 
   @@unique([documentDataId])
   @@index([envelopeId])
@@ -703,6 +713,8 @@ enum FieldType {
 model Field {
   id             Int          @id @default(autoincrement())
   secondaryId    String       @unique @default(cuid())
+  externalId     String?      @db.VarChar(255)
+  groupId        String?      @db.VarChar(255)
   envelopeId     String
   envelopeItemId String
   recipientId    Int
@@ -723,6 +735,41 @@ model Field {
   @@index([envelopeId])
   @@index([envelopeItemId])
   @@index([recipientId])
+}
+
+/// @zod.import(["import { ZEnvelopeContentMetaSchema } from '@documenso/lib/types/envelope-content-meta';"])
+model EnvelopeContent {
+  id             String @id
+  envelopeId     String
+  envelopeItemId String
+
+  envelopeItem EnvelopeItem @relation(fields: [envelopeItemId], references: [id], onDelete: Cascade)
+  envelope     Envelope     @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  contentMeta Json /// [EnvelopeContentMeta] @zod.custom.use(ZEnvelopeContentMetaSchema)
+
+  /// Any number of contents may point at the same data content, e.g. a
+  /// document created from a template shares the template's images.
+  dataContentId String?
+  dataContent   DataContent? @relation(fields: [dataContentId], references: [id], onDelete: SetNull)
+
+  @@index([envelopeId])
+  @@index([envelopeItemId])
+}
+
+/// Generic stored data (e.g. an uploaded image) which other models reference.
+/// The kind of data and its kind specific details live in `metadata`.
+/// @zod.import(["import { ZDataContentMetaSchema } from '@documenso/lib/types/data-content-meta';"])
+model DataContent {
+  id String @id
+
+  /// How `data` is stored, e.g. an S3 path or inline bytes.
+  type DocumentDataType
+  data String
+
+  metadata Json /// [DataContentMeta] @zod.custom.use(ZDataContentMetaSchema)
+
+  envelopeContents EnvelopeContent[]
 }
 
 model Signature {
@@ -849,6 +896,7 @@ model Organisation {
   organisationEmails OrganisationEmail[]
 
   monthlyStats OrganisationMonthlyStat[]
+  adminTags    AdminTag[]
 
   embedSignatures EmbedSignature[]
 
@@ -1309,4 +1357,83 @@ model RateLimit {
 
   @@id([key, action, bucket])
   @@index([createdAt])
+}
+
+enum AdminRuleMode {
+  ENFORCE
+  MONITOR
+  DISABLED
+}
+
+/// @zod.import(["import { ZAdminRuleDefinitionSchema, ZAdminRuleTriggerSchema } from '@documenso/lib/types/admin-rules';"])
+model AdminRule {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  description String?
+  mode        AdminRuleMode
+  trigger     String /// [AdminRuleTrigger] @zod.custom.use(ZAdminRuleTriggerSchema)
+  definition  Json /// [AdminRuleDefinition] @zod.custom.use(ZAdminRuleDefinitionSchema)
+  priority    Int
+  stopOnMatch Boolean
+
+  /// Escape hatch: organisations this rule is skipped for. Only meaningful on triggers that have an
+  /// organisation
+  exemptOrganisationIds String[] @default([])
+
+  matches   AdminRuleMatch[]
+  adminTags AdminTag[]
+
+  @@index([trigger, mode, priority])
+}
+
+/// @zod.import(["import { ZAdminRuleContextSchema, ZAdminRuleActionRunsSchema, ZAdminRuleTriggerSchema } from '@documenso/lib/types/admin-rules';"])
+model AdminRuleMatch {
+  id        String   @id
+  createdAt DateTime @default(now())
+
+  mode           AdminRuleMode
+  trigger        String /// [AdminRuleTrigger] @zod.custom.use(ZAdminRuleTriggerSchema)
+  organisationId String?
+  envelopeId     String?
+  eventSnapshot  Json /// [AdminRuleContext] @zod.custom.use(ZAdminRuleContextSchema)
+  actionsRun     Json /// [AdminRuleActionRuns] @zod.custom.use(ZAdminRuleActionRunsSchema)
+
+  ruleId String
+  rule   AdminRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  actorUserId Int?
+  actorUser   User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([ruleId, createdAt])
+  @@index([createdAt])
+}
+
+/// @zod.import(["import { ZAdminTagTypeSchema } from '@documenso/lib/types/admin-tags';"])
+model AdminTag {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type        String /// [AdminTagType] @zod.custom.use(ZAdminTagTypeSchema)
+  description String
+
+  // If this is unset, then organisationId must be set.
+  userId Int?
+  user   User? @relation("AdminTagSubject", fields: [userId], references: [id], onDelete: Cascade)
+
+  // If this is unset, then userId must be set.
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  createdByUserId Int?
+  createdByUser   User? @relation("AdminTagCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  adminRuleId String?
+  adminRule   AdminRule? @relation(fields: [adminRuleId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([organisationId])
 }

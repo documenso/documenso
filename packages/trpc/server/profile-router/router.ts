@@ -31,7 +31,7 @@ export const profileRouter = router({
       userId: ctx.user.id,
       name,
       signature,
-      requestMetadata: ctx.metadata.requestMetadata,
+      requestMetadata: ctx.metadata,
     });
   }),
 

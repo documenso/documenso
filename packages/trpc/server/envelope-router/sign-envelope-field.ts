@@ -1,18 +1,30 @@
+import { isFieldGroupValueShared } from '@documenso/lib/constants/field-groups';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-field-auth';
+import { lockFieldForSigning } from '@documenso/lib/server-only/field/lock-field-for-signing';
 import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
+import {
+  type ExtractFieldInsertionValuesOptions,
+  extractFieldInsertionValues,
+  extractGroupedCheckboxInsertionValues,
+  extractGroupedRadioInsertionValues,
+  type FieldInsertionValues,
+} from '@documenso/lib/utils/envelope-signing';
 import { getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipient-queries';
 import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentStatus, type Field, FieldType, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { procedure } from '../trpc';
-import { ZSignEnvelopeFieldRequestSchema, ZSignEnvelopeFieldResponseSchema } from './sign-envelope-field.types';
+import {
+  type TSignEnvelopeFieldValue,
+  ZSignEnvelopeFieldRequestSchema,
+  ZSignEnvelopeFieldResponseSchema,
+} from './sign-envelope-field.types';
 
 // Note that this is an unauthenticated public procedure route.
 export const signEnvelopeFieldRoute = procedure
@@ -41,6 +53,7 @@ export const signEnvelopeFieldRoute = procedure
     const field = await prisma.field.findFirst({
       where: {
         id: fieldId,
+        envelopeId: recipient.envelopeId,
         recipient: getRecipientFieldsWhereInput({
           recipient,
           allowAssistantAccessToOtherRecipients: true,
@@ -74,21 +87,7 @@ export const signEnvelopeFieldRoute = procedure
       });
     }
 
-    if (
-      field.type === FieldType.SIGNATURE &&
-      recipient.id !== field.recipientId &&
-      recipient.role === RecipientRole.ASSISTANT
-    ) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Assistant recipients cannot sign signature fields`,
-      });
-    }
-
-    if (fieldValue.type !== field.type) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Selected values do not match the field values',
-      });
-    }
+    assertFieldAcceptsValue({ recipient, field, fieldValue });
 
     if (envelope.deletedAt) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -114,112 +113,162 @@ export const signEnvelopeFieldRoute = procedure
       });
     }
 
-    if (field.fieldMeta?.readOnly) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Field ${fieldId} is read only`,
-      });
-    }
+    // Action auth is slow, so it runs before the envelope is locked. It only applies to
+    // signature fields, which cannot be grouped, so whether this request inserts or clears
+    // the field is known from the request alone.
+    const isClearingSignature = fieldValue.type === FieldType.SIGNATURE && !fieldValue.value;
 
-    // Unreachable code based on the above query but we need to satisfy TypeScript
-    if (field.recipientId === null) {
-      throw new Error(`Field ${fieldId} has no recipientId`);
-    }
-
-    const insertionValues = extractFieldInsertionValues({ fieldValue, field, documentMeta });
-
-    // Early return for uninserting fields.
-    if (!insertionValues.inserted) {
-      return await prisma.$transaction(async (tx) => {
-        const updatedField = await tx.field.update({
-          where: {
-            id: field.id,
-          },
-          data: {
-            customText: '',
-            inserted: false,
-          },
+    const derivedRecipientActionAuth = isClearingSignature
+      ? undefined
+      : await validateFieldAuth({
+          documentAuthOptions: envelope.authOptions,
+          recipient,
+          field,
+          userId: user?.id,
+          authOptions,
         });
-
-        await tx.signature.deleteMany({
-          where: {
-            fieldId: field.id,
-          },
-        });
-
-        if (recipient.role !== RecipientRole.ASSISTANT) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
-              envelopeId: envelope.id,
-              user: {
-                name: recipient.name,
-                email: recipient.email,
-              },
-              requestMetadata: metadata.requestMetadata,
-              data: {
-                field: field.type,
-                fieldId: field.secondaryId,
-              },
-            }),
-          });
-        }
-
-        return {
-          signedField: updatedField,
-        };
-      });
-    }
-
-    const derivedRecipientActionAuth = await validateFieldAuth({
-      documentAuthOptions: envelope.authOptions,
-      recipient,
-      field,
-      userId: user?.id,
-      authOptions,
-    });
-
-    const assistant = recipient.role === RecipientRole.ASSISTANT ? recipient : undefined;
 
     let signatureImageAsBase64 = null;
     let typedSignature = null;
 
-    if (field.type === FieldType.SIGNATURE) {
-      if (fieldValue.type !== FieldType.SIGNATURE) {
-        throw new AppError(AppErrorCode.INVALID_REQUEST, {
-          message: `Field ${fieldId} is not a signature field`,
-        });
-      }
+    if (fieldValue.type === FieldType.SIGNATURE && fieldValue.value) {
+      const isBase64 = isBase64Image(fieldValue.value);
 
-      if (fieldValue.value) {
-        const isBase64 = isBase64Image(fieldValue.value);
-
-        signatureImageAsBase64 = isBase64 ? fieldValue.value : null;
-        typedSignature = !isBase64 ? fieldValue.value : null;
-      }
+      signatureImageAsBase64 = isBase64 ? fieldValue.value : null;
+      typedSignature = !isBase64 ? fieldValue.value : null;
     }
 
     return await prisma.$transaction(async (tx) => {
-      const updatedField = await tx.field.update({
-        where: {
-          id: field.id,
-        },
-        data: {
-          customText: insertionValues.customText,
-          inserted: insertionValues.inserted,
-        },
-        include: {
-          signature: true,
-        },
+      const { recipient: lockedRecipient, field: lockedField } = await lockFieldForSigning(tx, {
+        envelopeId: envelope.id,
+        fieldId: field.id,
+        recipientId: recipient.id,
       });
 
-      if (field.type === FieldType.SIGNATURE) {
+      assertFieldAcceptsValue({ recipient: lockedRecipient, field: lockedField, fieldValue });
+
+      const assistant = lockedRecipient.role === RecipientRole.ASSISTANT ? lockedRecipient : undefined;
+
+      let groupFields: Field[] = [lockedField];
+
+      // Load all the fields in the group if available. This includes the field itself, since
+      // it matches every condition.
+      if (lockedField.groupId) {
+        groupFields = await tx.field.findMany({
+          where: {
+            envelopeId: envelope.id,
+            recipientId: lockedField.recipientId,
+            groupId: lockedField.groupId,
+            type: lockedField.type,
+          },
+          orderBy: {
+            id: 'asc',
+          },
+        });
+      }
+
+      const fieldInsertionValues = extractSignedFieldInsertionValues({
+        field: lockedField,
+        groupFields,
+        fieldValue,
+        documentMeta,
+      });
+
+      // Signing a field of a group writes every field in the group. Only the field which was
+      // signed, and the fields whose value changes with it, are recorded in the audit log.
+      const fieldIdsToLog = fieldInsertionValues
+        .filter((insertionValues) => {
+          const previousField = groupFields.find((groupField) => groupField.id === insertionValues.fieldId);
+
+          return insertionValues.fieldId === lockedField.id || insertionValues.customText !== previousField?.customText;
+        })
+        .map((insertionValues) => insertionValues.fieldId);
+
+      const isUninserting = fieldInsertionValues.every((insertionValues) => !insertionValues.inserted);
+
+      if (isUninserting) {
+        const updatedFields = await Promise.all(
+          fieldInsertionValues.map(async (insertionValues) =>
+            tx.field.update({
+              where: {
+                id: insertionValues.fieldId,
+              },
+              data: {
+                customText: '',
+                inserted: false,
+              },
+            }),
+          ),
+        );
+
+        await tx.signature.deleteMany({
+          where: {
+            fieldId: lockedField.id,
+          },
+        });
+
+        const uninsertedFields = updatedFields.filter((updatedField) => fieldIdsToLog.includes(updatedField.id));
+
+        if (!assistant) {
+          await tx.documentAuditLog.createMany({
+            data: uninsertedFields.map((uninsertedField) =>
+              createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
+                envelopeId: envelope.id,
+                user: {
+                  name: lockedRecipient.name,
+                  email: lockedRecipient.email,
+                },
+                requestMetadata: metadata.requestMetadata,
+                data: {
+                  field: uninsertedField.type,
+                  fieldId: uninsertedField.secondaryId,
+                },
+              }),
+            ),
+          });
+        }
+
+        return {
+          // Clients merge the response into their local fields, so the deleted signature
+          // must be returned as null rather than omitted.
+          signedFields: updatedFields.map((updatedField) => ({ ...updatedField, signature: null })),
+        };
+      }
+
+      const updatedFields = await Promise.all(
+        fieldInsertionValues.map(async (insertionValues) =>
+          tx.field.update({
+            where: {
+              id: insertionValues.fieldId,
+            },
+            data: {
+              customText: insertionValues.customText,
+              inserted: insertionValues.inserted,
+            },
+            include: {
+              signature: true,
+            },
+          }),
+        ),
+      );
+
+      const updatedField = updatedFields.find((currentField) => currentField.id === lockedField.id);
+
+      if (!updatedField) {
+        throw new Error('Not possible');
+      }
+
+      // Update the signature and mutate the response to contain
+      // the new signature for the updated field.
+      if (lockedField.type === FieldType.SIGNATURE) {
         const signature = await tx.signature.upsert({
           where: {
-            fieldId: field.id,
+            fieldId: lockedField.id,
           },
           create: {
-            fieldId: field.id,
-            recipientId: field.recipientId,
+            fieldId: lockedField.id,
+            recipientId: lockedField.recipientId,
             signatureImageAsBase64: signatureImageAsBase64,
             typedSignature: typedSignature,
           },
@@ -235,49 +284,176 @@ export const signEnvelopeFieldRoute = procedure
         });
       }
 
-      await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type:
-            assistant && field.recipientId !== assistant.id
-              ? DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED
-              : DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
-          envelopeId: envelope.id,
-          user: {
-            email: assistant?.email ?? recipient.email,
-            name: assistant?.name ?? recipient.name,
-          },
-          requestMetadata: metadata.requestMetadata,
-          data: {
-            recipientEmail: recipient.email,
-            recipientId: recipient.id,
-            recipientName: recipient.name,
-            recipientRole: recipient.role,
-            fieldId: updatedField.secondaryId,
-            field: match(updatedField.type)
-              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
-                type,
-                data: signatureImageAsBase64 || typedSignature || '',
-              }))
-              .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, FieldType.TEXT, FieldType.INITIALS, (type) => ({
-                type,
-                data: updatedField.customText,
-              }))
-              .with(FieldType.NUMBER, FieldType.RADIO, FieldType.CHECKBOX, FieldType.DROPDOWN, (type) => ({
-                type,
-                data: updatedField.customText,
-              }))
-              .exhaustive(),
-            fieldSecurity: derivedRecipientActionAuth
-              ? {
-                  type: derivedRecipientActionAuth,
-                }
-              : undefined,
-          },
-        }),
+      const isOptionGroup =
+        Boolean(lockedField.groupId) &&
+        (lockedField.type === FieldType.RADIO || lockedField.type === FieldType.CHECKBOX);
+
+      // A field of a radio or checkbox group can lose its value while its group stays answered,
+      // such as a radio whose selection moved to another field of the group. It is logged as
+      // unsigned. Any other field signed with an empty value is still inserted, so it is logged
+      // as an insertion.
+      const clearedFields = isOptionGroup
+        ? updatedFields.filter((updatedField) => {
+            const previousField = groupFields.find((groupField) => groupField.id === updatedField.id);
+
+            return Boolean(previousField?.customText) && !updatedField.customText;
+          })
+        : [];
+
+      const insertedFields = updatedFields.filter(
+        (updatedField) => fieldIdsToLog.includes(updatedField.id) && !clearedFields.includes(updatedField),
+      );
+
+      await tx.documentAuditLog.createMany({
+        data: insertedFields.map((insertedField) =>
+          createDocumentAuditLogData({
+            type:
+              assistant && lockedField.recipientId !== assistant.id
+                ? DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED
+                : DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+            envelopeId: envelope.id,
+            user: {
+              email: assistant?.email ?? lockedRecipient.email,
+              name: assistant?.name ?? lockedRecipient.name,
+            },
+            requestMetadata: metadata.requestMetadata,
+            data: {
+              recipientEmail: lockedRecipient.email,
+              recipientId: lockedRecipient.id,
+              recipientName: lockedRecipient.name,
+              recipientRole: lockedRecipient.role,
+              fieldId: insertedField.secondaryId,
+              field: match(insertedField.type)
+                .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
+                  type,
+                  data: signatureImageAsBase64 || typedSignature || '',
+                }))
+                .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, FieldType.TEXT, FieldType.INITIALS, (type) => ({
+                  type,
+                  data: insertedField.customText,
+                }))
+                .with(FieldType.NUMBER, FieldType.RADIO, FieldType.CHECKBOX, FieldType.DROPDOWN, (type) => ({
+                  type,
+                  data: insertedField.customText,
+                }))
+                .exhaustive(),
+              fieldSecurity: derivedRecipientActionAuth
+                ? {
+                    type: derivedRecipientActionAuth,
+                  }
+                : undefined,
+            },
+          }),
+        ),
       });
 
+      // Clearing a field is not logged for assistants. Not sure why, just basing this off
+      // how it was previously done.
+      if (!assistant) {
+        await tx.documentAuditLog.createMany({
+          data: clearedFields.map((clearedField) =>
+            createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
+              envelopeId: envelope.id,
+              user: {
+                name: lockedRecipient.name,
+                email: lockedRecipient.email,
+              },
+              requestMetadata: metadata.requestMetadata,
+              data: {
+                field: clearedField.type,
+                fieldId: clearedField.secondaryId,
+              },
+            }),
+          ),
+        });
+      }
+
       return {
-        signedField: updatedField,
+        signedFields: updatedFields,
       };
     });
   });
+
+type AssertFieldAcceptsValueOptions = {
+  recipient: Pick<Recipient, 'id' | 'role'>;
+  field: Pick<Field, 'id' | 'type' | 'recipientId' | 'fieldMeta'>;
+  fieldValue: TSignEnvelopeFieldValue;
+};
+
+const assertFieldAcceptsValue = ({ recipient, field, fieldValue }: AssertFieldAcceptsValueOptions) => {
+  if (
+    field.type === FieldType.SIGNATURE &&
+    recipient.id !== field.recipientId &&
+    recipient.role === RecipientRole.ASSISTANT
+  ) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Assistant recipients cannot sign signature fields`,
+    });
+  }
+
+  if (fieldValue.type !== field.type) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Selected values do not match the field values',
+    });
+  }
+
+  if (field.fieldMeta?.readOnly) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Field ${field.id} is read only`,
+    });
+  }
+};
+
+type ExtractSignedFieldInsertionValuesOptions = {
+  field: Field;
+  /** Every field in the field's group, or only the field itself if it is not grouped. */
+  groupFields: Field[];
+  fieldValue: TSignEnvelopeFieldValue;
+  documentMeta: ExtractFieldInsertionValuesOptions['documentMeta'];
+};
+
+const extractSignedFieldInsertionValues = ({
+  field,
+  groupFields,
+  fieldValue,
+  documentMeta,
+}: ExtractSignedFieldInsertionValuesOptions): FieldInsertionValues[] =>
+  match({ type: field.type, isGrouped: Boolean(field.groupId) })
+    .with({ type: FieldType.RADIO, isGrouped: true }, () => {
+      if (fieldValue.type !== FieldType.RADIO) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Selected values do not match the field values',
+        });
+      }
+
+      return extractGroupedRadioInsertionValues({
+        fields: groupFields,
+        selectedFieldId: field.id,
+        selectedIndex: fieldValue.value,
+      });
+    })
+    .with({ type: FieldType.CHECKBOX, isGrouped: true }, () => {
+      if (fieldValue.type !== FieldType.CHECKBOX) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Selected values do not match the field values',
+        });
+      }
+
+      return extractGroupedCheckboxInsertionValues({
+        fields: groupFields,
+        selectedFieldId: field.id,
+        selectedIndices: fieldValue.value,
+      });
+    })
+    .otherwise(() => {
+      const insertionValues = extractFieldInsertionValues({ fieldValue, field, documentMeta });
+
+      // Shared value groups apply the same value to every field.
+      const fieldsToUpdate = field.groupId && isFieldGroupValueShared(field.type) ? groupFields : [field];
+
+      return fieldsToUpdate.map((fieldToUpdate) => ({
+        fieldId: fieldToUpdate.id,
+        ...insertionValues,
+      }));
+    });

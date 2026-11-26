@@ -3,10 +3,13 @@ import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-va
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import {
+  refineFieldGroupIdAllowedForType,
   ZClampedFieldHeightSchema,
   ZClampedFieldPositionXSchema,
   ZClampedFieldPositionYSchema,
   ZClampedFieldWidthSchema,
+  ZFieldExternalIdSchema,
+  ZFieldGroupIdSchema,
   ZFieldPageNumberSchema,
 } from '@documenso/lib/types/field';
 import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
@@ -31,6 +34,9 @@ export const createEnvelopeMeta: TrpcRouteMeta = {
   },
 };
 
+/**
+ * Note: This is reused in the embedding routes.
+ */
 export const ZCreateEnvelopePayloadSchema = z.object({
   title: ZDocumentTitleSchema,
   type: z.nativeEnum(EnvelopeType),
@@ -52,16 +58,21 @@ export const ZCreateEnvelopePayloadSchema = z.object({
         fields: ZEnvelopeFieldAndMetaSchema.and(
           z.object({
             identifier: z
-              .union([z.string(), z.number()])
-              .describe('Either the filename or the index of the file that was uploaded to attach the field to.')
+              .union([z.string(), z.number().int().min(0)])
+              .describe(
+                'Either the filename or the zero-based index of the file that was uploaded to attach the field to.',
+              )
               .optional(),
             page: ZFieldPageNumberSchema,
             positionX: ZClampedFieldPositionXSchema,
             positionY: ZClampedFieldPositionYSchema,
             width: ZClampedFieldWidthSchema,
             height: ZClampedFieldHeightSchema,
+            groupId: ZFieldGroupIdSchema,
+            externalId: ZFieldExternalIdSchema,
           }),
         )
+          .superRefine(refineFieldGroupIdAllowedForType)
           .array()
           .optional(),
       }),

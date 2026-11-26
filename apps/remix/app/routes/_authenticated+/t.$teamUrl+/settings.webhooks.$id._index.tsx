@@ -203,21 +203,17 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
     <div>
       <SettingsHeader
         hideDivider
-        title={
-          <div className="flex items-center gap-2">
-            <p>
-              <Trans>Webhook</Trans>
-            </p>
-            <Badge variant={webhook.enabled ? 'default' : 'secondary'}>
-              {webhook.enabled ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>}
-            </Badge>
-          </div>
+        title={<Trans>Webhook</Trans>}
+        badge={
+          <Badge variant={webhook.enabled ? 'default' : 'secondary'}>
+            {webhook.enabled ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>}
+          </Badge>
         }
         subtitle={webhook.webhookUrl}
       >
         <div className="flex gap-2">
           <WebhookTestDialog webhook={webhook}>
-            <Button variant="outline">
+            <Button variant="outline" disabled={!webhook.enabled}>
               <TerminalIcon className="mr-2 h-4 w-4" />
               <Trans>Test</Trans>
             </Button>

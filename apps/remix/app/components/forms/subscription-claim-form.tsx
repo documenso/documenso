@@ -54,6 +54,8 @@ export const SubscriptionClaimForm = ({
       memberCount: subscriptionClaim.memberCount,
       envelopeItemCount: subscriptionClaim.envelopeItemCount,
       recipientCount: subscriptionClaim.recipientCount,
+      envelopeContentCount: subscriptionClaim.envelopeContentCount,
+      envelopeContentImageCount: subscriptionClaim.envelopeContentImageCount,
       flags: subscriptionClaim.flags,
       documentRateLimits: subscriptionClaim.documentRateLimits,
       documentQuota: subscriptionClaim.documentQuota,
@@ -179,6 +181,54 @@ export const SubscriptionClaimForm = ({
                 </FormControl>
                 <FormDescription>
                   <Trans>Maximum number of recipients per document allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="envelopeContentCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Envelope Content Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Maximum number of contents per envelope allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="envelopeContentImageCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Envelope Content Image Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Maximum number of image contents per envelope allowed. 0 = Unlimited</Trans>
                 </FormDescription>
                 <FormMessage />
               </FormItem>

@@ -3,6 +3,7 @@ import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { isTspEnvelope } from '../../types/signature-level';
+import { lockEnvelope } from './lock-envelope';
 
 type EnvelopeMutableSnapshot = {
   signatureLevel: string;
@@ -27,9 +28,9 @@ type EnvelopeIdRef = Pick<Envelope, 'id'>;
  * 1. Outside the transaction with the pre-fetched envelope snapshot —
  *    `assertEnvelopeMutable(envelope)` — fast-fail without a DB round-trip.
  * 2. Inside the transaction with `tx` — `assertEnvelopeMutable(envelope, tx)`
- *    — re-fetches under the transaction's snapshot, closing the TOCTOU
- *    window against a concurrent `sendDocument` committing DRAFT → PENDING
- *    between the snapshot read and the mutation.
+ *    — locks the envelope row (`lockEnvelope`), so a concurrent `sendDocument`
+ *    cannot commit DRAFT → PENDING between this check and the mutation. Must
+ *    be the first statement of the transaction.
  *
  * Throws:
  * - `ENVELOPE_TSP_LOCKED` when the envelope is PENDING (the case unique to
@@ -46,20 +47,15 @@ export async function assertEnvelopeMutable(
   tx?: Prisma.TransactionClient,
 ): Promise<void> {
   if (tx) {
-    return await refetchAndAssert(tx, (envelope as EnvelopeIdRef).id);
+    const lockedEnvelope = await lockEnvelope(tx, (envelope as EnvelopeIdRef).id);
+
+    assertSnapshotMutable(lockedEnvelope);
+
+    return;
   }
 
   assertSnapshotMutable(envelope as EnvelopeMutableSnapshot);
 }
-
-const refetchAndAssert = async (tx: Prisma.TransactionClient, envelopeId: string): Promise<void> => {
-  const refetched = await tx.envelope.findFirstOrThrow({
-    where: { id: envelopeId },
-    select: { signatureLevel: true, status: true },
-  });
-
-  assertSnapshotMutable(refetched);
-};
 
 const assertSnapshotMutable = (envelope: EnvelopeMutableSnapshot): void => {
   if (!isTspEnvelope(envelope)) {

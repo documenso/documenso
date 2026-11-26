@@ -156,7 +156,12 @@ export default function TeamAnalyticsPage({ loaderData }: Route.ComponentProps) 
           renderSummary={(count, activeCount) => (
             <>
               <Plural value={count} one="# member" other="# members" /> ·{' '}
-              <Trans>{activeCount} active this period</Trans>
+              <Plural
+                context="active members"
+                value={activeCount}
+                one="# active this period"
+                other="# active this period"
+              />
             </>
           )}
           renderShowing={(visibleCount, totalCount) => (

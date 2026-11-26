@@ -15,6 +15,9 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'EMAIL_SENT',
 
   // Document modification events.
+  'CONTENT_CREATED',
+  'CONTENT_DELETED',
+  'CONTENT_UPDATED',
   'FIELD_CREATED',
   'FIELD_DELETED',
   'FIELD_UPDATED',
@@ -86,12 +89,14 @@ export const ZDocumentMetaDiffTypeSchema = z.enum([
   'EMAIL_SETTINGS',
 ]);
 
-export const ZFieldDiffTypeSchema = z.enum(['DIMENSION', 'POSITION']);
+export const ZContentDiffTypeSchema = z.enum(['PROPERTY']);
+export const ZFieldDiffTypeSchema = z.enum(['DIMENSION', 'POSITION', 'GROUP_ID', 'EXTERNAL_ID']);
 export const ZRecipientDiffTypeSchema = z.enum(['NAME', 'ROLE', 'EMAIL', 'ACCESS_AUTH', 'ACTION_AUTH']);
 
 export const DOCUMENT_AUDIT_LOG_TYPE = ZDocumentAuditLogTypeSchema.Enum;
 export const DOCUMENT_EMAIL_TYPE = ZDocumentAuditLogEmailTypeSchema.Enum;
 export const DOCUMENT_META_DIFF_TYPE = ZDocumentMetaDiffTypeSchema.Enum;
+export const CONTENT_DIFF_TYPE = ZContentDiffTypeSchema.Enum;
 export const FIELD_DIFF_TYPE = ZFieldDiffTypeSchema.Enum;
 export const RECIPIENT_DIFF_TYPE = ZRecipientDiffTypeSchema.Enum;
 
@@ -121,6 +126,18 @@ export const ZFieldDiffPositionSchema = z.object({
   }),
 });
 
+export const ZFieldDiffGroupIdSchema = z.object({
+  type: z.literal(FIELD_DIFF_TYPE.GROUP_ID),
+  from: z.string().nullable(),
+  to: z.string().nullable(),
+});
+
+export const ZFieldDiffExternalIdSchema = z.object({
+  type: z.literal(FIELD_DIFF_TYPE.EXTERNAL_ID),
+  from: z.string().nullable(),
+  to: z.string().nullable(),
+});
+
 export const ZDocumentAuditLogDocumentMetaSchema = z.union([
   z.object({
     type: z.union([
@@ -141,7 +158,26 @@ export const ZDocumentAuditLogDocumentMetaSchema = z.union([
   }),
 ]);
 
-export const ZDocumentAuditLogFieldDiffSchema = z.union([ZFieldDiffDimensionSchema, ZFieldDiffPositionSchema]);
+/**
+ * Keyed rather than enumerated so a newly added setting is recorded without
+ * having to be registered here. Kept as a discriminated shape so a more
+ * structured diff can be introduced later without migrating the rows written today.
+ */
+export const ZContentDiffPropertySchema = z.object({
+  type: z.literal(CONTENT_DIFF_TYPE.PROPERTY),
+  key: z.string(),
+  from: z.union([z.string(), z.number(), z.boolean()]).nullable(),
+  to: z.union([z.string(), z.number(), z.boolean()]).nullable(),
+});
+
+export const ZDocumentAuditLogContentDiffSchema = ZContentDiffPropertySchema;
+
+export const ZDocumentAuditLogFieldDiffSchema = z.union([
+  ZFieldDiffDimensionSchema,
+  ZFieldDiffPositionSchema,
+  ZFieldDiffGroupIdSchema,
+  ZFieldDiffExternalIdSchema,
+]);
 
 export const ZGenericFromToSchema = z.object({
   from: z.union([z.string(), z.array(z.string())]).nullable(),
@@ -175,6 +211,12 @@ export const ZDocumentAuditLogRecipientDiffSchema = z.discriminatedUnion('type',
   ZRecipientDiffRoleSchema,
   ZRecipientDiffEmailSchema,
 ]);
+
+const ZBaseContentEventDataSchema = z.object({
+  contentId: z.string(),
+  contentType: z.string(), // We specifically don't want to use enums to allow for more flexibility.
+  envelopeItemId: z.string(),
+});
 
 const ZBaseFieldEventDataSchema = z.object({
   fieldId: z.string(), // Note: This is the secondary field ID, which will get migrated in the future.
@@ -647,6 +689,28 @@ export const ZDocumentAuditLogEventDocumentExternalIdUpdatedSchema = z.object({
   }),
 });
 
+export const ZDocumentAuditLogEventContentCreatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.CONTENT_CREATED),
+  data: ZBaseContentEventDataSchema.extend({
+    // A loose record rather than the content meta schema so rows written today
+    // still parse if the schema later gains a required key.
+    contentMeta: z.record(z.string(), z.unknown()),
+    dataContentId: z.string().nullable(),
+  }),
+});
+
+export const ZDocumentAuditLogEventContentRemovedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.CONTENT_DELETED),
+  data: ZBaseContentEventDataSchema,
+});
+
+export const ZDocumentAuditLogEventContentUpdatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.CONTENT_UPDATED),
+  data: ZBaseContentEventDataSchema.extend({
+    changes: z.array(ZDocumentAuditLogContentDiffSchema),
+  }),
+});
+
 /**
  * Event: Field created.
  */
@@ -862,6 +926,9 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentSentSchema,
     ZDocumentAuditLogEventDocumentTitleUpdatedSchema,
     ZDocumentAuditLogEventDocumentExternalIdUpdatedSchema,
+    ZDocumentAuditLogEventContentCreatedSchema,
+    ZDocumentAuditLogEventContentRemovedSchema,
+    ZDocumentAuditLogEventContentUpdatedSchema,
     ZDocumentAuditLogEventFieldCreatedSchema,
     ZDocumentAuditLogEventFieldRemovedSchema,
     ZDocumentAuditLogEventFieldUpdatedSchema,
@@ -880,6 +947,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
 export type TDocumentAuditLog = z.infer<typeof ZDocumentAuditLogSchema>;
 export type TDocumentAuditLogType = z.infer<typeof ZDocumentAuditLogTypeSchema>;
 
+export type TDocumentAuditLogContentDiffSchema = z.infer<typeof ZDocumentAuditLogContentDiffSchema>;
 export type TDocumentAuditLogFieldDiffSchema = z.infer<typeof ZDocumentAuditLogFieldDiffSchema>;
 
 export type TDocumentAuditLogDocumentMetaDiffSchema = z.infer<typeof ZDocumentAuditLogDocumentMetaSchema>;

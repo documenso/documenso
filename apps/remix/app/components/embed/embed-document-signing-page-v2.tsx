@@ -46,6 +46,7 @@ export const EmbedSignDocumentV2ClientPage = ({
   // const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [allowDocumentRejection, setAllowDocumentRejection] = useState(false);
+  const [allowDownloadPDF, setAllowDownloadPDF] = useState(true);
   const [isNameLocked, setIsNameLocked] = useState(false);
   const [isEmailLocked, setIsEmailLocked] = useState(envelope.type === EnvelopeType.DOCUMENT && !!email);
 
@@ -168,6 +169,7 @@ export const EmbedSignDocumentV2ClientPage = ({
       }
 
       setAllowDocumentRejection(!!data.allowDocumentRejection);
+      setAllowDownloadPDF(data.allowDownloadPDF);
 
       if (data.darkModeDisabled) {
         document.documentElement.classList.add('dark-mode-disabled');
@@ -269,6 +271,7 @@ export const EmbedSignDocumentV2ClientPage = ({
       isEmailLocked={isEmailLocked}
       hidePoweredBy={hidePoweredBy}
       allowDocumentRejection={allowDocumentRejection}
+      allowDownloadPDF={allowDownloadPDF}
       onDocumentCompleted={onDocumentCompleted}
       onDocumentError={onDocumentError}
       onDocumentRejected={onDocumentRejected}

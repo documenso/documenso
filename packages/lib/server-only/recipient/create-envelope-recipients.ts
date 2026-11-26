@@ -12,6 +12,7 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { lockEnvelope } from '../envelope/lock-envelope';
 import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 import { assignOmittedRecipientSigningOrders } from './assign-omitted-recipient-signing-orders';
@@ -94,9 +95,9 @@ export const createEnvelopeRecipients = async ({
 
   const createdRecipients = await prisma.$transaction(async (tx) => {
     // Lock the envelope so concurrent additions allocate distinct signing orders.
-    await tx.$queryRaw`SELECT "id" FROM "Envelope" WHERE "id" = ${envelope.id} FOR UPDATE`;
+    const lockedEnvelope = await lockEnvelope(tx, envelope.id);
 
-    await assertEnvelopeMutable(envelope, tx);
+    await assertEnvelopeMutable(lockedEnvelope);
 
     const existingRecipients = await tx.recipient.findMany({
       where: {

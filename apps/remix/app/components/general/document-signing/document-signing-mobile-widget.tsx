@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { match } from 'ts-pattern';
 
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
+import { SIGNING_VIEWPORT_OVERLAY_ATTRIBUTE } from '~/utils/scroll-to-signing-field';
 
 import { BrandingLogo } from '../branding-logo';
 import EnvelopeSignerForm from '../envelope-signing/envelope-signer-form';
@@ -32,7 +33,7 @@ export const DocumentSigningMobileWidget = () => {
 
   return (
     <div className="pointer-events-none fixed right-0 bottom-0 left-0 z-50 flex justify-center px-2 pb-2 sm:px-4 sm:pb-6">
-      <div className="pointer-events-auto w-full max-w-[760px]">
+      <div className="pointer-events-auto w-full max-w-[760px]" {...{ [SIGNING_VIEWPORT_OVERLAY_ATTRIBUTE]: '' }}>
         <div className="overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
           {/* Main Header Bar */}
           <div className="flex items-center justify-between gap-4 p-4">

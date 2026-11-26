@@ -1,3 +1,4 @@
+import { AdminRuleEngine } from '@documenso/ee/server-only/admin-rules/admin-rule-engine';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
@@ -45,12 +46,15 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
           email: true,
           name: true,
           disabled: true,
+          createdAt: true,
+          twoFactorEnabled: true,
         },
       },
       team: {
         select: {
           id: true,
           url: true,
+          name: true,
         },
       },
     },
@@ -66,15 +70,25 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
     throw new Error('Document has no recipients');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled, emailTransport } =
-    await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
-    });
+  const {
+    branding,
+    emailLanguage,
+    senderEmail,
+    replyToEmail,
+    organisationId,
+    organisationType,
+    organisationName,
+    claims,
+    emailsDisabled,
+    emailTransport,
+  } = await getEmailContext({
+    emailType: 'RECIPIENT',
+    source: {
+      type: 'team',
+      teamId: envelope.teamId,
+    },
+    meta: envelope.documentMeta,
+  });
 
   // Don't send completion emails if the organisation has email sending disabled or the owner is disabled (e.g. banned).
   if (envelope.user.disabled || emailsDisabled) {
@@ -83,15 +97,72 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
 
   const { user: owner } = envelope;
 
+  const emailSettings = extractDerivedDocumentEmailSettings(envelope.documentMeta);
+  const isDocumentCompletedEmailEnabled = emailSettings.documentCompleted;
+  const isOwnerDocumentCompletedEmailEnabled = emailSettings.ownerDocumentCompleted;
+
+  // Send email to document owner if:
+  // 1. Owner document completed emails are enabled AND
+  // 2. Either:
+  //    - The owner is not a recipient, OR
+  //    - Recipient emails are disabled
+  const shouldEmailOwner =
+    isOwnerDocumentCompletedEmailEnabled &&
+    (!envelope.recipients.find((recipient) => recipient.email === owner.email) || !isDocumentCompletedEmailEnabled);
+
+  const recipientsToNotify = isDocumentCompletedEmailEnabled
+    ? envelope.recipients.filter((recipient) => isRecipientEmailValidForSending(recipient))
+    : [];
+
+  // One check covers every completion email, so a block stops them all. So does a rule that turns
+  // off the organisation's emails, as if they were already off.
+  if (shouldEmailOwner || recipientsToNotify.length > 0) {
+    const adminRuleResult = await io.runTask('check-admin-rules', async () => {
+      const adminRuleEngine = new AdminRuleEngine();
+
+      const result = await adminRuleEngine.run({
+        trigger: 'EMAIL_SENT',
+        envelope: {
+          ...envelope,
+          team: {
+            id: envelope.team.id,
+            url: envelope.team.url,
+            name: envelope.team.name,
+            organisation: {
+              id: organisationId,
+              type: organisationType,
+              name: organisationName,
+              organisationClaim: claims,
+            },
+          },
+        },
+        sender: owner,
+        emailType: 'completed',
+        recipients: shouldEmailOwner ? [owner, ...recipientsToNotify] : recipientsToNotify,
+      });
+
+      return {
+        isBlocked: result.isBlocked,
+        hasDisabledEmails: result.hasDisabledEmails,
+      };
+    });
+
+    if (adminRuleResult.isBlocked || adminRuleResult.hasDisabledEmails) {
+      io.logger.info(`Completion emails for envelope ${envelope.id} stopped by an admin rule`);
+
+      return;
+    }
+  }
+
   const completedDocumentEmailAttachments = await Promise.all(
     envelope.envelopeItems.map(async (envelopeItem) => {
       const file = await getFileServerSide(envelopeItem.documentData);
 
       // Use the envelope title for version 1, and the envelope item title for version 2.
-      const fileNameToUse = envelope.internalVersion === 1 ? envelope.title : envelopeItem.title + '.pdf';
+      const fileNameToUse = envelope.internalVersion === 1 ? envelope.title : envelopeItem.title;
 
       return {
-        filename: fileNameToUse.endsWith('.pdf') ? fileNameToUse : fileNameToUse + '.pdf',
+        filename: fileNameToUse.endsWith('.pdf') ? fileNameToUse : `${fileNameToUse}.pdf`,
         content: Buffer.from(file),
         contentType: 'application/pdf',
       };
@@ -108,19 +179,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
     documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${envelope.team.url}/documents/${envelope.id}`;
   }
 
-  const emailSettings = extractDerivedDocumentEmailSettings(envelope.documentMeta);
-  const isDocumentCompletedEmailEnabled = emailSettings.documentCompleted;
-  const isOwnerDocumentCompletedEmailEnabled = emailSettings.ownerDocumentCompleted;
-
-  // Send email to document owner if:
-  // 1. Owner document completed emails are enabled AND
-  // 2. Either:
-  //    - The owner is not a recipient, OR
-  //    - Recipient emails are disabled
-  if (
-    isOwnerDocumentCompletedEmailEnabled &&
-    (!envelope.recipients.find((recipient) => recipient.email === owner.email) || !isDocumentCompletedEmailEnabled)
-  ) {
+  if (shouldEmailOwner) {
     const template = createElement(DocumentCompletedEmailTemplate, {
       documentName: envelope.title,
       assetBaseUrl,
@@ -170,12 +229,6 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
       }),
     });
   }
-
-  if (!isDocumentCompletedEmailEnabled) {
-    return;
-  }
-
-  const recipientsToNotify = envelope.recipients.filter((recipient) => isRecipientEmailValidForSending(recipient));
 
   await Promise.all(
     recipientsToNotify.map(async (recipient) => {

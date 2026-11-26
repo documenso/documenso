@@ -1,14 +1,20 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { nanoid } from '@documenso/lib/universal/id';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { seedBlankDocument } from '@documenso/prisma/seed/documents';
+import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { FieldType, SigningStatus } from '@prisma/client';
 
+import { apiSeedPendingDocument } from '../fixtures/api-seeds';
+import { WEBAPP_ORIGIN_HEADERS } from '../fixtures/authentication';
 import {
   addEnvelopeItemPdf,
   createEmbeddedEnvelopeCreateHash,
+  createEmbeddedEnvelopeEditHash,
   getEnvelopeEditorSettingsTrigger,
   openEmbeddedEnvelopeEditor,
   persistEmbeddedEnvelope,
@@ -144,23 +150,21 @@ const assertDarkModeDisabled = async (surface: TEnvelopeEditorSurface) => {
 };
 
 /**
- * Open an embedded create editor with a pre-seeded user. This is needed for folderId
- * tests where the folder must exist before the hash is built.
+ * Create an API token for the user and exchange it for an embedding presign token.
  */
-const openEmbeddedCreateWithUser = async (
+const createPresignToken = async (
   page: Page,
-  user: { id: number; email: string; name: string | null },
+  user: { id: number },
   team: { id: number },
-  options: { folderId?: string; tokenNamePrefix?: string },
-): Promise<TEnvelopeEditorSurface> => {
+  options: { tokenName: string; scope?: string },
+): Promise<string> => {
   const { token } = await createApiToken({
     userId: user.id,
     teamId: team.id,
-    tokenName: `${options.tokenNamePrefix ?? 'e2e-embed-folder'}-document`,
+    tokenName: options.tokenName,
     expiresIn: null,
   });
 
-  // Exchange API token for presign token.
   const response = await page
     .context()
     .request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/v2/embedding/create-presign-token`, {
@@ -168,7 +172,7 @@ const openEmbeddedCreateWithUser = async (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      data: {},
+      data: options.scope ? { scope: options.scope } : {},
     });
 
   const data: unknown = await response.json();
@@ -182,6 +186,23 @@ const openEmbeddedCreateWithUser = async (
   if (typeof presignToken !== 'string' || presignToken.length === 0) {
     throw new Error(`Unexpected presign response: ${JSON.stringify(data)}`);
   }
+
+  return presignToken;
+};
+
+/**
+ * Open an embedded create editor with a pre-seeded user. This is needed for folderId
+ * tests where the folder must exist before the hash is built.
+ */
+const openEmbeddedCreateWithUser = async (
+  page: Page,
+  user: { id: number; email: string; name: string | null },
+  team: { id: number },
+  options: { folderId?: string; tokenNamePrefix?: string },
+): Promise<TEnvelopeEditorSurface> => {
+  const presignToken = await createPresignToken(page, user, team, {
+    tokenName: `${options.tokenNamePrefix ?? 'e2e-embed-folder'}-document`,
+  });
 
   const hash = createEmbeddedEnvelopeCreateHash({
     envelopeType: 'DOCUMENT',
@@ -403,6 +424,24 @@ test.describe('embedded create', () => {
   });
 });
 
+test.describe('embedded edit - envelope version', () => {
+  test('does not open a V1 envelope in the V2 editor', async ({ page }) => {
+    const { user, team } = await seedUser();
+
+    const legacyDocument = await seedBlankDocument(user, team.id, { internalVersion: 1 });
+
+    const presignToken = await createPresignToken(page, user, team, {
+      tokenName: 'e2e-embed-edit-v1',
+      scope: `envelopeId:${legacyDocument.id}`,
+    });
+
+    await page.goto(`/embed/v2/authoring/envelope/edit/${legacyDocument.id}?token=${encodeURIComponent(presignToken)}`);
+
+    await expect(page).toHaveURL(/\/embed\/v2\/authoring\/error\/not-found/);
+    await expect(page.getByRole('heading', { name: 'Documents' })).not.toBeVisible();
+  });
+});
+
 test.describe('embedded edit', () => {
   test('cssVars and css respect embedAuthoringWhiteLabel flag', async ({ page }) => {
     const surface = await openEmbeddedEnvelopeEditor(page, {
@@ -432,5 +471,100 @@ test.describe('embedded edit', () => {
 
     // darkModeDisabled should still be applied after reload.
     await assertDarkModeDisabled(surface);
+  });
+
+  test('saving a partly signed document keeps its recipients and their signatures', async ({ page, request }) => {
+    const { envelope, user, team } = await apiSeedPendingDocument(request, {
+      recipients: [
+        { email: seedTestEmail(), name: 'Signer A' },
+        { email: seedTestEmail(), name: 'Signer B' },
+      ],
+    });
+
+    const signerA = await prisma.recipient.findFirstOrThrow({
+      where: {
+        envelopeId: envelope.id,
+        name: 'Signer A',
+      },
+      include: {
+        fields: true,
+      },
+    });
+
+    const [signatureA] = signerA.fields;
+
+    const postAsSignerA = async (procedure: string, json: Record<string, unknown>) =>
+      await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/${procedure}`, {
+        headers: { ...WEBAPP_ORIGIN_HEADERS, 'content-type': 'application/json' },
+        data: JSON.stringify({ json: { token: signerA.token, ...json } }),
+      });
+
+    const signResponse = await postAsSignerA('envelope.field.sign', {
+      fieldId: signatureA.id,
+      fieldValue: { type: FieldType.SIGNATURE, value: 'Signature A' },
+    });
+
+    const completeResponse = await postAsSignerA('recipient.completeDocumentWithToken', {
+      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+    });
+
+    expect(signResponse.status()).toBe(200);
+    expect(completeResponse.status()).toBe(200);
+
+    const findRecipients = async () =>
+      await prisma.recipient.findMany({
+        where: {
+          envelopeId: envelope.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          token: true,
+          signingStatus: true,
+        },
+        orderBy: {
+          id: 'asc',
+        },
+      });
+
+    const recipientsBefore = await findRecipients();
+
+    expect(recipientsBefore.map((recipient) => [recipient.name, recipient.signingStatus])).toEqual([
+      ['Signer A', SigningStatus.SIGNED],
+      ['Signer B', SigningStatus.NOT_SIGNED],
+    ]);
+
+    const presignToken = await createPresignToken(page, user, team, {
+      tokenName: 'e2e-embed-edit-partly-signed',
+      scope: `envelopeId:${envelope.id}`,
+    });
+
+    await page.goto(
+      `/embed/v2/authoring/envelope/edit/${envelope.id}?token=${encodeURIComponent(presignToken)}#${createEmbeddedEnvelopeEditHash({})}`,
+    );
+
+    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
+
+    await persistEmbeddedEnvelope({
+      root: page,
+      isEmbedded: true,
+      envelopeType: 'DOCUMENT',
+      userId: user.id,
+      userEmail: user.email,
+      userName: user.name ?? '',
+      teamId: team.id,
+    });
+
+    // Sent without their ids, the recipients would be deleted and created again, which takes
+    // the signature of anyone who has signed with them.
+    expect(await findRecipients()).toEqual(recipientsBefore);
+
+    const storedSignatureA = await prisma.field.findUniqueOrThrow({
+      where: {
+        id: signatureA.id,
+      },
+    });
+
+    expect(storedSignatureA.inserted).toBe(true);
   });
 });

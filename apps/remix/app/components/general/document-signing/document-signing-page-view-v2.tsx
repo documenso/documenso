@@ -1,6 +1,7 @@
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { getRemainingFields } from '@documenso/lib/utils/signing-items';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -20,7 +21,6 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
-import { SignFieldCheckboxDialog } from '~/components/dialogs/sign-field-checkbox-dialog';
 import { SignFieldDropdownDialog } from '~/components/dialogs/sign-field-dropdown-dialog';
 import { SignFieldEmailDialog } from '~/components/dialogs/sign-field-email-dialog';
 import { SignFieldInitialsDialog } from '~/components/dialogs/sign-field-initials-dialog';
@@ -30,12 +30,13 @@ import { SignFieldSignatureDialog } from '~/components/dialogs/sign-field-signat
 import { SignFieldTextDialog } from '~/components/dialogs/sign-field-text-dialog';
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { EnvelopeSignerPageRenderer } from '~/components/general/envelope-signing/envelope-signer-page-renderer';
+import { EnvelopeSigningFieldGroupProvider } from '~/components/general/envelope-signing/envelope-signing-field-group-provider';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 import { PublicLegalLinks } from '~/components/general/public-legal-links';
 
 import { BrandingLogo } from '../branding-logo';
 import { DocumentSigningAttachmentsPopover } from '../document-signing/document-signing-attachments-popover';
-import { EnvelopeItemSelector } from '../envelope-editor/envelope-file-selector';
+import { EnvelopeRendererFileSelector } from '../envelope-editor/envelope-file-selector';
 import EnvelopeSignerForm from '../envelope-signing/envelope-signer-form';
 import { EnvelopeSignerHeader } from '../envelope-signing/envelope-signer-header';
 import { DocumentSigningMobileWidget } from './document-signing-mobile-widget';
@@ -43,7 +44,7 @@ import { DocumentSigningRejectDialog } from './document-signing-reject-dialog';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
 
 export const DocumentSigningPageViewV2 = () => {
-  const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
+  const { envelopeItems, currentEnvelopeItem } = useCurrentEnvelopeRender();
 
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +61,7 @@ export const DocumentSigningPageViewV2 = () => {
   const {
     isEmbed = false,
     allowDocumentRejection = true,
+    allowDownloadPDF = true,
     hidePoweredBy = true,
     onDocumentRejected,
   } = useEmbedSigningContext() || {};
@@ -68,17 +70,14 @@ export const DocumentSigningPageViewV2 = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   /**
-   * The total remaining fields remaining for the current recipient or selected assistant recipient.
-   *
-   * Includes both optional and required fields.
+   * The fields still to be filled in for the current recipient or selected assistant
+   * recipient. Includes both optional and required fields.
    */
   const remainingFields = useMemo(() => {
-    if (recipient.role === RecipientRole.ASSISTANT) {
-      return selectedAssistantRecipientFields.filter((field) => !field.inserted);
-    }
+    const fields = recipient.role === RecipientRole.ASSISTANT ? selectedAssistantRecipientFields : recipientFields;
 
-    return recipientFields.filter((field) => !field.inserted);
-  }, [recipientFieldsRemaining, selectedAssistantRecipientFields, currentEnvelopeItem]);
+    return getRemainingFields(fields);
+  }, [recipient.role, recipientFields, selectedAssistantRecipientFields]);
 
   return (
     <div className="min-h-screen w-screen bg-gray-50 dark:bg-background">
@@ -89,7 +88,6 @@ export const DocumentSigningPageViewV2 = () => {
       <SignFieldInitialsDialog.Root />
       <SignFieldDropdownDialog.Root />
       <SignFieldSignatureDialog.Root />
-      <SignFieldCheckboxDialog.Root />
 
       <EnvelopeSignerHeader />
 
@@ -181,18 +179,20 @@ export const DocumentSigningPageViewV2 = () => {
                   }
                 />
 
-                <EnvelopeDownloadDialog
-                  envelopeId={envelope.id}
-                  envelopeStatus={envelope.status}
-                  envelopeItems={envelope.envelopeItems}
-                  token={recipient.token}
-                  trigger={
-                    <Button variant="ghost" size="sm" className="w-full justify-start">
-                      <DownloadCloudIcon className="mr-2 h-4 w-4" />
-                      <Trans>Download PDF</Trans>
-                    </Button>
-                  }
-                />
+                {allowDownloadPDF && (
+                  <EnvelopeDownloadDialog
+                    envelopeId={envelope.id}
+                    envelopeStatus={envelope.status}
+                    envelopeItems={envelope.envelopeItems}
+                    token={recipient.token}
+                    trigger={
+                      <Button variant="ghost" size="sm" className="w-full justify-start">
+                        <DownloadCloudIcon className="mr-2 h-4 w-4" />
+                        <Trans>Download PDF</Trans>
+                      </Button>
+                    }
+                  />
+                )}
 
                 {envelope.type === EnvelopeType.DOCUMENT && allowDocumentRejection && (
                   <DocumentSigningRejectDialog
@@ -238,39 +238,30 @@ export const DocumentSigningPageViewV2 = () => {
           </div>
         </div>
 
-        <div className="embed--DocumentContainer min-w-0 flex-1 overflow-y-auto" ref={scrollableContainerRef}>
+        <div
+          className="embed--DocumentContainer min-w-0 flex-1 overflow-x-auto overflow-y-auto"
+          ref={scrollableContainerRef}
+        >
           <div className="flex flex-col">
             {/* Horizontal envelope item selector */}
             {envelopeItems.length > 1 && (
-              <div className="flex h-fit space-x-2 overflow-x-auto p-2 pt-4 sm:p-4">
-                {envelopeItems.map((doc, i) => (
-                  <EnvelopeItemSelector
-                    key={doc.id}
-                    number={i + 1}
-                    primaryText={doc.title}
-                    secondaryText={
-                      <Plural
-                        one="1 Field"
-                        other="# Fields"
-                        value={remainingFields.filter((field) => field.envelopeItemId === doc.id).length}
-                      />
-                    }
-                    isSelected={currentEnvelopeItem?.id === doc.id}
-                    buttonProps={{ onClick: () => setCurrentEnvelopeItem(doc.id) }}
-                  />
-                ))}
-              </div>
+              <EnvelopeRendererFileSelector fields={remainingFields} className="px-2 pt-4 pb-0 sm:px-4 sm:pb-1.5" />
             )}
 
             {/* Document View */}
             <div className="embed--DocumentViewer flex flex-col items-center justify-center p-2 sm:mt-4 sm:p-4">
               {currentEnvelopeItem ? (
-                <EnvelopePdfViewer
-                  key={currentEnvelopeItem.id}
-                  customPageRenderer={EnvelopeSignerPageRenderer}
-                  scrollParentRef={scrollableContainerRef}
-                  errorMessage={PDF_VIEWER_ERROR_MESSAGES.signing}
-                />
+                <EnvelopeSigningFieldGroupProvider>
+                  <EnvelopePdfViewer
+                    key={currentEnvelopeItem.id}
+                    customPageRenderer={EnvelopeSignerPageRenderer}
+                    scrollParentRef={scrollableContainerRef}
+                    errorMessage={PDF_VIEWER_ERROR_MESSAGES.signing}
+                    toolbar={['zoom']}
+                    // Todo: Content - Decide how to manage zooming on mobile.
+                    toolbarClassName="hidden lg:flex"
+                  />
+                </EnvelopeSigningFieldGroupProvider>
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">
                   <p className="text-foreground text-sm">

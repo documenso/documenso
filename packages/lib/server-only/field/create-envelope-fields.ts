@@ -10,11 +10,14 @@ import { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { assertFieldGroupAllowedForType, assertFieldGroupsValid } from '../../utils/field-groups';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { lockEnvelope } from '../envelope/lock-envelope';
 import { type BoundingBox, whiteoutRegions } from '../pdf/auto-place-fields';
+import { assertFieldMetaValid } from './validate-field-meta';
 
 type CoordinatePosition = {
   page: number;
@@ -46,6 +49,8 @@ export type CreateEnvelopeFieldInput = TFieldAndMeta & {
   envelopeItemId?: string;
 
   recipientId: number;
+  groupId?: string | null;
+  externalId?: string | null;
 } & FieldPosition;
 
 export interface CreateEnvelopeFieldsOptions {
@@ -165,6 +170,21 @@ export const createEnvelopeFields = async ({
 
     const envelopeItemId = field.envelopeItemId || firstEnvelopeItem.id;
 
+    const groupId = field.groupId ?? null;
+    const externalId = field.externalId ?? null;
+
+    assertFieldGroupAllowedForType(field.type, groupId);
+
+    if (groupId && envelope.internalVersion !== 2) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Field groups are only supported for V2 envelopes',
+      });
+    }
+
+    if (field.fieldMeta) {
+      assertFieldMetaValid({ type: field.type, fieldMeta: field.fieldMeta, groupId });
+    }
+
     /*
       Resolve field position(s). Placeholder fields are resolved by searching the
       PDF text for the placeholder string and using its bounding box.
@@ -226,6 +246,8 @@ export const createEnvelopeFields = async ({
           positionY: (topLeftY / page.height) * 100,
           width: widthPercent,
           height: heightPercent,
+          groupId,
+          externalId,
         };
       });
     }
@@ -241,11 +263,57 @@ export const createEnvelopeFields = async ({
       positionY: field.positionY,
       width: field.width,
       height: field.height,
+      groupId,
+      externalId,
     };
   });
 
   const createdFields = await prisma.$transaction(async (tx) => {
-    await assertEnvelopeMutable(envelope, tx);
+    await lockEnvelope(tx, envelope.id);
+
+    const lockedEnvelope = await tx.envelope.findFirstOrThrow({
+      where: {
+        id: envelope.id,
+      },
+      include: {
+        recipients: true,
+        fields: true,
+      },
+    });
+
+    await assertEnvelopeMutable(lockedEnvelope);
+
+    if (lockedEnvelope.type === EnvelopeType.DOCUMENT && lockedEnvelope.completedAt) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Envelope already complete',
+      });
+    }
+
+    for (const field of validatedFields) {
+      const recipient = lockedEnvelope.recipients.find((recipient) => recipient.id === field.recipientId);
+
+      if (!recipient) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Recipient ${field.recipientId} not found`,
+        });
+      }
+
+      if (!canRecipientFieldsBeModified(recipient, lockedEnvelope.fields)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Recipient type cannot have fields, or they have already interacted with the document.',
+        });
+      }
+    }
+
+    const newGroupIds = new Set(validatedFields.flatMap((field) => (field.groupId ? [field.groupId] : [])));
+
+    if (newGroupIds.size > 0) {
+      const existingGroupedFields = lockedEnvelope.fields.filter(
+        (field) => field.groupId && newGroupIds.has(field.groupId),
+      );
+
+      assertFieldGroupsValid([...existingGroupedFields, ...validatedFields]);
+    }
 
     const newlyCreatedFields = await tx.field.createManyAndReturn({
       data: validatedFields.map((field) => ({
@@ -261,6 +329,8 @@ export const createEnvelopeFields = async ({
         envelopeId: envelope.id,
         envelopeItemId: field.envelopeItemId,
         recipientId: field.recipientId,
+        groupId: field.groupId,
+        externalId: field.externalId,
       })),
     });
 

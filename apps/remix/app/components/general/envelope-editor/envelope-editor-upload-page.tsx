@@ -54,6 +54,7 @@ export const EnvelopeEditorUploadPage = () => {
     envelope,
     setLocalEnvelope,
     editorFields,
+    editorContents,
     editorConfig,
     isEmbedded,
     navigateToStep,
@@ -139,7 +140,7 @@ export const EnvelopeEditorUploadPage = () => {
   );
 
   const { mutateAsync: replaceEnvelopeItemPdf } = trpc.envelope.item.replacePdf.useMutation({
-    onSuccess: ({ data, fields }) => {
+    onSuccess: ({ data, fields, contents }) => {
       // Update the envelope item with the new documentDataId.
       setLocalEnvelope({
         envelopeItems: envelope.envelopeItems.map((item) =>
@@ -150,8 +151,14 @@ export const EnvelopeEditorUploadPage = () => {
       // When fields were created or deleted during the replacement,
       // the server returns the full updated field list.
       if (fields) {
-        setLocalEnvelope({ fields });
-        editorFields.resetForm(fields);
+        const resetFields = editorFields.resetForm(fields);
+
+        setLocalEnvelope({ fields: resetFields });
+      }
+
+      if (contents) {
+        setLocalEnvelope({ contents });
+        editorContents.resetForm(contents);
       }
     },
   });
@@ -181,13 +188,17 @@ export const EnvelopeEditorUploadPage = () => {
     // Directly commit the files for embedded documents since those are not uploaded
     // until the end of the embedded flow.
     if (isEmbedded) {
+      // Deleting an item does not renumber the rest, so continue from the
+      // highest order rather than the item count.
+      const highestOrder = envelope.envelopeItems.reduce((highest, item) => Math.max(highest, item.order), 0);
+
       setLocalEnvelope({
         envelopeItems: [
           ...envelope.envelopeItems,
-          ...newUploadingFiles.map((file) => ({
+          ...newUploadingFiles.map((file, index) => ({
             id: file.envelopeItemId!,
             title: file.title,
-            order: envelope.envelopeItems.length + 1,
+            order: highestOrder + index + 1,
             envelopeId: envelope.id,
             data: file.data!,
             documentDataId: '',
@@ -269,16 +280,22 @@ export const EnvelopeEditorUploadPage = () => {
         const newPageCount = pdfDoc.getPageCount();
 
         // Remove fields that are on pages beyond the new PDF's page count.
-        const remainingFields = envelope.fields.filter(
-          (field) => field.envelopeItemId !== envelopeItemId || field.page <= newPageCount,
+        const remainingFields = editorFields.resetForm(
+          envelope.fields.filter((field) => field.envelopeItemId !== envelopeItemId || field.page <= newPageCount),
+        );
+
+        // Must match the server's pruning for non embedded replacements.
+        const remainingContents = envelope.contents.filter(
+          (content) => content.envelopeItemId !== envelopeItemId || content.contentMeta.page <= newPageCount,
         );
 
         setLocalEnvelope({
           envelopeItems: envelope.envelopeItems.map((item) => (item.id === envelopeItemId ? { ...item, data } : item)),
           fields: remainingFields,
+          contents: remainingContents,
         });
 
-        editorFields.resetForm(remainingFields);
+        editorContents.resetForm(remainingContents);
 
         return;
       }
@@ -325,15 +342,18 @@ export const EnvelopeEditorUploadPage = () => {
   const onFileDelete = (envelopeItemId: string) => {
     setLocalFiles((prev) => prev.filter((uploadingFile) => uploadingFile.envelopeItemId !== envelopeItemId));
 
-    const fieldsWithoutDeletedItem = envelope.fields.filter((field) => field.envelopeItemId !== envelopeItemId);
+    const fieldsWithoutDeletedItem = editorFields.resetForm(
+      envelope.fields.filter((field) => field.envelopeItemId !== envelopeItemId),
+    );
+    const contentsWithoutDeletedItem = envelope.contents.filter((content) => content.envelopeItemId !== envelopeItemId);
 
     setLocalEnvelope({
       envelopeItems: envelope.envelopeItems.filter((item) => item.id !== envelopeItemId),
-      fields: envelope.fields.filter((field) => field.envelopeItemId !== envelopeItemId),
+      fields: fieldsWithoutDeletedItem,
+      contents: contentsWithoutDeletedItem,
     });
 
-    // Reset editor fields.
-    editorFields.resetForm(fieldsWithoutDeletedItem);
+    editorContents.resetForm(contentsWithoutDeletedItem);
   };
 
   /**

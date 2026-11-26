@@ -1,8 +1,9 @@
 import type { WebhookTriggerEvents } from '@prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
+import { jobs } from '../../jobs/client';
 import { getWebhookById } from './get-webhook-by-id';
 import { generateSampleWebhookPayload } from './trigger/generate-sample-data';
-import { triggerWebhook } from './trigger/trigger-webhook';
 
 export type TriggerTestWebhookOptions = {
   id: string;
@@ -15,25 +16,25 @@ export const triggerTestWebhook = async ({ id, event, userId, teamId }: TriggerT
   const webhook = await getWebhookById({ id, userId, teamId });
 
   if (!webhook.enabled) {
-    throw new Error('Webhook is disabled');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Webhook is disabled',
+    });
   }
 
   if (!webhook.eventTriggers.includes(event)) {
-    throw new Error(`Webhook does not support event: ${event}`);
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Webhook does not support event: ${event}`,
+    });
   }
 
   const samplePayload = generateSampleWebhookPayload(event, webhook.webhookUrl);
 
-  try {
-    await triggerWebhook({
+  await jobs.triggerJob({
+    name: 'internal.execute-webhook',
+    payload: {
       event,
+      webhookId: webhook.id,
       data: samplePayload.payload,
-      userId,
-      teamId,
-    });
-
-    return { success: true, message: 'Test webhook triggered successfully' };
-  } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-  }
+    },
+  });
 };

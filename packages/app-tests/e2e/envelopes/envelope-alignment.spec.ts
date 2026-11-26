@@ -214,7 +214,9 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
           id: field.id,
         },
         data: {
-          inserted: true,
+          // A checkbox with nothing ticked is not inserted, as when signing. Inserted, it would
+          // break the checkbox rules which are checked when the recipient completes.
+          inserted: field.type !== FieldType.CHECKBOX || Boolean(foundField.customText),
           customText: foundField.customText,
           signature: foundField.signature
             ? {

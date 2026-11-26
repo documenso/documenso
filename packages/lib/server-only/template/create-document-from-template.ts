@@ -1,10 +1,12 @@
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import type { DocumentDistributionMethod, DocumentSigningOrder, Prisma } from '@prisma/client';
 import {
   DocumentSource,
   EnvelopeType,
   type Field,
+  FieldType,
   FolderType,
   type Recipient,
   RecipientRole,
@@ -15,6 +17,7 @@ import {
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
+import { validateCheckboxLength } from '../../advanced-fields-validation/validate-checkbox';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { TEnvelopeExpirationPeriod } from '../../constants/envelope-expiration';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
@@ -32,7 +35,13 @@ import type {
   TRadioFieldMeta,
   TTextFieldMeta,
 } from '../../types/field-meta';
-import { ZCheckboxFieldMeta, ZDropdownFieldMeta, ZFieldMetaSchema, ZRadioFieldMeta } from '../../types/field-meta';
+import {
+  ZBaseFieldMeta,
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZFieldMetaSchema,
+  ZRadioFieldMeta,
+} from '../../types/field-meta';
 import { ZSignatureLevelSchema } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
@@ -47,6 +56,8 @@ import {
 } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { buildEnvelopeContentCopyData } from '../../utils/envelope-content';
+import { assertFieldGroupsValid } from '../../utils/field-groups';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -96,6 +107,8 @@ export type CreateDocumentFromTemplateOptions = {
     type?: 'link';
   }>;
 
+  includeContents?: boolean;
+
   /**
    * Values that will override the predefined values in the template.
    */
@@ -138,6 +151,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
   // We've already validated that the field types match at a higher level
   // Start with the existing field meta or an empty object
   const existingMeta = field.fieldMeta || {};
+  const existingBaseMeta = ZBaseFieldMeta.safeParse(existingMeta).data;
 
   // Apply type-specific updates based on the prefill field type using ts-pattern
   return match(prefillField)
@@ -151,8 +165,8 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TTextFieldMeta = {
         ...existingMeta,
         type: 'text',
-        label: field.label,
-        placeholder: field.placeholder,
+        label: field.label ?? existingBaseMeta?.label,
+        placeholder: field.placeholder ?? existingBaseMeta?.placeholder,
         text: field.value,
       };
 
@@ -168,8 +182,8 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TNumberFieldMeta = {
         ...existingMeta,
         type: 'number',
-        label: field.label,
-        placeholder: field.placeholder,
+        label: field.label ?? existingBaseMeta?.label,
+        placeholder: field.placeholder ?? existingBaseMeta?.placeholder,
         value: field.value,
       };
 
@@ -209,7 +223,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TRadioFieldMeta = {
         ...existingMeta,
         type: 'radio',
-        label: field.label,
+        label: field.label ?? existingBaseMeta?.label,
         values: newValues,
         direction: radioMeta.direction ?? 'vertical',
       };
@@ -254,7 +268,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TCheckboxFieldMeta = {
         ...existingMeta,
         type: 'checkbox',
-        label: field.label,
+        label: field.label ?? existingBaseMeta?.label,
         values: newValues,
         direction: checkboxMeta.direction ?? 'vertical',
       };
@@ -284,7 +298,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
       const meta: TDropdownFieldMeta = {
         ...existingMeta,
         type: 'dropdown',
-        label: field.label,
+        label: field.label ?? existingBaseMeta?.label,
         defaultValue: field.value,
       };
 
@@ -305,6 +319,7 @@ export const createDocumentFromTemplate = async ({
   folderId,
   prefillFields,
   attachments,
+  includeContents = true,
   formValues,
 }: CreateDocumentFromTemplateOptions) => {
   const templateInclude = {
@@ -323,6 +338,7 @@ export const createDocumentFromTemplate = async ({
         documentData: true,
       },
     },
+    contents: true,
     documentMeta: true,
   } as const;
 
@@ -442,6 +458,10 @@ export const createDocumentFromTemplate = async ({
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
 
+  // Only items given a custom file are tracked, since the template's own files
+  // have the pages its contents were placed on.
+  const replacedEnvelopeItemPageCounts = new Map<string, number>();
+
   // Duplicate the envelope item data.
   // Note: This is duplicated in createDocumentFromDirectTemplate
   const envelopeItemsToCreate = await Promise.all(
@@ -485,19 +505,20 @@ export const createDocumentFromTemplate = async ({
         });
       }
 
-      const duplicatedFile = await putNormalizedPdfFileServerSide({
-        name: titleToUse,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(buffer),
-      });
-
-      const newDocumentData = await prisma.documentData.create({
-        data: {
-          type: duplicatedFile.type,
-          data: duplicatedFile.data,
+      const { documentData: newDocumentData, filePageCount } = await putNormalizedPdfFileServerSide(
+        {
+          name: titleToUse,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(buffer),
+        },
+        {
           initialData: documentDataToDuplicate.data,
         },
-      });
+      );
+
+      if (foundCustomDocumentData) {
+        replacedEnvelopeItemPageCounts.set(item.id, filePageCount);
+      }
 
       const newEnvelopeItemId = prefixedId('envelope_item');
 
@@ -573,10 +594,26 @@ export const createDocumentFromTemplate = async ({
     ),
   });
 
+  const envelopeId = prefixedId('envelope');
+
+  const contentsToCopy = template.contents.filter((content) => {
+    const replacedPageCount = replacedEnvelopeItemPageCounts.get(content.envelopeItemId);
+
+    return replacedPageCount === undefined || content.contentMeta.page <= replacedPageCount;
+  });
+
+  const contentsToCreate = includeContents
+    ? buildEnvelopeContentCopyData({
+        contents: contentsToCopy,
+        envelopeId,
+        envelopeItemIdMap: oldEnvelopeItemToNewEnvelopeItemIdMap,
+      })
+    : [];
+
   const { envelope, createdEnvelope } = await prisma.$transaction(async (tx) => {
     const envelope = await tx.envelope.create({
       data: {
-        id: prefixedId('envelope'),
+        id: envelopeId,
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
         internalVersion: template.internalVersion,
@@ -608,7 +645,7 @@ export const createDocumentFromTemplate = async ({
               const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
 
               return {
-                email: recipient.email,
+                email: recipient.email.toLowerCase(),
                 name: recipient.name,
                 role: recipient.role,
                 authOptions: createRecipientAuthOptions({
@@ -637,6 +674,12 @@ export const createDocumentFromTemplate = async ({
         },
       },
     });
+
+    if (contentsToCreate.length > 0) {
+      await tx.envelopeContent.createMany({
+        data: contentsToCreate,
+      });
+    }
 
     let fieldsToCreate: Omit<Field, 'id' | 'secondaryId'>[] = [];
 
@@ -686,57 +729,118 @@ export const createDocumentFromTemplate = async ({
         throw new Error('Recipient not found.');
       }
 
-      fieldsToCreate = fieldsToCreate.concat(
-        fields.map((field) => {
-          const prefillField = prefillFields?.find((value) => value.id === field.id);
+      // A radio or checkbox group acts as one field, so the prefilled fields of a group replace
+      // its selection, and the options of the group's other fields are cleared.
+      const prefilledOptionGroupIds = fields
+        .filter(
+          (field) =>
+            (field.type === FieldType.RADIO || field.type === FieldType.CHECKBOX) &&
+            prefillFields?.some((value) => value.id === field.id),
+        )
+        .map((field) => field.groupId);
 
-          const payload = {
-            envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[field.envelopeItemId],
-            envelopeId: envelope.id,
-            recipientId: recipient.id,
-            type: field.type,
-            page: field.page,
-            positionX: field.positionX,
-            positionY: field.positionY,
-            width: field.width,
-            height: field.height,
-            customText: '',
-            inserted: false,
-            fieldMeta: field.fieldMeta,
-          };
+      const recipientFieldsToCreate = fields.map((field) => {
+        const prefillField = prefillFields?.find((value) => value.id === field.id);
 
-          if (prefillField) {
-            match(prefillField)
-              .with({ type: 'date' }, (selector) => {
-                if (!selector.value) {
-                  throw new AppError(AppErrorCode.INVALID_BODY, {
-                    message: `Date value is required for field ${field.id}`,
-                  });
-                }
+        const payload = {
+          envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[field.envelopeItemId],
+          envelopeId: envelope.id,
+          recipientId: recipient.id,
+          type: field.type,
+          page: field.page,
+          positionX: field.positionX,
+          positionY: field.positionY,
+          width: field.width,
+          height: field.height,
+          customText: '',
+          inserted: false,
+          fieldMeta: field.fieldMeta,
+          groupId: field.groupId,
+          externalId: field.externalId,
+        };
 
-                const date = new Date(selector.value);
+        if (prefillField) {
+          match(prefillField)
+            .with({ type: 'date' }, (selector) => {
+              if (!selector.value) {
+                throw new AppError(AppErrorCode.INVALID_BODY, {
+                  message: `Date value is required for field ${field.id}`,
+                });
+              }
 
-                if (isNaN(date.getTime())) {
-                  throw new AppError(AppErrorCode.INVALID_BODY, {
-                    message: `Invalid date value for field ${field.id}: ${selector.value}`,
-                  });
-                }
+              const date = new Date(selector.value);
 
-                payload.customText = DateTime.fromJSDate(date).toFormat(
-                  template.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
-                );
+              if (isNaN(date.getTime())) {
+                throw new AppError(AppErrorCode.INVALID_BODY, {
+                  message: `Invalid date value for field ${field.id}: ${selector.value}`,
+                });
+              }
 
-                payload.inserted = true;
-              })
-              .otherwise((selector) => {
-                payload.fieldMeta = getUpdatedFieldMeta(field, selector);
-              });
+              payload.customText = DateTime.fromJSDate(date).toFormat(
+                documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+              );
+
+              payload.inserted = true;
+            })
+            .otherwise((selector) => {
+              payload.fieldMeta = getUpdatedFieldMeta(field, selector);
+            });
+        }
+
+        if (!prefillField && field.groupId && prefilledOptionGroupIds.includes(field.groupId)) {
+          const fieldMeta = ZFieldMetaSchema.safeParse(field.fieldMeta).data;
+
+          if (fieldMeta?.type === 'radio' || fieldMeta?.type === 'checkbox') {
+            payload.fieldMeta = {
+              ...fieldMeta,
+              values: fieldMeta.values?.map((value) => ({ ...value, checked: false })),
+            };
+          }
+        }
+
+        return payload;
+      });
+
+      // Options which break a checkbox's rule are left out when the document is sent, so a
+      // prefill which does that is rejected rather than lost. The options are counted across
+      // the field's group.
+      if (template.internalVersion === 2) {
+        for (const [index, field] of fields.entries()) {
+          if (field.type !== FieldType.CHECKBOX || !prefillFields?.some((value) => value.id === field.id)) {
+            continue;
           }
 
-          return payload;
-        }),
-      );
+          const { validationRule, validationLength } = ZCheckboxFieldMeta.parse(
+            recipientFieldsToCreate[index].fieldMeta,
+          );
+
+          const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
+
+          const groupFieldsToCreate = field.groupId
+            ? recipientFieldsToCreate.filter((fieldToCreate) => fieldToCreate.groupId === field.groupId)
+            : [recipientFieldsToCreate[index]];
+
+          const checkedCount = groupFieldsToCreate
+            .flatMap((fieldToCreate) => ZCheckboxFieldMeta.safeParse(fieldToCreate.fieldMeta).data?.values ?? [])
+            .filter((value) => value.checked).length;
+
+          if (
+            checkedCount > 0 &&
+            validation &&
+            validationLength &&
+            !validateCheckboxLength(checkedCount, validation.value, validationLength)
+          ) {
+            throw new AppError(AppErrorCode.INVALID_BODY, {
+              message: `The prefilled options for CHECKBOX field ${field.id} do not meet its validation rule`,
+            });
+          }
+        }
+      }
+
+      fieldsToCreate = fieldsToCreate.concat(recipientFieldsToCreate);
     });
+
+    assertFieldGroupsValid(fieldsToCreate);
 
     await tx.field.createMany({
       data: fieldsToCreate.map((field) => ({
