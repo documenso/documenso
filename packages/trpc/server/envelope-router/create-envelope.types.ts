@@ -3,10 +3,13 @@ import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-va
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import {
+  refineFieldGroupIdAllowedForType,
   ZClampedFieldHeightSchema,
   ZClampedFieldPositionXSchema,
   ZClampedFieldPositionYSchema,
   ZClampedFieldWidthSchema,
+  ZFieldExternalIdSchema,
+  ZFieldGroupIdSchema,
   ZFieldPageNumberSchema,
 } from '@documenso/lib/types/field';
 import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
@@ -65,8 +68,11 @@ export const ZCreateEnvelopePayloadSchema = z.object({
             positionY: ZClampedFieldPositionYSchema,
             width: ZClampedFieldWidthSchema,
             height: ZClampedFieldHeightSchema,
+            groupId: ZFieldGroupIdSchema,
+            externalId: ZFieldExternalIdSchema,
           }),
         )
+          .superRefine(refineFieldGroupIdAllowedForType)
           .array()
           .optional(),
       }),

@@ -1,9 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
+import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
+import { updateEnvelopeFields as updateEnvelopeFieldsServerSide } from '@documenso/lib/server-only/field/update-envelope-fields';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
+import { FIELD_RADIO_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType, FieldType, RecipientRole } from '@documenso/prisma/client';
+import { seedDraftDocument } from '@documenso/prisma/seed/documents';
+import { seedTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type {
   TCreateEnvelopePayload,
@@ -241,6 +247,7 @@ test.describe('Field meta configuration validation', () => {
 
     const errorResponse = await res.json();
     expect(errorResponse.message).toContain('A field cannot be both read-only and required');
+    expect(errorResponse.message).toContain(`TEXT field ${fieldId}`);
 
     const dbField = await prisma.field.findUniqueOrThrow({
       where: { id: fieldId },
@@ -289,5 +296,121 @@ test.describe('Field meta configuration validation', () => {
     });
 
     expect(dbField.fieldMeta).toMatchObject(readOnlyMeta);
+  });
+
+  test('V1 envelopes reject a checkbox, radio or dropdown field without field meta, V2 envelopes use the default', async () => {
+    const fieldPosition = { pageNumber: 1, pageX: 5, pageY: 10, pageWidth: 20, pageHeight: 5 };
+
+    const saveRadioWithoutMeta = async (internalVersion: number) => {
+      const document = await seedDraftDocument(user, team.id, ['no-meta@test.documenso.com'], { internalVersion });
+
+      const recipient = await prisma.recipient.findFirstOrThrow({ where: { envelopeId: document.id } });
+
+      await setFieldsForDocument({
+        userId: user.id,
+        teamId: team.id,
+        id: { type: 'envelopeId', id: document.id },
+        fields: [
+          {
+            type: FieldType.RADIO,
+            envelopeItemId: document.envelopeItems[0].id,
+            recipientId: recipient.id,
+            ...fieldPosition,
+          },
+        ],
+        requestMetadata: { requestMetadata: {}, source: 'app', auth: 'session' },
+      });
+
+      return document;
+    };
+
+    await expect(saveRadioWithoutMeta(1)).rejects.toThrow(/set at least one value for the Radio field/);
+
+    const legacyTemplate = await seedTemplate({ userId: user.id, teamId: team.id, internalVersion: 1 });
+
+    await expect(
+      setFieldsForTemplate({
+        userId: user.id,
+        teamId: team.id,
+        id: { type: 'envelopeId', id: legacyTemplate.id },
+        fields: [
+          {
+            type: FieldType.CHECKBOX,
+            envelopeItemId: legacyTemplate.envelopeItems[0].id,
+            recipientId: legacyTemplate.recipients[0].id,
+            ...fieldPosition,
+          },
+        ],
+      }),
+    ).rejects.toThrow(/set at least one value for the Checkbox field/);
+
+    const document = await saveRadioWithoutMeta(2);
+
+    const radioField = await prisma.field.findFirstOrThrow({
+      where: { envelopeId: document.id, type: FieldType.RADIO },
+    });
+
+    expect(radioField.fieldMeta).toMatchObject(FIELD_RADIO_META_DEFAULT_VALUES);
+  });
+
+  test('V1 envelopes accept field meta for another field type, V2 envelopes reject it', async () => {
+    // Both metas break the rules of their own type (read-only without a value), so a save only
+    // succeeds when meta for another field type is left unvalidated.
+    const legacyTextMeta = { type: 'text', readOnly: true } as const;
+    const legacyNumberMeta = { type: 'number', readOnly: true } as const;
+
+    const saveSignatureField = async (internalVersion: number) => {
+      const document = await seedDraftDocument(user, team.id, ['v1-compat@test.documenso.com'], { internalVersion });
+
+      const recipient = await prisma.recipient.findFirstOrThrow({
+        where: { envelopeId: document.id },
+      });
+
+      await setFieldsForDocument({
+        userId: user.id,
+        teamId: team.id,
+        id: { type: 'envelopeId', id: document.id },
+        fields: [
+          {
+            type: FieldType.SIGNATURE,
+            fieldMeta: legacyTextMeta,
+            envelopeItemId: document.envelopeItems[0].id,
+            recipientId: recipient.id,
+            pageNumber: 1,
+            pageX: 5,
+            pageY: 10,
+            pageWidth: 20,
+            pageHeight: 5,
+          },
+        ],
+        requestMetadata: { requestMetadata: {}, source: 'app', auth: 'session' },
+      });
+
+      return document;
+    };
+
+    await expect(saveSignatureField(2)).rejects.toThrow(/does not match the field type/);
+
+    const legacyDocument = await saveSignatureField(1);
+
+    const legacyField = await prisma.field.findFirstOrThrow({
+      where: { envelopeId: legacyDocument.id },
+    });
+
+    expect(legacyField).toMatchObject({ type: FieldType.SIGNATURE, fieldMeta: legacyTextMeta });
+
+    await updateEnvelopeFieldsServerSide({
+      userId: user.id,
+      teamId: team.id,
+      id: { type: 'envelopeId', id: legacyDocument.id },
+      fields: [{ id: legacyField.id, fieldMeta: legacyNumberMeta }],
+      requestMetadata: { requestMetadata: {}, source: 'app', auth: 'session' },
+    });
+
+    const updatedField = await prisma.field.findUniqueOrThrow({
+      where: { id: legacyField.id },
+    });
+
+    expect(updatedField.fieldMeta).toMatchObject(legacyNumberMeta);
   });
 });

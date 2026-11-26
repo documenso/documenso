@@ -1,3 +1,4 @@
+import { validateNumberFieldValue } from '@documenso/lib/advanced-fields-validation/validate-number';
 import {
   DEFAULT_FIELD_FONT_SIZE,
   FIELD_DEFAULT_GENERIC_ALIGN,
@@ -16,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import {
   EditorGenericFontSizeField,
@@ -57,20 +58,30 @@ const ZNumberFieldFormSchema = ZNumberFieldMeta.pick({
       path: ['minValue'],
     },
   )
-  .refine(
-    (data) => {
-      // A read-only field must have a value greater than 0
-      if (data.readOnly && data.value !== undefined && data.value !== '') {
-        const numberValue = parseFloat(data.value);
-        return !isNaN(numberValue) && numberValue > 0;
-      }
-      return !data.readOnly || (data.value !== undefined && data.value !== '');
-    },
-    {
-      message: 'A read-only field must have a value greater than 0',
-      path: ['value'],
-    },
-  );
+  .superRefine((data, ctx) => {
+    if (data.readOnly && !data.value) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'A read-only field must have a value greater than 0',
+        path: ['value'],
+      });
+
+      return;
+    }
+
+    const [valueError] = validateNumberFieldValue(data.value ?? '', {
+      type: 'number',
+      ...data,
+    });
+
+    if (valueError) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: valueError,
+        path: ['value'],
+      });
+    }
+  });
 
 type TNumberFieldFormSchema = z.infer<typeof ZNumberFieldFormSchema>;
 
@@ -117,7 +128,11 @@ export const EditorFieldNumberForm = ({
   useEffect(() => {
     const validatedFormValues = ZNumberFieldFormSchema.safeParse(formValues);
 
-    if (formValues.readOnly && !formValues.value) {
+    const valueError = validatedFormValues.error?.issues.find((issue) => issue.path[0] === 'value')?.message;
+
+    // Whether the value is valid depends on the other settings, and the form only re-validates
+    // the setting which changed.
+    if (valueError !== form.getFieldState('value').error?.message) {
       void form.trigger('value');
     }
 

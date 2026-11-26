@@ -11,6 +11,7 @@ import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../u
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { lockEnvelope } from '../envelope/lock-envelope';
 
 export interface DeleteEnvelopeRecipientOptions {
   userId: number;
@@ -104,7 +105,45 @@ export const deleteEnvelopeRecipient = async ({
   });
 
   const deletedRecipient = await prisma.$transaction(async (tx) => {
-    await assertEnvelopeMutable(envelope, tx);
+    await lockEnvelope(tx, envelope.id);
+
+    const lockedEnvelope = await tx.envelope.findFirstOrThrow({
+      where: {
+        id: envelope.id,
+      },
+      include: {
+        recipients: {
+          where: {
+            id: recipientId,
+          },
+          include: {
+            fields: true,
+          },
+        },
+      },
+    });
+
+    await assertEnvelopeMutable(lockedEnvelope);
+
+    if (lockedEnvelope.completedAt) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Document already complete',
+      });
+    }
+
+    const lockedRecipient = lockedEnvelope.recipients.at(0);
+
+    if (!lockedRecipient) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Recipient not found',
+      });
+    }
+
+    if (!canRecipientBeModified(lockedRecipient, lockedRecipient.fields)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Recipient has already interacted with the document.',
+      });
+    }
 
     if (envelope.type === EnvelopeType.DOCUMENT) {
       await tx.documentAuditLog.create({
@@ -113,10 +152,10 @@ export const deleteEnvelopeRecipient = async ({
           envelopeId: envelope.id,
           metadata: requestMetadata,
           data: {
-            recipientEmail: recipientToDelete.email,
-            recipientName: recipientToDelete.name,
-            recipientId: recipientToDelete.id,
-            recipientRole: recipientToDelete.role,
+            recipientEmail: lockedRecipient.email,
+            recipientName: lockedRecipient.name,
+            recipientId: lockedRecipient.id,
+            recipientRole: lockedRecipient.role,
           },
         }),
       });
@@ -134,11 +173,11 @@ export const deleteEnvelopeRecipient = async ({
 
   // Send email to deleted recipient.
   if (
-    recipientToDelete.sendStatus === SendStatus.SENT &&
-    recipientToDelete.role !== RecipientRole.CC &&
+    deletedRecipient.sendStatus === SendStatus.SENT &&
+    deletedRecipient.role !== RecipientRole.CC &&
     isRecipientRemovedEmailEnabled &&
     envelope.type === EnvelopeType.DOCUMENT &&
-    isRecipientEmailValidForSending(recipientToDelete)
+    isRecipientEmailValidForSending(deletedRecipient)
   ) {
     // Enqueue the "removed from document" email as a background job so a
     // transient mail outage doesn't fail the request and the send is retried.
@@ -146,8 +185,8 @@ export const deleteEnvelopeRecipient = async ({
       name: 'send.recipient.removed.email',
       payload: {
         envelopeId: envelope.id,
-        recipientEmail: recipientToDelete.email,
-        recipientName: recipientToDelete.name,
+        recipientEmail: deletedRecipient.email,
+        recipientName: deletedRecipient.name,
         inviterName: envelope.team?.name || user.name || undefined,
       },
     });

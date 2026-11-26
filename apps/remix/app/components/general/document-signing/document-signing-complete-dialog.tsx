@@ -1,7 +1,6 @@
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { type TRecipientAccessAuth, ZDocumentAccessAuthSchema } from '@documenso/lib/types/document-auth';
-import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -18,7 +17,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
-import type { Field, Recipient } from '@prisma/client';
+import type { Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
@@ -37,7 +36,11 @@ import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-p
 export type DocumentSigningCompleteDialogProps = {
   isSubmitting: boolean;
   documentTitle: string;
-  fields: Field[];
+  /**
+   * Whether the recipient has filled in everything needed to complete. Callers decide,
+   * since V1 and V2 envelopes have different rules.
+   */
+  isComplete: boolean;
   fieldsValidated: () => void | Promise<void>;
   onSignatureComplete: (
     nextSigner?: { name: string; email: string },
@@ -83,7 +86,7 @@ type TDirectRecipientFormSchema = z.infer<typeof ZDirectRecipientFormSchema>;
 export const DocumentSigningCompleteDialog = ({
   isSubmitting,
   documentTitle,
-  fields,
+  isComplete,
   fieldsValidated,
   onSignatureComplete,
   recipient,
@@ -127,8 +130,6 @@ export const DocumentSigningCompleteDialog = ({
       email: recipientPayload?.email ?? '',
     },
   });
-
-  const isComplete = useMemo(() => !fieldsContainUnsignedRequiredField(fields), [fields]);
 
   const completionRequires2FA = useMemo(
     () => derivedRecipientAccessAuth.includes('TWO_FACTOR_AUTH'),

@@ -112,19 +112,22 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
   );
 
   const appendItems = useCallback(
-    (newItems: TItem[]) => {
+    (newItems: TItem[], { shouldTriggerChange = true } = {}) => {
       if (newItems.length === 0) {
         return;
       }
 
       append(newItems);
-      triggerChange();
+
+      if (shouldTriggerChange) {
+        triggerChange();
+      }
     },
     [append, triggerChange],
   );
 
   const removeByFormId = useCallback(
-    (formIds: string[]) => {
+    (formIds: string[], { shouldTriggerChange = true } = {}) => {
       const indexes = formIds.map((formId) => findIndex(formId)).filter((index) => index !== -1);
 
       if (indexes.length === 0) {
@@ -132,7 +135,10 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
       }
 
       remove(indexes);
-      triggerChange();
+
+      if (shouldTriggerChange) {
+        triggerChange();
+      }
     },
     [findIndex, remove, triggerChange],
   );
@@ -185,6 +191,7 @@ export const useEditorFormArray = <TItem extends EditorItem, TSource>({
     appendItems,
     removeByFormId,
     updateByFormId,
+    triggerChange,
     selectedItem,
     setSelected,
     resetForm,

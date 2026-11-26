@@ -255,7 +255,7 @@ test.describe('PDF Viewer Rendering', () => {
       await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
     });
 
-    test('should render PDF on embed multisign page (V1 and V2)', async ({ page }) => {
+    test('should render embed multisign page (V1)', async ({ page }) => {
       const { user, team } = await seedUser();
 
       const { recipients: recipientsV1 } = await seedPendingDocumentWithFullFields({
@@ -265,30 +265,41 @@ test.describe('PDF Viewer Rendering', () => {
         fields: [FieldType.SIGNATURE],
       });
 
-      const { document: documentV2, recipients: recipientsV2 } = await seedPendingDocumentWithFullFields({
-        owner: user,
-        teamId: team.id,
-        recipients: ['multisign-v2@test.documenso.com'],
-        fields: [FieldType.SIGNATURE],
-        updateDocumentOptions: { internalVersion: 2 },
-      });
-      await addSecondEnvelopeItem(documentV2.id);
-
       await page.goto(`/embed/v1/multisign?token=${recipientsV1[0].token}`);
       await expect(page.getByText('Sign Documents')).toBeVisible({ timeout: 15_000 });
 
       // Todo: Multisign does not support multiple envelope items.
       // await page.getByRole('button', { name: /View/i }).first().click();
       // await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
+    });
 
-      await page.goto(`/embed/v1/multisign?token=${recipientsV2[0].token}`);
-      await expect(page.getByText('Sign Documents')).toBeVisible({ timeout: 15_000 });
-      await page.getByRole('button', { name: /View/i }).first().click();
-      await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
+    test('should not open V2 documents on embed multisign page', async ({ page }) => {
+      const { user, team } = await seedUser();
 
-      // Todo: Multisign does not support multiple envelope items.
-      // await page.getByRole('button', { name: /Page 2/ }).click();
-      // await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
+      const { recipients: recipientsV1 } = await seedPendingDocumentWithFullFields({
+        owner: user,
+        teamId: team.id,
+        recipients: ['multisign-mixed-v1@test.documenso.com'],
+        fields: [FieldType.SIGNATURE],
+      });
+
+      const { recipients: recipientsV2 } = await seedPendingDocumentWithFullFields({
+        owner: user,
+        teamId: team.id,
+        recipients: ['multisign-mixed-v2@test.documenso.com'],
+        fields: [FieldType.SIGNATURE],
+        updateDocumentOptions: { internalVersion: 2 },
+      });
+
+      // The embed signs through the legacy field routes, which reject V2 envelopes. One V2
+      // document blocks the whole bundle, the same as an unsupported signature level does.
+      await page.goto(`/embed/v1/multisign?token=${recipientsV1[0].token}&token=${recipientsV2[0].token}`);
+
+      await expect(page.getByText('Envelopes are not supported in this embed.')).toBeVisible({
+        timeout: 15_000,
+      });
+      await expect(page.getByText('Sign Documents')).toHaveCount(0);
+      await expect(page.getByRole('button', { name: /View/i })).toHaveCount(0);
     });
 
     test('should render PDF on embed authoring document create page', async ({ page }) => {

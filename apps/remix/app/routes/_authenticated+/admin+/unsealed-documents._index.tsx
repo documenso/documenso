@@ -14,6 +14,8 @@ import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router';
 
+import { SettingsHeader } from '~/components/general/settings-header';
+
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
 export default function AdminUnsealedDocumentsPage() {
@@ -146,21 +148,23 @@ export default function AdminUnsealedDocumentsPage() {
 
   return (
     <div>
-      <div className="flex items-center gap-3">
-        <AlertTriangleIcon className="h-8 w-8 text-destructive" />
-        <h2 className="font-semibold text-4xl">
-          <Trans>Unsealed Documents</Trans>
-        </h2>
-      </div>
+      <SettingsHeader
+        hideDivider
+        title={
+          <span className="flex items-center gap-2">
+            <AlertTriangleIcon className="h-5 w-5 text-destructive" />
+            <Trans>Unsealed Documents</Trans>
+          </span>
+        }
+        subtitle={
+          <Trans>
+            Documents where all recipients have signed but the document has not been sealed. Documents stuck for more
+            than 6 hours are no longer retried by the sweep job.
+          </Trans>
+        }
+      />
 
-      <p className="mt-2 text-muted-foreground text-sm">
-        <Trans>
-          Documents where all recipients have signed but the document has not been sealed. Documents stuck for more than
-          6 hours are no longer retried by the sweep job.
-        </Trans>
-      </p>
-
-      <div className="relative mt-8">
+      <div className="relative mt-4">
         <DataTable
           columns={columns}
           data={results.data}

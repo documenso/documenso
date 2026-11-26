@@ -153,7 +153,7 @@ test.describe
       });
 
       // Verify we're on the admin page
-      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Instance Stats' })).toBeVisible();
 
       // Global banner should not be visible (no license file)
       await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
@@ -181,7 +181,7 @@ test.describe
       });
 
       // Verify we're on the admin page
-      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Instance Stats' })).toBeVisible();
 
       // Global banner should not be visible (license is ACTIVE)
       await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
@@ -208,7 +208,7 @@ test.describe
       });
 
       // Verify we're on the admin page
-      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Instance Stats' })).toBeVisible();
 
       // Global banner should NOT be visible (only shows for EXPIRED + unauthorized)
       await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
@@ -237,7 +237,7 @@ test.describe
       });
 
       // Verify we're on the admin page
-      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Instance Stats' })).toBeVisible();
 
       // Global banner should NOT be visible (requires BOTH expired AND unauthorized)
       await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
@@ -266,7 +266,7 @@ test.describe
       });
 
       // Verify we're on the admin page
-      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Instance Stats' })).toBeVisible();
 
       // Global banner SHOULD be visible (EXPIRED + unauthorized)
       await expect(page.getByText('This is an expired license instance of Documenso')).toBeVisible();
@@ -294,7 +294,7 @@ test.describe
       });
 
       // Verify we're on the admin page
-      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Instance Stats' })).toBeVisible();
 
       // Global banner should NOT be visible (requires EXPIRED status)
       await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
@@ -330,7 +330,7 @@ test.describe
       });
 
       // Verify we're on the admin page
-      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Instance Stats' })).toBeVisible();
 
       // Global banner should NOT be visible (no EXPIRED status, only unauthorized flag)
       await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();

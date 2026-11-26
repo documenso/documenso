@@ -250,6 +250,8 @@ export const duplicateEnvelope = async ({
                       customText: '',
                       inserted: false,
                       fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
+                      groupId: field.groupId,
+                      externalId: field.externalId,
                     })),
                   },
                 }

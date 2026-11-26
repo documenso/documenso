@@ -21,7 +21,10 @@ type SeededEnvelopes = {
  * Returns the assistant's token from envelope A and the TEXT field id from
  * envelope B so callers can exercise signing routes across envelopes.
  */
-const seedTwoPendingEnvelopes = async (request: APIRequestContext): Promise<SeededEnvelopes> => {
+const seedTwoPendingEnvelopes = async (
+  request: APIRequestContext,
+  { internalVersion = 2 }: { internalVersion?: 1 | 2 } = {},
+): Promise<SeededEnvelopes> => {
   const envelopeA = await apiSeedPendingDocument(request, {
     title: '[TEST] Envelope A',
     recipients: [
@@ -72,6 +75,14 @@ const seedTwoPendingEnvelopes = async (request: APIRequestContext): Promise<Seed
     ],
   });
 
+  // The API only creates V2 envelopes, and the legacy token routes reject those.
+  if (internalVersion === 1) {
+    await prisma.envelope.updateMany({
+      where: { id: { in: [envelopeA.envelope.id, envelopeB.envelope.id] } },
+      data: { internalVersion: 1 },
+    });
+  }
+
   const otherEnvelope = await prisma.envelope.findUniqueOrThrow({
     where: { id: envelopeB.envelope.id },
     include: { fields: true },
@@ -117,7 +128,7 @@ test.describe('[ASSISTANT_SIGNING_AUTH]: cross-envelope field access', () => {
   });
 
   test('field.signFieldWithToken (V1) rejects fieldId from another envelope', async ({ request }) => {
-    const { assistantToken, otherEnvelopeFieldId } = await seedTwoPendingEnvelopes(request);
+    const { assistantToken, otherEnvelopeFieldId } = await seedTwoPendingEnvelopes(request, { internalVersion: 1 });
 
     const res = await trpcMutation(request, 'field.signFieldWithToken', {
       token: assistantToken,
@@ -137,7 +148,7 @@ test.describe('[ASSISTANT_SIGNING_AUTH]: cross-envelope field access', () => {
   });
 
   test('field.removeSignedFieldWithToken (V1) rejects fieldId from another envelope', async ({ request }) => {
-    const { assistantToken, otherEnvelopeFieldId } = await seedTwoPendingEnvelopes(request);
+    const { assistantToken, otherEnvelopeFieldId } = await seedTwoPendingEnvelopes(request, { internalVersion: 1 });
 
     // Pre-insert the field so a successful (incorrect) uninsert is detectable.
     await prisma.field.update({

@@ -7,6 +7,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useNavigate } from 'react-router';
 
 import { AdminRuleForm, type TAdminRuleFormSchema } from '~/components/forms/admin-rule-form';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
@@ -49,9 +50,13 @@ export default function AdminRuleCreatePage() {
 
   return (
     <div>
-      <h2 className="mb-6 font-semibold text-4xl">
-        <Trans>Create rule</Trans>
-      </h2>
+      <SettingsHeader
+        hideDivider
+        title={<Trans>Create rule</Trans>}
+        subtitle={
+          <Trans>Choose the event that triggers the rule, the conditions it checks and the actions it takes</Trans>
+        }
+      />
 
       <AdminRuleForm rule={null} onSubmit={onSubmit} onCancel={() => void navigate('/admin/rules')} />
     </div>

@@ -3,6 +3,8 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 
+import { reconcileEnvelopeFieldGroups } from '../field/reconcile-envelope-field-groups';
+
 type UnsafeDeleteEnvelopeItemOptions = {
   envelopeId: string;
   envelopeItemId: string;
@@ -36,6 +38,10 @@ export const UNSAFE_deleteEnvelopeItem = async ({
         },
       },
     });
+
+    // The item's fields were deleted with it, which can leave the rest of a group with a
+    // rule it can no longer satisfy.
+    await reconcileEnvelopeFieldGroups({ envelopeId, tx });
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({

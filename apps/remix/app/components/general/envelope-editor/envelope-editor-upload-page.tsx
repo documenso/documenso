@@ -151,8 +151,9 @@ export const EnvelopeEditorUploadPage = () => {
       // When fields were created or deleted during the replacement,
       // the server returns the full updated field list.
       if (fields) {
-        setLocalEnvelope({ fields });
-        editorFields.resetForm(fields);
+        const resetFields = editorFields.resetForm(fields);
+
+        setLocalEnvelope({ fields: resetFields });
       }
 
       if (contents) {
@@ -279,8 +280,8 @@ export const EnvelopeEditorUploadPage = () => {
         const newPageCount = pdfDoc.getPageCount();
 
         // Remove fields that are on pages beyond the new PDF's page count.
-        const remainingFields = envelope.fields.filter(
-          (field) => field.envelopeItemId !== envelopeItemId || field.page <= newPageCount,
+        const remainingFields = editorFields.resetForm(
+          envelope.fields.filter((field) => field.envelopeItemId !== envelopeItemId || field.page <= newPageCount),
         );
 
         // Must match the server's pruning for non embedded replacements.
@@ -294,7 +295,6 @@ export const EnvelopeEditorUploadPage = () => {
           contents: remainingContents,
         });
 
-        editorFields.resetForm(remainingFields);
         editorContents.resetForm(remainingContents);
 
         return;
@@ -342,7 +342,9 @@ export const EnvelopeEditorUploadPage = () => {
   const onFileDelete = (envelopeItemId: string) => {
     setLocalFiles((prev) => prev.filter((uploadingFile) => uploadingFile.envelopeItemId !== envelopeItemId));
 
-    const fieldsWithoutDeletedItem = envelope.fields.filter((field) => field.envelopeItemId !== envelopeItemId);
+    const fieldsWithoutDeletedItem = editorFields.resetForm(
+      envelope.fields.filter((field) => field.envelopeItemId !== envelopeItemId),
+    );
     const contentsWithoutDeletedItem = envelope.contents.filter((content) => content.envelopeItemId !== envelopeItemId);
 
     setLocalEnvelope({
@@ -351,8 +353,6 @@ export const EnvelopeEditorUploadPage = () => {
       contents: contentsWithoutDeletedItem,
     });
 
-    // Reset editor fields and contents.
-    editorFields.resetForm(fieldsWithoutDeletedItem);
     editorContents.resetForm(contentsWithoutDeletedItem);
   };
 

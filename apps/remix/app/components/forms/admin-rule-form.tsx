@@ -333,7 +333,8 @@ export const AdminRuleForm = ({ rule, onSubmit, onCancel }: AdminRuleFormProps) 
           <aside
             className={cn(
               'flex min-w-0 flex-[0_1_17rem] flex-col gap-5',
-              'xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto',
+              // `100cqh` is the height of the admin layout's scrolling pane, which is shorter than the viewport.
+              'xl:sticky xl:top-4 xl:max-h-[calc(100cqh-2rem)] xl:overflow-y-auto',
             )}
           >
             <AdminRuleFormTester key={trigger} trigger={trigger} />

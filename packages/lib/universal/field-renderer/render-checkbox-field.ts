@@ -103,7 +103,7 @@ export const renderCheckboxFieldElement = (field: FieldToRender, options: Render
         y: itemInputY,
       });
 
-      textElement.setAttrs({
+      textElement?.setAttrs({
         x: textX,
         y: textY,
         scaleX: 1,
@@ -205,7 +205,10 @@ export const renderCheckboxFieldElement = (field: FieldToRender, options: Render
 
     fieldGroup.add(square);
     fieldGroup.add(checkmark);
-    fieldGroup.add(text);
+
+    if (!checkboxMeta?.hideLabel) {
+      fieldGroup.add(text);
+    }
   });
 
   if (color !== 'readOnly' && mode !== 'export') {

@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { assertSenderNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -6,6 +7,8 @@ import { getRecipientFieldsWhereInput } from '@documenso/lib/utils/recipient-que
 import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
+
+import { lockFieldForSigning } from './lock-field-for-signing';
 
 export type RemovedSignedFieldWithTokenOptions = {
   token: string;
@@ -46,6 +49,12 @@ export const removeSignedFieldWithToken = async ({
 
   await assertSenderNotDisabled({ userId: envelope.userId });
 
+  if (envelope.internalVersion !== 1) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Envelope ${envelope.id} is not a version 1 envelope`,
+    });
+  }
+
   if (envelope.status !== DocumentStatus.PENDING) {
     throw new Error(`Document ${envelope.id} must be pending`);
   }
@@ -62,6 +71,12 @@ export const removeSignedFieldWithToken = async ({
   }
 
   await prisma.$transaction(async (tx) => {
+    await lockFieldForSigning(tx, {
+      envelopeId: envelope.id,
+      fieldId: field.id,
+      recipientId: recipient.id,
+    });
+
     await tx.field.update({
       where: {
         id: field.id,

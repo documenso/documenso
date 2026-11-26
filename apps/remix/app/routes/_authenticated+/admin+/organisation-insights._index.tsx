@@ -3,6 +3,7 @@ import type { DateRange } from '@documenso/lib/types/search-params';
 import { Trans } from '@lingui/react/macro';
 
 import { DateRangeFilter } from '~/components/filters/date-range-filter';
+import { SettingsHeader } from '~/components/general/settings-header';
 import {
   AdminOrganisationOverviewTable,
   type OrganisationOverview,
@@ -64,14 +65,15 @@ export default function Organisations({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-4xl">
-          <Trans>Organisation Insights</Trans>
-        </h2>
+      <SettingsHeader
+        hideDivider
+        title={<Trans>Organisation Insights</Trans>}
+        subtitle={<Trans>Compare signing activity across organisations</Trans>}
+      >
         <DateRangeFilter currentRange={dateRange} />
-      </div>
+      </SettingsHeader>
 
-      <div className="mt-8">
+      <div className="mt-4">
         <AdminOrganisationOverviewTable
           organisations={organisations}
           totalPages={totalPages}
