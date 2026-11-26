@@ -29,6 +29,7 @@ export const ZTemplateSchema = TemplateSchema.pick({
   publicTitle: true,
   publicDescription: true,
   folderId: true,
+  targetFolderId: true,
 }).extend({
   envelopeId: z.string(),
 
@@ -109,6 +110,7 @@ export const ZTemplateLiteSchema = TemplateSchema.pick({
   publicTitle: true,
   publicDescription: true,
   folderId: true,
+  targetFolderId: true,
   useLegacyFieldInsertion: true,
 }).extend({
   envelopeId: z.string(),

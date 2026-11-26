@@ -78,7 +78,7 @@ export const ZUseEnvelopePayloadSchema = z.object({
   folderId: z
     .string()
     .describe(
-      'The ID of the folder to create the document in. If not provided, the template target folder will be used if configured, otherwise the document will be created in the root folder.',
+      'The ID of the folder to create the document in. If not provided, the template target folder will be used if configured, otherwise the document will be created in the root folder. Pass null to create the document in the root folder.',
     )
     .nullish(),
   prefillFields: z

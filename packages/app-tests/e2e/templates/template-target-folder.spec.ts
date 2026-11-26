@@ -114,7 +114,9 @@ test('[TEMPLATE_TARGET_FOLDER]: target folder configured in settings applies to 
     where: {
       templateId: mapSecondaryIdToTemplateId(template.secondaryId),
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
   expect(directCreatedEnvelope.folderId).toBe(targetFolder.id);
@@ -134,7 +136,9 @@ test('[TEMPLATE_TARGET_FOLDER]: target folder configured in settings applies to 
 
   const overriddenEnvelopeId = page.url().split('/').pop()?.split('?')[0];
   const overriddenEnvelope = await prisma.envelope.findFirstOrThrow({
-    where: { id: overriddenEnvelopeId },
+    where: {
+      id: overriddenEnvelopeId,
+    },
   });
 
   expect(overriddenEnvelope.folderId).toBe(overrideFolder.id);
@@ -151,7 +155,9 @@ test('[TEMPLATE_TARGET_FOLDER]: target folder configured in settings applies to 
 
   const rootOverrideEnvelopeId = page.url().split('/').pop()?.split('?')[0];
   const rootOverrideEnvelope = await prisma.envelope.findFirstOrThrow({
-    where: { id: rootOverrideEnvelopeId },
+    where: {
+      id: rootOverrideEnvelopeId,
+    },
   });
 
   expect(rootOverrideEnvelope.folderId).toBeNull();
@@ -178,7 +184,9 @@ test('[TEMPLATE_TARGET_FOLDER]: deleting the target folder falls back to the roo
   });
 
   await prisma.folder.delete({
-    where: { id: targetFolder.id },
+    where: {
+      id: targetFolder.id,
+    },
   });
 
   await apiSignin({
@@ -195,7 +203,9 @@ test('[TEMPLATE_TARGET_FOLDER]: deleting the target folder falls back to the roo
 
   const createdEnvelopeId = page.url().split('/').pop()?.split('?')[0];
   const createdEnvelope = await prisma.envelope.findFirstOrThrow({
-    where: { id: createdEnvelopeId },
+    where: {
+      id: createdEnvelopeId,
+    },
   });
 
   expect(createdEnvelope.folderId).toBeNull();
