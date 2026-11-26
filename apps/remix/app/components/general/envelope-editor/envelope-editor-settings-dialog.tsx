@@ -84,6 +84,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
+import { FolderSelectCombobox } from '~/components/general/folder/folder-select-combobox';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -639,12 +640,6 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                           control={form.control}
                           name="targetFolderId"
                           render={({ field }) => {
-                            const selectedTargetFolderValue =
-                              field.value &&
-                              (!foldersData || documentFolders.some((folder) => folder.id === field.value))
-                                ? field.value
-                                : '-1';
-
                             return (
                               <FormItem>
                                 <FormLabel className="flex flex-row items-center">
@@ -664,31 +659,14 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                 </FormLabel>
 
                                 <FormControl>
-                                  <Select
-                                    value={selectedTargetFolderValue}
+                                  <FolderSelectCombobox
+                                    folders={documentFolders}
+                                    value={field.value ?? null}
+                                    onChange={field.onChange}
+                                    isLoading={isLoadingFolders}
                                     disabled={field.disabled}
-                                    onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
-                                  >
-                                    <SelectTrigger
-                                      data-testid="templateTargetFolderSelectValue"
-                                      loading={isLoadingFolders}
-                                      className="bg-background"
-                                    >
-                                      <SelectValue />
-                                    </SelectTrigger>
-
-                                    <SelectContent>
-                                      <SelectItem value="-1">
-                                        <Trans>Home (No Folder)</Trans>
-                                      </SelectItem>
-
-                                      {documentFolders.map((folder) => (
-                                        <SelectItem key={folder.id} value={folder.id}>
-                                          {folder.name}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                                    testId="templateTargetFolderSelectValue"
+                                  />
                                 </FormControl>
 
                                 <FormMessage />

@@ -25,7 +25,6 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -39,6 +38,7 @@ import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import * as z from 'zod';
+import { FolderSelectCombobox } from '~/components/general/folder/folder-select-combobox';
 import { getTemplateUseErrorMessage } from '~/utils/toast-error-messages';
 
 const DOCUMENT_NAME_SOURCE = {
@@ -840,11 +840,6 @@ export function TemplateUseDialog({
                   control={form.control}
                   name="folderId"
                   render={({ field }) => {
-                    const selectedFolderValue =
-                      field.value && (!foldersData || documentFolders.some((folder) => folder.id === field.value))
-                        ? field.value
-                        : '-1';
-
                     return (
                       <FormItem>
                         <FormLabel className="flex flex-row items-center">
@@ -862,31 +857,15 @@ export function TemplateUseDialog({
                         </FormLabel>
 
                         <FormControl>
-                          <Select
-                            value={selectedFolderValue}
+                          <FolderSelectCombobox
+                            folders={documentFolders}
+                            value={field.value ?? null}
+                            onChange={field.onChange}
+                            isLoading={isLoadingFolders}
                             disabled={field.disabled}
-                            onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
-                          >
-                            <SelectTrigger
-                              data-testid="templateUseTargetFolderSelectValue"
-                              loading={isLoadingFolders}
-                              className="bg-background"
-                            >
-                              <SelectValue />
-                            </SelectTrigger>
-
-                            <SelectContent className="z-[99999]">
-                              <SelectItem value="-1">
-                                <Trans>Home (No Folder)</Trans>
-                              </SelectItem>
-
-                              {documentFolders.map((folder) => (
-                                <SelectItem key={folder.id} value={folder.id}>
-                                  {folder.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            contentClassName="z-[99999]"
+                            testId="templateUseTargetFolderSelectValue"
+                          />
                         </FormControl>
 
                         <FormMessage />
