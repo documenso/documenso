@@ -1,6 +1,6 @@
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { DEFAULT_DOCUMENT_DATE_FORMAT, toLuxonDateFormat } from '@documenso/lib/constants/date-formats';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
@@ -140,7 +140,7 @@ export const EmbedDirectTemplateClientPage = ({
         if (field.type === FieldType.DATE) {
           newField.customText = DateTime.now()
             .setZone(metadata?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
-            .toFormat(metadata?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+            .toFormat(toLuxonDateFormat(metadata?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT));
         }
 
         return newField;

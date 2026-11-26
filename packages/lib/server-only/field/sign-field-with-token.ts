@@ -3,7 +3,7 @@ import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
+import { DEFAULT_DOCUMENT_DATE_FORMAT, toLuxonDateFormat } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -155,7 +155,7 @@ export const signFieldWithToken = async ({
   if (field.type === FieldType.DATE) {
     customText = DateTime.now()
       .setZone(documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
-      .toFormat(documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+      .toFormat(toLuxonDateFormat(documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT));
   }
 
   const assistant = recipient.role === RecipientRole.ASSISTANT ? recipient : undefined;
