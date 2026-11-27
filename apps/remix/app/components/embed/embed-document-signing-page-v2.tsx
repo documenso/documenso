@@ -36,7 +36,7 @@ export const EmbedSignDocumentV2ClientPage = ({
 
   const { isCompleted, isRejected, recipientSignature } = envelopeData;
 
-  const { persistSignature } = usePersistEmbedSignature({
+  const { persistSignature, flush: flushPersistSignature } = usePersistEmbedSignature({
     token: recipient.token,
     clientUserId,
     initialSignature: signature,
@@ -279,6 +279,7 @@ export const EmbedSignDocumentV2ClientPage = ({
       onFieldSigned={onFieldSigned}
       onFieldUnsigned={onFieldUnsigned}
       onSignatureChanged={persistSignature}
+      onBeforeComplete={flushPersistSignature}
     >
       <div className="embed--Root relative">
         {!hasFinishedInit && <EmbedClientLoading />}

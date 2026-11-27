@@ -85,7 +85,7 @@ export const EmbedSignDocumentV1ClientPage = ({
 
   const { fullName, email, signature, setFullName, setEmail, setSignature } = useRequiredDocumentSigningContext();
 
-  const { persistSignature } = usePersistEmbedSignature({
+  const { persistSignature, flush: flushPersistSignature } = usePersistEmbedSignature({
     token,
     clientUserId,
     initialSignature: signature,
@@ -147,6 +147,8 @@ export const EmbedSignDocumentV1ClientPage = ({
         setShowPendingFieldTooltip(true);
         return;
       }
+
+      await flushPersistSignature();
 
       const result = await completeDocumentWithToken({
         documentId,
