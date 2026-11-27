@@ -163,7 +163,7 @@ GET /envelope
 | `type`             | string  | Filter by `DOCUMENT` or `TEMPLATE`                            |
 | `status`           | string  | Filter by status: `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED`, `CANCELLED` |
 | `source`           | string  | Filter by creation source                                     |
-| `folderId`         | string  | Filter by folder ID                                           |
+| `folderId`         | string  | Filter by folder ID (when omitted, returns root-level envelopes only) |
 | `orderByColumn`    | string  | Sort field (only `createdAt` supported)                       |
 | `orderByDirection` | string  | Sort direction: `asc` or `desc` (default: `desc`)             |
 
@@ -916,7 +916,7 @@ flowchart LR
 | `type`     | `DOCUMENT`, `TEMPLATE`                      | Filter by envelope type   |
 | `status`   | `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED`, `CANCELLED` | Filter by status          |
 | `source`   | `DOCUMENT`, `TEMPLATE`, `TEMPLATE_DIRECT_LINK`          | Filter by creation source |
-| `folderId` | string                                      | Filter by folder          |
+| `folderId` | string                                      | Filter by folder (when omitted, returns root-level envelopes only) |
 
 ### Sorting
 

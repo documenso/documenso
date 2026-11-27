@@ -293,7 +293,12 @@ export const ZUpdateTemplateResponseSchema = ZTemplateLiteSchema;
 
 export const ZFindTemplatesRequestSchema = ZFindSearchParamsSchema.extend({
   type: z.nativeEnum(TemplateType).describe('Filter templates by type.').optional(),
-  folderId: z.string().describe('The ID of the folder to filter templates by.').optional(),
+  folderId: z
+    .string()
+    .describe(
+      'The ID of the folder to filter templates by. When omitted, only root-level templates (not in any folder) are returned.',
+    )
+    .optional(),
 });
 
 export const ZFindOrganisationTemplatesRequestSchema = ZFindSearchParamsSchema;

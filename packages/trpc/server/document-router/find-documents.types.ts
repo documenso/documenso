@@ -26,7 +26,12 @@ export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
     .describe('Filter for documents that have at least one recipient whose signing link has expired.')
     .transform((value) => value === 'true')
     .optional(),
-  folderId: z.string().describe('Filter documents by folder ID').optional(),
+  folderId: z
+    .string()
+    .describe(
+      'Filter documents by folder ID. When omitted, only root-level documents (not in any folder) are returned.',
+    )
+    .optional(),
   orderByColumn: z.enum(['createdAt']).optional(),
   orderByDirection: z.enum(['asc', 'desc']).describe('').default('desc'),
 });

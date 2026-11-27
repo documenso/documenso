@@ -293,7 +293,7 @@ GET /template
 | `page`             | integer | Page number (default: 1)                          |
 | `perPage`          | integer | Results per page (default: 10, max: 100)          |
 | `type`             | string  | Filter by type: `PRIVATE` or `PUBLIC`             |
-| `folderId`         | string  | Filter by folder ID                               |
+| `folderId`         | string  | Filter by folder ID (when omitted, returns root-level templates only) |
 | `orderByColumn`    | string  | Sort field (only `createdAt` supported)           |
 | `orderByDirection` | string  | Sort direction: `asc` or `desc` (default: `desc`) |
 
