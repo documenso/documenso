@@ -1,4 +1,3 @@
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { trpc } from '@documenso/trpc/react';
@@ -35,9 +34,7 @@ export const InboxTable = () => {
   const team = useOptionalCurrentTeam();
   const [isPending, startTransition] = useTransition();
 
-  const updateSearchParams = useUpdateSearchParams();
-
-  const [findInboxSearchParams] = useQueryStates(inboxSearchParams, {
+  const [findInboxSearchParams, setFindInboxSearchParams] = useQueryStates(inboxSearchParams, {
     history: 'push',
   });
 
@@ -98,7 +95,7 @@ export const InboxTable = () => {
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
-      updateSearchParams({
+      void setFindInboxSearchParams({
         page,
         perPage,
       });

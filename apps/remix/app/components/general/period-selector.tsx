@@ -26,7 +26,9 @@ export const PeriodSelector = () => {
       return;
     }
 
-    const params = new URLSearchParams(searchParams?.toString());
+    const params = new URLSearchParams(
+      typeof window !== 'undefined' ? window.location.search : searchParams?.toString(),
+    );
 
     params.set('period', newPeriod);
 

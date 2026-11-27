@@ -122,6 +122,71 @@ test('[TEMPLATES]: filter templates by owner', async ({ page }) => {
   await expect(page.getByTestId('data-table-count')).toContainText('Showing 2 results');
 });
 
+test('[TEMPLATES]: preserve owner filter and search when paginating', async ({ page }) => {
+  const { team, owner } = await seedTeam();
+
+  const teamMemberUser = await seedTeamMember({
+    teamId: team.id,
+    name: 'Paginated Owner',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  await Promise.all([
+    seedTemplate({
+      title: 'Quarterly Member Template 1',
+      userId: teamMemberUser.id,
+      teamId: team.id,
+    }),
+    seedTemplate({
+      title: 'Quarterly Member Template 2',
+      userId: teamMemberUser.id,
+      teamId: team.id,
+    }),
+    seedTemplate({
+      title: 'Quarterly Member Template 3',
+      userId: teamMemberUser.id,
+      teamId: team.id,
+    }),
+    seedTemplate({
+      title: 'Quarterly Owner Noise 1',
+      userId: owner.id,
+      teamId: team.id,
+    }),
+    seedTemplate({
+      title: 'Other Owner Noise 2',
+      userId: owner.id,
+      teamId: team.id,
+    }),
+  ]);
+
+  await apiSignin({
+    page,
+    email: owner.email,
+    redirectPath: `/t/${team.url}/templates?perPage=2`,
+  });
+
+  await page.getByTestId('templates-table-owner-filter').click();
+  await page.getByRole('option', { name: 'Paginated Owner' }).click();
+  await page.waitForURL((url) => url.searchParams.get('ownerIds') === String(teamMemberUser.id));
+  await page.keyboard.press('Escape');
+
+  await page.getByPlaceholder('Search templates...').fill('Quarterly');
+  await page.waitForURL((url) => url.searchParams.get('query') === 'Quarterly');
+
+  await expect(page.getByTestId('data-table-count')).toContainText('Showing 2 results');
+
+  await page.getByRole('button', { name: 'Go to next page' }).click();
+  await page.waitForURL((url) => url.searchParams.get('page') === '2');
+
+  const page2Url = new URL(page.url());
+  expect(page2Url.searchParams.get('ownerIds')).toBe(String(teamMemberUser.id));
+  expect(page2Url.searchParams.get('query')).toBe('Quarterly');
+
+  await expect(page.getByTestId('data-table-count')).toContainText('Showing 1 result');
+  await expect(page.getByRole('link', { name: 'Quarterly Owner Noise 1', exact: true })).not.toBeVisible();
+  await expect(page.getByRole('link', { name: 'Other Owner Noise 2', exact: true })).not.toBeVisible();
+});
+
 test('[TEMPLATES]: delete template', async ({ page }) => {
   const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 1,

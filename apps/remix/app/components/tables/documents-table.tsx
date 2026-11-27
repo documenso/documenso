@@ -1,4 +1,3 @@
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { findRecipientByEmail } from '@documenso/lib/utils/recipients';
@@ -14,12 +13,14 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
+import { useQueryStates } from 'nuqs';
 import { useMemo, useTransition } from 'react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { useCurrentTeam } from '~/providers/team';
+import { documentsSearchParams } from '~/utils/documents-search-params';
 
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
 import { DocumentsTableActionButton } from './documents-table-action-button';
@@ -51,7 +52,13 @@ export const DocumentsTable = ({
   const team = useCurrentTeam();
   const [isPending, startTransition] = useTransition();
 
-  const updateSearchParams = useUpdateSearchParams();
+  const [, setPaginationSearchParams] = useQueryStates(
+    {
+      page: documentsSearchParams.page,
+      perPage: documentsSearchParams.perPage,
+    },
+    { history: 'push' },
+  );
 
   const columns = useMemo(() => {
     const cols: DataTableColumnDef<DocumentsTableRow>[] = [];
@@ -129,7 +136,7 @@ export const DocumentsTable = ({
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
-      updateSearchParams({
+      void setPaginationSearchParams({
         page,
         perPage,
       });
