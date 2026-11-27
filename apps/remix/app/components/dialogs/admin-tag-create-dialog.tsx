@@ -1,5 +1,9 @@
+import type { TAdminTagType } from '@documenso/lib/types/admin-tags';
 import { trpc } from '@documenso/trpc/react';
-import type { TAdminTagData } from '@documenso/trpc/server/admin-router/tags/create-admin-tag.types';
+import type {
+  TAdminTagData,
+  TCreateAdminTagRequest,
+} from '@documenso/trpc/server/admin-router/tags/create-admin-tag.types';
 import type { TGetAdminTagsRequest } from '@documenso/trpc/server/admin-router/tags/get-admin-tags.types';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -20,10 +24,17 @@ import { AdminTagForm } from '../forms/admin-tag-form';
 
 export type AdminTagCreateDialogProps = {
   subject: TGetAdminTagsRequest;
+  defaultType: TAdminTagType;
+  showTypeField?: boolean;
   trigger?: React.ReactNode;
 };
 
-export const AdminTagCreateDialog = ({ subject, trigger }: AdminTagCreateDialogProps) => {
+export const AdminTagCreateDialog = ({
+  subject,
+  defaultType,
+  showTypeField = true,
+  trigger,
+}: AdminTagCreateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -35,7 +46,7 @@ export const AdminTagCreateDialog = ({ subject, trigger }: AdminTagCreateDialogP
 
   const onFormSubmit = async (data: TAdminTagData) => {
     try {
-      const payload =
+      const payload: TCreateAdminTagRequest =
         subject.type === 'user'
           ? {
               userId: subject.userId,
@@ -50,10 +61,10 @@ export const AdminTagCreateDialog = ({ subject, trigger }: AdminTagCreateDialogP
 
       await createTag(payload);
 
-      await trpcUtils.admin.tag.getMany.invalidate(subject);
+      await trpcUtils.admin.tag.invalidate();
 
       toast({
-        title: t`Tag added`,
+        title: t`Success`,
         duration: 5000,
       });
 
@@ -61,7 +72,6 @@ export const AdminTagCreateDialog = ({ subject, trigger }: AdminTagCreateDialogP
     } catch {
       toast({
         title: t`Something went wrong`,
-        description: t`We were unable to add the tag. Please try again.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -87,14 +97,19 @@ export const AdminTagCreateDialog = ({ subject, trigger }: AdminTagCreateDialogP
 
           <DialogDescription>
             {subject.type === 'organisation' ? (
-              <Trans>Tag this organisation so other admins know to keep an eye on it.</Trans>
+              <Trans>Add a tag to this organisation.</Trans>
             ) : (
-              <Trans>Tag this user so other admins know to keep an eye on them.</Trans>
+              <Trans>Add a tag to this user.</Trans>
             )}
           </DialogDescription>
         </DialogHeader>
 
         <AdminTagForm
+          defaultValues={{
+            type: defaultType,
+            description: '',
+          }}
+          showTypeField={showTypeField}
           onFormSubmit={onFormSubmit}
           formSubmitTrigger={
             <DialogFooter>

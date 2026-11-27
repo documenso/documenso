@@ -17,6 +17,7 @@ import {
   Settings2Icon,
   SettingsIcon,
   ShieldCheckIcon,
+  TagIcon,
   TrophyIcon,
   UserIcon,
   Users2Icon,
@@ -361,12 +362,6 @@ export const getAdminNavGroups = (): SettingsNavGroup[] => [
         label: msg`Users`,
         icon: UsersIcon,
       },
-      {
-        key: 'claims',
-        path: '/admin/claims',
-        label: msg`Claims`,
-        icon: Wallet2Icon,
-      },
     ],
   },
   {
@@ -392,6 +387,12 @@ export const getAdminNavGroups = (): SettingsNavGroup[] => [
     label: msg`Platform`,
     items: [
       {
+        key: 'claims',
+        path: '/admin/claims',
+        label: msg`Claims`,
+        icon: Wallet2Icon,
+      },
+      {
         key: 'email-transports',
         path: '/admin/email-transports',
         label: msg`Email Transports`,
@@ -413,6 +414,12 @@ export const getAdminNavGroups = (): SettingsNavGroup[] => [
             },
           ]
         : []),
+      {
+        key: 'tags',
+        path: '/admin/tags',
+        label: msg`Tags`,
+        icon: TagIcon,
+      },
       {
         key: 'site-settings',
         path: '/admin/site-settings',

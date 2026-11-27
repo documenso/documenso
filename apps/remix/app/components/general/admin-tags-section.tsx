@@ -1,10 +1,8 @@
-import { ADMIN_TAG_TYPE_MAP } from '@documenso/lib/constants/admin-tags-translations';
 import { trpc } from '@documenso/trpc/react';
 import type {
   TGetAdminTagsRequest,
   TGetAdminTagsResponse,
 } from '@documenso/trpc/server/admin-router/tags/get-admin-tags.types';
-import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -14,6 +12,7 @@ import { Link } from 'react-router';
 import { AdminTagCreateDialog } from '~/components/dialogs/admin-tag-create-dialog';
 import { AdminTagDeleteDialog } from '~/components/dialogs/admin-tag-delete-dialog';
 import { AdminTagUpdateDialog } from '~/components/dialogs/admin-tag-update-dialog';
+import { AdminTagTypeBadge } from '~/components/general/admin-tag-type-badge';
 
 export type AdminTagsSectionProps = {
   subject: TGetAdminTagsRequest;
@@ -34,14 +33,14 @@ export const AdminTagsSection = ({ subject, className }: AdminTagsSectionProps) 
           </h3>
           <p className="mt-1.5 text-muted-foreground text-sm">
             {isOrganisation ? (
-              <Trans>Internal tags on this organisation. Only admins can see them.</Trans>
+              <Trans>Tags on this organisation. Only admins can see them.</Trans>
             ) : (
-              <Trans>Internal tags on this user. Only admins can see them.</Trans>
+              <Trans>Tags on this user. Only admins can see them.</Trans>
             )}
           </p>
         </div>
 
-        <AdminTagCreateDialog subject={subject} />
+        <AdminTagCreateDialog subject={subject} defaultType="note" />
       </div>
 
       {isLoading ? (
@@ -66,7 +65,7 @@ type AdminTagListItemProps = {
 };
 
 const AdminTagListItem = ({ tag }: AdminTagListItemProps) => {
-  const { t, i18n } = useLingui();
+  const { i18n } = useLingui();
 
   const formatRelative = (date: Date) => DateTime.fromJSDate(date).setLocale(i18n.locale).toRelative();
   const formatFull = (date: Date) => i18n.date(date, { dateStyle: 'medium', timeStyle: 'short' });
@@ -83,9 +82,7 @@ const AdminTagListItem = ({ tag }: AdminTagListItemProps) => {
       className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
     >
       <div className="min-w-0 space-y-1.5">
-        <Badge variant="warning" size="small">
-          {t(ADMIN_TAG_TYPE_MAP[tag.type])}
-        </Badge>
+        <AdminTagTypeBadge type={tag.type} />
 
         <p className="whitespace-pre-wrap text-foreground text-sm [overflow-wrap:anywhere]">{tag.description}</p>
 

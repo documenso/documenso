@@ -8,5 +8,6 @@ import { msg } from '@lingui/core/macro';
 import type { TAdminTagType } from '../types/admin-tags';
 
 export const ADMIN_TAG_TYPE_MAP: Record<TAdminTagType, MessageDescriptor> = {
+  note: msg`Note`,
   flagged_for_review: msg`Flagged for review`,
 };

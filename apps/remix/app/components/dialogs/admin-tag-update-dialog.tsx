@@ -19,16 +19,28 @@ import { AdminTagForm } from '../forms/admin-tag-form';
 
 export type AdminTagUpdateDialogProps = {
   tag: Pick<TGetAdminTagsResponse[number], 'id' | 'type' | 'description'>;
-  trigger: React.ReactNode;
+  showTypeField?: boolean;
+  trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
-export const AdminTagUpdateDialog = ({ tag, trigger }: AdminTagUpdateDialogProps) => {
+export const AdminTagUpdateDialog = ({
+  tag,
+  showTypeField = true,
+  trigger,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+}: AdminTagUpdateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
   const trpcUtils = trpc.useUtils();
 
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = controlledOnOpenChange ?? setInternalOpen;
 
   const { mutateAsync: updateTag, isPending } = trpc.admin.tag.update.useMutation();
 
@@ -36,13 +48,16 @@ export const AdminTagUpdateDialog = ({ tag, trigger }: AdminTagUpdateDialogProps
     try {
       await updateTag({
         tagId: tag.id,
-        data,
+        data: {
+          type: data.type,
+          description: data.description,
+        },
       });
 
-      await trpcUtils.admin.tag.getMany.invalidate();
+      await trpcUtils.admin.tag.invalidate();
 
       toast({
-        title: t`Tag updated`,
+        title: t`Success`,
         duration: 5000,
       });
 
@@ -50,7 +65,6 @@ export const AdminTagUpdateDialog = ({ tag, trigger }: AdminTagUpdateDialogProps
     } catch {
       toast({
         title: t`Something went wrong`,
-        description: t`We were unable to update the tag. Please try again.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -59,7 +73,7 @@ export const AdminTagUpdateDialog = ({ tag, trigger }: AdminTagUpdateDialogProps
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isPending && setOpen(value)}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
       <DialogContent position="center">
         <DialogHeader>
@@ -68,7 +82,7 @@ export const AdminTagUpdateDialog = ({ tag, trigger }: AdminTagUpdateDialogProps
           </DialogTitle>
 
           <DialogDescription>
-            <Trans>Change the tag or update its description.</Trans>
+            <Trans>Update the tag's details.</Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -77,6 +91,7 @@ export const AdminTagUpdateDialog = ({ tag, trigger }: AdminTagUpdateDialogProps
             type: tag.type,
             description: tag.description,
           }}
+          showTypeField={showTypeField}
           onFormSubmit={onFormSubmit}
           formSubmitTrigger={
             <DialogFooter>

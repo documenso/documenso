@@ -21,52 +21,61 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 
 export type AdminTagFormProps = {
-  defaultValues?: TAdminTagData;
+  defaultValues: TAdminTagData;
+
+  /**
+   * When hidden, the tag keeps the type from `defaultValues`.
+   */
+  showTypeField?: boolean;
   onFormSubmit: (data: TAdminTagData) => Promise<void>;
   formSubmitTrigger: React.ReactNode;
 };
 
-export const AdminTagForm = ({ defaultValues, onFormSubmit, formSubmitTrigger }: AdminTagFormProps) => {
+export const AdminTagForm = ({
+  defaultValues,
+  showTypeField = true,
+  onFormSubmit,
+  formSubmitTrigger,
+}: AdminTagFormProps) => {
   const { t } = useLingui();
 
   const form = useForm<TAdminTagData>({
     resolver: zodResolver(ZAdminTagDataSchema),
-    defaultValues: defaultValues ?? {
-      type: 'flagged_for_review',
-      description: '',
-    },
+    defaultValues,
   });
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onFormSubmit)}>
         <fieldset className="flex flex-col gap-y-4" disabled={form.formState.isSubmitting}>
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel required>
-                  <Trans>Tag</Trans>
-                </FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {ZAdminTagTypeSchema.options.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {t(ADMIN_TAG_TYPE_MAP[type])}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {showTypeField && (
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>
+                    <Trans>Type</Trans>
+                  </FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {ZAdminTagTypeSchema.options.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {t(ADMIN_TAG_TYPE_MAP[type])}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}
@@ -82,13 +91,14 @@ export const AdminTagForm = ({ defaultValues, onFormSubmit, formSubmitTrigger }:
                     autoFocus
                     className="min-h-24"
                     maxLength={ADMIN_TAG_DESCRIPTION_MAX_LENGTH}
-                    placeholder={t`e.g. Sent 500 documents to unrelated recipients in an hour`}
+                    placeholder={t`e.g. Changed X setting because of Y`}
                   />
                 </FormControl>
-                <FormDescription>
-                  <Trans>Why the tag was added. Only admins can see this.</Trans>
-                </FormDescription>
                 <FormMessage />
+
+                <FormDescription>
+                  <Trans>Only admins can see this.</Trans>
+                </FormDescription>
               </FormItem>
             )}
           />

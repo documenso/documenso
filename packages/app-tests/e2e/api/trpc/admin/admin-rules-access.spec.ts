@@ -33,6 +33,7 @@ test('[ADMIN][TRPC][RULES]: signed out users are rejected by every rule and tag 
     type: 'organisation',
     organisationId: organisation.id,
   });
+  await expectQueryUnauthorized(request, 'admin.tag.find', {});
 
   await expectMutationUnauthorized(request, 'admin.rule.create', {
     name: createdRuleName,
@@ -48,12 +49,12 @@ test('[ADMIN][TRPC][RULES]: signed out users are rejected by every rule and tag 
   await expectMutationUnauthorized(request, 'admin.rule.reorder', { ruleIds: [rule.id] });
   await expectMutationUnauthorized(request, 'admin.tag.create', {
     userId: user.id,
-    type: 'flagged_for_review',
+    type: 'note',
     description: 'Added by a signed out user',
   });
   await expectMutationUnauthorized(request, 'admin.tag.create', {
     organisationId: organisation.id,
-    type: 'flagged_for_review',
+    type: 'note',
     description: 'Added by a signed out user',
   });
   await expectMutationUnauthorized(request, 'admin.tag.update', {
@@ -80,6 +81,7 @@ test('[ADMIN][TRPC][RULES]: non-admins are rejected by every rule and tag route'
     type: 'organisation',
     organisationId: organisation.id,
   });
+  await expectQueryUnauthorized(request, 'admin.tag.find', {});
 
   await expectMutationUnauthorized(request, 'admin.rule.create', {
     name: createdRuleName,
@@ -95,12 +97,12 @@ test('[ADMIN][TRPC][RULES]: non-admins are rejected by every rule and tag route'
   await expectMutationUnauthorized(request, 'admin.rule.reorder', { ruleIds: [rule.id] });
   await expectMutationUnauthorized(request, 'admin.tag.create', {
     userId: user.id,
-    type: 'flagged_for_review',
+    type: 'note',
     description: 'Added by a non-admin',
   });
   await expectMutationUnauthorized(request, 'admin.tag.create', {
     organisationId: organisation.id,
-    type: 'flagged_for_review',
+    type: 'note',
     description: 'Added by a non-admin',
   });
   await expectMutationUnauthorized(request, 'admin.tag.update', {
