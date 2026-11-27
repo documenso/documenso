@@ -482,15 +482,17 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
             }
 
             if (payload.value) {
+              const valueToSign = payload.value;
+
               await executeActionAuthProcedure({
                 onReauthFormSubmit: async (authOptions) => {
                   await signField(field.id, payload, authOptions);
+
+                  setSignature(valueToSign);
+                  onSignatureChanged?.(valueToSign);
                 },
                 actionTarget: field.type,
               });
-
-              setSignature(payload.value);
-              onSignatureChanged?.(payload.value);
             } else {
               await signField(field.id, payload);
             }

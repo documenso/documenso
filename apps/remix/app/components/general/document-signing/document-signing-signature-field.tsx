@@ -104,8 +104,6 @@ export const DocumentSigningSignatureField = ({
    */
   const onDialogSignClick = () => {
     setShowSignatureModal(false);
-    setProvidedSignature(localSignature);
-    onSignatureChanged?.(localSignature);
 
     if (!localSignature) {
       return;
@@ -150,6 +148,11 @@ export const DocumentSigningSignatureField = ({
         await onSignField(payload);
       } else {
         await signFieldWithToken(payload);
+      }
+
+      if (signature) {
+        setProvidedSignature(signature);
+        onSignatureChanged?.(signature);
       }
 
       await revalidate();
