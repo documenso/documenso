@@ -20,7 +20,7 @@ export type AdminTagsSectionProps = {
 };
 
 export const AdminTagsSection = ({ subject, className }: AdminTagsSectionProps) => {
-  const { data: tags, isLoading } = trpc.admin.tag.getMany.useQuery(subject);
+  const { data: tags, isLoading, isLoadingError } = trpc.admin.tag.getMany.useQuery(subject);
 
   const isOrganisation = subject.type === 'organisation';
 
@@ -45,6 +45,10 @@ export const AdminTagsSection = ({ subject, className }: AdminTagsSectionProps) 
 
       {isLoading ? (
         <Skeleton className="h-[88px] w-full rounded-lg" />
+      ) : isLoadingError ? (
+        <div className="rounded-lg border border-destructive/50 px-4 py-6 text-center text-destructive text-sm">
+          <Trans>We couldn't load the tags. Reload the page to try again.</Trans>
+        </div>
       ) : !tags || tags.length === 0 ? (
         <div className="rounded-lg border border-dashed px-4 py-6 text-center text-muted-foreground text-sm">
           {isOrganisation ? <Trans>This organisation has no tags.</Trans> : <Trans>This user has no tags.</Trans>}

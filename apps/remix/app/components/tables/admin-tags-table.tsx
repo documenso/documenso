@@ -40,7 +40,7 @@ import {
 } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
 import { AdminTagDeleteDialog } from '~/components/dialogs/admin-tag-delete-dialog';
@@ -105,6 +105,28 @@ export const AdminTagsTable = () => {
     currentPage: 1,
     totalPages: 1,
   };
+
+  // Removing the only tag on the last page leaves the URL past the end, so step back to the new last page.
+  useEffect(() => {
+    if (!data || isPlaceholderData) {
+      return;
+    }
+
+    const lastPage = Math.max(data.totalPages, 1);
+
+    if (data.currentPage <= lastPage) {
+      return;
+    }
+
+    void setSearchParams(
+      {
+        page: lastPage === 1 ? null : lastPage,
+      },
+      {
+        history: 'replace',
+      },
+    );
+  }, [data, isPlaceholderData]);
 
   const hasFilters =
     searchParams.query !== '' ||
@@ -311,6 +333,7 @@ export const AdminTagsTable = () => {
         <DataTable
           columns={columns}
           data={results.data}
+          getRowId={(row) => row.id}
           rowClassName="text-sm"
           perPage={results.perPage}
           currentPage={results.currentPage}

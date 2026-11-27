@@ -148,6 +148,29 @@ test('[ADMIN][TAGS_LIST]: the row menu edits and removes tags, closing once pick
   expect(remainingTagIds.map(({ id }) => id).sort()).toEqual([tags.userNote.id, tags.userTagByRule.id].sort());
 });
 
+test('[ADMIN][TAGS_LIST]: removing the only tag on the last page goes back to the new last page', async ({ page }) => {
+  const { adminUser, token, descriptions } = await seedTags();
+
+  await apiSignin({
+    page,
+    email: adminUser.email,
+    redirectPath: `/admin/tags?query=${token}&perPage=2&page=2`,
+  });
+
+  await expect(getDescriptions(page)).toHaveText([descriptions.userNote]);
+
+  await page
+    .getByRole('row')
+    .filter({ hasText: descriptions.userNote })
+    .getByRole('button', { name: 'Actions' })
+    .click();
+  await page.getByRole('menuitem', { name: 'Remove' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Remove tag' }).click();
+
+  await expect(getDescriptions(page)).toHaveText([descriptions.userTagByRule, descriptions.organisationNote]);
+  await expect(page).not.toHaveURL(/[?&]page=/);
+});
+
 /**
  * Two notes and a rule's tag, sharing a search token so each test only sees its own, since tags are
  * global. They were created an hour apart, and the oldest was edited last, so created and updated
@@ -168,13 +191,26 @@ const seedTags = async () => {
       mode: 'DISABLED',
       priority: 0,
       stopOnMatch: true,
+      // Must pass `ZAdminRuleDefinitionSchema`, or `admin.rule.getMany` fails for parallel rules tests.
       definition: {
         when: {
           type: 'group',
           match: 'all',
-          children: [],
+          children: [
+            {
+              type: 'condition',
+              field: 'user.new_name',
+              operator: 'contains',
+              value: token,
+            },
+          ],
         },
-        actions: [],
+        actions: [
+          {
+            type: 'log_only',
+            params: {},
+          },
+        ],
       },
     },
   });
