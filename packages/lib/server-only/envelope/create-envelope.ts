@@ -21,7 +21,7 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
-
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type {
   TDocumentAccessAuthTypes,
   TDocumentActionAuthTypes,
@@ -47,6 +47,7 @@ import { assignOmittedRecipientSigningOrders } from '../recipient/assign-omitted
 import { assertCompatibleRecipientGrouping } from '../signature-level/assert-compatible-recipient-grouping';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
+import { getTeamById } from '../team/get-team';
 import { getTeamSettings } from '../team/get-team-settings';
 import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -113,6 +114,7 @@ export type CreateEnvelopeOptions = {
     recipients?: CreateEnvelopeRecipientOptions[];
     contents?: CreateEnvelopeContentOptions[];
     folderId?: string;
+    targetFolderId?: string;
     delegatedDocumentOwner?: string;
     signatureLevel?: TSignatureLevel;
   };
@@ -156,6 +158,7 @@ export const createEnvelope = async ({
     formValues,
     userTimezone,
     folderId,
+    targetFolderId,
     templateType,
     globalAccessAuth,
     globalActionAuth,
@@ -212,6 +215,39 @@ export const createEnvelope = async ({
     if (!folder) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Folder not found',
+      });
+    }
+  }
+
+  if (targetFolderId) {
+    if (data.type !== EnvelopeType.TEMPLATE) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Target folder can only be set for template envelopes',
+      });
+    }
+
+    if (internalVersion !== 2) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Target folder is only supported for v2 template envelopes',
+      });
+    }
+
+    const { currentTeamRole } = await getTeamById({ userId, teamId });
+
+    const targetFolder = await prisma.folder.findFirst({
+      where: {
+        id: targetFolderId,
+        type: FolderType.DOCUMENT,
+        team: buildTeamWhereQuery({ teamId, userId }),
+        visibility: {
+          in: TEAM_DOCUMENT_VISIBILITY_MAP[currentTeamRole],
+        },
+      },
+    });
+
+    if (!targetFolder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Target folder not found',
       });
     }
   }
@@ -467,6 +503,7 @@ export const createEnvelope = async ({
         templateType: type === EnvelopeType.TEMPLATE ? templateType : undefined,
         publicTitle: type === EnvelopeType.TEMPLATE ? publicTitle : undefined,
         publicDescription: type === EnvelopeType.TEMPLATE ? publicDescription : undefined,
+        targetFolderId: type === EnvelopeType.TEMPLATE && internalVersion === 2 ? targetFolderId : undefined,
       },
       include: {
         envelopeItems: true,

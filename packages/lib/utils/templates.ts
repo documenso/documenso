@@ -100,6 +100,7 @@ export const mapEnvelopeToTemplateMany = (envelope: EnvelopeWithTemplateManyRela
     publicTitle: envelope.publicTitle,
     publicDescription: envelope.publicDescription,
     folderId: envelope.folderId,
+    targetFolderId: envelope.internalVersion === 2 ? envelope.targetFolderId : null,
     useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
     team: envelope.team,
     fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),

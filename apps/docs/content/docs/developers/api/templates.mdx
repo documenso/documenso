@@ -38,11 +38,15 @@ The request uses `multipart/form-data`:
 | `recipients`         | array   | No       | Recipient details mapped to recipients in the template                    |
 | `distributeDocument` | boolean | No       | If `true`, create the document as pending and distribute it               |
 | `customDocumentData` | array   | No       | Maps uploaded replacement PDFs to template envelope items                 |
-| `folderId`           | string  | No       | Folder in which to create the document                                    |
+| `folderId`           | string \| null | No | Folder to create the document in. If omitted, the template's target folder is used when set, otherwise Home. Pass `null` to always use Home. |
 | `prefillFields`      | array   | No       | Field values to prefill before distribution                               |
 | `override`           | object  | No       | Template values to override for the created document                      |
 | `attachments`        | array   | No       | Link attachments to add to the document                                   |
 | `formValues`         | object  | No       | PDF form values to apply                                                   |
+
+<Callout type="info">
+If a template has a [target folder](/docs/users/templates/create#target-folder), documents created through the API go there unless you pass `folderId`. Pass `folderId: null` to create the document in Home.
+</Callout>
 
 Each recipient entry accepts the following fields:
 

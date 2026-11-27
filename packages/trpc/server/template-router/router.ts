@@ -566,7 +566,8 @@ export const templateRouter = router({
         recipients,
         customDocumentData,
         requestMetadata: ctx.metadata,
-        folderId,
+        // Deprecated endpoint keeps its original root-folder default; target folders are Envelope API only.
+        folderId: folderId ?? null,
         prefillFields,
         externalId,
         override,

@@ -6,6 +6,7 @@ import {
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION, SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { type TRecipientLite, ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
+import { canAccessTeamDocument } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { DOCUMENT_TITLE_MAX_LENGTH } from '@documenso/trpc/server/document-router/schema';
 import type { TUseEnvelopePayload } from '@documenso/trpc/server/envelope-router/use-envelope.types';
@@ -32,12 +33,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
+import { DocumentDistributionMethod, DocumentSigningOrder, FolderType } from '@prisma/client';
 import { FileTextIcon, InfoIcon, Plus, UploadCloudIcon, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import * as z from 'zod';
+import { FolderSelectCombobox } from '~/components/general/folder/folder-select-combobox';
+import { useCurrentTeam } from '~/providers/team';
 import { getTemplateUseErrorMessage } from '~/utils/toast-error-messages';
 
 const DOCUMENT_NAME_SOURCE = {
@@ -68,6 +71,7 @@ const ZAddRecipientsForNewDocumentSchema = z
     distributeDocument: z.boolean(),
     includeContents: z.boolean().default(true),
     useCustomDocument: z.boolean().default(false),
+    folderId: z.string().nullish(),
     documentNameSource: z.enum([
       DOCUMENT_NAME_SOURCE.TEMPLATE,
       DOCUMENT_NAME_SOURCE.UPLOAD,
@@ -105,6 +109,7 @@ type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDoc
 export type TemplateUseDialogProps = {
   envelopeId: string;
   templateSigningOrder?: DocumentSigningOrder | null;
+  targetFolderId?: string | null;
   recipients: TRecipientLite[];
   documentDistributionMethod?: DocumentDistributionMethod;
   documentRootPath: string;
@@ -117,12 +122,14 @@ export function TemplateUseDialog({
   documentRootPath,
   envelopeId,
   templateSigningOrder,
+  targetFolderId,
   trigger,
 }: TemplateUseDialogProps) {
   const { toast } = useToast();
   const { _ } = useLingui();
 
   const navigate = useNavigate();
+  const team = useCurrentTeam();
 
   const [open, setOpen] = useState(false);
   const [lastUploadedFile, setLastUploadedFile] = useState<File>();
@@ -141,11 +148,27 @@ export function TemplateUseDialog({
 
   const envelopeItems = response?.data ?? [];
 
+  const { data: foldersData, isLoading: isLoadingFolders } = trpc.folder.findFoldersInternal.useQuery(
+    {
+      type: FolderType.DOCUMENT,
+    },
+    {
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      enabled: open,
+    },
+  );
+
+  // Owned folders are listed even when hidden from the user's role, but the server rejects them.
+  const documentFolders = (foldersData?.data ?? []).filter((folder) =>
+    canAccessTeamDocument(team.currentTeamRole, folder.visibility),
+  );
+
   const generateDefaultFormValues = () => {
     return {
       distributeDocument: false,
       includeContents: true,
       useCustomDocument: false,
+      folderId: targetFolderId ?? null,
       documentNameSource: DOCUMENT_NAME_SOURCE.TEMPLATE,
       customDocumentName: '',
       customDocumentData: envelopeItems.map((item) => ({
@@ -221,6 +244,9 @@ export function TemplateUseDialog({
       // items by index, which is robust against duplicate file names.
       const payload: TUseEnvelopePayload = {
         envelopeId,
+        // Omitting the folder lets the server resolve the template's target folder, falling back to
+        // the root folder when it is hidden from the user, so submitting before folders load is safe.
+        folderId: targetFolderId && data.folderId === targetFolderId ? undefined : (data.folderId ?? null),
         recipients: data.recipients,
         distributeDocument: data.distributeDocument,
         includeContents: data.includeContents,
@@ -281,6 +307,22 @@ export function TemplateUseDialog({
       setLastUploadedFile(undefined);
     }
   }, [open, form]);
+
+  // Runs after the reset above so a target folder the user cannot see falls back to the root folder,
+  // including when the dialog is reopened with cached folder data.
+  useEffect(() => {
+    if (
+      open &&
+      foldersData &&
+      targetFolderId &&
+      form.getValues('folderId') === targetFolderId &&
+      !foldersData.data.some(
+        (folder) => folder.id === targetFolderId && canAccessTeamDocument(team.currentTeamRole, folder.visibility),
+      )
+    ) {
+      form.setValue('folderId', null);
+    }
+  }, [open, foldersData, team.currentTeamRole, targetFolderId, form]);
 
   useEffect(() => {
     if (envelopeItems.length > 0 && localCustomDocumentData.length === 0) {
@@ -803,6 +845,44 @@ export function TemplateUseDialog({
                     )}
                   />
                 )}
+
+                <FormField
+                  control={form.control}
+                  name="folderId"
+                  render={({ field }) => {
+                    return (
+                      <FormItem>
+                        <FormLabel className="flex flex-row items-center">
+                          <Trans>Target Folder</Trans>
+                          <Tooltip>
+                            <TooltipTrigger type="button">
+                              <InfoIcon className="mx-1 h-4 w-4 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent className="z-[99999] max-w-xs text-muted-foreground">
+                              <Trans>
+                                Select the folder where the created document from this template will be placed.
+                              </Trans>
+                            </TooltipContent>
+                          </Tooltip>
+                        </FormLabel>
+
+                        <FormControl>
+                          <FolderSelectCombobox
+                            folders={documentFolders}
+                            value={field.value ?? null}
+                            onChange={field.onChange}
+                            isLoading={isLoadingFolders}
+                            disabled={field.disabled}
+                            contentClassName="z-[99999]"
+                            testId="templateUseTargetFolderSelectValue"
+                          />
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
               </div>
 
               <DialogFooter className="mt-4">

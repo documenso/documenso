@@ -794,6 +794,8 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       attachments: body.attachments,
       formValues: body.formValues,
       requestMetadata: metadata,
+      // The v1 API keeps its original root-folder default; target folders are Envelope API only.
+      folderId: null,
     });
 
     const envelopeItems = await prisma.envelopeItem.findMany({
@@ -901,7 +903,8 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         teamId: team.id,
         recipients: body.recipients,
         prefillFields: body.prefillFields,
-        folderId: body.folderId,
+        // The v1 API keeps its original root-folder default; target folders are Envelope API only.
+        folderId: body.folderId ?? null,
         override: {
           title: body.title,
           ...body.meta,

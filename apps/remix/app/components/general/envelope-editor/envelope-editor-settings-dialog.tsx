@@ -73,6 +73,7 @@ import {
   DocumentDistributionMethod,
   DocumentVisibility,
   EnvelopeType,
+  FolderType,
   RecipientRole,
   SendStatus,
   TemplateType,
@@ -83,11 +84,13 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
+import { FolderSelectCombobox } from '~/components/general/folder/folder-select-combobox';
 
 import { useCurrentTeam } from '~/providers/team';
 
 export const ZAddSettingsFormSchema = z.object({
   templateType: z.nativeEnum(TemplateType).optional(),
+  targetFolderId: z.string().nullish(),
   externalId: z.string().optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
   globalAccessAuth: z
@@ -191,6 +194,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
   const createDefaultValues = () => {
     return {
       templateType: envelope.templateType || TemplateType.PRIVATE,
+      targetFolderId: envelope.targetFolderId ?? null,
       externalId: envelope.externalId || '',
       visibility: envelope.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
@@ -242,6 +246,21 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
 
   const emails = emailData?.data || organisationEmails || [];
 
+  const { data: foldersData, isLoading: isLoadingFolders } = trpc.folder.findFoldersInternal.useQuery(
+    {
+      type: FolderType.DOCUMENT,
+    },
+    {
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      enabled: open && envelope.type === EnvelopeType.TEMPLATE && envelope.internalVersion === 2 && !isEmbedded,
+    },
+  );
+
+  // Owned folders are listed even when hidden from the user's role, but the server rejects them.
+  const documentFolders = (foldersData?.data ?? []).filter((folder) =>
+    canAccessTeamDocument(team.currentTeamRole, folder.visibility),
+  );
+
   const canUpdateVisibility = canAccessTeamDocument(team.currentTeamRole, envelope.visibility);
 
   const onFormSubmit = async (data: TAddSettingsFormSchema) => {
@@ -267,6 +286,10 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
       await updateEnvelopeAsync({
         data: {
           templateType: envelope.type === EnvelopeType.TEMPLATE ? data.templateType : undefined,
+          targetFolderId:
+            envelope.type === EnvelopeType.TEMPLATE && envelope.internalVersion === 2
+              ? (data.targetFolderId ?? null)
+              : undefined,
           externalId: data.externalId || null,
           visibility: data.visibility,
           globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
@@ -612,6 +635,47 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                               </FormControl>
                             </FormItem>
                           )}
+                        />
+                      )}
+
+                      {envelope.type === EnvelopeType.TEMPLATE && envelope.internalVersion === 2 && !isEmbedded && (
+                        <FormField
+                          control={form.control}
+                          name="targetFolderId"
+                          render={({ field }) => {
+                            return (
+                              <FormItem>
+                                <FormLabel className="flex flex-row items-center">
+                                  <Trans>Target Folder</Trans>
+                                  <Tooltip>
+                                    <TooltipTrigger type="button">
+                                      <InfoIcon className="mx-2 h-4 w-4" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent className="max-w-xs text-muted-foreground">
+                                      <Trans>
+                                        Select the folder where documents created from this template or its direct link
+                                        will be placed by default. Only folders from Documents are listed.
+                                      </Trans>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </FormLabel>
+
+                                <FormControl>
+                                  <FolderSelectCombobox
+                                    folders={documentFolders}
+                                    value={field.value ?? null}
+                                    onChange={field.onChange}
+                                    isLoading={isLoadingFolders}
+                                    disabled={field.disabled}
+                                    testId="templateTargetFolderSelectValue"
+                                  />
+                                </FormControl>
+
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
                         />
                       )}
 

@@ -402,6 +402,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       userId: tokenUserId,
       teamId: tokenTeamId,
       folderId: embedAuthoringOptions?.folderId ?? null,
+      targetFolderId: null,
       documentMeta: {
         id: '',
         ...defaultDocumentMeta,

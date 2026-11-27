@@ -21,6 +21,7 @@ import { validateCheckboxLength } from '../../advanced-fields-validation/validat
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { TEnvelopeExpirationPeriod } from '../../constants/envelope-expiration';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { ZDefaultRecipientsSchema } from '../../types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -87,7 +88,7 @@ export type CreateDocumentFromTemplateOptions = {
     email: string;
     signingOrder?: number | null;
   }[];
-  folderId?: string;
+  folderId?: string | null;
   prefillFields?: TFieldMetaPrefillFieldsSchema[];
 
   customDocumentData?: {
@@ -372,12 +373,17 @@ export const createDocumentFromTemplate = async ({
     });
   }
 
+  let resolvedFolderId: string | null = null;
+
   if (folderId) {
-    const folder = await prisma.folder.findUnique({
+    const folder = await prisma.folder.findFirst({
       where: {
         id: folderId,
         type: FolderType.DOCUMENT,
         team: buildTeamWhereQuery({ teamId, userId }),
+        visibility: {
+          in: TEAM_DOCUMENT_VISIBILITY_MAP[callerTeam.currentTeamRole],
+        },
       },
     });
 
@@ -386,6 +392,30 @@ export const createDocumentFromTemplate = async ({
         message: 'Folder not found',
       });
     }
+
+    resolvedFolderId = folder.id;
+  } else if (
+    folderId === undefined &&
+    template.internalVersion === 2 &&
+    template.targetFolderId &&
+    template.teamId === teamId
+  ) {
+    // Only fall back to the template's target folder when `folderId` is omitted;
+    // an explicit `null` means the caller chose the root folder override.
+    // A target folder hidden from the caller's role resolves to the root folder instead of erroring,
+    // so members can still use templates an admin pointed at an admin-only folder.
+    const targetFolder = await prisma.folder.findFirst({
+      where: {
+        id: template.targetFolderId,
+        type: FolderType.DOCUMENT,
+        team: buildTeamWhereQuery({ teamId, userId }),
+        visibility: {
+          in: TEAM_DOCUMENT_VISIBILITY_MAP[callerTeam.currentTeamRole],
+        },
+      },
+    });
+
+    resolvedFolderId = targetFolder?.id ?? null;
   }
 
   const legacyTemplateId = mapSecondaryIdToTemplateId(template.secondaryId);
@@ -623,7 +653,7 @@ export const createDocumentFromTemplate = async ({
         externalId: externalId || template.externalId,
         templateId: legacyTemplateId, // The template this envelope was created from.
         userId,
-        folderId,
+        folderId: resolvedFolderId,
         teamId,
         title: finalEnvelopeTitle,
         envelopeItems: {
