@@ -1,3 +1,4 @@
+import { IS_DOCUMENSO_CLOUD } from '@documenso/lib/constants/app';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
 import { ZUpdateUserRequestSchema } from '@documenso/trpc/server/admin-router/update-user.types';
@@ -186,9 +187,13 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
 
       <hr className="my-8" />
 
-      <AdminTagsSection subject={{ type: 'user', userId: user.id }} />
+      {IS_DOCUMENSO_CLOUD() && (
+        <>
+          <AdminTagsSection subject={{ type: 'user', userId: user.id }} />
 
-      <hr className="my-8" />
+          <hr className="my-8" />
+        </>
+      )}
 
       <div>
         <div className="mb-4 flex items-center justify-between">

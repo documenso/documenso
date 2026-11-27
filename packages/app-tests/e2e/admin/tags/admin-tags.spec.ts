@@ -7,6 +7,11 @@ import { apiSignin } from '../../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
+test.skip(
+  process.env.NEXT_PUBLIC_IS_DOCUMENSO_CLOUD !== 'true',
+  'Test skipped because admin tags are only shown on Documenso Cloud.',
+);
+
 test('[ADMIN][TAGS]: an admin can add, edit and remove a tag on a user', async ({ page }) => {
   const { user: adminUser } = await seedUser({ isAdmin: true });
   const { user } = await seedUser();

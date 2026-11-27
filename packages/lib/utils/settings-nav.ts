@@ -412,14 +412,14 @@ export const getAdminNavGroups = (): SettingsNavGroup[] => [
               label: msg`Rules`,
               icon: WorkflowIcon,
             },
+            {
+              key: 'tags',
+              path: '/admin/tags',
+              label: msg`Tags`,
+              icon: TagIcon,
+            },
           ]
         : []),
-      {
-        key: 'tags',
-        path: '/admin/tags',
-        label: msg`Tags`,
-        icon: TagIcon,
-      },
       {
         key: 'site-settings',
         path: '/admin/site-settings',

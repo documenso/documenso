@@ -7,6 +7,11 @@ import { apiSignin } from '../../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
+test.skip(
+  process.env.NEXT_PUBLIC_IS_DOCUMENSO_CLOUD !== 'true',
+  'Test skipped because admin tags are only shown on Documenso Cloud.',
+);
+
 const ruleIdsToCleanup: string[] = [];
 
 test.afterEach(async () => {

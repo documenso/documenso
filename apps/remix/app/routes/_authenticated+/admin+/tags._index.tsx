@@ -1,3 +1,4 @@
+import { IS_DOCUMENSO_CLOUD } from '@documenso/lib/constants/app';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 
@@ -10,6 +11,10 @@ export function meta() {
 }
 
 export default function AdminTagsPage() {
+  if (!IS_DOCUMENSO_CLOUD()) {
+    return null;
+  }
+
   return (
     <div>
       <SettingsHeader
