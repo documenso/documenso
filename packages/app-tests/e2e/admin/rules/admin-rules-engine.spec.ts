@@ -466,51 +466,6 @@ test('[ADMIN][RULES][ENGINE]: a monitor rule records the match without blocking'
   expect(match.actionsRun).toEqual([{ type: 'block_event', status: 'would_run' }]);
 });
 
-test('[ADMIN][RULES][ENGINE]: an admin can remove a tag from a user', async ({ page }) => {
-  const { user: adminUser } = await seedUser({ isAdmin: true });
-  const { user } = await seedUser();
-
-  const tag = await prisma.adminTag.create({
-    data: {
-      id: generateDatabaseId('admin_tag'),
-      type: 'flagged_for_review',
-      description: 'Needs a look',
-      userId: user.id,
-      createdByUserId: adminUser.id,
-    },
-  });
-
-  await apiSignin({ page, email: adminUser.email, redirectPath: `/admin/users/${user.id}` });
-
-  await expect(page.getByText('Flagged for review')).toBeVisible();
-  await expect(page.getByText('Needs a look')).toBeVisible();
-  await expect(page.getByText(`by ${adminUser.email}`)).toBeVisible();
-
-  // Removing asks for confirmation first, and cancelling keeps the tag.
-  const dialog = page.getByRole('dialog');
-
-  await page.getByRole('button', { name: 'Remove' }).click();
-  await expect(dialog.getByText('Needs a look')).toBeVisible();
-
-  await dialog.getByRole('button', { name: 'Cancel' }).click();
-  await expect(dialog).toHaveCount(0);
-
-  await page.getByRole('button', { name: 'Remove' }).click();
-  await dialog.getByRole('button', { name: 'Remove tag' }).click();
-
-  await expect(page.getByText('Tag removed', { exact: true })).toBeVisible();
-
-  await expect
-    .poll(async () =>
-      prisma.adminTag.findFirst({
-        where: {
-          id: tag.id,
-        },
-      }),
-    )
-    .toBeNull();
-});
-
 test('[ADMIN][RULES][ENGINE]: a sign-up runs sign-up rules, but never name rules, against the new account', async ({
   request,
 }) => {

@@ -1,0 +1,1 @@
+export const ADMIN_TAG_DESCRIPTION_MAX_LENGTH = 500;

@@ -1,4 +1,4 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { IS_DOCUMENSO_CLOUD, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
@@ -44,6 +44,7 @@ import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { AdminOrganisationSyncSubscriptionDialog } from '~/components/dialogs/admin-organisation-sync-subscription-dialog';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
+import { AdminTagsSection } from '~/components/general/admin-tags-section';
 import { ClaimLimitFields } from '~/components/general/claim-limit-fields';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { OrganisationUsagePanel } from '~/components/general/organisation-usage-panel';
@@ -271,6 +272,10 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       </SettingsHeader>
 
       <GenericOrganisationAdminForm organisation={organisation} />
+
+      {IS_DOCUMENSO_CLOUD() && (
+        <AdminTagsSection subject={{ type: 'organisation', organisationId: organisation.id }} className="my-10" />
+      )}
 
       <SettingsHeader
         hideDivider

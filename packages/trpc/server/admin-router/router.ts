@@ -50,7 +50,9 @@ import { swapOrganisationSubscriptionRoute } from './swap-organisation-subscript
 import { syncOrganisationSubscriptionRoute } from './sync-organisation-subscription';
 import { createAdminTagRoute } from './tags/create-admin-tag';
 import { deleteAdminTagRoute } from './tags/delete-admin-tag';
+import { findAdminTagsRoute } from './tags/find-admin-tags';
 import { getAdminTagsRoute } from './tags/get-admin-tags';
+import { updateAdminTagRoute } from './tags/update-admin-tag';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
 import { updateOrganisationMemberRoleRoute } from './update-organisation-member-role';
 import { updateRecipientRoute } from './update-recipient';
@@ -114,8 +116,10 @@ export const adminRouter = router({
     },
   },
   tag: {
+    find: findAdminTagsRoute,
     getMany: getAdminTagsRoute,
     create: createAdminTagRoute,
+    update: updateAdminTagRoute,
     delete: deleteAdminTagRoute,
   },
   document: {

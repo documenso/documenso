@@ -23,12 +23,17 @@ test.afterEach(async () => {
 });
 
 test('[ADMIN][TRPC][RULES]: signed out users are rejected by every rule and tag route', async ({ request }) => {
-  const { user, rule, tag, createdRuleName } = await seedRuleAndTag();
+  const { user, organisation, rule, tag, createdRuleName } = await seedRuleAndTag();
 
   await expectQueryUnauthorized(request, 'admin.rule.get', { ruleId: rule.id });
   await expectQueryUnauthorized(request, 'admin.rule.getMany');
   await expectQueryUnauthorized(request, 'admin.rule.matches.find', { ruleId: rule.id });
-  await expectQueryUnauthorized(request, 'admin.tag.getMany', { userId: user.id });
+  await expectQueryUnauthorized(request, 'admin.tag.getMany', { type: 'user', userId: user.id });
+  await expectQueryUnauthorized(request, 'admin.tag.getMany', {
+    type: 'organisation',
+    organisationId: organisation.id,
+  });
+  await expectQueryUnauthorized(request, 'admin.tag.find', {});
 
   await expectMutationUnauthorized(request, 'admin.rule.create', {
     name: createdRuleName,
@@ -44,16 +49,25 @@ test('[ADMIN][TRPC][RULES]: signed out users are rejected by every rule and tag 
   await expectMutationUnauthorized(request, 'admin.rule.reorder', { ruleIds: [rule.id] });
   await expectMutationUnauthorized(request, 'admin.tag.create', {
     userId: user.id,
-    type: 'flagged_for_review',
+    type: 'note',
     description: 'Added by a signed out user',
+  });
+  await expectMutationUnauthorized(request, 'admin.tag.create', {
+    organisationId: organisation.id,
+    type: 'note',
+    description: 'Added by a signed out user',
+  });
+  await expectMutationUnauthorized(request, 'admin.tag.update', {
+    tagId: tag.id,
+    data: { description: 'Edited by a signed out user' },
   });
   await expectMutationUnauthorized(request, 'admin.tag.delete', { tagId: tag.id });
 
-  await expectNothingChanged({ user, rule, tag, createdRuleName });
+  await expectNothingChanged({ user, organisation, rule, tag, createdRuleName });
 });
 
 test('[ADMIN][TRPC][RULES]: non-admins are rejected by every rule and tag route', async ({ page }) => {
-  const { user, rule, tag, createdRuleName } = await seedRuleAndTag();
+  const { user, organisation, rule, tag, createdRuleName } = await seedRuleAndTag();
 
   await apiSignin({ page, email: user.email });
 
@@ -62,7 +76,12 @@ test('[ADMIN][TRPC][RULES]: non-admins are rejected by every rule and tag route'
   await expectQueryUnauthorized(request, 'admin.rule.get', { ruleId: rule.id });
   await expectQueryUnauthorized(request, 'admin.rule.getMany');
   await expectQueryUnauthorized(request, 'admin.rule.matches.find', { ruleId: rule.id });
-  await expectQueryUnauthorized(request, 'admin.tag.getMany', { userId: user.id });
+  await expectQueryUnauthorized(request, 'admin.tag.getMany', { type: 'user', userId: user.id });
+  await expectQueryUnauthorized(request, 'admin.tag.getMany', {
+    type: 'organisation',
+    organisationId: organisation.id,
+  });
+  await expectQueryUnauthorized(request, 'admin.tag.find', {});
 
   await expectMutationUnauthorized(request, 'admin.rule.create', {
     name: createdRuleName,
@@ -78,16 +97,25 @@ test('[ADMIN][TRPC][RULES]: non-admins are rejected by every rule and tag route'
   await expectMutationUnauthorized(request, 'admin.rule.reorder', { ruleIds: [rule.id] });
   await expectMutationUnauthorized(request, 'admin.tag.create', {
     userId: user.id,
-    type: 'flagged_for_review',
+    type: 'note',
     description: 'Added by a non-admin',
+  });
+  await expectMutationUnauthorized(request, 'admin.tag.create', {
+    organisationId: organisation.id,
+    type: 'note',
+    description: 'Added by a non-admin',
+  });
+  await expectMutationUnauthorized(request, 'admin.tag.update', {
+    tagId: tag.id,
+    data: { description: 'Edited by a non-admin' },
   });
   await expectMutationUnauthorized(request, 'admin.tag.delete', { tagId: tag.id });
 
-  await expectNothingChanged({ user, rule, tag, createdRuleName });
+  await expectNothingChanged({ user, organisation, rule, tag, createdRuleName });
 });
 
 const seedRuleAndTag = async () => {
-  const { user } = await seedUser();
+  const { user, organisation } = await seedUser();
 
   const lastRule = await prisma.adminRule.findFirst({
     orderBy: {
@@ -141,7 +169,7 @@ const seedRuleAndTag = async () => {
     },
   });
 
-  return { user, rule, tag, createdRuleName: `Rule ${nanoid()}` };
+  return { user, organisation, rule, tag, createdRuleName: `Rule ${nanoid()}` };
 };
 
 const expectQueryUnauthorized = async (request: APIRequestContext, route: string, input?: object) => {
@@ -163,7 +191,13 @@ const expectMutationUnauthorized = async (request: APIRequestContext, route: str
 
 type ExpectNothingChangedOptions = Awaited<ReturnType<typeof seedRuleAndTag>>;
 
-const expectNothingChanged = async ({ user, rule, tag, createdRuleName }: ExpectNothingChangedOptions) => {
+const expectNothingChanged = async ({
+  user,
+  organisation,
+  rule,
+  tag,
+  createdRuleName,
+}: ExpectNothingChangedOptions) => {
   const unchangedRule = await prisma.adminRule.findFirstOrThrow({
     where: {
       id: rule.id,
@@ -182,9 +216,25 @@ const expectNothingChanged = async ({ user, rule, tag, createdRuleName }: Expect
 
   const tags = await prisma.adminTag.findMany({
     where: {
-      userId: user.id,
+      OR: [
+        {
+          userId: user.id,
+        },
+        {
+          organisationId: organisation.id,
+        },
+      ],
+    },
+    select: {
+      id: true,
+      description: true,
     },
   });
 
-  expect(tags.map(({ id }) => id)).toEqual([tag.id]);
+  expect(tags).toEqual([
+    {
+      id: tag.id,
+      description: tag.description,
+    },
+  ]);
 };

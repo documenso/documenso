@@ -1,8 +1,5 @@
-import { ADMIN_TAG_TYPE_MAP } from '@documenso/lib/constants/admin-tags-translations';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminTagsResponse } from '@documenso/trpc/server/admin-router/tags/get-admin-tags.types';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -17,25 +14,37 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
 
+import { AdminTagTypeBadge } from '~/components/general/admin-tag-type-badge';
+
 export type AdminTagDeleteDialogProps = {
-  tag: Pick<TGetAdminTagsResponse[number], 'id' | 'type' | 'description' | 'adminRule'>;
+  tag: Pick<TGetAdminTagsResponse[number], 'id' | 'type' | 'description' | 'organisationId' | 'adminRule'>;
   trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
-export const AdminTagDeleteDialog = ({ tag, trigger }: AdminTagDeleteDialogProps) => {
+export const AdminTagDeleteDialog = ({
+  tag,
+  trigger,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+}: AdminTagDeleteDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
   const trpcUtils = trpc.useUtils();
 
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = controlledOnOpenChange ?? setInternalOpen;
 
   const { mutate: deleteTag, isPending: isDeleting } = trpc.admin.tag.delete.useMutation({
     onSuccess: async () => {
-      await trpcUtils.admin.tag.getMany.invalidate();
+      await trpcUtils.admin.tag.invalidate();
 
       toast({
-        title: t`Tag removed`,
+        title: t`Success`,
         duration: 5000,
       });
 
@@ -44,7 +53,6 @@ export const AdminTagDeleteDialog = ({ tag, trigger }: AdminTagDeleteDialogProps
     onError: () => {
       toast({
         title: t`Something went wrong`,
-        description: t`We were unable to remove the tag. Please try again.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -53,13 +61,7 @@ export const AdminTagDeleteDialog = ({ tag, trigger }: AdminTagDeleteDialogProps
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isDeleting && setOpen(value)}>
-      <DialogTrigger asChild>
-        {trigger ?? (
-          <Button variant="outline" size="sm">
-            <Trans>Remove</Trans>
-          </Button>
-        )}
-      </DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
       <DialogContent position="center">
         <DialogHeader>
@@ -68,26 +70,24 @@ export const AdminTagDeleteDialog = ({ tag, trigger }: AdminTagDeleteDialogProps
           </DialogTitle>
 
           <DialogDescription className="mt-4">
-            {tag.adminRule ? (
-              <Trans>
-                You are about to remove the following tag from this user. The rule that added it can tag them again the
-                next time it matches.
-              </Trans>
+            {tag.organisationId ? (
+              <Trans>You are about to remove the following tag from this organisation.</Trans>
             ) : (
-              <Trans>You are about to remove the following tag from this user. This can't be undone.</Trans>
+              <Trans>You are about to remove the following tag from this user.</Trans>
+            )}{' '}
+            {tag.adminRule ? (
+              <Trans>The rule that added it can add it again the next time it matches.</Trans>
+            ) : (
+              <Trans>This can't be undone.</Trans>
             )}
           </DialogDescription>
         </DialogHeader>
 
-        <Alert variant="neutral">
-          <AlertDescription className="flex flex-col items-start gap-2">
-            <Badge variant="warning" size="small">
-              {t(ADMIN_TAG_TYPE_MAP[tag.type])}
-            </Badge>
+        <div className="flex flex-col items-start gap-2 rounded-lg border p-4 text-sm">
+          <AdminTagTypeBadge type={tag.type} />
 
-            <span className="text-foreground [overflow-wrap:anywhere]">{tag.description}</span>
-          </AlertDescription>
-        </Alert>
+          <span className="whitespace-pre-wrap text-foreground [overflow-wrap:anywhere]">{tag.description}</span>
+        </div>
 
         <fieldset disabled={isDeleting}>
           <DialogFooter>

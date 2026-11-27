@@ -3,12 +3,19 @@ import AdminTagSchema from '@documenso/prisma/generated/zod/modelSchema/AdminTag
 import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 import { z } from 'zod';
 
-export const ZGetAdminTagsRequestSchema = z.object({
-  userId: z.number(),
-});
+export const ZGetAdminTagsRequestSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('user'),
+    userId: z.number(),
+  }),
+  z.object({
+    type: z.literal('organisation'),
+    organisationId: z.string(),
+  }),
+]);
 
 /**
- * Every tag on the user, newest first.
+ * Every tag on the user or organisation, newest first.
  */
 export const ZGetAdminTagsResponseSchema = AdminTagSchema.extend({
   createdByUser: UserSchema.pick({
