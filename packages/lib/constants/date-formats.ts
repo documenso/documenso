@@ -166,40 +166,79 @@ export const DATE_FORMATS = [
   value: (typeof VALID_DATE_FORMAT_VALUES)[number];
 }[];
 
-type ConvertToLocalSystemFormatOptions = {
-  customText: string;
-  dateFormat: string | null | undefined;
-  timezone: string | null | undefined;
+/**
+ * The stored ISO 8601 value uses the `XXX` offset token, which luxon does not
+ * support and prints literally. It is kept as the stored value for backwards
+ * compatibility and mapped to the equivalent luxon `ZZ` token when formatting.
+ */
+const LEGACY_ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+const LUXON_ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ";
+
+/**
+ * Converts a stored document date format into a format string luxon can use.
+ */
+export const toLuxonDateFormat = (dateFormat?: string | null): string => {
+  const coalescedDateFormat = dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT;
+
+  if (coalescedDateFormat === LEGACY_ISO_8601_DATE_FORMAT) {
+    return LUXON_ISO_8601_DATE_FORMAT;
+  }
+
+  return coalescedDateFormat;
 };
 
-export const convertToLocalSystemFormat = ({
-  customText,
-  dateFormat,
-  timezone,
-}: ConvertToLocalSystemFormatOptions): string => {
-  const coalescedDateFormat = dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT;
-  const coalescedTimezone = timezone ?? DEFAULT_DOCUMENT_TIME_ZONE;
+type ConvertToLocalSystemFormatOptions = {
+  customText: string;
+  dateFormat?: string | null | undefined;
+  timezone?: string | null | undefined;
+};
 
-  const parsedDate = DateTime.fromFormat(customText, coalescedDateFormat, {
+export function convertToLocalSystemFormat(
+  optionsOrCustomText: ConvertToLocalSystemFormatOptions | string,
+  legacyDateFormat?: string | null,
+  legacyTimezone?: string | null,
+): string {
+  const options: ConvertToLocalSystemFormatOptions =
+    typeof optionsOrCustomText === 'string'
+      ? {
+          customText: optionsOrCustomText,
+          dateFormat: legacyDateFormat,
+          timezone: legacyTimezone,
+        }
+      : optionsOrCustomText;
+
+  const coalescedDateFormat = options.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT;
+  const coalescedTimezone = options.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE;
+
+  const luxonDateFormat = toLuxonDateFormat(coalescedDateFormat);
+
+  let parsedDate = DateTime.fromFormat(options.customText, luxonDateFormat, {
     zone: coalescedTimezone,
   });
+
+  // Dates signed before the ISO 8601 format was fixed were stored with a literal "XXX" suffix.
+  if (!parsedDate.isValid && luxonDateFormat !== coalescedDateFormat) {
+    parsedDate = DateTime.fromFormat(options.customText, coalescedDateFormat, {
+      zone: coalescedTimezone,
+    });
+  }
 
   if (!parsedDate.isValid) {
     return 'Invalid date';
   }
 
-  const hasHour = DateTime.fromFormatExplain(customText, coalescedDateFormat).tokens.some(
+  const hasHour = DateTime.fromFormatExplain(options.customText, luxonDateFormat).tokens.some(
     ({ literal, val }) => !literal && ['h', 'hh', 'H', 'HH'].includes(val),
   );
 
   // Formats without an hour are calendar dates, not moments, so converting them to the viewer's timezone could
   // only shift the day.
   if (!hasHour) {
-    return parsedDate.toFormat(coalescedDateFormat);
+    return parsedDate.toFormat(luxonDateFormat);
   }
 
-  return parsedDate.toLocal().toFormat(coalescedDateFormat);
-};
+  return parsedDate.toLocal().toFormat(luxonDateFormat);
+}
 
 export const isValidDateFormat = (dateFormat: unknown): dateFormat is ValidDateFormat => {
   return VALID_DATE_FORMAT_VALUES.includes(dateFormat as ValidDateFormat);
